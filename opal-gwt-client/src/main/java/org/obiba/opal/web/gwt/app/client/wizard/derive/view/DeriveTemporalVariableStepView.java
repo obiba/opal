@@ -108,8 +108,6 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
     toDate.setWidth("6em");
     to.insert(toDate, 0);
 
-    setSpanEnabled(true);
-
     spanRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
       @Override
@@ -126,6 +124,7 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
       }
     });
 
+    spanRadio.setValue(true, true);
   }
 
   private void setSpanEnabled(boolean enabled) {

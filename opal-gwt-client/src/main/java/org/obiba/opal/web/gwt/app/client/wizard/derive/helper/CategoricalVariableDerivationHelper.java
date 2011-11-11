@@ -32,9 +32,9 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private static final String NONE_REGEXP = "^NONE$|^NEVER$";
 
-  private static final String YES_REGEXP = "^Y$|^YES|TRUE$";
+  private static final String YES_REGEXP = "^Y$|^YES$|^TRUE$";
 
-  private static final String NO_REGEXP = "^N$|^NO|FALSE$";
+  private static final String NO_REGEXP = "^N$|^NO$|^FALSE$";
 
   private static final String MALE_REGEXP = "^MALE$";
 

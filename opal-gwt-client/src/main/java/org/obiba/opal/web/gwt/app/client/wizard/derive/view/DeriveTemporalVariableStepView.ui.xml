@@ -12,10 +12,10 @@
       <g:FlowPanel>
         
         <g:FlowPanel styleName="input">
-          <g:RadioButton name="method" ui:field="spanRadio" value="true">
+          <g:RadioButton name="method" ui:field="spanRadio">
             <ui:msg description="Group by type of time span label">Group by type of time span</ui:msg>
           </g:RadioButton>
-          <g:FlowPanel styleName="input">
+          <g:FlowPanel styleName="input block">
             <g:Label addStyleNames="key">
               <ui:msg description="Time span type label">Time span type</ui:msg>
             </g:Label>
@@ -27,13 +27,13 @@
           <g:RadioButton name="method" ui:field="rangeRadio">
             <ui:msg description="Group by date ranges label">Group by date ranges</ui:msg>
           </g:RadioButton>
-          <g:FlowPanel styleName="input">
+          <g:FlowPanel styleName="input block">
             <g:Label addStyleNames="key">
               <ui:msg description="Time span type label">Date range type</ui:msg>
             </g:Label>
             <g:ListBox ui:field="rangeBox" enabled="false"></g:ListBox>
           </g:FlowPanel>
-          <g:FlowPanel styleName="input">
+          <g:FlowPanel styleName="input block">
             <g:Label addStyleNames="key"><ui:msg description="Date Range label">Date range definition (YYYY-MM-DD)</ui:msg></g:Label>
             <g:FlowPanel ui:field="dates">
               <g:FlowPanel ui:field="from" addStyleNames="inline">

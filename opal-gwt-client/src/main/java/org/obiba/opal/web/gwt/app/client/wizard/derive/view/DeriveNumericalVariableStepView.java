@@ -80,8 +80,6 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   public DeriveNumericalVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    setRangeEnabled(true);
-
     rangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
       @Override
@@ -111,6 +109,9 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
         setLengthEnabled(false);
       }
     });
+
+    rangeRadio.setValue(true, true);
+    lengthRadio.setValue(true, true);
   }
 
   private void setRangeEnabled(boolean enabled) {

@@ -82,6 +82,38 @@ textarea[disabled] {
   color: #888888;
 }
 
+td.top {
+  vertical-align: top;
+}
+
+td.small-indent {
+  padding-left: 0.8em;
+}
+
+td.indent {
+  padding-left: 1.6em;
+}
+
+td.large-indent {
+  padding-left: 1.6em;
+}
+
+td.small-top-margin {
+  padding-top: 0.4em;
+}
+
+td.top-margin {
+  padding-top: 0.8em;
+}
+
+td.large-top-margin {
+  padding-top: 1.2em;
+}
+
+td.link {
+  text-decoration: underline;
+}
+
 .clickable:hover {
   cursor: pointer;
 }
@@ -203,6 +235,15 @@ img.clickable {
 
 .gwt-MenuBar-vertical .gwt-MenuItemSeparator .menuSeparatorInner {
     background: none repeat scroll 0 0 transparent;
+}
+
+.gwt-DisclosurePanel .header {
+  background: url(../image/action-link.png) no-repeat left center;
+  padding-left: 16px;
+}
+
+.gwt-DisclosurePanel .content {
+  border: none;
 }
 
 .gwt-TabLayoutPanel .gwt-TabLayoutPanelTab {
@@ -1288,16 +1329,23 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
 /* Inputs */
 
 div.input {
-  margin-top: 1em;
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+
+div.input.block {
+  border: 1px dotted #CCC;
+  padding: 0.8em;
+  background: #F8F8F8;
 }
 
 div.input div.input {
-  margin-left: 2em;
+  margin-left: 1.6em;
 }
 
 div.input div.inline {
   display: inline-block;
-  margin-right: 1em;
+  margin-right: 0.8em;
 }
 
 div.input .key {
