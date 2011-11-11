@@ -85,6 +85,7 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
   public boolean addEntry(String value, String newValue) {
     if(value != null && !value.trim().equals("") && newValue != null && !newValue.trim().equals("")) {
       valueMapEntries.add(ValueMapEntry.fromDistinct(value).newValue(newValue).build());
+      display.entryAdded();
       return true;
     }
     return false;

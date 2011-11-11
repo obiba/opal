@@ -123,11 +123,20 @@ public class ValueMapGrid extends FlowPanel {
       @Override
       public void doAction(ValueMapEntry object, String actionName) {
         valueMapEntries.remove(object);
-        dataProvider.refresh();
+        refresh();
       }
 
     });
     return deleteColumn;
+  }
+
+  public void entryAdded() {
+    populate(valueMapEntries);
+  }
+
+  private void refresh() {
+    table.setRowCount(valueMapEntries.size());
+    dataProvider.refresh();
   }
 
   private void initializeColumns() {
@@ -281,4 +290,5 @@ public class ValueMapGrid extends FlowPanel {
 
     }
   }
+
 }
