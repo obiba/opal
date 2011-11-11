@@ -15,35 +15,54 @@
           <g:RadioButton name="method" ui:field="spanRadio">
             <ui:msg description="Group by type of time span label">Group by type of time span</ui:msg>
           </g:RadioButton>
+          
+          <g:Grid>
+            <g:row>
+              <g:customCell styleName="top">
           <g:FlowPanel styleName="input block">
             <g:Label addStyleNames="key">
               <ui:msg description="Time span type label">Time span type</ui:msg>
             </g:Label>
             <g:ListBox ui:field="spanBox"></g:ListBox>
           </g:FlowPanel>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+          
         </g:FlowPanel>
         
         <g:FlowPanel styleName="input" ui:field="range">
           <g:RadioButton name="method" ui:field="rangeRadio">
             <ui:msg description="Group by date ranges label">Group by date ranges</ui:msg>
           </g:RadioButton>
-          <g:FlowPanel styleName="input block">
-            <g:Label addStyleNames="key">
-              <ui:msg description="Time span type label">Date range type</ui:msg>
-            </g:Label>
-            <g:ListBox ui:field="rangeBox" enabled="false"></g:ListBox>
-          </g:FlowPanel>
-          <g:FlowPanel styleName="input block">
-            <g:Label addStyleNames="key"><ui:msg description="Date Range label">Date range definition (YYYY-MM-DD)</ui:msg></g:Label>
-            <g:FlowPanel ui:field="dates">
-              <g:FlowPanel ui:field="from" addStyleNames="inline">
-                <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
+          
+          <g:Grid>
+            <g:row>
+              <g:customCell styleName="top">
+              <g:FlowPanel styleName="input block">
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Time span type label">Date range type</ui:msg>
+                </g:Label>
+                <g:ListBox ui:field="rangeBox" enabled="false"></g:ListBox>
               </g:FlowPanel>
-              <g:FlowPanel ui:field="to" addStyleNames="inline">
-                <g:Label styleName="help-block"><ui:msg description="To label">To</ui:msg></g:Label>
+              </g:customCell>
+            
+              <g:customCell styleName="top">
+              <g:FlowPanel styleName="input block">
+                <g:Label addStyleNames="key"><ui:msg description="Date Range label">Date range definition (YYYY-MM-DD)</ui:msg></g:Label>
+                <g:FlowPanel ui:field="dates">
+                  <g:FlowPanel ui:field="from" addStyleNames="inline">
+                    <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
+                  </g:FlowPanel>
+                  <g:FlowPanel ui:field="to" addStyleNames="inline">
+                    <g:Label styleName="help-block"><ui:msg description="To label">To</ui:msg></g:Label>
+                  </g:FlowPanel>
+                </g:FlowPanel>
               </g:FlowPanel>
-            </g:FlowPanel>
-          </g:FlowPanel>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+          
         </g:FlowPanel>
       </g:FlowPanel>
     </o:WizardStep>

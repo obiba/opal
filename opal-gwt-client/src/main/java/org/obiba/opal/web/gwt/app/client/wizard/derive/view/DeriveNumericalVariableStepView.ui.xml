@@ -15,47 +15,53 @@
             <ui:msg description="Group by ranges of values label">Group by ranges of values</ui:msg>
           </g:RadioButton>
           
-          <g:FlowPanel styleName="input block">
-            <g:Label addStyleNames="key"><ui:msg description="Date Range label">Value limits</ui:msg></g:Label>
-            <g:FlowPanel>
-              <g:FlowPanel addStyleNames="inline">
-                <o:NumericTextBox ui:field="fromBox" width="6em"></o:NumericTextBox>
-                <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
+          <g:Grid>
+            <g:row>
+              <g:customCell styleName="top">
+              <g:FlowPanel styleName="input block">
+                <g:Label addStyleNames="key"><ui:msg description="Date Range label">Value limits</ui:msg></g:Label>
+                <g:FlowPanel>
+                  <g:FlowPanel addStyleNames="inline">
+                    <o:NumericTextBox ui:field="fromBox" width="6em"></o:NumericTextBox>
+                    <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
+                  </g:FlowPanel>
+                  <g:FlowPanel addStyleNames="inline">
+                    <o:NumericTextBox ui:field="toBox" width="6em"></o:NumericTextBox>
+                    <g:Label styleName="help-block"><ui:msg description="To label">To</ui:msg></g:Label>
+                  </g:FlowPanel>
+                </g:FlowPanel>
               </g:FlowPanel>
-              <g:FlowPanel addStyleNames="inline">
-                <o:NumericTextBox ui:field="toBox" width="6em"></o:NumericTextBox>
-                <g:Label styleName="help-block"><ui:msg description="To label">To</ui:msg></g:Label>
-              </g:FlowPanel>
-            </g:FlowPanel>
-          </g:FlowPanel>
-          
-          <g:FlowPanel styleName="input block">
-            <g:Label addStyleNames="key"><ui:msg description="Ranges definition label">Ranges definition</ui:msg></g:Label>
+              </g:customCell>
             
-            <g:Grid>
-              <g:row>
-                <g:customCell>
-                  <g:RadioButton name="range" ui:field="lengthRadio">
-                    <ui:msg description="Ranges length label">Ranges length</ui:msg>
-                  </g:RadioButton>
-                </g:customCell>
-                <g:customCell>
-                  <o:NumericTextBox ui:field="lengthBox" width="6em"></o:NumericTextBox>
-                </g:customCell>
-              </g:row>
-              <g:row>
-                <g:customCell>
-                  <g:RadioButton name="range" ui:field="numberRadio">
-                    <ui:msg description="Number of ranges label">Number of ranges</ui:msg>
-                  </g:RadioButton>
-                </g:customCell>
-                <g:customCell>
-                  <o:NumericTextBox ui:field="numberBox" width="6em"></o:NumericTextBox>
-                </g:customCell>
-              </g:row>
-            </g:Grid>
-                
-          </g:FlowPanel>
+              <g:customCell styleName="top">
+              <g:FlowPanel styleName="input block">
+                <g:Label addStyleNames="key"><ui:msg description="Ranges definition label">Ranges definition</ui:msg></g:Label>
+                <g:Grid>
+                  <g:row>
+                    <g:customCell>
+                      <g:RadioButton name="range" ui:field="lengthRadio">
+                        <ui:msg description="Ranges length label">Ranges length</ui:msg>
+                      </g:RadioButton>
+                    </g:customCell>
+                    <g:customCell>
+                      <o:NumericTextBox ui:field="lengthBox" width="6em"></o:NumericTextBox>
+                    </g:customCell>
+                  </g:row>
+                  <g:row>
+                    <g:customCell>
+                      <g:RadioButton name="range" ui:field="numberRadio">
+                        <ui:msg description="Number of ranges label">Number of ranges</ui:msg>
+                      </g:RadioButton>
+                    </g:customCell>
+                    <g:customCell>
+                      <o:NumericTextBox ui:field="numberBox" width="6em"></o:NumericTextBox>
+                    </g:customCell>
+                  </g:row>
+                </g:Grid>
+              </g:FlowPanel>                        
+              </g:customCell>
+            </g:row>
+          </g:Grid>
           
         </g:FlowPanel>
         
@@ -113,8 +119,8 @@
                     <g:TextBox ui:field="newValueBox" width="8em"></g:TextBox>
                   </g:FlowPanel>        
                 </g:customCell>
-                </g:row>
-                      <g:row>
+              </g:row>
+              <g:row>
                 <g:customCell>
                   <g:Button styleName="btn info"><ui:msg description="Add label">Add</ui:msg></g:Button>      
                 </g:customCell>
