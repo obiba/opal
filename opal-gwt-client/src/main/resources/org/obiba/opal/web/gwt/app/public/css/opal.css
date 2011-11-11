@@ -1300,6 +1300,11 @@ div.input div.inline {
   margin-right: 1em;
 }
 
+div.input .key {
+  font-weight: bold;
+  padding-bottom: 0.4em;
+}
+
 div.input.error input,
 div.input.error select,
 div.input.error textarea {
