@@ -6,69 +6,36 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <g:FlowPanel>
-                  
-    <g:FlowPanel ui:field="methodsPanel" addStyleNames="panel">
-      <g:FlowPanel addStyleNames="title">
-        <g:InlineLabel><ui:msg description="Aggregation Methods label" >Aggregation Methods</ui:msg></g:InlineLabel>
-        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
-          <g:HTMLPanel>
-            <g:Label addStyleNames="title"><ui:msg description="Aggregation Methods label">Aggregation Methods</ui:msg></g:Label>
-            <p>
-              <ui:msg description="Aggregation Methods information">
-                The aggregation methods are used by DataShield in order to compile individual data. The same aggregation methods must be defined in each DataShield server that will be involved in a computation process. Each aggregation method is identified by a name that will be used from the R-DataShield client. 
-              </ui:msg>
-            </p>
-            <g:Label addStyleNames="title"><ui:msg description="R Function label">R Function</ui:msg></g:Label>
-            <p>
-              <ui:msg description="R Function information">
-                Some aggregation methods are already defined in R as functions. For security reasons, R functions should be fully named, i.e. including package name space. This way the aggregating function to be used can be unambiguously identified. For example use "base::summary" in place of "summary". 
-              </ui:msg>
-            </p>
-            <g:Label addStyleNames="title"><ui:msg description="R Script label">R Script</ui:msg></g:Label>
-            <p>
-              <ui:msg description="R Script information">
-                Any R script that does not return any individual data.
-              </ui:msg>
-            </p>
-          </g:HTMLPanel>
-        </o:HelpImage>
-      </g:FlowPanel>
-      <g:VerticalPanel width="100%" addStyleNames="content">
-        <g:Button ui:field="addMethodButton" styleName="btn"><ui:msg description="Add DataShield method label" >Add Method</ui:msg></g:Button>
-        <c:SimplePager ui:field="methodsTablePager" location="CENTER" addStyleNames="right-aligned" visible="false" />
-        <o:Table width="100%" ui:field="methodsTable" addStyleNames="gwt-CellTable" visible="false"/>
-      </g:VerticalPanel>
+  <g:FlowPanel ui:field="methodsPanel" addStyleNames="panel">
+    <g:FlowPanel addStyleNames="title">
+      <g:InlineLabel><ui:msg description="Aggregation Methods label" >Aggregation Methods</ui:msg></g:InlineLabel>
+      <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
+        <g:HTMLPanel>
+          <g:Label addStyleNames="title"><ui:msg description="Aggregation Methods label">Aggregation Methods</ui:msg></g:Label>
+          <p>
+            <ui:msg description="Aggregation Methods information">
+              The aggregation methods are used by DataShield in order to compile individual data. The same aggregation methods must be defined in each DataShield server that will be involved in a computation process. Each aggregation method is identified by a name that will be used from the R-DataShield client. 
+            </ui:msg>
+          </p>
+          <g:Label addStyleNames="title"><ui:msg description="R Function label">R Function</ui:msg></g:Label>
+          <p>
+            <ui:msg description="R Function information">
+              Some aggregation methods are already defined in R as functions. For security reasons, R functions should be fully named, i.e. including package name space. This way the aggregating function to be used can be unambiguously identified. For example use "base::summary" in place of "summary". 
+            </ui:msg>
+          </p>
+          <g:Label addStyleNames="title"><ui:msg description="R Script label">R Script</ui:msg></g:Label>
+          <p>
+            <ui:msg description="R Script information">
+              Any R script that does not return any individual data.
+            </ui:msg>
+          </p>
+        </g:HTMLPanel>
+      </o:HelpImage>
     </g:FlowPanel>
-    
-    <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">
-      <g:FlowPanel addStyleNames="title">
-        <g:InlineLabel><ui:msg description="Permissions label" >Permissions</ui:msg></g:InlineLabel>
-        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
-          <g:HTMLPanel>
-            <g:Label addStyleNames="title"><ui:msg description="DataShield Permissions label">DataShield Permissions</ui:msg></g:Label>
-            <p>
-              <ui:msg description="DataShield Permissions information">
-                 Permissions for accessing DataShield service should be specified. The permissions can be applied to a user or a group of users.
-              </ui:msg>
-            </p>
-            <g:Label addStyleNames="title"><ui:msg description="DataShield Users label">Users</ui:msg></g:Label>
-            <p>
-              <ui:msg description="DataShield Users information">
-                 DataShield Users are allowed to perform DataShield operations from their R client.
-              </ui:msg>
-            </p>
-            <g:Label addStyleNames="title"><ui:msg description="DataShield Administrators label">Administrators</ui:msg></g:Label>
-            <p>
-              <ui:msg description="DataShield Administrators information">
-                DataShield Administrators are allowed to configure the set of aggregation methods.
-              </ui:msg>
-            </p>
-          </g:HTMLPanel>
-        </o:HelpImage>
-      </g:FlowPanel>
-      <g:SimplePanel ui:field="permissions"></g:SimplePanel>
-    </g:FlowPanel>
-    
+    <g:VerticalPanel width="100%" addStyleNames="content">
+      <g:Button ui:field="addMethodButton" styleName="btn"><ui:msg description="Add DataShield method label" >Add Method</ui:msg></g:Button>
+      <c:SimplePager ui:field="methodsTablePager" location="CENTER" addStyleNames="right-aligned" visible="false" />
+      <o:Table width="100%" ui:field="methodsTable" addStyleNames="gwt-CellTable" visible="false"/>
+    </g:VerticalPanel>
   </g:FlowPanel>
 </ui:UiBinder>

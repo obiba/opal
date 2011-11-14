@@ -101,6 +101,24 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
   }
 
   /**
+   * Executes a batch of {@code ROperation} within a single connection to the R environment.
+   * @param rops
+   */
+  public void execute(Iterable<ROperation> rops) {
+    RConnection connection = null;
+    lock.lock();
+    try {
+      connection = newConnection();
+      for(ROperation rop : rops) {
+        rop.doWithConnection(connection);
+      }
+    } finally {
+      lock.unlock();
+      if(connection != null) close(connection);
+    }
+  }
+
+  /**
    * Close the R session.
    */
   public void close() {

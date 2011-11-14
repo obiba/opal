@@ -50,8 +50,13 @@ public class OpalRSessionsResource {
   @POST
   public Response newCurrentRSession(@Context UriInfo info) {
     OpalRSession rSession = opalRSessionManager.newSubjectCurrentRSession();
+    onNewSession(rSession);
     List<URI> locations = getLocations(info, rSession.getId());
     return Response.created(locations.get(0)).header("X-Alt-Location", locations.get(1)).entity(Dtos.asDto(rSession)).build();
+  }
+
+  protected void onNewSession(OpalRSession rSession) {
+
   }
 
   protected List<URI> getLocations(UriInfo info, String id) {

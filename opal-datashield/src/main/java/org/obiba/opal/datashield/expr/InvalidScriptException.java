@@ -7,19 +7,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.datashield;
+package org.obiba.opal.datashield.expr;
 
-import org.obiba.opal.r.ROperation;
+public class InvalidScriptException extends RuntimeException {
 
-/**
- * Interface to be implemented by methods that can be executed through datashield
- */
-public interface DataShieldMethod {
+  private static final long serialVersionUID = 1L;
 
-  public String getName();
+  public InvalidScriptException() {
+    super();
+  }
 
-  public ROperation assign();
+  public InvalidScriptException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-  public String invoke();
+  public InvalidScriptException(String message) {
+    super(message);
+  }
+
+  public InvalidScriptException(Throwable cause) {
+    super(cause);
+  }
 
 }

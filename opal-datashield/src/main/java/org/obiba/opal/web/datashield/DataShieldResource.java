@@ -9,42 +9,26 @@
  ******************************************************************************/
 package org.obiba.opal.web.datashield;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
-import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
+import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
-import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.r.OpalRSessionResource;
 import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
-
 @Component
 @Path("/datashield")
 public class DataShieldResource {
-
-  private final OpalRService opalRService;
 
   private final DatashieldConfigurationSupplier configurationSupplier;
 
@@ -53,12 +37,10 @@ public class DataShieldResource {
   private final DataShieldMethodConverterRegistry methodConverterRegistry;
 
   @Autowired
-  public DataShieldResource(OpalRService opalRService, DatashieldConfigurationSupplier configurationSupplier, OpalRSessionManager opalRSessionManager, DataShieldMethodConverterRegistry methodConverterRegistry) {
-    if(opalRService == null) throw new IllegalArgumentException("opalRService cannot be null");
+  public DataShieldResource(DatashieldConfigurationSupplier configurationSupplier, OpalRSessionManager opalRSessionManager, DataShieldMethodConverterRegistry methodConverterRegistry) {
     if(configurationSupplier == null) throw new IllegalArgumentException("configurationSupplier cannot be null");
     if(opalRSessionManager == null) throw new IllegalArgumentException("opalRSessionManager cannot be null");
     if(methodConverterRegistry == null) throw new IllegalArgumentException("methodConverterRegistry cannot be null");
-    this.opalRService = opalRService;
     this.configurationSupplier = configurationSupplier;
     this.opalRSessionManager = opalRSessionManager;
     this.methodConverterRegistry = methodConverterRegistry;
@@ -66,129 +48,47 @@ public class DataShieldResource {
 
   @Path("/sessions")
   public OpalRSessionsResource getSessions() {
-    return new OpalRSessionsResource(opalRSessionManager);
+    return new OpalRSessionsResource(opalRSessionManager) {
+      @Override
+      protected void onNewSession(OpalRSession rSession) {
+        onNewDataShieldSession(rSession);
+      }
+    };
   }
 
   @Path("/session/{id}")
   public OpalRSessionResource getSession(@PathParam("id") String id) {
-    return new OpalDataShieldSessionResource(opalRService, configurationSupplier, opalRSessionManager, opalRSessionManager.getSubjectRSession(id));
+    return new OpalDataShieldSessionResource(configurationSupplier, opalRSessionManager, opalRSessionManager.getSubjectRSession(id));
   }
 
   @Path("/session/current")
   public OpalRSessionResource getCurrentSession() {
     if(opalRSessionManager.hasSubjectCurrentRSession() == false) {
       OpalRSession session = opalRSessionManager.newSubjectCurrentRSession();
-      DataShieldLog.userLog("created a datashield session {}", session.getId());
+      onNewDataShieldSession(session);
     }
-    return new OpalDataShieldSessionResource(opalRService, configurationSupplier, opalRSessionManager, opalRSessionManager.getSubjectCurrentRSession());
+    return new OpalDataShieldSessionResource(configurationSupplier, opalRSessionManager, opalRSessionManager.getSubjectCurrentRSession());
+  }
+
+  @Path("/env/{name}")
+  public DataShieldEnvironmentResource getEnvironment(@PathParam("name") String env) {
+    return new DataShieldEnvironmentResource(Environment.valueOf(env.toUpperCase()), configurationSupplier, methodConverterRegistry);
   }
 
   @GET
-  @Path("/methods")
-  public List<DataShield.DataShieldMethodDto> getDataShieldMethods() {
-    final List<DataShield.DataShieldMethodDto> dtos = Lists.newArrayList();
-    for(DataShieldMethod method : listMethods()) {
-      dtos.add(methodConverterRegistry.asDto(method));
+  @Path("/cfg")
+  public Response getConfig() {
+    // TODO: implement GET and PUT for altering the restriction level through the UI
+    return Response.ok().build();
+  }
+
+  protected void onNewDataShieldSession(OpalRSession session) {
+    // TODO: assign methods to specific environments within R.
+    DatashieldConfiguration config = configurationSupplier.get();
+    for(Environment environment : Environment.values()) {
+      config.getEnvironment(environment).prepare(session);
     }
-    sortByName(dtos);
-    return dtos;
-  }
-
-  @DELETE
-  @Path("/methods")
-  public Response deleteDataShieldMethods() {
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        for(DataShieldMethod method : config.getAggregatingMethods()) {
-          config.removeAggregatingMethod(method.getName());
-        }
-      }
-    });
-
-    DataShieldLog.adminLog("deleted all aggregating methods.");
-    return Response.ok().build();
-  }
-
-  @POST
-  @Path("/methods")
-  public Response createDataShieldMethod(final DataShield.DataShieldMethodDto dto) {
-    DatashieldConfiguration config = getDatashieldConfiguration();
-    if(config.hasAggregatingMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
-
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        config.addAggregatingMethod(methodConverterRegistry.parse(dto));
-      }
-    });
-    DataShieldLog.adminLog("added aggregating method '{}'.", dto.getName());
-    UriBuilder ub = UriBuilder.fromPath("/").path(DataShieldResource.class).path(DataShieldResource.class, "getDataShieldMethod");
-    return Response.created(ub.build(dto.getName())).build();
-  }
-
-  @GET
-  @Path("/method/{name}")
-  public Response getDataShieldMethod(@PathParam("name") String name) {
-    return Response.ok().entity(methodConverterRegistry.asDto(getDatashieldConfiguration().getAggregatingMethod(name))).build();
-  }
-
-  @PUT
-  @Path("/method/{name}")
-  public Response updateDataShieldMethod(@PathParam("name") String name, final DataShield.DataShieldMethodDto dto) {
-    if(!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
-
-    DatashieldConfiguration config = getDatashieldConfiguration();
-    if(!config.hasAggregatingMethod(name)) return Response.status(Status.NOT_FOUND).build();
-
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        config.addAggregatingMethod(methodConverterRegistry.parse(dto));
-      }
-    });
-
-    DataShieldLog.adminLog("modified aggregating method '{}'.", name);
-
-    return Response.ok().build();
-  }
-
-  @DELETE
-  @Path("/method/{name}")
-  public Response deleteDataShieldMethod(final @PathParam("name") String name) {
-
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        config.removeAggregatingMethod(name);
-      }
-    });
-    DataShieldLog.adminLog("deleted aggregating method '{}'.", name);
-    return Response.ok().build();
-  }
-
-  private Iterable<DataShieldMethod> listMethods() {
-    return getDatashieldConfiguration().getAggregatingMethods();
-  }
-
-  private DatashieldConfiguration getDatashieldConfiguration() {
-    return configurationSupplier.get();
-  }
-
-  private void sortByName(List<DataShield.DataShieldMethodDto> dtos) {
-    // sort alphabetically
-    Collections.sort(dtos, new Comparator<DataShield.DataShieldMethodDto>() {
-
-      @Override
-      public int compare(DataShield.DataShieldMethodDto d1, DataShield.DataShieldMethodDto d2) {
-        return d1.getName().compareTo(d2.getName());
-      }
-
-    });
+    DataShieldLog.userLog("created a datashield session {}", session.getId());
   }
 
 }

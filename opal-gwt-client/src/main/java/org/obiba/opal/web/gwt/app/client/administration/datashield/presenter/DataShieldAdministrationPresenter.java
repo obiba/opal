@@ -6,12 +6,11 @@ import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
+import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
@@ -36,40 +35,24 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
-/**
- * DataShield related administration.
- */
-public class DataShieldAdministrationPresenter extends ItemAdministrationPresenter<DataShieldAdministrationPresenter.Display> {
+public class DataShieldAdministrationPresenter extends WidgetPresenter<DataShieldAdministrationPresenter.Display> {
 
-  //
-  // Instance Variables
-  //
+  private String env;
 
   private Runnable removeMethodConfirmation;
 
   private DataShieldMethodPresenter dataShieldMethodPresenter;
 
-  private AuthorizationPresenter authorizationPresenter;
-
-  //
-  // Constructors
-  //
-
   @Inject
-  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus, DataShieldMethodPresenter dataShieldMethodPresenter, AuthorizationPresenter authorizationPresenter) {
+  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus, DataShieldMethodPresenter dataShieldMethodPresenter) {
     super(display, eventBus);
     this.dataShieldMethodPresenter = dataShieldMethodPresenter;
-    this.authorizationPresenter = authorizationPresenter;
   }
 
-  @Override
-  public String getName() {
-    return "DataShield";
+  void setEnvironment(String env) {
+    this.env = env;
+    this.dataShieldMethodPresenter.setEnvironement(env);
   }
-
-  //
-  // WidgetPresenter Methods
-  //
 
   @Override
   public Place getPlace() {
@@ -78,9 +61,6 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   protected void onBind() {
-    authorizationPresenter.bind();
-    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
-
     addEventHandlers();
   }
 
@@ -124,7 +104,6 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
   @Override
   protected void onUnbind() {
-    authorizationPresenter.unbind();
   }
 
   @Override
@@ -137,11 +116,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
     authorize();
   }
 
-  //
-  // private methods
-  //
-
-  @Override
+  // @Override
   public void authorize(HasAuthorization authorizer) {
     authorizeMethods(CascadingAuthorizer.newBuilder()//
     .or(AclRequest.newResourceAuthorizationRequestBuilder())//
@@ -153,28 +128,38 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
     authorizeMethods(new CompositeAuthorizer(getDisplay().getMethodsAuthorizer(), new MethodsUpdate()));
     // create method
     authorizeAddMethod(getDisplay().getAddMethodAuthorizer());
-    // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+  }
+
+  private String environment() {
+    return "/datashield/env/" + this.env;
+  }
+
+  private String methods() {
+    return environment() + "/methods";
+  }
+
+  private String method(String method) {
+    return environment() + "/method/" + method;
   }
 
   private void authorizeMethods(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").get().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(methods()).get().authorize(authorizer).send();
   }
 
   private void authorizeAddMethod(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/methods").post().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(methods()).post().authorize(authorizer).send();
   }
 
   private void authorizeEditMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/method/" + dto.getName()).put().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).put().authorize(authorizer).send();
   }
 
   private void authorizeDeleteMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/method/" + dto.getName()).delete().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete().authorize(authorizer).send();
   }
 
   private void updateDataShieldMethods() {
-    ResourceRequestBuilderFactory.<JsArray<DataShieldMethodDto>> newBuilder().forResource("/datashield/methods").get()//
+    ResourceRequestBuilderFactory.<JsArray<DataShieldMethodDto>> newBuilder().forResource(methods()).get()//
     .withCallback(new ResourceCallback<JsArray<DataShieldMethodDto>>() {
 
       @Override
@@ -226,7 +211,7 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/datashield/method/" + dto.getName()).delete() //
+    ResourceRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete() //
     .withCallback(Response.SC_OK, callbackHandler) //
     .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
     .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
@@ -256,29 +241,6 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
     }
   }
 
-  /**
-   *
-   */
-  private final class PermissionsUpdate implements HasAuthorization {
-    @Override
-    public void unauthorized() {
-
-    }
-
-    @Override
-    public void beforeAuthorization() {
-
-    }
-
-    @Override
-    public void authorized() {
-      authorizationPresenter.setAclRequest(AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"),//
-      // AclRequest.newBuilder("Allow Users", "/authz/datashield", "*:GET/*")
-      AclRequest.newBuilder("Administrate", "/datashield/method", "*:GET/*"));
-      authorizationPresenter.refreshDisplay();
-    }
-  }
-
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     @Override
@@ -295,15 +257,11 @@ public class DataShieldAdministrationPresenter extends ItemAdministrationPresent
 
     void renderDataShieldMethodsRows(JsArray<DataShieldMethodDto> rows);
 
-    HasAuthorization getPermissionsAuthorizer();
-
     HasActionHandler<DataShieldMethodDto> getDataShieldMethodActionsColumn();
 
     HandlerRegistration addMethodHandler(ClickHandler handler);
 
     HasAuthorization getAddMethodAuthorizer();
-
-    void setPermissionsDisplay(AuthorizationPresenter.Display display);
 
     HasAuthorization getMethodsAuthorizer();
 

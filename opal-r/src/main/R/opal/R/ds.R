@@ -37,7 +37,7 @@ datashield.summary=function(object, ...) {
 }
 
 datashield.summary.opal=function(opal, expr) {
-  return(datashield.aggregate.opal(opal, "summary", expr))
+  return(datashield.aggregate.opal(opal, as.call(c(quote(summary), expr))))
 }
 
 datashield.summary.list=function(opals, expr) {
@@ -50,7 +50,7 @@ datashield.length=function(object, ...) {
 }
 
 datashield.length.opal=function(opal, expr) {
-  return(datashield.aggregate.opal(opal, "length", expr))
+  return(datashield.aggregate.opal(opal, as.call(c(quote(length), expr))))
 }
 
 datashield.length.list=function(opals, expr) {
@@ -62,7 +62,7 @@ datashield.aggregate=function(object, ...) {
 }
 
 # Inner methods that sends a script, and aggregates the result using the specified aggregation method
-datashield.aggregate.opal=function(opal, aggregation, expr, arguments=list()) {
+datashield.aggregate.opal=function(opal, expr) {
   expression = expr
   # convert a call to a string
   if(is.language(expr)) {
@@ -71,11 +71,11 @@ datashield.aggregate.opal=function(opal, aggregation, expr, arguments=list()) {
     return(print(paste("Invalid expression type: '", class(value), "'. Expected a call or character vector.", sep="")))
   }
 
-  .post(opal, "datashield", "session", "current", "aggregate", aggregation, query=arguments, body=expression)
+  .post(opal, "datashield", "session", "current", "aggregate", body=expression, contentType="application/x-rscript")
 }
 
-datashield.aggregate.list=function(opals, aggregation, expr, arguments=list()) {
-  lapply(opals, FUN=datashield.aggregate.opal, aggregation, expr, arguments)
+datashield.aggregate.list=function(opals, expr) {
+  lapply(opals, FUN=datashield.aggregate.opal, expr)
 }
 
 datashield.assign=function(object, ...) {
@@ -95,7 +95,7 @@ datashield.assign.opal=function(opal, symbol, value) {
 
   .put(opal, "datashield", "session", "current", "symbol", symbol, body=body, contentType=contentType)
   # Return the new symbols length
-  datashield.length(opal, symbol)
+  datashield.length(opal, as.symbol(symbol))
 }
 
 datashield.assign.list=function(opals, ...) {
@@ -175,7 +175,7 @@ datashield.glm=function(object, ...) {
   UseMethod('datashield.glm');
 }
 
-datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
+datashield.glm.list=function(opals, formula, family, maxit=10) {
 
   numstudies<-length(opals)
 
@@ -205,11 +205,12 @@ datashield.glm.list=function(opals, formula, glmparams=list(), maxit=10) {
     cat("--------------------------------------------\n")
     cat("Iteration", iteration.count, "\n")
 
-    glmparams=list(x=TRUE, control=quote(glm.control(maxit=1)))
-    call<-as.call(c('glm', formula, glmparams))
+    call<-as.call(list(quote(glm_ds), formula, family, as.vector(beta.vect.next)));
 
-    study.summary<-datashield.aggregate(opals, 'glm.ds', call, arguments=list(beta.vect=.deparse(as.vector(beta.vect.next))))
-
+    print(call);
+    study.summary<-datashield.aggregate(opals, call);
+    print(call);
+    
     info.matrix.total<-Reduce(f="+", .select(study.summary, 'info.matrix'))
     score.vect.total<-Reduce(f="+", .select(study.summary, 'score.vect'))
     dev.total<-Reduce(f="+", .select(study.summary, 'dev'))

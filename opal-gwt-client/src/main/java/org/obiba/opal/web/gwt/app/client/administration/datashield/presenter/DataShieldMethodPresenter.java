@@ -60,6 +60,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
   //
   // Instance Variables
   //
+  private String environement;
 
   private MethodValidationHandler methodValidationHandler;
 
@@ -75,6 +76,10 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
   @Override
   public Place getPlace() {
     return null;
+  }
+
+  public void setEnvironement(String environement) {
+    this.environement = environement;
   }
 
   @Override
@@ -154,11 +159,19 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
     }
   }
 
+  private String method(String method) {
+    return "/datashield/env/" + this.environement + "/method/" + method;
+  }
+
+  private String methods() {
+    return "/datashield/env/" + this.environement + "/methods";
+  }
+
   private void createMethod() {
     if(methodValidationHandler.validate()) {
       CreateMethodCallBack createCallback = new CreateMethodCallBack();
       AlreadyExistMethodCallBack alreadyExistCallback = new AlreadyExistMethodCallBack();
-      ResourceRequestBuilderFactory.<DataShieldMethodDto> newBuilder().forResource("/datashield/method/" + getDisplay().getName().getText()).get()//
+      ResourceRequestBuilderFactory.<DataShieldMethodDto> newBuilder().forResource(method(getDisplay().getName().getText())).get()//
       .withCallback(alreadyExistCallback)//
       .withCallback(Response.SC_NOT_FOUND, createCallback).send();
     }
@@ -166,7 +179,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
   private void postMethod(DataShieldMethodDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/datashield/methods").post()//
+    ResourceRequestBuilderFactory.newBuilder().forResource(methods()).post()//
     .withResourceBody(DataShieldMethodDto.stringify(dto))//
     .withCallback(Response.SC_OK, callbackHandler)//
     .withCallback(Response.SC_CREATED, callbackHandler)//
@@ -175,7 +188,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
   private void putMethod(DataShieldMethodDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/datashield/method/" + getDisplay().getName().getText()).put()//
+    ResourceRequestBuilderFactory.newBuilder().forResource(method(getDisplay().getName().getText())).put()//
     .withResourceBody(DataShieldMethodDto.stringify(dto))//
     .withCallback(Response.SC_OK, callbackHandler)//
     .withCallback(Response.SC_CREATED, callbackHandler)//

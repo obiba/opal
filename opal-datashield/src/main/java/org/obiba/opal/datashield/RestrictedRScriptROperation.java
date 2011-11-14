@@ -9,36 +9,28 @@
  ******************************************************************************/
 package org.obiba.opal.datashield;
 
-import java.io.StringReader;
-
-import org.obiba.opal.datashield.expr.DataShieldGrammar;
+import org.obiba.opal.datashield.expr.DataShieldScriptValidator;
 import org.obiba.opal.datashield.expr.ParseException;
-import org.obiba.opal.datashield.expr.RScriptGenerator;
-import org.obiba.opal.datashield.expr.SimpleNode;
-import org.obiba.opal.r.AbstractROperationWithResult;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Parses a restricted R script, executes it and stores the result.
  */
-public class RestrictedRScriptROperation extends AbstractROperationWithResult {
+public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROperation {
 
-  private final String symbol;
+  public RestrictedRScriptROperation(String script, DataShieldEnvironment environment, DataShieldScriptValidator validator) throws ParseException {
+    super(script, environment, validator);
+  }
 
-  private final SimpleNode scriptAst;
-
-  public RestrictedRScriptROperation(String symbol, String script) throws ParseException {
-    super();
-    Preconditions.checkArgument(symbol != null, "symbol cannot be null");
-    Preconditions.checkArgument(script != null, "script cannot be null");
-    this.symbol = symbol;
-    this.scriptAst = new DataShieldGrammar(new StringReader(script)).root();
+  public RestrictedRScriptROperation(String script, DataShieldEnvironment environment) throws ParseException {
+    this(script, environment, new DataShieldScriptValidator());
   }
 
   @Override
   protected void doWithConnection() {
     setResult(null);
-    setResult(eval(symbol + "<-" + new RScriptGenerator().toScript(scriptAst)));
+    String script = super.restricted();
+    String eval = String.format("eval({%s})", script);
+    DataShieldLog.userLog("evaluating {}", script);
+    setResult(eval(eval));
   }
 }

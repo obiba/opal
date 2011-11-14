@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.Dat
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -26,6 +27,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
@@ -53,6 +55,12 @@ public class DataShieldMethodView extends Composite implements Display {
 
   @UiField
   DialogBox dialog;
+
+  @UiField
+  DockLayoutPanel contentLayout;
+
+  @UiField
+  ResizeHandle resizeHandle;
 
   @UiField
   Button saveButton;
@@ -90,6 +98,7 @@ public class DataShieldMethodView extends Composite implements Display {
 
   private void initWidgets() {
     dialog.hide();
+    resizeHandle.makeResizable(contentLayout);
     typeList.addItem(translations.rFunctionLabel(), MethodType.RFUNCTION.toString());
     typeList.addItem(translations.rScriptLabel(), MethodType.RSCRIPT.toString());
     script.setVisible(false);

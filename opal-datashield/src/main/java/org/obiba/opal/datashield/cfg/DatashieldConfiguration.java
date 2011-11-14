@@ -12,82 +12,49 @@ package org.obiba.opal.datashield.cfg;
 import java.util.List;
 
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.datashield.DataShieldEnvironment;
 import org.obiba.opal.datashield.DataShieldMethod;
-import org.obiba.opal.datashield.NoSuchDataShieldMethodException;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Preconditions;
 
 public class DatashieldConfiguration implements OpalConfigurationExtension {
 
   public enum Level {
-    FREEDOM, FLEXIBLE, FIRM
+    RESTRICTED, UNRESTRICTED
+  }
+
+  public enum Environment {
+    AGGREGATE, ASSIGN
   }
 
   private Level level;
 
   private List<DataShieldMethod> aggregatingMethods;
 
+  private DataShieldEnvironment assign;
+
+  private DataShieldEnvironment aggregate;
+
   public Level getLevel() {
-    return level != null ? level : Level.FIRM;
+    return level != null ? level : Level.RESTRICTED;
   }
 
-  /**
-   * Get the registered aggregating methods.
-   * @return
-   */
-  public List<DataShieldMethod> getAggregatingMethods() {
-    return ImmutableList.copyOf(aggregatingMethods);
+  public DataShieldEnvironment getAggregateEnvironment() {
+    return aggregate;
   }
 
-  /**
-   * Add or replace the provide method.
-   * @param method
-   */
-  public void addAggregatingMethod(DataShieldMethod method) {
-    for(DataShieldMethod m : getAggregatingMethods()) {
-      if(m.getName().equals(method.getName())) {
-        aggregatingMethods.remove(m);
-        break;
-      }
+  public DataShieldEnvironment getAssignEnvironment() {
+    return assign;
+  }
+
+  public DataShieldEnvironment getEnvironment(Environment env) {
+    Preconditions.checkArgument(env != null, "env cannot be null");
+    switch(env) {
+    case AGGREGATE:
+      return getAggregateEnvironment();
+    case ASSIGN:
+      return getAssignEnvironment();
     }
-    aggregatingMethods.add(method);
-  }
-
-  /**
-   * Remove the method with the given name.
-   * @param name
-   * @throws NoSuchDataShieldMethodException
-   */
-  public void removeAggregatingMethod(String name) {
-    aggregatingMethods.remove(getAggregatingMethod(name));
-  }
-
-  /**
-   * Check if there is a method with the given name.
-   * @param name
-   * @return
-   */
-  public boolean hasAggregatingMethod(String name) {
-    for(DataShieldMethod method : aggregatingMethods) {
-      if(method.getName().equals(name)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Get the method with from its name.
-   * @param name
-   * @throws NoSuchDataShieldMethodException
-   * @return
-   */
-  public DataShieldMethod getAggregatingMethod(String name) {
-    for(DataShieldMethod method : aggregatingMethods) {
-      if(method.getName().equals(name)) {
-        return method;
-      }
-    }
-    throw new NoSuchDataShieldMethodException(name);
+    throw new IllegalArgumentException("Unknown environment " + env);
   }
 }

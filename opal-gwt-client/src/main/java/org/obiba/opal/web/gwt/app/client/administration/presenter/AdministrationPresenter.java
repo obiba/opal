@@ -9,7 +9,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
@@ -25,7 +25,7 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
   //
 
   @Inject
-  private DataShieldAdministrationPresenter dataShieldAdministrationPresenter;
+  private DataShieldConfigPresenter dataShieldAdministrationPresenter;
 
   @Inject
   private RAdministrationPresenter rAdministrationPresenter;

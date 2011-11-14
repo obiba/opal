@@ -22,6 +22,7 @@ public class DataShieldExprTest {
   .put("A symbol", "A")//
   .put("A number", "1.0")//
   .put("A negative number", "-0.43151402098822")//
+  .put("An embedded symbol", "A$B$C")//
   .put("A formula", "A ~ B")//
   .put("A function invocation", "A()")//
   .put("An operator on symbols", "A + B")//

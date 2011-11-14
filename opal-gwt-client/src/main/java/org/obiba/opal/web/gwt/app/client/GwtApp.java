@@ -188,7 +188,7 @@ public class GwtApp implements EntryPoint {
 
       @Override
       public void onWindowClosing(ClosingEvent arg0) {
-        opalGinjector.getEventBus().fireEvent(new SessionEndedEvent());
+        // opalGinjector.getEventBus().fireEvent(new SessionEndedEvent());
       }
 
     });

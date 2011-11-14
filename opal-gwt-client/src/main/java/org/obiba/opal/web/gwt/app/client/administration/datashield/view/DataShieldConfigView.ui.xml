@@ -1,0 +1,61 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client" xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat' ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+  ui:generateLocales="default">
+
+  <g:FlowPanel>
+    <g:FlowPanel addStyleNames="panel">
+      <g:FlowPanel addStyleNames="title">
+        <g:InlineLabel><ui:msg description="Restriction Level">Restriction Level</ui:msg></g:InlineLabel>
+        <o:HelpImage imageSize="16">
+	      <g:HTMLPanel>
+            <g:Label addStyleNames="title"><ui:msg description="Restriction Level">Restriction Levels</ui:msg></g:Label>
+            <p>
+              <ui:msg description="Restriction Level information">
+                 The restriction level dictates how scripts sent by DataSHIELD clients are interpreted by this server. In a secured environment, 
+                 the scripts can only be composed of pre-defined functions that have a known and validated behaviour. This is the Restricted level where
+                 administrators can then define the allowable methods for aggregating or assignment operations.
+                 
+                 When the Unrestricted level is active, DataSHIELD clients are allowed to send arbitrary R-Script that will be executed without any restriction on this server.
+              </ui:msg>
+            </p>
+          </g:HTMLPanel>
+        </o:HelpImage>
+      </g:FlowPanel>
+      <g:RadioButton ui:field="restricted" name="level" addStyleNames="block small-top-margin">Restricted</g:RadioButton>
+      <g:RadioButton ui:field="unrestricted" name="level" addStyleNames="block small-top-margin">Unrestricted</g:RadioButton>
+    </g:FlowPanel>
+
+    <o:HorizontalTabLayout ui:field="environments" addStyleNames="panel" />
+
+    <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">
+      <g:FlowPanel addStyleNames="title">
+        <g:InlineLabel><ui:msg description="Permissions label">Permissions</ui:msg></g:InlineLabel>
+        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
+          <g:HTMLPanel>
+            <g:Label addStyleNames="title"><ui:msg description="DataShield Permissions label">DataShield Permissions</ui:msg></g:Label>
+            <p>
+              <ui:msg description="DataShield Permissions information">
+                 Permissions for accessing DataShield service should be specified. The permissions can be applied to a user or a group of users.
+              </ui:msg>
+            </p>
+            <g:Label addStyleNames="title"><ui:msg description="DataShield Users label">Users</ui:msg></g:Label>
+            <p>
+              <ui:msg description="DataShield Users information">
+                 DataShield Users are allowed to perform DataShield operations from their R client.
+              </ui:msg>
+            </p>
+            <g:Label addStyleNames="title"><ui:msg description="DataShield Administrators label">Administrators</ui:msg></g:Label>
+            <p>
+              <ui:msg description="DataShield Administrators information">
+                DataShield Administrators are allowed to configure the set of aggregation methods.
+              </ui:msg>
+            </p>
+          </g:HTMLPanel>
+        </o:HelpImage>
+      </g:FlowPanel>
+      <g:SimplePanel ui:field="permissions"></g:SimplePanel>
+    </g:FlowPanel>
+
+  </g:FlowPanel>
+</ui:UiBinder>

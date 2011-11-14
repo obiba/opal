@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.RestrictedRScriptROperation;
+import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.expr.ParseException;
 import org.obiba.opal.r.service.OpalRSession;
@@ -42,14 +42,12 @@ public class DataShieldSymbolResource extends RSymbolResource {
   public Response putRScript(UriInfo uri, String script) {
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
     switch(configSupplier.get().getLevel()) {
-    case FIRM:
-      return Response.status(Status.FORBIDDEN).build();
-    case FLEXIBLE:
+    case RESTRICTED:
       return putRestrictedRScript(uri, script);
-    case FREEDOM:
+    case UNRESTRICTED:
       return super.putRScript(uri, script);
     }
-    throw new IllegalStateException("Unknown script interpretation level");
+    throw new IllegalStateException("Unknown script interpretation level: " + configSupplier.get().getLevel());
   }
 
   @Override
@@ -74,7 +72,7 @@ public class DataShieldSymbolResource extends RSymbolResource {
 
   protected Response putRestrictedRScript(UriInfo uri, String content) {
     try {
-      getRSession().execute(new RestrictedRScriptROperation(getName(), content));
+      getRSession().execute(new RestrictedAssignmentROperation(getName(), content, this.configSupplier.get().getAssignEnvironment()));
       return Response.created(getSymbolURI(uri)).build();
     } catch(ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();

@@ -27,16 +27,25 @@
 
   <extensions>
     <org.obiba.opal.datashield.cfg.DatashieldConfiguration>
-      <aggregatingMethods>
-      
-        <org.obiba.opal.datashield.RFunctionDataShieldMethod>
-          <name>length</name>
-          <function>base::length</function>
-        </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+      <level>RESTRICTED</level>
+      <assign>
+        <methods>
+          <org.obiba.opal.datashield.RFunctionDataShieldMethod>
+            <name>log</name>
+            <function>base::log</function>
+          </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+        </methods>
+      </assign>
+      <aggregate>
+        <methods>
+          <org.obiba.opal.datashield.RFunctionDataShieldMethod>
+            <name>length</name>
+            <function>base::length</function>
+          </org.obiba.opal.datashield.RFunctionDataShieldMethod>
 
-        <org.obiba.opal.datashield.CustomRScriptMethod>
-          <name>summary</name>
-          <script><![CDATA[function(data) {
+          <org.obiba.opal.datashield.CustomRScriptMethod>
+            <name>summary</name>
+            <script><![CDATA[function(data) {
   if(is.atomic(data)) {
     if(length(data) <= 1) {
       "Vector too small."
@@ -47,12 +56,12 @@
       base::summary.default(data);
   }
 }]]>
-</script>
-        </org.obiba.opal.datashield.CustomRScriptMethod>
+            </script>
+          </org.obiba.opal.datashield.CustomRScriptMethod>
 
-        <org.obiba.opal.datashield.CustomRScriptMethod>
-          <name>lm.ds</name>
-          <script><![CDATA[function(data) {
+          <org.obiba.opal.datashield.CustomRScriptMethod>
+            <name>lm.ds</name>
+            <script><![CDATA[function(data) {
   if(inherits(data, 'lm')) {
    sum.lm <- stats::summary.lm(data)
    list(
@@ -63,18 +72,20 @@
   NULL
  }
 }]]></script>
-        </org.obiba.opal.datashield.CustomRScriptMethod>
-        
-        <org.obiba.opal.datashield.CustomRScriptMethod>
-          <name>glm.ds</name>
-          <script><![CDATA[function (mod.glm.ds, beta.vect=NULL) {
+          </org.obiba.opal.datashield.CustomRScriptMethod>
+
+          <org.obiba.opal.datashield.CustomRScriptMethod>
+            <name>glm.ds</name>
+            <script><![CDATA[function (formula, family, beta.vect=NULL) {
+
+  mod.glm.ds <- glm(formula, family=family, x=TRUE, control=glm.control(maxit=1))
+
+  X.mat <- as.matrix(mod.glm.ds$x)
 
   if(is.null(beta.vect)) {
-    X.mat<-as.matrix(mod.glm.ds$x)
-    beta.vect<-rep(0,dim(X.mat)[2])
+    beta.vect <- rep(0,dim(X.mat)[2])
   }
 
-  X.mat<-as.matrix(mod.glm.ds$x)
   numsubs<-dim(X.mat)[1]
 
   y.vect<-as.vector(mod.glm.ds$y)
@@ -98,9 +109,9 @@
 
   list(family=f, info.matrix=info.matrix, score.vect=score.vect, numsubs=numsubs, dev=dev)
 }]]></script>
-        </org.obiba.opal.datashield.CustomRScriptMethod>
-        
-      </aggregatingMethods>
+          </org.obiba.opal.datashield.CustomRScriptMethod>
+        </methods>
+      </aggregate>
     </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
   </extensions>
 </org.obiba.opal.core.cfg.OpalConfiguration>

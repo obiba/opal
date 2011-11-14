@@ -33,13 +33,13 @@
 	.perform(opal, .url(opal, ..., query=query), opts)
 }
 
-.post <- function(opal, ..., query=list(), body='') {
+.post <- function(opal, ..., query=list(), body='', contentType='application/x-rscript') {
 	.nobody <- missing(body) || length(body) == 0
 	if(.nobody) {
 		# Act like a GET, but send a POST. This is required when posting without any body 
 		opts = curlOptions(httpget=TRUE, customrequest="POST", .opts=opal$opts)
 	} else {
-		opts = curlOptions(post=TRUE, customrequest=NULL, postfields=body, .opts=opal$opts)
+		opts = curlOptions(post=TRUE, customrequest=NULL, httpheader=c(opal$opts$httpheader, 'Content-Type'=contentType), postfields=body, .opts=opal$opts)
 	}
 	.perform(opal, .url(opal, ..., query=query), opts)
 }

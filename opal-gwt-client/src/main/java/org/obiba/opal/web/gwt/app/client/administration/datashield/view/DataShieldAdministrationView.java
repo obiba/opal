@@ -13,7 +13,6 @@ import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
@@ -48,21 +47,9 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   interface ViewUiBinder extends UiBinder<Widget, DataShieldAdministrationView> {
   }
 
-  //
-  // Constants
-  //
-
-  //
-  // Static Variables
-  //
-
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
-
-  //
-  // Instance Variables
-  //
 
   @UiField
   Panel methodsPanel;
@@ -76,29 +63,15 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   @UiField
   SimplePager methodsTablePager;
 
-  @UiField
-  Panel permissionsPanel;
-
-  @UiField
-  Panel permissions;
-
   private JsArrayDataProvider<DataShieldMethodDto> methodsDataProvider = new JsArrayDataProvider<DataShieldMethodDto>();
 
   private ActionsColumn<DataShieldMethodDto> actionsColumn;
-
-  //
-  // Constructors
-  //
 
   public DataShieldAdministrationView() {
     super();
     initWidget(uiBinder.createAndBindUi(this));
     initMethodsTable();
   }
-
-  //
-  // AdministrationPresenter.Display Methods
-  //
 
   @Override
   public Widget asWidget() {
@@ -136,10 +109,6 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
     return actionsColumn;
   }
 
-  //
-  // Methods
-  //
-
   private void initMethodsTable() {
 
     addMethodsTableColumns();
@@ -174,17 +143,6 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
   @Override
   public HasAuthorization getAddMethodAuthorizer() {
     return new WidgetAuthorizer(addMethodButton);
-  }
-
-  @Override
-  public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
-    display.setExplanation(translations.datashieldPermissions());
-    permissions.add(display.asWidget());
-  }
-
-  @Override
-  public HasAuthorization getPermissionsAuthorizer() {
-    return new WidgetAuthorizer(permissionsPanel);
   }
 
   @Override

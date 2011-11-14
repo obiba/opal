@@ -10,8 +10,10 @@
 package org.obiba.opal.web.gwt.inject.client;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldConfigView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldMethodView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
@@ -31,6 +33,7 @@ public class AdministrationModule extends AbstractGinModule {
     // Bind concrete implementations to interfaces
     bind(AdministrationPresenter.Display.class).to(AdministrationView.class).in(Singleton.class);
     bind(DataShieldAdministrationPresenter.Display.class).to(DataShieldAdministrationView.class);
+    bind(DataShieldConfigPresenter.Display.class).to(DataShieldConfigView.class);
     bind(DataShieldMethodPresenter.Display.class).to(DataShieldMethodView.class);
     bind(RAdministrationPresenter.Display.class).to(RAdministrationView.class);
   }

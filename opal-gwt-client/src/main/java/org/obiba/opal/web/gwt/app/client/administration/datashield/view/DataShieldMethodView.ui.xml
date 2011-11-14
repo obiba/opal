@@ -1,15 +1,15 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
     .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
-    .right-aligned { float: right; }
-    .top-margin { margin-top: 0.5em; }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
-    <g:DockLayoutPanel unit="EM" height="22em" width="40em">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="22em" width="40em">
       <g:center>
         <g:ScrollPanel>
           <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
@@ -58,16 +58,15 @@
         </g:ScrollPanel>
       </g:center>
       <g:south size="3.25">
-        <g:HTMLPanel addStyleNames="footer">
-          <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="saveButton" styleName="btn">
-              <ui:msg description="Save button label">Save</ui:msg>
-            </g:Button>
-            <g:Button ui:field="cancelButton" styleName="btn">
-              <ui:msg description="Cancel button label">Cancel</ui:msg>
-            </g:Button>
-          </span>
-        </g:HTMLPanel>
+        <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
+          <g:Button ui:field="cancelButton" addStyleNames="btn right-aligned small-top-margin">
+            <ui:msg description="Cancel button label">Cancel</ui:msg>
+          </g:Button>
+          <g:Button ui:field="saveButton" addStyleNames="btn primary right-aligned small-top-margin">
+            <ui:msg description="Save button label">Save</ui:msg>
+          </g:Button>
+        </g:FlowPanel>
       </g:south>
     </g:DockLayoutPanel>
 

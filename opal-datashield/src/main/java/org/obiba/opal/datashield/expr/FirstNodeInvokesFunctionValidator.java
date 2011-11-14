@@ -7,19 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.datashield;
+package org.obiba.opal.datashield.expr;
 
-import org.obiba.opal.r.ROperation;
+public class FirstNodeInvokesFunctionValidator extends DataShieldScriptValidator {
 
-/**
- * Interface to be implemented by methods that can be executed through datashield
- */
-public interface DataShieldMethod {
-
-  public String getName();
-
-  public ROperation assign();
-
-  public String invoke();
+  @Override
+  public Object visit(ASTroot node, Object data) {
+    boolean valid = node.jjtGetNumChildren() == 1 && node.jjtGetChild(0) instanceof ASTfuncCall;
+    if(valid == false) throw new InvalidScriptException("must invoke a function.");
+    return null;
+  }
 
 }

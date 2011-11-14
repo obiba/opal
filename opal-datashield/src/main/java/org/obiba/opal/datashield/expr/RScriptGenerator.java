@@ -9,15 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.datashield.expr;
 
+import java.util.List;
+
+import org.obiba.opal.datashield.DataShieldMethod;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 /**
  * Generates RScript from a DataSHIELD script.
  */
 public class RScriptGenerator implements DataShieldGrammarVisitor {
 
-  // TODO connet to Datashield configuration to obtain allowable methods and operators.
+  private final List<DataShieldMethod> methods;
 
-  public RScriptGenerator() {
-
+  public RScriptGenerator(List<DataShieldMethod> methods) {
+    this.methods = methods;
   }
 
   public String toScript(SimpleNode node) {
@@ -36,7 +43,7 @@ public class RScriptGenerator implements DataShieldGrammarVisitor {
   @Override
   public Object visit(ASTfuncCall node, Object data) {
     StringBuilder sb = (StringBuilder) data;
-    sb.append(node.value).append("( ");
+    sb.append(findMethod(node.value.toString()).invoke()).append("( ");
     for(int i = 0; i < node.jjtGetNumChildren(); i++) {
       Node child = node.jjtGetChild(i);
       if(i > 0) sb.append(',');
@@ -71,4 +78,13 @@ public class RScriptGenerator implements DataShieldGrammarVisitor {
     return node.childrenAccept(this, data);
   }
 
+  private DataShieldMethod findMethod(final String name) {
+    return Iterables.find(this.methods, new Predicate<DataShieldMethod>() {
+
+      @Override
+      public boolean apply(DataShieldMethod input) {
+        return input.getName().equals(name);
+      }
+    });
+  }
 }
