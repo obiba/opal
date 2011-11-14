@@ -73,6 +73,21 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   @UiField
   NumericTextBox numberBox;
 
+  @UiField
+  RadioButton addRangeRadio;
+
+  @UiField
+  RadioButton addDiscreteRadio;
+
+  @UiField
+  NumericTextBox addFromBox;
+
+  @UiField
+  NumericTextBox addToBox;
+
+  @UiField
+  NumericTextBox valueBox;
+
   //
   // Constructors
   //
@@ -112,6 +127,30 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
     rangeRadio.setValue(true, true);
     lengthRadio.setValue(true, true);
+
+    addRangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setAddRangeEnabled(true);
+      }
+    });
+
+    addDiscreteRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setAddRangeEnabled(false);
+      }
+    });
+
+    addRangeRadio.setValue(true, true);
+  }
+
+  private void setAddRangeEnabled(boolean enabled) {
+    addFromBox.setEnabled(enabled);
+    addToBox.setEnabled(enabled);
+    valueBox.setEnabled(!enabled);
   }
 
   private void setRangeEnabled(boolean enabled) {

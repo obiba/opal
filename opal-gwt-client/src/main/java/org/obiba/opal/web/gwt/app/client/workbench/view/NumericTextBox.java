@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
@@ -45,10 +46,6 @@ public class NumericTextBox extends TextBox {
     @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
     private boolean processKeyCode(int keyCode) {
       switch(keyCode) {
-      case KeyCodes.KEY_LEFT:
-      case KeyCodes.KEY_RIGHT:
-      case KeyCodes.KEY_BACKSPACE:
-      case KeyCodes.KEY_DELETE:
       case KeyCodes.KEY_UP:
         increaseValue(step);
         break;
@@ -88,8 +85,11 @@ public class NumericTextBox extends TextBox {
         return;
       }
 
-      cancelKey();
-      setValue(getNewText(event.getCharCode()), true);
+      String newText = getNewText(event.getCharCode());
+      if(!newText.equals("-")) {
+        cancelKey();
+        setValue(newText, true);
+      }
     }
 
     private String getNewText(char code) {
@@ -196,6 +196,7 @@ public class NumericTextBox extends TextBox {
 
   @Override
   public void setValue(String value, boolean fireEvents) {
+    GWT.log("setValue=" + value);
     try {
       long newValue = parseValue(value);
       if((maxConstrained && (newValue > max)) || (minConstrained && (newValue < min))) {

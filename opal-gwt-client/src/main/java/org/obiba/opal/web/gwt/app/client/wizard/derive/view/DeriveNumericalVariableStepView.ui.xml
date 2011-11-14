@@ -5,6 +5,12 @@
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
+  
+  <ui:style>
+    .space {
+    	margin: 0 5px;
+    }
+  </ui:style>
 
   <g:FlowPanel>
      <o:WizardStep ui:field="methodStep">
@@ -22,11 +28,11 @@
                 <g:Label addStyleNames="key"><ui:msg description="Date Range label">Value limits</ui:msg></g:Label>
                 <g:FlowPanel>
                   <g:FlowPanel addStyleNames="inline">
-                    <o:NumericTextBox ui:field="fromBox" width="6em"></o:NumericTextBox>
+                    <o:NumericTextBox ui:field="fromBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
                     <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
                   </g:FlowPanel>
                   <g:FlowPanel addStyleNames="inline">
-                    <o:NumericTextBox ui:field="toBox" width="6em"></o:NumericTextBox>
+                    <o:NumericTextBox ui:field="toBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
                     <g:Label styleName="help-block"><ui:msg description="To label">To</ui:msg></g:Label>
                   </g:FlowPanel>
                 </g:FlowPanel>
@@ -44,7 +50,7 @@
                       </g:RadioButton>
                     </g:customCell>
                     <g:customCell>
-                      <o:NumericTextBox ui:field="lengthBox" width="6em"></o:NumericTextBox>
+                      <o:NumericTextBox ui:field="lengthBox" width="6em" value="10" maxConstrained="false"></o:NumericTextBox>
                     </g:customCell>
                   </g:row>
                   <g:row>
@@ -54,7 +60,7 @@
                       </g:RadioButton>
                     </g:customCell>
                     <g:customCell>
-                      <o:NumericTextBox ui:field="numberBox" width="6em"></o:NumericTextBox>
+                      <o:NumericTextBox ui:field="numberBox" width="6em" value="10" maxConstrained="false"></o:NumericTextBox>
                     </g:customCell>
                   </g:row>
                 </g:Grid>
@@ -94,9 +100,9 @@
                         </g:customCell>
                         <g:customCell>
                           <g:HorizontalPanel>
-                              <o:NumericTextBox ui:field="addFromBox" width="6em"></o:NumericTextBox>
-                              <g:InlineLabel>-</g:InlineLabel>
-                              <o:NumericTextBox ui:field="addToBox" width="6em"></o:NumericTextBox>
+                              <o:NumericTextBox ui:field="addFromBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
+                              <g:InlineLabel addStyleNames="{style.space}">-</g:InlineLabel>
+                              <o:NumericTextBox ui:field="addToBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
                           </g:HorizontalPanel>
                         </g:customCell>
                       </g:row>
@@ -107,7 +113,7 @@
                           </g:RadioButton>
                         </g:customCell>
                         <g:customCell>
-                          <o:NumericTextBox ui:field="valueBox" width="8em" enabled="false"></o:NumericTextBox>
+                          <o:NumericTextBox ui:field="valueBox" width="8em" enabled="false" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
                         </g:customCell>
                       </g:row>
                     </g:Grid>
