@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.datashield;
 
+import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperations;
 
@@ -36,12 +37,12 @@ public class RFunctionDataShieldMethod implements DataShieldMethod {
   }
 
   @Override
-  public ROperation assign() {
+  public ROperation assign(Environment env) {
     return ROperations.noOp();
   }
 
   @Override
-  public String invoke() {
+  public String invoke(Environment env) {
     return getFunction();
   }
 }

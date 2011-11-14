@@ -30,12 +30,30 @@ public final class ROperations {
     return NoOpROperation.INSTANCE;
   }
 
+  public static ROperationWithResult eval(final String script, final String env) {
+    return new AbstractROperationWithResult() {
+
+      @Override
+      protected void doWithConnection() {
+        super.eval(script);
+      }
+    };
+  }
+
   public static ROperation assign(final String name, final String script) {
+    return assign(name, script, null, false);
+  }
+
+  public static ROperation assign(final String name, final String script, final String env, final boolean lock) {
     return new AbstractROperation() {
 
       @Override
       protected void doWithConnection() {
-        eval(String.format("assign('%s', value={%s})", name, script));
+        String format = env == null ? "base::assign('%s', value={%s})" : "base::assign('%s', value={%s}, envir=%s)";
+        eval(String.format(format, name, script, env));
+        if(lock) {
+          eval(String.format("base::lockBinding('%s', %s)", name, env));
+        }
       }
     };
   }

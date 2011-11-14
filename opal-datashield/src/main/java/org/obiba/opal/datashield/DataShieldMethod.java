@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.datashield;
 
+import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.r.ROperation;
 
 /**
@@ -18,8 +19,8 @@ public interface DataShieldMethod {
 
   public String getName();
 
-  public ROperation assign();
+  public ROperation assign(Environment env);
 
-  public String invoke();
+  public String invoke(Environment env);
 
 }

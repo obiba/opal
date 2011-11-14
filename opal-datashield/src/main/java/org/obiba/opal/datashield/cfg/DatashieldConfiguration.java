@@ -24,36 +24,35 @@ public class DatashieldConfiguration implements OpalConfigurationExtension {
   }
 
   public enum Environment {
-    AGGREGATE, ASSIGN
+    AGGREGATE, ASSIGN;
+
+    public String symbol() {
+      return "." + this.toString();
+    }
   }
 
   private Level level;
 
   private List<DataShieldMethod> aggregatingMethods;
 
-  private DataShieldEnvironment assign;
-
-  private DataShieldEnvironment aggregate;
+  private List<DataShieldEnvironment> environments;
 
   public Level getLevel() {
     return level != null ? level : Level.RESTRICTED;
   }
 
   public DataShieldEnvironment getAggregateEnvironment() {
-    return aggregate;
+    return getEnvironment(Environment.AGGREGATE);
   }
 
   public DataShieldEnvironment getAssignEnvironment() {
-    return assign;
+    return getEnvironment(Environment.ASSIGN);
   }
 
   public DataShieldEnvironment getEnvironment(Environment env) {
     Preconditions.checkArgument(env != null, "env cannot be null");
-    switch(env) {
-    case AGGREGATE:
-      return getAggregateEnvironment();
-    case ASSIGN:
-      return getAssignEnvironment();
+    for(DataShieldEnvironment environment : this.environments) {
+      if(environment.getEnvironment() == env) return environment;
     }
     throw new IllegalArgumentException("Unknown environment " + env);
   }

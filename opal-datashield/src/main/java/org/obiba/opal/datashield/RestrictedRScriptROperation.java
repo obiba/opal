@@ -29,8 +29,7 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
   protected void doWithConnection() {
     setResult(null);
     String script = super.restricted();
-    String eval = String.format("eval({%s})", script);
-    DataShieldLog.userLog("evaluating {}", script);
-    setResult(eval(eval));
+    DataShieldLog.userLog("evaluating '{}'", script);
+    super.eval(script);
   }
 }

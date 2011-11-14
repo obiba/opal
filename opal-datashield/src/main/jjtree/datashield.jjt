@@ -44,13 +44,14 @@ TOKEN : /* Numeric Constants */
 
 TOKEN:
 {
-      < R_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOLLAR>)* >
+      < R_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOLLAR> | <DOT> )* >
   |   < R_OPERATOR: (["/", "!"]) | "%*%">
   |   < F_OPERATOR: ([":"] | "%in%") >
   |   < COMMON_OPERATOR: (["+","-","*", "^"]) >
   |   < #LETTER: ["a"-"z", "A"-"Z"] >
   |   < #UNDERSCORE: "_">
   |   < #DOLLAR: "$">
+  |   < #DOT: ".">
 }
 
 SimpleNode root() #root :

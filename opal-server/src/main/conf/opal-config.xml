@@ -28,24 +28,30 @@
   <extensions>
     <org.obiba.opal.datashield.cfg.DatashieldConfiguration>
       <level>RESTRICTED</level>
-      <assign>
-        <methods>
-          <org.obiba.opal.datashield.RFunctionDataShieldMethod>
-            <name>log</name>
-            <function>base::log</function>
-          </org.obiba.opal.datashield.RFunctionDataShieldMethod>
-        </methods>
-      </assign>
-      <aggregate>
-        <methods>
-          <org.obiba.opal.datashield.RFunctionDataShieldMethod>
-            <name>length</name>
-            <function>base::length</function>
-          </org.obiba.opal.datashield.RFunctionDataShieldMethod>
-
-          <org.obiba.opal.datashield.CustomRScriptMethod>
-            <name>summary</name>
-            <script><![CDATA[function(data) {
+      <environments>
+        <org.obiba.opal.datashield.DataShieldEnvironment>
+          <environment>ASSIGN</environment>
+          <methods>
+            <org.obiba.opal.datashield.RFunctionDataShieldMethod>
+              <name>log</name>
+              <function>base::log</function>
+            </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+          </methods>
+        </org.obiba.opal.datashield.DataShieldEnvironment>
+        <org.obiba.opal.datashield.DataShieldEnvironment>
+          <environment>AGGREGATE</environment>
+          <methods>
+            <org.obiba.opal.datashield.RFunctionDataShieldMethod>
+              <name>length</name>
+              <function>base::length</function>
+            </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+            <org.obiba.opal.datashield.RFunctionDataShieldMethod>
+              <name>c</name>
+              <function>base::c</function>
+            </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+            <org.obiba.opal.datashield.CustomRScriptMethod>
+              <name>summary</name>
+              <script><![CDATA[function(data) {
   if(is.atomic(data)) {
     if(length(data) <= 1) {
       "Vector too small."
@@ -56,12 +62,12 @@
       base::summary.default(data);
   }
 }]]>
-            </script>
-          </org.obiba.opal.datashield.CustomRScriptMethod>
+              </script>
+            </org.obiba.opal.datashield.CustomRScriptMethod>
 
-          <org.obiba.opal.datashield.CustomRScriptMethod>
-            <name>lm.ds</name>
-            <script><![CDATA[function(data) {
+            <org.obiba.opal.datashield.CustomRScriptMethod>
+              <name>lm.ds</name>
+              <script><![CDATA[function(data) {
   if(inherits(data, 'lm')) {
    sum.lm <- stats::summary.lm(data)
    list(
@@ -72,11 +78,11 @@
   NULL
  }
 }]]></script>
-          </org.obiba.opal.datashield.CustomRScriptMethod>
+            </org.obiba.opal.datashield.CustomRScriptMethod>
 
-          <org.obiba.opal.datashield.CustomRScriptMethod>
-            <name>glm.ds</name>
-            <script><![CDATA[function (formula, family, beta.vect=NULL) {
+            <org.obiba.opal.datashield.CustomRScriptMethod>
+              <name>glm.ds</name>
+              <script><![CDATA[function (formula, family, beta.vect=NULL) {
 
   mod.glm.ds <- glm(formula, family=family, x=TRUE, control=glm.control(maxit=1))
 
@@ -99,7 +105,7 @@
   var.vect<-f$variance(mu.vect)
   dev<-sum(f$dev.resids(y.vect, mu.vect, rep(1, length(y.vect))))
 
-  W.vect<-mu.eta.val^2/var.vect
+  W.vect<-as.vector(mu.eta.val^2/var.vect)
   WX.mat<-W.vect*X.mat
   info.matrix<-t(X.mat)%*%WX.mat
 
@@ -109,9 +115,10 @@
 
   list(family=f, info.matrix=info.matrix, score.vect=score.vect, numsubs=numsubs, dev=dev)
 }]]></script>
-          </org.obiba.opal.datashield.CustomRScriptMethod>
-        </methods>
-      </aggregate>
+            </org.obiba.opal.datashield.CustomRScriptMethod>
+          </methods>
+        </org.obiba.opal.datashield.DataShieldEnvironment>
+      </environments>
     </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
   </extensions>
 </org.obiba.opal.core.cfg.OpalConfiguration>

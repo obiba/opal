@@ -33,13 +33,20 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
     Preconditions.checkArgument(environment != null, "environment cannot be null");
     Preconditions.checkArgument(validator != null, "validator cannot be null");
 
-    this.scriptAst = new DataShieldGrammar(new StringReader(script)).root();
-    validator.validate(this.scriptAst);
     this.environment = environment;
+
+    DataShieldLog.userLog("parsing '{}'", script);
+    this.scriptAst = new DataShieldGrammar(new StringReader(script)).root();
+    try {
+      validator.validate(this.scriptAst);
+    } catch(InvalidScriptException e) {
+      DataShieldLog.userLog("Script failed valiation: " + e.getMessage());
+      throw e;
+    }
   }
 
   protected String restricted() {
-    String restrictedScript = new RScriptGenerator(environment.getMethods()).toScript(scriptAst);
+    String restrictedScript = new RScriptGenerator(environment).toScript(scriptAst);
     return restrictedScript;
   }
 

@@ -71,6 +71,7 @@ public abstract class AbstractROperation implements ROperation {
 
     REXP evaled;
     try {
+      log.debug("evaluating {}", script);
       evaled = connection.eval("try(serialize({" + script + "}, NULL))");
     } catch(RserveException e) {
       log.warn("Failed evaluating: " + script, e);

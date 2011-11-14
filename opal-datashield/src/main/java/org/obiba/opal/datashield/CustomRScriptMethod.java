@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.datashield;
 
+import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperations;
 
@@ -36,13 +37,13 @@ public class CustomRScriptMethod implements DataShieldMethod {
   }
 
   @Override
-  public ROperation assign() {
-    return ROperations.assign(getName(), getScript());
+  public ROperation assign(Environment env) {
+    return ROperations.assign(getName(), getScript(), env.symbol(), true);
   }
 
   @Override
-  public String invoke() {
-    return getName();
+  public String invoke(Environment env) {
+    return env.symbol() + "$" + getName();
   }
 
 }

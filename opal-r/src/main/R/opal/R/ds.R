@@ -205,12 +205,10 @@ datashield.glm.list=function(opals, formula, family, maxit=10) {
     cat("--------------------------------------------\n")
     cat("Iteration", iteration.count, "\n")
 
-    call<-as.call(list(quote(glm_ds), formula, family, as.vector(beta.vect.next)));
+    call<-as.call(list(quote(glm.ds), formula, family, as.vector(beta.vect.next)));
 
-    print(call);
     study.summary<-datashield.aggregate(opals, call);
-    print(call);
-    
+
     info.matrix.total<-Reduce(f="+", .select(study.summary, 'info.matrix'))
     score.vect.total<-Reduce(f="+", .select(study.summary, 'score.vect'))
     dev.total<-Reduce(f="+", .select(study.summary, 'dev'))

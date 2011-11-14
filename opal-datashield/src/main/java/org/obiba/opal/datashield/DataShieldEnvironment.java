@@ -11,7 +11,9 @@ package org.obiba.opal.datashield;
 
 import java.util.List;
 
+import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.r.ROperation;
+import org.obiba.opal.r.ROperations;
 import org.obiba.opal.r.service.OpalRSession;
 
 import com.google.common.base.Function;
@@ -20,7 +22,13 @@ import com.google.common.collect.Iterables;
 
 public class DataShieldEnvironment {
 
+  private Environment environment;
+
   private List<DataShieldMethod> methods;
+
+  public Environment getEnvironment() {
+    return environment;
+  }
 
   /**
    * Get the registered methods.
@@ -83,13 +91,15 @@ public class DataShieldEnvironment {
   }
 
   public void prepare(OpalRSession session) {
+    session.execute(ROperations.eval(String.format("base::rm(%s)", environment.symbol()), null));
+    session.execute(ROperations.assign(environment.symbol(), "base::new.env()"));
     session.execute(Iterables.transform(getMethods(), new Function<DataShieldMethod, ROperation>() {
 
       @Override
       public ROperation apply(DataShieldMethod input) {
-        return input.assign();
+        return input.assign(environment);
       }
     }));
+    session.execute(ROperations.eval(String.format("base::lockEnvironment(%s)", environment.symbol()), null));
   }
-
 }
