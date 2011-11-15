@@ -17,6 +17,7 @@ import org.obiba.opal.r.ROperations;
 import org.obiba.opal.r.service.OpalRSession;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -25,6 +26,18 @@ public class DataShieldEnvironment {
   private Environment environment;
 
   private List<DataShieldMethod> methods;
+
+  // XStream ctor
+  public DataShieldEnvironment() {
+
+  }
+
+  public DataShieldEnvironment(Environment environment, List<DataShieldMethod> methods) {
+    Preconditions.checkArgument(environment != null);
+    Preconditions.checkArgument(methods != null);
+    this.environment = environment;
+    this.methods = ImmutableList.copyOf(methods);
+  }
 
   public Environment getEnvironment() {
     return environment;
@@ -100,6 +113,9 @@ public class DataShieldEnvironment {
         return input.assign(environment);
       }
     }));
-    session.execute(ROperations.eval(String.format("base::lockEnvironment(%s)", environment.symbol()), null));
+    // Protect the contents of the environment
+    session.execute(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", environment.symbol()), null));
+    // Protect re-assiging the environment
+    session.execute(ROperations.eval(String.format("base::lockBinding('%s', base::environment())", environment.symbol()), null));
   }
 }
