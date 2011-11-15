@@ -15,7 +15,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRSession;
@@ -83,11 +82,6 @@ public class DataShieldResource {
   }
 
   protected void onNewDataShieldSession(OpalRSession session) {
-    // TODO: assign methods to specific environments within R.
-    DatashieldConfiguration config = configurationSupplier.get();
-    for(Environment environment : Environment.values()) {
-      config.getEnvironment(environment).prepare(session);
-    }
     DataShieldLog.userLog("created a datashield session {}", session.getId());
   }
 

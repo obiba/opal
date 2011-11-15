@@ -14,7 +14,6 @@ import java.util.List;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperations;
-import org.obiba.opal.r.service.OpalRSession;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -103,19 +102,28 @@ public class DataShieldEnvironment {
     throw new NoSuchDataShieldMethodException(name);
   }
 
-  public void prepare(OpalRSession session) {
-    session.execute(ROperations.eval(String.format("base::rm(%s)", environment.symbol()), null));
-    session.execute(ROperations.assign(environment.symbol(), "base::new.env()"));
-    session.execute(Iterables.transform(getMethods(), new Function<DataShieldMethod, ROperation>() {
+  /**
+   * Returns a sequence of {@code ROperation} instances to run in order to prepare an R environment for executing the
+   * methods defined by this {@code DataShieldEnvironment}. Once the operations are executed, an environment is setup
+   * and the method {@code DataShieldMethod#invoke(Environment)} will allow obtaining the signature to invoke the
+   * method.
+   * 
+   * @return a sequence of {@code ROperation} that will create a protected R environment for executing methods defined.
+   */
+  public Iterable<ROperation> prepareOps() {
+    return ImmutableList.<ROperation> builder()//
+    .add(ROperations.eval(String.format("base::rm(%s)", environment.symbol()), null))//
+    .add(ROperations.assign(environment.symbol(), "base::new.env()"))//
+    .addAll(Iterables.transform(getMethods(), new Function<DataShieldMethod, ROperation>() {
 
       @Override
       public ROperation apply(DataShieldMethod input) {
         return input.assign(environment);
       }
-    }));
+    }))//
     // Protect the contents of the environment
-    session.execute(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", environment.symbol()), null));
-    // Protect re-assiging the environment
-    session.execute(ROperations.eval(String.format("base::lockBinding('%s', base::environment())", environment.symbol()), null));
+    .add(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", environment.symbol()), null))//
+    // Protect the contents of the environment
+    .add(ROperations.eval(String.format("base::lockBinding('%s', base::environment())", environment.symbol()), null)).build();
   }
 }

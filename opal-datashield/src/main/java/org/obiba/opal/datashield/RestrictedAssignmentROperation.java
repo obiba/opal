@@ -33,6 +33,7 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
 
   @Override
   protected void doWithConnection() {
+    super.doWithConnection();
     setResult(null);
     String script = super.restricted();
     DataShieldLog.userLog("assigning '{}' with {}", symbol, script);
