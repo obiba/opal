@@ -154,6 +154,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     requestBuilder.withFormBody("script", script);
 
     summaryTabPresenter.setRequestBuilder(requestBuilder);
+    summaryTabPresenter.forgetSummary();
     summaryTabPresenter.refreshDisplay();
   }
 

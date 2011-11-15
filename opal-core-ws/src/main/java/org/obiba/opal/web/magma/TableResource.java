@@ -178,12 +178,14 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @Path("/variable/_transient")
-  public VariableResource getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String script, @QueryParam("category") List<String> categories, @FormParam("script") String scriptFormParam, @FormParam("category") List<String> categoriesFormParam) {
+  public VariableResource getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
+    String script = scriptQP;
+    List<String> categories = categoriesQP;
     if(script == null || script.equals("")) {
-      script = scriptFormParam;
+      script = scriptFP;
     }
     if(categories == null || categories.isEmpty()) {
-      categories = categoriesFormParam;
+      categories = categoriesFP;
     }
     Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script, categories == null ? ImmutableList.<String> of() : categories);
     JavascriptVariableValueSource jvvs = new JavascriptVariableValueSource(transientVariable, getValueTable());
