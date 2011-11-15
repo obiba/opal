@@ -18,14 +18,15 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -110,9 +111,9 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     StringBuilder link = new StringBuilder(table.getLink())//
     .append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
     .append("&offset=").append(offset).append("&");
-    appendVariableArguments(link);
-    ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
-    .forResource(link.toString()).get() //
+    appendVariableLimitArguments(link);
+    ResourceRequestBuilder<JsArray<ValueDto>> requestBuilder = ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
+    .forResource(link.toString()).post() //
     .withCallback(new ResourceCallback<JsArray<ValueDto>>() {
 
       @Override
@@ -125,33 +126,48 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
         getDisplay().populateValues(resource);
       }
 
-    })//
-    .send();
+    });
+    requestBuilder.withFormBody("script", script);
+    requestBuilder.send();
   }
 
   private void requestSummary() {
     StringBuilder link = new StringBuilder(table.getLink()).append("/variable/_transient/summary?");
-    appendVariableArguments(link);
+    appendVariableSummaryArguments(link);
 
+    String[] catsArray = null;
     if(variable != null) {
+      catsArray = new String[variable.getCategoriesArray().length() * 2];
       JsArray<CategoryDto> cats = variable.getCategoriesArray();
       if(cats != null) {
         for(int i = 0; i < cats.length(); i++) {
-          link.append("&category=" + URL.encodeQueryString(cats.get(i).getName()));
+          catsArray[2 * i] = "category";
+          catsArray[2 * i + 1] = URL.encodeQueryString(cats.get(i).getName());
         }
       }
     }
-    
-    summaryTabPresenter.setResourceUri(link.toString());
+
+    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
+    .forResource(link.toString()).post();
+
+    requestBuilder.withFormBody(catsArray);
+    requestBuilder.withFormBody("script", script);
+
+    summaryTabPresenter.setRequestBuilder(requestBuilder);
     summaryTabPresenter.refreshDisplay();
   }
 
-  private void appendVariableArguments(StringBuilder link) {
-    link.append("valueType=" + valueType) //
-    .append("&repeatable=" + repeatable) //
-    .append("&script=" + URL.encodeQueryString(script))//
-    .append("&nature=categorical")//
+  private void appendVariableSummaryArguments(StringBuilder link) {
+    appendVariableLimitArguments(link);
+
+    // TODO refactor this, nature=categorical and distinct=true are not for all derived methods
+    link.append("&nature=categorical")//
     .append("&distinct=true");
+  }
+
+  private void appendVariableLimitArguments(StringBuilder link) {
+    link.append("valueType=" + valueType) //
+    .append("&repeatable=" + repeatable); //
   }
 
   //

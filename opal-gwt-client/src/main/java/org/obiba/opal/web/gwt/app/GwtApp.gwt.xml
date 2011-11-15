@@ -4,6 +4,8 @@
   <!-- Third-party tools and libraries -->
   <!-- Inherit the core Web Toolkit stuff. -->
   <inherits name='com.google.gwt.user.User' />
+  <!-- Guava Collections -->
+  <inherits name="com.google.common.collect.Collect"/>
   <!-- Sophisticated visualisations -->
   <inherits name='com.google.gwt.visualization.Visualization' />
   <!-- Use an MVP pattern framework -->

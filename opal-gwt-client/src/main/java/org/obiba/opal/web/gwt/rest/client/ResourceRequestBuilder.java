@@ -29,7 +29,7 @@ public interface ResourceRequestBuilder<T extends JavaScriptObject> {
 
   public ResourceRequestBuilder<T> withResourceBody(/* T.stringify() */String dto);
 
-  public ResourceRequestBuilder<T> withFormBody(String key1, String value1, String... keyValues);
+  public ResourceRequestBuilder<T> withFormBody(String... keyValues);
 
   public ResourceRequestBuilder<T> get();
 

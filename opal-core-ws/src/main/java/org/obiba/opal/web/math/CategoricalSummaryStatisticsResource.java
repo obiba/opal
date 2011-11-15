@@ -12,6 +12,7 @@ package org.obiba.opal.web.math;
 import java.util.Iterator;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 
 import org.apache.commons.math.stat.Frequency;
@@ -46,6 +47,7 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
   }
 
   @GET
+  @POST
   public SummaryStatisticsDto compute(@QueryParam("distinct") boolean distinct) {
     Frequency freq = computeFrequencyDistribution();
     CategoricalSummaryDto.Builder builder = CategoricalSummaryDto.newBuilder();

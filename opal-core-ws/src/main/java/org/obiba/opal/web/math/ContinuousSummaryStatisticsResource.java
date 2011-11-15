@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 
 import org.apache.commons.math.MathException;
@@ -59,6 +60,7 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
   }
 
   @GET
+  @POST
   public SummaryStatisticsDto compute(@QueryParam("d") @DefaultValue("normal") Distribution distribution, @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals) {
     List<Double> percentilesOrDefault = null;
     if(percentiles != null && !percentiles.isEmpty()) {

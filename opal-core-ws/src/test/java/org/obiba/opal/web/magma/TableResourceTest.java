@@ -59,7 +59,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   private static final Logger log = LoggerFactory.getLogger(TableResourceTest.class);
 
   @BeforeClass
-  public static void before() {
+  public static void before() { 
     AbstractMagmaResourceTest.before();
     addDatasource(DATASOURCE2);
   }
@@ -264,7 +264,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(mockTable);
 
     // Exercise
-    VariableResource variableResource = sut.getTransient(TextType.get().getName(), false, script, ImmutableList.<String> of("CAT1", "CAT2"));
+    VariableResource variableResource = sut.getTransient(TextType.get().getName(), false, script, ImmutableList.<String> of("CAT1", "CAT2"), script, ImmutableList.<String> of("CAT1", "CAT2"));
 
     // Verify behaviour
     verify(mockTable);

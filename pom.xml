@@ -771,7 +771,7 @@
 
     <obiba.commons.version>1.2.1</obiba.commons.version>
     <magma.version>1.2.8</magma.version>
-    <guava.version>r09</guava.version>
+    <guava.version>10.0.1</guava.version>
     <spring.version>3.0.6.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <slf4j.version>1.6.2</slf4j.version>

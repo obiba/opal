@@ -74,7 +74,7 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
         }
       }).send();
     } else {
-      display.populateValues(new ArrayList<ValueMapEntry>());
+      display.populateValues(valueMapEntries);
     }
   }
 

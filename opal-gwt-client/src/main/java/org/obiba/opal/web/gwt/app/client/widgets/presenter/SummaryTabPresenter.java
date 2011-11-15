@@ -17,6 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
@@ -45,6 +46,8 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   private Request summaryRequest;
 
+  private ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder;
+
   @Inject
   public SummaryTabPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -70,8 +73,12 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   @Override
   public void refreshDisplay() {
-    if(resourceUri != null && hasSummaryOrPendingRequest() == false) {
-      requestSummary(resourceUri);
+    if(hasSummaryOrPendingRequest() == false) {
+      if(resourceRequestBuilder != null) {
+        requestSummary(resourceRequestBuilder);
+      } else if(resourceUri != null) {
+        requestSummary(resourceUri);
+      }
     }
   }
 
@@ -87,6 +94,10 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
   public void setResourceUri(String resourceUri) {
     cancelPendingSummaryRequest();
     this.resourceUri = resourceUri;
+  }
+
+  public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
+    this.resourceRequestBuilder = resourceRequestBuilder;
   }
 
   /**
@@ -106,6 +117,19 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
         }
       }
 
+    }).send();
+  }
+
+  private void requestSummary(final ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
+    getDisplay().requestingSummary();
+    summaryRequest = resourceRequestBuilder.withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+      @Override
+      public void onResource(Response response, SummaryStatisticsDto resource) {
+        if(SummaryTabPresenter.this.resourceRequestBuilder == resourceRequestBuilder) {
+          summary = resource;
+          getDisplay().renderSummary(resource);
+        }
+      }
     }).send();
   }
 

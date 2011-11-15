@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
@@ -45,6 +46,7 @@ public class VariableResource {
   }
 
   @GET
+  @POST
   @Path("/values")
   public Iterable<ValueDto> getValues(@QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") @DefaultValue("10") Integer limit) {
     if(limit < 0) {

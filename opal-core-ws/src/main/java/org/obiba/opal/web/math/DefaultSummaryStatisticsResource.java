@@ -10,6 +10,7 @@
 package org.obiba.opal.web.math;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -31,6 +32,7 @@ public class DefaultSummaryStatisticsResource extends AbstractSummaryStatisticsR
   }
 
   @GET
+  @POST
   public SummaryStatisticsDto compute() {
     return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).build();
   }

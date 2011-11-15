@@ -9,10 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
@@ -20,6 +18,7 @@ import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
+import com.google.common.collect.HashMultimap;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsonUtils;
@@ -52,13 +51,13 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   private Set<String> accept = new HashSet<String>();
 
-  private Map<String, String> form = new HashMap<String, String>();
+  private HashMultimap<String, String> form = HashMultimap.create();
 
   private ResourceCallback<T> resourceCallback;
 
   // An array of handlers for HTTP status codes: the index of the array is the HTTP code. This will be 99% empty. This
   // may not be appropriate, depends on how the browser handles this...
-  // TODO: determine the implications fo this
+  // TODO: determine the implications for this
   private ResponseCodeCallback[] codes;
 
   private AuthorizationCallback authorizationCallback;
@@ -119,8 +118,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     return withBody(RESOURCE_MEDIA_TYPE, dto);
   }
 
-  public DefaultResourceRequestBuilder<T> withFormBody(String key1, String value1, String... keyValues) {
-    form.put(key1, URL.encodeQueryString(value1));
+  public DefaultResourceRequestBuilder<T> withFormBody(String... keyValues) {
     for(int i = 0; i < keyValues.length; i += 2) {
       form.put(keyValues[i], URL.encodeQueryString(keyValues[i + 1]));
     }
@@ -197,10 +195,11 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     boolean needSeparator = false;
     StringBuilder sb = new StringBuilder();
     for(String key : this.form.keySet()) {
-      String value = this.form.get(key);
-      if(needSeparator) sb.append('&');
-      sb.append(key).append('=').append(value);
-      needSeparator = true;
+      for(String value : this.form.get(key)) {
+        if(needSeparator) sb.append('&');
+        sb.append(key).append('=').append(value);
+        needSeparator = true;
+      }
     }
     return sb.toString();
   }
