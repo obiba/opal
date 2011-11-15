@@ -1060,4 +1060,10 @@ public interface Translations extends Constants {
   })
   Map<String, String> timeGroupMap();
 
+  @Description("DataSHIELD Labels")
+  @DefaultStringMapValue({ //
+  "Aggregate", "Aggregate",//
+  "Assign", "Assign" //
+  })
+  Map<String, String> dataShieldLabelsMap();
 }

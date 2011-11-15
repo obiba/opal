@@ -10,16 +10,20 @@
 package org.obiba.opal.web.datashield;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
 import org.obiba.opal.datashield.DataShieldLog;
+import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
+import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
 import org.obiba.opal.web.r.OpalRSessionResource;
 import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,8 +81,22 @@ public class DataShieldResource {
   @GET
   @Path("/cfg")
   public Response getConfig() {
-    // TODO: implement GET and PUT for altering the restriction level through the UI
-    return Response.ok().build();
+    DataShieldConfigDto.Level level = DataShieldConfigDto.Level.valueOf(configurationSupplier.get().getLevel().name());
+    return Response.ok(DataShieldConfigDto.newBuilder().setLevel(level).build()).build();
+  }
+
+  @PUT
+  @Path("/cfg")
+  public Response setConfig(DataShieldConfigDto config) {
+    final DatashieldConfiguration.Level level = DatashieldConfiguration.Level.valueOf(config.getLevel().name());
+    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
+
+      @Override
+      public void doWithConfig(DatashieldConfiguration config) {
+        config.setLevel(level);
+      }
+    });
+    return getConfig();
   }
 
   protected void onNewDataShieldSession(OpalRSession session) {

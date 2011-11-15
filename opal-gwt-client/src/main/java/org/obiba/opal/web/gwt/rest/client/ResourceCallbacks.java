@@ -7,19 +7,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.r;
+package org.obiba.opal.web.gwt.rest.client;
 
-/**
- * R operation template is responsible for managing the R connection and make it available to a {@link ROperation}.
- */
-public interface ROperationTemplate {
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.http.client.Response;
 
-  /**
-   * Set up the R connection, do the R operation and clean up the R connection.
-   * @param rop
-   */
-  public void execute(ROperation rop);
+public final class ResourceCallbacks {
 
-  public void execute(Iterable<ROperation> rop);
+  public static final <T extends JavaScriptObject> ResourceCallback<T> noOp() {
+    return new ResourceCallback<T>() {
 
+      @Override
+      public void onResource(Response response, T resource) {
+      }
+
+    };
+  }
 }

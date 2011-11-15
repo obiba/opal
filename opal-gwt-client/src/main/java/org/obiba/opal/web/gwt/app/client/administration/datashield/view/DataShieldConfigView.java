@@ -9,19 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
+import java.util.Comparator;
+
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto;
+import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto.Level;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,9 +61,32 @@ public class DataShieldConfigView implements DataShieldConfigPresenter.Display {
   @UiField
   Panel permissions;
 
+  RadioGroup<DataShieldConfigDto.Level> radioGroup;
+
   public DataShieldConfigView() {
     super();
     uiWidget = uiBinder.createAndBindUi(this);
+    radioGroup = new RadioGroup<DataShieldConfigDto.Level>(new Comparator<Level>() {
+
+      @Override
+      public int compare(Level o1, Level o2) {
+        return o1.getName().compareTo(o2.getName());
+      }
+
+    });
+
+    // TODO: determine if we're leaking handlers here.
+    radioGroup.addButton(restricted, DataShieldConfigDto.Level.RESTRICTED);
+    radioGroup.addButton(unrestricted, DataShieldConfigDto.Level.UNRESTRICTED);
+    radioGroup.addValueChangeHandler(new ValueChangeHandler<DataShieldConfigDto.Level>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Level> event) {
+        boolean isRestricted = event.getValue() == DataShieldConfigDto.Level.RESTRICTED;
+        environments.setVisible(isRestricted);
+
+      }
+    });
   }
 
   @Override
@@ -74,25 +105,13 @@ public class DataShieldConfigView implements DataShieldConfigPresenter.Display {
   }
 
   @Override
-  public String getLevel() {
-    if(unrestricted.getValue()) {
-      return "UNRESTRICTED";
-    }
-    return "RESTRICTED";
-  }
-
-  @Override
-  public void setLevel(String level) {
-    boolean isUnrestricted = level.equals("UNRESTRICTED");
-    unrestricted.setValue(isUnrestricted);
-    restricted.setValue(!isUnrestricted);
-
-    environments.setVisible(!isUnrestricted);
+  public HasValue<Level> levelSelector() {
+    return radioGroup;
   }
 
   @Override
   public void addEnvironmentDisplay(String name, WidgetDisplay display) {
-    environments.add(display.asWidget(), name);
+    environments.add(display.asWidget(), translations.dataShieldLabelsMap().get(name));
   }
 
   @Override

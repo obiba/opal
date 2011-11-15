@@ -17,9 +17,19 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallbacks;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto;
+import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto.Level;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -27,9 +37,7 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
   public interface Display extends WidgetDisplay {
 
-    String getLevel();
-
-    void setLevel(String level);
+    HasValue<DataShieldConfigDto.Level> levelSelector();
 
     void addEnvironmentDisplay(String name, WidgetDisplay display);
 
@@ -85,10 +93,29 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
     assignPresenter.onBind();
     authorizationPresenter.bind();
 
-    getDisplay().setLevel("RESTRICTED");
+    getDisplay().levelSelector().addValueChangeHandler(new ValueChangeHandler<DataShieldConfigDto.Level>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Level> event) {
+        DataShieldConfigDto dto = DataShieldConfigDto.create();
+        dto.setLevel(event.getValue());
+        ResourceRequestBuilderFactory.<DataShieldConfigDto> newBuilder().forResource("/datashield/cfg").withResourceBody(DataShieldConfigDto.stringify(dto)).withCallback(ResourceCallbacks.<DataShieldConfigDto> noOp()).put().send();
+      }
+    });
+
     getDisplay().addEnvironmentDisplay("Aggregate", aggregatePresenter.getDisplay());
     getDisplay().addEnvironmentDisplay("Assign", assignPresenter.getDisplay());
     getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+
+    getDisplay().levelSelector().setValue(DataShieldConfigDto.Level.RESTRICTED);
+    ResourceRequestBuilderFactory.<DataShieldConfigDto> newBuilder().forResource("/datashield/cfg").withCallback(new ResourceCallback<DataShieldConfigDto>() {
+
+      @Override
+      public void onResource(Response response, DataShieldConfigDto resource) {
+        GWT.log(resource.getLevel().getName());
+        getDisplay().levelSelector().setValue(resource.getLevel(), true);
+      }
+    }).get().send();
+
   }
 
   @Override

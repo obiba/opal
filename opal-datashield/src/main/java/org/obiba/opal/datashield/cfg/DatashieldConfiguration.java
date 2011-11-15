@@ -41,6 +41,10 @@ public class DatashieldConfiguration implements OpalConfigurationExtension {
     return level != null ? level : Level.RESTRICTED;
   }
 
+  public void setLevel(Level level) {
+    this.level = level;
+  }
+
   public DataShieldEnvironment getAggregateEnvironment() {
     return getEnvironment(Environment.AGGREGATE);
   }

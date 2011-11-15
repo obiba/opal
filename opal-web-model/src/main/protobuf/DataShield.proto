@@ -3,6 +3,16 @@ package DataShield;
 
 option java_package = "org.obiba.opal.web.model";
 
+message DataShieldConfigDto {
+
+  enum Level {
+    RESTRICTED = 0;
+    UNRESTRICTED = 1;
+  }
+  
+  required Level level = 1;
+}
+
 message DataShieldMethodDto {
   required string name = 1;
   extensions 1000 to max;
@@ -14,7 +24,6 @@ message RFunctionDataShieldMethodDto {
     optional RFunctionDataShieldMethodDto method = 1000;
   }
 }
-
 
 message RScriptDataShieldMethodDto {
   required string script = 1;
