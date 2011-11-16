@@ -23,6 +23,9 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.NumericalVariableD
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 
 /**
@@ -35,6 +38,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   @Inject
   public DeriveNumericalVariableStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+
+    super.registerHandler(getDisplay().addValueMapEntryHandler(new AddValueMapEntryHandler()));
   }
 
   @Override
@@ -98,6 +103,24 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   // Interfaces
   //
 
+  /**
+   *
+   */
+  private final class AddValueMapEntryHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent event) {
+      boolean added = false;
+      if(getDisplay().addRangeSelected()) {
+        added = derivationHelper.addValueMapEntry(getDisplay().getLowerValue(), getDisplay().getUpperValue(), getDisplay().getNewValue());
+      } else {
+        added = derivationHelper.addValueMapEntry(getDisplay().getDiscreteValue(), getDisplay().getNewValue());
+      }
+      if(added) {
+        getDisplay().refreshValuesMapDisplay();
+      }
+    }
+  }
+
   public interface Display extends WidgetDisplay {
 
     DefaultWizardStepController.Builder getMethodStepController();
@@ -105,6 +128,20 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     DefaultWizardStepController.Builder getMapStepController();
 
     void populateValues(List<ValueMapEntry> valuesMap);
+
+    void refreshValuesMapDisplay();
+
+    HandlerRegistration addValueMapEntryHandler(ClickHandler handler);
+
+    String getNewValue();
+
+    boolean addRangeSelected();
+
+    Long getDiscreteValue();
+
+    Long getLowerValue();
+
+    Long getUpperValue();
 
   }
 

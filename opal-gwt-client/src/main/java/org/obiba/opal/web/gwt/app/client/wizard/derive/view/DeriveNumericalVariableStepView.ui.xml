@@ -128,7 +128,7 @@
               </g:row>
               <g:row>
                 <g:customCell>
-                  <g:Button styleName="btn info"><ui:msg description="Add label">Add</ui:msg></g:Button>      
+                  <g:Button styleName="btn info" ui:field="addButton"><ui:msg description="Add label">Add</ui:msg></g:Button>      
                 </g:customCell>
               </g:row>
             </g:Grid>

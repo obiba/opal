@@ -212,6 +212,12 @@ public class NumericTextBox extends TextBox {
     }
   }
 
+  public Long getLongValue() {
+    if(getText().isEmpty()) return null;
+
+    return getNumericValue();
+  }
+
   public long getNumericValue() {
     return parseValue(getValue());
   }

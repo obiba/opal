@@ -18,13 +18,17 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -88,6 +92,12 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   @UiField
   NumericTextBox valueBox;
 
+  @UiField
+  TextBox newValueBox;
+
+  @UiField
+  Button addButton;
+
   //
   // Constructors
   //
@@ -145,6 +155,7 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
     });
 
     addRangeRadio.setValue(true, true);
+
   }
 
   private void setAddRangeEnabled(boolean enabled) {
@@ -197,6 +208,41 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   @Override
   public void populateValues(List<ValueMapEntry> valuesMap) {
     valuesMapGrid.populate(valuesMap);
+  }
+
+  @Override
+  public HandlerRegistration addValueMapEntryHandler(ClickHandler handler) {
+    return addButton.addClickHandler(handler);
+  }
+
+  @Override
+  public String getNewValue() {
+    return newValueBox.getText();
+  }
+
+  @Override
+  public boolean addRangeSelected() {
+    return addRangeRadio.getValue();
+  }
+
+  @Override
+  public Long getDiscreteValue() {
+    return valueBox.getLongValue();
+  }
+
+  @Override
+  public Long getLowerValue() {
+    return addFromBox.getLongValue();
+  }
+
+  @Override
+  public Long getUpperValue() {
+    return addToBox.getLongValue();
+  }
+
+  @Override
+  public void refreshValuesMapDisplay() {
+    valuesMapGrid.refreshValuesMap();
   }
 
 }

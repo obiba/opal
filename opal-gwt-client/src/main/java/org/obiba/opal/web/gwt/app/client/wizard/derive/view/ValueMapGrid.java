@@ -93,6 +93,10 @@ public class ValueMapGrid extends FlowPanel {
     addStyleName("value-map");
   }
 
+  public void refreshValuesMap() {
+    dataProvider.refresh();
+  }
+
   private void initializeTable() {
     if(table != null) {
       remove(table);

@@ -79,6 +79,18 @@ public class ValueMapEntry {
     return new Builder(ValueMapEntryType.DISTINCT_VALUE).value(value).label("");
   }
 
+  public static Builder fromRange(Long lower, Long upper) {
+    String value = "";
+    if(lower == null) {
+      value = "-" + upper;
+    } else if(upper == null) {
+      value = lower + "+";
+    } else {
+      value = lower + "-" + upper;
+    }
+    return new Builder(ValueMapEntryType.RANGE).value(value).label("");
+  }
+
   public static Builder createEmpties(String label) {
     return new Builder(ValueMapEntryType.EMPTY_VALUES).value("null").label(label).missing();
   }
