@@ -31,7 +31,7 @@ public class ValueMapEntry {
     super();
     this.type = type;
     this.value = value;
-    this.label = value;
+    this.label = label;
     this.newValue = newValue;
     this.missing = missing;
   }
