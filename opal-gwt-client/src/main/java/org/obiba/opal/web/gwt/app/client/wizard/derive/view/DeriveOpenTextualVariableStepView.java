@@ -86,13 +86,13 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @UiField
   ValueMapGrid valuesMapGrid;
 
-  MySuggestOrable valueOracle;
+  MultiWordSuggestOracleWithDisplayStringInAddMethod valueOracle;
 
-  MySuggestOrable newValueOracle;
+  MultiWordSuggestOracleWithDisplayStringInAddMethod newValueOracle;
 
   public DeriveOpenTextualVariableStepView() {
-    value = new SuggestBox(valueOracle = new MySuggestOrable());
-    newValue = new SuggestBox(newValueOracle = new MySuggestOrable());
+    value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplayStringInAddMethod());
+    newValue = new SuggestBox(newValueOracle = new MultiWordSuggestOracleWithDisplayStringInAddMethod());
 
     auto = new RadioButton(Method.group);
     manual = new RadioButton(Method.group);
@@ -179,7 +179,7 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
     valueOracle.add(replacementString, displayString);
   }
 
-  public class MySuggestOrable extends MultiWordSuggestOracle {
+  public class MultiWordSuggestOracleWithDisplayStringInAddMethod extends MultiWordSuggestOracle {
 
     Map<String, String> map = new HashMap<String, String>();
 
