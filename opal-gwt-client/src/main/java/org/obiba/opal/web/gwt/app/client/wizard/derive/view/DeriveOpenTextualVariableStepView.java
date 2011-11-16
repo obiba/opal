@@ -190,7 +190,7 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
 
     @Override
     protected MultiWordSuggestion createSuggestion(String replacementString, String displayString) {
-      return super.createSuggestion(replacementString, replacementString + ".................................." + map.get(replacementString));
+      return super.createSuggestion(replacementString, displayString + ".................................." + map.get(replacementString));
     }
   }
 
