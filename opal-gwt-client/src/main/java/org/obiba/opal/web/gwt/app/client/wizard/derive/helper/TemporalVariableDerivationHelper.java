@@ -259,8 +259,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       @Override
       public void initializeValueMapEntries(TemporalVariableDerivationHelper helper) {
         for(int i = 1; i < 13; i++) {
-          String str = Integer.toString(i);
-          addValueMapEntry(helper, ValueMapEntry.fromDistinct(str).label(translateMonth(i)).newValue(str).build());
+          addValueMapEntry(helper, ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(translateMonth(i)).newValue(Integer.toString(i)).build());
         }
       }
 
@@ -281,14 +280,13 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         String quarter = translateTime("Quarter") + " ";
         for(int i = 1; i < 5; i++) {
           String str = Integer.toString(i);
-          addValueMapEntry(helper, ValueMapEntry.fromDistinct(str).label(quarter + str).newValue(str).build());
+          addValueMapEntry(helper, ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(quarter + str).newValue(str).build());
         }
       }
 
       @Override
       public String getScript(TemporalVariableDerivationHelper helper) {
-        // TODO quarterOfYear()
-        return "month().map({1:1,2:1,3:1,4:2,5:2,6:2,7:3,8:3,9:3,10:4,11:4,12:4},null)";
+        return "quarter()";
       }
 
       @Override
@@ -302,14 +300,13 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         String semester = translateTime("Semester") + " ";
         for(int i = 1; i < 3; i++) {
           String str = Integer.toString(i);
-          addValueMapEntry(helper, ValueMapEntry.fromDistinct(str).label(semester + str).newValue(str).build());
+          addValueMapEntry(helper, ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(semester + str).newValue(str).build());
         }
       }
 
       @Override
       public String getScript(TemporalVariableDerivationHelper helper) {
-        // TODO semesterOfYear()
-        return "month().map({1:1,2:1,3:1,4:1,5:1,6:1,7:2,8:2,9:2,10:2,11:2,12:2},null)";
+        return "semester()";
       }
 
       @Override
