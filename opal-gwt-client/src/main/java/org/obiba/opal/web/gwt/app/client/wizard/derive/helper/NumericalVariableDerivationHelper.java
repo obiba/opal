@@ -46,7 +46,7 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
   public boolean addValueMapEntry(Long value, String newValue) {
     if(value != null && newValue != null && !newValue.trim().equals("")) {
       if(!hasValueMapEntryWithValue(value.toString())) {
-        valueMapEntries.add(0, ValueMapEntry.fromDistinct(value.toString()).newValue(newValue).build());
+        valueMapEntries.add(ValueMapEntry.fromDistinct(value.toString()).newValue(newValue).build());
         return true;
       }
     }
@@ -61,7 +61,7 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
       ValueMapEntry entry = ValueMapEntry.fromRange(lower, upper).label(range.toString()).newValue(newValue).build();
       if(!hasValueMapEntryWithValue(entry.getValue())) {
         entryRangeMap.put(entry, range);
-        valueMapEntries.add(0, entry);
+        valueMapEntries.add(entry);
         return true;
       }
     }

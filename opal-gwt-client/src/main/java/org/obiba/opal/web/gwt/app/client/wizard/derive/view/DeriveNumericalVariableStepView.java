@@ -227,17 +227,17 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
   @Override
   public Long getDiscreteValue() {
-    return valueBox.getLongValue();
+    return valueBox.getNumberValue();
   }
 
   @Override
   public Long getLowerValue() {
-    return addFromBox.getLongValue();
+    return addFromBox.getNumberValue();
   }
 
   @Override
   public Long getUpperValue() {
-    return addToBox.getLongValue();
+    return addToBox.getNumberValue();
   }
 
   @Override
