@@ -49,7 +49,7 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
 
-    if(method.isAutomatically()) {
+    if(method == Method.AUTOMATICALLY) {
 
       valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
       valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
@@ -65,13 +65,15 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
         @Override
         public void onResource(Response response, SummaryStatisticsDto dto) {
           CategoricalSummaryDto categoricalSummaryDto = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-          for(int i = 0; i < categoricalSummaryDto.getFrequenciesArray().length(); i++) {
-            FrequencyDto frequencyDto = categoricalSummaryDto.getFrequenciesArray().get(i);
-            String value = frequencyDto.getValue();
-            valueMapEntries.add(ValueMapEntry.fromDistinct(value).newValue(value).build());
+          JsArray<FrequencyDto> frequencies = categoricalSummaryDto.getFrequenciesArray();
+          for(int i = 0; i < frequencies.length(); i++) {
+            FrequencyDto frequencyDto = frequencies.get(i);
+            valueMapEntries.add(ValueMapEntry.fromDistinct(frequencyDto.getValue()).newValue(frequencyDto.getValue()).build());
+            display.addValueSuggestion(frequencyDto.getValue(), new Double(frequencyDto.getFreq()).intValue() + "");
           }
           display.populateValues(valueMapEntries);
         }
+
       }).send();
     } else {
       display.populateValues(valueMapEntries);
@@ -144,6 +146,8 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
 
     private final String method;
 
+    public static final String group = "group-method";
+
     Method(String method) {
       this.method = method;
     }
@@ -161,10 +165,5 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
     public String toString() {
       return method;
     }
-
-    public boolean isAutomatically() {
-      return this == AUTOMATICALLY;
-    }
   }
-
 }

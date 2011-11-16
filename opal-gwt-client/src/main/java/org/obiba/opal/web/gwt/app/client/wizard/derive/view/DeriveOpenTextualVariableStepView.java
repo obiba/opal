@@ -9,9 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.OpenTextualVariableDerivationHelper.Method;
@@ -24,10 +27,12 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -50,28 +55,30 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @UiField
   WizardStep mapStep;
 
-  @UiField
+  @UiField(provided = true)
   RadioButton auto;
 
   @UiField
   Label labelAuto;
 
-  @UiField
+  @UiField(provided = true)
   RadioButton manual;
 
   @UiField
   Label labelManual;
+
+  RadioGroup<Method> radioGroup;
 
   // --- Map fields ---
 
   @UiField
   InlineLabel labelValue;
 
-  @UiField
-  TextBox value;
+  @UiField(provided = true)
+  SuggestBox value;
 
-  @UiField
-  TextBox newValue;
+  @UiField(provided = true)
+  SuggestBox newValue;
 
   @UiField
   Button addButton;
@@ -79,8 +86,22 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @UiField
   ValueMapGrid valuesMapGrid;
 
+  MySuggestOrable valueOracle;
+
+  MySuggestOrable newValueOracle;
+
   public DeriveOpenTextualVariableStepView() {
+    value = new SuggestBox(valueOracle = new MySuggestOrable());
+    newValue = new SuggestBox(newValueOracle = new MySuggestOrable());
+
+    auto = new RadioButton(Method.group);
+    manual = new RadioButton(Method.group);
+
     initWidget(uiBinder.createAndBindUi(this));
+
+    radioGroup = new RadioGroup<Method>();
+    radioGroup.addButton(auto, Method.AUTOMATICALLY);
+    radioGroup.addButton(manual, Method.MANUAL);
 
     // TODO localized
     labelValue.setText(translations.valueLabel() + ": ");
@@ -96,12 +117,7 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
 
   @Override
   public Method getMethod() {
-    if(auto.getValue()) {
-      return Method.AUTOMATICALLY;
-    } else if(manual.getValue()) {
-      return Method.MANUAL;
-    }
-    return null;
+    return radioGroup.getValue();
   }
 
   @Override
@@ -128,13 +144,13 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   }
 
   @Override
-  public String getValue() {
-    return value.getValue();
+  public HasValue<String> getValue() {
+    return value;
   }
 
   @Override
-  public String getNewValue() {
-    return newValue.getValue();
+  public HasValue<String> getNewValue() {
+    return newValue;
   }
 
   @Override
@@ -156,6 +172,26 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @Override
   public void entryAdded() {
     valuesMapGrid.entryAdded();
+  }
+
+  @Override
+  public void addValueSuggestion(String replacementString, String displayString) {
+    valueOracle.add(replacementString, displayString);
+  }
+
+  public class MySuggestOrable extends MultiWordSuggestOracle {
+
+    Map<String, String> map = new HashMap<String, String>();
+
+    public void add(String replacementString, String displayString) {
+      super.add(replacementString);
+      map.put(replacementString, displayString);
+    }
+
+    @Override
+    protected MultiWordSuggestion createSuggestion(String replacementString, String displayString) {
+      return super.createSuggestion(replacementString, replacementString + ".................................." + map.get(replacementString));
+    }
   }
 
 }

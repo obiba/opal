@@ -28,6 +28,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
 /**
@@ -84,7 +85,7 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
       @Override
       public void onClick(ClickEvent event) {
-        if(derivationHelper.addEntry(getDisplay().getValue(), getDisplay().getNewValue())) {
+        if(derivationHelper.addEntry(getDisplay().getValue().getValue(), getDisplay().getNewValue().getValue())) {
           getDisplay().emptyValueFields();
         }
       }
@@ -118,12 +119,14 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
     ValueMapGrid getValueMapGrid();
 
-    String getValue();
+    HasValue<String> getValue();
 
-    String getNewValue();
+    HasValue<String> getNewValue();
 
     void emptyValueFields();
 
     void entryAdded();
+
+    void addValueSuggestion(String replacementString, String displayString);
   }
 }

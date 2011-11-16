@@ -14,11 +14,11 @@
   <g:FlowPanel>
      <o:WizardStep ui:field="methodStep">
       <g:FlowPanel>
-      	<g:RadioButton ui:field="auto" name="group-method" />
+      	<g:RadioButton ui:field="auto" />
       	<g:Label ui:field="labelAuto" addStyleNames="key"></g:Label>
       </g:FlowPanel>
       <g:FlowPanel>
-      	<g:RadioButton ui:field="manual" name="group-method" />
+      	<g:RadioButton ui:field="manual" />
       	<g:Label ui:field="labelManual" addStyleNames="key"></g:Label>
       </g:FlowPanel>
      </o:WizardStep>
@@ -30,10 +30,10 @@
      					<g:InlineLabel ui:field="labelValue"/>
      				</td>
      				<td class="{style.padding}">
-     					<g:TextBox ui:field="value"/>
+     					<g:SuggestBox ui:field="value"/>
      				</td>
      				<td class="{style.padding}">
-     					<g:TextBox ui:field="newValue"/>
+     					<g:SuggestBox ui:field="newValue"/>
      				</td>
      				<td class="{style.padding}">
      					<g:Button ui:field="addButton" styleName="btn"/>
