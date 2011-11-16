@@ -82,6 +82,7 @@ public class NumericTextBox extends TextBox {
       case KeyCodes.KEY_PAGEUP:
       case KeyCodes.KEY_DOWN:
       case KeyCodes.KEY_PAGEDOWN:
+      case KeyCodes.KEY_TAB:
         return;
       }
 
