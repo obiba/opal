@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.datashield.cfg;
 
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.List;
 
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
@@ -17,7 +19,7 @@ import org.obiba.opal.datashield.DataShieldMethod;
 
 import com.google.common.base.Preconditions;
 
-public class DatashieldConfiguration implements OpalConfigurationExtension {
+public class DatashieldConfiguration implements OpalConfigurationExtension, Serializable {
 
   public enum Level {
     RESTRICTED, UNRESTRICTED
@@ -33,6 +35,9 @@ public class DatashieldConfiguration implements OpalConfigurationExtension {
 
   private Level level;
 
+  @SuppressWarnings("unused")
+  @Deprecated
+  // Used to allow successful deserialisation
   private List<DataShieldMethod> aggregatingMethods;
 
   private List<DataShieldEnvironment> environments;
@@ -60,4 +65,13 @@ public class DatashieldConfiguration implements OpalConfigurationExtension {
     }
     throw new IllegalArgumentException("Unknown environment " + env);
   }
+
+  private Object readResolve() throws ObjectStreamException {
+    if(aggregatingMethods != null && aggregatingMethods.size() > 0) {
+      environments.add(new DataShieldEnvironment(Environment.AGGREGATE, aggregatingMethods));
+      aggregatingMethods = null;
+    }
+    return this;
+  }
+
 }

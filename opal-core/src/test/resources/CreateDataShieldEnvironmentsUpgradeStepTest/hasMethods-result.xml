@@ -1,0 +1,27 @@
+<org.obiba.opal.core.cfg.OpalConfiguration>
+  <fileSystemRoot>somewhere</fileSystemRoot>
+  <extensions>
+    <org.obiba.opal.datashield.cfg.DatashieldConfiguration>
+      <environments><org.obiba.opal.datashield.DataShieldEnvironment><environment>AGGREGATE</environment><methods>
+        <org.obiba.opal.datashield.RFunctionDataShieldMethod>
+          <name>log</name>
+          <function>base::log</function>
+        </org.obiba.opal.datashield.RFunctionDataShieldMethod>
+        <org.obiba.opal.datashield.CustomRScriptMethod>
+          <name>inv</name>
+          <script><![CDATA[function(data) {
+  if(is.atomic(data)) {
+    if(length(data) <= 1) {
+      "Vector too small."
+    } else {
+      base::summary(data);
+    }
+  } else if(is.recursive(data)) {
+      base::summary.default(data);
+  }
+}]]></script>
+        </org.obiba.opal.datashield.CustomRScriptMethod>
+      </methods></org.obiba.opal.datashield.DataShieldEnvironment></environments>
+    </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
+  </extensions>
+</org.obiba.opal.core.cfg.OpalConfiguration>

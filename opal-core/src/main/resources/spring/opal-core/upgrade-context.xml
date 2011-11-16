@@ -152,6 +152,8 @@
           <property name="appliesTo" value="1.6.0" />
           <property name="procedureName" value="update_var_index"/>
         </bean>
+
+        <bean class="org.obiba.opal.core.runtime.upgrade.CreateDataShieldEnvironmentsUpgradeStep"/>
       </list>
     </property>
 
