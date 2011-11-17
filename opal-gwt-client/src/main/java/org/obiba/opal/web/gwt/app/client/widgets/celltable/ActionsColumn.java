@@ -14,6 +14,7 @@ public class ActionsColumn<T> extends Column<T, T> implements HasActionHandler<T
 
   public ActionsColumn(ActionsProvider<T> actionsProvider) {
     super(new ActionsCell<T>(actionsProvider));
+    setCellStyleNames("row-actions");
   }
 
   public T getValue(T object) {

@@ -168,8 +168,8 @@ public class ValueMapGrid extends FlowPanel {
       }
 
     };
-    valueColumn.setCellStyleNames("value");
-    table.addColumn(valueColumn, translations.valueLabel());
+    valueColumn.setCellStyleNames("original-value");
+    table.addColumn(valueColumn, translations.originalValueLabel());
   }
 
   private void initializeLabelColumn() {
@@ -182,8 +182,8 @@ public class ValueMapGrid extends FlowPanel {
       }
 
     };
-    labelColumn.setCellStyleNames("value-label");
-    table.addColumn(labelColumn, translations.labelLabel());
+    labelColumn.setCellStyleNames("original-label");
+    table.addColumn(labelColumn, translations.originalLabelLabel());
   }
 
   private void initializeNewValueColumn() {
@@ -215,7 +215,7 @@ public class ValueMapGrid extends FlowPanel {
         return entry.isMissing();
       }
     };
-    missingColumn.setCellStyleNames("missing");
+    missingColumn.setCellStyleNames("new-missing");
     table.addColumn(missingColumn, translations.missingLabel());
     table.setColumnWidth(missingColumn, "8em");
     missingColumn.setFieldUpdater(new FieldUpdater<ValueMapEntry, Boolean>() {

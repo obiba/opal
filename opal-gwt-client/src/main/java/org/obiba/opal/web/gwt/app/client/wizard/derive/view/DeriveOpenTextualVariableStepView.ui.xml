@@ -41,7 +41,7 @@
      			</tr>
      		</table>
      	</g:HTMLPanel>
-     	<o2:ValueMapGrid width="100%" addStyleNames="gwt-CellTable" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="38em"/>
+     	<o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="38em"/>
      </o:WizardStep>
   </g:FlowPanel>
 </ui:UiBinder>

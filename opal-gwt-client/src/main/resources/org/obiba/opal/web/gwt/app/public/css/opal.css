@@ -352,7 +352,8 @@ img.clickable {
 .gwt-CellTable {
 }
 
-.gwt-CellTable td span {
+.gwt-CellTable td span,
+td.row-actions span {
   margin-right: 0.5em;
   cursor: pointer;
   text-decoration: underline;

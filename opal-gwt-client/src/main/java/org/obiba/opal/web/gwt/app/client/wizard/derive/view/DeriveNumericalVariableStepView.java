@@ -112,6 +112,32 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   public DeriveNumericalVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
 
+    initializeMethodForm();
+    initializeValueMapEntryForm();
+  }
+
+  private void initializeValueMapEntryForm() {
+    addRangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setAddRangeEnabled(true);
+      }
+    });
+
+    addDiscreteRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        setAddRangeEnabled(false);
+      }
+    });
+
+    addRangeRadio.setValue(true, true);
+    valuesMapGrid.enableRowDeletion(true);
+  }
+
+  private void initializeMethodForm() {
     rangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
       @Override
@@ -144,24 +170,6 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
     rangeRadio.setValue(true, true);
     lengthRadio.setValue(true, true);
-
-    addRangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setAddRangeEnabled(true);
-      }
-    });
-
-    addDiscreteRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setAddRangeEnabled(false);
-      }
-    });
-
-    addRangeRadio.setValue(true, true);
 
   }
 

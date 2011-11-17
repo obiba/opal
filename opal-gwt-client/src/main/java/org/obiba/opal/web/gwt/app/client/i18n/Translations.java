@@ -47,6 +47,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Label")
   String labelLabel();
 
+  @Description("Original Label label")
+  @DefaultStringValue("Original Label")
+  String originalLabelLabel();
+
   @Description("ID label")
   @DefaultStringValue("ID")
   String idLabel();
@@ -295,6 +299,10 @@ public interface Translations extends Constants {
   @Description("Value label")
   @DefaultStringValue("Value")
   String valueLabel();
+
+  @Description("Original Value label")
+  @DefaultStringValue("Original Value")
+  String originalValueLabel();
 
   @Description("New Value label")
   @DefaultStringValue("New Value")
