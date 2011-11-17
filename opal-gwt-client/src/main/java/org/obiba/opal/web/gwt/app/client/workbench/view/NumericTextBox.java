@@ -100,7 +100,7 @@ public class NumericTextBox extends TextBox {
     if(newValue == null || (maxConstrained && (newValue.intValue() > max))) {
       return;
     }
-    setValue(newValue.toString());
+    setValue(numberType.formatValue(newValue));
   }
 
   protected void decreaseValue(int step) {
@@ -110,7 +110,7 @@ public class NumericTextBox extends TextBox {
     if(newValue == null || (minConstrained && (newValue.intValue() < min))) {
       return;
     }
-    setValue(newValue.toString());
+    setValue(numberType.formatValue(newValue));
   }
 
   @Override
@@ -126,7 +126,7 @@ public class NumericTextBox extends TextBox {
         return;
       }
       String prevText = getValue();
-      super.setText(newValue.toString());
+      super.setText(numberType.formatValue(newValue));
       if(fireEvents) {
         ValueChangeEvent.fireIfNotEqual(this, getValue(), prevText);
       }
@@ -283,9 +283,22 @@ public class NumericTextBox extends TextBox {
           return null;
         }
       }
+
+      @Override
+      public String formatValue(Number value) {
+        String str = super.formatValue(value);
+        if(str.endsWith(".0")) {
+          return str.substring(0, str.length() - 2);
+        }
+        return str;
+      }
     };
 
     public abstract Number parseValue(String value);
+
+    public String formatValue(Number value) {
+      return value.toString();
+    }
 
     public abstract Number increaseValue(String value, int step);
 
