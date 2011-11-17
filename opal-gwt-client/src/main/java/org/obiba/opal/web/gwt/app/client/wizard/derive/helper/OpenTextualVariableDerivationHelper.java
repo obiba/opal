@@ -10,7 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -21,11 +24,9 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
+import com.google.common.collect.Ordering;
 import com.google.gwt.core.client.JsArray;
 
-/**
- *
- */
 public class OpenTextualVariableDerivationHelper extends DerivationHelper {
 
   private CategoricalSummaryDto categoricalSummaryDto;
@@ -46,15 +47,33 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
 
     if(method == Method.AUTOMATICALLY) {
-      JsArray<FrequencyDto> frequencies = categoricalSummaryDto.getFrequenciesArray();
-      for(int i = 0; i < frequencies.length(); i++) {
-        FrequencyDto frequencyDto = frequencies.get(i);
+      int i = 0;
+      for(FrequencyDto frequencyDto : sortByFrequency()) {
         valueMapEntries.add(ValueMapEntry.fromDistinct(frequencyDto.getValue())//
-        .newValue((i + 1) + "")//
+        .newValue((i++) + "")//
         .label(frequencyDto.getValue())//
         .count(new Double(frequencyDto.getFreq()).intValue()).build());
       }
     }
+  }
+
+  private List<FrequencyDto> sortByFrequency() {
+    final Ordering<FrequencyDto> ordering = new Ordering<FrequencyDto>() {
+      @Override
+      public int compare(FrequencyDto left, FrequencyDto right) {
+        return new Double(left.getFreq()).compareTo(right.getFreq());
+      }
+    };
+
+    List<FrequencyDto> list = JsArrays.toList(categoricalSummaryDto.getFrequenciesArray());
+
+    Collections.sort(list, new Comparator<FrequencyDto>() {
+      @Override
+      public int compare(FrequencyDto freq1, FrequencyDto freq2) {
+        return ordering.compare(freq1, freq2);
+      }
+    });
+    return list;
   }
 
   public Method getMethod() {
