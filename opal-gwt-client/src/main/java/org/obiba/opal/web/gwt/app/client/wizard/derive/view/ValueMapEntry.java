@@ -27,6 +27,8 @@ public class ValueMapEntry {
 
   private boolean missing;
 
+  private double count;
+
   private ValueMapEntry(ValueMapEntryType type, String value, String label, String newValue, boolean missing) {
     super();
     this.type = type;
@@ -71,12 +73,24 @@ public class ValueMapEntry {
     this.missing = missing;
   }
 
+  public double getCount() {
+    return count;
+  }
+
   public static Builder fromCategory(CategoryDto cat) {
-    return new Builder(ValueMapEntryType.CATEGORY_NAME).value(cat.getName()).label(VariableViewHelper.getLabelValue(cat.getAttributesArray()));
+    return fromCategory(cat, 0);
+  }
+
+  public static Builder fromCategory(CategoryDto cat, double count) {
+    return new Builder(ValueMapEntryType.CATEGORY_NAME).value(cat.getName()).label(VariableViewHelper.getLabelValue(cat.getAttributesArray())).count(count);
   }
 
   public static Builder fromDistinct(String value) {
-    return new Builder(ValueMapEntryType.DISTINCT_VALUE).value(value).label("");
+    return fromDistinct(value, 0);
+  }
+
+  public static Builder fromDistinct(String value, double count) {
+    return new Builder(ValueMapEntryType.DISTINCT_VALUE).value(value).label("").count(count);
   }
 
   public static Builder fromRange(Number lower, Number upper) {
@@ -127,6 +141,11 @@ public class ValueMapEntry {
 
     public Builder missing() {
       entry.missing = true;
+      return this;
+    }
+
+    public Builder count(double count) {
+      entry.count = count;
       return this;
     }
 

@@ -23,6 +23,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -36,6 +37,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.view.client.ListDataProvider;
 
 public class ValueMapGrid extends FlowPanel {
+
+  private static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
 
   private static final int DEFAULT_PAGE_SIZE_MIN = 10;
 
@@ -81,7 +84,7 @@ public class ValueMapGrid extends FlowPanel {
     this.gridHeight = gridHeight;
   }
 
-  public void populate(List<ValueMapEntry> valueMapEntries) {
+  public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries) {
     this.valueMapEntries = valueMapEntries;
 
     initializeTable();
@@ -164,7 +167,7 @@ public class ValueMapGrid extends FlowPanel {
 
       @Override
       protected String getText(ValueMapEntry entry) {
-        return entry.getValue();
+        return entry.getValue() + " (" + FREQ_FORMAT.format(entry.getCount()) + ")";
       }
 
     };
@@ -199,6 +202,7 @@ public class ValueMapGrid extends FlowPanel {
     table.addColumn(newValueColumn, translations.newValueLabel());
     table.setColumnWidth(newValueColumn, "10em");
     newValueColumn.setFieldUpdater(new FieldUpdater<ValueMapEntry, String>() {
+      @Override
       public void update(int index, ValueMapEntry entry, String value) {
         entry.setNewValue(value);
         debug();
@@ -288,9 +292,8 @@ public class ValueMapGrid extends FlowPanel {
         builder.appendEscaped(res.getGroup(2));
         builder.append(SafeHtmlUtils.fromTrustedString(res.getGroup(3)));
         return builder.toSafeHtml();
-      } else {
-        return SafeHtmlUtils.fromString(object);
       }
+      return SafeHtmlUtils.fromString(object);
 
     }
   }

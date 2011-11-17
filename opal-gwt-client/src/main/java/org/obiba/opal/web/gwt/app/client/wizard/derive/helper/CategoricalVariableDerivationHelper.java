@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
+import org.obiba.opal.web.model.client.math.FrequencyDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.regexp.shared.RegExp;
@@ -40,41 +44,63 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private static final String FEMALE_REGEXP = "^FEMALE$";
 
-  public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
+  private final SummaryStatisticsDto statisticsDto;
+
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto statistics) {
     super(originalVariable);
+    this.statisticsDto = statistics;
     initializeValueMapEntries();
   }
 
+  @Override
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
 
-    // recode non-missing values and identify missing values
-    initializeCategoryValueMapEntries();
+    // For each category and value without category, make value map entry and process separately missing and non-missing
+    // ones.
 
-    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
-    valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
-  }
+    Map<String, Double> countByCategoryName = new HashMap<String, Double>();
+    CategoricalSummaryDto categoricalSummaryDto = statisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+    JsArray<FrequencyDto> frequencies = categoricalSummaryDto.getFrequenciesArray();
+    for(int i = 0; i < frequencies.length(); i++) {
+      FrequencyDto frequencyDto = frequencies.get(i);
+      countByCategoryName.put(frequencyDto.getValue(), frequencyDto.getFreq());
+    }
 
-  /**
-   * For each category, make value map entry and process separately missing and non-missing ones.
-   */
-  private void initializeCategoryValueMapEntries() {
     List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
     int index = 1;
 
-    for(CategoryDto cat : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
-      ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(cat);
-
-      if(estimateIsMissing(cat)) {
+    // recode categories
+    for(CategoryDto category : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
+      Double count = countByCategoryName.get(category.getName());
+      ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(category, count);
+      if(estimateIsMissing(category)) {
         builder.missing();
         missingValueMapEntries.add(builder.build());
       } else {
-        index = initializeNonMissingCategoryValueMapEntry(index, cat, builder);
+        index = initializeNonMissingCategoryValueMapEntry(index, category.getName(), builder);
+      }
+      countByCategoryName.remove(category.getName());
+    }
+
+    // recode values not corresponding to a category
+    for(Map.Entry<String, Double> entry : countByCategoryName.entrySet()) {
+      String value = entry.getKey();
+      ValueMapEntry.Builder builder = ValueMapEntry.fromDistinct(value, entry.getValue());
+      if(estimateIsMissing(value)) {
+        builder.missing();
+        missingValueMapEntries.add(builder.build());
+      } else {
+        index = initializeNonMissingCategoryValueMapEntry(index, value, builder);
       }
     }
 
     // recode missing values
     initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
+
+    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
+    valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
+
   }
 
   /**
@@ -85,19 +111,18 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param builder
    * @return current index value
    */
-  @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
-  private int initializeNonMissingCategoryValueMapEntry(int index, CategoryDto cat, ValueMapEntry.Builder builder) {
+  private int initializeNonMissingCategoryValueMapEntry(int index, String value, ValueMapEntry.Builder builder) {
     int newIndex = index;
-    if(RegExp.compile("^\\d+$").test(cat.getName())) {
-      builder.newValue(cat.getName());
-    } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(cat.getName())) {
+    if(RegExp.compile("^\\d+$").test(value)) {
+      builder.newValue(value);
+    } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(value)) {
       builder.newValue("0");
-    } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(cat.getName())) {
+    } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(value)) {
       builder.newValue("1");
       if(index < 2) {
         newIndex = 2;
       }
-    } else if(RegExp.compile(FEMALE_REGEXP, "i").test(cat.getName())) {
+    } else if(RegExp.compile(FEMALE_REGEXP, "i").test(value)) {
       builder.newValue("2");
       if(index < 3) {
         newIndex = 3;
@@ -132,6 +157,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     valueMapEntries.addAll(missingValueMapEntries);
   }
 
+  @Override
   public VariableDto getDerivedVariable() {
     VariableDto derived = copyVariable(originalVariable);
 

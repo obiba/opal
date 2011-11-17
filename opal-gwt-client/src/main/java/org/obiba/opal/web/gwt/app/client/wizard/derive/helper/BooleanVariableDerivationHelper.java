@@ -30,6 +30,7 @@ public class BooleanVariableDerivationHelper extends DerivationHelper {
     initializeValueMapEntries();
   }
 
+  @Override
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
 
@@ -39,6 +40,7 @@ public class BooleanVariableDerivationHelper extends DerivationHelper {
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
   }
 
+  @Override
   public VariableDto getDerivedVariable() {
     VariableDto derived = copyVariable(originalVariable);
     derived.setValueType("text");

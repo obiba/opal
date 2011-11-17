@@ -70,15 +70,14 @@ public class JsArrays {
   public static <T extends JavaScriptObject> T[] toArray(JsArray<? extends T> values) {
     if(GWT.isScript()) {
       return reinterpretCast(values);
-    } else {
-      int length = values.length();
-      @SuppressWarnings("unchecked")
-      T[] ret = (T[]) new JavaScriptObject[length];
-      for(int i = 0, l = length; i < l; i++) {
-        ret[i] = values.get(i);
-      }
-      return ret;
     }
+    int length = values.length();
+    @SuppressWarnings("unchecked")
+    T[] ret = (T[]) new JavaScriptObject[length];
+    for(int i = 0, l = length; i < l; i++) {
+      ret[i] = values.get(i);
+    }
+    return ret;
   }
 
   public static <T extends JavaScriptObject> List<T> toList(final JsArray<T> array) {
@@ -142,7 +141,7 @@ public class JsArrays {
 
   @SuppressWarnings("unchecked")
   public static <T extends JavaScriptObject> JsArray<T> create() {
-    return (JsArray<T>) JsArray.createArray();
+    return (JsArray<T>) JavaScriptObject.createArray();
   }
 
   public static <T extends JavaScriptObject> JsArray<T> toSafeArray(JsArray<T> array) {
@@ -154,7 +153,7 @@ public class JsArrays {
 
   public static <T extends JavaScriptObject> JsArrayString toSafeArray(JsArrayString array) {
     if(array == null) {
-      return (JsArrayString) JsArrayString.createArray();
+      return (JsArrayString) JavaScriptObject.createArray();
     }
     return array;
   }

@@ -21,8 +21,12 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 /**
@@ -42,10 +46,16 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   //
 
   @Override
-  void initialize(VariableDto variable) {
+  void initialize(final VariableDto variable) {
     super.initialize(variable);
-    derivationHelper = new CategoricalVariableDerivationHelper(variable);
-    getDisplay().populateValues(derivationHelper.getValueMapEntries());
+
+    ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder().forResource(originalVariable.getLink() + "/summary?nature=categorical&distinct=true").get().withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+      @Override
+      public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
+        derivationHelper = new CategoricalVariableDerivationHelper(variable, statisticsDto);
+        getDisplay().populateValues(derivationHelper.getValueMapEntries());
+      }
+    }).send();
   }
 
   @Override
