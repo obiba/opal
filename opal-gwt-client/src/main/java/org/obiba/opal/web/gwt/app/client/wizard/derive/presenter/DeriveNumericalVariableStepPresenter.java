@@ -45,7 +45,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   @Override
   void initialize(VariableDto variable) {
     super.initialize(variable);
-    // TODO initialize when method is chosen
+    getDisplay().setNumberType(variable.getValueType());
   }
 
   @Override
@@ -137,11 +137,13 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
     boolean addRangeSelected();
 
-    Long getDiscreteValue();
+    Number getDiscreteValue();
 
-    Long getLowerValue();
+    Number getLowerValue();
 
-    Long getUpperValue();
+    Number getUpperValue();
+
+    void setNumberType(String valueType);
 
   }
 

@@ -23,12 +23,11 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 
 public class NumericalVariableDerivationHelper extends DerivationHelper {
 
-  private Map<ValueMapEntry, Range<Long>> entryRangeMap;
+  private Map<ValueMapEntry, Range<?>> entryRangeMap;
 
   public NumericalVariableDerivationHelper(VariableDto originalVariable) {
     super(originalVariable);
@@ -38,30 +37,30 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
   @Override
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
-    this.entryRangeMap = new HashMap<ValueMapEntry, Range<Long>>();
+    this.entryRangeMap = new HashMap<ValueMapEntry, Range<?>>();
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
   }
 
-  public boolean addValueMapEntry(Long value, String newValue) {
+  public boolean addValueMapEntry(Number value, String newValue) {
     if(value != null && newValue != null && !newValue.trim().equals("")) {
       if(!hasValueMapEntryWithValue(value.toString())) {
-        valueMapEntries.add(ValueMapEntry.fromDistinct(value.toString()).newValue(newValue).build());
+        valueMapEntries.add(valueMapEntries.size() - 2, ValueMapEntry.fromDistinct(value.toString()).newValue(newValue).build());
         return true;
       }
     }
     return false;
   }
 
-  public boolean addValueMapEntry(Long lower, Long upper, String newValue) {
+  public boolean addValueMapEntry(Number lower, Number upper, String newValue) {
     if(lower != null && lower.equals(upper)) {
       return addValueMapEntry(lower, newValue);
     } else if((lower != null || upper != null) && newValue != null && !newValue.trim().equals("")) {
-      Range<Long> range = buildRange(lower, upper);
+      Range<?> range = buildNumberRange(lower, upper);
       ValueMapEntry entry = ValueMapEntry.fromRange(lower, upper).label(range.toString()).newValue(newValue).build();
       if(!hasValueMapEntryWithValue(entry.getValue())) {
         entryRangeMap.put(entry, range);
-        valueMapEntries.add(entry);
+        valueMapEntries.add(valueMapEntries.size() - 2, entry);
         return true;
       }
     }
@@ -93,7 +92,7 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
 
   private void appendGroupMethod(StringBuilder scriptBuilder) {
     // group method
-    List<Range<Long>> ranges = new ArrayList<Range<Long>>();
+    List<Range<?>> ranges = new ArrayList<Range<?>>();
     List<ValueMapEntry> outliers = new ArrayList<ValueMapEntry>();
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
@@ -113,10 +112,10 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
     scriptBuilder.append(")");
   }
 
-  private void appendBounds(StringBuilder scriptBuilder, List<Range<Long>> ranges) {
+  private void appendBounds(StringBuilder scriptBuilder, List<Range<?>> ranges) {
     scriptBuilder.append("[");
     boolean first = true;
-    for(Range<Long> range : ranges) {
+    for(Range<?> range : ranges) {
       if(range.hasLowerBound()) {
         if(first) {
           first = false;
@@ -171,25 +170,25 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
     return false;
   }
 
-  public Range<Long> buildRange(String value) {
-    if(value.startsWith("-")) {
-      Long upper = Long.parseLong(value.substring(1));
-      GWT.log("(*, " + upper + "]");
+  public Range<?> buildNumberRange(Number lower, Number upper) {
+    if(lower instanceof Long) {
+      return buildRange((Long) lower, (Long) upper);
+    } else {
+      return buildRange((Double) lower, (Double) upper);
+    }
+  }
+
+  public Range<?> buildRange(Long lower, Long upper) {
+    if(lower == null) {
       return Ranges.lessThan(upper);
-    } else if(value.endsWith("+")) {
-      Long lower = Long.parseLong(value.substring(0, value.length() - 1));
-      GWT.log("[" + lower + ", *)");
+    } else if(upper == null) {
       return Ranges.atLeast(lower);
     } else {
-      String[] vals = value.split("-");
-      Long lower = Long.parseLong(vals[0]);
-      Long upper = Long.parseLong(vals[1]);
-      GWT.log("[" + lower + ", " + upper + "]");
       return Ranges.closedOpen(lower, upper);
     }
   }
 
-  public Range<Long> buildRange(Long lower, Long upper) {
+  public Range<?> buildRange(Double lower, Double upper) {
     if(lower == null) {
       return Ranges.lessThan(upper);
     } else if(upper == null) {

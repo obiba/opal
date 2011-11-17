@@ -226,23 +226,32 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   }
 
   @Override
-  public Long getDiscreteValue() {
+  public Number getDiscreteValue() {
     return valueBox.getNumberValue();
   }
 
   @Override
-  public Long getLowerValue() {
+  public Number getLowerValue() {
     return addFromBox.getNumberValue();
   }
 
   @Override
-  public Long getUpperValue() {
+  public Number getUpperValue() {
     return addToBox.getNumberValue();
   }
 
   @Override
   public void refreshValuesMapDisplay() {
     valuesMapGrid.refreshValuesMap();
+  }
+
+  @Override
+  public void setNumberType(String valueType) {
+    fromBox.setNumberType(valueType);
+    toBox.setNumberType(valueType);
+    addFromBox.setNumberType(valueType);
+    addToBox.setNumberType(valueType);
+    valueBox.setNumberType(valueType);
   }
 
 }

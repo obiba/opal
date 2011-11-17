@@ -79,7 +79,7 @@ public class ValueMapEntry {
     return new Builder(ValueMapEntryType.DISTINCT_VALUE).value(value).label("");
   }
 
-  public static Builder fromRange(Long lower, Long upper) {
+  public static Builder fromRange(Number lower, Number upper) {
     String value = "";
     if(lower == null) {
       value = "-" + upper;
