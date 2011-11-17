@@ -1355,7 +1355,10 @@ div.input .key {
 
 div.input.error input,
 div.input.error select,
-div.input.error textarea {
+div.input.error textarea,
+input.error,
+select.error,
+textarea.error {
   border-color:#c87872;
   -webkit-box-shadow:0 0 3px rgba(171, 41, 32, 0.25);
   -moz-box-shadow:0 0 3px rgba(171, 41, 32, 0.25);
@@ -1364,7 +1367,10 @@ div.input.error textarea {
 
 div.input.error input:focus,
 div.input.error select:focus,
-div.input.error textarea:focus {
+div.input.error textarea:focus,
+input.error:focus,
+select.error:focus,
+textarea.error:focus {
   border-color:#b9554d;
   -webkit-box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
   -moz-box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
