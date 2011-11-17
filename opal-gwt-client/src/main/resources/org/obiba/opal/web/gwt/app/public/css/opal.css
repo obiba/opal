@@ -238,8 +238,13 @@ img.clickable {
 }
 
 .gwt-DisclosurePanel .header {
-  background: url(../image/action-link.png) no-repeat left center;
   padding-left: 16px;
+}
+.gwt-DisclosurePanel-closed .header {
+  background: url(../image/more.png) no-repeat left center;
+}
+.gwt-DisclosurePanel-open .header {
+  background: url(../image/less.png) no-repeat left center;
 }
 
 .gwt-DisclosurePanel .content {
