@@ -153,12 +153,12 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
         } else {
           scriptBuilder.append(", ");
         }
-        scriptBuilder.append("'").append(entry.getValue()).append("': ");
+        scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
         appendNewValue(scriptBuilder, entry);
         addNewCategory(newCategoriesMap, entry);
       }
     }
-    scriptBuilder.append("}");
+    scriptBuilder.append("\n  }");
     appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
     appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
     scriptBuilder.append(")");
