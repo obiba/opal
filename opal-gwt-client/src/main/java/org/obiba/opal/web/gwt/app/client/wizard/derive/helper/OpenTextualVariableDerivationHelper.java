@@ -14,69 +14,46 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveOpenTextualVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveOpenTextualVariableStepPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
-import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Response;
 
 /**
  *
  */
 public class OpenTextualVariableDerivationHelper extends DerivationHelper {
 
-  private final DeriveOpenTextualVariableStepPresenter.Display display;
+  private CategoricalSummaryDto categoricalSummaryDto;
 
   private Method method;
 
-  public OpenTextualVariableDerivationHelper(VariableDto originalVariable, Display display) {
+  public OpenTextualVariableDerivationHelper(VariableDto originalVariable, Method method, CategoricalSummaryDto categoricalSummaryDto) {
     super(originalVariable);
-    this.display = display;
-    this.method = display.getMethod();
+    this.method = method;
+    this.categoricalSummaryDto = categoricalSummaryDto;
     initializeValueMapEntries();
   }
 
   @Override
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
+    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
+    valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
 
     if(method == Method.AUTOMATICALLY) {
-
-      valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
-      valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
-
-      StringBuilder link = new StringBuilder(originalVariable.getLink())//
-      .append("/summary")//
-      .append("?nature=categorical")//
-      .append("&distinct=true");
-
-      ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
-      .forResource(link.toString()).get()//
-      .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
-        @Override
-        public void onResource(Response response, SummaryStatisticsDto dto) {
-          CategoricalSummaryDto categoricalSummaryDto = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-          JsArray<FrequencyDto> frequencies = categoricalSummaryDto.getFrequenciesArray();
-          for(int i = 0; i < frequencies.length(); i++) {
-            FrequencyDto frequencyDto = frequencies.get(i);
-            valueMapEntries.add(ValueMapEntry.fromDistinct(frequencyDto.getValue()).newValue(frequencyDto.getValue()).build());
-            display.addValueSuggestion(frequencyDto.getValue(), new Double(frequencyDto.getFreq()).intValue() + "");
-          }
-          display.populateValues(valueMapEntries);
-        }
-
-      }).send();
-    } else {
-      display.populateValues(valueMapEntries);
+      JsArray<FrequencyDto> frequencies = categoricalSummaryDto.getFrequenciesArray();
+      for(int i = 0; i < frequencies.length(); i++) {
+        FrequencyDto frequencyDto = frequencies.get(i);
+        valueMapEntries.add(ValueMapEntry.fromDistinct(frequencyDto.getValue())//
+        .newValue((i + 1) + "")//
+        .label(frequencyDto.getValue())//
+        .count(new Double(frequencyDto.getFreq()).intValue()).build());
+      }
     }
   }
 
@@ -84,10 +61,9 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
     return method;
   }
 
-  public boolean addEntry(String value, String newValue) {
+  public boolean addEntry(String value, String newValue, String label) {
     if(value != null && !value.trim().equals("") && newValue != null && !newValue.trim().equals("")) {
-      valueMapEntries.add(ValueMapEntry.fromDistinct(value).newValue(newValue).build());
-      display.entryAdded();
+      valueMapEntries.add(ValueMapEntry.fromDistinct(value).newValue(newValue).label(label).build());
       return true;
     }
     return false;

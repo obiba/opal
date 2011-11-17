@@ -23,11 +23,18 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.OpenTextualVariabl
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.OpenTextualVariableDerivationHelper.Method;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapGrid;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
+import org.obiba.opal.web.model.client.math.FrequencyDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
@@ -71,7 +78,30 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
       @Override
       public void onStepIn() {
         if(derivationHelper == null || derivationHelper.getMethod() != getDisplay().getMethod()) {
-          derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, getDisplay());
+          StringBuilder link = new StringBuilder(originalVariable.getLink())//
+          .append("/summary")//
+          .append("?nature=categorical")//
+          .append("&distinct=true");
+
+          ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
+          .forResource(link.toString()).get()//
+          .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+            @Override
+            public void onResource(Response response, SummaryStatisticsDto dto) {
+              CategoricalSummaryDto categoricalSummaryDto = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+              derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, getDisplay().getMethod(), categoricalSummaryDto);
+
+              if(getDisplay().getMethod() == Method.AUTOMATICALLY) {
+                JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+                for(int i = 0; i < frequenciesArray.length(); i++) {
+                  FrequencyDto frequencyDto = frequenciesArray.get(i);
+                  display.addValueSuggestion(frequencyDto.getValue(), new Double(frequencyDto.getFreq()).intValue() + "");
+                }
+              }
+              display.populateValues(derivationHelper.getValueMapEntries());
+            }
+
+          }).send();
         }
       }
     }).build());
@@ -85,8 +115,9 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
       @Override
       public void onClick(ClickEvent event) {
-        if(derivationHelper.addEntry(getDisplay().getValue().getValue(), getDisplay().getNewValue().getValue())) {
+        if(derivationHelper.addEntry(getDisplay().getValue().getValue(), getDisplay().getNewValue().getValue(), getDisplay().getNewValue().getValue())) {
           getDisplay().emptyValueFields();
+          display.entryAdded();
         }
       }
     });
