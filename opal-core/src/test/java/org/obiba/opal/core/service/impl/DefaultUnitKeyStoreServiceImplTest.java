@@ -146,8 +146,8 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
       barray = baos.toByteArray();
     } finally {
-      baos.close();
-      testKeyStoreStream.close();
+      if(baos != null) baos.close();
+      if(testKeyStoreStream != null) testKeyStoreStream.close();
     }
     return barray;
 

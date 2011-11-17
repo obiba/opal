@@ -28,6 +28,7 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
   private final DataShieldEnvironment environment;
 
+  @SuppressWarnings("null")
   public AbstractRestrictedRScriptROperation(String script, DataShieldEnvironment environment, DataShieldScriptValidator validator) throws ParseException, InvalidScriptException {
     super();
     Preconditions.checkArgument(script != null, "script cannot be null");
