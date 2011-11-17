@@ -147,7 +147,7 @@ public class NumericTextBox extends TextBox {
   private final class NumericKeyPressHandler implements KeyPressHandler {
     @Override
     public void onKeyPress(KeyPressEvent event) {
-      if(isReadOnly() || !isEnabled()) {
+      if(isReadOnly() || !isEnabled() || event.getNativeEvent().getCtrlKey() || event.getNativeEvent().getAltKey()) {
         return;
       }
 
