@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
 import java.util.List;
 
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveNumericalVariableStepPresenter;
@@ -27,6 +29,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -72,10 +75,10 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   NumericTextBox lengthBox;
 
   @UiField
-  RadioButton numberRadio;
+  RadioButton countRadio;
 
   @UiField
-  NumericTextBox numberBox;
+  NumericTextBox countBox;
 
   @UiField
   RadioButton addRangeRadio;
@@ -97,6 +100,9 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
   @UiField
   Button addButton;
+
+  @UiField
+  Panel summary;
 
   //
   // Constructors
@@ -128,7 +134,7 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
       }
     });
 
-    numberRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+    countRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
       @Override
       public void onValueChange(ValueChangeEvent<Boolean> event) {
         setLengthEnabled(false);
@@ -168,14 +174,14 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
     fromBox.setEnabled(enabled);
     toBox.setEnabled(enabled);
     lengthRadio.setEnabled(enabled);
-    numberRadio.setEnabled(enabled);
+    countRadio.setEnabled(enabled);
     lengthBox.setEnabled(enabled && lengthRadio.getValue());
-    numberBox.setEnabled(enabled && numberRadio.getValue());
+    countBox.setEnabled(enabled && countRadio.getValue());
   }
 
   private void setLengthEnabled(boolean enabled) {
     lengthBox.setEnabled(enabled);
-    numberBox.setEnabled(!enabled);
+    countBox.setEnabled(!enabled);
   }
 
   @Override
@@ -203,6 +209,12 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
   @Override
   public void stopProcessing() {
+  }
+
+  @Override
+  public void setSummaryTabWidget(WidgetDisplay widget) {
+    summary.clear();
+    summary.add(widget.asWidget());
   }
 
   @Override
@@ -254,4 +266,39 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
     valueBox.setNumberType(valueType);
   }
 
+  @Override
+  public void setValueLimits(Number from, Number to) {
+    fromBox.setValue(from.toString());
+    toBox.setValue(to.toString());
+  }
+
+  @Override
+  public Number getLowerLimit() {
+    return fromBox.getNumberValue();
+  }
+
+  @Override
+  public Number getUpperLimit() {
+    return toBox.getNumberValue();
+  }
+
+  @Override
+  public boolean byRangeLengthSelected() {
+    return lengthRadio.getValue();
+  }
+
+  @Override
+  public Long getRangeLength() {
+    return lengthBox.getNumberValue();
+  }
+
+  @Override
+  public Long getRangeCount() {
+    return countBox.getNumberValue();
+  }
+
+  @Override
+  public boolean rangeSelected() {
+    return rangeRadio.getValue();
+  }
 }

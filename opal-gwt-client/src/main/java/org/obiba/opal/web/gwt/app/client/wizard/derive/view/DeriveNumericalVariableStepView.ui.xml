@@ -14,9 +14,11 @@
 
   <g:FlowPanel>
      <o:WizardStep ui:field="methodStep">
-      <g:FlowPanel>
+      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+        <g:Anchor><ui:msg description="Options title">Options</ui:msg></g:Anchor>
+        <g:FlowPanel>
       
-        <g:FlowPanel styleName="input">
+          <g:FlowPanel styleName="input">
           <g:RadioButton name="method" ui:field="rangeRadio">
             <ui:msg description="Group by ranges of values label">Group by ranges of values</ui:msg>
           </g:RadioButton>
@@ -55,29 +57,31 @@
                   </g:row>
                   <g:row>
                     <g:customCell>
-                      <g:RadioButton name="range" ui:field="numberRadio">
+                      <g:RadioButton name="range" ui:field="countRadio">
                         <ui:msg description="Number of ranges label">Number of ranges</ui:msg>
                       </g:RadioButton>
                     </g:customCell>
                     <g:customCell>
-                      <o:NumericTextBox ui:field="numberBox" width="6em" value="10" maxConstrained="false"></o:NumericTextBox>
+                      <o:NumericTextBox ui:field="countBox" width="6em" value="10" maxConstrained="false"></o:NumericTextBox>
                     </g:customCell>
                   </g:row>
                 </g:Grid>
               </g:FlowPanel>                        
               </g:customCell>
             </g:row>
-          </g:Grid>
-          
-        </g:FlowPanel>
+            </g:Grid>
+           </g:FlowPanel>
         
-        <g:FlowPanel styleName="input">
-          <g:RadioButton name="method" ui:field="discreteRadio">
-            <ui:msg description="Map discrete values label">Map discrete values</ui:msg>
-          </g:RadioButton>
-        </g:FlowPanel>
-      
-      </g:FlowPanel>
+           <g:FlowPanel styleName="input">
+             <g:RadioButton name="method" ui:field="discreteRadio">
+               <ui:msg description="Map discrete values label">Map discrete values</ui:msg>
+             </g:RadioButton>
+           </g:FlowPanel>      
+         </g:FlowPanel>
+         
+         <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>
+         <g:SimplePanel ui:field="summary" width="100%" />
+       </o:HorizontalTabLayout>
      </o:WizardStep>
      <o:WizardStep ui:field="mapStep">
       <g:FlowPanel>

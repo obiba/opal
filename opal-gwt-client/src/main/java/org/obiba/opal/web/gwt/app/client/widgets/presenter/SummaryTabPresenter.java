@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -114,6 +115,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
         if(resourceUri.equals(uri)) {
           summary = resource;
           getDisplay().renderSummary(resource);
+          eventBus.fireEvent(new SummaryReceivedEvent(uri, resource));
         }
       }
 

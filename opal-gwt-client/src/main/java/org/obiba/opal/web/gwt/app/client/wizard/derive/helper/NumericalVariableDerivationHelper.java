@@ -55,9 +55,9 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
   public boolean addValueMapEntry(Number lower, Number upper, String newValue) {
     if(lower != null && lower.equals(upper)) {
       return addValueMapEntry(lower, newValue);
-    } else if((lower != null || upper != null) && newValue != null && !newValue.trim().equals("")) {
+    } else if((lower != null || upper != null)) {
       Range<?> range = buildNumberRange(lower, upper);
-      ValueMapEntry entry = ValueMapEntry.fromRange(lower, upper).label(range.toString()).newValue(newValue).build();
+      ValueMapEntry entry = ValueMapEntry.fromRange(lower, upper).label(range.toString()).newValue(newValue == null ? "" : newValue).build();
       if(!hasValueMapEntryWithValue(entry.getValue())) {
         entryRangeMap.put(entry, range);
         valueMapEntries.add(valueMapEntries.size() - 2, entry);

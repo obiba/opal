@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
@@ -121,7 +120,6 @@ public class NumericTextBox extends TextBox {
 
   @Override
   public void setValue(String value, boolean fireEvents) {
-    GWT.log("setValue=" + value);
     try {
       Number newValue = numberType.parseValue(value);
       if(newValue == null || (maxConstrained && (newValue.intValue() > max)) || (minConstrained && (newValue.intValue() < min))) {
