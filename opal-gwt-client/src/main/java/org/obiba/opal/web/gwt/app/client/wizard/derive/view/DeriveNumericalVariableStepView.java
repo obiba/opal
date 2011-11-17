@@ -32,6 +32,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -283,7 +284,7 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   }
 
   @Override
-  public boolean byRangeLengthSelected() {
+  public boolean rangeLengthSelected() {
     return lengthRadio.getValue();
   }
 
@@ -300,5 +301,33 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   @Override
   public boolean rangeSelected() {
     return rangeRadio.getValue();
+  }
+
+  @Override
+  public void setRangeCountError(boolean error) {
+    setUIObjectError(countBox, error);
+  }
+
+  @Override
+  public void setRangeLengthError(boolean error) {
+    setUIObjectError(lengthBox, error);
+  }
+
+  @Override
+  public void setUpperLimitError(boolean error) {
+    setUIObjectError(toBox, error);
+  }
+
+  @Override
+  public void setLowerLimitError(boolean error) {
+    setUIObjectError(fromBox, error);
+  }
+
+  private void setUIObjectError(UIObject obj, boolean error) {
+    if(error) {
+      obj.addStyleName("error");
+    } else {
+      obj.removeStyleName("error");
+    }
   }
 }

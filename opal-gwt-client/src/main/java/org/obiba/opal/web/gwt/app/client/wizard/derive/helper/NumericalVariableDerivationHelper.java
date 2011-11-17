@@ -158,7 +158,10 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
         addNewCategory(newCategoriesMap, entry);
       }
     }
-    scriptBuilder.append("})");
+    scriptBuilder.append("}");
+    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
+    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
+    scriptBuilder.append(")");
   }
 
   private boolean hasValueMapEntryWithValue(String value) {

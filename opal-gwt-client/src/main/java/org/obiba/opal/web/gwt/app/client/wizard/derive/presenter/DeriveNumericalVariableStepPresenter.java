@@ -17,12 +17,17 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.NumericalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
@@ -37,6 +42,8 @@ import com.google.inject.Inject;
  *
  */
 public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> {
+
+  private static Translations translations = GWT.create(Translations.class);
 
   @Inject
   private SummaryTabPresenter summaryTabPresenter;
@@ -64,19 +71,71 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMethodStepController().build());
+    stepCtrls.add(getDisplay().getMethodStepController().onValidate(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        List<String> errorMessages = new ArrayList<String>();
+        if(getDisplay().rangeSelected()) {
+          validateRangeForm(errorMessages);
+        }
+        if(!errorMessages.isEmpty()) {
+          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
+        }
+        return errorMessages.isEmpty();
+      }
+
+      private void validateRangeForm(List<String> errorMessages) {
+        validateRangeLimitsForm(errorMessages);
+        validateRangeDefinitionForm(errorMessages);
+      }
+
+      private void validateRangeLimitsForm(List<String> errorMessages) {
+        getDisplay().setLowerLimitError(false);
+        getDisplay().setUpperLimitError(false);
+
+        if(getDisplay().getLowerLimit() == null) {
+          errorMessages.add(translations.lowerValueLimitRequired());
+          getDisplay().setLowerLimitError(true);
+        }
+        if(getDisplay().getUpperLimit() == null) {
+          errorMessages.add(translations.upperValueLimitRequired());
+          getDisplay().setUpperLimitError(true);
+        }
+      }
+
+      private void validateRangeDefinitionForm(List<String> errorMessages) {
+        getDisplay().setRangeLengthError(false);
+        getDisplay().setRangeCountError(false);
+
+        if(getDisplay().rangeLengthSelected() && getDisplay().getRangeLength() == null) {
+          errorMessages.add(translations.rangesLengthRequired());
+          getDisplay().setRangeLengthError(true);
+        } else if(!getDisplay().rangeLengthSelected() && getDisplay().getRangeCount() == null) {
+          errorMessages.add(translations.rangesCountRequired());
+          getDisplay().setRangeCountError(true);
+        }
+      }
+
+    }).build());
     stepCtrls.add(getDisplay().getMapStepController().onStepIn(new StepInHandler() {
 
       @Override
       public void onStepIn() {
         derivationHelper = new NumericalVariableDerivationHelper(originalVariable);
         if(getDisplay().rangeSelected()) {
-          if(getDisplay().byRangeLengthSelected()) {
-            addRangesByLength();
+          // ranges
+          if(getDisplay().rangeLengthSelected()) {
+            addRangesByLengthMapping();
           } else {
-            addRangesByCount();
+            addRangesByCountMapping();
           }
+          addCategoriesMapping();
+        } else {
+          // TODO query distinct values
+          addCategoriesMapping();
         }
+
         getDisplay().populateValues(derivationHelper.getValueMapEntries());
       }
     }).build());
@@ -84,7 +143,14 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     return stepCtrls;
   }
 
-  private void addRangesByCount() {
+  private void addCategoriesMapping() {
+    // distinct values
+    for(CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(originalVariable.getCategoriesArray()))) {
+      addValueMapEntry(category.getName(), category.getName());
+    }
+  }
+
+  private void addRangesByCountMapping() {
     double lowerLimit = getDisplay().getLowerLimit().doubleValue();
     double upperLimit = getDisplay().getUpperLimit().doubleValue();
     long count = getDisplay().getRangeCount().longValue();
@@ -92,7 +158,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     addRangesByLength(length);
   }
 
-  private void addRangesByLength() {
+  private void addRangesByLengthMapping() {
     addRangesByLength(getDisplay().getRangeLength().longValue());
   }
 
@@ -105,13 +171,21 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     double lower = lowerLimit;
     double upper = lower + length;
 
-    addValueMapEntry(null, lower, "");
+    addValueMapEntry(null, lower, String.valueOf(newValue++));
     while(upper <= upperLimit) {
       addValueMapEntry(lower, upper, String.valueOf(newValue++));
       lower = upper;
       upper += length;
     }
-    addValueMapEntry(lower, null, "");
+    addValueMapEntry(lower, null, String.valueOf(newValue++));
+  }
+
+  private void addValueMapEntry(String value, String newValue) {
+    if(originalVariable.getValueType().equals("integer")) {
+      derivationHelper.addValueMapEntry(new Long(value), newValue);
+    } else {
+      derivationHelper.addValueMapEntry(new Double(value), newValue);
+    }
   }
 
   private void addValueMapEntry(Double lower, Double upper, String newValue) {
@@ -210,6 +284,14 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
     DefaultWizardStepController.Builder getMethodStepController();
 
+    void setRangeCountError(boolean error);
+
+    void setRangeLengthError(boolean error);
+
+    void setUpperLimitError(boolean error);
+
+    void setLowerLimitError(boolean error);
+
     DefaultWizardStepController.Builder getMapStepController();
 
     void populateValues(List<ValueMapEntry> valuesMap);
@@ -230,7 +312,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
     Long getRangeCount();
 
-    boolean byRangeLengthSelected();
+    boolean rangeLengthSelected();
 
     Number getDiscreteValue();
 

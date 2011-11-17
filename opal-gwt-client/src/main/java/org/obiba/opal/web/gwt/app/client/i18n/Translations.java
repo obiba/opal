@@ -1066,4 +1066,21 @@ public interface Translations extends Constants {
   "Assign", "Assign" //
   })
   Map<String, String> dataShieldLabelsMap();
+
+  @Description("Lower Value Limit Required label")
+  @DefaultStringValue("Lower value limit is required.")
+  String lowerValueLimitRequired();
+
+  @Description("Upper Value Limit Required label")
+  @DefaultStringValue("Upper value limit is required.")
+  String upperValueLimitRequired();
+
+  @Description("Ranges Length Required label")
+  @DefaultStringValue("Ranges Length is required.")
+  String rangesLengthRequired();
+
+  @Description("Ranges Count Required label")
+  @DefaultStringValue("Number of ranges is required.")
+  String rangesCountRequired();
+
 }
