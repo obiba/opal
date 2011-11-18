@@ -24,7 +24,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
-import com.google.common.collect.Ordering;
 import com.google.gwt.core.client.JsArray;
 
 public class OpenTextualVariableDerivationHelper extends DerivationHelper {
@@ -58,19 +57,12 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
   }
 
   private List<FrequencyDto> sortByFrequency() {
-    final Ordering<FrequencyDto> ordering = new Ordering<FrequencyDto>() {
-      @Override
-      public int compare(FrequencyDto left, FrequencyDto right) {
-        return new Double(left.getFreq()).compareTo(right.getFreq());
-      }
-    };
-
     List<FrequencyDto> list = JsArrays.toList(categoricalSummaryDto.getFrequenciesArray());
 
     Collections.sort(list, new Comparator<FrequencyDto>() {
       @Override
       public int compare(FrequencyDto freq1, FrequencyDto freq2) {
-        return ordering.compare(freq1, freq2);
+        return new Double(freq2.getFreq()).compareTo(freq1.getFreq());
       }
     });
     return list;
