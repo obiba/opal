@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -126,18 +128,52 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
 
   private void appendBounds(StringBuilder scriptBuilder, List<Range<N>> ranges) {
     scriptBuilder.append("[");
-    boolean first = true;
-    for(Range<N> range : ranges) {
-      if(range.hasLowerBound()) {
-        if(first) {
-          first = false;
-        } else {
-          scriptBuilder.append(", ");
-        }
-        scriptBuilder.append(range.lowerEndpoint());
+
+    Collections.sort(ranges, new Comparator<Range<N>>() {
+
+      @Override
+      public int compare(Range<N> r1, Range<N> r2) {
+        if(!r1.hasLowerBound()) return -1;
+        if(!r2.hasLowerBound()) return 1;
+
+        return r1.lowerEndpoint().compareTo(r2.lowerEndpoint());
       }
+    });
+
+    boolean first = true;
+    Range<N> previousRange = null;
+    N bound = null;
+    for(Range<N> range : ranges) {
+      if(previousRange != null && !previousRange.isConnected(range) && previousRange.hasLowerBound()) {
+        first = appendBound(scriptBuilder, previousRange.upperEndpoint(), first);
+      }
+
+      if(previousRange == null || (previousRange != null && previousRange.isConnected(range) && previousRange.hasLowerBound())) {
+        if(range.hasLowerBound()) {
+          bound = range.lowerEndpoint();
+        } else {
+          bound = range.upperEndpoint();
+        }
+        first = appendBound(scriptBuilder, bound, first);
+      }
+
+      previousRange = range;
+    }
+    // close the last range
+    if(previousRange.hasUpperBound()) {
+      appendBound(scriptBuilder, previousRange.upperEndpoint(), false);
     }
     scriptBuilder.append("]");
+  }
+
+  private boolean appendBound(StringBuilder scriptBuilder, N bound, boolean first) {
+    if(first) {
+      first = false;
+    } else {
+      scriptBuilder.append(", ");
+    }
+    scriptBuilder.append(bound);
+    return first;
   }
 
   private void appendOutliers(StringBuilder scriptBuilder, List<ValueMapEntry> outliers) {
