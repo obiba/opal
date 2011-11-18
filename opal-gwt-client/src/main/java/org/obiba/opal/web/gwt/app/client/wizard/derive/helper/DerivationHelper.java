@@ -48,6 +48,16 @@ public abstract class DerivationHelper {
     return valueMapEntries;
   }
 
+  public boolean addEntry(ValueMapEntry entryArg) {
+    for(ValueMapEntry entry : valueMapEntries) {
+      if(entry.getValue().equals(entryArg.getValue())) {
+        return false;
+      }
+    }
+    valueMapEntries.add(entryArg);
+    return true;
+  }
+
   public VariableDto copyVariable(VariableDto variable) {
     return copyVariable(variable, false);
   }

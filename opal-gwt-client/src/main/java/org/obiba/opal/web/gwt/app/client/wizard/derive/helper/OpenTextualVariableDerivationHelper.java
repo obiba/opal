@@ -58,7 +58,6 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
 
   private List<FrequencyDto> sortByFrequency() {
     List<FrequencyDto> list = JsArrays.toList(categoricalSummaryDto.getFrequenciesArray());
-
     Collections.sort(list, new Comparator<FrequencyDto>() {
       @Override
       public int compare(FrequencyDto freq1, FrequencyDto freq2) {
@@ -70,14 +69,6 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
 
   public Method getMethod() {
     return method;
-  }
-
-  public boolean addEntry(String value, String newValue, String label) {
-    if(value != null && !value.trim().equals("") && newValue != null && !newValue.trim().equals("")) {
-      valueMapEntries.add(ValueMapEntry.fromDistinct(value).newValue(newValue).label(label).build());
-      return true;
-    }
-    return false;
   }
 
   // TODO this has been ~ copy/paste from temporal helper (maybe we can factorize)

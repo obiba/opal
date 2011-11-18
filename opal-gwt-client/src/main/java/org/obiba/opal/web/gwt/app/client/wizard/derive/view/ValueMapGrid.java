@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -68,7 +66,7 @@ public class ValueMapGrid extends FlowPanel {
 
   private Column<ValueMapEntry, String> frequencyColumn;
 
-  private double maxFrequency;
+  private Double maxFrequency = null;
 
   public ValueMapGrid() {
     super();
@@ -94,7 +92,6 @@ public class ValueMapGrid extends FlowPanel {
 
   public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries) {
     this.valueMapEntries = valueMapEntries;
-    calcalatuteMaxFrequency();
 
     initializeTable();
 
@@ -103,17 +100,6 @@ public class ValueMapGrid extends FlowPanel {
     dataProvider.refresh();
 
     addStyleName("value-map");
-  }
-
-  private void calcalatuteMaxFrequency() {
-    maxFrequency = Collections.max(valueMapEntries, new Comparator<ValueMapEntry>() {
-
-      @Override
-      public int compare(ValueMapEntry o1, ValueMapEntry o2) {
-        return new Double(o1.getCount()).compareTo(o2.getCount());
-      }
-    }).getCount();
-
   }
 
   public void refreshValuesMap() {
@@ -314,13 +300,15 @@ public class ValueMapGrid extends FlowPanel {
 
         @Override
         public SafeHtml render(String object) {
+          GWT.log(maxFrequency + "");
           Double parse = Double.parseDouble(object);
-          Double width = parse * (100 / maxFrequency);
+          Double width = maxFrequency == 0 ? 0 : parse * (100 / maxFrequency);
+
           return SafeHtmlUtils.fromTrustedString(//
-          "<div align='center'" + //
-          "style='background-color:#6bb5cb; width:" + width + "px'>" + //
+          "<div align='center' style='background-color:#6bb5cb; width:" + (width + 1) + "px'>" + //
+          "<div style='border:1px solid; width:100px'>" + //
           parse.intValue() + //
-          "</div>");
+          "</div>" + "</div>");
         }
       }));
     }
@@ -354,6 +342,10 @@ public class ValueMapGrid extends FlowPanel {
       return SafeHtmlUtils.fromString(object);
 
     }
+  }
+
+  public void setMaxFrequency(Double maxFrequency) {
+    this.maxFrequency = maxFrequency;
   }
 
 }
