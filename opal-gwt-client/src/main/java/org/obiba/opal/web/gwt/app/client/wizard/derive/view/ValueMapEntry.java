@@ -96,13 +96,19 @@ public class ValueMapEntry {
   public static Builder fromRange(Number lower, Number upper) {
     String value = "";
     if(lower == null) {
-      value = "-" + upper;
+      value = "-" + formatNumber(upper);
     } else if(upper == null) {
-      value = lower + "+";
+      value = formatNumber(lower) + "+";
     } else {
-      value = lower + "-" + upper;
+      value = formatNumber(lower) + "-" + formatNumber(upper);
     }
     return new Builder(ValueMapEntryType.RANGE).value(value).label("");
+  }
+
+  private static String formatNumber(Number nb) {
+    if(nb == null) return null;
+    String str = nb.toString();
+    return str.endsWith(".0") ? str.substring(0, str.length() - 2) : str;
   }
 
   public static Builder createEmpties(String label) {
