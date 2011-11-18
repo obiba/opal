@@ -25,9 +25,9 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.google.gwt.core.client.JsArray;
 
-public class NumericalVariableDerivationHelper extends DerivationHelper {
+public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>> extends DerivationHelper {
 
-  private Map<ValueMapEntry, Range<?>> entryRangeMap;
+  private Map<ValueMapEntry, Range<N>> entryRangeMap;
 
   public NumericalVariableDerivationHelper(VariableDto originalVariable) {
     super(originalVariable);
@@ -37,30 +37,41 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
   @Override
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
-    this.entryRangeMap = new HashMap<ValueMapEntry, Range<?>>();
+    this.entryRangeMap = new HashMap<ValueMapEntry, Range<N>>();
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
   }
 
-  public boolean addValueMapEntry(Number value, String newValue) {
-    if(value != null && newValue != null && !newValue.trim().equals("")) {
-      if(!hasValueMapEntryWithValue(value.toString())) {
-        valueMapEntries.add(valueMapEntries.size() - 2, ValueMapEntry.fromDistinct(value.toString()).newValue(newValue).build());
-        return true;
-      }
-    }
-    return false;
+  public void addValueMapEntry(N value, String newValue) {
+    addValueMapEntry(value, value, newValue);
   }
 
-  public boolean addValueMapEntry(Number lower, Number upper, String newValue) {
+  public void addValueMapEntry(N lower, N upper, String newValue) {
+    if(lower == null && upper == null) return;
+
+    ValueMapEntry entry = null;
+    String nv = newValue == null ? "" : newValue;
+
     if(lower != null && lower.equals(upper)) {
-      return addValueMapEntry(lower, newValue);
-    } else if((lower != null || upper != null)) {
-      Range<?> range = buildNumberRange(lower, upper);
-      ValueMapEntry entry = ValueMapEntry.fromRange(lower, upper).label(range.toString()).newValue(newValue == null ? "" : newValue).build();
-      if(!hasValueMapEntryWithValue(entry.getValue())) {
-        entryRangeMap.put(entry, range);
-        valueMapEntries.add(valueMapEntries.size() - 2, entry);
+      entry = ValueMapEntry.fromDistinct(lower).newValue(nv).build();
+    } else {
+      Range<N> range = buildRange(lower, upper);
+      entry = ValueMapEntry.fromRange(range).newValue(nv).build();
+      entryRangeMap.put(entry, range);
+    }
+
+    valueMapEntries.add(valueMapEntries.size() - 2, entry);
+  }
+
+  public boolean isRangeOverlap(N lower, N upper) {
+    return isRangeOverlap(buildRange(lower, upper));
+  }
+
+  public boolean isRangeOverlap(Range<N> range) {
+    for(ValueMapEntry e : valueMapEntries) {
+      Range<N> r = entryRangeMap.get(e);
+      if(r != null && r.isConnected(range) && !r.intersection(range).isEmpty()) {
+        // range overlap
         return true;
       }
     }
@@ -92,7 +103,8 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
 
   private void appendGroupMethod(StringBuilder scriptBuilder) {
     // group method
-    List<Range<?>> ranges = new ArrayList<Range<?>>();
+    // ImmutableSortedSet.Builder<Range<N>> ranges = ImmutableSortedSet.naturalOrder();
+    List<Range<N>> ranges = new ArrayList<Range<N>>();
     List<ValueMapEntry> outliers = new ArrayList<ValueMapEntry>();
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
@@ -112,10 +124,10 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
     scriptBuilder.append(")");
   }
 
-  private void appendBounds(StringBuilder scriptBuilder, List<Range<?>> ranges) {
+  private void appendBounds(StringBuilder scriptBuilder, List<Range<N>> ranges) {
     scriptBuilder.append("[");
     boolean first = true;
-    for(Range<?> range : ranges) {
+    for(Range<N> range : ranges) {
       if(range.hasLowerBound()) {
         if(first) {
           first = false;
@@ -164,40 +176,16 @@ public class NumericalVariableDerivationHelper extends DerivationHelper {
     scriptBuilder.append(")");
   }
 
-  private boolean hasValueMapEntryWithValue(String value) {
-    for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getValue().equals(value)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public Range<?> buildNumberRange(Number lower, Number upper) {
-    if(lower instanceof Long) {
-      return buildRange((Long) lower, (Long) upper);
-    } else {
-      return buildRange((Double) lower, (Double) upper);
-    }
-  }
-
-  public Range<?> buildRange(Long lower, Long upper) {
+  public Range<N> buildRange(N lower, N upper) {
     if(lower == null) {
       return Ranges.lessThan(upper);
     } else if(upper == null) {
       return Ranges.atLeast(lower);
+    } else if(lower.equals(upper)) {
+      return Ranges.closed(lower, upper);
     } else {
       return Ranges.closedOpen(lower, upper);
     }
   }
 
-  public Range<?> buildRange(Double lower, Double upper) {
-    if(lower == null) {
-      return Ranges.lessThan(upper);
-    } else if(upper == null) {
-      return Ranges.atLeast(lower);
-    } else {
-      return Ranges.closedOpen(lower, upper);
-    }
-  }
 }

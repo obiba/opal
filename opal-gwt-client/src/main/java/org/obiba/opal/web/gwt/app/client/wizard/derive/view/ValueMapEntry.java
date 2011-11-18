@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 
+import com.google.common.collect.Range;
+
 public class ValueMapEntry {
   public enum ValueMapEntryType {
     CATEGORY_NAME, DISTINCT_VALUE, RANGE, EMPTY_VALUES, OTHER_VALUES
@@ -85,6 +87,10 @@ public class ValueMapEntry {
     return new Builder(ValueMapEntryType.CATEGORY_NAME).value(cat.getName()).label(VariableViewHelper.getLabelValue(cat.getAttributesArray())).count(count);
   }
 
+  public static Builder fromDistinct(Number value) {
+    return fromRange(value, value);
+  }
+
   public static Builder fromDistinct(String value) {
     return fromDistinct(value, 0);
   }
@@ -93,16 +99,25 @@ public class ValueMapEntry {
     return new Builder(ValueMapEntryType.DISTINCT_VALUE).value(value).label("").count(count);
   }
 
+  public static Builder fromRange(Range<? extends Number> range) {
+    return fromRange(range.hasLowerBound() ? range.lowerEndpoint() : null, range.hasUpperBound() ? range.upperEndpoint() : null).label(range.toString());
+  }
+
   public static Builder fromRange(Number lower, Number upper) {
     String value = "";
+    ValueMapEntryType type = ValueMapEntryType.RANGE;
+
     if(lower == null) {
       value = "-" + formatNumber(upper);
     } else if(upper == null) {
       value = formatNumber(lower) + "+";
+    } else if(lower.equals(upper)) {
+      value = formatNumber(lower);
+      type = ValueMapEntryType.DISTINCT_VALUE;
     } else {
       value = formatNumber(lower) + "-" + formatNumber(upper);
     }
-    return new Builder(ValueMapEntryType.RANGE).value(value).label("");
+    return new Builder(type).value(value).label(value);
   }
 
   private static String formatNumber(Number nb) {

@@ -1091,6 +1091,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Number of ranges is required.")
   String rangesCountRequired();
 
+  @Description("Ranges Overlap label")
+  @DefaultStringValue("Range is overlapping another range.")
+  String rangeOverlap();
+
+  @Description("Value Map Already Added label")
+  @DefaultStringValue("This value is already mapped.")
+  String valueMapAlreadyAdded();
+
   @Description("Frequency label")
   @DefaultStringValue("Frequency")
   String frequency();

@@ -48,7 +48,9 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   @Inject
   private SummaryTabPresenter summaryTabPresenter;
 
-  private NumericalVariableDerivationHelper derivationHelper;
+  private NumericalVariableDerivationHelper<? extends Number> derivationHelper;
+
+  private NumberType numberType;
 
   @Inject
   public DeriveNumericalVariableStepPresenter(final Display display, final EventBus eventBus) {
@@ -122,7 +124,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
       @Override
       public void onStepIn() {
-        derivationHelper = new NumericalVariableDerivationHelper(originalVariable);
+        newDerivationHelper();
         if(getDisplay().rangeSelected()) {
           // ranges
           if(getDisplay().rangeLengthSelected()) {
@@ -180,20 +182,26 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     addValueMapEntry(lower, null, String.valueOf(newValue++));
   }
 
-  private void addValueMapEntry(String value, String newValue) {
-    if(originalVariable.getValueType().equals("integer")) {
-      derivationHelper.addValueMapEntry(new Long(value), newValue);
-    } else {
-      derivationHelper.addValueMapEntry(new Double(value), newValue);
-    }
+  private void newDerivationHelper() {
+    numberType = NumberType.valueOf(originalVariable.getValueType().toUpperCase());
+    derivationHelper = numberType.newDerivationHelper(originalVariable);
   }
 
-  private void addValueMapEntry(Double lower, Double upper, String newValue) {
-    if(originalVariable.getValueType().equals("integer")) {
-      derivationHelper.addValueMapEntry(lower == null ? null : lower.longValue(), upper == null ? null : upper.longValue(), newValue);
-    } else {
-      derivationHelper.addValueMapEntry(lower, upper, newValue);
+  private boolean addValueMapEntry(String value, String newValue) {
+    if(derivationHelper.hasValueMapEntryWithValue(value)) {
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
+      return false;
     }
+    numberType.addValueMapEntry(derivationHelper, value, newValue);
+    return true;
+  }
+
+  private boolean addValueMapEntry(Number lower, Number upper, String newValue) {
+    if(!numberType.addValueMapEntry(derivationHelper, lower, upper, newValue)) {
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.rangeOverlap()).build());
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -237,6 +245,78 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   // Interfaces
   //
 
+  private enum NumberType {
+    INTEGER() {
+
+      @Override
+      public NumericalVariableDerivationHelper<?> newDerivationHelper(VariableDto originalVariable) {
+        return new NumericalVariableDerivationHelper<Long>(originalVariable);
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value, String newValue) {
+        ((NumericalVariableDerivationHelper<Long>) helper).addValueMapEntry(new Long(value), newValue);
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower, Number upper, String newValue) {
+        NumericalVariableDerivationHelper<Long> h = (NumericalVariableDerivationHelper<Long>) helper;
+        Long l = lower == null ? null : lower.longValue();
+        Long u = lower == null ? null : lower.longValue();
+        if(h.isRangeOverlap(l, u)) {
+          return false;
+        }
+        h.addValueMapEntry(l, u, newValue);
+        return true;
+      }
+
+    },
+    DECIMAL() {
+      @Override
+      public String formatNumber(Number nb) {
+        if(nb == null) return null;
+        String str = nb.toString();
+        return str.endsWith(".0") ? str.substring(0, str.length() - 2) : str;
+      }
+
+      @Override
+      public NumericalVariableDerivationHelper<? extends Number> newDerivationHelper(VariableDto originalVariable) {
+        return new NumericalVariableDerivationHelper<Double>(originalVariable);
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value, String newValue) {
+        ((NumericalVariableDerivationHelper<Double>) helper).addValueMapEntry(new Double(value), newValue);
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower, Number upper, String newValue) {
+        NumericalVariableDerivationHelper<Double> h = (NumericalVariableDerivationHelper<Double>) helper;
+        Double l = lower == null ? null : lower.doubleValue();
+        Double u = upper == null ? null : upper.doubleValue();
+        if(h.isRangeOverlap(l, u)) {
+          return false;
+        }
+        h.addValueMapEntry(l, u, newValue);
+        return true;
+      }
+    };
+
+    public String formatNumber(Number nb) {
+      return nb == null ? null : nb.toString();
+    }
+
+    public abstract NumericalVariableDerivationHelper<? extends Number> newDerivationHelper(VariableDto originalVariable);
+
+    public abstract void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value, String newValue);
+
+    public abstract boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower, Number upper, String newValue);
+  }
+
   /**
    *
    */
@@ -247,15 +327,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         SummaryStatisticsDto dto = event.getSummary();
         if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
           ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
-          GWT.log("min=" + continuous.getSummary().getMin());
-          GWT.log("max=" + continuous.getSummary().getMax());
-          GWT.log("mean=" + continuous.getSummary().getMean());
-          GWT.log("median=" + continuous.getSummary().getMedian());
-          GWT.log("stddev" + continuous.getSummary().getStdDev());
-
           double from = new Double(continuous.getSummary().getMin());
           double to = new Double(continuous.getSummary().getMax());
-
           getDisplay().setValueLimits(new Long((long) from), new Long((long) to + 1));
         }
       }
@@ -270,9 +343,9 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     public void onClick(ClickEvent event) {
       boolean added = false;
       if(getDisplay().addRangeSelected()) {
-        added = derivationHelper.addValueMapEntry(getDisplay().getLowerValue(), getDisplay().getUpperValue(), getDisplay().getNewValue());
+        added = addValueMapEntry(getDisplay().getLowerValue(), getDisplay().getUpperValue(), getDisplay().getNewValue());
       } else {
-        added = derivationHelper.addValueMapEntry(getDisplay().getDiscreteValue(), getDisplay().getNewValue());
+        added = addValueMapEntry(numberType.formatNumber(getDisplay().getDiscreteValue()), getDisplay().getNewValue());
       }
       if(added) {
         getDisplay().refreshValuesMapDisplay();

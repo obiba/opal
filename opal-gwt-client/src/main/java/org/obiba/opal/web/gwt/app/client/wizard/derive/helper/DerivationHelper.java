@@ -95,6 +95,16 @@ public abstract class DerivationHelper {
     return scriptAttr;
   }
 
+  public boolean hasValueMapEntryWithValue(String value) {
+    for(ValueMapEntry entry : valueMapEntries) {
+      GWT.log(entry.getValue() + " == " + value);
+      if(entry.getValue().equals(value)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   protected void appendSpecialValuesEntry(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap, ValueMapEntry entry) {
     if(entry == null) {
       scriptBuilder.append(",\n  null");
