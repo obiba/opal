@@ -62,9 +62,9 @@ public class ValueMapGrid extends FlowPanel {
 
   private String gridHeight = "30em";
 
-  private boolean enableRowDeletion = false;
+  private boolean allowRowDeletion = false;
 
-  private boolean enableFrequencyColumn = false;
+  private boolean allowFrequencyColumn = false;
 
   private Column<ValueMapEntry, String> frequencyColumn;
 
@@ -176,14 +176,14 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   private void initializeFrequencyColumn() {
-    if(enableFrequencyColumn) {
+    if(allowFrequencyColumn) {
       frequencyColumn = new StatColumn();
       table.addColumn(frequencyColumn, translations.frequency());
     }
   }
 
   private void initializeDeleteColumn() {
-    if(enableRowDeletion) {
+    if(allowRowDeletion) {
       ActionsColumn<ValueMapEntry> deleteColumn = createDeletionColumn();
       table.addColumn(deleteColumn, translations.actionsLabel());
     }
@@ -195,7 +195,7 @@ public class ValueMapGrid extends FlowPanel {
 
       @Override
       protected String getText(ValueMapEntry entry) {
-        return entry.getValue();
+        return entry.getValue() + " (" + FREQ_FORMAT.format(entry.getCount()) + ")";
       }
 
     };
@@ -261,11 +261,11 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   public void enableRowDeletion(boolean enable) {
-    enableRowDeletion = enable;
+    allowRowDeletion = enable;
   }
 
   public void enableFrequencyColumn(boolean enable) {
-    enableFrequencyColumn = enable;
+    allowFrequencyColumn = enable;
   }
 
   private void debug() {
