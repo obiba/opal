@@ -1091,4 +1091,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("Number of ranges is required.")
   String rangesCountRequired();
 
+  @Description("Frequency label")
+  @DefaultStringValue("Frequency")
+  String frequency();
+
 }

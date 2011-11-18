@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -60,7 +62,13 @@ public class ValueMapGrid extends FlowPanel {
 
   private String gridHeight = "30em";
 
-  private boolean allowRowDeletion = false;
+  private boolean enableRowDeletion = false;
+
+  private boolean enableFrequencyColumn = false;
+
+  private Column<ValueMapEntry, String> frequencyColumn;
+
+  private double maxFrequency;
 
   public ValueMapGrid() {
     super();
@@ -86,6 +94,7 @@ public class ValueMapGrid extends FlowPanel {
 
   public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries) {
     this.valueMapEntries = valueMapEntries;
+    calcalatuteMaxFrequency();
 
     initializeTable();
 
@@ -94,6 +103,17 @@ public class ValueMapGrid extends FlowPanel {
     dataProvider.refresh();
 
     addStyleName("value-map");
+  }
+
+  private void calcalatuteMaxFrequency() {
+    maxFrequency = Collections.max(valueMapEntries, new Comparator<ValueMapEntry>() {
+
+      @Override
+      public int compare(ValueMapEntry o1, ValueMapEntry o2) {
+        return new Double(o1.getCount()).compareTo(o2.getCount());
+      }
+    }).getCount();
+
   }
 
   public void refreshValuesMap() {
@@ -148,14 +168,22 @@ public class ValueMapGrid extends FlowPanel {
 
   private void initializeColumns() {
     initializeValueColumn();
+    initializeFrequencyColumn();
     initializeLabelColumn();
     initializeNewValueColumn();
     initializeMissingColumn();
     initializeDeleteColumn();
   }
 
+  private void initializeFrequencyColumn() {
+    if(enableFrequencyColumn) {
+      frequencyColumn = new StatColumn();
+      table.addColumn(frequencyColumn, translations.frequency());
+    }
+  }
+
   private void initializeDeleteColumn() {
-    if(allowRowDeletion) {
+    if(enableRowDeletion) {
       ActionsColumn<ValueMapEntry> deleteColumn = createDeletionColumn();
       table.addColumn(deleteColumn, translations.actionsLabel());
     }
@@ -167,7 +195,7 @@ public class ValueMapGrid extends FlowPanel {
 
       @Override
       protected String getText(ValueMapEntry entry) {
-        return entry.getValue() + " (" + FREQ_FORMAT.format(entry.getCount()) + ")";
+        return entry.getValue();
       }
 
     };
@@ -233,7 +261,11 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   public void enableRowDeletion(boolean enable) {
-    allowRowDeletion = enable;
+    enableRowDeletion = enable;
+  }
+
+  public void enableFrequencyColumn(boolean enable) {
+    enableFrequencyColumn = enable;
   }
 
   private void debug() {
@@ -274,6 +306,31 @@ public class ValueMapGrid extends FlowPanel {
     }
   }
 
+  public class StatColumn extends Column<ValueMapEntry, String> {
+
+    public StatColumn() {
+
+      super(new TextCell(new AbstractSafeHtmlRenderer<String>() {
+
+        @Override
+        public SafeHtml render(String object) {
+          Double parse = Double.parseDouble(object);
+          Double width = parse * (100 / maxFrequency);
+          return SafeHtmlUtils.fromTrustedString(//
+          "<div align='center'" + //
+          "style='background-color:#6bb5cb; width:" + width + "px'>" + //
+          parse.intValue() + //
+          "</div>");
+        }
+      }));
+    }
+
+    @Override
+    public String getValue(ValueMapEntry object) {
+      return object.getCount() + "";
+    }
+  }
+
   /**
    * Escape user string, not ours.
    */
@@ -293,6 +350,7 @@ public class ValueMapGrid extends FlowPanel {
         builder.append(SafeHtmlUtils.fromTrustedString(res.getGroup(3)));
         return builder.toSafeHtml();
       }
+      GWT.log(SafeHtmlUtils.fromString(object) + "");
       return SafeHtmlUtils.fromString(object);
 
     }

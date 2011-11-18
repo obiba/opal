@@ -111,6 +111,7 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
   @Override
   protected void onBind() {
     getDisplay().getValueMapGrid().enableRowDeletion(true);
+    getDisplay().getValueMapGrid().enableFrequencyColumn(true);
     getDisplay().getAddButton().addClickHandler(new ClickHandler() {
 
       @Override
