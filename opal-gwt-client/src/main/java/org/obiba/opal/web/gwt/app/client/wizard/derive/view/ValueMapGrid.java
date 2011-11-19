@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueM
 import org.obiba.opal.web.gwt.app.client.workbench.view.Grid;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 
+import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
@@ -130,12 +131,21 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   private ActionsColumn<ValueMapEntry> createDeletionColumn() {
-    ActionsColumn<ValueMapEntry> deleteColumn = new ActionsColumn<ValueMapEntry>(ActionsColumn.DELETE_ACTION);
+    ActionsColumn<ValueMapEntry> deleteColumn = new ActionsColumn<ValueMapEntry>(ActionsColumn.DELETE_ACTION) {
+      @Override
+      public void render(Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
+        // do not allow removing special rows
+        if(!entry.getType().equals(ValueMapEntryType.EMPTY_VALUES) //
+            && !entry.getType().equals(ValueMapEntryType.OTHER_VALUES)) {
+          super.render(context, entry, sb);
+        }
+      }
+    };
     deleteColumn.setActionHandler(new ActionHandler<ValueMapEntry>() {
 
       @Override
-      public void doAction(ValueMapEntry object, String actionName) {
-        valueMapEntries.remove(object);
+      public void doAction(ValueMapEntry entry, String actionName) {
+        valueMapEntries.remove(entry);
         refresh();
       }
 
