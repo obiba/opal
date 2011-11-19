@@ -144,16 +144,12 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     Range<N> previousRange = null;
     N bound = null;
     for(Range<N> range : ranges) {
-      if(previousRange != null && !previousRange.isConnected(range) && previousRange.hasLowerBound()) {
+      if(previousRange != null && !previousRange.isConnected(range)) {
         first = appendBound(scriptBuilder, previousRange.upperEndpoint(), first);
       }
 
-      if(previousRange == null || (previousRange != null && previousRange.isConnected(range) && previousRange.hasLowerBound())) {
-        if(range.hasLowerBound()) {
-          bound = range.lowerEndpoint();
-        } else {
-          bound = range.upperEndpoint();
-        }
+      if(range.hasLowerBound()) {
+        bound = range.lowerEndpoint();
         first = appendBound(scriptBuilder, bound, first);
       }
 
