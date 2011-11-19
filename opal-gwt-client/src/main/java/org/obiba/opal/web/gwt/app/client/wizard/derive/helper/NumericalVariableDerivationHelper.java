@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -62,7 +63,8 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
       entryRangeMap.put(entry, range);
     }
 
-    valueMapEntries.add(valueMapEntries.size() - 2, entry);
+    valueMapEntries.add(0, entry);
+    Collections.sort(valueMapEntries, new NumericValueMapEntryComparator());
   }
 
   public boolean isRangeOverlap(N lower, N upper) {
@@ -128,17 +130,6 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
 
   private void appendBounds(StringBuilder scriptBuilder, List<Range<N>> ranges) {
     scriptBuilder.append("[");
-
-    Collections.sort(ranges, new Comparator<Range<N>>() {
-
-      @Override
-      public int compare(Range<N> r1, Range<N> r2) {
-        if(!r1.hasLowerBound()) return -1;
-        if(!r2.hasLowerBound()) return 1;
-
-        return r1.lowerEndpoint().compareTo(r2.lowerEndpoint());
-      }
-    });
 
     boolean first = true;
     Range<N> previousRange = null;
@@ -217,6 +208,37 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
       return Ranges.closed(lower, upper);
     } else {
       return Ranges.closedOpen(lower, upper);
+    }
+  }
+
+  private final class NumericValueMapEntryComparator implements Comparator<ValueMapEntry> {
+    @Override
+    public int compare(ValueMapEntry o1, ValueMapEntry o2) {
+      switch(o1.getType()) {
+      case RANGE:
+        return o2.getType().equals(ValueMapEntryType.RANGE) ? compareRanges(o1, o2) : -1;
+      case DISTINCT_VALUE:
+        if(o2.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) return compareDistincts(o1, o2);
+        return o2.getType().equals(ValueMapEntryType.EMPTY_VALUES) ? -1 : 1;
+      case EMPTY_VALUES:
+        return o2.getType().equals(ValueMapEntryType.OTHER_VALUES) ? -1 : 1;
+      case OTHER_VALUES:
+        return 1;
+      }
+      return 0;
+    }
+
+    private int compareRanges(ValueMapEntry o1, ValueMapEntry o2) {
+      Range<N> r1 = entryRangeMap.get(o1);
+      Range<N> r2 = entryRangeMap.get(o2);
+      if(!r1.hasLowerBound()) return -1;
+      if(!r2.hasLowerBound()) return 1;
+
+      return r1.lowerEndpoint().compareTo(r2.lowerEndpoint());
+    }
+
+    private int compareDistincts(ValueMapEntry o1, ValueMapEntry o2) {
+      return new Double(o1.getValue()).compareTo(new Double(o2.getValue()));
     }
   }
 
