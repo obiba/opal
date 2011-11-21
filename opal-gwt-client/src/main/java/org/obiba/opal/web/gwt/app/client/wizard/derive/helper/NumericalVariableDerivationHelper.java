@@ -147,12 +147,14 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     N bound = null;
     for(Range<N> range : ranges) {
       if(previousRange != null && !previousRange.isConnected(range)) {
-        first = appendBound(scriptBuilder, previousRange.upperEndpoint(), first);
+        appendBound(scriptBuilder, previousRange.upperEndpoint(), first);
+        first = false;
       }
 
       if(range.hasLowerBound()) {
         bound = range.lowerEndpoint();
-        first = appendBound(scriptBuilder, bound, first);
+        appendBound(scriptBuilder, bound, first);
+        first = false;
       }
 
       previousRange = range;
@@ -164,14 +166,11 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     scriptBuilder.append("]");
   }
 
-  private boolean appendBound(StringBuilder scriptBuilder, N bound, boolean first) {
-    if(first) {
-      first = false;
-    } else {
+  private void appendBound(StringBuilder scriptBuilder, N bound, boolean first) {
+    if(!first) {
       scriptBuilder.append(", ");
     }
     scriptBuilder.append(bound);
-    return first;
   }
 
   private void appendOutliers(StringBuilder scriptBuilder, List<ValueMapEntry> outliers) {
