@@ -400,6 +400,7 @@ td.row-actions span {
 
 .topbar {
   background-color: #c65f00;
+  z-index: auto;
 }
 
 .topbar > .gwt-Label {
