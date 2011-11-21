@@ -316,9 +316,9 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         SummaryStatisticsDto dto = event.getSummary();
         if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
           ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
-          double from = new Double(continuous.getSummary().getMin());
-          double to = new Double(continuous.getSummary().getMax());
-          getDisplay().setValueLimits(new Long((long) from), new Long((long) to + 1));
+          double from = continuous.getSummary().getMin();
+          double to = continuous.getSummary().getMax();
+          getDisplay().setValueLimits(Long.valueOf((long) from), Long.valueOf((long) to + 1));
         }
       }
     }
