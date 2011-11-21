@@ -18,45 +18,55 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.Builder;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.core.client.JsArray;
 
-public class OpenTextualVariableDerivationHelper extends DerivationHelper {
-
-  private CategoricalSummaryDto categoricalSummaryDto;
+public class OpenTextualVariableDerivationHelper extends CategoricalVariableDerivationHelper {
 
   private Method method;
 
-  public OpenTextualVariableDerivationHelper(VariableDto originalVariable, Method method, CategoricalSummaryDto categoricalSummaryDto) {
-    super(originalVariable);
+  public OpenTextualVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto summaryStatisticsDto, Method method) {
+    super(originalVariable, summaryStatisticsDto);
     this.method = method;
-    this.categoricalSummaryDto = categoricalSummaryDto;
-    initializeValueMapEntries();
   }
 
   @Override
-  protected void initializeValueMapEntries() {
+  public void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
 
     if(method == Method.AUTOMATICALLY) {
-      int i = 0;
+
+      List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
+      int index = 1;
       for(FrequencyDto frequencyDto : sortByFrequency()) {
-        valueMapEntries.add(ValueMapEntry.fromDistinct(frequencyDto.getValue())//
-        .newValue((i++) + "")//
-        .label(frequencyDto.getValue())//
-        .count(new Double(frequencyDto.getFreq()).intValue()).build());
+
+        Builder entry = ValueMapEntry.fromDistinct(frequencyDto.getValue()).label(frequencyDto.getValue()).count(frequencyDto.getFreq());
+
+        if(estimateIsMissing(frequencyDto.getValue())) {
+          entry.missing();
+          missingValueMapEntries.add(entry.build());
+        } else {
+          index = initializeNonMissingCategoryValueMapEntry(index, frequencyDto.getValue(), entry);
+        }
       }
+
+      // recode missing values
+      initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
+
     }
   }
 
   private List<FrequencyDto> sortByFrequency() {
+	// TODO do not recast.
+    CategoricalSummaryDto categoricalSummaryDto = statisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
     List<FrequencyDto> list = JsArrays.toList(categoricalSummaryDto.getFrequenciesArray());
     Collections.sort(list, new Comparator<FrequencyDto>() {
       @Override
@@ -97,25 +107,6 @@ public class OpenTextualVariableDerivationHelper extends DerivationHelper {
     derived.setCategoriesArray(cats);
 
     return derived;
-  }
-
-  // TODO this has been copy/paste from temporal helper (maybe we can factorize)
-  private void appendDistinctValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
-    boolean first = true;
-    for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
-        if(first) {
-          first = false;
-        } else {
-          scriptBuilder.append(",");
-        }
-        scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
-        appendNewValue(scriptBuilder, entry);
-
-        // new category
-        addNewCategory(newCategoriesMap, entry);
-      }
-    }
   }
 
   public enum Method {

@@ -46,7 +46,7 @@ public class StatCell extends AbstractCell<ValueMapEntry> {
   public void render(com.google.gwt.cell.client.Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
     if(entry != null) {
       double width = maxFrequency == 0 ? 0 : entry.getCount() * (100 / maxFrequency);
-      sb.append(template.stat(Double.valueOf(width).intValue(), Double.valueOf(entry.getCount()).intValue()));
+      sb.append(template.stat(Double.valueOf(width + 1).intValue(), Double.valueOf(entry.getCount()).intValue()));
     }
   }
 }

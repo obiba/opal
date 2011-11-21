@@ -39,17 +39,17 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 
-/**
- *
- */
 public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<DeriveOpenTextualVariableStepPresenter.Display> {
 
   private OpenTextualVariableDerivationHelper derivationHelper;
 
   private CategoricalSummaryDto categoricalSummaryDto;
+
+  private static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
 
   @Inject
   public DeriveOpenTextualVariableStepPresenter(Display display, EventBus eventBus) {
@@ -96,16 +96,16 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
             @Override
             public void onResource(Response response, SummaryStatisticsDto dto) {
               categoricalSummaryDto = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-              derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, getDisplay().getMethod(), categoricalSummaryDto);
+              derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, dto, getDisplay().getMethod());
+              derivationHelper.initializeValueMapEntries();
               JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
               for(int i = 0; i < frequenciesArray.length(); i++) {
                 FrequencyDto frequencyDto = frequenciesArray.get(i);
-                display.addValueSuggestion(frequencyDto.getValue(), new Double(frequencyDto.getFreq()).intValue() + "");
+                display.addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()) + "");
               }
-              display.populateValues(derivationHelper.getValueMapEntries());
               display.getValueMapGrid().setMaxFrequency(getMaxFrequency());
+              display.populateValues(derivationHelper.getValueMapEntries());
             }
-
           }).send();
         }
       }

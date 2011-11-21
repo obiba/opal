@@ -44,18 +44,17 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private static final String FEMALE_REGEXP = "^FEMALE$";
 
-  private final SummaryStatisticsDto statisticsDto;
+  protected final SummaryStatisticsDto statisticsDto;
 
   private double maxFrequency;
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto statistics) {
     super(originalVariable);
     this.statisticsDto = statistics;
-    initializeValueMapEntries();
   }
 
   @Override
-  protected void initializeValueMapEntries() {
+  public void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
 
     // For each category and value without category, make value map entry and process separately missing and non-missing
@@ -120,7 +119,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param builder
    * @return current index value
    */
-  private int initializeNonMissingCategoryValueMapEntry(int index, String value, ValueMapEntry.Builder builder) {
+  protected int initializeNonMissingCategoryValueMapEntry(int index, String value, ValueMapEntry.Builder builder) {
     int newIndex = index;
     if(RegExp.compile("^\\d+$").test(value)) {
       builder.newValue(value);
@@ -150,7 +149,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param missingValueMapEntries
    * @param indexMax
    */
-  private void initializeMissingCategoryValueMapEntries(List<ValueMapEntry> missingValueMapEntries, int indexMax) {
+  protected void initializeMissingCategoryValueMapEntries(List<ValueMapEntry> missingValueMapEntries, int indexMax) {
     if(missingValueMapEntries.size() == 0) return;
 
     int missIndex = 10 - missingValueMapEntries.size();
@@ -194,7 +193,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     return derived;
   }
 
-  private void appendCategoryValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
+  protected void appendCategoryValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
     JsArray<CategoryDto> origCats = originalVariable.getCategoriesArray();
 
     for(int i = 0; i < origCats.length(); i++) {
@@ -213,7 +212,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     }
   }
 
-  private void appendDistinctValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
+  protected void appendDistinctValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
     boolean first = true;
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
@@ -231,7 +230,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     }
   }
 
-  private void addNewCategory(Map<String, CategoryDto> newCategoriesMap, CategoryDto origCat, ValueMapEntry entry) {
+  protected void addNewCategory(Map<String, CategoryDto> newCategoriesMap, CategoryDto origCat, ValueMapEntry entry) {
     if(!entry.getNewValue().isEmpty()) {
       CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
       if(cat == null) {
@@ -257,7 +256,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     return missing;
   }
 
-  private boolean estimateIsMissing(String value) {
+  protected boolean estimateIsMissing(String value) {
     return value == null || value.isEmpty() ? true : RegExp.compile(MISSING_REGEXP, "i").test(value);
   }
 }
