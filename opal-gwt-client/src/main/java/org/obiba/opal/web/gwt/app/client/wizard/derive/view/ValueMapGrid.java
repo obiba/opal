@@ -310,7 +310,6 @@ public class ValueMapGrid extends FlowPanel {
 
         @Override
         public SafeHtml render(String object) {
-          GWT.log(maxFrequency + "");
           Double parse = Double.parseDouble(object);
           Double width = maxFrequency == 0 ? 0 : parse * (100 / maxFrequency);
 
