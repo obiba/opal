@@ -6,84 +6,77 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <g:HTMLPanel>
-    <table class="full-width" cellspacing="10">
-      <tbody>
-        <tr>
-          <td>
-            <ui:msg description="File label">File</ui:msg>:
-          </td>
-          <td>
-            <g:SimplePanel ui:field="selectCsvFilePanel" />
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-          <g:DisclosurePanel ui:field="advancedOptions">
-            <g:header><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:header>
-              <g:HTMLPanel>
-	            <table cellspacing="5">
-	              <tr>
-			          <td>
-			            <ui:msg description="From row label">From Row:</ui:msg>            
-			          </td>
-			          <td>
-			            <o:NumericTextBox ui:field="row" />            
-			          </td>
-			        </tr>
-			        <tr>
-			          <td>
-			            <ui:msg description="Separators label">Separators:</ui:msg>            
-			          </td>
-			          <td>
-			            <ui:msg description="Field label">Field</ui:msg>:
-			            <w:EditableListBox ui:field="field"/>
-			            <ui:msg description="Quote label">Quote</ui:msg>:
-			            <w:EditableListBox ui:field="quote"/>
-			          </td>
-			        </tr>
-			        <tr>
-			          <td colspan="2" class="key">
-			            <ui:msg description="Character set label">Character Set:</ui:msg>                
-			          </td>
-			        </tr>
-			        <tr>
-			          <td colspan="2">
-			            <div class="small-indent">
-			              <g:RadioButton name="charsetGroup" ui:field="charsetDefault" checked="true"><ui:msg description="Use default charset label">use Opal's default value (<span ui:field='defaultCharset' />)</ui:msg></g:RadioButton>
-			            </div>
-			            <div class="small-indent small-top-margin nowrap">
-			              <g:RadioButton name="charsetGroup" ui:field="charsetCommonList"><ui:msg description="Choose from a list of common charsets label">select from list of common character sets</ui:msg></g:RadioButton>            
-			              <g:ListBox ui:field='charsetCommonListBox' visibleItemCount='1' enabled="false">
-			                <g:item>ISO-8859-1</g:item>
-			                <g:item>ISO-8859-2</g:item>
-			                <g:item>ISO-8859-3</g:item>
-			                <g:item>ISO-8859-4</g:item>
-			                <g:item>ISO-8859-5</g:item>
-			                <g:item>ISO-8859-6</g:item>
-			                <g:item>ISO-8859-7</g:item>
-			                <g:item>ISO-8859-8</g:item>
-			                <g:item>ISO-8859-9</g:item>
-			                <g:item>ISO-8859-13</g:item>
-			                <g:item>ISO-8859-15</g:item>
-			                <g:item>UTF-8</g:item>
-			                <g:item>UTF-16</g:item>
-			                <g:item>UTF-32</g:item>
-			              </g:ListBox>
-			            </div>
-			            <div class="small-indent small-top-margin nowrap">
-			              <g:RadioButton name="charsetGroup" ui:field="charsetSpecify"><ui:msg description="Enter a specific charset label">select a specific one</ui:msg></g:RadioButton>            
-			              <g:TextBox ui:field="charsetSpecifyTextBox" enabled="false" />
-			            </div>             
-			          </td>
-			        </tr> 
-	            </table>
-			  </g:HTMLPanel>
-            </g:DisclosurePanel>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </g:HTMLPanel>
+  <g:FlowPanel>
+      <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="CSV File label">CSV File</ui:msg></g:Label>
+      <g:SimplePanel ui:field="selectCsvFilePanel" />
+    </g:FlowPanel>
+  
+    <g:DisclosurePanel ui:field="advancedOptions">
+      <g:customHeader>
+        <g:Label><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:Label>
+      </g:customHeader>
+      <g:FlowPanel>
+        <g:Grid width="100%">
+          <g:row>
+            <g:customCell styleName="top">
+          <g:FlowPanel styleName="input block">
+            <g:Label addStyleNames="key"><ui:msg description="From row label">From Row</ui:msg></g:Label>
+            <o:NumericTextBox ui:field="row" />
+          </g:FlowPanel>                  
+            </g:customCell>
+            <g:customCell styleName="top small-indent">
+             <g:FlowPanel styleName="input block">
+            <g:Label addStyleNames="key"><ui:msg description="Separators label">Separators</ui:msg></g:Label>
+            <g:FlowPanel>
+              <g:FlowPanel addStyleNames="inline">
+                <w:EditableListBox ui:field="field"/>
+                <g:Label styleName="help-block"><ui:msg description="Field label">Field</ui:msg></g:Label>  
+              </g:FlowPanel>
+              <g:FlowPanel addStyleNames="inline">
+                <w:EditableListBox ui:field="quote"/>
+                <g:Label styleName="help-block"><ui:msg description="Quote label">Quote</ui:msg></g:Label>
+              </g:FlowPanel>
+            </g:FlowPanel>
+          </g:FlowPanel>                          
+            </g:customCell>
+          </g:row>
+        </g:Grid>        
+        <g:FlowPanel styleName="input block">
+            <g:Label addStyleNames="key"><ui:msg description="Character set label">Character Set</ui:msg></g:Label>
+            <g:FlowPanel>
+              <g:FlowPanel styleName="input">
+                <g:RadioButton name="charsetGroup" ui:field="charsetDefault" checked="true"><ui:msg description="Use default charset label">use Opal's default value (<span ui:field='defaultCharset' />)</ui:msg></g:RadioButton>
+              </g:FlowPanel>
+              <g:FlowPanel styleName="input">
+                <g:RadioButton name="charsetGroup" ui:field="charsetCommonList"><ui:msg description="Choose from a list of common charsets label">select from list of common character sets</ui:msg></g:RadioButton>            
+                <g:ListBox ui:field='charsetCommonListBox' visibleItemCount='1' enabled="false">
+                  <g:item>ISO-8859-1</g:item>
+                  <g:item>ISO-8859-2</g:item>
+                  <g:item>ISO-8859-3</g:item>
+                  <g:item>ISO-8859-4</g:item>
+                  <g:item>ISO-8859-5</g:item>
+                  <g:item>ISO-8859-6</g:item>
+                  <g:item>ISO-8859-7</g:item>
+                  <g:item>ISO-8859-8</g:item>
+                  <g:item>ISO-8859-9</g:item>
+                  <g:item>ISO-8859-13</g:item>
+                  <g:item>ISO-8859-15</g:item>
+                  <g:item>UTF-8</g:item>
+                  <g:item>UTF-16</g:item>
+                  <g:item>UTF-32</g:item>
+                </g:ListBox>
+              </g:FlowPanel>
+              <g:FlowPanel styleName="input">
+                <g:RadioButton name="charsetGroup" ui:field="charsetSpecify"><ui:msg description="Enter a specific charset label">select a specific one</ui:msg></g:RadioButton>            
+                <g:TextBox ui:field="charsetSpecifyTextBox" enabled="false" />
+              </g:FlowPanel>
+            </g:FlowPanel>
+          </g:FlowPanel>
+      </g:FlowPanel>
+
+    </g:DisclosurePanel>
+  
+  </g:FlowPanel>
   
 </ui:UiBinder>

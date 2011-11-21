@@ -11,34 +11,22 @@
     </g:caption>
     <g:FlowPanel>
       <o:WizardStep ui:field="selectTypeStep">
-	      <g:HTMLPanel>
-	        <table class="full-width" cellspacing="10">
-	          <tbody>
-	            <tr>
-	              <td>
-	                <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg>:</g:Label>          
-	              </td>
-	              <td>
-	                <g:TextBox ui:field="datasourceName" addStyleNames="not-so-full-width"/>
-	              </td>
-	            </tr>
-	            <tr>
-	              <td>
-	                <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg>:</g:Label>          
-	              </td>
-	              <td>
-	                <g:ListBox ui:field="datasourceType" visibleItemCount="1">
-	                  <g:item value="hibernate"></g:item>
-	                  <g:item value="jdbc"></g:item>
-<!--	                  <g:item value="jdbc"></g:item>-->
-<!--	                  <g:item value="csv"></g:item>-->
-<!--	                  <g:item value="excel"></g:item>-->
-	                </g:ListBox>
-	              </td>
-	            </tr>
-	          </tbody>
-	        </table>
-	      </g:HTMLPanel>
+        <g:FlowPanel>
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+            <g:TextBox ui:field="datasourceName"/>
+          </g:FlowPanel>
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg></g:Label>
+            <g:ListBox ui:field="datasourceType" visibleItemCount="1">
+	          <g:item value="hibernate"></g:item>
+	          <g:item value="jdbc"></g:item>
+<!--	      <g:item value="jdbc"></g:item>-->
+<!--	      <g:item value="csv"></g:item>-->
+<!--	      <g:item value="excel"></g:item>-->
+	        </g:ListBox>
+          </g:FlowPanel>
+        </g:FlowPanel>
       </o:WizardStep>
       <o:WizardStep ui:field="datasourceFormStep">
       </o:WizardStep>

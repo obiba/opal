@@ -4,89 +4,48 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
   
-  <g:HTMLPanel>
-    <table class="full-width" cellspacing="5">
-          <tbody>
-            <tr>
-              <td colspan="2">
-                <ui:msg description="Database Connection Parameters label">Database Connection Parameters</ui:msg>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label addStyleNames="indent key"><ui:msg description="Driver label">Driver</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:ListBox ui:field="driver" visibleItemCount="1" addStyleNames="small-indent" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label addStyleNames="indent key"><ui:msg description="URL label">URL</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:TextBox ui:field="url" addStyleNames="small-indent not-so-full-width" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label addStyleNames="indent key"><ui:msg description="User Name label">User Name</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:TextBox ui:field="username" addStyleNames="small-indent not-so-full-width" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label addStyleNames="indent key"><ui:msg description="Password label">Password</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:PasswordTextBox ui:field="password" addStyleNames="small-indent not-so-full-width" />
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <g:DisclosurePanel>
-                  <g:header><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:header>
-                  <g:HTMLPanel>
-			        <table cellspacing="5">
-			          <tbody>
-			            <tr>
-			              <td colspan="2"><ui:msg description="Additional Columns Names label">Additional Columns Names:</ui:msg></td>
-			            </tr>
-			            <tr>
-			              <td>
-			                <g:Label addStyleNames="indent key"><ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg>:</g:Label>          
-			              </td>
-			              <td>
-			                <g:TextBox ui:field="defaultCreatedTimestampColumnName" addStyleNames="small-indent" />
-			              </td>
-			            </tr>
-			            <tr>
-			              <td>
-			                <g:Label addStyleNames="indent key"><ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg>:</g:Label>          
-			              </td>
-			              <td>
-			                <g:TextBox ui:field="defaultUpdatedTimestampColumnName" addStyleNames="small-indent" />
-			              </td>
-			            </tr>
-			            <tr>
-			              <td>
-			                <g:Label addStyleNames="key"><ui:msg description="Include meta-data tables label">Include meta-data tables</ui:msg>:</g:Label>          
-			              </td>
-			              <td>
-			                <g:RadioButton name="includeMetaDataTablesGroup" ui:field="useMetadataTablesOption" addStyleNames="small-indent"><ui:msg description="Yes label">Yes</ui:msg></g:RadioButton>
-			                <g:RadioButton name="includeMetaDataTablesGroup" ui:field="doNotUseMetadataTablesOption" addStyleNames="small-indent"><ui:msg description="No label">No</ui:msg></g:RadioButton>
-			              </td>
-			            </tr> 
-			          </tbody>
-			        </table>
-			      </g:HTMLPanel>
-                </g:DisclosurePanel>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-  </g:HTMLPanel>
+  <g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="Driver label">Driver</ui:msg></g:Label>
+      <g:ListBox ui:field="driver" visibleItemCount="1"/>
+    </g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="URL label">URL</ui:msg></g:Label>
+      <g:TextBox ui:field="url"/>
+    </g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="User Name label">User Name</ui:msg></g:Label>
+      <g:TextBox ui:field="username"/>
+    </g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="Password label">Password</ui:msg></g:Label>
+      <g:PasswordTextBox ui:field="password"/>
+    </g:FlowPanel>
+    
+    <g:DisclosurePanel>
+      <g:customHeader>
+        <g:Label><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:Label>
+      </g:customHeader>
+      <g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key"><ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg></g:Label>
+          <g:TextBox ui:field="defaultCreatedTimestampColumnName"/>
+        </g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key"><ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg></g:Label>
+          <g:TextBox ui:field="defaultUpdatedTimestampColumnName"/>
+        </g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key"><ui:msg description="Include meta-data tables label">Include meta-data tables</ui:msg></g:Label>
+          <g:RadioButton name="includeMetaDataTablesGroup" ui:field="useMetadataTablesOption" addStyleNames="top-margin"><ui:msg description="Yes label">Yes</ui:msg></g:RadioButton>
+          <g:RadioButton name="includeMetaDataTablesGroup" ui:field="doNotUseMetadataTablesOption" addStyleNames="top-margin"><ui:msg description="No label">No</ui:msg></g:RadioButton>
+        </g:FlowPanel>
+      </g:FlowPanel>
+    </g:DisclosurePanel>    
+    
+  </g:FlowPanel>
+  
+
+
   
 </ui:UiBinder>

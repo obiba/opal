@@ -5,59 +5,40 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <!--    <ui:msg description="Identity archive summary">Provide the following additional information</ui:msg>-->
+  <g:FlowPanel>
     <g:FlowPanel>
-      <g:HTMLPanel ui:field="step">
-        <table class="full-width" cellspacing="10">
-          <tbody>
-            <tr>
-              <td>
-                <g:InlineLabel ui:field="noUnitLabel"><ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will be used as-is (no unit is defined).</ui:msg></g:InlineLabel>
-                <g:InlineLabel ui:field="unitLabel"><ui:msg description="Participant identifier in files label">The participant identifiers in the file(s) should:</ui:msg></g:InlineLabel>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true" addStyleNames="small-indent"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
-                <g:ListBox ui:field="units" enabled="false"/>      
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <ui:msg description="Archive files label">Once a file has been successfully imported:</ui:msg>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true" addStyleNames="small-indent"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:RadioButton name="archiveGroup" ui:field="archiveMove" addStyleNames="small-indent"><ui:msg description="Move file label">move it to another folder</ui:msg>:</g:RadioButton>
-                <g:SimplePanel ui:field="archivePanel" addStyleNames="small-top-margin indent"/>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </g:HTMLPanel>
-    
-      <g:HTMLPanel ui:field="help">
-          <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
-          <p><ui:msg description="Unique identifier information">The unique identifiers in the imported file(s) can</ui:msg></p>
-          <ul>
-            <li><ui:msg description="CSV format information">be used exactly as they appear in the files and directly written to the destination.</ui:msg></li>
-            <li><ui:msg description="Opal XML information">be stored in a different place than the data found in the file(s). These identifiers are then substituted with identifiers that are known only by your organisation.<p/>This is usually done so that two organisations (units) may share data about participants without disclosing internal identifiers to one-another. Opal can effectively maintain any number of identifier per participant.</ui:msg></li>
-          </ul>
-          <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
-          <p><ui:msg description="Select archive directory information">If you wish, you can select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
-      </g:HTMLPanel>
+      <g:InlineLabel ui:field="noUnitLabel"><ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will be used as-is (no unit is defined).</ui:msg></g:InlineLabel>
+      <g:InlineLabel ui:field="unitLabel"><ui:msg description="Participant identifier in files label">The participant identifiers in the file(s) should:</ui:msg></g:InlineLabel>
+      <g:FlowPanel styleName="input">
+        <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true" addStyleNames="small-indent"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
+      </g:FlowPanel>
+      <g:FlowPanel styleName="input">
+        <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
+        <g:ListBox ui:field="units" enabled="false"/>
+      </g:FlowPanel>
+    </g:FlowPanel>
+    <g:FlowPanel>
+      <g:Label><ui:msg description="Archive files label">Once a file has been successfully imported:</ui:msg></g:Label>
+      <g:FlowPanel styleName="input">
+        <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true" addStyleNames="small-indent"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
+      </g:FlowPanel>
+      <g:FlowPanel styleName="input">
+        <g:RadioButton name="archiveGroup" ui:field="archiveMove" addStyleNames="small-indent"><ui:msg description="Move file label">move it to another folder</ui:msg>:</g:RadioButton>
+        <g:SimplePanel ui:field="archivePanel" addStyleNames="small-top-margin indent"/>
+      </g:FlowPanel>
+    </g:FlowPanel>
+  
+    <g:HTMLPanel ui:field="help">
+      <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
+      <p><ui:msg description="Unique identifier information">The unique identifiers in the imported file(s) can</ui:msg></p>
+      <ul>
+        <li><ui:msg description="CSV format information">be used exactly as they appear in the files and directly written to the destination.</ui:msg></li>
+        <li><ui:msg description="Opal XML information">be stored in a different place than the data found in the file(s). These identifiers are then substituted with identifiers that are known only by your organisation.<p/>This is usually done so that two organisations (units) may share data about participants without disclosing internal identifiers to one-another. Opal can effectively maintain any number of identifier per participant.</ui:msg></li>
+      </ul>
+      <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
+      <p><ui:msg description="Select archive directory information">If you wish, you can select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
+   </g:HTMLPanel>
       
-    </g:FlowPanel>    
+  </g:FlowPanel>    
   
 </ui:UiBinder>

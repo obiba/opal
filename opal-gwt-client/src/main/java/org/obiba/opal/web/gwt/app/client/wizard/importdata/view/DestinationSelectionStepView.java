@@ -18,14 +18,13 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -44,7 +43,7 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   ListBox tableListBox;
 
   @UiField
-  DivElement tableListBoxLabel;
+  Label tableListBoxLabel;
 
   private JsArray<DatasourceDto> datasources;
 
@@ -103,13 +102,13 @@ public class DestinationSelectionStepView extends Composite implements Destinati
 
   @Override
   public void hideTables() {
-    tableListBoxLabel.getStyle().setVisibility(Visibility.HIDDEN);
+    tableListBoxLabel.setVisible(false);
     tableListBox.setVisible(false);
   }
 
   @Override
   public void showTables() {
-    tableListBoxLabel.getStyle().setVisibility(Visibility.VISIBLE);
+    tableListBoxLabel.setVisible(true);
     tableListBox.setVisible(true);
   }
 

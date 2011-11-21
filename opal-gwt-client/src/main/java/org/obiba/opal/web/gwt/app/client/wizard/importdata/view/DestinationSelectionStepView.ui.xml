@@ -5,29 +5,15 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-<!--    <g:Label><ui:msg description="Destination selection summary">Select the destination (where you wish to write the data to)</ui:msg></g:Label>-->
-    <g:HTMLPanel ui:field="step">
-        <table class="gwt-KeyValue" cellspacing="10">
-          <tbody>
-            <tr>
-              <td>
-                <ui:msg description="Destination dataset label">Destination Dataset:</ui:msg>        
-              </td>
-              <td>
-                <g:ListBox ui:field='datasetListBox' visibleItemCount='1'/>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div ui:field='tableListBoxLabel'><ui:msg description="Destination table label">Destination Table:</ui:msg></div>  
-              </td>
-              <td>
-                <g:ListBox ui:field='tableListBox' visibleItemCount='1'/>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-    </g:HTMLPanel>   
-    
+  <g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="Destination dataset label">Destination Dataset</ui:msg></g:Label>
+      <g:ListBox ui:field='datasetListBox' visibleItemCount='1'/>
+    </g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label ui:field='tableListBoxLabel' addStyleNames="key"><ui:msg description="Destination table label">Destination Table</ui:msg></g:Label>
+      <g:ListBox ui:field='tableListBox' visibleItemCount='1'/>
+    </g:FlowPanel>
+  </g:FlowPanel>
   
 </ui:UiBinder>
