@@ -28,7 +28,7 @@ public class StatCell extends AbstractCell<ValueMapEntry> {
     SafeHtml stat(int width, int value);
   }
 
-  protected static Template template = GWT.create(Template.class);
+  protected final static Template template = GWT.create(Template.class);
 
   private final double maxFrequency;
 

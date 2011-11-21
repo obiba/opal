@@ -28,6 +28,9 @@ import com.google.gwt.core.client.JsArray;
 
 public class OpenTextualVariableDerivationHelper extends CategoricalVariableDerivationHelper {
 
+  // TODO put in super class
+  private static final String NA = "N/A";
+
   private Method method;
 
   public OpenTextualVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto summaryStatisticsDto, Method method) {
@@ -38,7 +41,8 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
   @Override
   public void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
-    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
+
+    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
 
     if(method == Method.AUTOMATICALLY) {
@@ -47,20 +51,30 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
       int index = 1;
       for(FrequencyDto frequencyDto : sortByFrequency()) {
 
-        Builder entry = ValueMapEntry.fromDistinct(frequencyDto.getValue()).label(frequencyDto.getValue()).count(frequencyDto.getFreq());
+        String value = frequencyDto.getValue();
+        if(value.equals(NA)) continue;
+        Builder entry = ValueMapEntry.fromDistinct(value).label(value).count(frequencyDto.getFreq());
 
-        if(estimateIsMissing(frequencyDto.getValue())) {
+        if(estimateIsMissing(value)) {
           entry.missing();
           missingValueMapEntries.add(entry.build());
         } else {
-          index = initializeNonMissingCategoryValueMapEntry(index, frequencyDto.getValue(), entry);
+          index = initializeNonMissingCategoryValueMapEntry(index, value, entry);
         }
       }
-
       // recode missing values
       initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
-
     }
+  }
+
+  private double nbEmpty() {
+    JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+    for(int i = 0; i < frequenciesArray.length(); i++) {
+      if(frequenciesArray.get(i).getValue().equals(NA)) {
+        return frequenciesArray.get(i).getFreq();
+      }
+    }
+    return 0;
   }
 
   private List<FrequencyDto> sortByFrequency() {
