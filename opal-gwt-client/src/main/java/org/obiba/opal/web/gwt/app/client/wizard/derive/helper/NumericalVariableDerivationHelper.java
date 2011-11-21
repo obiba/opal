@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -41,8 +40,20 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
     this.entryRangeMap = new HashMap<ValueMapEntry, Range<N>>();
+
+    addMissingCategoriesMapping();
+
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
+  }
+
+  private void addMissingCategoriesMapping() {
+    // distinct values
+    for(CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(originalVariable.getCategoriesArray()))) {
+      if(category.getIsMissing()) {
+        valueMapEntries.add(ValueMapEntry.fromCategory(category).missing().build());
+      }
+    }
   }
 
   public void addValueMapEntry(N value, String newValue) {
@@ -111,7 +122,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     List<Range<N>> ranges = new ArrayList<Range<N>>();
     List<ValueMapEntry> outliers = new ArrayList<ValueMapEntry>();
     for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
+      if(entry.getType().equals(ValueMapEntryType.CATEGORY_NAME) || entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
         outliers.add(entry);
       } else if(entry.getType().equals(ValueMapEntryType.RANGE)) {
         ranges.add(entryRangeMap.get(entry));
@@ -182,7 +193,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     scriptBuilder.append(".map({");
     boolean first = true;
     for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE) || entry.getType().equals(ValueMapEntryType.RANGE)) {
+      if(entry.getType().equals(ValueMapEntryType.CATEGORY_NAME) || entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE) || entry.getType().equals(ValueMapEntryType.RANGE)) {
         if(first) {
           first = false;
         } else {
@@ -199,7 +210,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     scriptBuilder.append(")");
   }
 
-  public Range<N> buildRange(N lower, N upper) {
+  private Range<N> buildRange(N lower, N upper) {
     if(lower == null) {
       return Ranges.lessThan(upper);
     } else if(upper == null) {
@@ -217,8 +228,9 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
       switch(o1.getType()) {
       case RANGE:
         return o2.getType().equals(ValueMapEntryType.RANGE) ? compareRanges(o1, o2) : -1;
+      case CATEGORY_NAME:
       case DISTINCT_VALUE:
-        if(o2.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) return compareDistincts(o1, o2);
+        if(o2.getType().equals(ValueMapEntryType.CATEGORY_NAME) || o2.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) return compareDistincts(o1, o2);
         return o2.getType().equals(ValueMapEntryType.EMPTY_VALUES) ? -1 : 1;
       case EMPTY_VALUES:
         return o2.getType().equals(ValueMapEntryType.OTHER_VALUES) ? -1 : 1;

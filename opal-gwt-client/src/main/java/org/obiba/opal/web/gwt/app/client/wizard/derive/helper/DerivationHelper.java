@@ -107,7 +107,6 @@ public abstract class DerivationHelper {
 
   public boolean hasValueMapEntryWithValue(String value) {
     for(ValueMapEntry entry : valueMapEntries) {
-      GWT.log(entry.getValue() + " == " + value);
       if(entry.getValue().equals(value)) {
         return true;
       }

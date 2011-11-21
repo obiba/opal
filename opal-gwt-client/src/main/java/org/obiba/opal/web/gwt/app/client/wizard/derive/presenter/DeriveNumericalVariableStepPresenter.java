@@ -19,7 +19,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
@@ -27,7 +26,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.NumericalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
@@ -132,10 +130,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
           } else {
             addRangesByCountMapping();
           }
-          addCategoriesMapping();
         } else {
           // TODO query distinct values
-          addCategoriesMapping();
         }
 
         getDisplay().populateValues(derivationHelper.getValueMapEntries());
@@ -143,13 +139,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     }).build());
 
     return stepCtrls;
-  }
-
-  private void addCategoriesMapping() {
-    // distinct values
-    for(CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(originalVariable.getCategoriesArray()))) {
-      addValueMapEntry(category.getName(), category.getName());
-    }
   }
 
   private void addRangesByCountMapping() {
@@ -264,7 +253,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       public boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower, Number upper, String newValue) {
         NumericalVariableDerivationHelper<Long> h = (NumericalVariableDerivationHelper<Long>) helper;
         Long l = lower == null ? null : lower.longValue();
-        Long u = lower == null ? null : lower.longValue();
+        Long u = upper == null ? null : upper.longValue();
         if(h.isRangeOverlap(l, u)) {
           return false;
         }
