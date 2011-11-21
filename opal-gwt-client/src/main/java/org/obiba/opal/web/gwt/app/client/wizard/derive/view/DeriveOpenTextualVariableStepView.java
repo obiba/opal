@@ -9,9 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
@@ -30,7 +28,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -86,13 +83,13 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @UiField
   ValueMapGrid valuesMapGrid;
 
-  MultiWordSuggestOracleWithDisplayStringInAddMethod valueOracle;
+  MultiWordSuggestOracleWithDisplay valueOracle;
 
-  MultiWordSuggestOracleWithDisplayStringInAddMethod newValueOracle;
+  MultiWordSuggestOracleWithDisplay newValueOracle;
 
   public DeriveOpenTextualVariableStepView() {
-    value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplayStringInAddMethod());
-    newValue = new SuggestBox(newValueOracle = new MultiWordSuggestOracleWithDisplayStringInAddMethod());
+    value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplay());
+    newValue = new SuggestBox(newValueOracle = new MultiWordSuggestOracleWithDisplay());
 
     auto = new RadioButton(Method.group);
     manual = new RadioButton(Method.group);
@@ -177,29 +174,6 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @Override
   public void addValueSuggestion(String replacementString, String displayString) {
     valueOracle.add(replacementString, displayString);
-  }
-
-  public class MultiWordSuggestOracleWithDisplayStringInAddMethod extends MultiWordSuggestOracle {
-
-    Map<String, String> map = new HashMap<String, String>();
-
-    public void add(String replacementString, String displayString) {
-      super.add(replacementString);
-      map.put(replacementString, displayString);
-    }
-
-    @Override
-    protected MultiWordSuggestion createSuggestion(String replacementString, String displayString) {
-      return super.createSuggestion(replacementString, "<div style='float:left'>" + displayString + createSpaces() + "</div><div style='float:right'>(" + map.get(replacementString) + ")</div>");
-    }
-
-    private String createSpaces() {
-      StringBuilder sb = new StringBuilder();
-      for(int i = 0; i < 25; i++) {
-        sb.append("&nbsp.");
-      }
-      return sb.toString();
-    }
   }
 
 }
