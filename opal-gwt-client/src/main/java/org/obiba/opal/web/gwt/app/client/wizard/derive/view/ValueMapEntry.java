@@ -15,6 +15,7 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import com.google.common.collect.Range;
 
 public class ValueMapEntry {
+
   public enum ValueMapEntryType {
     CATEGORY_NAME, DISTINCT_VALUE, RANGE, EMPTY_VALUES, OTHER_VALUES
   }
@@ -31,13 +32,14 @@ public class ValueMapEntry {
 
   private double count;
 
-  private ValueMapEntry(ValueMapEntryType type, String value, String label, String newValue, boolean missing) {
+  private ValueMapEntry(ValueMapEntryType type, String value, String label, String newValue, boolean missing, double count) {
     super();
     this.type = type;
     this.value = value;
     this.label = label;
     this.newValue = newValue;
     this.missing = missing;
+    this.count = count;
   }
 
   public boolean isType(ValueMapEntryType... types) {
@@ -142,7 +144,7 @@ public class ValueMapEntry {
     private ValueMapEntry entry;
 
     private Builder(ValueMapEntryType type) {
-      entry = new ValueMapEntry(type, "", "", "", false);
+      entry = new ValueMapEntry(type, "", "", "", false, 0);
     }
 
     public Builder value(String value) {

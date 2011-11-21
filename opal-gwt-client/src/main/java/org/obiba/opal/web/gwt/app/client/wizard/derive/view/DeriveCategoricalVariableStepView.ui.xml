@@ -9,7 +9,7 @@
 
   <g:FlowPanel>
     <o:WizardStep ui:field="mapStep">
-      <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="40em"/>
+      <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" gridHeight="40em" />
     </o:WizardStep>
   </g:FlowPanel>
   

@@ -53,6 +53,8 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
       @Override
       public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
         derivationHelper = new CategoricalVariableDerivationHelper(variable, statisticsDto);
+        getDisplay().enableFrequencyColumn(true);
+        getDisplay().setMaxFrequency(derivationHelper.getMaxFrequency());
         getDisplay().populateValues(derivationHelper.getValueMapEntries());
       }
     }).send();
@@ -115,6 +117,10 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   public interface Display extends WidgetDisplay {
 
     DefaultWizardStepController.Builder getMapStepController();
+
+    void setMaxFrequency(double maxFrequency);
+
+    void enableFrequencyColumn(boolean enableFrequencyColumn);
 
     void populateValues(List<ValueMapEntry> valuesMap);
 

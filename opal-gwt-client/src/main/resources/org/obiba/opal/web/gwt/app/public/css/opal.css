@@ -1332,6 +1332,12 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
   width: 8em;
 }
 
+.warning {
+	background-image: url('../image/16/warning.png');
+	background-repeat: no-repeat;
+	padding-left: 18px;
+}
+
 /* Inputs */
 
 div.input {
@@ -1381,4 +1387,14 @@ textarea.error:focus {
   -webkit-box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
   -moz-box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
   box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
+}
+
+.progress-bar {
+	background-color:#6bb5cb;
+	text-align: center;
+}
+
+.progress-bar .inner {
+	border: 1px solid black;
+	width: 100px;
 }

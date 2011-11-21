@@ -134,7 +134,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
   }
 
-  @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
+  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateDerivationPresenter() {
     // TODO
     String valueType = variable.getValueType();
@@ -288,6 +288,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   class CancelClickHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent arg0) {
       getDisplay().hideDialog();
     }
@@ -295,6 +296,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   class FinishClickHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent arg0) {
       // validation
       List<String> errorMessages = validate();
@@ -317,6 +319,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
           } else {
             if(getVariablePosition(resource, derived) != -1) {
               overwriteConfirmation = new Runnable() {
+                @Override
                 public void run() {
                   saveVariable(resource, derived);
                 }
@@ -333,6 +336,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
         @Override
         public void onResponseCode(Request request, Response response) {
           viewCreationConfirmation = new Runnable() {
+            @Override
             public void run() {
               saveVariable(datasourceName, viewName, derived);
             }
@@ -520,6 +524,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(viewCreationConfirmation != null && event.getSource().equals(viewCreationConfirmation) && event.isConfirmed()) {
         viewCreationConfirmation.run();

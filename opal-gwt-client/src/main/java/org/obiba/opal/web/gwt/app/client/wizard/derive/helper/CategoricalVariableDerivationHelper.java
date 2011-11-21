@@ -46,6 +46,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private final SummaryStatisticsDto statisticsDto;
 
+  private double maxFrequency;
+
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto statistics) {
     super(originalVariable);
     this.statisticsDto = statistics;
@@ -65,6 +67,9 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     for(int i = 0; i < frequencies.length(); i++) {
       FrequencyDto frequencyDto = frequencies.get(i);
       countByCategoryName.put(frequencyDto.getValue(), frequencyDto.getFreq());
+      if(frequencyDto.getFreq() > maxFrequency) {
+        maxFrequency = frequencyDto.getFreq();
+      }
     }
 
     List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
@@ -101,6 +106,10 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
 
+  }
+
+  public double getMaxFrequency() {
+    return maxFrequency;
   }
 
   /**
@@ -164,12 +173,16 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
 
     StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "').map({");
-
     appendCategoryValueMapEntries(scriptBuilder, newCategoriesMap);
-    scriptBuilder.append("  }");
+    scriptBuilder.append(",");
+    appendDistinctValueMapEntries(scriptBuilder, newCategoriesMap);
+    scriptBuilder.append("\n  }");
     appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
     appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
     scriptBuilder.append(");");
+
+    // set script in derived variable
+    setScript(derived, scriptBuilder.toString());
 
     // new categories
     JsArray<CategoryDto> cats = JsArrays.create();
@@ -177,9 +190,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
       cats.push(cat);
     }
     derived.setCategoriesArray(cats);
-
-    // set script in derived variable
-    setScript(derived, scriptBuilder.toString());
 
     return derived;
   }
@@ -193,7 +203,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
       if(entry.isType(ValueMapEntryType.CATEGORY_NAME)) {
         // script
-        scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
+        scriptBuilder.append("\n    '" + entry.getValue() + "': ");
         appendNewValue(scriptBuilder, entry);
 
         if(i < origCats.length() - 1) {
@@ -204,6 +214,24 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
         // new category
         addNewCategory(newCategoriesMap, origCat, entry);
+      }
+    }
+  }
+
+  private void appendDistinctValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
+    boolean first = true;
+    for(ValueMapEntry entry : valueMapEntries) {
+      if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
+        if(first) {
+          first = false;
+        } else {
+          scriptBuilder.append(",");
+        }
+        scriptBuilder.append("\n    '" + entry.getValue() + "': ");
+        appendNewValue(scriptBuilder, entry);
+
+        // new category
+        addNewCategory(newCategoriesMap, entry);
       }
     }
   }
@@ -235,7 +263,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   }
 
   private boolean estimateIsMissing(String value) {
-    if(value == null || value.isEmpty()) return true;
-    return RegExp.compile(MISSING_REGEXP, "i").test(value);
+    return value == null || value.isEmpty() ? true : RegExp.compile(MISSING_REGEXP, "i").test(value);
   }
 }

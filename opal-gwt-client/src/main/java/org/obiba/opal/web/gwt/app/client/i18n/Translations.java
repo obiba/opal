@@ -1091,6 +1091,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Number of ranges is required.")
   String rangesCountRequired();
 
+  @Description("Value is not a category label")
+  @DefaultStringValue("This value does not correspond to any category")
+  String valueIsNotACategory();
+  
   @Description("Ranges Overlap label")
   @DefaultStringValue("Range is overlapping another range.")
   String rangeOverlap();
@@ -1102,5 +1106,4 @@ public interface Translations extends Constants {
   @Description("Frequency label")
   @DefaultStringValue("Frequency")
   String frequency();
-
 }

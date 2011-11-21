@@ -18,19 +18,13 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueM
 import org.obiba.opal.web.gwt.app.client.workbench.view.Grid;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
@@ -38,8 +32,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.view.client.ListDataProvider;
 
 public class ValueMapGrid extends FlowPanel {
-
-  private static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
 
   private static final int DEFAULT_PAGE_SIZE_MIN = 10;
 
@@ -49,7 +41,7 @@ public class ValueMapGrid extends FlowPanel {
 
   private SimplePager pager;
 
-  private AbstractCellTable<ValueMapEntry> table;
+  protected AbstractCellTable<ValueMapEntry> table;
 
   private ListDataProvider<ValueMapEntry> dataProvider;
 
@@ -65,9 +57,9 @@ public class ValueMapGrid extends FlowPanel {
 
   private boolean allowFrequencyColumn = false;
 
-  private Column<ValueMapEntry, String> frequencyColumn;
+  private Column<ValueMapEntry, ValueMapEntry> frequencyColumn;
 
-  private Double maxFrequency = null;
+  private double maxFrequency;
 
   public ValueMapGrid() {
     super();
@@ -173,7 +165,7 @@ public class ValueMapGrid extends FlowPanel {
 
   private void initializeFrequencyColumn() {
     if(allowFrequencyColumn) {
-      frequencyColumn = new StatColumn();
+      frequencyColumn = new ValueMapColum(new StatCell(maxFrequency));
       table.addColumn(frequencyColumn, translations.frequency());
     }
   }
@@ -185,30 +177,32 @@ public class ValueMapGrid extends FlowPanel {
     }
   }
 
-  private void initializeValueColumn() {
-    // Value
-    Column<ValueMapEntry, String> valueColumn = new WrappedTextColumn() {
+  protected void initializeValueColumn() {
+
+    ValueMapCell cell = new ValueMapCell() {
 
       @Override
       protected String getText(ValueMapEntry entry) {
-        return entry.getValue() + " (" + FREQ_FORMAT.format(entry.getCount()) + ")";
+        return entry.getValue();
       }
-
     };
+
+    Column<ValueMapEntry, ValueMapEntry> valueColumn = new ValueMapColum(cell);
     valueColumn.setCellStyleNames("original-value");
     table.addColumn(valueColumn, translations.originalValueLabel());
   }
 
   private void initializeLabelColumn() {
-    // Label
-    Column<ValueMapEntry, String> labelColumn = new WrappedTextColumn() {
+
+    ValueMapCell cell = new ValueMapCell() {
 
       @Override
       protected String getText(ValueMapEntry entry) {
         return entry.getLabel();
       }
-
     };
+
+    Column<ValueMapEntry, ValueMapEntry> labelColumn = new ValueMapColum(cell);
     labelColumn.setCellStyleNames("original-label");
     table.addColumn(labelColumn, translations.originalLabelLabel());
   }
@@ -271,90 +265,21 @@ public class ValueMapGrid extends FlowPanel {
     }
   }
 
-  private abstract class WrappedTextColumn extends Column<ValueMapEntry, String> {
-
-    public WrappedTextColumn() {
-      super(new TextCell(new TrustedHtmlRenderer()));
-    }
-
-    protected abstract String getText(ValueMapEntry entry);
-
-    @Override
-    public String getValue(ValueMapEntry entry) {
-      return wrapText(entry.getType(), getText(entry));
-    }
-
-    private String wrapText(ValueMapEntryType type, String text) {
-      switch(type) {
-      case CATEGORY_NAME:
-        return "<span class='category'>" + text + "</span>";
-      case DISTINCT_VALUE:
-        return "<span class='distinct'>" + text + "</span>";
-      case RANGE:
-        return "<span class='range'>" + text + "</span>";
-      case OTHER_VALUES:
-        return "<span class='special others'>" + text + "</span>";
-      case EMPTY_VALUES:
-        return "<span class='special empties'>" + text + "</span>";
-      default:
-        return text;
-      }
-    }
-  }
-
-  public class StatColumn extends Column<ValueMapEntry, String> {
-
-    public StatColumn() {
-
-      super(new TextCell(new AbstractSafeHtmlRenderer<String>() {
-
-        @Override
-        public SafeHtml render(String object) {
-          Double parse = Double.parseDouble(object);
-          Double width = maxFrequency == 0 ? 0 : parse * (100 / maxFrequency);
-
-          return SafeHtmlUtils.fromTrustedString(//
-          "<div align='center' style='background-color:#6bb5cb; width:" + (width + 1) + "px'>" + //
-          "<div style='border:1px solid; width:100px'>" + //
-          parse.intValue() + //
-          "</div>" + "</div>");
-        }
-      }));
-    }
-
-    @Override
-    public String getValue(ValueMapEntry object) {
-      return object.getCount() + "";
-    }
-  }
-
-  /**
-   * Escape user string, not ours.
-   */
-  private static final class TrustedHtmlRenderer extends AbstractSafeHtmlRenderer<String> {
-
-    private final RegExp rg = RegExp.compile("(^<span class='[\\w\\s]+'>)(.*)(</span>$)");
-
-    @Override
-    public SafeHtml render(String object) {
-      if(object == null) return SafeHtmlUtils.EMPTY_SAFE_HTML;
-
-      MatchResult res = rg.exec(object);
-      if(res.getGroupCount() == 4) {
-        SafeHtmlBuilder builder = new SafeHtmlBuilder();
-        builder.append(SafeHtmlUtils.fromTrustedString(res.getGroup(1)));
-        builder.appendEscaped(res.getGroup(2));
-        builder.append(SafeHtmlUtils.fromTrustedString(res.getGroup(3)));
-        return builder.toSafeHtml();
-      }
-      GWT.log(SafeHtmlUtils.fromString(object) + "");
-      return SafeHtmlUtils.fromString(object);
-
-    }
-  }
-
-  public void setMaxFrequency(Double maxFrequency) {
+  public void setMaxFrequency(double maxFrequency) {
     this.maxFrequency = maxFrequency;
+  }
+
+  private class ValueMapColum extends Column<ValueMapEntry, ValueMapEntry> {
+
+    public ValueMapColum(Cell<ValueMapEntry> cell) {
+      super(cell);
+    }
+
+    @Override
+    public ValueMapEntry getValue(ValueMapEntry entry) {
+      return entry;
+    }
+
   }
 
 }
