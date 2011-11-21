@@ -205,12 +205,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
         // script
         scriptBuilder.append("\n    '" + entry.getValue() + "': ");
         appendNewValue(scriptBuilder, entry);
-
-        if(i < origCats.length() - 1) {
-          scriptBuilder.append(",");
-        } else {
-          scriptBuilder.append("\n");
-        }
+        if(i < origCats.length() - 1) scriptBuilder.append(",");
 
         // new category
         addNewCategory(newCategoriesMap, origCat, entry);

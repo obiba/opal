@@ -173,7 +173,7 @@ public abstract class DerivationHelper {
       // if(RegExp.compile("^\\d+$").test(entry.getNewValue())) {
       // scriptBuilder.append(entry.getNewValue());
       // } else {
-      scriptBuilder.append("'").append(value).append("'");
+      scriptBuilder.append("'" + value + "'");
       // }
     } else {
       scriptBuilder.append("null");
@@ -183,7 +183,7 @@ public abstract class DerivationHelper {
   protected ValueMapEntry appendValueMapEntry(StringBuilder scriptBuilder, String value) {
     ValueMapEntry entry = getValueMapEntry(value);
     if(entry != null) {
-      scriptBuilder.append("\n    '").append(value).append("': ");
+      scriptBuilder.append("\n    '" + value + "': ");
       appendNewValue(scriptBuilder, entry);
     }
     return entry;
