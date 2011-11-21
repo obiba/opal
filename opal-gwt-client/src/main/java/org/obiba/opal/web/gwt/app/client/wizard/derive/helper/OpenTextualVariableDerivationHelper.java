@@ -21,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.Builder;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
@@ -65,8 +64,6 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
   }
 
   private List<FrequencyDto> sortByFrequency() {
-	// TODO do not recast.
-    CategoricalSummaryDto categoricalSummaryDto = statisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
     List<FrequencyDto> list = JsArrays.toList(categoricalSummaryDto.getFrequenciesArray());
     Collections.sort(list, new Comparator<FrequencyDto>() {
       @Override
@@ -81,7 +78,7 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
     return method;
   }
 
-  // TODO this has been ~ copy/paste from temporal helper (maybe we can factorize)
+  // TODO this has been ~ copy/paste from super class
   @Override
   public VariableDto getDerivedVariable() {
     VariableDto derived = copyVariable(originalVariable);

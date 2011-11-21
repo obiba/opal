@@ -94,9 +94,9 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
           .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
 
             @Override
-            public void onResource(Response response, SummaryStatisticsDto dto) {
-              categoricalSummaryDto = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-              derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, dto, getDisplay().getMethod());
+            public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
+              categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+              derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, summaryStatisticsDto, getDisplay().getMethod());
               derivationHelper.initializeValueMapEntries();
               JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
               for(int i = 0; i < frequenciesArray.length(); i++) {

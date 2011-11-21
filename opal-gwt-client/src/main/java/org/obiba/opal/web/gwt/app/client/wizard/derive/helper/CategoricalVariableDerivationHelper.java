@@ -44,13 +44,13 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private static final String FEMALE_REGEXP = "^FEMALE$";
 
-  protected final SummaryStatisticsDto statisticsDto;
+  protected final CategoricalSummaryDto categoricalSummaryDto;
 
   private double maxFrequency;
 
-  public CategoricalVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto statistics) {
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto summaryStatisticsDto) {
     super(originalVariable);
-    this.statisticsDto = statistics;
+    categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
   }
 
   @Override
@@ -61,7 +61,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     // ones.
 
     Map<String, Double> countByCategoryName = new HashMap<String, Double>();
-    CategoricalSummaryDto categoricalSummaryDto = statisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
     JsArray<FrequencyDto> frequencies = categoricalSummaryDto.getFrequenciesArray();
     for(int i = 0; i < frequencies.length(); i++) {
       FrequencyDto frequencyDto = frequencies.get(i);
