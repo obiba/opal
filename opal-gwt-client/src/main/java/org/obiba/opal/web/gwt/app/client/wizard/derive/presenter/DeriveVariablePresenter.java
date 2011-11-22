@@ -29,7 +29,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -77,6 +76,9 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   @Inject
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
+
+  @Inject
+  private DeriveCustomVariablePresenter deriveCustomVariablePresenter;
 
   private VariableDto variable;
 
@@ -127,11 +129,22 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     updateDatasources();
 
-    if(event.getWizardType() == WizardType.DERIVE_CATEGORIZE_VARIABLE) {
+    switch(event.getWizardType()) {
+    case DERIVE_CATEGORIZE_VARIABLE:
       updateDerivationPresenter();
-    } else {
+      break;
+    case DERIVE_CUSTOM_VARIABLE:
+      setCustomDerivationPresenter();
+      break;
+    default:
       // TODO
+      break;
     }
+  }
+
+  private void setCustomDerivationPresenter() {
+    derivationPresenter = deriveCustomVariablePresenter;
+    getDisplay().appendWizardSteps(derivationPresenter.getWizardSteps());
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")

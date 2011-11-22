@@ -131,7 +131,9 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
       @Override
       public void onClick(ClickEvent event) {
-        if(addEntry(getDisplay().getValue().getValue(), getDisplay().getNewValue().getValue(), getDisplay().getNewValue().getValue())) {
+        String newValue = getDisplay().getNewValue().getValue();
+        String valueValue = getDisplay().getValue().getValue();
+        if(addEntry(valueValue, newValue, newValue)) {
           getDisplay().emptyValueFields();
           display.entryAdded();
         }
