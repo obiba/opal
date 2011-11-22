@@ -217,8 +217,6 @@ img.clickable {
 /* GWT */
 
 .gwt-MenuBar-horizontal .gwt-MenuItem {
-  padding-top:0.2em;
-  padding-bottom:0.4em;
 }
 
 .gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
@@ -323,11 +321,27 @@ img.clickable {
 }
 
 .gwt-DialogBox .Caption {
-  border-top:0.4em solid #DDDDDD;
+  background: none repeat scroll 0 0 #F5F5F5;
+  border-top: medium none;
+  color: #404040;
+  font-size: 1.4em;
+  font-weight: bold;
+  line-height: 30px;
+  border-radius: 6px 6px 0 0;
+  border-left: 1px solid #888888;
+  border-right: 1px solid #888888;
+  border-top: 1px solid #888888;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+  box-shadow: 0 1px 0 #FFFFFF inset;
 }
 
 .gwt-DialogBox .dialogMiddleCenter {
   padding:0px;
+  border-radius: 0 0 6px 6px;
+  border-left: 1px solid #888888;
+  border-right: 1px solid #888888;
+  border-bottom: 1px solid #888888;
 }
 
 .gwt-DialogBox .dialogContent .main {
@@ -338,9 +352,21 @@ img.clickable {
   line-height: 1.6em;
 }
 
+.gwt-DialogBox .dialogBottomCenter,
+.gwt-DialogBox .dialogMiddleRight,
+.gwt-DialogBox .dialogMiddleLeft,
+.gwt-DialogBox .dialogTopRight,
+.gwt-DialogBox .dialogTopLeft,
+.gwt-DialogBox .dialogBottomRight,
+.gwt-DialogBox .dialogBottomLeft {
+  background: none;
+}
+
 .gwt-DialogBox .dialogContent .footer {
   background-color:#F3F4EB;
   border-top:1px solid #B4A291;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 1px 0 #FFFFFF inset;
 }
 
 .gwt-DialogBox .dialogContent .footer .gwt-Button,
@@ -401,6 +427,7 @@ td.row-actions span {
 .topbar {
   background-color: #c65f00;
   z-index: auto;
+  height: auto;
 }
 
 .topbar > .gwt-Label {
@@ -416,8 +443,7 @@ margin-left:0.8em;
 }
 
 .topbar img {
-  margin-left: 0.8em;
-  padding-top: 0.3em;
+  padding: 0.3em 0.8em;
 }
 
 .topbar span, .topbar a {
@@ -438,20 +464,23 @@ margin-left:0.8em;
 
 .top .gwt-MenuBar table {
   border-spacing:0.8em 0;
+  height: 2.5em;
 }
 
 .top .gwt-MenuBar-horizontal {
   background: transparent;
   border: 0px;
   margin-left:40px;
+  display: inline-block;
 }
 
 .top .gwt-MenuBar-horizontal .gwt-MenuItem {
-  background-color: #888888;
   color: #cccccc;
-  -moz-border-radius-bottomleft: 0.5em; -webkit-border-bottom-left-radius: 0.5em; 
-  -moz-border-radius-bottomright: 0.5em; -webkit-border-bottom-right-radius: 0.5em;
-  -moz-box-shadow: 0.1em 0.05em 0.4em #888888;-webkit-box-shadow: 0.1em 0.05em 0.4em #888888;box-shadow: 0.1em 0.05em 0.4em #888888;
+  text-shadow: 0 1px 1px black;
+}
+
+.top .gwt-MenuBar-horizontal td.gwt-MenuItem {
+  vertical-align: middle;
 }
 
 .top .gwt-MenuBar-horizontal .gwt-MenuItem.selected {
@@ -1132,11 +1161,11 @@ div.variablesListTabContent .form table {
 
 .resizable-handle.resizable-s {
   cursor:s-resize;
-    display:block;
+  display:block;
 }
 
 .resizable-handle {
-  top:2em;
+  top:1.7em;
 }
 
 /* Wizard */
@@ -1147,10 +1176,10 @@ div.variablesListTabContent .form table {
 }
 
 .wizard .step > div.title {
-  font-weight: bold;
+  font-weight: normal;
   margin-bottom: 0.8em;
-    color: #444444;
-    font-size: 1em;
+  color: #444444;
+  font-size: 1.2em;
 }
 
 .wizard .footer .help {

@@ -2,20 +2,11 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:DockLayoutPanel unit="EM">
-    <g:north size="4.5">
-      <g:LayoutPanel addStyleNames="top">
-        <g:layer top="0" height="2.5em">
+    <g:north size="2.5">
+      <g:FlowPanel addStyleNames="top">
           <g:FlowPanel  ui:field="topBar" addStyleNames="topbar">
             <g:Image url="image/logo-opal-white.png"></g:Image>
-            <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
-            <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
-            <g:Anchor ui:field="administration"><ui:msg description="Administration link text">Administration</ui:msg></g:Anchor>
-            <g:InlineLabel ui:field="username"></g:InlineLabel>
-          </g:FlowPanel>
-        </g:layer>
-
-        <g:layer bottom="0" height="2em">
-          <g:MenuBar ui:field="menuBar" autoOpen="true">
+            <g:MenuBar ui:field="menuBar" autoOpen="true">
             <g:MenuItem  ui:field="dashboardItem">
               <ui:msg description="Dashboard menu item">Dashboard</ui:msg>              
             </g:MenuItem>
@@ -35,9 +26,12 @@
               <ui:msg description="Jobs menu item">Jobs</ui:msg>
             </g:MenuItem>
           </g:MenuBar>
-
-        </g:layer>
-      </g:LayoutPanel>
+            <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
+            <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
+            <g:Anchor ui:field="administration"><ui:msg description="Administration link text">Administration</ui:msg></g:Anchor>
+            <g:InlineLabel ui:field="username"></g:InlineLabel>
+          </g:FlowPanel>
+      </g:FlowPanel>
     </g:north>
     <g:center>
       <g:LayoutPanel ui:field="workbench" addStyleNames="main-content ui-corner-all">

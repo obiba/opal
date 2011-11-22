@@ -19,15 +19,14 @@
 
 .top .gwt-MenuBar-horizontal {
     margin-left: 0px;
-    background-color: #F6F4CD;
 }
 
 .top .gwt-MenuBar-horizontal .gwt-MenuItem.selected, .top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected.selected {
-	background-color: #402817;
+	background-color: #6E4A2B;
 }
 
 .top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected {
-	background-color: #888888;
+	background-color: #402817
 }
 
 .main-content {
