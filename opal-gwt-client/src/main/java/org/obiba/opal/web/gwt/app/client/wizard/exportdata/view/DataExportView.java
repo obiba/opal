@@ -36,6 +36,7 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -99,7 +100,7 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   CheckBox useAlias;
 
   @UiField
-  HTMLPanel unitSelection;
+  Panel unitSelection;
 
   @UiField
   Label noUnitSelection;
