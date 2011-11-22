@@ -4,16 +4,15 @@
   
   <ui:style>
     .right-aligned { float: right; }
-    .top-margin { margin-top: 0.5em; }
   </ui:style>
   
   <g:DockLayoutPanel unit="EM">
     <g:center>
       <g:HTML ui:field="message" addStyleNames="main p">Confirmation message.</g:HTML>
     </g:center>
-    <g:south size="3.25">
+    <g:south size="4">
       <g:HTMLPanel addStyleNames="footer">
-        <span class="{style.right-aligned} {style.top-margin}">
+        <span class="{style.right-aligned} top-margin">
           <g:Button ui:field="yesButton" styleName="btn primary">
             <ui:msg description="Yes label">Yes</ui:msg>
           </g:Button>

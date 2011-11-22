@@ -31,7 +31,9 @@
       <tr>
         <td colspan="2">
           <g:DisclosurePanel ui:field="resultsPanel" addStyleNames="resultsPanel not-so-full-width">
-            <g:header><ui:msg description="Results label">Results</ui:msg></g:header>
+            <g:customHeader>
+             <g:Label><ui:msg description="Results label">Results</ui:msg></g:Label>
+            </g:customHeader>
             <g:VerticalPanel ui:field="testResults" width="100%" height="23em"/>
           </g:DisclosurePanel>
         </td>

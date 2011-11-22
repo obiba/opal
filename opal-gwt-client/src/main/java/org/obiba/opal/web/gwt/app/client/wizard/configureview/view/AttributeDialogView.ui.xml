@@ -6,7 +6,6 @@
   <ui:style>
     .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
     .right-aligned { float: right; }
-    .top-margin { margin-top: 0.5em; }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="18em" width="35em">
@@ -42,10 +41,10 @@
           </g:HTMLPanel>
         </g:ScrollPanel>
       </g:center>
-      <g:south size="3.25">
+      <g:south size="4">
         <g:HTMLPanel addStyleNames="footer">
-          <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="saveButton" styleName="btn">
+          <span class="{style.right-aligned} top-margin">
+            <g:Button ui:field="saveButton" styleName="btn primary">
                 <ui:msg description="Save button label">Save</ui:msg>
             </g:Button>
             <g:Button ui:field="cancelButton" styleName="btn">

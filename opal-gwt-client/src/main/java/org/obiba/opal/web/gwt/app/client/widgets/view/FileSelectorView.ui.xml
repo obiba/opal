@@ -40,21 +40,21 @@
       
       </g:FlowPanel>
     </g:center>
-    <g:south size="3.25">
+    <g:south size="4">
       <g:HTMLPanel addStyleNames="footer">
-        <span class="{style.left-aligned} {style.top-margin}">
+        <span class="{style.left-aligned} top-margin">
           <g:HTMLPanel ui:field="createFolderPanel" addStyleNames="{style.inline}">
             <g:TextBox ui:field="createFolderName" />
-            <g:Button ui:field="createFolderButton" styleName="btn">
+            <g:Button ui:field="createFolderButton" styleName="btn info">
               <ui:msg description="Create Folder button label">Create Folder</ui:msg>
             </g:Button>
           </g:HTMLPanel>
-          <g:Button ui:field="uploadButton" styleName="btn">
+          <g:Button ui:field="uploadButton" styleName="btn info">
             <ui:msg description="Upload File label">Upload</ui:msg>
           </g:Button>
         </span>
-        <span class="{style.right-aligned} {style.top-margin} {style.left-margin} {style.right-margin}">
-          <g:Button ui:field="selectButton" styleName="btn">
+        <span class="{style.right-aligned} top-margin {style.left-margin} {style.right-margin}">
+          <g:Button ui:field="selectButton" styleName="btn primary">
             <ui:msg description="Select button label">Select</ui:msg>
           </g:Button>
           <g:Button ui:field="cancelButton" styleName="btn">

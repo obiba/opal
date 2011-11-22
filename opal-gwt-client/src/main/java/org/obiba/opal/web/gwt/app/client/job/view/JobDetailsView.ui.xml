@@ -5,7 +5,6 @@
 
   <ui:style>
     .right-aligned { float: right; margin:10px; }
-    .top-margin { margin-top: 0.5em; }
   </ui:style>
     
   <g:DockLayoutPanel unit="EM">
@@ -14,10 +13,10 @@
         <o:Table width="100%" ui:field="table" addStyleNames="main"/>
       </g:ScrollPanel>
     </g:center>
-    <g:south size="3.25">
+    <g:south size="4">
       <g:HTMLPanel addStyleNames="footer">
-        <span class="{style.right-aligned} {style.top-margin}">
-          <g:Button ui:field="close" styleName="btn"><ui:msg description="Close label">Close</ui:msg></g:Button>
+        <span class="{style.right-aligned} top-margin">
+          <g:Button ui:field="close" styleName="btn info"><ui:msg description="Close label">Close</ui:msg></g:Button>
         </span>
       </g:HTMLPanel>
     </g:south> 

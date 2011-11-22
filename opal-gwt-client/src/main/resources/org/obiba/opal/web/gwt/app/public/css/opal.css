@@ -1165,7 +1165,7 @@ div.variablesListTabContent .form table {
 }
 
 .resizable-handle {
-  top:1.7em;
+  top:2.3em;
 }
 
 /* Wizard */
@@ -1393,6 +1393,14 @@ div.input div.inline {
 div.input .key {
   font-weight: bold;
   padding-bottom: 0.4em;
+}
+
+div.input span.key {
+  display: block;
+}
+
+div.input .key label {
+  font-weight: bold;
 }
 
 div.input.error input,

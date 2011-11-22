@@ -42,10 +42,10 @@
           </g:HTMLPanel>
         </g:ScrollPanel>
       </g:center>
-      <g:south size="3.25">
+      <g:south size="4">
         <g:HTMLPanel addStyleNames="footer">
-          <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="saveButton" styleName="btn">
+          <span class="{style.right-aligned} top-margin">
+            <g:Button ui:field="saveButton" styleName="btn primary">
                 <ui:msg description="Save button label">Save</ui:msg>
             </g:Button>
             <g:Button ui:field="cancelButton" styleName="btn">

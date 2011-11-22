@@ -68,14 +68,14 @@
 	    </g:ScrollPanel>
 	          
     </g:center>
-    <g:south size="3.25">
+    <g:south size="4">
       <g:FlowPanel addStyleNames="footer">
         
           <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
-          <g:Button ui:field="close" styleName="btn right-aligned small-top-margin">
+          <g:Button ui:field="close" styleName="btn right-aligned top-margin info">
             <ui:msg description="Close label">Close</ui:msg>
           </g:Button>
-          <g:Button ui:field="help" styleName="btn left-aligned small-top-margin small-indent">
+          <g:Button ui:field="help" styleName="btn left-aligned top-margin small-indent">
             <ui:msg description="Help label">Help</ui:msg>
           </g:Button>
       </g:FlowPanel>

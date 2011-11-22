@@ -12,58 +12,33 @@
     <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="22em" width="40em">
       <g:center>
         <g:ScrollPanel>
-          <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
-            <table class="full-width">
-              <tr>
-                <td>
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Name label">Name</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:TextBox addStyleNames="text not-so-full-width" name="name" ui:field="name"/>
-                </td>
-              </tr>
-              <tr>
-	            <td>
-	              <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg>:</g:Label>          
-	            </td>
-	            <td>
-	              <g:ListBox ui:field="typeList" visibleItemCount="1"/>
-	            </td>
-	          </tr>
-              <tr>
-                <td>
-                  <g:Label addStyleNames="key" ui:field="functionLabel">
-                    <ui:msg description="DataShield function label">Function</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:TextBox addStyleNames="text not-so-full-width" name="function" ui:field="function"/>
-                </td>
-              </tr>
-              <tr>
-                <td valign="top">
-                  <g:Label addStyleNames="key" ui:field="scriptLabel">
-                    <ui:msg description="DataShield script label">Script</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:TextArea addStyleNames="text not-so-full-width" name="script" ui:field="script"/>
-                </td>
-              </tr>
-            </table>
-
-          </g:HTMLPanel>
+          <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+              <g:TextBox name="name" ui:field="name"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg></g:Label>
+              <g:ListBox ui:field="typeList" visibleItemCount="1"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key" ui:field="functionLabel"><ui:msg description="DataShield function label">Function</ui:msg></g:Label>
+              <g:TextBox name="function" ui:field="function"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key" ui:field="scriptLabel"><ui:msg description="DataShield script label">Script</ui:msg></g:Label>
+              <g:TextArea addStyleNames="not-so-full-width" name="script" ui:field="script"/>
+            </g:FlowPanel>
+          </g:FlowPanel>
         </g:ScrollPanel>
       </g:center>
-      <g:south size="3.25">
+      <g:south size="4">
         <g:FlowPanel addStyleNames="footer">
           <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
-          <g:Button ui:field="cancelButton" addStyleNames="btn right-aligned small-top-margin">
+          <g:Button ui:field="cancelButton" addStyleNames="btn right-aligned top-margin">
             <ui:msg description="Cancel button label">Cancel</ui:msg>
           </g:Button>
-          <g:Button ui:field="saveButton" addStyleNames="btn primary right-aligned small-top-margin">
+          <g:Button ui:field="saveButton" addStyleNames="btn primary right-aligned top-margin primary">
             <ui:msg description="Save button label">Save</ui:msg>
           </g:Button>
         </g:FlowPanel>

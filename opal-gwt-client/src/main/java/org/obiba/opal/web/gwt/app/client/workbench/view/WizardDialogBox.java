@@ -101,7 +101,7 @@ public class WizardDialogBox extends DialogBox {
 
   private void initControls() {
     FlowPanel south;
-    contentLayout.addSouth(south = new FlowPanel(), 3.25);
+    contentLayout.addSouth(south = new FlowPanel(), 4);
     south.addStyleName("footer");
 
     south.add(resizeHandle = new ResizeHandle());
@@ -132,7 +132,7 @@ public class WizardDialogBox extends DialogBox {
     help.addStyleName("btn");
     help.removeStyleName("gwt-Button");
     help.addStyleName("left-aligned");
-    help.addStyleName("small-top-margin");
+    help.addStyleName("top-margin");
     help.setEnabled(false);
   }
 
@@ -141,7 +141,7 @@ public class WizardDialogBox extends DialogBox {
     button.addStyleName("btn");
     button.removeStyleName("gwt-Button");
     button.addStyleName("right-aligned");
-    button.addStyleName("small-top-margin");
+    button.addStyleName("top-margin");
   }
 
   public void setHelpEnabled(boolean enabled) {
