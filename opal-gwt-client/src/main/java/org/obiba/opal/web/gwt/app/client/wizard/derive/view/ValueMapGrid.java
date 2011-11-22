@@ -29,6 +29,7 @@ import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.view.client.ListDataProvider;
 
 public class ValueMapGrid extends FlowPanel {
@@ -61,6 +62,8 @@ public class ValueMapGrid extends FlowPanel {
 
   private double maxFrequency;
 
+  private Image loading = new Image("image/loading.gif");
+
   public ValueMapGrid() {
     super();
     this.pager = new SimplePager();
@@ -69,6 +72,7 @@ public class ValueMapGrid extends FlowPanel {
     this.pager.setVisible(false);
     add(pager);
     this.table = null;
+    add(loading);
   }
 
   public void setPageSizeMin(int pageSizeMin) {
@@ -111,6 +115,7 @@ public class ValueMapGrid extends FlowPanel {
     } else {
       table = new Table<ValueMapEntry>(pager.getPageSize());
     }
+    remove(loading);
     table.addStyleName("clear");
     table.setPageSize(pageSizeMax);
     table.setWidth("100%");

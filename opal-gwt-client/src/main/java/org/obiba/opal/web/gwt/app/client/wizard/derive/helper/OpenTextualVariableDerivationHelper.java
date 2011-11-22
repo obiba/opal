@@ -28,9 +28,6 @@ import com.google.gwt.core.client.JsArray;
 
 public class OpenTextualVariableDerivationHelper extends CategoricalVariableDerivationHelper {
 
-  // TODO put in super class
-  private static final String NA = "N/A";
-
   private Method method;
 
   public OpenTextualVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto summaryStatisticsDto, Method method) {
@@ -65,16 +62,6 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
       // recode missing values
       initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
     }
-  }
-
-  private double nbEmpty() {
-    JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
-    for(int i = 0; i < frequenciesArray.length(); i++) {
-      if(frequenciesArray.get(i).getValue().equals(NA)) {
-        return frequenciesArray.get(i).getFreq();
-      }
-    }
-    return 0;
   }
 
   private List<FrequencyDto> sortByFrequency() {

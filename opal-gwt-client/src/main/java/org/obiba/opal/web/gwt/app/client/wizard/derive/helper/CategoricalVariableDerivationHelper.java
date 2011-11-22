@@ -44,6 +44,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private static final String FEMALE_REGEXP = "^FEMALE$";
 
+  protected static final String NA = "N/A";
+
   protected final CategoricalSummaryDto categoricalSummaryDto;
 
   private double maxFrequency;
@@ -64,6 +66,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     JsArray<FrequencyDto> frequencies = categoricalSummaryDto.getFrequenciesArray();
     for(int i = 0; i < frequencies.length(); i++) {
       FrequencyDto frequencyDto = frequencies.get(i);
+      String value = frequencyDto.getValue();
+      if(value.equals(NA)) continue;
       countByCategoryName.put(frequencyDto.getValue(), frequencyDto.getFreq());
       if(frequencyDto.getFreq() > maxFrequency) {
         maxFrequency = frequencyDto.getFreq();
@@ -101,13 +105,26 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     // recode missing values
     initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
 
-    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
+    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
 
   }
 
   public double getMaxFrequency() {
     return maxFrequency;
+  }
+
+  /**
+   * Return frequency of N/A in summary stats
+   */
+  protected double nbEmpty() {
+    JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+    for(int i = 0; i < frequenciesArray.length(); i++) {
+      if(frequenciesArray.get(i).getValue().equals(NA)) {
+        return frequenciesArray.get(i).getFreq();
+      }
+    }
+    return 0;
   }
 
   /**
