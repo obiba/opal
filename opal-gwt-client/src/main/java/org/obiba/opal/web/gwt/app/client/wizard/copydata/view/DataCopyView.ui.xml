@@ -16,24 +16,17 @@
       </o:WizardStep>
       
       <o:WizardStep ui:field="destinationStep">
-        <g:HTMLPanel>
-          <table cellspacing="10">
-	         <tbody>
-	           <tr>
-	             <td><g:Label><ui:msg description="Destination field">Destination</ui:msg>:</g:Label></td>
-	             <td><g:ListBox ui:field="datasources"/></td>
-	           </tr>
-	           <tr>
-	             <td colspan="2"><g:CheckBox ui:field="incremental"><ui:msg description="Incremental checkbox label">incremental</ui:msg></g:CheckBox></td>
-	           </tr>
-	           <tr>
-	             <td colspan="2">
-	               <g:CheckBox ui:field="useAlias"><ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename variables</ui:msg></g:CheckBox>
-	             </td>
-	           </tr>
-	         </tbody>
-          </table>
-        </g:HTMLPanel>
+        <g:FlowPanel>
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Destination field">Destination</ui:msg></g:Label>
+            <g:ListBox ui:field="datasources"/>
+          </g:FlowPanel>
+          <g:FlowPanel styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Options title">Options</ui:msg></g:Label>
+            <g:CheckBox ui:field="incremental" addStyleNames="block"><ui:msg description="Incremental checkbox label">incremental</ui:msg></g:CheckBox>                    
+            <g:CheckBox ui:field="useAlias" addStyleNames="small-top-margin block"><ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename variables</ui:msg></g:CheckBox>
+          </g:FlowPanel>  
+        </g:FlowPanel>
       </o:WizardStep>
             
 	  <o:WizardStep ui:field="conclusionStep">
