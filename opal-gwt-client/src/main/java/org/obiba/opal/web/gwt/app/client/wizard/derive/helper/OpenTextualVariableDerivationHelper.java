@@ -79,7 +79,6 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
     return method;
   }
 
-  // TODO this has been ~ copy/paste from super class
   @Override
   public VariableDto getDerivedVariable() {
     VariableDto derived = copyVariable(originalVariable);
@@ -109,28 +108,9 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
 
   public enum Method {
 
-    AUTOMATICALLY("Automatically"), MANUAL("Manual");
-
-    private final String method;
+    AUTOMATICALLY, MANUAL;
 
     public static final String group = "group-method";
 
-    Method(String method) {
-      this.method = method;
-    }
-
-    public static Method fromString(String text) {
-      for(Method g : values()) {
-        if(g.method.equalsIgnoreCase(text)) {
-          return g;
-        }
-      }
-      return null;
-    }
-
-    @Override
-    public String toString() {
-      return method;
-    }
   }
 }

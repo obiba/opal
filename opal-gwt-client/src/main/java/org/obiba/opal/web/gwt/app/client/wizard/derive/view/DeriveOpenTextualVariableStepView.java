@@ -100,13 +100,12 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
     radioGroup.addButton(auto, Method.AUTOMATICALLY);
     radioGroup.addButton(manual, Method.MANUAL);
 
-    // TODO localized
     labelValue.setText(translations.valueLabel() + ": ");
-    auto.setText(Method.AUTOMATICALLY.toString());
+    auto.setText(translations.automatically());
     auto.setValue(true);
     labelAuto.setText("Similar disctinct values will be grouped together");
 
-    manual.setText(Method.MANUAL.toString());
+    manual.setText(translations.manually());
     labelManual.setText("No predefined value mapping");
 
     addButton.setText("Add");

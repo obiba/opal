@@ -1008,6 +1008,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Map a value to a new value")
   String recodeOpenTextualMapStepTitle();
 
+  @Description("Automatically Label")
+  @DefaultStringValue("Automatically")
+  String automatically();
+
+  @Description("Manually Label")
+  @DefaultStringValue("Manually")
+  String manually();
+
   @Description("Time map")
   @DefaultStringMapValue({ //
   "Hour", "Hour", //
@@ -1094,7 +1102,7 @@ public interface Translations extends Constants {
   @Description("Value is not a category label")
   @DefaultStringValue("This value does not correspond to any category")
   String valueIsNotACategory();
-  
+
   @Description("Ranges Overlap label")
   @DefaultStringValue("Range is overlapping another range.")
   String rangeOverlap();
