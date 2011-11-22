@@ -18,7 +18,7 @@ public class CreateDataShieldEnvironmentsUpgradeStep extends AbstractConfigurati
 
   @Override
   public String getDescription() {
-    return "Create the AGGREGATE environment from aggregatingMethods.";
+    return "Create the AGGREGATE environment from existing aggregating methods.";
   }
 
   @Override
@@ -39,6 +39,16 @@ public class CreateDataShieldEnvironmentsUpgradeStep extends AbstractConfigurati
       return;
     }
 
+    Node environment = createEnvironmentNode(opalConfig, aggregatingMethods);
+    datashieldConfig.replaceChild(environment, aggregatingMethods);
+  }
+
+  @Override
+  public Version getAppliesTo() {
+    return new Version(1, 7, 0);
+  }
+
+  private Node createEnvironmentNode(Document opalConfig, Node aggregatingMethods) {
     Node environments = opalConfig.createElement("environments");
     Node environment = opalConfig.createElement("org.obiba.opal.datashield.DataShieldEnvironment");
     environments.appendChild(environment);
@@ -52,13 +62,7 @@ public class CreateDataShieldEnvironmentsUpgradeStep extends AbstractConfigurati
     while(aggregatingMethods.hasChildNodes()) {
       methods.appendChild(aggregatingMethods.getFirstChild());
     }
-
-    datashieldConfig.replaceChild(environments, aggregatingMethods);
-  }
-
-  @Override
-  public Version getAppliesTo() {
-    return new Version(1, 7, 0);
+    return environments;
   }
 
 }
