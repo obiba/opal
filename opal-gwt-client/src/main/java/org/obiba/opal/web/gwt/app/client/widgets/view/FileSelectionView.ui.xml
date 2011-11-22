@@ -7,7 +7,11 @@
 
   <ui:style>
     .button {
-    cursor: pointer;
+      cursor: pointer;
+      margin-left: 0.4em;
+      padding-bottom: 0.4em;
+      padding-top: 0.4em;
+      font-size: 0.9em;
     }
   </ui:style>
 
