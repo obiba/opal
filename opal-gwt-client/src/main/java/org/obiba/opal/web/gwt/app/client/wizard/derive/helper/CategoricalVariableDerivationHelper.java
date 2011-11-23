@@ -161,6 +161,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param builder
    * @return current index value
    */
+  @SuppressWarnings("PMD.NcssMethodCount")
   protected int initializeNonMissingCategoryValueMapEntry(int index, String value, ValueMapEntry.Builder builder) {
     int newIndex = index;
     if(RegExp.compile("^\\d+$").test(value)) {
