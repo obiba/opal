@@ -874,7 +874,7 @@ a.table.conflict, a.table.conflict:visited, a.table.conflict:hover {
 }
 
 a.table.creation, a.table.creation:visited, a.table.creation:hover {
-  background:transparent url(../image/16/list-add.png) no-repeat scroll left center;
+  background:transparent url(../image/more.png) no-repeat scroll left center;
   height:18px;
   padding-left:20px;
 }
