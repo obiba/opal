@@ -17,72 +17,41 @@
     <g:caption>
       <ui:msg description="Report template update dialog title">Add/Edit Report Template</ui:msg>
     </g:caption>
-    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="30em" width="60em">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="45em" width="50em">
       <g:center>
         <g:ScrollPanel>
-          <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
-            <table class="reportTemplateProperties full-width">
-              <tr>
-                <td>
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Name label">Name</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:TextBox name="reportTemplateName" ui:field="reportTemplateName" addStyleNames="text not-so-full-width"/>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="BIRT Design File label">BIRT Design File</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:SimplePanel ui:field="designFilePanel"/>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Format label">Format</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:ListBox ui:field="format">
-                    <g:item value="pdf">PDF</g:item>
-                    <g:item value="html">Html</g:item>
-                    <g:item value="excel">Excel</g:item>
-                  </g:ListBox>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Parameters label">Parameters</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:SimplePanel addStyleNames="widget" ui:field="reportParametersPanel"/>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:RadioButton name="schedule" ui:field="runManuallyRadio" checked="true" addStyleNames="key">
-                    <ui:msg description="Run manually label">Run manually</ui:msg>
-                  </g:RadioButton>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:RadioButton name="schedule" ui:field="scheduleRadio" checked="false" addStyleNames="key">
-                    <ui:msg description="Schedule label">Schedule</ui:msg>:
-                  </g:RadioButton>
-                </td>
-                <td>
-                  <g:TextBox addStyleNames="text" name="schedule" ui:field="schedule"
-                    visibleLength="40"/>
-                  <o:HelpImage imageSize="16" tooltipWidth="400px">
+          <g:FlowPanel addStyleNames="main">
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+              <g:TextBox name="reportTemplateName" ui:field="reportTemplateName"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="BIRT Design File label">BIRT Design File</ui:msg></g:Label>
+              <g:SimplePanel ui:field="designFilePanel"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Format label">Format</ui:msg></g:Label>
+              <g:ListBox ui:field="format">
+                <g:item value="pdf">PDF</g:item>
+                <g:item value="html">Html</g:item>
+                <g:item value="excel">Excel</g:item>
+              </g:ListBox>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Parameters label">Parameters</ui:msg></g:Label>
+              <g:SimplePanel addStyleNames="widget" ui:field="reportParametersPanel"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Scheduling label">Scheduling</ui:msg></g:Label>
+              <g:RadioButton name="schedule" ui:field="runManuallyRadio" checked="true" addStyleNames="block">
+                <ui:msg description="Run manually label">Run manually</ui:msg>
+              </g:RadioButton>
+              <g:FlowPanel addStyleNames="small-top-margin">
+                <g:RadioButton name="schedule" ui:field="scheduleRadio" checked="false">
+                  <ui:msg description="Schedule plan label">Schedule plan</ui:msg>
+                </g:RadioButton>
+                <g:TextBox addStyleNames="text" name="schedule" ui:field="schedule"/>
+                <o:HelpImage imageSize="16" tooltipWidth="400px" addStyleNames="xsmall-indent">
                     <g:HTMLPanel>
                       <g:Label addStyleNames="title"><ui:msg description="Schedule Expression label">Schedule Expression</ui:msg></g:Label>
                       <p>
@@ -178,20 +147,13 @@
 						</table>
                     </g:HTMLPanel>
                   </o:HelpImage>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Notification Emails label">Notification Emails</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:SimplePanel ui:field="notificationEmailsPanel"/>
-                </td>
-              </tr>
-            </table>
-          </g:HTMLPanel>
+              </g:FlowPanel>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Notification Emails label">Notification Emails</ui:msg></g:Label>
+              <g:SimplePanel ui:field="notificationEmailsPanel"/>
+            </g:FlowPanel>
+          </g:FlowPanel>
         </g:ScrollPanel>
       </g:center>
       <g:south size="4">
