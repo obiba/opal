@@ -57,38 +57,18 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   public void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
 
-    // For each category and value without category, make value map entry and process separately missing and non-missing
-    // ones.
-
-    Map<String, Double> countByCategoryName = findFrequencies(categoricalSummaryDto.getFrequenciesArray());
-
     List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
     int index = 1;
 
+    // For each category and value without category, make value map entry and process separately missing and non-missing
+    // ones.
+    Map<String, Double> countByCategoryName = findFrequencies(categoricalSummaryDto.getFrequenciesArray());
+
     // recode categories
-    for(CategoryDto category : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
-      Double count = countByCategoryName.get(category.getName());
-      ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(category, count);
-      if(estimateIsMissing(category)) {
-        builder.missing();
-        missingValueMapEntries.add(builder.build());
-      } else {
-        index = initializeNonMissingCategoryValueMapEntry(index, category.getName(), builder);
-      }
-      countByCategoryName.remove(category.getName());
-    }
+    index = initializeNonMissingCategoryValueMapEntries(countByCategoryName, missingValueMapEntries, index);
 
     // recode values not corresponding to a category
-    for(Map.Entry<String, Double> entry : countByCategoryName.entrySet()) {
-      String value = entry.getKey();
-      ValueMapEntry.Builder builder = ValueMapEntry.fromDistinct(value, entry.getValue());
-      if(estimateIsMissing(value)) {
-        builder.missing();
-        missingValueMapEntries.add(builder.build());
-      } else {
-        index = initializeNonMissingCategoryValueMapEntry(index, value, builder);
-      }
-    }
+    index = initializeValueMapEntriesWithoutCategory(countByCategoryName, missingValueMapEntries, index);
 
     // recode missing values
     initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
@@ -96,6 +76,47 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
 
+  }
+
+  /**
+   * @param countByCategoryName
+   * @param missingValueMapEntries
+   * @param index
+   */
+  private int initializeValueMapEntriesWithoutCategory(Map<String, Double> countByCategoryName, List<ValueMapEntry> missingValueMapEntries, int index) {
+    int newIndex = index;
+    for(Map.Entry<String, Double> entry : countByCategoryName.entrySet()) {
+      String value = entry.getKey();
+      ValueMapEntry.Builder builder = ValueMapEntry.fromDistinct(value, entry.getValue());
+      if(estimateIsMissing(value)) {
+        builder.missing();
+        missingValueMapEntries.add(builder.build());
+      } else {
+        newIndex = initializeNonMissingCategoryValueMapEntry(newIndex, value, builder);
+      }
+    }
+    return newIndex;
+  }
+
+  /**
+   * @param countByCategoryName
+   * @param missingValueMapEntries
+   * @param index
+   */
+  private int initializeNonMissingCategoryValueMapEntries(Map<String, Double> countByCategoryName, List<ValueMapEntry> missingValueMapEntries, int index) {
+    int newIndex = index;
+    for(CategoryDto category : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
+      Double count = countByCategoryName.get(category.getName());
+      ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(category, count);
+      if(estimateIsMissing(category)) {
+        builder.missing();
+        missingValueMapEntries.add(builder.build());
+      } else {
+        newIndex = initializeNonMissingCategoryValueMapEntry(newIndex, category.getName(), builder);
+      }
+      countByCategoryName.remove(category.getName());
+    }
+    return newIndex;
   }
 
   /**
