@@ -11,13 +11,11 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
@@ -182,82 +180,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   }
 
   @Override
-  public VariableDto getDerivedVariable() {
-    VariableDto derived = copyVariable(originalVariable);
-
-    Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
-
-    StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "').map({");
-    appendCategoryValueMapEntries(scriptBuilder, newCategoriesMap);
-    scriptBuilder.append(",");
-    appendDistinctValueMapEntries(scriptBuilder, newCategoriesMap);
-    scriptBuilder.append("\n  }");
-    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
-    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
-    scriptBuilder.append(");");
-
-    // set script in derived variable
-    setScript(derived, scriptBuilder.toString());
-
-    // new categories
-    JsArray<CategoryDto> cats = JsArrays.create();
-    for(CategoryDto cat : newCategoriesMap.values()) {
-      cats.push(cat);
-    }
-    derived.setCategoriesArray(cats);
-
-    return derived;
-  }
-
-  protected void appendCategoryValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
-    JsArray<CategoryDto> origCats = originalVariable.getCategoriesArray();
-
-    for(int i = 0; i < origCats.length(); i++) {
-      CategoryDto origCat = origCats.get(i);
-      ValueMapEntry entry = getValueMapEntry(origCat.getName());
-
-      if(entry.isType(ValueMapEntryType.CATEGORY_NAME)) {
-        // script
-        scriptBuilder.append("\n    '" + entry.getValue() + "': ");
-        appendNewValue(scriptBuilder, entry);
-        if(i < origCats.length() - 1) scriptBuilder.append(",");
-
-        // new category
-        addNewCategory(newCategoriesMap, origCat, entry);
-      }
-    }
-  }
-
-  protected void appendDistinctValueMapEntries(StringBuilder scriptBuilder, Map<String, CategoryDto> newCategoriesMap) {
-    boolean first = true;
-    for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
-        if(first) {
-          first = false;
-        } else {
-          scriptBuilder.append(",");
-        }
-        scriptBuilder.append("\n    '" + entry.getValue() + "': ");
-        appendNewValue(scriptBuilder, entry);
-
-        // new category
-        addNewCategory(newCategoriesMap, entry);
-      }
-    }
-  }
-
-  protected void addNewCategory(Map<String, CategoryDto> newCategoriesMap, CategoryDto origCat, ValueMapEntry entry) {
-    if(!entry.getNewValue().isEmpty()) {
-      CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
-      if(cat == null) {
-        cat = newCategory(entry);
-        cat.setAttributesArray(copyAttributes(origCat.getAttributesArray()));
-        newCategoriesMap.put(cat.getName(), cat);
-      } else {
-        // merge attributes
-        mergeAttributes(origCat.getAttributesArray(), cat.getAttributesArray());
-      }
-    }
+  protected DerivedVariableGenerator getDerivedVariableGenerator() {
+    return new DerivedCategoricalVariableGenerator(originalVariable, valueMapEntries);
   }
 
   private boolean estimateIsMissing(CategoryDto cat) {
@@ -274,5 +198,24 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   protected boolean estimateIsMissing(String value) {
     return value == null || value.isEmpty() ? true : RegExp.compile(MISSING_REGEXP, "i").test(value);
+  }
+
+  public static class DerivedCategoricalVariableGenerator extends DerivedVariableGenerator {
+
+    public DerivedCategoricalVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries) {
+      super(originalVariable, valueMapEntries);
+    }
+
+    @Override
+    protected void generateScript() {
+      scriptBuilder.append("$('" + originalVariable.getName() + "').map({");
+      appendCategoryValueMapEntries();
+      scriptBuilder.append(",");
+      appendDistinctValueMapEntries();
+      scriptBuilder.append("\n  }");
+      appendSpecialValuesEntry(getOtherValuesMapEntry());
+      appendSpecialValuesEntry(getEmptyValuesMapEntry());
+      scriptBuilder.append(");");
+    }
   }
 }

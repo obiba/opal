@@ -125,6 +125,7 @@ public class ValueMapEntry {
   private static String formatNumber(Number nb) {
     if(nb == null) return null;
     String str = nb.toString();
+    // TODO use NumberFormat
     return str.endsWith(".0") ? str.substring(0, str.length() - 2) : str;
   }
 

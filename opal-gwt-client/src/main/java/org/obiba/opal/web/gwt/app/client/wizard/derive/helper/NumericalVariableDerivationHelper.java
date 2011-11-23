@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -25,7 +23,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
-import com.google.gwt.core.client.JsArray;
 
 public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>> extends DerivationHelper {
 
@@ -94,122 +91,11 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
   }
 
   @Override
-  public VariableDto getDerivedVariable() {
-    VariableDto derived = copyVariable(originalVariable);
-    derived.setValueType("text");
-
-    StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "')");
-    Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
-
-    appendGroupMethod(scriptBuilder);
-    appendMapMethod(newCategoriesMap, scriptBuilder);
-
-    setScript(derived, scriptBuilder.toString());
-
-    // new categories
-    JsArray<CategoryDto> cats = JsArrays.create();
-    for(CategoryDto cat : newCategoriesMap.values()) {
-      cats.push(cat);
-    }
-    derived.setCategoriesArray(cats);
-
-    return derived;
+  protected DerivedVariableGenerator getDerivedVariableGenerator() {
+    return new DerivedNumericalVariableGenerator<N>(originalVariable, valueMapEntries, entryRangeMap);
   }
 
-  private void appendGroupMethod(StringBuilder scriptBuilder) {
-    // group method
-    // ImmutableSortedSet.Builder<Range<N>> ranges = ImmutableSortedSet.naturalOrder();
-    List<Range<N>> ranges = new ArrayList<Range<N>>();
-    List<ValueMapEntry> outliers = new ArrayList<ValueMapEntry>();
-    for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.CATEGORY_NAME) || entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
-        outliers.add(entry);
-      } else if(entry.getType().equals(ValueMapEntryType.RANGE)) {
-        ranges.add(entryRangeMap.get(entry));
-      }
-    }
-
-    if(ranges.size() == 0) return;
-
-    scriptBuilder.append(".group(");
-
-    appendBounds(scriptBuilder, ranges);
-    appendOutliers(scriptBuilder, outliers);
-
-    scriptBuilder.append(")");
-  }
-
-  private void appendBounds(StringBuilder scriptBuilder, List<Range<N>> ranges) {
-    scriptBuilder.append("[");
-
-    boolean first = true;
-    Range<N> previousRange = null;
-    N bound = null;
-    for(Range<N> range : ranges) {
-      if(previousRange != null && !previousRange.isConnected(range)) {
-        appendBound(scriptBuilder, previousRange.upperEndpoint(), first);
-        first = false;
-      }
-
-      if(range.hasLowerBound()) {
-        bound = range.lowerEndpoint();
-        appendBound(scriptBuilder, bound, first);
-        first = false;
-      }
-
-      previousRange = range;
-    }
-    // close the last range
-    if(previousRange.hasUpperBound()) {
-      appendBound(scriptBuilder, previousRange.upperEndpoint(), false);
-    }
-    scriptBuilder.append("]");
-  }
-
-  private void appendBound(StringBuilder scriptBuilder, N bound, boolean first) {
-    if(!first) {
-      scriptBuilder.append(", ");
-    }
-    scriptBuilder.append(bound);
-  }
-
-  private void appendOutliers(StringBuilder scriptBuilder, List<ValueMapEntry> outliers) {
-    if(outliers.size() == 0) return;
-    scriptBuilder.append(", [");
-    boolean first = true;
-    for(ValueMapEntry entry : outliers) {
-      if(first) {
-        first = false;
-      } else {
-        scriptBuilder.append(", ");
-      }
-      scriptBuilder.append(entry.getValue());
-    }
-    scriptBuilder.append("]");
-  }
-
-  private void appendMapMethod(Map<String, CategoryDto> newCategoriesMap, StringBuilder scriptBuilder) {
-    scriptBuilder.append(".map({");
-    boolean first = true;
-    for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.CATEGORY_NAME) || entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE) || entry.getType().equals(ValueMapEntryType.RANGE)) {
-        if(first) {
-          first = false;
-        } else {
-          scriptBuilder.append(", ");
-        }
-        scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
-        appendNewValue(scriptBuilder, entry);
-        addNewCategory(newCategoriesMap, entry);
-      }
-    }
-    scriptBuilder.append("\n  }");
-    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
-    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
-    scriptBuilder.append(")");
-  }
-
-  private Range<N> buildRange(N lower, N upper) {
+  public static <N extends Number & Comparable<N>> Range<N> buildRange(N lower, N upper) {
     if(lower == null) {
       return Ranges.lessThan(upper);
     } else if(upper == null) {

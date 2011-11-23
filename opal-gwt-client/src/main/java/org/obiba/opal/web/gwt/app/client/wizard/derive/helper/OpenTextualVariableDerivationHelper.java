@@ -12,14 +12,10 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.Builder;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
@@ -50,7 +46,7 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
 
         String value = frequencyDto.getValue();
         if(value.equals(NA)) continue;
-        Builder entry = ValueMapEntry.fromDistinct(value).label(value).count(frequencyDto.getFreq());
+        ValueMapEntry.Builder entry = ValueMapEntry.fromDistinct(value).label(value).count(frequencyDto.getFreq());
 
         if(estimateIsMissing(value)) {
           entry.missing();
@@ -80,30 +76,8 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
   }
 
   @Override
-  public VariableDto getDerivedVariable() {
-    VariableDto derived = copyVariable(originalVariable);
-    derived.setValueType("text");
-
-    Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
-
-    StringBuilder scriptBuilder = new StringBuilder("$('" + originalVariable.getName() + "')");
-    scriptBuilder.append(".map({");
-    appendDistinctValueMapEntries(scriptBuilder, newCategoriesMap);
-    scriptBuilder.append("\n").append("  }");
-    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getOtherValuesMapEntry());
-    appendSpecialValuesEntry(scriptBuilder, newCategoriesMap, getEmptyValuesMapEntry());
-    scriptBuilder.append(");");
-
-    setScript(derived, scriptBuilder.toString());
-
-    // new categories
-    JsArray<CategoryDto> cats = JsArrays.create();
-    for(CategoryDto cat : newCategoriesMap.values()) {
-      cats.push(cat);
-    }
-    derived.setCategoriesArray(cats);
-
-    return derived;
+  protected DerivedVariableGenerator getDerivedVariableGenerator() {
+    return new DerivedOpenTextualVariableGenerator(originalVariable, valueMapEntries);
   }
 
   public enum Method {
@@ -113,4 +87,22 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
     public static final String group = "group-method";
 
   }
+
+  public static class DerivedOpenTextualVariableGenerator extends DerivedVariableGenerator {
+
+    public DerivedOpenTextualVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries) {
+      super(originalVariable, valueMapEntries);
+    }
+
+    @Override
+    protected void generateScript() {
+      scriptBuilder.append("$('" + originalVariable.getName() + "').map({");
+      appendDistinctValueMapEntries();
+      scriptBuilder.append("\n  }");
+      appendSpecialValuesEntry(getOtherValuesMapEntry());
+      appendSpecialValuesEntry(getEmptyValuesMapEntry());
+      scriptBuilder.append(");");
+    }
+  }
+
 }

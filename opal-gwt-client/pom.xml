@@ -125,6 +125,7 @@
           <runTarget>org.obiba.opal.web.gwt.app.GwtApp/index.html</runTarget>
           <hostedWebapp>war</hostedWebapp>
           <extraParam>true</extraParam>
+          <includes>**/*Gwt*Suite.java</includes>
           <!--style>PRETTY</style -->
         </configuration>
       </plugin>
@@ -143,6 +144,16 @@
           </tasks>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/*GwtTest*.java</exclude>
+            <exclude>**/*Gwt*Suite*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>       
     </plugins>
   </build>
 

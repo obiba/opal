@@ -32,7 +32,7 @@ public abstract class ValueMapCell extends AbstractCell<ValueMapEntry> {
 
   }
 
-  protected static Template template = GWT.create(Template.class);
+  protected static final Template template = GWT.create(Template.class);
 
   /**
    * @param renderer
