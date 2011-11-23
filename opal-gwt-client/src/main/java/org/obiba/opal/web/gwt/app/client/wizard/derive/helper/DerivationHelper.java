@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
@@ -50,7 +51,16 @@ public abstract class DerivationHelper {
         return false;
       }
     }
-    valueMapEntries.add(entryArg);
+    for(int i = valueMapEntries.size() - 1; i >= 0; i--) {
+      if(!valueMapEntries.get(i).getType().equals(ValueMapEntryType.EMPTY_VALUES) && !valueMapEntries.get(i).getType().equals(ValueMapEntryType.OTHER_VALUES)) {
+        valueMapEntries.add(i + 1, entryArg);
+        break;
+      }
+    }
+    if(!valueMapEntries.contains(entryArg)) {
+      valueMapEntries.add(0, entryArg);
+    }
+
     return true;
   }
 

@@ -34,7 +34,7 @@
                     <g:customCell styleName="top small-indent">
                   <g:FlowPanel styleName="input block">
                     <g:Label addStyleNames="key"><ui:msg description="New Value label">New Value</ui:msg></g:Label>
-                    <g:SuggestBox ui:field="newValue"/>
+                    <g:TextBox ui:field="newValue"/>
                   </g:FlowPanel>
                 </g:customCell>
               </g:row>

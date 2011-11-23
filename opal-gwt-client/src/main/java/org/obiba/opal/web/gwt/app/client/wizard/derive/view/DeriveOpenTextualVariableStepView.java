@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -70,8 +71,8 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @UiField(provided = true)
   SuggestBox value;
 
-  @UiField(provided = true)
-  SuggestBox newValue;
+  @UiField
+  TextBox newValue;
 
   @UiField
   Button addButton;
@@ -81,11 +82,8 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
 
   MultiWordSuggestOracleWithDisplay valueOracle;
 
-  MultiWordSuggestOracleWithDisplay newValueOracle;
-
   public DeriveOpenTextualVariableStepView() {
     value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplay());
-    newValue = new SuggestBox(newValueOracle = new MultiWordSuggestOracleWithDisplay());
 
     auto = new RadioButton(Method.group);
     manual = new RadioButton(Method.group);
