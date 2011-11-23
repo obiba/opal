@@ -320,6 +320,15 @@ img.clickable {
     z-index: 1000;
 }
 
+.gwt-DialogBox > div:first-child {
+  -webkit-border-radius:6px;
+  -moz-border-radius:6px;
+  border-radius:6px;
+  -webkit-box-shadow:0 3px 7px rgba(0, 0, 0, 0.8);
+  -moz-box-shadow:0 3px 7px rgba(0, 0, 0, 0.8);
+  box-shadow:0 3px 7px rgba(0, 0, 0, 0.8)
+}
+
 .gwt-DialogBox .Caption {
   background: none repeat scroll 0 0 #F5F5F5;
   border-top: medium none;
@@ -327,17 +336,23 @@ img.clickable {
   font-size: 1.4em;
   font-weight: bold;
   line-height: 30px;
+  -webkit-border-radius: 6px 6px 0 0;
+  -moz-border-radius: 6px 6px 0 0;
   border-radius: 6px 6px 0 0;
   border-left: 1px solid #888888;
   border-right: 1px solid #888888;
   border-top: 1px solid #888888;
   padding-left: 0.8em;
   padding-right: 0.8em;
+  -webkit-box-shadow: 0 1px 0 #FFFFFF inset;
+  -moz-box-shadow: 0 1px 0 #FFFFFF inset;
   box-shadow: 0 1px 0 #FFFFFF inset;
 }
 
 .gwt-DialogBox .dialogMiddleCenter {
   padding:0px;
+  -webkit-border-radius: 0 0 6px 6px;
+  -moz-border-radius: 0 0 6px 6px;
   border-radius: 0 0 6px 6px;
   border-left: 1px solid #888888;
   border-right: 1px solid #888888;
@@ -360,12 +375,17 @@ img.clickable {
 .gwt-DialogBox .dialogBottomRight,
 .gwt-DialogBox .dialogBottomLeft {
   background: none;
+  display: none;
 }
 
 .gwt-DialogBox .dialogContent .footer {
   background-color:#F3F4EB;
   border-top:1px solid #B4A291;
+  -webkit-border-radius: 0 0 6px 6px;
+  -moz-border-radius: 0 0 6px 6px;
   border-radius: 0 0 6px 6px;
+  -webkit-box-shadow: 0 1px 0 #FFFFFF inset;
+  -moz-box-shadow: 0 1px 0 #FFFFFF inset;
   box-shadow: 0 1px 0 #FFFFFF inset;
 }
 
@@ -1363,9 +1383,9 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
 }
 
 .warning {
-	background-image: url('../image/16/warning.png');
-	background-repeat: no-repeat;
-	padding-left: 18px;
+  background-image: url('../image/16/warning.png');
+  background-repeat: no-repeat;
+  padding-left: 18px;
 }
 
 /* Inputs */
@@ -1428,11 +1448,11 @@ textarea.error:focus {
 }
 
 .progress-bar {
-	background-color:#6bb5cb;
-	text-align: center;
+  background-color:#6bb5cb;
+  text-align: center;
 }
 
 .progress-bar .inner {
-	border: 1px solid black;
-	width: 100px;
+  border: 1px solid black;
+  width: 100px;
 }
