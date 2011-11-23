@@ -274,7 +274,7 @@ public class ValueMapGrid extends FlowPanel {
     this.maxFrequency = maxFrequency;
   }
 
-  private class ValueMapColum extends Column<ValueMapEntry, ValueMapEntry> {
+  private static class ValueMapColum extends Column<ValueMapEntry, ValueMapEntry> {
 
     public ValueMapColum(Cell<ValueMapEntry> cell) {
       super(cell);

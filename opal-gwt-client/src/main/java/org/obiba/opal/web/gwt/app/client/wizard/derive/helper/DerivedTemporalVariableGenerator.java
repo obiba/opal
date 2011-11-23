@@ -30,8 +30,8 @@ public class DerivedTemporalVariableGenerator extends DerivedVariableGenerator {
   public DerivedTemporalVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries, GroupMethod groupMethod, Date fromDate, Date toDate) {
     super(originalVariable, valueMapEntries);
     this.groupMethod = groupMethod;
-    this.fromDate = fromDate;
-    this.toDate = toDate;
+    this.fromDate = new Date(fromDate.getTime());
+    this.toDate = new Date(toDate.getTime());
   }
 
   @Override

@@ -20,8 +20,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
-import com.google.gwt.core.client.JsArray;
-
 public class OpenTextualVariableDerivationHelper extends CategoricalVariableDerivationHelper {
 
   private Method method;

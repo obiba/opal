@@ -60,17 +60,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     // For each category and value without category, make value map entry and process separately missing and non-missing
     // ones.
 
-    Map<String, Double> countByCategoryName = new HashMap<String, Double>();
-    JsArray<FrequencyDto> frequencies = categoricalSummaryDto.getFrequenciesArray();
-    for(int i = 0; i < frequencies.length(); i++) {
-      FrequencyDto frequencyDto = frequencies.get(i);
-      String value = frequencyDto.getValue();
-      if(value.equals(NA)) continue;
-      countByCategoryName.put(frequencyDto.getValue(), frequencyDto.getFreq());
-      if(frequencyDto.getFreq() > maxFrequency) {
-        maxFrequency = frequencyDto.getFreq();
-      }
-    }
+    Map<String, Double> countByCategoryName = findFrequencies(categoricalSummaryDto.getFrequenciesArray());
 
     List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
     int index = 1;
@@ -108,6 +98,23 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   }
 
+  /**
+   * @param countByCategoryName
+   */
+  private Map<String, Double> findFrequencies(JsArray<FrequencyDto> frequencies) {
+    Map<String, Double> countByCategoryName = new HashMap<String, Double>();
+    for(int i = 0; i < frequencies.length(); i++) {
+      FrequencyDto frequencyDto = frequencies.get(i);
+      String value = frequencyDto.getValue();
+      if(value.equals(NA)) continue;
+      countByCategoryName.put(frequencyDto.getValue(), frequencyDto.getFreq());
+      if(frequencyDto.getFreq() > maxFrequency) {
+        maxFrequency = frequencyDto.getFreq();
+      }
+    }
+    return countByCategoryName;
+  }
+
   public double getMaxFrequency() {
     return maxFrequency;
   }
@@ -141,14 +148,10 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
       builder.newValue("0");
     } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(value)) {
       builder.newValue("1");
-      if(index < 2) {
-        newIndex = 2;
-      }
+      if(index < 2) newIndex = 2;
     } else if(RegExp.compile(FEMALE_REGEXP, "i").test(value)) {
       builder.newValue("2");
-      if(index < 3) {
-        newIndex = 3;
-      }
+      if(index < 3) newIndex = 3;
     } else {
       builder.newValue(Integer.toString(newIndex++));
     }

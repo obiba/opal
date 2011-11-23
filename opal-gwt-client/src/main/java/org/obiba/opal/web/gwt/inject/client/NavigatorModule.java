@@ -60,22 +60,30 @@ public class NavigatorModule extends AbstractGinModule {
   protected void configure() {
     // Bind concrete implementations to interfaces
     bind(NavigatorPresenter.Display.class).to(NavigatorView.class).in(Singleton.class);
-    bind(CreateDatasourcePresenter.Display.class).to(CreateDatasourceView.class);
-    bind(DeriveVariablePresenter.Display.class).to(DeriveVariableView.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(NavigatorTreePresenter.Display.class).to(NavigatorTreeView.class);
-    bind(DatasourcePresenter.Display.class).to(DatasourceView.class);
     bind(TablePresenter.Display.class).to(TableView.class);
     bind(VariablePresenter.Display.class).to(VariableView.class);
 
+    configureDatasourcePresenters();
+
+    configureDeriveVariablePresenters();
+  }
+
+  private void configureDatasourcePresenters() {
+    bind(CreateDatasourcePresenter.Display.class).to(CreateDatasourceView.class);
+    bind(DatasourcePresenter.Display.class).to(DatasourceView.class);
     bind(CreateDatasourceConclusionStepPresenter.Display.class).to(CreateDatasourceConclusionStepView.class);
     bind(HibernateDatasourceFormPresenter.Display.class).to(HibernateDatasourceFormView.class);
     bind(ExcelDatasourceFormPresenter.Display.class).to(ExcelDatasourceFormView.class);
     bind(FsDatasourceFormPresenter.Display.class).to(FsDatasourceFormView.class);
     bind(JdbcDatasourceFormPresenter.Display.class).to(JdbcDatasourceFormView.class);
     bind(CsvDatasourceFormPresenter.Display.class).to(CsvDatasourceFormView.class);
+  }
 
+  private void configureDeriveVariablePresenters() {
+    bind(DeriveVariablePresenter.Display.class).to(DeriveVariableView.class);
     bind(DeriveCategoricalVariableStepPresenter.Display.class).to(DeriveCategoricalVariableStepView.class);
     bind(DeriveNumericalVariableStepPresenter.Display.class).to(DeriveNumericalVariableStepView.class);
     bind(DeriveBooleanVariableStepPresenter.Display.class).to(DeriveBooleanVariableStepView.class);
