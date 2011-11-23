@@ -86,6 +86,10 @@ td.top {
   vertical-align: top;
 }
 
+td.xsmall-indent {
+  padding-left: 0.4em;
+}
+
 td.small-indent {
   padding-left: 0.8em;
 }
@@ -128,6 +132,10 @@ td.link {
 
 .left-aligned {
   float: left;
+}
+
+.xsmall-indent {
+  margin-left: 0.4em;
 }
 
 .small-indent {
