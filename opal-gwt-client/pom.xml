@@ -41,7 +41,7 @@
     <dependency>
       <groupId>com.google.gwt.inject</groupId>
       <artifactId>gin</artifactId>
-      <version>1.5.0</version>
+      <version>${gin.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -72,7 +72,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.7</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -83,7 +82,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.1-beta-1</version>
+        <version>${maven-war-plugin.version}</version>
         <configuration>
           <warSourceDirectory>war</warSourceDirectory>
           <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
@@ -92,6 +91,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
+        <version>${maven-clean-plugin.version}</version>
         <configuration>
           <filesets>
             <fileset>
@@ -131,6 +131,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
+        <version>${maven-antrun-plugin.version}</version>
         <configuration>
           <tasks>
             <!-- Run python mergelocales.py script using "mvn antrun:run" -->
@@ -169,10 +170,15 @@
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
 
+    <gin.version>1.5.0</gin.version>
     <gwt.version>2.4.0</gwt.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
     <gwt-presenter.version>1.0.0</gwt-presenter.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+
+    <maven-war-plugin.version>2.1.1</maven-war-plugin.version>
+    <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
+    <maven-clean-plugin.version>2.4.1</maven-clean-plugin.version>
   </properties>
 
 </project>
