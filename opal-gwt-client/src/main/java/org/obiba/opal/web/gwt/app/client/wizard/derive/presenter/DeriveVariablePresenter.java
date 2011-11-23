@@ -222,6 +222,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     numericalPresenter.bind();
     temporalPresenter.bind();
     openTextualPresenter.bind();
+    deriveCustomVariablePresenter.bind();
 
     scriptEvaluationPresenter.bind();
     getDisplay().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay());
@@ -236,6 +237,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     numericalPresenter.unbind();
     temporalPresenter.unbind();
     openTextualPresenter.unbind();
+    deriveCustomVariablePresenter.unbind();
 
     scriptEvaluationPresenter.unbind();
   }

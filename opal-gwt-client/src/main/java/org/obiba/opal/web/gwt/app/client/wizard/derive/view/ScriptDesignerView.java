@@ -9,35 +9,33 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
-import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCustomVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptDesignerPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
-public class DeriveCustomVariableStepView extends Composite implements DeriveCustomVariablePresenter.Display {
+public class ScriptDesignerView extends Composite implements ScriptDesignerPresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @UiField
-  WizardStep deriveStep;
+  TextArea scriptArea;
 
-  @UiTemplate("DeriveCustomVariableStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveCustomVariableStepView> {
+  @UiField
+  Button test;
+
+  @UiTemplate("ScriptDesignerView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, ScriptDesignerView> {
   }
 
-  public DeriveCustomVariableStepView() {
+  public ScriptDesignerView() {
     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  @Override
-  public DefaultWizardStepController.Builder getDeriveStepController() {
-    return DefaultWizardStepController.Builder.create(deriveStep).title("");
   }
 
   @Override
@@ -46,11 +44,6 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
 
   @Override
   public void stopProcessing() {
-  }
-
-  @Override
-  public void add(Widget widget) {
-    deriveStep.add(widget);
   }
 
 }

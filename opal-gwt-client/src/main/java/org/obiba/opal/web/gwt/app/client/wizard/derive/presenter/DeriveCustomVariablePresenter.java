@@ -19,12 +19,15 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCustomVariablePresenter.Display> {
+
+  @Inject
+  ScriptDesignerPresenter scriptDesignerPresenter;
 
   @Inject
   public DeriveCustomVariablePresenter(Display display, EventBus eventBus) {
@@ -49,21 +52,19 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   @Override
   List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
-    stepCtrls.add(getDisplay().getDeriveStepController().onStepIn(new StepInHandler() {
-
-      @Override
-      public void onStepIn() {
-      }
-    }).build());
+    stepCtrls.add(getDisplay().getDeriveStepController().build());
     return stepCtrls;
   }
 
   @Override
   protected void onBind() {
+    scriptDesignerPresenter.bind();
+    getDisplay().add(scriptDesignerPresenter.getDisplay().asWidget());
   }
 
   @Override
   protected void onUnbind() {
+    scriptDesignerPresenter.unbind();
   }
 
   @Override
@@ -78,6 +79,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   public interface Display extends WidgetDisplay {
 
     Builder getDeriveStepController();
+
+    void add(Widget widget);
 
   }
 }
