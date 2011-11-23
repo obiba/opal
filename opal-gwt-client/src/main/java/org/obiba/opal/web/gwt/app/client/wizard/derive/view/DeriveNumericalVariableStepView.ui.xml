@@ -94,7 +94,7 @@
               <g:row>
                 <g:customCell styleName="top">
                   <g:FlowPanel styleName="input block">
-                    <g:Label addStyleNames="key"><ui:msg description="Value label">Value</ui:msg></g:Label>
+                    <g:Label addStyleNames="key"><ui:msg description="Original Value label">Original Value</ui:msg></g:Label>
                     <g:Grid>
                       <g:row>
                         <g:customCell>

@@ -26,7 +26,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -68,9 +67,6 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
 
   // --- Map fields ---
 
-  @UiField
-  InlineLabel labelValue;
-
   @UiField(provided = true)
   SuggestBox value;
 
@@ -100,7 +96,6 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
     radioGroup.addButton(auto, Method.AUTOMATICALLY);
     radioGroup.addButton(manual, Method.MANUAL);
 
-    labelValue.setText(translations.valueLabel() + ": ");
     auto.setText(translations.automatically());
     auto.setValue(true);
     labelAuto.setText("Similar disctinct values will be grouped together");
