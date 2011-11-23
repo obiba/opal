@@ -39,7 +39,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -89,7 +88,7 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   ListBox datasources;
 
   @UiField
-  InlineLabel destinationLabel;
+  Label destinationLabel;
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -116,7 +115,7 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
     .append(fileSelectionStep, fileSelectionHelp)//
-    .title(translations.variablesImportFileSelectionStep())// 
+    .title(translations.variablesImportFileSelectionStep())//
     .onReset(new ResetHandler() {
 
       @Override
@@ -128,7 +127,7 @@ public class VariablesImportView extends Composite implements VariablesImportPre
     })//
 
     .append(compareStep)//
-    .title(translations.variablesImportCompareStep())// 
+    .title(translations.variablesImportCompareStep())//
     .help(new WidgetProvider() {
 
       @Override
