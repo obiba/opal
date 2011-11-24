@@ -3,46 +3,40 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
-    .right-aligned { float: right; }
     .top-margin { margin-top: 0.5em; }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
-    <g:DockLayoutPanel unit="EM" height="20em" width="40em">
+    <g:caption>
+      <ui:msg description="Create a Coding View title">Create a Coding View</ui:msg>
+    </g:caption>
+    <g:DockLayoutPanel unit="EM" height="30em" width="40em">
       <g:center>
         <g:ScrollPanel>
-          <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
-            <table class="functionalUnitProperties full-width">
-              <tr>
-                <td>
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Name label">Name</ui:msg>:
-                  </g:Label>
-                </td>
-                <td>
-                  <g:TextBox addStyleNames="text not-so-full-width" name="functionalUnitName" ui:field="functionalUnitName"/>
-                </td>
-              </tr>
-              <tr>
-                <td valign="top">
-                  <g:CheckBox ui:field="selectEnabled" addStyleNames="key">
-                    <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter:</ui:msg>
-                  </g:CheckBox>
-                </td>
-                <td>
-                  <g:TextArea addStyleNames="text not-so-full-width" name="select" ui:field="select"/>
-                </td>
-              </tr>
-            </table>
-
-          </g:HTMLPanel>
+          <g:FlowPanel addStyleNames="main">
+          	<g:Label>Categorical variables will be automatically recoded with numbers. Other variables can be optionally duplicated.</g:Label>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
+              <g:ListBox ui:field="datasourceNameBox"></g:ListBox>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="View label">View</ui:msg></g:Label>
+              <g:TextBox ui:field="viewNameBox"/>
+              <g:Label styleName="help-block">Name of the view that will be created with the derived variables</g:Label>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+          	  <g:CheckBox ui:field="duplicateCheck">Duplicate non-categorical variables</g:CheckBox>
+          	</g:FlowPanel>
+            <g:FlowPanel styleName="input">
+          	  <g:CheckBox ui:field="displayViewCheck">Display the new view</g:CheckBox>
+          	</g:FlowPanel>
+          </g:FlowPanel>
         </g:ScrollPanel>
       </g:center>
-      <g:south size="3.25">
+      <g:south size="4">
         <g:HTMLPanel addStyleNames="footer">
-          <span class="{style.right-aligned} {style.top-margin}">
-            <g:Button ui:field="updateFunctionalUnitButton" styleName="btn">
+          <span class="right-aligned top-margin">
+            <g:Button ui:field="saveButton" styleName="btn primary">
               <ui:msg description="Save button label">Save</ui:msg>
             </g:Button>
             <g:Button ui:field="cancelButton" styleName="btn">

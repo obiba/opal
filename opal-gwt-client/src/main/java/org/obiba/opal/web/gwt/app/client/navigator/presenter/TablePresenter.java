@@ -27,7 +27,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectio
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
@@ -58,7 +57,6 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
@@ -70,12 +68,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   private String next;
 
-  @Inject
-  private Provider<NavigatorPresenter> navigationPresenter;
-
   private AuthorizationPresenter authorizationPresenter;
 
-  CodingViewDialogPresenter codingViewDialogPresenter;
+  @Inject
+  private CodingViewDialogPresenter codingViewDialogPresenter;
 
   private Runnable removeConfirmation;
 
@@ -92,10 +88,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
    * @param eventBus
    */
   @Inject
-  public TablePresenter(final Display display, final EventBus eventBus, AuthorizationPresenter authorizationPresenter, CodingViewDialogPresenter codingViewDialogPresenter) {
+  public TablePresenter(final Display display, final EventBus eventBus, AuthorizationPresenter authorizationPresenter) {
     super(display, eventBus);
     this.authorizationPresenter = authorizationPresenter;
-    this.codingViewDialogPresenter = codingViewDialogPresenter;
   }
 
   @Override
@@ -451,9 +446,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     @Override
     public void execute() {
       codingViewDialogPresenter.bind();
-      codingViewDialogPresenter.setDialogMode(Mode.CREATE);
-      codingViewDialogPresenter.getDisplay().clear();
-      codingViewDialogPresenter.getDisplay().setEnabledCodingViewName(true);
       codingViewDialogPresenter.revealDisplay();
     }
   }

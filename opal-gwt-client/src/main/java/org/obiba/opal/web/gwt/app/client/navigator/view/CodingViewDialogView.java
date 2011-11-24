@@ -11,12 +11,12 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter.Mode;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -25,7 +25,8 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -43,36 +44,38 @@ public class CodingViewDialogView extends Composite implements Display {
   DialogBox dialog;
 
   @UiField
-  Button updateFunctionalUnitButton;
+  Button saveButton;
 
   @UiField
   Button cancelButton;
 
   @UiField
-  TextBox functionalUnitName;
+  ListBox datasourceNameBox;
 
   @UiField
-  TextArea select;
+  TextBox viewNameBox;
 
   @UiField
-  CheckBox selectEnabled;
+  CheckBox duplicateCheck;
+
+  @UiField
+  CheckBox displayViewCheck;
 
   public CodingViewDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     dialog.hide();
-    selectEnabled.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+    cancelButton.addClickHandler(new ClickHandler() {
 
       @Override
-      public void onValueChange(ValueChangeEvent<Boolean> evt) {
-        select.setEnabled(evt.getValue());
-        if(!evt.getValue()) {
-          select.setText("");
-        }
+      public void onClick(ClickEvent event) {
+        dialog.hide();
       }
     });
-    selectEnabled.setValue(false);
-    select.setEnabled(false);
+
+    duplicateCheck.setValue(true);
+    displayViewCheck.setValue(true);
   }
 
   @Override
@@ -92,7 +95,7 @@ public class CodingViewDialogView extends Composite implements Display {
   public void showDialog() {
     dialog.center();
     dialog.show();
-    functionalUnitName.setFocus(true);
+    viewNameBox.setFocus(true);
   }
 
   @Override
@@ -101,68 +104,18 @@ public class CodingViewDialogView extends Composite implements Display {
   }
 
   @Override
-  public Button getCancelButton() {
-    return cancelButton;
+  public HandlerRegistration addSaveHandler(ClickHandler handler) {
+    return saveButton.addClickHandler(handler);
   }
 
   @Override
-  public Button getUpdateFunctionalUnitButton() {
-    return updateFunctionalUnitButton;
+  public HasText getViewName() {
+    return viewNameBox;
   }
 
   @Override
-  public HasCloseHandlers getDialog() {
-    return dialog;
-  }
-
-  @Override
-  public HasText getName() {
-    return functionalUnitName;
-  }
-
-  @Override
-  public void setName(String name) {
-    functionalUnitName.setText(name != null ? name : "");
-  }
-
-  @Override
-  public void clear() {
-    setName("");
-    setSelect("");
-  }
-
-  @Override
-  public void setSelect(String select) {
-    if(select == null || select.trim().length() == 0) {
-      selectEnabled.setValue(false);
-      this.select.setEnabled(false);
-      this.select.setText("");
-    } else {
-      selectEnabled.setValue(true);
-      this.select.setEnabled(true);
-      this.select.setText(select);
-    }
-  }
-
-  @Override
-  public void setDialogMode(Mode dialogMode) {
-    functionalUnitName.setEnabled(Mode.CREATE.equals(dialogMode));
-    if(Mode.CREATE.equals(dialogMode)) {
-      dialog.setText(translations.addUnit());
-    } else {
-      dialog.setText(translations.editUnit());
-    }
-  }
-
-  @Override
-  public HasText getSelect() {
-    return select;
-  }
-
-  @Override
-  public void setEnabledCodingViewName(boolean enabled) {
-    // TODO Auto-generated method stub
-
+  public HandlerRegistration addCloseHandler(CloseHandler<PopupPanel> closeHandler) {
+    return dialog.addCloseHandler(closeHandler);
   }
 
 }
