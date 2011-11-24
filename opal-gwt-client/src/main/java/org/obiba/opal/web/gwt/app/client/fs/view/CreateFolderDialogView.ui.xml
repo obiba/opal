@@ -2,7 +2,7 @@
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="35em">
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true">
     <g:caption>
       <ui:msg description="Create folder dialog title">Create Folder</ui:msg>
     </g:caption>
