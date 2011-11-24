@@ -283,7 +283,7 @@ img.clickable {
   z-index: 10000;
 }
 
-.gwt-PasswordTextBox,.gwt-TextBox,.gwt-TextArea,.gwt-ListBox {
+.gwt-PasswordTextBox,.gwt-TextBox,.gwt-TextArea,.gwt-ListBox,.gwt-SuggestBox {
     margin-bottom: 4px;
 }
 
