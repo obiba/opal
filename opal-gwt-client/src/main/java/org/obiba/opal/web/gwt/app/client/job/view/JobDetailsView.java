@@ -62,8 +62,8 @@ public class JobDetailsView extends DialogBox implements Display {
   //
 
   public JobDetailsView() {
-    setHeight(DIALOG_HEIGHT);
-    setWidth(DIALOG_WIDTH);
+    setModal(true);
+    setGlassEnabled(true);
 
     DockLayoutPanel content = uiBinder.createAndBindUi(this);
     content.setHeight(DIALOG_HEIGHT);

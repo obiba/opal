@@ -2,10 +2,6 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
   xmlns:c="urn:import:com.google.gwt.user.cellview.client">
-
-  <ui:style>
-    .right-aligned { float: right; margin:10px; }
-  </ui:style>
     
   <g:DockLayoutPanel unit="EM">
     <g:center>
@@ -15,7 +11,7 @@
     </g:center>
     <g:south size="4">
       <g:HTMLPanel addStyleNames="footer">
-        <span class="{style.right-aligned} top-margin">
+        <span class="right-aligned top-margin">
           <g:Button ui:field="close" styleName="btn info"><ui:msg description="Close label">Close</ui:msg></g:Button>
         </span>
       </g:HTMLPanel>
