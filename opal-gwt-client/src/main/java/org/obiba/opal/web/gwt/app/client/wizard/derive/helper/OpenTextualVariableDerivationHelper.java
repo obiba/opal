@@ -33,9 +33,6 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
   public void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
 
-    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());
-    valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
-
     if(method == Method.AUTOMATICALLY) {
 
       List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
@@ -56,6 +53,9 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
       // recode missing values
       initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
     }
+
+    valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());
+    valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
   }
 
   private List<FrequencyDto> sortByFrequency() {
