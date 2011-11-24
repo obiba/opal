@@ -291,7 +291,7 @@ img.clickable {
 
 .gwt-PopupPanel {
   border:0.4em solid #DDDDDD;
-  -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
   z-index: 10000;
 }
 
@@ -300,7 +300,7 @@ img.clickable {
   background-color: #222222;
   opacity: 0.9;
   color:#ffffff;
-  -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
   float:right;
 }
 
