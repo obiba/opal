@@ -985,19 +985,19 @@ public interface Translations extends Constants {
   String falseLabel();
 
   @Description("Recode Temporal Method Step title")
-  @DefaultStringValue("Dates and times can be grouped together using the following method:")
+  @DefaultStringValue("Dates and times can be grouped together using the following methods")
   String recodeTemporalMethodStepTitle();
 
   @Description("Recode Temporal Map Step title")
-  @DefaultStringValue("Map each time range to a new value:")
+  @DefaultStringValue("Map each time range to a new value")
   String recodeTemporalMapStepTitle();
 
   @Description("Recode Numerical Method Step title")
-  @DefaultStringValue("Numerical values can be grouped together using the following method:")
+  @DefaultStringValue("Numerical values can be grouped together using the following methods")
   String recodeNumericalMethodStepTitle();
 
   @Description("Recode Numerical Map Step title")
-  @DefaultStringValue("Map each range or discrete value to a new value:")
+  @DefaultStringValue("Map each range or discrete value to a new value")
   String recodeNumericalMapStepTitle();
 
   @Description("Recode Open Textual Method Step Title")
@@ -1005,7 +1005,7 @@ public interface Translations extends Constants {
   String recodeOpenTextualMethodStepTitle();
 
   @Description("Recode Open Textual Map Step Title")
-  @DefaultStringValue("Map a value to a new value")
+  @DefaultStringValue("Map original values to new values")
   String recodeOpenTextualMapStepTitle();
 
   @Description("Automatically Label")
