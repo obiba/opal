@@ -37,6 +37,10 @@ public abstract class DerivedVariableGenerator {
 
   protected final Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
 
+  private boolean categoryValuesAppended;
+
+  private boolean distinctValuesAppended;
+
   public DerivedVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries) {
     this.originalVariable = originalVariable;
     this.valueMapEntries = valueMapEntries;
@@ -68,7 +72,6 @@ public abstract class DerivedVariableGenerator {
   protected abstract void generateScript();
 
   protected void appendCategoryValueMapEntries() {
-
     int nbCategories = originalVariable.getCategoriesArray().length();
     for(int i = 0; i < nbCategories; i++) {
       CategoryDto origCat = originalVariable.getCategoriesArray().get(i);
@@ -90,7 +93,7 @@ public abstract class DerivedVariableGenerator {
     boolean first = true;
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
-        if(first) {
+        if(first && !categoryValuesAppended) {
           first = false;
         } else {
           scriptBuilder.append(",");
@@ -148,6 +151,7 @@ public abstract class DerivedVariableGenerator {
         // merge attributes
         mergeAttributes(origCat.getAttributesArray(), cat.getAttributesArray());
       }
+      categoryValuesAppended = true;
     }
   }
 
@@ -161,6 +165,7 @@ public abstract class DerivedVariableGenerator {
       } else {
         newCategoriesMap.put(entry.getNewValue(), cat);
       }
+      distinctValuesAppended = true;
     }
   }
 
@@ -325,5 +330,13 @@ public abstract class DerivedVariableGenerator {
       AttributeDto attr = attrs.get(i);
       GWT.log(message + "[" + (i + 1) + "]=" + attr.getName() + ", " + attr.getLocale() + ", " + attr.getValue());
     }
+  }
+
+  public boolean isCategoryValuesAppended() {
+    return categoryValuesAppended;
+  }
+
+  public boolean isDistinctValuesAppended() {
+    return distinctValuesAppended;
   }
 }

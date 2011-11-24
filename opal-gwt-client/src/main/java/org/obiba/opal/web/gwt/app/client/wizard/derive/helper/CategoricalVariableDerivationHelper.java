@@ -106,7 +106,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   private int initializeNonMissingCategoryValueMapEntries(Map<String, Double> countByCategoryName, List<ValueMapEntry> missingValueMapEntries, int index) {
     int newIndex = index;
     for(CategoryDto category : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
-      Double count = countByCategoryName.get(category.getName());
+      double count = countByCategoryName.containsKey(category.getName()) ? countByCategoryName.get(category.getName()) : 0;
       ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(category, count);
       if(estimateIsMissing(category)) {
         builder.missing();
@@ -235,7 +235,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     protected void generateScript() {
       scriptBuilder.append("$('" + originalVariable.getName() + "').map({");
       appendCategoryValueMapEntries();
-      scriptBuilder.append(",");
       appendDistinctValueMapEntries();
       scriptBuilder.append("\n  }");
       appendSpecialValuesEntry(getOtherValuesMapEntry());
