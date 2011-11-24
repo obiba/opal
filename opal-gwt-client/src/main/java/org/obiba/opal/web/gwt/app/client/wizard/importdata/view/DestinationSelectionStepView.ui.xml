@@ -7,7 +7,7 @@
 
   <g:FlowPanel>
     <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="Destination dataset label">Destination Dataset</ui:msg></g:Label>
+      <g:Label addStyleNames="key"><ui:msg description="Destination datasource label">Destination Datasource</ui:msg></g:Label>
       <g:ListBox ui:field='datasetListBox' visibleItemCount='1'/>
     </g:FlowPanel>
     <g:FlowPanel styleName="input">
