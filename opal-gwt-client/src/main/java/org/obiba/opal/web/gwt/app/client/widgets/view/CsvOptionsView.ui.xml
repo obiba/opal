@@ -8,8 +8,9 @@
 
   <g:FlowPanel>
       <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="CSV File label">CSV File</ui:msg></g:Label>
+      <g:Label addStyleNames="key"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
       <g:SimplePanel ui:field="selectCsvFilePanel" />
+      <g:Label styleName="help-block"><ui:msg description="CSV File Description label">Data in CSV format are in a text file (.csv)</ui:msg></g:Label>
     </g:FlowPanel>
   
     <g:DisclosurePanel ui:field="advancedOptions">

@@ -7,8 +7,9 @@
 
   <g:FlowPanel>
     <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="Opal XML File label">Opal XML File</ui:msg></g:Label>
+      <g:Label addStyleNames="key"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
       <g:SimplePanel ui:field="selectXmlFilePanel" />
+      <g:Label styleName="help-block"><ui:msg description="Opal XML File Description label">Data in Opal XML format are packaged in an archive file (.zip)</ui:msg></g:Label>
     </g:FlowPanel>
       
     <g:HTMLPanel ui:field="help">
