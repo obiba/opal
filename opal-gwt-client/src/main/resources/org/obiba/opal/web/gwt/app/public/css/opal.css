@@ -1460,20 +1460,21 @@ textarea.error:focus {
 }
 
 .progress-bar {
-  background-color: #339BB9;
+  background-color: #EEDC94;
   background-repeat:repeat-x;
-  background-image:-khtml-gradient(linear, left top, left bottom, from(#5bc0de), to(#339bb9));
-  background-image:-moz-linear-gradient(top, #5bc0de, #339bb9);
-  background-image:-ms-linear-gradient(top, #5bc0de, #339bb9);
-  background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #5bc0de), color-stop(100%, #339bb9));
-  background-image:-webkit-linear-gradient(top, #5bc0de, #339bb9);
-  background-image:-o-linear-gradient(top, #5bc0de, #339bb9);
-  background-image:linear-gradient(top, #5bc0de, #339bb9);
-  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#5bc0de', endColorstr='#339bb9', GradientType=0);
+  background-image:-khtml-gradient(linear, left top, left bottom, from(#FCEEC1), to(#EEDC94));
+  background-image:-moz-linear-gradient(top, #FCEEC1, #EEDC94);
+  background-image:-ms-linear-gradient(top, #FCEEC1, #EEDC94);
+  background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #FCEEC1), color-stop(100%, #EEDC94));
+  background-image:-webkit-linear-gradient(top, #FCEEC1, #EEDC94);
+  background-image:-o-linear-gradient(top, #FCEEC1, #EEDC94);
+  background-image:linear-gradient(top, #FCEEC1, #EEDC94);
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FCEEC1', endColorstr='#EEDC94', GradientType=0);
   -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
   -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
   color: #404040;
+  border: 1px solid #EFDFDF;
   text-align: center;
   -webkit-text-shadow:0 1px 0 rgba(255, 255, 255, 0.5);
   -moz-text-shadow:0 1px 0 rgba(255, 255, 255, 0.5);
