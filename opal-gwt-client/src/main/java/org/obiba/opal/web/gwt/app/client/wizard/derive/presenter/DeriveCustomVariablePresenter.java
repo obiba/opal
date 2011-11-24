@@ -19,19 +19,26 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCustomVariablePresenter.Display> {
 
-  @Inject
-  ScriptDesignerPresenter scriptDesignerPresenter;
+  private VariableDuplicationHelper derivationHelper;
 
   @Inject
   public DeriveCustomVariablePresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
+  }
+
+  @Override
+  void initialize(VariableDto variable) {
+    super.initialize(variable);
+    display.getValueType().setValue(variable.getValueType());
   }
 
   @Override
@@ -46,7 +53,10 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
   @Override
   public VariableDto getDerivedVariable() {
-    return null;
+    derivationHelper = new VariableDuplicationHelper(originalVariable);
+    VariableDto derivedVariable = derivationHelper.getDerivedVariable();
+    derivedVariable.setValueType(display.getValueType().getValue());
+    return derivedVariable;
   }
 
   @Override
@@ -58,13 +68,10 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
   @Override
   protected void onBind() {
-    scriptDesignerPresenter.bind();
-    getDisplay().add(scriptDesignerPresenter.getDisplay().asWidget());
   }
 
   @Override
   protected void onUnbind() {
-    scriptDesignerPresenter.unbind();
   }
 
   @Override
@@ -81,6 +88,10 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     Builder getDeriveStepController();
 
     void add(Widget widget);
+
+    HasValue<String> getScript();
+
+    HasValue<String> getValueType();
 
   }
 }

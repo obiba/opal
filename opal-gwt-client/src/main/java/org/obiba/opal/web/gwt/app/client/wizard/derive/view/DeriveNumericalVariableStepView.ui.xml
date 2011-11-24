@@ -27,7 +27,7 @@
             <g:row>
               <g:customCell styleName="top">
               <g:FlowPanel styleName="input block">
-                <g:Label addStyleNames="key"><ui:msg description="Date Range label">Value limits</ui:msg></g:Label>
+                <g:Label addStyleNames="key"><ui:msg description="Value limits label">Value limits</ui:msg></g:Label>
                 <g:FlowPanel>
                   <g:FlowPanel addStyleNames="inline">
                     <o:NumericTextBox ui:field="fromBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>

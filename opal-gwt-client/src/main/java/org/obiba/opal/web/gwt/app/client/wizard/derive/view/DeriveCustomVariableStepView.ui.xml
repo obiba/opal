@@ -6,9 +6,34 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
   
-   <g:FlowPanel>
-     <o:WizardStep ui:field="deriveStep">
-     </o:WizardStep>
-   </g:FlowPanel>
+  	<ui:style>
+    	.width-height {width:400px;height:400px}
+  	</ui:style>
+  	
+  	<g:FlowPanel> 
+	     <o:WizardStep ui:field="deriveStep">
+		 	<g:FlowPanel>
+		 		<g:HTMLPanel>
+		 			<table>
+		 			<tr>
+		 				<td>
+				 			<o2:ValueTypeBox ui:field="valueTypeBox" />
+				 		</td>
+				 	</tr>
+				 	<tr>
+		 				<td>
+							<g:Button ui:field="test" styleName="btn"><ui:msg description="Test label">Test</ui:msg></g:Button>
+						</td>
+				 	</tr>
+					<tr>
+		 				<td>
+							<g:TextArea ui:field="scriptArea" addStyleNames="{style.width-height}"/>
+						</td>
+				 	</tr>
+					</table>
+				</g:HTMLPanel>
+			</g:FlowPanel>
+	     </o:WizardStep>
+    </g:FlowPanel>
     
 </ui:UiBinder>

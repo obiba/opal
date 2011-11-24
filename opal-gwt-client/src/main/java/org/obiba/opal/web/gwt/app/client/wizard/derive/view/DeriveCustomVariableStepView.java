@@ -17,19 +17,31 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DeriveCustomVariableStepView extends Composite implements DeriveCustomVariablePresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  @UiField
-  WizardStep deriveStep;
-
   @UiTemplate("DeriveCustomVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveCustomVariableStepView> {
   }
+
+  @UiField
+  WizardStep deriveStep;
+
+  @UiField
+  ValueTypeBox valueTypeBox;
+
+  @UiField
+  TextArea scriptArea;
+
+  @UiField
+  Button test;
 
   public DeriveCustomVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -51,6 +63,16 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   @Override
   public void add(Widget widget) {
     deriveStep.add(widget);
+  }
+
+  @Override
+  public HasValue<String> getScript() {
+    return scriptArea;
+  }
+
+  @Override
+  public HasValue<String> getValueType() {
+    return valueTypeBox;
   }
 
 }

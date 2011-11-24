@@ -57,11 +57,6 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
   }
 
   @Override
-  void initialize(VariableDto variable) {
-    super.initialize(variable);
-  }
-
-  @Override
   public void refreshDisplay() {
   }
 

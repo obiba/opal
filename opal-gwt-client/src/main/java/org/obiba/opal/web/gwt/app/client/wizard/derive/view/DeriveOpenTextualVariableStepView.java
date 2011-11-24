@@ -26,7 +26,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -55,14 +54,8 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @UiField(provided = true)
   RadioButton auto;
 
-  @UiField
-  Label labelAuto;
-
   @UiField(provided = true)
   RadioButton manual;
-
-  @UiField
-  Label labelManual;
 
   RadioGroup<Method> radioGroup;
 
@@ -94,12 +87,7 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
     radioGroup.addButton(auto, Method.AUTOMATICALLY);
     radioGroup.addButton(manual, Method.MANUAL);
 
-    auto.setText(translations.automatically());
     auto.setValue(true);
-    labelAuto.setText("Similar disctinct values will be grouped together");
-
-    manual.setText(translations.manually());
-    labelManual.setText("No predefined value mapping");
 
     addButton.setText("Add");
   }

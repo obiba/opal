@@ -144,6 +144,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   private void setCustomDerivationPresenter() {
     derivationPresenter = deriveCustomVariablePresenter;
+    derivationPresenter.initialize(variable);
     getDisplay().appendWizardSteps(derivationPresenter.getWizardSteps());
   }
 
