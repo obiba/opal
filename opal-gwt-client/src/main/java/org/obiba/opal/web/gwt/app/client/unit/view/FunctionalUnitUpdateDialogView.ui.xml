@@ -3,7 +3,6 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
     .right-aligned { float: right; }
   </ui:style>
 
@@ -11,7 +10,7 @@
     <g:DockLayoutPanel unit="EM" height="30em" width="40em">
       <g:center>
         <g:ScrollPanel>
-          <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
+          <g:FlowPanel addStyleNames="main">
             <g:FlowPanel styleName="input">
               <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
               <g:TextBox name="functionalUnitName" ui:field="functionalUnitName"/>
