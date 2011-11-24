@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectio
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
@@ -74,6 +75,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   private AuthorizationPresenter authorizationPresenter;
 
+  CodingViewDialogPresenter codingViewDialogPresenter;
+
   private Runnable removeConfirmation;
 
   private Boolean sortAscending;
@@ -89,9 +92,10 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
    * @param eventBus
    */
   @Inject
-  public TablePresenter(final Display display, final EventBus eventBus, AuthorizationPresenter authorizationPresenter) {
+  public TablePresenter(final Display display, final EventBus eventBus, AuthorizationPresenter authorizationPresenter, CodingViewDialogPresenter codingViewDialogPresenter) {
     super(display, eventBus);
     this.authorizationPresenter = authorizationPresenter;
+    this.codingViewDialogPresenter = codingViewDialogPresenter;
   }
 
   @Override
@@ -102,6 +106,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
+    getDisplay().setCreateCodingViewCommand(new CreateCodingViewCommand());
     getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
     getDisplay().setExportDataCommand(new ExportDataCommand());
     getDisplay().setCopyDataCommand(new CopyDataCommand());
@@ -222,6 +227,51 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }
     return next;
   }
+
+  // public class CreateCodingViewClickHandler implements ClickHandler {
+  //
+  // @Override
+  // public void onClick(ClickEvent event) {
+  // codingViewDialogPresenter.bind();
+  // codingViewDialogPresenter.setDialogMode(Mode.CREATE);
+  // codingViewDialogPresenter.getDisplay().clear();
+  // codingViewDialogPresenter.getDisplay().setEnabledCodingViewName(true);
+  // codingViewDialogPresenter.revealDisplay();
+  // }
+  //
+  // }
+
+  // private void createCodingView(String viewName) {
+  // ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+  //
+  // @Override
+  // public void onResponseCode(Request request, Response response) {
+  // if(response.getStatusCode() != Response.SC_OK) {
+  // String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
+  // eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+  // } else {
+  // eventBus.fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+  // }
+  // }
+  // };
+  //
+  // List<TableDto> tables = new ArrayList<TableDto>();
+  // tables.add(table);
+  // ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(table.getName() +
+  // "_codzzzesd").fromTables(tables);
+  //
+  // ResourceRequestBuilderFactory.newBuilder()//
+  // .post()//
+  // .forResource("/datasource/" + table.getDatasourceName() + "/views")//
+  // .withResourceBody(ViewDto.stringify(viewDtoBuilder.defaultJavaScriptView().build()))//
+  // .withCallback(Response.SC_CREATED, callbackHandler)//
+  // .withCallback(Response.SC_OK, callbackHandler)//
+  // .withCallback(Response.SC_BAD_REQUEST, callbackHandler)//
+  // .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
+  // .withCallback(Response.SC_METHOD_NOT_ALLOWED, callbackHandler)//
+  // .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)//
+  // .send();
+  // }
 
   private void removeView(String viewName) {
 
@@ -396,6 +446,18 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }
   }
 
+  final class CreateCodingViewCommand implements Command {
+
+    @Override
+    public void execute() {
+      codingViewDialogPresenter.bind();
+      codingViewDialogPresenter.setDialogMode(Mode.CREATE);
+      codingViewDialogPresenter.getDisplay().clear();
+      codingViewDialogPresenter.getDisplay().setEnabledCodingViewName(true);
+      codingViewDialogPresenter.revealDisplay();
+    }
+  }
+
   class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
@@ -529,6 +591,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     void setRemoveCommand(Command cmd);
 
     void setEditCommand(Command cmd);
+
+    void setCreateCodingViewCommand(Command cmd);
 
     void setParentName(String name);
 

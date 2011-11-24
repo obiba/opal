@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
@@ -146,6 +147,8 @@ public interface OpalGinjector extends Ginjector {
   DataCopyPresenter getDataCopyPresenter();
 
   DeriveVariablePresenter getDeriveVariablePresenter();
+
+  CodingViewDialogPresenter getCodingViewDialogPresenter();
 
   WizardManager getWizardManager();
 }

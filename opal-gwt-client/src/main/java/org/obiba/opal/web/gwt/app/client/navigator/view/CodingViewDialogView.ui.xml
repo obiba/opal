@@ -1,0 +1,58 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <ui:style>
+    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
+    .right-aligned { float: right; }
+    .top-margin { margin-top: 0.5em; }
+  </ui:style>
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
+    <g:DockLayoutPanel unit="EM" height="20em" width="40em">
+      <g:center>
+        <g:ScrollPanel>
+          <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
+            <table class="functionalUnitProperties full-width">
+              <tr>
+                <td>
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="Name label">Name</ui:msg>:
+                  </g:Label>
+                </td>
+                <td>
+                  <g:TextBox addStyleNames="text not-so-full-width" name="functionalUnitName" ui:field="functionalUnitName"/>
+                </td>
+              </tr>
+              <tr>
+                <td valign="top">
+                  <g:CheckBox ui:field="selectEnabled" addStyleNames="key">
+                    <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter:</ui:msg>
+                  </g:CheckBox>
+                </td>
+                <td>
+                  <g:TextArea addStyleNames="text not-so-full-width" name="select" ui:field="select"/>
+                </td>
+              </tr>
+            </table>
+
+          </g:HTMLPanel>
+        </g:ScrollPanel>
+      </g:center>
+      <g:south size="3.25">
+        <g:HTMLPanel addStyleNames="footer">
+          <span class="{style.right-aligned} {style.top-margin}">
+            <g:Button ui:field="updateFunctionalUnitButton" styleName="btn">
+              <ui:msg description="Save button label">Save</ui:msg>
+            </g:Button>
+            <g:Button ui:field="cancelButton" styleName="btn">
+              <ui:msg description="Cancel button label">Cancel</ui:msg>
+            </g:Button>
+          </span>
+        </g:HTMLPanel>
+      </g:south>
+    </g:DockLayoutPanel>
+
+  </g:DialogBox>
+
+</ui:UiBinder>

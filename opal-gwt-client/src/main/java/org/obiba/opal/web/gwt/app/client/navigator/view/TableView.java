@@ -113,6 +113,8 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   private MenuItem removeItem;
 
+  private MenuItem createCodingViewItem;
+
   private MenuItemSeparator removeItemSeparator;
 
   public TableView() {
@@ -301,6 +303,20 @@ public class TableView extends Composite implements TablePresenter.Display {
     if(cmd != null) {
       removeItemSeparator = toolbar.getToolsMenu().addSeparator();
       removeItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
+    }
+
+  }
+
+  @Override
+  public void setCreateCodingViewCommand(Command cmd) {
+
+    if(createCodingViewItem != null) {
+      // toolbar.getToolsMenu().removeSeparator(removeItemSeparator);
+      toolbar.getToolsMenu().removeItem(createCodingViewItem);
+    }
+
+    if(cmd != null) {
+      createCodingViewItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.createCodingView(), cmd));
     }
 
   }

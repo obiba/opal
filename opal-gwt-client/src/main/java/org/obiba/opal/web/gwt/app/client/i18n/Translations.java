@@ -1114,4 +1114,12 @@ public interface Translations extends Constants {
   @Description("Frequency label")
   @DefaultStringValue("Frequency")
   String frequency();
+  
+  @Description("Create a Coding View")
+  @DefaultStringValue("Create a Coding View")
+  String createCodingView();
+
+  @Description("Confirrm Create a Coding View")
+  @DefaultStringValue("Do you Create a Coding View")
+  String confirmCreateCodingView();
 }
