@@ -1403,6 +1403,10 @@ div.input {
   margin-bottom: 0.8em;
 }
 
+div.main.input {
+  margin-top: 0;
+}
+
 div.input.block {
   border: 1px dotted #CCC;
   padding: 0.8em;

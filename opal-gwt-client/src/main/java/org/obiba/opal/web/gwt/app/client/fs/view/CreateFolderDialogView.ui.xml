@@ -2,27 +2,20 @@
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
-    .right-aligned { float: right; }
-  </ui:style>
-
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="35em">
     <g:caption>
       <ui:msg description="Create folder dialog title">Create Folder</ui:msg>
     </g:caption>
     <g:DockLayoutPanel unit="EM" height="10em" width="35em">
       <g:center>
-        <g:VerticalPanel ui:field="inputFieldPanel" addStyleNames="main {style.optionsPanelMsg}">
-          <g:Label>
-            <ui:msg description="Enter name of folder to create label">Please enter the name of the folder to create:</ui:msg>
-          </g:Label>
+        <g:FlowPanel ui:field="inputFieldPanel" addStyleNames="main input">
+          <g:Label addStyleNames="key"><ui:msg description="Folder Name label">Folder Name</ui:msg></g:Label>
           <g:TextBox name="folderToCreate" ui:field="folderToCreate" visibleLength="40"/>
-        </g:VerticalPanel>
+        </g:FlowPanel>
       </g:center>
       <g:south size="4">
         <g:HTMLPanel addStyleNames="footer">
-          <span class="{style.right-aligned} top-margin">
+          <span class="right-aligned top-margin">
             <g:Button ui:field="createFolderButton" styleName="btn primary">
                 <ui:msg description="Create folder button label">Create Folder</ui:msg>
             </g:Button>
