@@ -3,42 +3,36 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .optionsPanelMsg td { margin: 0.5em 0.5em
-    0.5em 0.5em; }
     .remoteFolderName{ font-weight:bold; }
-    .errorMsg{color:red;}
-    .right-aligned { float: right; }
+    .progress {vertical-align: bottom;}
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="10em" width="35em">
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true">
     <g:caption>
       <ui:msg description="Upload file dialog title">File Upload</ui:msg>
     </g:caption>
-    <g:FlowPanel height="12em" width="35em">
-      <!-- The width here have to match EXACTLY the one on DialogBox above -->
-      <g:DockLayoutPanel unit="EM" height="12em" width="35em">
-        <g:north size="2">
-          <g:HTMLPanel ui:field="uploadingText" visible="false" addStyleNames="processingText">
-            <g:Label><ui:msg description="Uploading label">Uploading file...</ui:msg></g:Label>
-            <img src="image/in-progress.gif"/>
-          </g:HTMLPanel>
-        </g:north>
+      <g:DockLayoutPanel unit="EM" height="14em" width="35em">
         <g:center>
-          <g:VerticalPanel ui:field="inputFieldPanel" addStyleNames="main {style.optionsPanelMsg}">
-            <g:HorizontalPanel>
-              <g:Label>
-                <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
-              </g:Label>
-              <g:Label ui:field="remoteFolderName" addStyleNames="small-indent {style.remoteFolderName}"/>
-            </g:HorizontalPanel>
-            <g:FormPanel encoding="multipart/form-data" method="POST" ui:field="form">
-              <g:FileUpload name="fileToUpload" ui:field="fileToUpload"/>
-            </g:FormPanel>
-          </g:VerticalPanel>
+          <g:ScrollPanel>
+            <g:FlowPanel ui:field="inputFieldPanel" addStyleNames="main">
+              <g:FlowPanel>
+                <g:Label><ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg></g:Label>
+                <g:FlowPanel addStyleNames="small-top-margin">
+                  <g:InlineLabel ui:field="remoteFolderName" addStyleNames="small-indent {style.remoteFolderName}"/>
+                  <g:Image ui:field="uploadingText" visible="false" addStyleNames="small-indent {style.progress}" url="image/in-progress.gif"/>
+                </g:FlowPanel>
+              </g:FlowPanel>
+              <g:FlowPanel styleName="input">
+                <g:FormPanel encoding="multipart/form-data" method="POST" ui:field="form">
+                  <g:FileUpload name="fileToUpload" ui:field="fileToUpload"/>
+                </g:FormPanel>
+              </g:FlowPanel>
+            </g:FlowPanel>
+          </g:ScrollPanel>
         </g:center>
         <g:south size="4">
           <g:HTMLPanel addStyleNames="footer">
-            <span class="{style.right-aligned} top-margin">
+            <span class="right-aligned top-margin">
               <g:Button ui:field="uploadButton" styleName="btn primary">
                 <ui:msg description="Upload button label">Upload</ui:msg>
               </g:Button>
@@ -49,7 +43,6 @@
           </g:HTMLPanel>
         </g:south>
       </g:DockLayoutPanel>
-    </g:FlowPanel>
   </g:DialogBox>
 
 </ui:UiBinder>

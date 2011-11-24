@@ -22,10 +22,10 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FileUploadDialogView extends Composite implements Display {
@@ -55,10 +55,10 @@ public class FileUploadDialogView extends Composite implements Display {
   FormPanel form;
 
   @UiField
-  VerticalPanel inputFieldPanel;
+  Panel inputFieldPanel;
 
   @UiField
-  HTMLPanel uploadingText;
+  Image uploadingText;
 
   public FileUploadDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
