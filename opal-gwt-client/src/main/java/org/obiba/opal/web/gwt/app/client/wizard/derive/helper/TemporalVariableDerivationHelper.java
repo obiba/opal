@@ -48,6 +48,10 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
     return new Date(fromDate.getTime());
   }
 
+  public Date getToDate() {
+    return new Date(toDate.getTime());
+  }
+
   public static int getYear(Date date) {
     return Integer.parseInt(YEAR_FORMAT.format(date));
   }
@@ -56,32 +60,12 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
     return Integer.parseInt(MONTH_FORMAT.format(date));
   }
 
-  public int getFromYear() {
-    return getYear(fromDate);
-  }
-
-  public int getFromMonth() {
-    return getMonth(fromDate);
-  }
-
-  public Date getToDate() {
-    return new Date(toDate.getTime());
-  }
-
-  public int getToYear() {
-    return getYear(toDate);
-  }
-
-  public int getToMonth() {
-    return getMonth(toDate);
-  }
-
   @Override
   protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
     if(groupMethod == null) return;
 
-    groupMethod.initializeValueMapEntries(getValueMapEntries(), null, null);
+    groupMethod.initializeValueMapEntries(getValueMapEntries(), fromDate, toDate);
 
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
