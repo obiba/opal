@@ -35,7 +35,7 @@
     <dependency>
       <groupId>org.mortbay.jetty</groupId>
       <artifactId>jetty-util</artifactId>
-      <version>6.1.22</version>
+      <version>${jetty.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -170,6 +170,7 @@
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
 
+    <jetty.version>6.1.22</jetty.version>
     <gin.version>1.5.0</gin.version>
     <gwt.version>2.4.0</gwt.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
