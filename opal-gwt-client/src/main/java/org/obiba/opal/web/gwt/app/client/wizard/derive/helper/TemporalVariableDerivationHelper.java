@@ -80,10 +80,10 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
     HOUR_OF_DAY {
       @Override
       public void initializeValueMapEntries(List<ValueMapEntry> valueMapEntries, Date fromDate, Date toDate) {
-        String hour = translateTime("Hour") + " ";
+        String hour = " " + translateTime("Hour");
         for(int i = 0; i < 24; i++) {
           String str = Integer.toString(i);
-          valueMapEntries.add(ValueMapEntry.fromDistinct(str).label(hour + (i + 1)).newValue(str).build());
+          valueMapEntries.add(ValueMapEntry.fromDistinct(str).label(i + "-" + (i + 1) + hour).newValue(str).build());
         }
       }
 
