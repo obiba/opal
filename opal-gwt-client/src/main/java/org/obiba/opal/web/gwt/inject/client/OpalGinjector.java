@@ -31,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotification
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardManager;
@@ -109,6 +110,8 @@ public interface OpalGinjector extends Ginjector {
   FileSelectionPresenter getFileSectionPresenter();
 
   ConfirmationPresenter getConfirmationPresenter();
+
+  ScriptEvaluationPopupPresenter getScriptEvaluationPopupPresenter();
 
   CreateFolderDialogPresenter getCreateFolderDialogPresenter();
 

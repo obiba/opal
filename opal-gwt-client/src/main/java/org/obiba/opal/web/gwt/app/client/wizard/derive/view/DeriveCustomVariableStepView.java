@@ -9,9 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCustomVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ValueTypeBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.model.client.magma.LinkDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -20,12 +24,13 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DeriveCustomVariableStepView extends Composite implements DeriveCustomVariablePresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private Translations translations = GWT.create(Translations.class);
 
   @UiTemplate("DeriveCustomVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveCustomVariableStepView> {
@@ -38,7 +43,7 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   ValueTypeBox valueTypeBox;
 
   @UiField
-  TextArea scriptArea;
+  ScriptSuggestBox script;
 
   @UiField
   Button test;
@@ -49,7 +54,7 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
 
   @Override
   public DefaultWizardStepController.Builder getDeriveStepController() {
-    return DefaultWizardStepController.Builder.create(deriveStep).title("");
+    return DefaultWizardStepController.Builder.create(deriveStep).title(translations.recodeCustomDeriveStepTitle());
   }
 
   @Override
@@ -67,12 +72,17 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
 
   @Override
   public HasValue<String> getScript() {
-    return scriptArea;
+    return script;
   }
 
   @Override
   public HasValue<String> getValueType() {
     return valueTypeBox;
+  }
+
+  @Override
+  public void pushSuggestions(LinkDto parentLink) {
+    script.pushAsyncSuggestions(parentLink);
   }
 
 }

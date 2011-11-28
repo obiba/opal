@@ -12,6 +12,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardManager;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
@@ -66,6 +67,7 @@ public class GwtApp implements EntryPoint {
     initLoginPresenter();
     initTableSelectorPresenter();
     initConfirmationPresenter();
+    initScriptEvaluationPopupPresenter();
     initViewWizards();
     initWizardManager();
 
@@ -122,6 +124,11 @@ public class GwtApp implements EntryPoint {
   private void initConfirmationPresenter() {
     ConfirmationPresenter confirmationPresenter = opalGinjector.getConfirmationPresenter();
     confirmationPresenter.bind();
+  }
+
+  private void initScriptEvaluationPopupPresenter() {
+    ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter = opalGinjector.getScriptEvaluationPopupPresenter();
+    scriptEvaluationPopupPresenter.bind();
   }
 
   private void initViewWizards() {

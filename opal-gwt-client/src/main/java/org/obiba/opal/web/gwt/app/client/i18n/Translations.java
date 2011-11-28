@@ -1008,13 +1008,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Map original values to new values")
   String recodeOpenTextualMapStepTitle();
 
-  @Description("Automatically Label")
-  @DefaultStringValue("Automatically")
-  String automatically();
-
-  @Description("Manually Label")
-  @DefaultStringValue("Manually")
-  String manually();
+  @Description("Recode Custom Step Title")
+  @DefaultStringValue("Specify The custom derivation script")
+  String recodeCustomDeriveStepTitle();
 
   @Description("Time map")
   @DefaultStringMapValue({ //
@@ -1114,7 +1110,7 @@ public interface Translations extends Constants {
   @Description("Frequency label")
   @DefaultStringValue("Frequency")
   String frequency();
-  
+
   @Description("Create a Coding View")
   @DefaultStringValue("Create a Coding View")
   String createCodingView();
@@ -1122,4 +1118,5 @@ public interface Translations extends Constants {
   @Description("Confirrm Create a Coding View")
   @DefaultStringValue("Do you Create a Coding View")
   String confirmCreateCodingView();
+
 }

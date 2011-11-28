@@ -19,7 +19,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
+import org.obiba.opal.web.model.client.magma.LinkDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.user.client.ui.HasValue;
@@ -27,8 +28,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCustomVariablePresenter.Display> {
-
-  private VariableDuplicationHelper derivationHelper;
 
   @Inject
   public DeriveCustomVariablePresenter(Display display, EventBus eventBus) {
@@ -39,6 +38,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   void initialize(VariableDto variable) {
     super.initialize(variable);
     display.getValueType().setValue(variable.getValueType());
+    display.getScript().setValue("$('" + originalVariable.getName() + "')");
+    display.pushSuggestions(variable.getParentLink());
   }
 
   @Override
@@ -53,10 +54,10 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
   @Override
   public VariableDto getDerivedVariable() {
-    derivationHelper = new VariableDuplicationHelper(originalVariable);
-    VariableDto derivedVariable = derivationHelper.getDerivedVariable();
-    derivedVariable.setValueType(display.getValueType().getValue());
-    return derivedVariable;
+    VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, false);
+    DerivedVariableGenerator.setScript(derived, display.getScript().getValue());
+    derived.setValueType(display.getValueType().getValue());
+    return derived;
   }
 
   @Override
@@ -86,6 +87,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   public interface Display extends WidgetDisplay {
 
     Builder getDeriveStepController();
+
+    void pushSuggestions(LinkDto parentLink);
 
     void add(Widget widget);
 
