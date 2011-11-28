@@ -16,6 +16,12 @@ public class ScriptEvaluationEvent extends GwtEvent<ScriptEvaluationEvent.Handle
 
   private static Type<Handler> TYPE = new Type<Handler>();
 
+  private String script;
+
+  public ScriptEvaluationEvent(String script) {
+    this.script = script;
+  }
+
   public static Type<Handler> getType() {
     return TYPE;
   }
@@ -34,4 +40,7 @@ public class ScriptEvaluationEvent extends GwtEvent<ScriptEvaluationEvent.Handle
     public void onScriptEvaluation(ScriptEvaluationEvent scriptEvaluationEvent);
   }
 
+  public String getScript() {
+    return script;
+  }
 }

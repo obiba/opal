@@ -70,4 +70,9 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
     show();
   }
 
+  @Override
+  public void setScript(String script) {
+    GWT.log(script);
+  }
+
 }

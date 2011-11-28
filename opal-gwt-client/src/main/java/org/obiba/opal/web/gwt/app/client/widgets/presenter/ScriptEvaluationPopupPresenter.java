@@ -21,6 +21,8 @@ import com.google.inject.Inject;
 
 public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvaluationPopupPresenter.Display> {
 
+  private String script;
+
   @Inject
   public ScriptEvaluationPopupPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -33,6 +35,7 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
   @Override
   public void revealDisplay() {
+    display.setScript(script);
     display.showDialog();
   }
 
@@ -62,6 +65,7 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
     @Override
     public void onScriptEvaluation(ScriptEvaluationEvent scriptEvaluationEvent) {
+      script = scriptEvaluationEvent.getScript();
       revealDisplay();
     }
   }
@@ -69,6 +73,8 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
   public interface Display extends WidgetDisplay {
 
     void showDialog();
+
+    void setScript(String script);
 
   }
 }

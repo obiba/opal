@@ -52,7 +52,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
     @Override
     public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new ScriptEvaluationEvent());
+      eventBus.fireEvent(new ScriptEvaluationEvent(display.getScript().getValue()));
     }
   }
 
