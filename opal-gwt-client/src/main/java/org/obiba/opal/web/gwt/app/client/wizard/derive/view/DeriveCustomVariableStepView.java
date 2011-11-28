@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.LinkDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -46,7 +47,7 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   ScriptSuggestBox script;
 
   @UiField
-  Button test;
+  Button testButton;
 
   public DeriveCustomVariableStepView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -83,6 +84,11 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   @Override
   public void pushSuggestions(LinkDto parentLink) {
     script.pushAsyncSuggestions(parentLink);
+  }
+
+  @Override
+  public HasClickHandlers getTestButton() {
+    return testButton;
   }
 
 }

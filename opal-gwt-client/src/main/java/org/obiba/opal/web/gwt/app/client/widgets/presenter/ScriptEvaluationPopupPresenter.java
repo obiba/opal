@@ -15,6 +15,8 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationEvent;
+
 import com.google.inject.Inject;
 
 public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvaluationPopupPresenter.Display> {
@@ -22,46 +24,51 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
   @Inject
   public ScriptEvaluationPopupPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
-    // TODO Auto-generated constructor stub
   }
 
   @Override
   public void refreshDisplay() {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void revealDisplay() {
-    // TODO Auto-generated method stub
-
+    display.showDialog();
   }
 
   @Override
   protected void onBind() {
-    // TODO Auto-generated method stub
-
+    addHandler();
   }
 
   @Override
   protected void onUnbind() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public Place getPlace() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
-    // TODO Auto-generated method stub
+  }
 
+  private void addHandler() {
+    super.registerHandler(eventBus.addHandler(ScriptEvaluationEvent.getType(), new EvaluationHandler()));
+  }
+
+  class EvaluationHandler implements ScriptEvaluationEvent.Handler {
+
+    @Override
+    public void onScriptEvaluation(ScriptEvaluationEvent scriptEvaluationEvent) {
+      revealDisplay();
+    }
   }
 
   public interface Display extends WidgetDisplay {
+
+    void showDialog();
 
   }
 }

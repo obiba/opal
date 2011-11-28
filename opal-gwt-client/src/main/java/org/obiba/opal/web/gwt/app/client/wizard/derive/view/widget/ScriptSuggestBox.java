@@ -71,7 +71,7 @@ public class ScriptSuggestBox extends Composite implements HasValue<String> {
         for(int i = 0; i < resource.length(); i++) {
           String suggestion = "$('" + resource.get(i).getName() + "')";
           suggest.add(suggestion);
-          innerAutoCompleteTextArea.add(suggestion);
+          innerAutoCompleteTextArea.addSuggestion(suggestion);
         }
 
       }

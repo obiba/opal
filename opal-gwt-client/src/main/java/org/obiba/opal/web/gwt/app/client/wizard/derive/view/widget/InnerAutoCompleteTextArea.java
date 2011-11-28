@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -51,38 +50,30 @@ public class InnerAutoCompleteTextArea extends TextArea {
   public String getText() {
     int cursorPosition = getCursorPos();
     String text = super.getText();
+    if(cursorPosition == 0) return text;
     if(text.equals(previousWholeText)) return current;
     previousWholeText = text;
     if(Strings.isNullOrEmpty(text)) {
       current = "";
       return text;
     }
-
-    if(cursorPosition == 0) return text;
-
-    if(!backspacePressed) {
+    if(backspacePressed) {
+      if(!Strings.isNullOrEmpty(current)) current = current.substring(0, current.length() - 1);
+    } else {
       char charAt = text.charAt(cursorPosition - 1);
       current += Character.toString(charAt);
-    } else {
-      if(!Strings.isNullOrEmpty(current)) {
-        current = current.substring(0, current.length() - 1);
-      }
     }
     currentSuggestionPosition = cursorPosition;
-
-    GWT.log(current + "");
-    if(!isSuggestionMatch()) {
-      current = "";
-    }
+    if(!isSuggestionMatch()) current = "";
     return current;
   }
 
   @Override
-  public void setText(String text) {
+  public void setText(String textArg) {
     String superText = super.getText();
     String start = superText.substring(0, currentSuggestionPosition);
     String end = superText.substring(currentSuggestionPosition, superText.length());
-    text = text.substring(current.length(), text.length());
+    String text = textArg.substring(current.length(), textArg.length());
     super.setText(start + text + end);
     current = "";
     setCursorPos(currentSuggestionPosition + text.length());
@@ -95,7 +86,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
     return false;
   }
 
-  public void add(String suggestion) {
+  public void addSuggestion(String suggestion) {
     suggestions.add(suggestion);
   }
 

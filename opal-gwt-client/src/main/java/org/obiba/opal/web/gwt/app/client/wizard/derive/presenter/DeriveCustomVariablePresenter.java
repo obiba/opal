@@ -17,12 +17,16 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
 import org.obiba.opal.web.model.client.magma.LinkDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,9 +41,19 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   @Override
   void initialize(VariableDto variable) {
     super.initialize(variable);
+    display.getTestButton().addClickHandler(new TestButtonClickHandler());
+
     display.getValueType().setValue(variable.getValueType());
     display.getScript().setValue("$('" + originalVariable.getName() + "')");
     display.pushSuggestions(variable.getParentLink());
+  }
+
+  class TestButtonClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      eventBus.fireEvent(new ScriptEvaluationEvent());
+    }
   }
 
   @Override
@@ -87,6 +101,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   public interface Display extends WidgetDisplay {
 
     Builder getDeriveStepController();
+
+    HasClickHandlers getTestButton();
 
     void pushSuggestions(LinkDto parentLink);
 

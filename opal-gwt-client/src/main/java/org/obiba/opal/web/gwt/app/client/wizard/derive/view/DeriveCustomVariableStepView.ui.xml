@@ -25,7 +25,7 @@
           <g:Grid>
           	 <g:row>
                 <g:customCell styleName="top">
-  					<g:Button ui:field="test" styleName="btn"><ui:msg description="Test label">Test</ui:msg></g:Button>
+  					<g:Button ui:field="testButton" styleName="btn"><ui:msg description="Test label">Test</ui:msg></g:Button>
                 </g:customCell>
              </g:row>
           	 <g:row>
