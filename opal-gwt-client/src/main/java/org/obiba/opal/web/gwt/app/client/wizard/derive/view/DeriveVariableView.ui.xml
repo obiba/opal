@@ -27,7 +27,7 @@
           
           <g:FlowPanel ui:field="viewNameInput" styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Destination View Name label">Destination View Name</ui:msg></g:Label>
-            <g:SuggestBox ui:field="viewNameBox"/>
+            <o:DropdownSuggestBox ui:field="viewNameBox"/>
             <g:Label styleName="help-block"><ui:msg description="Destination View Name help label">Select an existing view or provide a name for a new view</ui:msg></g:Label>
           </g:FlowPanel>
           

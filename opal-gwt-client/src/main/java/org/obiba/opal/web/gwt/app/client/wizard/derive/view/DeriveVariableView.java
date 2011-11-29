@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -39,8 +40,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -79,12 +78,10 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   ListBox datasourceNameBox;
 
   @UiField(provided = true)
-  SuggestBox viewNameBox;
+  DropdownSuggestBox viewNameBox;
 
   @UiField
   FlowPanel viewNameInput;
-
-  MultiWordSuggestOracle viewNameSuggestions;
 
   private StepInHandler summaryHandler;
 
@@ -97,16 +94,16 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   private Map<String, List<String>> viewSuggestions;
 
   public DeriveVariableView() {
-    viewNameBox = new SuggestBox(viewNameSuggestions = new MultiWordSuggestOracle());
+    this.viewNameBox = new DropdownSuggestBox();
     this.dialog = uiBinder.createAndBindUi(this);
 
     datasourceNameBox.addChangeHandler(new ChangeHandler() {
 
       @Override
       public void onChange(ChangeEvent event) {
-        viewNameSuggestions.clear();
+        viewNameBox.getSuggestOracle().clear();
         for(String viewName : viewSuggestions.get(getDatasourceName())) {
-          viewNameSuggestions.add(viewName);
+          viewNameBox.getSuggestOracle().add(viewName);
         }
         // viewNameBox.setText("");
       }
@@ -225,7 +222,7 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
     viewSuggestions.get(ds.getName()).add(viewName);
 
     if(ds.getName().equals(getDatasourceName())) {
-      viewNameSuggestions.add(viewName);
+      viewNameBox.getSuggestOracle().add(viewName);
     }
   }
 
@@ -240,7 +237,7 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
     }
     datasourceNameBox.setSelectedIndex(0);
 
-    viewNameSuggestions.clear();
+    viewNameBox.getSuggestOracle().clear();
   }
 
   @Override

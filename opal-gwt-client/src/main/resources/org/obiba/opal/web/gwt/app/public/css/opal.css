@@ -1459,6 +1459,8 @@ textarea.error:focus {
   box-shadow:0 0 6px rgba(171, 41, 32, 0.5);
 }
 
+/* Progress bar */
+
 .progress-bar {
   background-color: #EEDC94;
   background-repeat:repeat-x;
@@ -1485,4 +1487,28 @@ textarea.error:focus {
 
 .progress-bar .inner {
   width: 100px;
+}
+
+/* Dropdown suggest box */
+
+.obiba-DropdownSuggestBox {
+  
+}
+
+.obiba-DropdownSuggestBox .gwt-SuggestBox {
+  -webkit-border-radius:3px 0 0 3px;
+  -moz-border-radius:3px 0 0 3px;
+  border-radius: 3px 0 0 3px;
+  border-right: none;  
+}
+
+.obiba-DropdownSuggestBox .btn {
+  -webkit-border-radius:0 4px 4px 0;
+  -moz-border-radius:0 4px 4px 0;
+  border-radius: 0 4px 4px 0;
+  height: 24px;
+  padding: 0;
+  vertical-align: top;
+  width: 24px;
+  color: #666;
 }
