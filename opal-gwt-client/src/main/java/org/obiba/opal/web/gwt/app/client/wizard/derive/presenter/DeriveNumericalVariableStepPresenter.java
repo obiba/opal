@@ -163,10 +163,12 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     double upper = lower + length;
 
     addValueMapEntry(null, lower, String.valueOf(newValue++));
-    while(upper <= upperLimit) {
-      addValueMapEntry(lower, upper, String.valueOf(newValue++));
-      lower = upper;
-      upper += length;
+    if(length >= 0) {
+      while(upper <= upperLimit) {
+        addValueMapEntry(lower, upper, String.valueOf(newValue++));
+        lower = upper;
+        upper += length;
+      }
     }
     addValueMapEntry(lower, null, String.valueOf(newValue++));
   }
