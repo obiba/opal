@@ -50,13 +50,18 @@ public class InnerAutoCompleteTextArea extends TextArea {
   public String getText() {
     int cursorPosition = getCursorPos();
     String text = super.getText();
-    if(cursorPosition == 0) return text;
-    if(text.equals(previousWholeText)) return current;
-    previousWholeText = text;
+    if(cursorPosition == 0) {
+      previousWholeText = text;
+      return text;
+    }
+    if(text.equals(previousWholeText)) {
+      return current;
+    }
     if(Strings.isNullOrEmpty(text)) {
       current = "";
       return text;
     }
+    previousWholeText = text;
     if(backspacePressed) {
       if(!Strings.isNullOrEmpty(current)) current = current.substring(0, current.length() - 1);
     } else {
@@ -91,6 +96,9 @@ public class InnerAutoCompleteTextArea extends TextArea {
   }
 
   @Override
+  /**
+   * Intern for InnerAutoCompleteTextArea. Not part of API...
+   */
   public void setSelectionRange(int pos, int length) {
     if(!isAttached()) {
       return;

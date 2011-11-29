@@ -10,58 +10,99 @@
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter.Display;
+import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
+import org.obiba.opal.web.model.client.magma.ValueDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 
 public class ScriptEvaluationPopupView extends DialogBox implements Display {
 
-  private Translations translations = GWT.create(Translations.class);
+  @UiTemplate("ScriptEvaluationPopupView.ui.xml")
+  interface ViewUiBinder extends UiBinder<FlowPanel, ScriptEvaluationPopupView> {
+  }
 
-  private static final String DIALOG_HEIGHT = "15em";
+  private static String DIALOG_WIDTH = "70em";
 
-  private static final String DIALOG_WIDTH = "30em";
+  private static String DIALOG_HEIGHT = "40em";
+
+  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private static Translations translations = GWT.create(Translations.class);
+
+  @UiField
+  FlowPanel content;
+
+  @UiField
+  DockLayoutPanel dock;
+
+  @UiField
+  CellTable<ValueDto> valuesTable;
+
+  @UiField
+  PrettyPrintLabel script;
+
+  @UiField
+  Button closeButton;
+
+  @UiField
+  Anchor previousPage;
+
+  @UiField
+  Anchor nextPage;
+
+  @UiField
+  Label pageLow;
+
+  @UiField
+  Label pageHigh;
 
   public ScriptEvaluationPopupView() {
     setHeight(DIALOG_HEIGHT);
     setWidth(DIALOG_WIDTH);
+    setText(translations.scriptLabel());
+    content = uiBinder.createAndBindUi(this);
+    dock.setHeight(DIALOG_HEIGHT);
+    dock.setWidth(DIALOG_WIDTH);
+    valuesTable.addColumn(new TextColumn<ValueDto>() {
 
-    SimplePanel content = new SimplePanel();
-    content.setHeight(DIALOG_HEIGHT);
-    content.setWidth(DIALOG_WIDTH);
-
-    Button closeButton = createCloseButton();
-
-    content.add(closeButton);
+      @Override
+      public String getValue(ValueDto value) {
+        return value.getValue();
+      }
+    }, translations.valueLabel());
+    content.add(dock);
     add(content);
   }
 
-  private Button createCloseButton() {
-    Button closeButton = new Button(translations.closeLabel());
-    closeButton.addStyleName("btn");
-    closeButton.addClickHandler(new CloseHandler());
+  @Override
+  public void populateValues(JsArray<ValueDto> values) {
+    JsArrayDataProvider<ValueDto> dataProvider = new JsArrayDataProvider<ValueDto>();
+    dataProvider.addDataDisplay(valuesTable);
+    dataProvider.setArray(JsArrays.toSafeArray(values));
+    dataProvider.refresh();
+  }
+
+  @Override
+  public HasClickHandlers getButton() {
     return closeButton;
-  }
-
-  class CloseHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      hide();
-    }
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   @Override
@@ -71,8 +112,46 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
   }
 
   @Override
-  public void setScript(String script) {
-    GWT.log(script);
+  public void closeDialog() {
+    hide();
   }
 
+  @Override
+  public void setScript(String script) {
+    this.script.setText(script);
+  }
+
+  @Override
+  public HandlerRegistration addNextPageClickHandler(ClickHandler handler) {
+    return nextPage.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addPreviousPageClickHandler(ClickHandler handler) {
+    return previousPage.addClickHandler(handler);
+  }
+
+  @Override
+  public void setPageLimits(int low, int high, int count) {
+    if(low == 1) {
+      previousPage.addStyleName("disabled");
+    } else {
+      previousPage.removeStyleName("disabled");
+    }
+    if(high >= count) {
+      nextPage.addStyleName("disabled");
+    } else {
+      nextPage.removeStyleName("disabled");
+    }
+    pageLow.setText(Integer.toString(low));
+    pageHigh.setText(Integer.toString(high));
+  }
+
+  @Override
+  public void startProcessing() {
+  }
+
+  @Override
+  public void stopProcessing() {
+  }
 }

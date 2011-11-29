@@ -21,6 +21,11 @@
                   </g:FlowPanel> 
                 </g:customCell>
               </g:row>
+              <g:row>
+                <g:customCell styleName="top">
+              		<g:CheckBox ui:field="repeatable"><ui:msg description="Repeatable label">Repeatable</ui:msg></g:CheckBox>
+                </g:customCell>
+              </g:row>
           </g:Grid>
           <g:Grid>
           	 <g:row>

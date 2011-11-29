@@ -23,6 +23,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
@@ -45,6 +46,9 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
 
   @UiField
   ScriptSuggestBox script;
+
+  @UiField
+  CheckBox repeatable;
 
   @UiField
   Button testButton;
@@ -89,6 +93,11 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   @Override
   public HasClickHandlers getTestButton() {
     return testButton;
+  }
+
+  @Override
+  public HasValue<Boolean> getRepeatable() {
+    return repeatable;
   }
 
 }

@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.LinkDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -85,7 +86,15 @@ public class ScriptSuggestBox extends Composite implements HasValue<String> {
 
   @Override
   public String getValue() {
-    return variable.getValue();
+    String value = variable.getValue();
+
+    // due to getText() and setText() of innerAutoCompleteTextArea are overridden,
+    // behaviour of TextArea is affected.
+    if(Strings.isNullOrEmpty(value)) {
+      innerAutoCompleteTextArea.setCursorPos(0);
+      return innerAutoCompleteTextArea.getValue();
+    }
+    return value;
   }
 
   @Override

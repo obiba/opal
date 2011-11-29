@@ -41,8 +41,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   @Override
   void initialize(VariableDto variable) {
     super.initialize(variable);
+    display.getRepeatable().setValue(variable.getIsRepeatable());
     display.getTestButton().addClickHandler(new TestButtonClickHandler());
-
     display.getValueType().setValue(variable.getValueType());
     display.getScript().setValue("$('" + originalVariable.getName() + "')");
     display.pushSuggestions(variable.getParentLink());
@@ -69,6 +69,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   @Override
   public VariableDto getDerivedVariable() {
     VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, false);
+    derived.setIsRepeatable(display.getRepeatable().getValue());
     DerivedVariableGenerator.setScript(derived, display.getScript().getValue());
     derived.setValueType(display.getValueType().getValue());
     return derived;
@@ -111,6 +112,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     HasValue<String> getScript();
 
     HasValue<String> getValueType();
+
+    HasValue<Boolean> getRepeatable();
 
   }
 }
