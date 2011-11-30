@@ -80,7 +80,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
       return "";
     }
     int length = getSelectionLength();
-    return getRealText().substring(start, start + length);
+    return length > 0 ? getRealText().substring(start, start + length) : getRealText();
   }
 
   public String getRealText() {
