@@ -38,7 +38,6 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
     for(ValueType valueType : ValueType.values()) {
       addItem(valueType.label);
     }
-
   }
 
   @Override

@@ -13,11 +13,11 @@ public class InnerAutoCompleteTextArea extends TextArea {
 
   private List<String> suggestions = new ArrayList<String>();
 
-  private String previousWholeText = "";
+  private String previousText = "";
 
   private int currentSuggestionPosition = 0;
 
-  private String current = "";
+  private String currentSuggestion = "";
 
   private boolean backspacePressed = false;
 
@@ -26,7 +26,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
 
       @Override
       public void onKeyDown(KeyDownEvent event) {
-        if(!Strings.isNullOrEmpty(current)) {
+        if(!Strings.isNullOrEmpty(currentSuggestion)) {
           switch(event.getNativeKeyCode()) {
           case KeyCodes.KEY_ENTER:
           case KeyCodes.KEY_UP:
@@ -37,7 +37,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
           case KeyCodes.KEY_ESCAPE:
           case KeyCodes.KEY_LEFT:
           case KeyCodes.KEY_RIGHT:
-            current = "";
+            currentSuggestion = "";
             break;
           }
         }
@@ -47,30 +47,33 @@ public class InnerAutoCompleteTextArea extends TextArea {
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   public String getText() {
     int cursorPosition = getCursorPos();
     String text = super.getText();
     if(cursorPosition == 0) {
-      previousWholeText = text;
+      previousText = text;
       return text;
     }
-    if(text.equals(previousWholeText)) {
-      return current;
+    if(text.equals(previousText)) {
+      return currentSuggestion;
     }
     if(Strings.isNullOrEmpty(text)) {
-      current = "";
+      currentSuggestion = "";
       return text;
     }
-    previousWholeText = text;
+    previousText = text;
     if(backspacePressed) {
-      if(!Strings.isNullOrEmpty(current)) current = current.substring(0, current.length() - 1);
+      if(!Strings.isNullOrEmpty(currentSuggestion)) {
+        currentSuggestion = currentSuggestion.substring(0, currentSuggestion.length() - 1);
+      }
     } else {
       char charAt = text.charAt(cursorPosition - 1);
-      current += Character.toString(charAt);
+      currentSuggestion += Character.toString(charAt);
     }
     currentSuggestionPosition = cursorPosition;
-    if(!isSuggestionMatch()) current = "";
-    return current;
+    if(!isSuggestionMatch()) currentSuggestion = "";
+    return currentSuggestion;
   }
 
   @Override
@@ -78,15 +81,15 @@ public class InnerAutoCompleteTextArea extends TextArea {
     String superText = super.getText();
     String start = superText.substring(0, currentSuggestionPosition);
     String end = superText.substring(currentSuggestionPosition, superText.length());
-    String text = textArg.substring(current.length(), textArg.length());
+    String text = textArg.substring(currentSuggestion.length(), textArg.length());
     super.setText(start + text + end);
-    current = "";
+    currentSuggestion = "";
     setCursorPos(currentSuggestionPosition + text.length());
   }
 
   private boolean isSuggestionMatch() {
     for(String suggestion : suggestions) {
-      if(suggestion.startsWith(current)) return true;
+      if(suggestion.startsWith(currentSuggestion)) return true;
     }
     return false;
   }

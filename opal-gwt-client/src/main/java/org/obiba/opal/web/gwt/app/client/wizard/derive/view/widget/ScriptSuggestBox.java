@@ -27,40 +27,40 @@ import com.google.gwt.user.client.ui.UIObject;
 
 public class ScriptSuggestBox extends Composite implements HasValue<String> {
 
-  SuggestBox variable;
+  private SuggestBox variable;
 
-  MultiWordSuggestOracle suggest;
+  private MultiWordSuggestOracle suggest;
 
-  private InnerAutoCompleteTextArea innerAutoCompleteTextArea;
+  private InnerAutoCompleteTextArea inner;
 
   public ScriptSuggestBox() {
     suggest = new MultiWordSuggestOracle();
     SuggestBox.DefaultSuggestionDisplay display = new SuggestBox.DefaultSuggestionDisplay();
-    innerAutoCompleteTextArea = new InnerAutoCompleteTextArea();
+    inner = new InnerAutoCompleteTextArea();
 
     display.setPositionRelativeTo(new UIObject() {
       @Override
       public int getAbsoluteLeft() {
-        return innerAutoCompleteTextArea.getAbsoluteLeft();
+        return inner.getAbsoluteLeft() + inner.getOffsetWidth();
       }
 
       @Override
       public int getOffsetHeight() {
-        return innerAutoCompleteTextArea.getOffsetHeight();
+        return 1;
       }
 
       @Override
       public int getAbsoluteTop() {
-        return innerAutoCompleteTextArea.getAbsoluteTop();
+        return inner.getAbsoluteTop();
       }
 
       @Override
       public int getOffsetWidth() {
-        return innerAutoCompleteTextArea.getOffsetWidth();
+        return 1;
       }
     });
 
-    variable = new SuggestBox(suggest, innerAutoCompleteTextArea, display);
+    variable = new SuggestBox(suggest, inner, display);
     initWidget(variable);
   }
 
@@ -72,7 +72,7 @@ public class ScriptSuggestBox extends Composite implements HasValue<String> {
         for(int i = 0; i < resource.length(); i++) {
           String suggestion = "$('" + resource.get(i).getName() + "')";
           suggest.add(suggestion);
-          innerAutoCompleteTextArea.addSuggestion(suggestion);
+          inner.addSuggestion(suggestion);
         }
 
       }
@@ -91,8 +91,8 @@ public class ScriptSuggestBox extends Composite implements HasValue<String> {
     // due to getText() and setText() of innerAutoCompleteTextArea are overridden,
     // behaviour of TextArea is affected.
     if(Strings.isNullOrEmpty(value)) {
-      innerAutoCompleteTextArea.setCursorPos(0);
-      return innerAutoCompleteTextArea.getValue();
+      inner.setCursorPos(0);
+      return inner.getValue();
     }
     return value;
   }
