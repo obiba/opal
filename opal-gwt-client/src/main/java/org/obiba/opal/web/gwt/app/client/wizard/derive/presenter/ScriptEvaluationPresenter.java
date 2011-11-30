@@ -177,8 +177,10 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
   @Override
   public void refreshDisplay() {
-    requestSummary();
-    populateValues(0);
+    if(!valueType.equals("binary")) {
+      requestSummary();
+      populateValues(0);
+    }
   }
 
   @Override

@@ -153,7 +153,10 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     // TODO
     String valueType = variable.getValueType();
     derivationPresenter = null;
-    if(valueType.equals("text") && allCategoriesMissing(variable)) {
+    if(valueType.equals("binary")) {
+      // should not arrive here
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("Cannot categorize binary values.").build());
+    } else if(valueType.equals("text") && allCategoriesMissing(variable)) {
       derivationPresenter = openTextualPresenter;
     } else if(valueType.equals("integer") || valueType.equals("decimal")) {
       derivationPresenter = numericalPresenter;

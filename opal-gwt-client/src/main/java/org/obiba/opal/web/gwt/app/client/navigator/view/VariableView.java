@@ -142,6 +142,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   private MenuBar deriveBar;
 
+  private MenuItem categorizeItem;
+
   //
   // Constructors
   //
@@ -298,7 +300,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   @Override
   public void setDeriveCategorizeCommand(Command cmd) {
-    withDeriveItem(new MenuItem(translations.deriveCategorizeLabel(), cmd));
+    withDeriveItem(categorizeItem = new MenuItem(translations.deriveCategorizeLabel(), cmd));
   }
 
   @Override
@@ -413,5 +415,12 @@ public class VariableView extends Composite implements VariablePresenter.Display
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new TabAuthorizer(tabs, SUMMARY_TAB_INDEX + 1);
+  }
+
+  @Override
+  public void setCategorizeMenuAvailable(boolean available) {
+    if(categorizeItem != null) {
+      categorizeItem.setEnabled(available);
+    }
   }
 }

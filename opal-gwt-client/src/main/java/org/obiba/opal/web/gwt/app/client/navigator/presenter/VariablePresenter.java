@@ -127,6 +127,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
       getDisplay().renderCategoryRows(variable.getCategoriesArray());
       getDisplay().renderAttributeRows(variable.getAttributesArray());
+      getDisplay().setCategorizeMenuAvailable(!variable.getValueType().equals("binary"));
 
       updateDerivedVariableDisplay(table);
 
@@ -307,6 +308,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   public interface Display extends WidgetDisplay {
 
     void setVariableName(String name);
+
+    void setCategorizeMenuAvailable(boolean available);
 
     void setDerivedVariable(boolean derived, String script);
 
