@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
@@ -26,6 +28,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -154,6 +157,29 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   @Override
   public void addValueSuggestion(String replacementString, String displayString) {
     valueOracle.add(replacementString, displayString);
+  }
+
+  private static class MultiWordSuggestOracleWithDisplay extends MultiWordSuggestOracle {
+
+    Map<String, String> map = new HashMap<String, String>();
+
+    public void add(String replacementString, String displayString) {
+      super.add(replacementString);
+      map.put(replacementString, displayString);
+    }
+
+    @Override
+    protected MultiWordSuggestion createSuggestion(String replacementString, String displayString) {
+      return super.createSuggestion(replacementString, "<div style='float:left'>" + displayString + createSpaces() + "</div><div style='float:right'>(" + map.get(replacementString) + ")</div>");
+    }
+
+    private String createSpaces() {
+      StringBuilder sb = new StringBuilder();
+      for(int i = 0; i < 25; i++) {
+        sb.append("&nbsp.");
+      }
+      return sb.toString();
+    }
   }
 
 }

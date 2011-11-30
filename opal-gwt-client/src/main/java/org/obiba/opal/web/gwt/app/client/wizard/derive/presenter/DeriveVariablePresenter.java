@@ -162,7 +162,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       derivationPresenter = numericalPresenter;
     } else if(valueType.equals("date") || valueType.equals("datetime")) {
       derivationPresenter = temporalPresenter;
-    } else if(valueType.equals("text") && variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0) {
+    } else if(valueType.equals("text") && hasCategories(variable)) {
       derivationPresenter = categoricalPresenter;
     } else if(valueType.equals("boolean")) {
       derivationPresenter = booleanPresenter;
@@ -176,12 +176,18 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
   }
 
+  // TODO maybe put in Util class or Variables class
+  public static boolean hasCategories(VariableDto variable) {
+    return variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0;
+  }
+
   /**
    * Return false if variableDto contains at least one non-missing category, otherwise true
    * @param variableDto
    * @return
    */
-  private boolean allCategoriesMissing(VariableDto variableDto) {
+  // TODO maybe put in Util class or Variables class
+  public static boolean allCategoriesMissing(VariableDto variableDto) {
     JsArray<CategoryDto> categoriesArray = variableDto.getCategoriesArray();
     if(categoriesArray == null) return true;
     for(int i = 0; i < categoriesArray.length(); i++) {
