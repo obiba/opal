@@ -21,12 +21,17 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.LinkDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -44,15 +49,20 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     display.getRepeatable().setValue(variable.getIsRepeatable());
     display.getTestButton().addClickHandler(new TestButtonClickHandler());
     display.getValueType().setValue(variable.getValueType());
-    display.getScript().setValue("$('" + originalVariable.getName() + "')");
-    display.pushSuggestions(variable.getParentLink());
+    display.getScriptBox().setValue("$('" + originalVariable.getName() + "')");
+    display.addSuggestions(variable.getParentLink());
   }
 
   class TestButtonClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new ScriptEvaluationEvent(display.getScript().getValue()));
+      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(originalVariable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
+        @Override
+        public void onResource(Response response, TableDto table) {
+          eventBus.fireEvent(new ScriptEvaluationEvent(display.getScriptBox().getSelectedScript(), table));
+        }
+      }).send();
     }
   }
 
@@ -70,7 +80,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   public VariableDto getDerivedVariable() {
     VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, false);
     derived.setIsRepeatable(display.getRepeatable().getValue());
-    DerivedVariableGenerator.setScript(derived, display.getScript().getValue());
+    DerivedVariableGenerator.setScript(derived, display.getScriptBox().getValue());
     derived.setValueType(display.getValueType().getValue());
     return derived;
   }
@@ -105,11 +115,11 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
     HasClickHandlers getTestButton();
 
-    void pushSuggestions(LinkDto parentLink);
+    void addSuggestions(LinkDto parentLink);
 
     void add(Widget widget);
 
-    HasValue<String> getScript();
+    ScriptSuggestBox getScriptBox();
 
     HasValue<String> getValueType();
 

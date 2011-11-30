@@ -21,6 +21,8 @@ public class InnerAutoCompleteTextArea extends TextArea {
 
   private boolean backspacePressed = false;
 
+  private String text;
+
   public InnerAutoCompleteTextArea() {
     addKeyDownHandler(new KeyDownHandler() {
 
@@ -47,14 +49,9 @@ public class InnerAutoCompleteTextArea extends TextArea {
   }
 
   @Override
-  @SuppressWarnings("PMD.NcssMethodCount")
   public String getText() {
     int cursorPosition = getCursorPos();
-    String text = super.getText();
-    if(cursorPosition == 0) {
-      previousText = text;
-      return text;
-    }
+    text = super.getText();
     if(text.equals(previousText)) {
       return currentSuggestion;
     }
@@ -74,6 +71,24 @@ public class InnerAutoCompleteTextArea extends TextArea {
     currentSuggestionPosition = cursorPosition;
     if(!isSuggestionMatch()) currentSuggestion = "";
     return currentSuggestion;
+  }
+
+  @Override
+  public String getSelectedText() {
+    int start = getCursorPos();
+    if(start < 0) {
+      return "";
+    }
+    int length = getSelectionLength();
+    return getRealText().substring(start, start + length);
+  }
+
+  public String getRealText() {
+    return text;
+  }
+
+  public void setRealText(String value) {
+    text = value;
   }
 
   @Override
@@ -108,4 +123,5 @@ public class InnerAutoCompleteTextArea extends TextArea {
     }
     getImpl().setSelectionRange(getElement(), pos, length);
   }
+
 }

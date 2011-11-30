@@ -45,7 +45,7 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   ValueTypeBox valueTypeBox;
 
   @UiField
-  ScriptSuggestBox script;
+  ScriptSuggestBox scriptBox;
 
   @UiField
   CheckBox repeatable;
@@ -76,8 +76,8 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   }
 
   @Override
-  public HasValue<String> getScript() {
-    return script;
+  public ScriptSuggestBox getScriptBox() {
+    return scriptBox;
   }
 
   @Override
@@ -86,8 +86,8 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   }
 
   @Override
-  public void pushSuggestions(LinkDto parentLink) {
-    script.pushAsyncSuggestions(parentLink);
+  public void addSuggestions(LinkDto parentLink) {
+    scriptBox.addAsyncSuggestions(parentLink);
   }
 
   @Override

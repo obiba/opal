@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -35,6 +36,8 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
   private String script;
 
+  private TableDto table;
+
   private int currentOffset;
 
   @Inject
@@ -43,11 +46,11 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
   }
 
   private void populateValues(final int offset) {
+
     getDisplay().setScript(script);
 
     currentOffset = offset;
-    // TODO adjust table request
-    StringBuilder link = new StringBuilder("/datasource/opal-data/table/questionnaire")//
+    StringBuilder link = new StringBuilder(table.getLink())//
     .append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
     .append("&offset=").append(offset);
     // appendVariableLimitArguments(link);
@@ -61,11 +64,9 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
         if(resource != null && resource.length() < high) {
           high = offset + resource.length();
         }
-        // TODO not 50000 but table size
-        getDisplay().setPageLimits(offset + 1, high, 50000);
+        getDisplay().setPageLimits(offset + 1, high, table.getValueSetCount());
         getDisplay().populateValues(resource);
       }
-
     });
     requestBuilder.withFormBody("script", script);
     requestBuilder.send();
@@ -121,6 +122,7 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
     @Override
     public void onScriptEvaluation(ScriptEvaluationEvent scriptEvaluationEvent) {
       script = scriptEvaluationEvent.getScript();
+      table = scriptEvaluationEvent.getTable();
       revealDisplay();
     }
   }

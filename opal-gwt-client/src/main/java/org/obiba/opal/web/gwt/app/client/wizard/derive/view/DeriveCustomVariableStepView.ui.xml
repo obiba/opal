@@ -35,7 +35,7 @@
              </g:row>
           	 <g:row>
           	 	<g:customCell styleName="top">
-     				<o2:ScriptSuggestBox ui:field="script" addStyleNames="{style.width-height}"/>
+     				<o2:ScriptSuggestBox ui:field="scriptBox" addStyleNames="{style.width-height}"/>
      			</g:customCell>
           	 </g:row>
           </g:Grid>

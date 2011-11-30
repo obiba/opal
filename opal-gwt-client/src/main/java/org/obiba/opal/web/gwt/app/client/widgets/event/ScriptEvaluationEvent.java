@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
+import org.obiba.opal.web.model.client.magma.TableDto;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -18,8 +20,11 @@ public class ScriptEvaluationEvent extends GwtEvent<ScriptEvaluationEvent.Handle
 
   private String script;
 
-  public ScriptEvaluationEvent(String script) {
+  private TableDto table;
+
+  public ScriptEvaluationEvent(String script, TableDto table) {
     this.script = script;
+    this.table = table;
   }
 
   public static Type<Handler> getType() {
@@ -43,4 +48,9 @@ public class ScriptEvaluationEvent extends GwtEvent<ScriptEvaluationEvent.Handle
   public String getScript() {
     return script;
   }
+
+  public TableDto getTable() {
+    return table;
+  }
+
 }
