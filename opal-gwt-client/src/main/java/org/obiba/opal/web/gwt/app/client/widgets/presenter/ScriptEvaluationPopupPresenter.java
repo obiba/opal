@@ -15,74 +15,35 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueDto;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ValueTypeBox.ValueType;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvaluationPopupPresenter.Display> {
 
-  public static final int PAGE_SIZE = 20;
-
-  private String script;
-
-  private TableDto table;
-
-  private int currentOffset;
+  @Inject
+  private ScriptEvaluationPresenter scriptEvaluationPresenter;
 
   @Inject
   public ScriptEvaluationPopupPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 
-  private void populateValues(final int offset) {
-
-    getDisplay().setScript(script);
-
-    currentOffset = offset;
-    StringBuilder link = new StringBuilder(table.getLink())//
-    .append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
-    .append("&offset=").append(offset);
-    // appendVariableLimitArguments(link);
-    ResourceRequestBuilder<JsArray<ValueDto>> requestBuilder = ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
-    .forResource(link.toString()).post() //
-    .withCallback(new ResourceCallback<JsArray<ValueDto>>() {
-
-      @Override
-      public void onResource(Response response, JsArray<ValueDto> resource) {
-        int high = offset + PAGE_SIZE;
-        if(resource != null && resource.length() < high) {
-          high = offset + resource.length();
-        }
-        getDisplay().setPageLimits(offset + 1, high, table.getValueSetCount());
-        getDisplay().populateValues(resource);
-      }
-    });
-    requestBuilder.withFormBody("script", script);
-    requestBuilder.send();
-  }
-
   @Override
   public void refreshDisplay() {
-
+    scriptEvaluationPresenter.refreshDisplay();
   }
 
   @Override
   public void revealDisplay() {
-    display.getButton().addClickHandler(new CloseHandler());
-    display.setScript(script);
-    populateValues(0);
     display.showDialog();
+    scriptEvaluationPresenter.refreshDisplay();
   }
 
   class CloseHandler implements ClickHandler {
@@ -95,11 +56,15 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
   @Override
   protected void onBind() {
+    scriptEvaluationPresenter.bind();
+    display.getButton().addClickHandler(new CloseHandler());
+    display.setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay().asWidget());
     addHandler();
   }
 
   @Override
   protected void onUnbind() {
+    scriptEvaluationPresenter.unbind();
   }
 
   @Override
@@ -112,60 +77,32 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
   }
 
   private void addHandler() {
-    super.registerHandler(eventBus.addHandler(ScriptEvaluationEvent.getType(), new EvaluationHandler()));
-    super.registerHandler(getDisplay().addNextPageClickHandler(new NextPageClickHandler()));
-    super.registerHandler(getDisplay().addPreviousPageClickHandler(new PreviousPageClickHandler()));
+    super.registerHandler(eventBus.addHandler(ScriptEvaluationPopupEvent.getType(), new EvaluationHandler()));
   }
 
-  class EvaluationHandler implements ScriptEvaluationEvent.Handler {
+  class EvaluationHandler implements ScriptEvaluationPopupEvent.Handler {
 
     @Override
-    public void onScriptEvaluation(ScriptEvaluationEvent scriptEvaluationEvent) {
-      script = scriptEvaluationEvent.getScript();
-      table = scriptEvaluationEvent.getTable();
+    public void onScriptEvaluation(ScriptEvaluationPopupEvent scriptEvaluationEvent) {
+      scriptEvaluationPresenter.setTable(scriptEvaluationEvent.getTable());
+      if(scriptEvaluationEvent.isScriptMode()) {
+        scriptEvaluationPresenter.setScript(ValueType.TEXT.getLabel(), scriptEvaluationEvent.getScript(), false);
+      } else {
+        scriptEvaluationPresenter.setVariable(scriptEvaluationEvent.getVariable());
+      }
       revealDisplay();
     }
-  }
-
-  public class PreviousPageClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      if(currentOffset > 0) {
-        populateValues(currentOffset - PAGE_SIZE);
-      }
-    }
-
-  }
-
-  public class NextPageClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      // if(currentOffset + PAGE_SIZE < table.getValueSetCount()) {
-      populateValues(currentOffset + PAGE_SIZE);
-      // }
-    }
-
   }
 
   public interface Display extends WidgetDisplay {
 
     void showDialog();
 
-    void setScript(String script);
+    void setScriptEvaluationWidget(Widget display);
 
     HasClickHandlers getButton();
 
     void closeDialog();
-
-    void populateValues(JsArray<ValueDto> values);
-
-    HandlerRegistration addNextPageClickHandler(ClickHandler handler);
-
-    HandlerRegistration addPreviousPageClickHandler(ClickHandler handler);
-
-    void setPageLimits(int low, int high, int count);
 
   }
 }

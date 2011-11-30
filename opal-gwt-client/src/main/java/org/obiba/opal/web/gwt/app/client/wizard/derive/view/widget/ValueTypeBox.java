@@ -79,6 +79,10 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
     private ValueType() {
       label = name().toLowerCase();
     }
+
+    public String getLabel() {
+      return label;
+    }
   }
 
 }

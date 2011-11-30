@@ -17,7 +17,7 @@ import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
-import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
@@ -28,6 +28,7 @@ import org.obiba.opal.web.model.client.magma.LinkDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -60,7 +61,12 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
       ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(originalVariable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
         @Override
         public void onResource(Response response, TableDto table) {
-          eventBus.fireEvent(new ScriptEvaluationEvent(display.getScriptBox().getSelectedScript(), table));
+          String selectedScript = display.getScriptBox().getSelectedScript();
+          if(Strings.isNullOrEmpty(selectedScript)) {
+            eventBus.fireEvent(new ScriptEvaluationPopupEvent(getDerivedVariable(), table));
+          } else {
+            eventBus.fireEvent(new ScriptEvaluationPopupEvent(selectedScript, table));
+          }
         }
       }).send();
     }

@@ -106,7 +106,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
   private void populateValues(final int offset) {
     getDisplay().setScript(script);
-
+    getDisplay().populateValues(null);
     currentOffset = offset;
     StringBuilder link = new StringBuilder(table.getLink())//
     .append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
@@ -149,8 +149,9 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
     ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
     .forResource(link.toString()).post();
-
-    requestBuilder.withFormBody(catsArray);
+    if(catsArray != null) {
+      requestBuilder.withFormBody(catsArray);
+    }
     requestBuilder.withFormBody("script", script);
 
     summaryTabPresenter.setRequestBuilder(requestBuilder);
@@ -177,10 +178,8 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
   @Override
   public void refreshDisplay() {
-    if(!valueType.equals("binary")) {
-      requestSummary();
-      populateValues(0);
-    }
+    requestSummary();
+    populateValues(0);
   }
 
   @Override

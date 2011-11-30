@@ -10,19 +10,31 @@
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
-public class ScriptEvaluationEvent extends GwtEvent<ScriptEvaluationEvent.Handler> {
+public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEvent.Handler> {
 
   private static Type<Handler> TYPE = new Type<Handler>();
 
   private String script;
 
+  private VariableDto variable;
+
   private TableDto table;
 
-  public ScriptEvaluationEvent(String script, TableDto table) {
+  private Mode mode;
+
+  public ScriptEvaluationPopupEvent(VariableDto variable, TableDto table) {
+    mode = Mode.VARIABLE;
+    this.variable = variable;
+    this.table = table;
+  }
+
+  public ScriptEvaluationPopupEvent(String script, TableDto table) {
+    mode = Mode.SCRIPT;
     this.script = script;
     this.table = table;
   }
@@ -42,7 +54,7 @@ public class ScriptEvaluationEvent extends GwtEvent<ScriptEvaluationEvent.Handle
   }
 
   public interface Handler extends EventHandler {
-    public void onScriptEvaluation(ScriptEvaluationEvent scriptEvaluationEvent);
+    public void onScriptEvaluation(ScriptEvaluationPopupEvent scriptEvaluationEvent);
   }
 
   public String getScript() {
@@ -51,6 +63,22 @@ public class ScriptEvaluationEvent extends GwtEvent<ScriptEvaluationEvent.Handle
 
   public TableDto getTable() {
     return table;
+  }
+
+  public VariableDto getVariable() {
+    return variable;
+  }
+
+  private enum Mode {
+    VARIABLE, SCRIPT;
+  }
+
+  public boolean isVariableMode() {
+    return mode == Mode.VARIABLE;
+  }
+
+  public boolean isScriptMode() {
+    return mode == Mode.SCRIPT;
   }
 
 }

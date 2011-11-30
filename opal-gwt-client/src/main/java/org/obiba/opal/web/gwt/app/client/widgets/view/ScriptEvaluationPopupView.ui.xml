@@ -8,30 +8,10 @@
 	ui:generateLocales="default">
 
 	<g:FlowPanel ui:field="content">
-		<g:DockLayoutPanel ui:field="dock" unit="EM">
-			<g:east size="35">
-				<pretty:PrettyPrintLabel ui:field="script"/>
-			</g:east>
-			<g:center>
-				<g:FlowPanel>
-					<g:FlowPanel addStyleNames="paging">
-				        <g:Anchor ui:field="previousPage" addStyleNames="previous"></g:Anchor>
-						<g:InlineLabel ui:field="pageLow">1</g:InlineLabel>
-						<g:InlineLabel> ... </g:InlineLabel>
-						<g:InlineLabel ui:field="pageHigh">10</g:InlineLabel>
-						<g:Anchor ui:field="nextPage" addStyleNames="next"></g:Anchor>
-			      	</g:FlowPanel>
-					<o:Table width="100%" ui:field="valuesTable"/>
-				</g:FlowPanel>
-			</g:center>
-			<g:south size="5">
-				<g:FlowPanel addStyleNames="footer">
-					<g:Button styleName="btn right-aligned" ui:field="closeButton">
-						<ui:msg description="Close label">Close</ui:msg>
-					</g:Button>
-				</g:FlowPanel>
-			</g:south>
-		</g:DockLayoutPanel>
-		
+		<g:FlowPanel addStyleNames="footer">
+			<g:Button styleName="btn right-aligned" ui:field="closeButton">
+				<ui:msg description="Close label">Close</ui:msg>
+			</g:Button>
+		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder>
