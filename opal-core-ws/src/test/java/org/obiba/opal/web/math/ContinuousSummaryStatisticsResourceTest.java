@@ -30,6 +30,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VectorSource;
+import org.obiba.magma.support.NullTimestamps;
 import org.obiba.magma.support.Values;
 import org.obiba.magma.type.IntegerType;
 import org.obiba.opal.web.math.ContinuousSummaryStatisticsResource.Distribution;
@@ -115,6 +116,7 @@ public class ContinuousSummaryStatisticsResourceTest {
     ValueTable mockTable = createMock(ValueTable.class);
     VectorSource mockSource = createMock(VectorSource.class);
 
+    expect(mockTable.getTimestamps()).andReturn(NullTimestamps.get());
     expect(mockTable.getVariableEntities()).andReturn(new TreeSet<VariableEntity>());
     expect(mockSource.getValues((SortedSet<VariableEntity>) EasyMock.anyObject())).andReturn(values);
 

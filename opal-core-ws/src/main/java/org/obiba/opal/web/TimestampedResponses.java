@@ -51,7 +51,12 @@ public final class TimestampedResponses {
   }
 
   public static Response.ResponseBuilder with(Response.ResponseBuilder builder, Timestamped stamped) {
-    return builder.lastModified((Date) stamped.getTimestamps().getLastUpdate().getValue());
+    Value lastModified = stamped.getTimestamps().getLastUpdate();
+    // This null-check shouldn't be necessary: https://issues.jboss.org/browse/RESTEASY-630
+    if(lastModified.isNull() == false) {
+      return builder.lastModified((Date) stamped.getTimestamps().getLastUpdate().getValue());
+    }
+    return builder;
   }
 
 }

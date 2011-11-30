@@ -30,6 +30,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VectorSource;
+import org.obiba.magma.support.NullTimestamps;
 import org.obiba.magma.support.Values;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
@@ -91,6 +92,7 @@ public class CategoricalSummaryStatisticsResourceTest {
     ValueTable mockTable = createMock(ValueTable.class);
     VectorSource mockSource = createMock(VectorSource.class);
 
+    expect(mockTable.getTimestamps()).andReturn(NullTimestamps.get());
     expect(mockTable.getVariableEntities()).andReturn(new TreeSet<VariableEntity>());
     expect(mockSource.getValues((SortedSet<VariableEntity>) EasyMock.anyObject())).andReturn(values);
 
