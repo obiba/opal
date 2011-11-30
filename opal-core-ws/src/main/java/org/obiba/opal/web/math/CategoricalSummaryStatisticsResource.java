@@ -14,13 +14,16 @@ import java.util.Iterator;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.math.stat.Frequency;
+import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.Math.FrequencyDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
@@ -48,7 +51,8 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
 
   @GET
   @POST
-  public SummaryStatisticsDto compute(@QueryParam("distinct") boolean distinct) {
+  @Cache(isPrivate = true, mustRevalidate = true)
+  public Response compute(@QueryParam("distinct") boolean distinct) {
     Frequency freq = computeFrequencyDistribution();
     CategoricalSummaryDto.Builder builder = CategoricalSummaryDto.newBuilder();
     long max = 0;
@@ -74,7 +78,7 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
       builder.addFrequencies(FrequencyDto.newBuilder().setValue(value).setFreq(freq.getCount(value)).setPct(freq.getPct(value)));
     }
     builder.setMode(mode).setN(freq.getSumFreq());
-    return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(CategoricalSummaryDto.categorical, builder.build()).build();
+    return TimestampedResponses.ok(getValueTable(), SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(CategoricalSummaryDto.categorical, builder.build()).build()).build();
   }
 
   private Frequency computeFrequencyDistribution() {

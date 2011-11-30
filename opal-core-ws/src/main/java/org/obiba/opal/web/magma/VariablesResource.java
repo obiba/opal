@@ -26,12 +26,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
@@ -42,6 +44,7 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
@@ -69,7 +72,8 @@ public class VariablesResource extends AbstractValueTableResource {
    * @return
    */
   @GET
-  public Iterable<VariableDto> getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
+  @Cache(isPrivate = true, mustRevalidate = true)
+  public Response getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
     }
@@ -84,7 +88,11 @@ public class VariablesResource extends AbstractValueTableResource {
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
 
     Iterable<Variable> variables = filterVariables(script, offset, limit);
-    return Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub));
+    Iterable<VariableDto> entity = Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub));
+
+    // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
+    return TimestampedResponses.ok(getValueTable(), new GenericEntity<Iterable<VariableDto>>(entity) {
+    }).build();
   }
 
   @GET
@@ -92,6 +100,7 @@ public class VariablesResource extends AbstractValueTableResource {
   @Produces("application/vnd.ms-excel")
   @AuthenticatedByCookie
   @AuthorizeResource
+  @Cache(isPrivate = true, mustRevalidate = true)
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
@@ -99,13 +108,12 @@ public class VariablesResource extends AbstractValueTableResource {
 
     destinationDatasource.initialise();
     try {
-      DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-      copier.copy(getValueTable(), destinationDatasource);
+      DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(getValueTable(), destinationDatasource);
     } finally {
       Disposables.silentlyDispose(destinationDatasource);
     }
 
-    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
+    return TimestampedResponses.ok(getValueTable()).entity(excelOutput.toByteArray()).type("application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
   @GET

@@ -120,7 +120,7 @@ public class ContinuousSummaryStatisticsResourceTest {
 
     replay(mockTable, mockSource);
     ContinuousSummaryStatisticsResource resource = new ContinuousSummaryStatisticsResource(mockTable, variable, mockSource);
-    SummaryStatisticsDto dto = resource.compute(Distribution.normal, ImmutableList.<Double>of(), 10);
+    SummaryStatisticsDto dto = (SummaryStatisticsDto) resource.compute(Distribution.normal, ImmutableList.<Double>of(), 10).getEntity();
     verify(mockTable, mockSource);
 
     assertThat(dto, notNullValue());

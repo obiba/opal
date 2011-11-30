@@ -20,9 +20,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -59,7 +61,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   private static final Logger log = LoggerFactory.getLogger(TableResourceTest.class);
 
   @BeforeClass
-  public static void before() { 
+  public static void before() {
     AbstractMagmaResourceTest.before();
     addDatasource(DATASOURCE2);
   }
@@ -113,7 +115,8 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(uriInfoMock);
     replay(segments.toArray());
 
-    List<VariableDto> dtos = Lists.newArrayList(resource.getVariables().getVariables(uriInfoMock, null, 0, null));
+    Response r = new VariablesResource(datasource.getValueTable("Weight"), Collections.<Locale> emptySet()).getVariables(uriInfoMock, null, 0, null);
+    List<VariableDto> dtos = ImmutableList.copyOf(((GenericEntity<Iterable<VariableDto>>) r.getEntity()).getEntity());
 
     verify(uriInfoMock);
     verify(segments.toArray());
@@ -162,8 +165,6 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     ValueTableWriter valueTableWriterMock = EasyMock.createMock(ValueTableWriter.class);
     VariableWriter variableWriterMock = EasyMock.createMock(VariableWriter.class);
 
-    TableResource resource = new TableResource(valueTableMock);
-
     expect(valueTableMock.getDatasource()).andReturn(datasourceMock);
     expect(valueTableMock.getName()).andReturn("name");
     expect(valueTableMock.getEntityType()).andReturn("entityType");
@@ -182,7 +183,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
       variablesDto.add(VariableDto.newBuilder().setName("name").setEntityType("entityType").setValueType("text").setIsRepeatable(false).build());
     }
 
-    resource.getVariables().addOrUpdateVariables(variablesDto);
+    new VariablesResource(valueTableMock, Collections.<Locale> emptySet()).addOrUpdateVariables(variablesDto);
 
     verify(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
 
@@ -190,8 +191,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testAddOrUpdateVariables_InternalServerError() {
-    TableResource resource = new TableResource(null);
-    Response response = resource.getVariables().addOrUpdateVariables(null);
+    Response response = new VariablesResource(null, Collections.<Locale> emptySet()).addOrUpdateVariables(null);
     Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 

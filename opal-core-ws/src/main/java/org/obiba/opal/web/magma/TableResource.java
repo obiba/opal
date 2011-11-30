@@ -25,6 +25,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.mozilla.javascript.Scriptable;
@@ -42,6 +43,7 @@ import org.obiba.magma.js.MagmaContext;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BooleanType;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
@@ -71,7 +73,8 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @Path("/variables")
-  public VariablesResource getVariables() {
+  public VariablesResource getVariables(@Context Request request) {
+    TimestampedResponses.evaluate(request, getValueTable());
     return new VariablesResource(getValueTable(), getLocales());
   }
 
@@ -173,7 +176,8 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @Path("/variable/{variable}")
-  public VariableResource getVariable(@PathParam("variable") String name) {
+  public VariableResource getVariable(@Context Request request, @PathParam("variable") String name) {
+    TimestampedResponses.evaluate(request, getValueTable());
     return getVariableResource(getValueTable().getVariableValueSource(name));
   }
 

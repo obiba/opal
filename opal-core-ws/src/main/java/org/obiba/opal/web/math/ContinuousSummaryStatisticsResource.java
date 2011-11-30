@@ -16,6 +16,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ContinuousDistribution;
@@ -32,6 +33,7 @@ import org.obiba.magma.VectorSource;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.math.stat.IntervalFrequency.Interval;
 import org.obiba.magma.type.IntegerType;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.Math.DescriptiveStatsDto;
 import org.obiba.opal.web.model.Math.IntervalFrequencyDto;
@@ -61,16 +63,19 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
 
   @GET
   @POST
-  public SummaryStatisticsDto compute(@QueryParam("d") @DefaultValue("normal") Distribution distribution, @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals) {
+  public Response compute(@QueryParam("d") @DefaultValue("normal") Distribution distribution, @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals) {
     List<Double> percentilesOrDefault = null;
     if(percentiles != null && !percentiles.isEmpty()) {
       percentilesOrDefault = percentiles;
     } else { // default
       percentilesOrDefault = ImmutableList.<Double> of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d, 90d, 95d, 99.5d, 99.95d);
     }
-    return SummaryStatisticsDto.newBuilder()//
+
+    SummaryStatisticsDto entity = SummaryStatisticsDto.newBuilder()//
     .setResource(getVariable().getName())//
     .setExtension(ContinuousSummaryDto.continuous, distribution.calc(getVariable().getValueType(), missing, getValues(), percentilesOrDefault, intervals).build()).build();
+
+    return TimestampedResponses.ok(getValueTable(), entity).build();
   }
 
   public enum Distribution {
