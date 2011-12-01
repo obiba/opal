@@ -7,11 +7,13 @@
 	ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
 	ui:generateLocales="default">
 
-	<g:FlowPanel ui:field="content">
-		<g:FlowPanel addStyleNames="footer">
-			<g:Button styleName="btn right-aligned" ui:field="closeButton">
-				<ui:msg description="Close label">Close</ui:msg>
-			</g:Button>
-		</g:FlowPanel>
-	</g:FlowPanel>
+	<g:DockLayoutPanel ui:field="content" unit="EM">
+		<g:south size="4">
+			<g:FlowPanel addStyleNames="footer">
+				<g:Button styleName="btn right-aligned top-margin" ui:field="closeButton">
+					<ui:msg description="Close label">Close</ui:msg>
+				</g:Button>
+			</g:FlowPanel>
+		</g:south>
+	</g:DockLayoutPanel>
 </ui:UiBinder>

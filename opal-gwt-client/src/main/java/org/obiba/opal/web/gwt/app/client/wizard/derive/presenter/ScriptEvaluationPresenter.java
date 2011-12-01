@@ -17,6 +17,8 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -162,9 +164,10 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   private void appendVariableSummaryArguments(StringBuilder link) {
     appendVariableLimitArguments(link);
 
-    // TODO refactor this, nature=categorical and distinct=true are not for all derived methods
-    link.append("&nature=categorical")//
-    .append("&distinct=true");
+    if(ValueType.TEXT.is(variable.getValueType()) && Variables.allCategoriesMissing(variable)) {
+      link.append("&nature=categorical")//
+      .append("&distinct=true");
+    }
   }
 
   private void appendVariableLimitArguments(StringBuilder link) {

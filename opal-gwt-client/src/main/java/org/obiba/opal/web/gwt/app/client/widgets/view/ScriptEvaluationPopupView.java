@@ -19,25 +19,25 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ScriptEvaluationPopupView extends DialogBox implements Display {
 
   @UiTemplate("ScriptEvaluationPopupView.ui.xml")
-  interface ViewUiBinder extends UiBinder<FlowPanel, ScriptEvaluationPopupView> {
+  interface ViewUiBinder extends UiBinder<DockLayoutPanel, ScriptEvaluationPopupView> {
   }
 
   private static String DIALOG_WIDTH = "45em";
 
-  private static String DIALOG_HEIGHT = "40em";
+  private static String DIALOG_HEIGHT = "45em";
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
 
   @UiField
-  FlowPanel content;
+  DockLayoutPanel content;
 
   @UiField
   Button closeButton;

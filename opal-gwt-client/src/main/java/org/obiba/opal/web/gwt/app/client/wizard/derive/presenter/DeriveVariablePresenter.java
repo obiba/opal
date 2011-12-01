@@ -29,11 +29,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -156,17 +156,17 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     if(valueType.equals("binary")) {
       // should not arrive here
       eventBus.fireEvent(NotificationEvent.newBuilder().error("Cannot categorize binary values.").build());
-    } else if(valueType.equals("text") && allCategoriesMissing(variable)) {
+    } else if(valueType.equals("text") && Variables.allCategoriesMissing(variable)) {
       derivationPresenter = openTextualPresenter;
     } else if(valueType.equals("integer") || valueType.equals("decimal")) {
       derivationPresenter = numericalPresenter;
     } else if(valueType.equals("date") || valueType.equals("datetime")) {
       derivationPresenter = temporalPresenter;
-    } else if(valueType.equals("text") && hasCategories(variable)) {
+    } else if(valueType.equals("text") && Variables.hasCategories(variable)) {
       derivationPresenter = categoricalPresenter;
     } else if(valueType.equals("boolean")) {
       derivationPresenter = booleanPresenter;
-    } else if(allCategoriesMissing(variable)) {
+    } else if(Variables.allCategoriesMissing(variable)) {
       derivationPresenter = openTextualPresenter;
     }
 
@@ -174,26 +174,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       derivationPresenter.initialize(variable);
       getDisplay().appendWizardSteps(derivationPresenter.getWizardSteps());
     }
-  }
-
-  // TODO maybe put in Util class or Variables class
-  public static boolean hasCategories(VariableDto variable) {
-    return variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0;
-  }
-
-  /**
-   * Return false if variableDto contains at least one non-missing category, otherwise true
-   * @param variableDto
-   * @return
-   */
-  // TODO maybe put in Util class or Variables class
-  public static boolean allCategoriesMissing(VariableDto variableDto) {
-    JsArray<CategoryDto> categoriesArray = variableDto.getCategoriesArray();
-    if(categoriesArray == null) return true;
-    for(int i = 0; i < categoriesArray.length(); i++) {
-      if(!categoriesArray.get(i).getIsMissing()) return false;
-    }
-    return true;
   }
 
   private void updateDatasources() {

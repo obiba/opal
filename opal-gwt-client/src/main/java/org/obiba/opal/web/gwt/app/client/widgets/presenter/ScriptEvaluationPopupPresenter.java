@@ -17,7 +17,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ValueTypeBox.ValueType;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

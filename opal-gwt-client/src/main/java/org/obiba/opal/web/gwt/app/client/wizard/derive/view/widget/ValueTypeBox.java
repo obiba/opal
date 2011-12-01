@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget;
 
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
+
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -36,7 +38,7 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
 
   private void populate() {
     for(ValueType valueType : ValueType.values()) {
-      addItem(valueType.label);
+      addItem(valueType.getLabel());
     }
   }
 
@@ -47,7 +49,7 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
 
   @Override
   public String getValue() {
-    return valueType.label;
+    return valueType.getLabel();
   }
 
   @Override
@@ -55,7 +57,7 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
     this.valueType = ValueType.valueOf(value.toUpperCase());
     for(int i = 0; i < getItemCount(); i++) {
       String text = getItemText(i);
-      if(text.equals(valueType.label)) {
+      if(text.equals(valueType.getLabel())) {
         setSelectedIndex(i);
         break;
       }
@@ -68,20 +70,6 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
       setValue(value);
     } else {
       this.valueType = ValueType.valueOf(value);
-    }
-  }
-
-  public enum ValueType {
-    TEXT, DECIMAL, INTEGER, BINARY, BOOLEAN, DATETIME, DATE, LOCALE;
-
-    String label;
-
-    private ValueType() {
-      label = name().toLowerCase();
-    }
-
-    public String getLabel() {
-      return label;
     }
   }
 
