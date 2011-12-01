@@ -20,6 +20,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ScriptEvaluationPopupView extends DialogBox implements Display {
@@ -77,7 +78,9 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
   }
 
   @Override
-  public void setScriptEvaluationWidget(Widget display) {
-    content.add(display);
+  public void addScriptEvaluationWidget(Widget display) {
+    ScrollPanel scroll = new ScrollPanel();
+    scroll.add(display);
+    content.add(scroll);
   }
 }
