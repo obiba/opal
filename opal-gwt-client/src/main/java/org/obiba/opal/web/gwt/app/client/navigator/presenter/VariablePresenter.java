@@ -51,10 +51,6 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   private VariableDto variable;
 
-  //
-  // Constructors
-  //
-
   /**
    * @param display
    * @param eventBus
@@ -106,10 +102,6 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   public void revealDisplay() {
   }
 
-  //
-  // Methods
-  //
-
   private void updateDisplay(TableDto table, VariableDto variableDto, VariableDto previous, VariableDto next) {
     if(variable == null || !isCurrentVariable(variableDto)) {
       variable = variableDto;
@@ -131,7 +123,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
       updateDerivedVariableDisplay(table);
 
-      authorize();
+      authorize(table);
     }
   }
 
@@ -149,12 +141,14 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     }
   }
 
-  private void authorize() {
+  private void authorize(TableDto table) {
     // summary
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getDisplay().getSummaryAuthorizer(), new SummaryUpdate())).send();
 
     // edit variable
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(getViewLink()).put().authorize(getDisplay().getEditAuthorizer()).send();
+    if(table.hasViewLink()) {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put().authorize(getDisplay().getEditAuthorizer()).send();
+    }
 
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
