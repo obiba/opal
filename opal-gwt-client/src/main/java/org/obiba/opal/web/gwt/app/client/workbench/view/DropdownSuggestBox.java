@@ -82,7 +82,7 @@ public class DropdownSuggestBox extends Composite implements HasText {
     return (MultiWordSuggestOracle) suggestBox.getSuggestOracle();
   }
 
-  private final class DropdownMultiWordSuggestOracle extends MultiWordSuggestOracle {
+  private static final class DropdownMultiWordSuggestOracle extends MultiWordSuggestOracle {
 
     private List<String> defaults = new ArrayList<String>();
 
