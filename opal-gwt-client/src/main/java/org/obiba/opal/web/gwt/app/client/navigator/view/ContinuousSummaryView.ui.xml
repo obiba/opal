@@ -48,8 +48,8 @@
       </tr>
     </table>
     <div id="plot-container">
-      <div id="histogram-plot" class="{style.plot}" style="width:400px"/>
-      <div id="normal-probability-plot" class="{style.plot}" style="width:400px"/>
+      <div ui:field="histogramElement" class="{style.plot}" style="width:400px"/>
+      <div ui:field="qqPlotElement" class="{style.plot}" style="width:400px"/>
     </div>
   </g:HTMLPanel>
 

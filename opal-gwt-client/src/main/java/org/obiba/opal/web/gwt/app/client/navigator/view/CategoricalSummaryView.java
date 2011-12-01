@@ -15,6 +15,7 @@ import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -39,6 +40,9 @@ public class CategoricalSummaryView extends Composite {
   @UiField
   Label mode;
 
+  @UiField
+  DivElement frequencyElement;
+
   final HTMLPanel widget;
 
   final JqPlot plot;
@@ -46,11 +50,13 @@ public class CategoricalSummaryView extends Composite {
   public CategoricalSummaryView(CategoricalSummaryDto categorical) {
     widget = uiBinder.createAndBindUi(this);
     initWidget(widget);
+    frequencyElement.setId(HTMLPanel.createUniqueId());
+
     obs.setText("" + categorical.getN());
     mode.setText(categorical.getMode());
 
     if(categorical.getFrequenciesArray() != null) {
-      FrequencyPlot freqPlot = new FrequencyPlot("frequency-plot");
+      FrequencyPlot freqPlot = new FrequencyPlot(frequencyElement.getId());
       for(int i = 0; i < categorical.getFrequenciesArray().length(); i++) {
         FrequencyDto value = categorical.getFrequenciesArray().get(i);
         if(value.hasValue()) {

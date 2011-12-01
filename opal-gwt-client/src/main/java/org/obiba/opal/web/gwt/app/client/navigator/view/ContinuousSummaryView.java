@@ -17,10 +17,12 @@ import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
 import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -68,6 +70,12 @@ public class ContinuousSummaryView extends Composite {
   @UiField
   Label sumsq;
 
+  @UiField
+  DivElement histogramElement;
+
+  @UiField
+  DivElement qqPlotElement;
+
   final Widget widget;
 
   final JqPlot histogram;
@@ -77,6 +85,9 @@ public class ContinuousSummaryView extends Composite {
   public ContinuousSummaryView(ContinuousSummaryDto continuous) {
     widget = uiBinder.createAndBindUi(this);
     initWidget(widget);
+    histogramElement.setId(HTMLPanel.createUniqueId());
+    qqPlotElement.setId(HTMLPanel.createUniqueId());
+
     obs.setText("" + continuous.getSummary().getN());
     max.setText("" + continuous.getSummary().getMax());
     min.setText("" + continuous.getSummary().getMin());
@@ -91,7 +102,7 @@ public class ContinuousSummaryView extends Composite {
 
     DescriptiveStatsDto ds = continuous.getSummary();
     if(ds.getVariance() > 0) {
-      HistogramPlot plot = new HistogramPlot("histogram-plot", ds.getMin(), ds.getMax());
+      HistogramPlot plot = new HistogramPlot(histogramElement.getId(), ds.getMin(), ds.getMax());
       if(continuous.getIntervalFrequencyArray() != null) {
         for(int i = 0; i < continuous.getIntervalFrequencyArray().length(); i++) {
           IntervalFrequencyDto value = continuous.getIntervalFrequencyArray().get(i);
@@ -99,7 +110,7 @@ public class ContinuousSummaryView extends Composite {
         }
       }
       histogram = plot;
-      NormalProbabilityPlot qqplot = new NormalProbabilityPlot("normal-probability-plot", ds.getMin(), ds.getMax());
+      NormalProbabilityPlot qqplot = new NormalProbabilityPlot(qqPlotElement.getId(), ds.getMin(), ds.getMax());
       qqplot.push(ds.getPercentilesArray(), continuous.getDistributionPercentilesArray());
       this.qqPlot = qqplot;
     } else {

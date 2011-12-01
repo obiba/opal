@@ -18,7 +18,7 @@
       </tr>
     </table>
     <div id="plot-container">
-      <div id="frequency-plot" class="{style.plot}" style="width:400px"/>
+      <div ui:field="frequencyElement" class="{style.plot}" style="width:400px"/>
     </div>
   </g:HTMLPanel>
 
