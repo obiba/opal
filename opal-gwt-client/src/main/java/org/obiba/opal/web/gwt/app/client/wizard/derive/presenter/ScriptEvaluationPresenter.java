@@ -34,7 +34,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 
 /**
@@ -137,24 +136,17 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     StringBuilder link = new StringBuilder(table.getLink()).append("/variable/_transient/summary?");
     appendVariableSummaryArguments(link);
 
-    String[] catsArray = null;
+    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
+    .forResource(link.toString()).withFormBody("script", script).post();
+
     if(variable != null) {
-      catsArray = new String[variable.getCategoriesArray().length() * 2];
       JsArray<CategoryDto> cats = variable.getCategoriesArray();
       if(cats != null) {
         for(int i = 0; i < cats.length(); i++) {
-          catsArray[2 * i] = "category";
-          catsArray[2 * i + 1] = URL.encodeQueryString(cats.get(i).getName());
+          requestBuilder.withFormBody("category", cats.get(i).getName());
         }
       }
     }
-
-    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
-    .forResource(link.toString()).post();
-    if(catsArray != null) {
-      requestBuilder.withFormBody(catsArray);
-    }
-    requestBuilder.withFormBody("script", script);
 
     summaryTabPresenter.setRequestBuilder(requestBuilder);
     summaryTabPresenter.forgetSummary();

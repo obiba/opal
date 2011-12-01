@@ -302,4 +302,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     return version;
   }
 
+  public String getUri() {
+    return uri;
+  }
+
 }

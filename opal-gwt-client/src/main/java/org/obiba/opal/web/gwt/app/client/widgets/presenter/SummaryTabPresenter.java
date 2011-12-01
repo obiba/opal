@@ -39,10 +39,6 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   }
 
-  // TODO: SummaryStatisticsDto should have a link. This was the purpose of its "resource" attribute, but is not
-  // complete.
-  private String resourceUri;
-
   private SummaryStatisticsDto summary;
 
   private Request summaryRequest;
@@ -75,11 +71,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
   @Override
   public void refreshDisplay() {
     if(hasSummaryOrPendingRequest() == false) {
-      if(resourceRequestBuilder != null) {
-        requestSummary(resourceRequestBuilder);
-      } else if(resourceUri != null) {
-        requestSummary(resourceUri);
-      }
+      requestSummary(resourceRequestBuilder);
     }
   }
 
@@ -94,32 +86,11 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   public void setResourceUri(String resourceUri) {
     cancelPendingSummaryRequest();
-    this.resourceUri = resourceUri;
+    this.resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder().forResource(resourceUri).get();
   }
 
   public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
     this.resourceRequestBuilder = resourceRequestBuilder;
-  }
-
-  /**
-   * @param selection
-   */
-  private void requestSummary(final String uri) {
-    getDisplay().requestingSummary();
-
-    summaryRequest = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
-    .forResource(uri).get()//
-    .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
-      @Override
-      public void onResource(Response response, SummaryStatisticsDto resource) {
-        if(resourceUri.equals(uri)) {
-          summary = resource;
-          getDisplay().renderSummary(resource);
-          eventBus.fireEvent(new SummaryReceivedEvent(uri, resource));
-        }
-      }
-
-    }).send();
   }
 
   private void requestSummary(final ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
@@ -130,6 +101,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
         if(SummaryTabPresenter.this.resourceRequestBuilder == resourceRequestBuilder) {
           summary = resource;
           getDisplay().renderSummary(resource);
+          eventBus.fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getUri(), resource));
         }
       }
     }).send();
@@ -152,7 +124,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     @Override
     public void onSummaryRequest(SummaryRequiredEvent event) {
       cancelPendingSummaryRequest();
-      resourceUri = event.getResourceUri();
+      setResourceUri(event.getResourceUri());
     }
 
   }

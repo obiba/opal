@@ -314,7 +314,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   private final class OriginalVariableSummaryReceivedHandler implements SummaryReceivedEvent.Handler {
     @Override
     public void onSummaryReceived(SummaryReceivedEvent event) {
-      if(event.getResourceUri().equals(originalVariable.getLink() + "/summary")) {
+      if(originalVariable != null && event.getResourceUri().equals(originalVariable.getLink() + "/summary")) {
         SummaryStatisticsDto dto = event.getSummary();
         if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
           ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
