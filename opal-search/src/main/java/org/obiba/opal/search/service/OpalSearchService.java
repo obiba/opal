@@ -61,6 +61,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   public void stop() {
     if(isRunning()) {
       esNode.close();
+      esNode = null;
     }
   }
 
