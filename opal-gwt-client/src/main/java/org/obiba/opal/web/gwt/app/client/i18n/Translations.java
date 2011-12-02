@@ -1119,4 +1119,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("Do you Create a Coding View")
   String confirmCreateCodingView();
 
+  @Description("Script Evaluation Failed Label")
+  @DefaultStringValue("Script evaluation on values failed, check if Type seems correct")
+  String scriptEvaluationFailed();
+
 }

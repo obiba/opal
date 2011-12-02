@@ -19,6 +19,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -42,6 +44,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvaluationPopupPresenter.Display> {
+
+  private static Translations translations = GWT.create(Translations.class);
 
   @Inject
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
@@ -110,40 +114,56 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
       .append(0)//
       .append("&valueType=" + variable.getValueType()) //
       .append("&repeatable=" + variable.getIsNewVariable()); //
+
+      ScriptEvaluationCallback callback = new ScriptEvaluationCallback(table, variable);
+
       // TODO maybe we can avoid this request (because also done values tab...)
       ResourceRequestBuilder<JsArray<ValueDto>> requestBuilder = ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
       .forResource(link.toString()).post().withFormBody("script", scriptToEvaluate) //
 
-      // On script evaluation failed
-      .withCallback(400, new ScriptEvaluationFail())
-
-      // On script evaluation success
-      .withCallback(200, new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          scriptEvaluationPresenter.setTable(table);
-          scriptEvaluationPresenter.setVariable(variable);
-          revealDisplay();
-        }
-      });
-      requestBuilder.accept("application/x-protobuf+json");
+      .withCallback(200, callback).withCallback(400, callback).withCallback(500, callback) //
+      .accept("application/x-protobuf+json");
       requestBuilder.send();
     }
   }
 
-  class ScriptEvaluationFail implements ResponseCodeCallback {
+  private class ScriptEvaluationCallback implements ResponseCodeCallback {
+    private final TableDto table;
+
+    private final VariableDto variable;
+
+    public ScriptEvaluationCallback(TableDto table, VariableDto variable) {
+      this.table = table;
+      this.variable = variable;
+    }
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      GWT.log(response.getStatusCode() + "");
+      switch(response.getStatusCode()) {
+      case Response.SC_OK:
+        scriptEvaluationPresenter.setTable(table);
+        scriptEvaluationPresenter.setVariable(variable);
+        revealDisplay();
+        break;
+      case Response.SC_BAD_REQUEST:
+        scriptInterpretationFail(response);
+        break;
+      default:
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
+        break;
+      }
+    }
+  }
 
-      // TODO copy/paste from evaluate script view. need to factorize in common method
-      ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-      if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
-        List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
-        for(JavaScriptErrorDto error : errors) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error("Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error.getMessage()).build());
-        }
+  private void scriptInterpretationFail(Response response) {
+
+    // TODO copy/paste from evaluate script view. need to factorize in common method
+    ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+    if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
+      List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
+      for(JavaScriptErrorDto error : errors) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error.getMessage()).build());
       }
     }
   }
