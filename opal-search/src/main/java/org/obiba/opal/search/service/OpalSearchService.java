@@ -44,9 +44,11 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   @Override
   public void start() {
-    ElasticSearchConfiguration esConfig = configService.getConfig();
-    esNode = NodeBuilder.nodeBuilder().client(true).settings(ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false)).clusterName(esConfig.getClusterName("opal")).client(esConfig.isDataNode() == false).node();
-    client = esNode.client();
+    if(!isRunning()) {
+      ElasticSearchConfiguration esConfig = configService.getConfig();
+      esNode = NodeBuilder.nodeBuilder().client(true).settings(ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false)).clusterName(esConfig.getClusterName("opal")).client(esConfig.isDataNode() == false).node();
+      client = esNode.client();
+    }
   }
 
   public Client getClient() {
@@ -62,6 +64,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
     if(isRunning()) {
       esNode.close();
       esNode = null;
+      client = null;
     }
   }
 
