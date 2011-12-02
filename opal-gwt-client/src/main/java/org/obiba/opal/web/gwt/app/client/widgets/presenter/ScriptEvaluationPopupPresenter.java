@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -100,9 +101,15 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
     @Override
     public void onScriptEvaluation(final ScriptEvaluationPopupEvent event) {
       final TableDto table = event.getTable();
-      final String scriptToEvaluate = Variables.getScript(event.getVariable());
-      StringBuilder link = new StringBuilder(table.getLink()).append("/variable/_transient/values?limit=").append(20).append("&offset=").append(0);
+      final VariableDto variable = event.getVariable();
 
+      final String scriptToEvaluate = Variables.getScript(variable);
+      StringBuilder link = new StringBuilder(table.getLink()).append("/variable/_transient/values?limit=")//
+      .append(20)//
+      .append("&offset=")//
+      .append(0)//
+      .append("&valueType=" + variable.getValueType()) //
+      .append("&repeatable=" + variable.getIsNewVariable()); //
       // TODO maybe we can avoid this request (because also done values tab...)
       ResourceRequestBuilder<JsArray<ValueDto>> requestBuilder = ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
       .forResource(link.toString()).post().withFormBody("script", scriptToEvaluate) //
@@ -116,10 +123,11 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
         @Override
         public void onResponseCode(Request request, Response response) {
           scriptEvaluationPresenter.setTable(table);
-          scriptEvaluationPresenter.setVariable(event.getVariable());
+          scriptEvaluationPresenter.setVariable(variable);
           revealDisplay();
         }
       });
+      requestBuilder.accept("application/x-protobuf+json");
       requestBuilder.send();
     }
   }
