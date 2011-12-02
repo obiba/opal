@@ -25,17 +25,8 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
 
   private TableDto table;
 
-  private Mode mode;
-
   public ScriptEvaluationPopupEvent(VariableDto variable, TableDto table) {
-    mode = Mode.VARIABLE;
     this.variable = variable;
-    this.table = table;
-  }
-
-  public ScriptEvaluationPopupEvent(String script, TableDto table) {
-    mode = Mode.SCRIPT;
-    this.script = script;
     this.table = table;
   }
 
@@ -67,18 +58,6 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
 
   public VariableDto getVariable() {
     return variable;
-  }
-
-  private enum Mode {
-    VARIABLE, SCRIPT;
-  }
-
-  public boolean isVariableMode() {
-    return mode == Mode.VARIABLE;
-  }
-
-  public boolean isScriptMode() {
-    return mode == Mode.SCRIPT;
   }
 
 }

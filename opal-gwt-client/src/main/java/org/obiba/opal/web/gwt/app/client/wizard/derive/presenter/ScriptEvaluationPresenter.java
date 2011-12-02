@@ -15,14 +15,12 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
@@ -79,30 +77,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     this.variable = variable;
     this.valueType = variable.getValueType();
     this.repeatable = variable.getIsRepeatable();
-    this.script = getScript(variable);
-  }
-
-  /**
-   * Set script and value type manually.
-   * @param valueType
-   * @param script
-   */
-  public void setScript(String valueType, String script, boolean repeatable) {
-    this.variable = null;
-    this.valueType = valueType;
-    this.repeatable = repeatable;
-    this.script = script;
-  }
-
-  private String getScript(VariableDto derived) {
-    AttributeDto scriptAttr = null;
-    for(AttributeDto attr : JsArrays.toIterable(JsArrays.toSafeArray(derived.getAttributesArray()))) {
-      if(attr.getName().equals("script")) {
-        scriptAttr = attr;
-        break;
-      }
-    }
-    return scriptAttr != null ? scriptAttr.getValue() : "null";
+    this.script = Variables.getScript(variable);
   }
 
   private void populateValues(final int offset) {
@@ -114,7 +89,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     .append("&offset=").append(offset).append("&");
     appendVariableLimitArguments(link);
     ResourceRequestBuilder<JsArray<ValueDto>> requestBuilder = ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
-    .forResource(link.toString()).post() //
+    .forResource(link.toString()).post().withFormBody("script", script) //
     .withCallback(new ResourceCallback<JsArray<ValueDto>>() {
 
       @Override
@@ -128,7 +103,6 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
       }
 
     });
-    requestBuilder.withFormBody("script", script);
     requestBuilder.send();
   }
 

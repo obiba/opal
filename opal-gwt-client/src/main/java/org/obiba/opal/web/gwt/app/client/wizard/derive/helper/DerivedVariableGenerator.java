@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -220,25 +221,11 @@ public abstract class DerivedVariableGenerator {
   }
 
   public static void setScript(VariableDto derived, String script) {
-    AttributeDto scriptAttr = getScriptAttribute(derived);
-    scriptAttr.setValue(script);
+    Variables.setScript(derived, script);
   }
 
   public static AttributeDto getScriptAttribute(VariableDto derived) {
-    AttributeDto scriptAttr = null;
-    for(AttributeDto attr : JsArrays.toIterable(derived.getAttributesArray())) {
-      if(attr.getName().equals("script")) {
-        scriptAttr = attr;
-        break;
-      }
-    }
-    if(scriptAttr == null) {
-      scriptAttr = AttributeDto.create();
-      scriptAttr.setName("script");
-      scriptAttr.setValue("null");
-      derived.getAttributesArray().push(scriptAttr);
-    }
-    return scriptAttr;
+    return Variables.getScriptAttribute(derived);
   }
 
   public static AttributeDto newLabelAttribute(ValueMapEntry entry) {

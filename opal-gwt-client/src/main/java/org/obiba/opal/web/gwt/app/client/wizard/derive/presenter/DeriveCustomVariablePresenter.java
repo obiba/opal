@@ -21,6 +21,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEven
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -62,11 +64,13 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
         @Override
         public void onResource(Response response, TableDto table) {
           String selectedScript = display.getScriptBox().getSelectedScript();
-          if(Strings.isNullOrEmpty(selectedScript)) {
-            eventBus.fireEvent(new ScriptEvaluationPopupEvent(getDerivedVariable(), table));
-          } else {
-            eventBus.fireEvent(new ScriptEvaluationPopupEvent(selectedScript, table));
+          VariableDto variable = getDerivedVariable();
+          if(!Strings.isNullOrEmpty(selectedScript)) {
+            variable.setValueType(ValueType.TEXT.getLabel());
+            variable.setIsRepeatable(false);
+            Variables.setScript(variable, selectedScript);
           }
+          eventBus.fireEvent(new ScriptEvaluationPopupEvent(variable, table));
         }
       }).send();
     }
