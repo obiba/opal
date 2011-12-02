@@ -77,7 +77,7 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   @UiField
   ListBox datasourceNameBox;
 
-  @UiField(provided = true)
+  @UiField
   DropdownSuggestBox viewNameBox;
 
   @UiField
@@ -94,7 +94,6 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   private Map<String, List<String>> viewSuggestions;
 
   public DeriveVariableView() {
-    this.viewNameBox = new DropdownSuggestBox();
     this.dialog = uiBinder.createAndBindUi(this);
 
     datasourceNameBox.addChangeHandler(new ChangeHandler() {
@@ -105,7 +104,6 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
         for(String viewName : viewSuggestions.get(getDatasourceName())) {
           viewNameBox.getSuggestOracle().add(viewName);
         }
-        // viewNameBox.setText("");
       }
     });
   }
