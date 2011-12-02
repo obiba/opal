@@ -51,4 +51,6 @@ public interface ResourceRequestBuilder<T extends JavaScriptObject> {
 
   public String getUri();
 
+  public String getResource();
+
 }

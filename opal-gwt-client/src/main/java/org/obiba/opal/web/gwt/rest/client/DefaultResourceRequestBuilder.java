@@ -43,6 +43,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   private static String version;
 
+  private String resource;
+
   private String uri;
 
   private String contentType;
@@ -77,6 +79,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   public DefaultResourceRequestBuilder<T> forResource(String resource) {
     if(resource == null) throw new IllegalArgumentException("path cannot be null");
+    this.resource = resource;
     this.uri = resource.startsWith("http") ? resource : OPAL_WS_ROOT + resource;
     return this;
   }
@@ -306,4 +309,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     return uri;
   }
 
+  public String getResource() {
+    return resource;
+  }
 }

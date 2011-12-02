@@ -101,7 +101,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
         if(SummaryTabPresenter.this.resourceRequestBuilder == resourceRequestBuilder) {
           summary = resource;
           getDisplay().renderSummary(resource);
-          eventBus.fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getUri(), resource));
+          eventBus.fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
         }
       }
     }).send();
