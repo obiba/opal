@@ -5,42 +5,26 @@
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
-  
-  	<ui:style>
-    	.width-height {width:500px;height:300px}
-  	</ui:style>
-  	
+    	
   	<g:FlowPanel> 
 	     <o:WizardStep ui:field="deriveStep">
-	      <g:Grid>
-              <g:row>
-                <g:customCell styleName="top">
-                  <g:FlowPanel styleName="input block">
-                  	<g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg></g:Label>
-                  	<o2:ValueTypeBox ui:field="valueTypeBox" />
-                  </g:FlowPanel> 
-                </g:customCell>
-              </g:row>
-              <g:row>
-                <g:customCell styleName="top">
-              		<g:CheckBox ui:field="repeatable"><ui:msg description="Repeatable label">Repeatable</ui:msg></g:CheckBox>
-                </g:customCell>
-              </g:row>
-          </g:Grid>
-          <g:Grid>
-          	 <g:row>
-                <g:customCell styleName="top right-aligned">
-  					<g:Button ui:field="testButton" styleName="btn" >
-  					<img src="image/20/job.png" /><ui:msg description="Test label">Test</ui:msg>
-  					</g:Button>
-                </g:customCell>
-             </g:row>
-          	 <g:row>
-          	 	<g:customCell styleName="top">
-     				<o2:ScriptSuggestBox ui:field="scriptBox" addStyleNames="{style.width-height}"/>
-     			</g:customCell>
-          	 </g:row>
-          </g:Grid>
+	     <g:FlowPanel>
+	       <g:FlowPanel styleName="input">
+             <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg></g:Label>
+             <o2:ValueTypeBox ui:field="valueTypeBox" />
+           </g:FlowPanel>
+           <g:FlowPanel styleName="input">
+             <g:CheckBox ui:field="repeatable" addStyleNames="key"><ui:msg description="Repeatable label">Repeatable</ui:msg></g:CheckBox>
+           </g:FlowPanel>
+           <g:FlowPanel styleName="input">
+             <g:Label addStyleNames="key"><ui:msg description="Script label">Script</ui:msg></g:Label>
+             <o2:ScriptSuggestBox ui:field="scriptBox" addStyleNames="x-high full-width"/>
+             <g:Label styleName="help-block inline"><ui:msg description="Script Help label">Edit the script and test it. Or select a portion of the script and test it.</ui:msg></g:Label>
+             <g:Button ui:field="testButton" addStyleNames="btn info right-aligned" >
+  		       <ui:msg description="Test label">Test</ui:msg>
+  		     </g:Button>
+  		   </g:FlowPanel>
+	     </g:FlowPanel>
 	     </o:WizardStep>
     </g:FlowPanel>
     
