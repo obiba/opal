@@ -25,7 +25,9 @@
     
     <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
     <g:FlowPanel>
-      <pretty:PrettyPrintLabel ui:field="script"/>
+      <g:InlineLabel addStyleNames="key"><ui:msg description="Value Type label">Value Type</ui:msg>: </g:InlineLabel>
+      <g:InlineLabel ui:field="valueType" addStyleNames="small-indent"></g:InlineLabel>
+      <pretty:PrettyPrintLabel ui:field="script" addStyleNames="top-margin"/>
     </g:FlowPanel>
          
   </o:HorizontalTabLayout>
