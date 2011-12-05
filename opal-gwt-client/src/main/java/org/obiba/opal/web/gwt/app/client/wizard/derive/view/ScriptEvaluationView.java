@@ -69,6 +69,9 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   HorizontalTabLayout tabs;
 
   @UiField
+  Label valueType;
+
+  @UiField
   PrettyPrintLabel script;
 
   public ScriptEvaluationView() {
@@ -96,6 +99,11 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
     dataProvider.addDataDisplay(valuesTable);
     dataProvider.setArray(JsArrays.toSafeArray(values));
     dataProvider.refresh();
+  }
+
+  @Override
+  public void setValueType(String type) {
+    valueType.setText(type);
   }
 
   @Override

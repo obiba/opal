@@ -10,7 +10,7 @@
 	     <o:WizardStep ui:field="deriveStep">
 	     <g:FlowPanel>
 	       <g:FlowPanel styleName="input">
-             <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg></g:Label>
+             <g:Label addStyleNames="key"><ui:msg description="Value Type label">Value Type</ui:msg></g:Label>
              <o2:ValueTypeBox ui:field="valueTypeBox" />
            </g:FlowPanel>
            <g:FlowPanel styleName="input">

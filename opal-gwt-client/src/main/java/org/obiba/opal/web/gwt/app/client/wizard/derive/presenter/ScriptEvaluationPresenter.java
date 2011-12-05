@@ -81,6 +81,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   }
 
   private void populateValues(final int offset) {
+    getDisplay().setValueType(valueType);
     getDisplay().setScript(script);
     getDisplay().populateValues(null);
     currentOffset = offset;
@@ -212,6 +213,8 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     void setSummaryTabWidget(WidgetDisplay widget);
 
     void populateValues(JsArray<ValueDto> values);
+
+    void setValueType(String type);
 
     void setScript(String text);
 
