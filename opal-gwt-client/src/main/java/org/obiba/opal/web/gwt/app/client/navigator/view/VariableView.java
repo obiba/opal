@@ -398,6 +398,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
     noScript.setVisible(derived && value.length() == 0);
     script.setVisible(derived && value.length() > 0);
     script.setText(value);
+    if(toolbar.getEditItem() != null) {
+      toolbar.getEditItem().setVisible(derived);
+    }
   }
 
   @Override
