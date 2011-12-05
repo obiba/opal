@@ -19,8 +19,6 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
 
   private static Type<Handler> TYPE = new Type<Handler>();
 
-  private String script;
-
   private VariableDto variable;
 
   private TableDto table;
@@ -46,10 +44,6 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
 
   public interface Handler extends EventHandler {
     public void onScriptEvaluation(ScriptEvaluationPopupEvent scriptEvaluationEvent);
-  }
-
-  public String getScript() {
-    return script;
   }
 
   public TableDto getTable() {
