@@ -34,6 +34,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
@@ -97,8 +98,9 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     getDisplay().populateValues(null);
     currentOffset = offset;
 
-    StringBuilder link = new StringBuilder(table.getLink())//
-    .append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
+    StringBuilder link = new StringBuilder();
+    appendTable(link);
+    link.append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
     .append("&offset=").append(offset).append("&");
     appendVariableLimitArguments(link);
 
@@ -113,8 +115,10 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
   private void requestSummary() {
     String script = Variables.getScript(variable);
+    StringBuilder link = new StringBuilder();
 
-    StringBuilder link = new StringBuilder(table.getLink()).append("/variable/_transient/summary?");
+    appendTable(link);
+    link.append("/variable/_transient/summary?");
     appendVariableSummaryArguments(link);
 
     ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
@@ -158,6 +162,17 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   private void appendVariableLimitArguments(StringBuilder link) {
     link.append("valueType=" + variable.getValueType()) //
     .append("&repeatable=" + variable.getIsRepeatable()); //
+  }
+
+  private void appendTable(StringBuilder link) {
+    if(!Strings.isNullOrEmpty(table.getViewLink())) {
+      // OPAL-879
+      link.append(table.getViewLink()).append("/from");
+    } else if(!Strings.isNullOrEmpty(table.getLink())) {
+      link.append(table.getLink());
+    } else {
+      link.append("/datasource/").append(table.getDatasourceName()).append("/table/").append(table.getName());
+    }
   }
 
   //

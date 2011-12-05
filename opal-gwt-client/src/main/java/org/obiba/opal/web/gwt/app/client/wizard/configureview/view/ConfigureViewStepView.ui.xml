@@ -12,7 +12,7 @@
   
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
     <g:caption><ui:msg description="Configure View title">Configure View</ui:msg></g:caption>
-	 <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="40em" width="60em">
+	 <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="60em" width="60em">
     <g:center>
 		<g:ScrollPanel>
 			<g:FlowPanel addStyleNames="{style.content-margin}">
@@ -72,7 +72,7 @@
       <g:FlowPanel addStyleNames="footer">
         
           <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
-          <g:Button ui:field="close" styleName="btn right-aligned top-margin info">
+          <g:Button ui:field="close" styleName="btn right-aligned top-margin">
             <ui:msg description="Close label">Close</ui:msg>
           </g:Button>
           <g:Button ui:field="help" styleName="btn left-aligned top-margin small-indent">

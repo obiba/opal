@@ -42,7 +42,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequ
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.VariablesListTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -143,8 +142,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   @Override
   protected void onBind() {
     scriptWidget.bind();
-    scriptWidget.setEvaluationMode(Mode.ENTITY_VALUE);
-    scriptWidget.setTableIsView(true);
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
     categoriesPresenter.bind();
@@ -205,10 +202,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     TableDto tableDto = TableDto.create();
     tableDto.setDatasourceName(viewDto.getDatasourceName());
     tableDto.setName(viewDto.getName());
+    tableDto.setViewLink("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName());
     scriptWidget.setTable(tableDto);
-    scriptWidget.getDisplay().showResults(false);
-    scriptWidget.getDisplay().clearResults();
-    scriptWidget.getDisplay().showPaging(false);
 
     getDisplay().saveChangesEnabled(false);
 
@@ -246,9 +241,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private void updateSelectedVariableName() {
     if(!getVariableList().isEmpty()) {
-      // OPAL-965: Clear script results when navigating to a different variable.
-      scriptWidget.getDisplay().clearResults();
-
       getDisplay().setSelectedVariableName(displayedVariableName, getPreviousVariableName(), getNextVariableName());
       eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(getVariableList().get(getVariableIndex(displayedVariableName))));
     }
@@ -431,8 +423,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     String getScript();
 
-    HasText getScriptText();
-
     HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler);
 
     void saveChangesEnabled(boolean enabled);
@@ -588,19 +578,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       } else {
         // Validate current variable and save to variable list.
         if(validate()) {
-          scriptWidget.evaluateScript(new ResponseCodeCallback() {
-
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              int statusCode = response.getStatusCode();
-              if(statusCode == Response.SC_OK) {
-                updateViewDto();
-                refreshVariableSuggestions();
-              } else {
-                eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.scriptContainsErrorsAndWasNotSaved()).build());
-              }
-            }
-          });
+          updateViewDto();
+          refreshVariableSuggestions();
         }
       }
     }

@@ -29,8 +29,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePend
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Mode;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -41,9 +39,6 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -93,8 +88,6 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
   @Override
   protected void onBind() {
     scriptWidget.bind();
-    scriptWidget.setEvaluationMode(Mode.VARIABLE);
-    scriptWidget.setTableIsView(true);
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
     getDisplay().saveChangesEnabled(false);
@@ -137,9 +130,6 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     tableDto.setDatasourceName(viewDto.getDatasourceName());
     tableDto.setName(viewDto.getName());
     scriptWidget.setTable(tableDto);
-    scriptWidget.getDisplay().showResults(false);
-    scriptWidget.getDisplay().clearResults();
-    scriptWidget.getDisplay().showPaging(false);
 
     JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
     if(jsViewDto != null && jsViewDto.hasSelect()) {
@@ -195,8 +185,6 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     String getScript();
 
-    HasText getScriptText();
-
     void setVariablesToView(VariablesToView scriptOrAll);
 
     VariablesToView getVariablesToView();
@@ -227,24 +215,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     @Override
     public void onClick(ClickEvent event) {
       if(validate()) {
-        if(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT)) {
-          // Test the script. If ok, update the ViewDto.
-          scriptWidget.evaluateScript(new ResponseCodeCallback() {
-
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              int statusCode = response.getStatusCode();
-              if(statusCode == Response.SC_OK) {
-                updateViewDto();
-              } else {
-                eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.scriptContainsErrorsAndWasNotSaved()).build());
-              }
-            }
-          });
-        } else {
-          // No script ("all" option selected), so just update the ViewDto.
-          updateViewDto();
-        }
+        updateViewDto();
       }
     }
 

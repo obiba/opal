@@ -73,7 +73,7 @@
       </table>
     </g:HTMLPanel>
     
-    <o:HorizontalTabLayout ui:field="variableDetailTabs">
+    <o:HorizontalTabLayout ui:field="variableDetailTabs" addStyleNames="top-margin">
         <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
         <g:SimplePanel ui:field="scriptWidgetPanel" addStyleNames="small-top-margin"/>
     

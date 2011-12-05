@@ -41,6 +41,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
@@ -108,7 +109,7 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   TextBox unit;
 
   @UiField
-  HTMLPanel form;
+  Panel form;
 
   MultiWordSuggestOracle suggestions;
 
@@ -442,11 +443,6 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   @Override
   public HandlerRegistration addMimeTypeChangedHandler(ChangeHandler changeHandler) {
     return mimeType.addChangeHandler(changeHandler);
-  }
-
-  @Override
-  public HasText getScriptText() {
-    return scriptWidgetDisplay.getScriptText();
   }
 
   @Override

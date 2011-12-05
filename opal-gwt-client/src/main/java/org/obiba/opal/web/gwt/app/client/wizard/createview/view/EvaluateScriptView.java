@@ -9,74 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Result;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
-import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DisclosurePanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
 
 public class EvaluateScriptView extends Composite implements EvaluateScriptPresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static Translations translations = GWT.create(Translations.class);
 
   @UiField
   TextArea scriptArea;
 
   @UiField
   Button testScript;
-
-  @UiField
-  VerticalPanel testResults;
-
-  @UiField
-  DisclosurePanel resultsPanel;
-
-  @UiField
-  Anchor previousPage;
-
-  @UiField
-  Anchor nextPage;
-
-  @UiField
-  Label pageItemType;
-
-  @UiField
-  Label pageLimit;
-
-  @UiField
-  HTMLPanel paging;
-
-  CellTable<Result> resultTable;
 
   public EvaluateScriptView() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -114,88 +69,15 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     return scriptArea.getText();
   }
 
-  @Override
-  public void addResults(List<Result> results) {
-    populateResultsTable(results, resultTable);
-    testResults.add(resultTable);
-  }
-
-  @Override
-  public void clearResults() {
-    testResults.clear();
-  }
-
-  @Override
-  public void setTestVariableCount(int count) {
-    testResults.add(new Label("Variables: " + count));
-  }
-
-  @Override
-  public void setTestEntityCount(int count) {
-    testResults.add(new Label("Entities: " + count));
-  }
-
-  private void populateResultsTable(final List<Result> results, CellTable<Result> table) {
-    ListDataProvider<Result> dataProvider = new ListDataProvider<Result>();
-    dataProvider.addDataDisplay(table);
-    dataProvider.setList(results);
-    dataProvider.refresh();
-  }
-
   public String getSelectedScript() {
-    return scriptArea.getSelectedText();
-  }
-
-  @Override
-  public int[] getSelectedScriptRange() {
-    return new int[] { scriptArea.getCursorPos(), scriptArea.getSelectionLength() };
-  }
-
-  @Override
-  public void setSelectedScriptRange(int[] selected) {
-    scriptArea.setFocus(true);
-    scriptArea.setSelectionRange(selected[0], selected[1]);
-  }
-
-  @Override
-  public void initializeResultTable() {
-    resultTable = new Table<EvaluateScriptPresenter.Result>();
-    resultTable.setWidth("100%");
-  }
-
-  @Override
-  public void addVariableColumn() {
-    resultTable.addColumn(new TextColumn<Result>() {
-      @Override
-      public String getValue(Result result) {
-        return result.getVariable().getName();
-      }
-    }, translations.variableLabel());
-  }
-
-  @Override
-  public void addValueColumn() {
-    resultTable.addColumn(new TextColumn<Result>() {
-      @Override
-      public String getValue(Result result) {
-        return result.getValue().getValue();
-      }
-    }, translations.valueLabel());
-  }
-
-  @Override
-  public void showResults(boolean visible) {
-    resultsPanel.setOpen(visible);
-  }
-
-  @Override
-  public void showErrorMessage(ClientErrorDto errorDto) {
-    if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
-      List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
-      for(JavaScriptErrorDto error : errors) {
-        testResults.add(new Label("Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error.getMessage()));
-      }
+    int start = scriptArea.getCursorPos();
+    if(start < 0) {
+      return "";
     }
+    int length = scriptArea.getSelectionLength();
+    String selected = scriptArea.getText().substring(start, start + length);
+    GWT.log("selected=" + selected);
+    return selected;
   }
 
   @Override
@@ -208,66 +90,6 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
     scriptArea.setText(script);
   }
 
-  @SuppressWarnings("unchecked")
-  private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
-    List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
-
-    JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
-    if(errors != null) {
-      for(int i = 0; i < errors.length(); i++) {
-        javaScriptErrors.add(errors.get(i));
-      }
-    }
-
-    return javaScriptErrors;
-  }
-
-  @Override
-  public HandlerRegistration addNextPageClickHandler(ClickHandler handler) {
-    return nextPage.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addPreviousPageClickHandler(ClickHandler handler) {
-    return previousPage.addClickHandler(handler);
-  }
-
-  @Override
-  public void showPaging(boolean visible) {
-    paging.setVisible(visible);
-  }
-
-  @Override
-  public void setPaging(int start, int end) {
-    pageLimit.setText("(" + start + " " + translations.toLabel() + " " + end + ")");
-  }
-
-  @Override
-  public void setItemTypeVariables() {
-    pageItemType.setText(translations.variablesLabel());
-
-  }
-
-  @Override
-  public void setItemTypeValues() {
-    pageItemType.setText(translations.valuesLabel());
-  }
-
-  @Override
-  public HandlerRegistration addResultsOpenHandler(OpenHandler openHandler) {
-    return resultsPanel.addOpenHandler(openHandler);
-  }
-
-  @Override
-  public HandlerRegistration addResultsCloseHandler(CloseHandler closeHandler) {
-    return resultsPanel.addCloseHandler(closeHandler);
-  }
-
-  @Override
-  public HasText getScriptText() {
-    return scriptArea;
-  }
-
   @Override
   public void formEnable(boolean enabled) {
     scriptArea.setEnabled(enabled);
@@ -277,6 +99,5 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   @Override
   public void formClear() {
     scriptArea.setText("");
-    clearResults();
   }
 }

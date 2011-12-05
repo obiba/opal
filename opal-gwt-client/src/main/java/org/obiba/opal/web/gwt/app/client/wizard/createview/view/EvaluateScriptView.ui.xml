@@ -8,34 +8,14 @@
     <table class="full-width">
       <tr>
         <td colspan="2">
-          <g:TextArea ui:field="scriptArea" addStyleNames="not-so-full-width"/>
+          <g:TextArea ui:field="scriptArea" addStyleNames="x-high full-width"/>
         </td>
       </tr>
       <tr>
         <td>
-		  <g:HTMLPanel addStyleNames="paging" visible="false" ui:field="paging">
-		    <div class="pagingInfo">
-		      <g:Label ui:field="pageItemType"/>
-		      <g:Label ui:field="pageLimit"/>
-		    </div>
-		    <div class="pagingActions">
-		      <g:Anchor ui:field="previousPage"><img src="image/16/previous.png" align="middle"/></g:Anchor>
-		      <g:Anchor ui:field="nextPage"><img src="image/16/next.png" align="middle"/></g:Anchor>
-		    </div>
-		  </g:HTMLPanel>
         </td>
         <td align="right">
-          <g:Button ui:field="testScript" styleName="btn"><ui:msg description="Test button label">Test</ui:msg></g:Button>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <g:DisclosurePanel ui:field="resultsPanel" addStyleNames="resultsPanel not-so-full-width">
-            <g:customHeader>
-             <g:Label><ui:msg description="Results label">Results</ui:msg></g:Label>
-            </g:customHeader>
-            <g:VerticalPanel ui:field="testResults" width="100%" height="23em"/>
-          </g:DisclosurePanel>
+          <g:Button ui:field="testScript" styleName="btn info"><ui:msg description="Test button label">Test</ui:msg></g:Button>
         </td>
       </tr>
     </table>

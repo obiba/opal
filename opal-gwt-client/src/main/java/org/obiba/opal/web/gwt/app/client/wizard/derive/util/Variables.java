@@ -64,6 +64,8 @@ public class Variables {
       scriptAttr = AttributeDto.create();
       scriptAttr.setName("script");
       scriptAttr.setValue("null");
+      // make sure attributes array is defined
+      derived.setAttributesArray(JsArrays.toSafeArray(derived.getAttributesArray()));
       derived.getAttributesArray().push(scriptAttr);
     }
     return scriptAttr;
