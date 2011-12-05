@@ -822,7 +822,7 @@ margin-left:0.8em;
 .navigator pre.prettyprint, .main pre.prettyprint {
   border: 1px dashed #CCCCCC;
   padding:10px;
-  margin:0;
+  margin-bottom:0;
 }
 
 .navigator .tableList td:first-child  {
