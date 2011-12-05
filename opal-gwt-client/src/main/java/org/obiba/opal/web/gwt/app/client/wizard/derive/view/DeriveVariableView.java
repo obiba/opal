@@ -276,4 +276,9 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
     }
   }
 
+  @Override
+  public void setScriptEvaluationSuccess(boolean success) {
+    dialog.setNextEnabled(success);
+  }
+
 }

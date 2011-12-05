@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -215,6 +216,18 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     deriveCustomVariablePresenter.bind();
 
     scriptEvaluationPresenter.bind();
+    scriptEvaluationPresenter.setScriptEvaluationCallback(new ScriptEvaluationCallback() {
+
+      @Override
+      public void onSuccess(VariableDto variable) {
+        getDisplay().setScriptEvaluationSuccess(true);
+      }
+
+      @Override
+      public void onFailure(VariableDto variable) {
+        getDisplay().setScriptEvaluationSuccess(false);
+      }
+    });
     getDisplay().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay());
     getDisplay().setScriptEvaluationStepInHandler(new ScriptEvaluationStepInHandler());
     addEventHandlers();
@@ -544,6 +557,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
   public interface Display extends WidgetDisplay {
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
+
+    void setScriptEvaluationSuccess(boolean success);
 
     void addViewSuggestion(DatasourceDto ds, String viewName);
 

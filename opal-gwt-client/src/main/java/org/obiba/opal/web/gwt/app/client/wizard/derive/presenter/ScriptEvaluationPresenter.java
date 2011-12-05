@@ -9,28 +9,38 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
@@ -39,6 +49,8 @@ import com.google.inject.Inject;
  */
 public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationPresenter.Display> {
 
+  private static Translations translations = GWT.create(Translations.class);
+
   public static final int PAGE_SIZE = 20;
 
   @Inject
@@ -46,15 +58,11 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
   private VariableDto variable;
 
-  private String script;
-
-  private String valueType;
-
   private TableDto table;
 
   private int currentOffset;
 
-  private boolean repeatable;
+  private ScriptEvaluationCallback scriptEvaluationCallback;
 
   //
   // Constructors
@@ -75,44 +83,43 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
    */
   public void setVariable(VariableDto variable) {
     this.variable = variable;
-    this.valueType = variable.getValueType();
-    this.repeatable = variable.getIsRepeatable();
-    this.script = Variables.getScript(variable);
+  }
+
+  public void setScriptEvaluationCallback(ScriptEvaluationCallback scriptEvaluationCallback) {
+    this.scriptEvaluationCallback = scriptEvaluationCallback;
   }
 
   private void populateValues(final int offset) {
-    getDisplay().setValueType(valueType);
+    String script = Variables.getScript(variable);
+
+    getDisplay().setValueType(variable.getValueType());
     getDisplay().setScript(script);
     getDisplay().populateValues(null);
     currentOffset = offset;
+
     StringBuilder link = new StringBuilder(table.getLink())//
     .append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
     .append("&offset=").append(offset).append("&");
     appendVariableLimitArguments(link);
+
+    ValuesRequestCallback callback = new ValuesRequestCallback(offset);
+
     ResourceRequestBuilder<JsArray<ValueDto>> requestBuilder = ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
     .forResource(link.toString()).post().withFormBody("script", script) //
-    .withCallback(new ResourceCallback<JsArray<ValueDto>>() {
-
-      @Override
-      public void onResource(Response response, JsArray<ValueDto> resource) {
-        int high = offset + PAGE_SIZE;
-        if(resource != null && resource.length() < high) {
-          high = offset + resource.length();
-        }
-        getDisplay().setPageLimits(offset + 1, high, table.getValueSetCount());
-        getDisplay().populateValues(resource);
-      }
-
-    });
+    .withCallback(200, callback).withCallback(400, callback).withCallback(500, callback)//
+    .accept("application/x-protobuf+json");
     requestBuilder.send();
   }
 
   private void requestSummary() {
+    String script = Variables.getScript(variable);
+
     StringBuilder link = new StringBuilder(table.getLink()).append("/variable/_transient/summary?");
     appendVariableSummaryArguments(link);
 
     ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
-    .forResource(link.toString()).withFormBody("script", script).post();
+    .forResource(link.toString()).withFormBody("script", script).post()//
+    .accept("application/x-protobuf+json");
 
     if(variable != null) {
       JsArray<CategoryDto> cats = variable.getCategoriesArray();
@@ -122,6 +129,17 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
         }
       }
     }
+
+    // No-op because already handled by the values request
+    ResponseCodeCallback noOpCallback = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+
+      }
+    };
+
+    requestBuilder.withCallback(400, noOpCallback).withCallback(500, noOpCallback);
 
     summaryTabPresenter.setRequestBuilder(requestBuilder);
     summaryTabPresenter.forgetSummary();
@@ -138,8 +156,8 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   }
 
   private void appendVariableLimitArguments(StringBuilder link) {
-    link.append("valueType=" + valueType) //
-    .append("&repeatable=" + repeatable); //
+    link.append("valueType=" + variable.getValueType()) //
+    .append("&repeatable=" + variable.getIsRepeatable()); //
   }
 
   //
@@ -186,6 +204,71 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   // Inner classes and Interfaces
   //
 
+  private final class ValuesRequestCallback implements ResponseCodeCallback {
+    private final int offset;
+
+    private ValuesRequestCallback(int offset) {
+      this.offset = offset;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      boolean success = false;
+      switch(response.getStatusCode()) {
+      case Response.SC_OK:
+        updateValuesDisplay((JsArray<ValueDto>) JsonUtils.unsafeEval(response.getText()));
+        success = true;
+        break;
+      case Response.SC_BAD_REQUEST:
+        scriptInterpretationFail(response);
+        break;
+      default:
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
+        break;
+      }
+      if(scriptEvaluationCallback != null) {
+        if(success) scriptEvaluationCallback.onSuccess(variable);
+        else
+          scriptEvaluationCallback.onFailure(variable);
+      }
+    }
+
+    private void updateValuesDisplay(JsArray<ValueDto> resource) {
+      int high = offset + PAGE_SIZE;
+      if(resource != null && resource.length() < high) {
+        high = offset + resource.length();
+      }
+      getDisplay().setPageLimits(offset + 1, high, table.getValueSetCount());
+      getDisplay().populateValues(resource);
+    }
+
+    private void scriptInterpretationFail(Response response) {
+      ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+      if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
+        List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
+        for(JavaScriptErrorDto error : errors) {
+          // TODO translate
+          eventBus.fireEvent(NotificationEvent.newBuilder().error("Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error.getMessage()).build());
+        }
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
+      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
+
+      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+      if(errors != null) {
+        for(int i = 0; i < errors.length(); i++) {
+          javaScriptErrors.add(errors.get(i));
+        }
+      }
+
+      return javaScriptErrors;
+    }
+  }
+
   public class PreviousPageClickHandler implements ClickHandler {
 
     @Override
@@ -206,6 +289,12 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
       }
     }
 
+  }
+
+  public interface ScriptEvaluationCallback {
+    public void onSuccess(VariableDto variable);
+
+    public void onFailure(VariableDto variable);
   }
 
   public interface Display extends WidgetDisplay {
