@@ -49,7 +49,7 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
 
   public ScriptEvaluationPopupView() {
     setModal(false);
-    setText(translations.scriptLabel());
+    setText(translations.scriptEvaluationLabel());
     content = uiBinder.createAndBindUi(this);
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);

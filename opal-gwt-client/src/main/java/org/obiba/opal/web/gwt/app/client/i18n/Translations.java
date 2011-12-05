@@ -631,6 +631,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Script")
   String scriptLabel();
 
+  @Description("Script Evaluation label")
+  @DefaultStringValue("Script Evaluation")
+  String scriptEvaluationLabel();
+
   @Description("Line label")
   @DefaultStringValue("Line")
   String lineLabel();
