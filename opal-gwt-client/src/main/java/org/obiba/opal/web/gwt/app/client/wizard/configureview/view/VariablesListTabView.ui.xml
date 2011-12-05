@@ -26,7 +26,7 @@
           <ui:msg description="Remove label">Remove</ui:msg>
         </g:Button>
       </g:FlowPanel>
-      <g:Button ui:field="saveChangesButton" styleName="btn right-aligned">
+      <g:Button ui:field="saveChangesButton" styleName="btn primary right-aligned">
         <ui:msg description="Save changes button label">Save Changes</ui:msg>
       </g:Button>
     </g:FlowPanel>
