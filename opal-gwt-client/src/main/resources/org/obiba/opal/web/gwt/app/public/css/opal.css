@@ -46,6 +46,18 @@ th {
 
 textarea {
   min-height: 10em;
+  box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+}
+
+textarea.high {
+  height: 20em;
+}
+
+textarea.x-high {
+  height: 30em;
 }
 
 h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, cite, code, del, dfn, em, img, q, s, samp, small, strike, strong, sub, sup, tt, var, dd, dl, dt, li, ol, ul, fieldset, form, label, legend, button, table, caption, tbody, tfoot, thead, tr, th, td {
@@ -1432,6 +1444,10 @@ div.input span.key {
 
 div.input .key label {
   font-weight: bold;
+}
+
+div.input textarea {
+  display: block;	
 }
 
 div.input.error input,
