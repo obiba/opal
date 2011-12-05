@@ -985,31 +985,31 @@ public interface Translations extends Constants {
   String falseLabel();
 
   @Description("Recode Temporal Method Step title")
-  @DefaultStringValue("Dates and times can be grouped together using the following methods")
+  @DefaultStringValue("Dates and times can be grouped together using the following methods:")
   String recodeTemporalMethodStepTitle();
 
   @Description("Recode Temporal Map Step title")
-  @DefaultStringValue("Map each time range to a new value")
+  @DefaultStringValue("Map each time range to a new value.")
   String recodeTemporalMapStepTitle();
 
   @Description("Recode Numerical Method Step title")
-  @DefaultStringValue("Numerical values can be grouped together using the following methods")
+  @DefaultStringValue("Numerical values can be grouped together using the following methods:")
   String recodeNumericalMethodStepTitle();
 
   @Description("Recode Numerical Map Step title")
-  @DefaultStringValue("Map each range or discrete value to a new value")
+  @DefaultStringValue("Map each range or discrete value to a new value.")
   String recodeNumericalMapStepTitle();
 
   @Description("Recode Open Textual Method Step Title")
-  @DefaultStringValue("Group the values using the following method")
+  @DefaultStringValue("Group the values using the following method.")
   String recodeOpenTextualMethodStepTitle();
 
   @Description("Recode Open Textual Map Step Title")
-  @DefaultStringValue("Map original values to new values")
+  @DefaultStringValue("Map original values to new values.")
   String recodeOpenTextualMapStepTitle();
 
   @Description("Recode Custom Step Title")
-  @DefaultStringValue("Specify The custom derivation script")
+  @DefaultStringValue("Specify the custom derivation script.")
   String recodeCustomDeriveStepTitle();
 
   @Description("Time map")
@@ -1115,12 +1115,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("Create a Coding View")
   String createCodingView();
 
-  @Description("Confirrm Create a Coding View")
+  @Description("Confirm Create a Coding View")
   @DefaultStringValue("Do you Create a Coding View")
   String confirmCreateCodingView();
 
   @Description("Script Evaluation Failed Label")
-  @DefaultStringValue("Script evaluation on values failed, check if Type seems correct")
+  @DefaultStringValue("Script evaluation failed: check if value type is correct.")
   String scriptEvaluationFailed();
 
 }
