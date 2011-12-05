@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -43,14 +44,17 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
   @UiField
   Button closeButton;
 
+  @UiField
+  ResizeHandle resizeHandle;
+
   public ScriptEvaluationPopupView() {
-    setHeight(DIALOG_HEIGHT);
-    setWidth(DIALOG_WIDTH);
+    setModal(false);
     setText(translations.scriptLabel());
     content = uiBinder.createAndBindUi(this);
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
     add(content);
+    resizeHandle.makeResizable(content);
   }
 
   @Override
@@ -60,8 +64,10 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
 
   @Override
   public void showDialog() {
-    center();
-    show();
+    if(!isShowing()) {
+      center();
+      show();
+    }
   }
 
   @Override
