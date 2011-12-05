@@ -178,6 +178,11 @@ td.link {
   display: inline;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
+
 .small-top-margin {
   margin-top: 0.4em;
 }

@@ -31,47 +31,30 @@
       </g:Button>
     </g:FlowPanel>
     
-    <g:HTMLPanel ui:field="form" addStyleNames="form">      
-      <table>
-        <tr>
-          <td>
-            <g:Label>
-              <ui:msg description="Name label">Name</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:TextBox ui:field="variableName" width="15em" enabled="false"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label>
-              <ui:msg description="Type label">Type</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:ListBox ui:field="valueType">
-              <g:item value="text"><ui:msg description="Text label">text</ui:msg></g:item>
-              <g:item value="decimal"><ui:msg description="Decimal label">decimal</ui:msg></g:item>            
-              <g:item value="integer"><ui:msg description="Integer label">integer</ui:msg></g:item>            
-              <g:item value="binary"><ui:msg description="Binary label">binary</ui:msg></g:item>            
-              <g:item value="boolean"><ui:msg description="Boolean label">boolean</ui:msg></g:item>
-              <g:item value="datetime"><ui:msg description="Datetime label">datetime</ui:msg></g:item>            
-              <g:item value="date"><ui:msg description="Date label">date</ui:msg></g:item>            
-              <g:item value="locale"><ui:msg description="Locale label">locale</ui:msg></g:item>            
-            </g:ListBox>
-          </td>
-        </tr>
-        <tr>
-          <td/>
-          <td>
-            <g:CheckBox ui:field="repeatableCheckbox">
-              <ui:msg description="Repeatable label">Repeatable</ui:msg>
-            </g:CheckBox>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
+    <g:FlowPanel addStyleNames="form">
+      <g:FlowPanel addStyleNames="input inline-block">
+        <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+        <g:TextBox ui:field="variableName" width="15em" enabled="false"/>
+      </g:FlowPanel>
+      <g:FlowPanel addStyleNames="input inline-block indent">
+        <g:Label addStyleNames="key"><ui:msg description="Value Type label">Value Type</ui:msg></g:Label>
+        <g:ListBox ui:field="valueType">
+          <g:item value="text"><ui:msg description="Text label">text</ui:msg></g:item>
+          <g:item value="decimal"><ui:msg description="Decimal label">decimal</ui:msg></g:item>            
+          <g:item value="integer"><ui:msg description="Integer label">integer</ui:msg></g:item>            
+          <g:item value="binary"><ui:msg description="Binary label">binary</ui:msg></g:item>            
+          <g:item value="boolean"><ui:msg description="Boolean label">boolean</ui:msg></g:item>
+          <g:item value="datetime"><ui:msg description="Datetime label">datetime</ui:msg></g:item>            
+          <g:item value="date"><ui:msg description="Date label">date</ui:msg></g:item>            
+          <g:item value="locale"><ui:msg description="Locale label">locale</ui:msg></g:item>            
+        </g:ListBox>
+      </g:FlowPanel>
+      <g:FlowPanel addStyleNames="input inline-block indent">
+        <g:CheckBox ui:field="repeatableCheckbox" addStyleNames="key">
+          <ui:msg description="Repeatable label">Repeatable</ui:msg>
+        </g:CheckBox>
+      </g:FlowPanel>
+    </g:FlowPanel>
     
     <o:HorizontalTabLayout ui:field="variableDetailTabs" addStyleNames="top-margin">
         <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
@@ -84,40 +67,20 @@
         <g:SimplePanel ui:field="attributesTabPanel"/>
       
         <g:Anchor><ui:msg description="Options label">Options</ui:msg></g:Anchor>
-        <g:HTMLPanel ui:field="optionsTabPanel">
-          <table>
-            <tr>
-              <td>
-                <g:Label>
-                  <ui:msg description="Occurence group label">Occurence Group</ui:msg>:
-                </g:Label>
-              </td>
-              <td>
-                <g:TextBox  enabled="false" ui:field="occurenceGroup"/>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <g:Label>
-                  <ui:msg description="Unit label">Unit</ui:msg>:
-                </g:Label>
-              </td>
-              <td>
-                <g:TextBox ui:field="unit"/>
-              </td>              
-            </tr>
-            <tr>
-              <td>
-                <g:Label>
-                  <ui:msg description="Mime type label">Mime-Type</ui:msg>:
-                </g:Label>
-              </td>
-              <td>
-                <g:TextBox ui:field="mimeType"/>
-              </td>                
-            </tr>
-          </table>
-        </g:HTMLPanel>
+        <g:FlowPanel>
+          <g:FlowPanel addStyleNames="input">
+            <g:Label addStyleNames="key"><ui:msg description="Occurence group label">Occurence Group</ui:msg></g:Label>
+            <g:TextBox  enabled="false" ui:field="occurenceGroup"/>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="input">
+            <g:Label addStyleNames="key"><ui:msg description="Unit label">Unit</ui:msg></g:Label>
+            <g:TextBox ui:field="unit"/>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="input">
+            <g:Label addStyleNames="key"><ui:msg description="Mime type label">Mime-Type</ui:msg></g:Label>
+            <g:TextBox ui:field="mimeType"/>
+          </g:FlowPanel>
+        </g:FlowPanel>
   
         <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>
         <g:SimplePanel ui:field="summaryTabPanel" width="100%" />

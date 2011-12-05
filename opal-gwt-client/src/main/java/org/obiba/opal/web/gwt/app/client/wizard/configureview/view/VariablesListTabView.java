@@ -36,12 +36,10 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
@@ -97,9 +95,6 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
   SimplePanel summaryTabPanel;
 
   @UiField
-  HTMLPanel optionsTabPanel;
-
-  @UiField
   TextBox occurenceGroup;
 
   @UiField
@@ -107,9 +102,6 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
 
   @UiField
   TextBox unit;
-
-  @UiField
-  Panel form;
 
   MultiWordSuggestOracle suggestions;
 
@@ -450,7 +442,6 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
     navigationEnabled(enabled);
     saveChangesButton.setEnabled(enabled);
 
-    form.setVisible(enabled);
     variableDetailTabs.setVisible(enabled);
 
     variableName.setEnabled(enabled);
