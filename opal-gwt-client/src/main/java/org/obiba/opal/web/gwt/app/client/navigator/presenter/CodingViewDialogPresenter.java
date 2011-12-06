@@ -151,6 +151,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
       datasources = JsArrays.toSafeArray(resources);
       getDisplay().populateDatasources(datasources);
       getDisplay().getViewName().setText("");
+      getDisplay().showProgress(false);
     }
   }
 
@@ -158,6 +159,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
     @Override
     public void onResource(Response response, ViewDto resource) {
+      getDisplay().showProgress(false);
       eventBus.fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExists").build());
     }
 
@@ -167,6 +169,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
     @Override
     public void onClick(ClickEvent event) {
       if(validCodingView()) {
+        getDisplay().showProgress(true);
         CreateCodingViewCallBack createCodingViewCallback = new CreateCodingViewCallBack();
         AlreadyExistViewCallBack alreadyExistCodingViewCallback = new AlreadyExistViewCallBack();
         ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + getDisplay().getDatasourceName() + "/view/" + getDisplay().getViewName().getText()).get().withCallback(alreadyExistCodingViewCallback).withCallback(Response.SC_NOT_FOUND, createCodingViewCallback).send();
@@ -196,6 +199,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
     @Override
     public void onResponseCode(Request request, Response response) {
+
       ViewDto codingView = getViewDto();
       CreatedCodingViewCallBack callbackHandler = new CreatedCodingViewCallBack(codingView);
       ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + getDisplay().getDatasourceName() + "/views/").post().withResourceBody(ViewDto.stringify(codingView)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
@@ -212,6 +216,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      getDisplay().showProgress(false);
       getDisplay().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
         eventBus.fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
@@ -240,6 +245,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
     HandlerRegistration addCloseHandler(CloseHandler<PopupPanel> closeHandler);
 
+    void showProgress(boolean progress);
   }
 
 }

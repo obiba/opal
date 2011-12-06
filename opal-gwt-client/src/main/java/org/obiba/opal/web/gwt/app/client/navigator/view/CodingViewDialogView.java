@@ -133,4 +133,17 @@ public class CodingViewDialogView extends Composite implements Display {
     return datasourceNameBox.getItemText(datasourceNameBox.getSelectedIndex());
   }
 
+  @Override
+  public void showProgress(boolean progress) {
+
+    if(progress) dialog.addStyleName("progress");
+    else
+      dialog.removeStyleName("progress");
+    datasourceNameBox.setEnabled(!progress);
+    viewNameBox.setEnabled(!progress);
+    duplicateCheck.setEnabled(!progress);
+    saveButton.setEnabled(!progress);
+    cancelButton.setEnabled(!progress);
+  }
+
 }
