@@ -209,6 +209,9 @@ public abstract class DerivedVariableGenerator {
     derived.setValueType(variable.getValueType());
     derived.setEntityType(variable.getEntityType());
     derived.setIsRepeatable(variable.getIsRepeatable());
+    derived.setIndex(variable.getIndex());
+    derived.setOccurrenceGroup(variable.getOccurrenceGroup());
+    derived.setUnit(variable.getUnit());
 
     // set attributes
     derived.setAttributesArray(copyAttributes(variable.getAttributesArray()));
