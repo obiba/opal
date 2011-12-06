@@ -31,6 +31,8 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
   @Inject
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
 
+  private CloseCallback closeCallback;
+
   @Inject
   public ScriptEvaluationPopupPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -51,6 +53,7 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
     @Override
     public void onClick(ClickEvent event) {
       display.closeDialog();
+      if(closeCallback != null) closeCallback.onClose();
     }
   }
 
@@ -96,6 +99,7 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
       public void onScriptEvaluation(final ScriptEvaluationPopupEvent event) {
         scriptEvaluationPresenter.setTable(event.getTable());
         scriptEvaluationPresenter.setVariable(event.getVariable());
+        ScriptEvaluationPopupPresenter.this.closeCallback = event.getCloseCallback();      
         refreshDisplay();
       }
     }));
@@ -111,5 +115,9 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
     void closeDialog();
 
+  }
+
+  public interface CloseCallback {
+    public void onClose();
   }
 }

@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter.CloseCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
@@ -70,7 +71,13 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
             variable.setIsRepeatable(false);
             Variables.setScript(variable, selectedScript);
           }
-          eventBus.fireEvent(new ScriptEvaluationPopupEvent(variable, table));
+          eventBus.fireEvent(new ScriptEvaluationPopupEvent(variable, table, new CloseCallback() {
+
+            @Override
+            public void onClose() {
+              display.getScriptBox().focus();
+            }
+          }));
         }
       }).send();
       display.getScriptBox().focus();

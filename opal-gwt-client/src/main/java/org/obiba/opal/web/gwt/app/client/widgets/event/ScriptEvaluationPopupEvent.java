@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter.CloseCallback;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -23,9 +24,16 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
 
   private TableDto table;
 
+  private CloseCallback closeCallback;
+
   public ScriptEvaluationPopupEvent(VariableDto variable, TableDto table) {
     this.variable = variable;
     this.table = table;
+  }
+
+  public ScriptEvaluationPopupEvent(VariableDto variable, TableDto table, CloseCallback closeCallback) {
+    this(variable, table);
+    this.closeCallback = closeCallback;
   }
 
   public static Type<Handler> getType() {
@@ -52,6 +60,10 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
 
   public VariableDto getVariable() {
     return variable;
+  }
+
+  public CloseCallback getCloseCallback() {
+    return closeCallback;
   }
 
 }
