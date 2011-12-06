@@ -54,18 +54,20 @@ public class Variables {
 
   public static AttributeDto getScriptAttribute(VariableDto derived) {
     AttributeDto scriptAttr = null;
+    // make sure attributes array is defined
+    derived.setAttributesArray(JsArrays.toSafeArray(derived.getAttributesArray()));
+
     for(AttributeDto attr : JsArrays.toIterable(derived.getAttributesArray())) {
       if(attr.getName().equals("script")) {
         scriptAttr = attr;
         break;
       }
     }
+
     if(scriptAttr == null) {
       scriptAttr = AttributeDto.create();
       scriptAttr.setName("script");
       scriptAttr.setValue("null");
-      // make sure attributes array is defined
-      derived.setAttributesArray(JsArrays.toSafeArray(derived.getAttributesArray()));
       derived.getAttributesArray().push(scriptAttr);
     }
     return scriptAttr;
