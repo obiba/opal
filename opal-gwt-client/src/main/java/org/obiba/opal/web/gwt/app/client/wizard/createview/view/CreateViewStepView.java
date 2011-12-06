@@ -152,8 +152,7 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
       @Override
       public void onReset() {
         viewNameTextBox.setText("");
-        applyingGlobalVariableFilterRadioButton.setValue(true);
-        ValueChangeEvent.fire(applyingGlobalVariableFilterRadioButton, true);
+        addingVariablesOneByOneRadioButton.setValue(true, true);
       }
     })//
 
