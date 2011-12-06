@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 
 public class ValueMapEntry {
@@ -86,11 +87,11 @@ public class ValueMapEntry {
   }
 
   public static Builder fromCategory(CategoryDto cat, double count) {
-    return new Builder(ValueMapEntryType.CATEGORY_NAME).value(cat.getName()).label(VariableViewHelper.getLabelValue(cat.getAttributesArray())).count(count);
-  }
-
-  public static Builder fromDistinct(Number value) {
-    return fromRange(value, value);
+    String label = VariableViewHelper.getLabelValue(cat.getAttributesArray());
+    if(Strings.isNullOrEmpty(label)) {
+      label = buildLabel(cat.getName());
+    }
+    return new Builder(ValueMapEntryType.CATEGORY_NAME).value(cat.getName()).label(label).count(count);
   }
 
   public static Builder fromDistinct(String value) {
@@ -98,7 +99,11 @@ public class ValueMapEntry {
   }
 
   public static Builder fromDistinct(String value, double count) {
-    return new Builder(ValueMapEntryType.DISTINCT_VALUE).value(value).label("").count(count);
+    return new Builder(ValueMapEntryType.DISTINCT_VALUE).value(value).label(buildLabel(value)).count(count);
+  }
+
+  public static Builder fromDistinct(Number value) {
+    return fromRange(value, value);
   }
 
   public static Builder fromRange(Range<? extends Number> range) {
@@ -139,6 +144,21 @@ public class ValueMapEntry {
 
   public static Builder create(ValueMapEntryType type) {
     return new Builder(type);
+  }
+
+  private static String buildLabel(String text) {
+    if(Strings.isNullOrEmpty(text)) return "";
+
+    String label = text.toLowerCase().replace('_', ' ');
+    // Upper case for first letter of words
+    StringBuilder b = new StringBuilder(label);
+    int i = 0;
+    do {
+      b.replace(i, i + 1, b.substring(i, i + 1).toUpperCase());
+      i = b.indexOf(" ", i) + 1;
+    } while(i > 0 && i < b.length());
+
+    return b.toString();
   }
 
   public static class Builder {

@@ -144,13 +144,17 @@ public abstract class DerivedVariableGenerator {
   protected void addNewCategory(CategoryDto origCat, ValueMapEntry entry) {
     if(!entry.getNewValue().isEmpty()) {
       CategoryDto cat = newCategoriesMap.get(entry.getNewValue());
+      JsArray<AttributeDto> origAttrs = origCat.getAttributesArray();
+      if(origAttrs == null || origAttrs.length() == 0) {
+        origAttrs = newAttributes(newLabelAttribute(entry));
+      }
       if(cat == null) {
         cat = newCategory(entry);
-        cat.setAttributesArray(copyAttributes(origCat.getAttributesArray()));
+        cat.setAttributesArray(copyAttributes(origAttrs));
         newCategoriesMap.put(cat.getName(), cat);
       } else {
         // merge attributes
-        mergeAttributes(origCat.getAttributesArray(), cat.getAttributesArray());
+        mergeAttributes(origAttrs, cat.getAttributesArray());
       }
       categoryValuesAppended = true;
     }
