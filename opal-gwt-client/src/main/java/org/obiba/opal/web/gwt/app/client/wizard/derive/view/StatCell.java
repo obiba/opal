@@ -50,8 +50,12 @@ public class StatCell extends AbstractCell<ValueMapEntry> {
   @Override
   public void render(com.google.gwt.cell.client.Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
     if(entry != null) {
-      double width = (maxFrequency == 0 ? 0 : entry.getCount() * (100 / maxFrequency)) + 1;
-      SafeStylesBuilder cssStyleBuilder = new SafeStylesBuilder().appendTrustedString("width: " + WIDTH_FORMAT.format(width) + "px;");
+      double width = (maxFrequency == 0 ? 0 : entry.getCount() * (100 / maxFrequency));
+      String style = "width: " + WIDTH_FORMAT.format(width) + "px;";
+      if(width == 0) {
+        style += " border: none;";
+      }
+      SafeStylesBuilder cssStyleBuilder = new SafeStylesBuilder().appendTrustedString(style);
       sb.append(template.stat(cssStyleBuilder.toSafeStyles(), Double.valueOf(entry.getCount()).intValue()));
     }
   }
