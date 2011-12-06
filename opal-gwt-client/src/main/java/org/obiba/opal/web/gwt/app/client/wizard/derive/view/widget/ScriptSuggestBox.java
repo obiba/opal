@@ -52,6 +52,10 @@ public class ScriptSuggestBox extends Composite {
     }).send();
   }
 
+  public void focus() {
+    inner.setFocus(true);
+  }
+
   public String getSelectedScript() {
     return inner.getSelectedText();
   }

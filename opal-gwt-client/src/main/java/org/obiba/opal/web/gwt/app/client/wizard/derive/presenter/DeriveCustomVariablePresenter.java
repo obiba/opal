@@ -73,6 +73,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
           eventBus.fireEvent(new ScriptEvaluationPopupEvent(variable, table));
         }
       }).send();
+      display.getScriptBox().focus();
     }
   }
 
