@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.ws.provider;
+package org.obiba.opal.web.provider;
 
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.DataShield;
