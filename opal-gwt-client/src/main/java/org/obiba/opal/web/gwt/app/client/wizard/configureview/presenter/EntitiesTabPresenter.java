@@ -21,7 +21,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
@@ -33,7 +32,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -80,8 +78,6 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
    */
   private ViewDto viewDto;
 
-  private Translations translations = GWT.create(Translations.class);
-
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   /**
@@ -98,6 +94,7 @@ public class EntitiesTabPresenter extends WidgetPresenter<EntitiesTabPresenter.D
   @Override
   protected void onBind() {
     scriptWidget.bind();
+    scriptWidget.showTest(false);
     getDisplay().setScriptWidget(scriptWidget.getDisplay());
 
     getDisplay().saveChangesEnabled(true);

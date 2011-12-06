@@ -10,7 +10,7 @@
       <g:item value="all"><ui:msg description="All label">all</ui:msg></g:item>
       <g:item value="script"><ui:msg description="Script label">script</ui:msg></g:item>
     </g:ListBox>
-    <g:Button ui:field="saveChangesButton" styleName="btn right-aligned">
+    <g:Button ui:field="saveChangesButton" styleName="btn right-aligned primary">
       <ui:msg description="Save changes button label">Save Changes</ui:msg>
     </g:Button>
     <g:SimplePanel ui:field="scriptWidgetPanel" addStyleNames="small-top-margin" />

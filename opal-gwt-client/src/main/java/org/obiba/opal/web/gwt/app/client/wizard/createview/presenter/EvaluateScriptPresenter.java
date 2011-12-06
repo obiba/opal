@@ -84,6 +84,10 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     return script.trim().equals("") ? "null" : script;
   }
 
+  public void showTest(boolean b) {
+    getDisplay().showTest(b);
+  }
+
   class TestButtonClickHandler implements ClickHandler {
 
     @Override
@@ -106,6 +110,8 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   public interface Display extends WidgetDisplay {
 
     String getScript();
+
+    void showTest(boolean b);
 
     void setScript(String script);
 

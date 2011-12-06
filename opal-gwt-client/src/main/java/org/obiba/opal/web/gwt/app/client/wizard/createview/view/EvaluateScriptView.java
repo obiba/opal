@@ -100,4 +100,9 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   public void formClear() {
     scriptArea.setText("");
   }
+
+  @Override
+  public void showTest(boolean b) {
+    testScript.setVisible(b);
+  }
 }
