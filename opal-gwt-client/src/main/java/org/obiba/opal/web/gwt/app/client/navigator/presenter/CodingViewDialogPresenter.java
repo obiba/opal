@@ -21,14 +21,24 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -44,18 +54,11 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-  public interface Display extends WidgetDisplay {
-    void showDialog();
+  private JsArray<DatasourceDto> datasources;
 
-    void hideDialog();
+  private TableDto table;
 
-    HasText getViewName();
-
-    HandlerRegistration addSaveHandler(ClickHandler handler);
-
-    HandlerRegistration addCloseHandler(CloseHandler<PopupPanel> closeHandler);
-
-  }
+  private JsArray<VariableDto> variables;
 
   @Inject
   public CodingViewDialogPresenter(Display display, EventBus eventBus) {
@@ -69,12 +72,22 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
   @Override
   protected void onBind() {
+    updateDatasources();
     addEventHandlers();
     addValidators();
   }
 
   private void addValidators() {
-    validators.add(new RequiredTextValidator(getDisplay().getViewName(), "CodingViewNameIsRequired"));
+    validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
+  }
+
+  private void updateDatasources() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new DatasourcesCallback()).send();
+  }
+
+  public void setTableVariables(TableDto table, JsArray<VariableDto> variables) {
+    this.table = table;
+    this.variables = variables;
   }
 
   @Override
@@ -109,20 +122,43 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private ViewDto getViewDto() {
-    ViewDto view = ViewDto.create();
-    view.setName(getDisplay().getViewName().getText());
-    // view.setKeyVariableName(getDisplay().getName().getText());
-    // if(getDisplay().getSelect().getText().trim().length() > 0) {
-    // view.setKeyVariableName(getDisplay().getSelect().getText());
-    // }
+    ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table).defaultVariableListView().build();
+    VariableListViewDto derivedVariables = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+
+    for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
+      DerivationHelper derivator = null;
+      if(JsArrays.toSafeArray(variable.getCategoriesArray()).length() > 0) {
+        derivator = new CategoricalVariableDerivationHelper(variable);
+      } else if(getDisplay().getDuplicate()) {
+        derivator = new VariableDuplicationHelper(variable);
+      }
+
+      if(derivator != null) {
+        derivedVariables.getVariablesArray().push(derivator.getDerivedVariable());
+      }
+    }
+
     return view;
+  }
+
+  //
+  // Inner classes and Interfaces
+  //
+
+  private final class DatasourcesCallback implements ResourceCallback<JsArray<DatasourceDto>> {
+    @Override
+    public void onResource(Response response, JsArray<DatasourceDto> resources) {
+      datasources = JsArrays.toSafeArray(resources);
+      getDisplay().populateDatasources(datasources);
+      getDisplay().getViewName().setText("");
+    }
   }
 
   private class AlreadyExistViewCallBack implements ResourceCallback<ViewDto> {
 
     @Override
     public void onResource(Response response, ViewDto resource) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExistWithTheSpecifiedName").build());
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExists").build());
     }
 
   }
@@ -133,7 +169,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
       if(validCodingView()) {
         CreateCodingViewCallBack createCodingViewCallback = new CreateCodingViewCallBack();
         AlreadyExistViewCallBack alreadyExistCodingViewCallback = new AlreadyExistViewCallBack();
-        ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/views/" + getDisplay().getViewName().getText()).get().withCallback(alreadyExistCodingViewCallback).withCallback(Response.SC_NOT_FOUND, createCodingViewCallback).send();
+        ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + getDisplay().getDatasourceName() + "/view/" + getDisplay().getViewName().getText()).get().withCallback(alreadyExistCodingViewCallback).withCallback(Response.SC_NOT_FOUND, createCodingViewCallback).send();
       }
     }
 
@@ -162,7 +198,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
     public void onResponseCode(Request request, Response response) {
       ViewDto codingView = getViewDto();
       CreatedCodingViewCallBack callbackHandler = new CreatedCodingViewCallBack(codingView);
-      ResourceRequestBuilderFactory.newBuilder().forResource("/views/").post().withResourceBody(ViewDto.stringify(codingView)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + getDisplay().getDatasourceName() + "/views/").post().withResourceBody(ViewDto.stringify(codingView)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
     }
   }
 
@@ -185,6 +221,25 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
         eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
     }
+  }
+
+  public interface Display extends WidgetDisplay {
+    void showDialog();
+
+    void populateDatasources(JsArray<DatasourceDto> datasources);
+
+    void hideDialog();
+
+    HasText getViewName();
+
+    String getDatasourceName();
+
+    boolean getDuplicate();
+
+    HandlerRegistration addSaveHandler(ClickHandler handler);
+
+    HandlerRegistration addCloseHandler(CloseHandler<PopupPanel> closeHandler);
+
   }
 
 }

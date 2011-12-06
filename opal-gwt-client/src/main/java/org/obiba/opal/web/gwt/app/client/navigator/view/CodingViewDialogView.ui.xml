@@ -14,7 +14,7 @@
       <g:center>
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main">
-          	<g:Label>Categorical variables will be automatically recoded with numbers. Other variables can be optionally duplicated.</g:Label>
+          	<g:Label><ui:msg description="Coding View title">Categorical variables will be automatically recoded with numbers. Other variables can be optionally duplicated.</ui:msg></g:Label>
             <g:FlowPanel styleName="input">
               <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
               <g:ListBox ui:field="datasourceNameBox"></g:ListBox>
@@ -22,13 +22,10 @@
             <g:FlowPanel styleName="input">
               <g:Label addStyleNames="key"><ui:msg description="View label">View</ui:msg></g:Label>
               <g:TextBox ui:field="viewNameBox"/>
-              <g:Label styleName="help-block">Name of the view that will be created with the derived variables</g:Label>
+              <g:Label styleName="help-block"><ui:msg description="Coding View Name Help label">Name of the view that will be created with the derived variables</ui:msg></g:Label>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-          	  <g:CheckBox ui:field="duplicateCheck">Duplicate non-categorical variables</g:CheckBox>
-          	</g:FlowPanel>
-            <g:FlowPanel styleName="input">
-          	  <g:CheckBox ui:field="displayViewCheck">Display the new view</g:CheckBox>
+          	  <g:CheckBox ui:field="duplicateCheck"><ui:msg description="Duplicate non-categorical Variables label">Duplicate non-categorical variables</ui:msg></g:CheckBox>
           	</g:FlowPanel>
           </g:FlowPanel>
         </g:ScrollPanel>

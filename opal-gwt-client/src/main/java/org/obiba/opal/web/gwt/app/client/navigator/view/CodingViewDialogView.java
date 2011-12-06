@@ -9,10 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter.Display;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseHandler;
@@ -38,8 +40,6 @@ public class CodingViewDialogView extends Composite implements Display {
 
   private static CodingViewDialogUiBinder uiBinder = GWT.create(CodingViewDialogUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
-
   @UiField
   DialogBox dialog;
 
@@ -58,9 +58,6 @@ public class CodingViewDialogView extends Composite implements Display {
   @UiField
   CheckBox duplicateCheck;
 
-  @UiField
-  CheckBox displayViewCheck;
-
   public CodingViewDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
@@ -75,7 +72,6 @@ public class CodingViewDialogView extends Composite implements Display {
     });
 
     duplicateCheck.setValue(true);
-    displayViewCheck.setValue(true);
   }
 
   @Override
@@ -116,6 +112,25 @@ public class CodingViewDialogView extends Composite implements Display {
   @Override
   public HandlerRegistration addCloseHandler(CloseHandler<PopupPanel> closeHandler) {
     return dialog.addCloseHandler(closeHandler);
+  }
+
+  @Override
+  public void populateDatasources(JsArray<DatasourceDto> datasources) {
+    datasourceNameBox.clear();
+    for(DatasourceDto ds : JsArrays.toIterable(datasources)) {
+      datasourceNameBox.addItem(ds.getName());
+    }
+    datasourceNameBox.setSelectedIndex(0);
+  }
+
+  @Override
+  public boolean getDuplicate() {
+    return duplicateCheck.getValue();
+  }
+
+  @Override
+  public String getDatasourceName() {
+    return datasourceNameBox.getItemText(datasourceNameBox.getSelectedIndex());
   }
 
 }

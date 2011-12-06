@@ -223,51 +223,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     return next;
   }
 
-  // public class CreateCodingViewClickHandler implements ClickHandler {
-  //
-  // @Override
-  // public void onClick(ClickEvent event) {
-  // codingViewDialogPresenter.bind();
-  // codingViewDialogPresenter.setDialogMode(Mode.CREATE);
-  // codingViewDialogPresenter.getDisplay().clear();
-  // codingViewDialogPresenter.getDisplay().setEnabledCodingViewName(true);
-  // codingViewDialogPresenter.revealDisplay();
-  // }
-  //
-  // }
-
-  // private void createCodingView(String viewName) {
-  // ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-  //
-  // @Override
-  // public void onResponseCode(Request request, Response response) {
-  // if(response.getStatusCode() != Response.SC_OK) {
-  // String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
-  // eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-  // } else {
-  // eventBus.fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-  // }
-  // }
-  // };
-  //
-  // List<TableDto> tables = new ArrayList<TableDto>();
-  // tables.add(table);
-  // ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(table.getName() +
-  // "_codzzzesd").fromTables(tables);
-  //
-  // ResourceRequestBuilderFactory.newBuilder()//
-  // .post()//
-  // .forResource("/datasource/" + table.getDatasourceName() + "/views")//
-  // .withResourceBody(ViewDto.stringify(viewDtoBuilder.defaultJavaScriptView().build()))//
-  // .withCallback(Response.SC_CREATED, callbackHandler)//
-  // .withCallback(Response.SC_OK, callbackHandler)//
-  // .withCallback(Response.SC_BAD_REQUEST, callbackHandler)//
-  // .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
-  // .withCallback(Response.SC_METHOD_NOT_ALLOWED, callbackHandler)//
-  // .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)//
-  // .send();
-  // }
-
   private void removeView(String viewName) {
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
@@ -446,6 +401,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     @Override
     public void execute() {
       codingViewDialogPresenter.bind();
+      codingViewDialogPresenter.setTableVariables(table, variables);
       codingViewDialogPresenter.revealDisplay();
     }
   }

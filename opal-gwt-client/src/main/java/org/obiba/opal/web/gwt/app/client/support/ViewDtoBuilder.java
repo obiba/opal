@@ -9,11 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.support;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
@@ -40,6 +43,17 @@ public class ViewDtoBuilder {
     return this;
   }
 
+  public ViewDtoBuilder fromTables(TableDto... tableDtos) {
+    if(tableDtos != null) {
+      List<TableDto> list = new ArrayList<TableDto>();
+      for(TableDto tableDto : tableDtos) {
+        list.add(tableDto);
+      }
+      fromTables(list);
+    }
+    return this;
+  }
+
   public ViewDtoBuilder fromTables(List<TableDto> tableDtos) {
     JsArrayString fromTables = JavaScriptObject.createArray().cast();
     for(TableDto tableDto : tableDtos) {
@@ -59,6 +73,7 @@ public class ViewDtoBuilder {
 
   public ViewDtoBuilder defaultVariableListView() {
     VariableListViewDto listDto = VariableListViewDto.create();
+    listDto.setVariablesArray(JsArrays.<VariableDto> create());
     viewDto.setExtension(VariableListViewDto.ViewDtoExtensions.view, listDto);
 
     return this;

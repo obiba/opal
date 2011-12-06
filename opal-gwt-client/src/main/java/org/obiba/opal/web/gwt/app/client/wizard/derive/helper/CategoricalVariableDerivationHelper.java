@@ -48,13 +48,21 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private double maxFrequency;
 
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
+    this(originalVariable, null);
+  }
+
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto summaryStatisticsDto) {
     super(originalVariable);
-    categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+    if(summaryStatisticsDto != null) {
+      this.categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+    } else
+      this.categoricalSummaryDto = null;
+    initializeValueMapEntries();
   }
 
   @Override
-  public void initializeValueMapEntries() {
+  protected void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
 
     List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
@@ -62,7 +70,10 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
     // For each category and value without category, make value map entry and process separately missing and non-missing
     // ones.
-    Map<String, Double> countByCategoryName = findFrequencies(categoricalSummaryDto.getFrequenciesArray());
+    Map<String, Double> countByCategoryName = new HashMap<String, Double>();
+    if(isSummaryAvailable()) {
+      findFrequencies(countByCategoryName, categoricalSummaryDto.getFrequenciesArray());
+    }
 
     // recode categories
     index = initializeNonMissingCategoryValueMapEntries(countByCategoryName, missingValueMapEntries, index);
@@ -76,6 +87,10 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
 
+  }
+
+  private boolean isSummaryAvailable() {
+    return this.categoricalSummaryDto != null;
   }
 
   /**
@@ -122,8 +137,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   /**
    * @param countByCategoryName
    */
-  private Map<String, Double> findFrequencies(JsArray<FrequencyDto> frequencies) {
-    Map<String, Double> countByCategoryName = new HashMap<String, Double>();
+  private void findFrequencies(Map<String, Double> countByCategoryName, JsArray<FrequencyDto> frequencies) {
     for(int i = 0; i < frequencies.length(); i++) {
       FrequencyDto frequencyDto = frequencies.get(i);
       String value = frequencyDto.getValue();
@@ -133,7 +147,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
         maxFrequency = frequencyDto.getFreq();
       }
     }
-    return countByCategoryName;
   }
 
   public double getMaxFrequency() {
@@ -144,10 +157,12 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * Return frequency of N/A in summary stats
    */
   protected double nbEmpty() {
-    JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
-    for(int i = 0; i < frequenciesArray.length(); i++) {
-      if(frequenciesArray.get(i).getValue().equals(NA)) {
-        return frequenciesArray.get(i).getFreq();
+    if(isSummaryAvailable()) {
+      JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+      for(int i = 0; i < frequenciesArray.length(); i++) {
+        if(frequenciesArray.get(i).getValue().equals(NA)) {
+          return frequenciesArray.get(i).getFreq();
+        }
       }
     }
     return 0;
