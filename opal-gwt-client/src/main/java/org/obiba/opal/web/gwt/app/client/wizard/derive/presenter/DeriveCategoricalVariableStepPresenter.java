@@ -53,6 +53,7 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
       @Override
       public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
         derivationHelper = new CategoricalVariableDerivationHelper(variable, statisticsDto);
+        derivationHelper.initializeValueMapEntries();
         getDisplay().enableFrequencyColumn(true);
         getDisplay().setMaxFrequency(derivationHelper.getMaxFrequency());
         getDisplay().populateValues(derivationHelper.getValueMapEntries());

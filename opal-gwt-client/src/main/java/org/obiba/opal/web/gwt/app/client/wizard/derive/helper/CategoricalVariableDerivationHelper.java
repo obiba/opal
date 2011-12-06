@@ -58,11 +58,10 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
       this.categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
     } else
       this.categoricalSummaryDto = null;
-    initializeValueMapEntries();
   }
 
   @Override
-  protected void initializeValueMapEntries() {
+  public void initializeValueMapEntries() {
     this.valueMapEntries = new ArrayList<ValueMapEntry>();
 
     List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();

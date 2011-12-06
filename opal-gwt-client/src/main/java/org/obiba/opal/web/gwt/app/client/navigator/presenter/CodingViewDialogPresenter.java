@@ -128,7 +128,9 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
     for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
       DerivationHelper derivator = null;
       if(JsArrays.toSafeArray(variable.getCategoriesArray()).length() > 0) {
-        derivator = new CategoricalVariableDerivationHelper(variable);
+        CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
+        d.initializeValueMapEntries();
+        derivator = d;
       } else if(getDisplay().getDuplicate()) {
         derivator = new VariableDuplicationHelper(variable);
       }
