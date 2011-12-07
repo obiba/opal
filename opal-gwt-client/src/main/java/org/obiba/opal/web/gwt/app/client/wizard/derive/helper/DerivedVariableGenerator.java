@@ -22,6 +22,7 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 
@@ -29,6 +30,8 @@ import com.google.gwt.core.client.JsArray;
  *
  */
 public abstract class DerivedVariableGenerator {
+
+  public static final String DERIVED_FROM_ATTRIBUTE = "derivedFrom";
 
   protected final VariableDto originalVariable;
 
@@ -219,7 +222,11 @@ public abstract class DerivedVariableGenerator {
 
     // set attributes
     derived.setAttributesArray(copyAttributes(variable.getAttributesArray()));
+    if(!Strings.isNullOrEmpty(variable.getLink())) {
+      Variables.setAttribute(derived, DERIVED_FROM_ATTRIBUTE, variable.getLink());
+    }
 
+    // set categories
     if(withCategories) {
       derived.setCategoriesArray(copyCategories(derived.getCategoriesArray()));
     }

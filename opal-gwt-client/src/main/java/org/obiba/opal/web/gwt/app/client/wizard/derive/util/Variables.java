@@ -18,17 +18,23 @@ import com.google.gwt.core.client.JsArray;
 
 //TODO move this class out to derive package (or in magma ?)
 public class Variables {
+
+  /**
+   * True if variable has at least one category defined.
+   * @param variable
+   * @return
+   */
   public static boolean hasCategories(VariableDto variable) {
     return variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0;
   }
 
   /**
    * Return false if variableDto contains at least one non-missing category, otherwise true
-   * @param variableDto
+   * @param variable
    * @return
    */
-  public static boolean allCategoriesMissing(VariableDto variableDto) {
-    JsArray<CategoryDto> categoriesArray = variableDto.getCategoriesArray();
+  public static boolean allCategoriesMissing(VariableDto variable) {
+    JsArray<CategoryDto> categoriesArray = variable.getCategoriesArray();
     if(categoriesArray == null) return true;
     for(int i = 0; i < categoriesArray.length(); i++) {
       if(!categoriesArray.get(i).getIsMissing()) return false;
@@ -36,9 +42,14 @@ public class Variables {
     return true;
   }
 
-  public static String getScript(VariableDto derived) {
+  /**
+   * Get the script value if it exists (otherwise returns 'null' script).
+   * @param variable
+   * @return
+   */
+  public static String getScript(VariableDto variable) {
     AttributeDto scriptAttr = null;
-    for(AttributeDto attr : JsArrays.toIterable(JsArrays.toSafeArray(derived.getAttributesArray()))) {
+    for(AttributeDto attr : JsArrays.toIterable(JsArrays.toSafeArray(variable.getAttributesArray()))) {
       if(attr.getName().equals("script")) {
         scriptAttr = attr;
         break;
@@ -47,18 +58,38 @@ public class Variables {
     return scriptAttr != null ? scriptAttr.getValue() : "null";
   }
 
-  public static void setScript(VariableDto derived, String script) {
-    AttributeDto scriptAttr = getScriptAttribute(derived);
+  /**
+   * Set the script value in an attribute.
+   * @param variable
+   * @param script
+   */
+  public static void setScript(VariableDto variable, String script) {
+    AttributeDto scriptAttr = getScriptAttribute(variable);
     scriptAttr.setValue(script);
   }
 
-  public static AttributeDto getScriptAttribute(VariableDto derived) {
+  /**
+   * Get or create script attribute from variable.
+   * @param variable
+   * @return
+   */
+  public static AttributeDto getScriptAttribute(VariableDto variable) {
+    return getAttribute(variable, "script");
+  }
+
+  /**
+   * Get or create an attribute from the provided variable.
+   * @param variable
+   * @param name
+   * @return
+   */
+  public static AttributeDto getAttribute(VariableDto variable, String name) {
     AttributeDto scriptAttr = null;
     // make sure attributes array is defined
-    derived.setAttributesArray(JsArrays.toSafeArray(derived.getAttributesArray()));
+    variable.setAttributesArray(JsArrays.toSafeArray(variable.getAttributesArray()));
 
-    for(AttributeDto attr : JsArrays.toIterable(derived.getAttributesArray())) {
-      if(attr.getName().equals("script")) {
+    for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
+      if(attr.getName().equals(name)) {
         scriptAttr = attr;
         break;
       }
@@ -66,11 +97,22 @@ public class Variables {
 
     if(scriptAttr == null) {
       scriptAttr = AttributeDto.create();
-      scriptAttr.setName("script");
+      scriptAttr.setName(name);
       scriptAttr.setValue("null");
-      derived.getAttributesArray().push(scriptAttr);
+      variable.getAttributesArray().push(scriptAttr);
     }
     return scriptAttr;
+  }
+
+  /**
+   * Set the attribute value of a variable (create attribute if it does not exist).
+   * @param variable
+   * @param name
+   * @param value
+   */
+  public static void setAttribute(VariableDto variable, String name, String value) {
+    AttributeDto attr = getAttribute(variable, name);
+    attr.setValue(value);
   }
 
   public enum ValueType {
