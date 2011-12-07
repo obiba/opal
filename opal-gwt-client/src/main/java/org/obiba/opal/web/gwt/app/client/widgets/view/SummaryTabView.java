@@ -72,7 +72,7 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       CategoricalSummaryDto categorical = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
       summary.add(new CategoricalSummaryView(categorical));
     } else {
-      summary.add(new Label(translations.noDataAvailableLabel()));
+      summary.add(new Label(translations.noSummaryDataAvailableLabel()));
     }
   }
 

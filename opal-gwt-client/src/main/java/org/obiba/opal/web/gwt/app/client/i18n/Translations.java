@@ -599,6 +599,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("No data available")
   String noDataAvailableLabel();
 
+  @Description("No summary data available label")
+  @DefaultStringValue("No summary data available")
+  String noSummaryDataAvailableLabel();
+
   @Description("Remove label")
   @DefaultStringValue("Remove")
   String removeLabel();
