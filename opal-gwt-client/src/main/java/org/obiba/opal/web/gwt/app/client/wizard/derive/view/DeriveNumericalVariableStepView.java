@@ -64,6 +64,9 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   RadioButton discreteRadio;
 
   @UiField
+  RadioButton manualRadio;
+
+  @UiField
   NumericTextBox fromBox;
 
   @UiField
@@ -146,13 +149,16 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
       }
     });
 
-    discreteRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+    ValueChangeHandler<Boolean> rangeDisable = new ValueChangeHandler<Boolean>() {
 
       @Override
       public void onValueChange(ValueChangeEvent<Boolean> event) {
         setRangeEnabled(false);
       }
-    });
+    };
+
+    discreteRadio.addValueChangeHandler(rangeDisable);
+    manualRadio.addValueChangeHandler(rangeDisable);
 
     lengthRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
       @Override
@@ -312,6 +318,16 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   }
 
   @Override
+  public boolean discreteSelected() {
+    return discreteRadio.getValue();
+  }
+
+  @Override
+  public void enableFrequency(boolean enable) {
+    valuesMapGrid.enableFrequencyColumn(enable);
+  }
+
+  @Override
   public void setRangeCountError(boolean error) {
     setUIObjectError(countBox, error);
   }
@@ -337,5 +353,10 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
     } else {
       obj.removeStyleName("error");
     }
+  }
+
+  @Override
+  public void setMaxFrequency(double maxFreq) {
+    valuesMapGrid.setMaxFrequency(maxFreq);
   }
 }

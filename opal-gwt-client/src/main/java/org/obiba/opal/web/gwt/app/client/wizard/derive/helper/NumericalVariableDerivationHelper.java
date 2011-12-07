@@ -16,13 +16,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveOpenTextualVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
+import org.obiba.opal.web.model.client.math.FrequencyDto;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
+import com.google.gwt.core.client.JsArray;
 
 public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>> extends DerivationHelper {
 
@@ -53,6 +57,39 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     }
   }
 
+  public double addDistinctValues(CategoricalSummaryDto categoricalSummaryDto) {
+    JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+    double maxFreq = 0;
+    for(int i = 0; i < frequenciesArray.length(); i++) {
+      FrequencyDto frequencyDto = frequenciesArray.get(i);
+      double freq = frequencyDto.getFreq();
+      if(!frequencyDto.getValue().equals("N/A")) {
+        ValueMapEntry entry;
+        if(hasValueMapEntryWithValue(frequencyDto.getValue())) {
+          entry = getValueMapEntryWithValue(frequencyDto.getValue());
+        } else {
+          entry = ValueMapEntry.fromDistinct(frequencyDto.getValue()).newValue(Integer.toString(i + 1)).build();
+          addValueMapEntry(entry);
+        }
+        entry.setCount(Double.parseDouble(DeriveOpenTextualVariableStepPresenter.FREQ_FORMAT.format(freq)));
+      } else {
+        setEmptiesFrequency(freq);
+      }
+      if(freq > maxFreq) {
+        maxFreq = freq;
+      }
+    }
+
+    return maxFreq;
+  }
+
+  private void setEmptiesFrequency(double emptiesFrequency) {
+    ValueMapEntry entry = getEmptiesValueMapEntry();
+    if(entry != null) {
+      entry.setCount(emptiesFrequency);
+    }
+  }
+
   public void addValueMapEntry(N value, String newValue) {
     addValueMapEntry(value, value, newValue);
   }
@@ -71,6 +108,10 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
       entryRangeMap.put(entry, range);
     }
 
+    addValueMapEntry(entry);
+  }
+
+  private void addValueMapEntry(ValueMapEntry entry) {
     valueMapEntries.add(0, entry);
     Collections.sort(valueMapEntries, new NumericValueMapEntryComparator());
   }

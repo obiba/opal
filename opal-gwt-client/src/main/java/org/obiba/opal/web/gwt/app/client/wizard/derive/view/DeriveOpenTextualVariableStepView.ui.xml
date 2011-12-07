@@ -10,11 +10,11 @@
      <o:WizardStep ui:field="methodStep">
       <g:FlowPanel styleName="input">
       	<g:RadioButton ui:field="auto"><ui:msg description="Automatically label">Automatically</ui:msg></g:RadioButton>
-      	<g:Label addStyleNames="small-top-margin indent"><ui:msg description="Automatically description label">Similar distinct values will be grouped together</ui:msg></g:Label>
+      	<g:Label addStyleNames="small-top-margin indent"><ui:msg description="Automatically description label">Similar distinct values will be grouped together.</ui:msg></g:Label>
       </g:FlowPanel>
       <g:FlowPanel styleName="input">
       	<g:RadioButton ui:field="manual"><ui:msg description="Manually label">Manually</ui:msg></g:RadioButton>
-      	<g:Label addStyleNames="small-top-margin indent"><ui:msg description="Manually description label">No predefined value mapping</ui:msg></g:Label>
+      	<g:Label addStyleNames="small-top-margin indent"><ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg></g:Label>
       </g:FlowPanel>
      </o:WizardStep>
      <o:WizardStep ui:field="mapStep">

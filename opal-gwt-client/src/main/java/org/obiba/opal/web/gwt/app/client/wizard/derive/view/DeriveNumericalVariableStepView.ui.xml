@@ -22,6 +22,7 @@
           <g:RadioButton name="method" ui:field="rangeRadio">
             <ui:msg description="Group by ranges of values label">Group by ranges of values</ui:msg>
           </g:RadioButton>
+          <g:Label addStyleNames="small-top-margin indent"><ui:msg description="Range mapping description label">Each range of values will be mapped to a category.</ui:msg></g:Label>
           
           <g:Grid>
             <g:row>
@@ -76,7 +77,14 @@
              <g:RadioButton name="method" ui:field="discreteRadio">
                <ui:msg description="Map discrete values label">Map discrete values</ui:msg>
              </g:RadioButton>
-           </g:FlowPanel>      
+             <g:Label addStyleNames="small-top-margin indent"><ui:msg description="Discrete value mapping description label">Each value will be mapped to a category.</ui:msg></g:Label>
+           </g:FlowPanel>
+           
+           <g:FlowPanel styleName="input">
+      	     <g:RadioButton name="method" ui:field="manualRadio"><ui:msg description="Manually label">Manually</ui:msg></g:RadioButton>
+      	     <g:Label addStyleNames="small-top-margin indent"><ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg></g:Label>
+           </g:FlowPanel>
+      
          </g:FlowPanel>
          
          <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>

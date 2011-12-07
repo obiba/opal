@@ -65,12 +65,24 @@ public abstract class DerivationHelper {
   }
 
   public boolean hasValueMapEntryWithValue(String value) {
+    return getValueMapEntryWithValue(value) != null;
+  }
+
+  public ValueMapEntry getValueMapEntryWithValue(String value) {
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getValue().equals(value)) {
-        return true;
+        return entry;
       }
     }
-    return false;
+    return null;
+  }
+
+  public ValueMapEntry getEmptiesValueMapEntry() {
+    return getValueMapEntryWithValue(ValueMapEntry.EMPTY_VALUES_VALUE);
+  }
+
+  public ValueMapEntry getOthersValueMapEntry() {
+    return getValueMapEntryWithValue(ValueMapEntry.OTHER_VALUES_VALUE);
   }
 
   public VariableDto getOriginalVariable() {

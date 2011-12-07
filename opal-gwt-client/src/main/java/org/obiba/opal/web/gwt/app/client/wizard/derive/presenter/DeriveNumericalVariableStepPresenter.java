@@ -26,7 +26,10 @@ import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.NumericalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
@@ -34,6 +37,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 /**
@@ -71,106 +75,10 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMethodStepController().onValidate(new ValidationHandler() {
-
-      @Override
-      public boolean validate() {
-        List<String> errorMessages = new ArrayList<String>();
-        if(getDisplay().rangeSelected()) {
-          validateRangeForm(errorMessages);
-        }
-        if(!errorMessages.isEmpty()) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
-        }
-        return errorMessages.isEmpty();
-      }
-
-      private void validateRangeForm(List<String> errorMessages) {
-        validateRangeLimitsForm(errorMessages);
-        validateRangeDefinitionForm(errorMessages);
-      }
-
-      private void validateRangeLimitsForm(List<String> errorMessages) {
-        getDisplay().setLowerLimitError(false);
-        getDisplay().setUpperLimitError(false);
-
-        if(getDisplay().getLowerLimit() == null) {
-          errorMessages.add(translations.lowerValueLimitRequired());
-          getDisplay().setLowerLimitError(true);
-        }
-        if(getDisplay().getUpperLimit() == null) {
-          errorMessages.add(translations.upperValueLimitRequired());
-          getDisplay().setUpperLimitError(true);
-        }
-      }
-
-      private void validateRangeDefinitionForm(List<String> errorMessages) {
-        getDisplay().setRangeLengthError(false);
-        getDisplay().setRangeCountError(false);
-
-        if(getDisplay().rangeLengthSelected() && getDisplay().getRangeLength() == null) {
-          errorMessages.add(translations.rangesLengthRequired());
-          getDisplay().setRangeLengthError(true);
-        } else if(!getDisplay().rangeLengthSelected() && getDisplay().getRangeCount() == null) {
-          errorMessages.add(translations.rangesCountRequired());
-          getDisplay().setRangeCountError(true);
-        }
-      }
-
-    }).build());
-    stepCtrls.add(getDisplay().getMapStepController().onStepIn(new StepInHandler() {
-
-      @Override
-      public void onStepIn() {
-        newDerivationHelper();
-        if(getDisplay().rangeSelected()) {
-          // ranges
-          if(getDisplay().rangeLengthSelected()) {
-            addRangesByLengthMapping();
-          } else {
-            addRangesByCountMapping();
-          }
-        } else {
-          // TODO query distinct values
-        }
-
-        getDisplay().populateValues(derivationHelper.getValueMapEntries());
-      }
-    }).build());
+    stepCtrls.add(getDisplay().getMethodStepController().onValidate(new MethodStepValidationHandler()).build());
+    stepCtrls.add(getDisplay().getMapStepController().onStepIn(new MapStepInHandler()).build());
 
     return stepCtrls;
-  }
-
-  private void addRangesByCountMapping() {
-    double lowerLimit = getDisplay().getLowerLimit().doubleValue();
-    double upperLimit = getDisplay().getUpperLimit().doubleValue();
-    long count = getDisplay().getRangeCount().longValue();
-    long length = ((long) (upperLimit - lowerLimit)) / count;
-    addRangesByLength(length);
-  }
-
-  private void addRangesByLengthMapping() {
-    addRangesByLength(getDisplay().getRangeLength().longValue());
-  }
-
-  private void addRangesByLength(long length) {
-    double lowerLimit = getDisplay().getLowerLimit().doubleValue();
-    double upperLimit = getDisplay().getUpperLimit().doubleValue();
-
-    int newValue = 1;
-
-    double lower = lowerLimit;
-    double upper = lower + length;
-
-    addValueMapEntry(null, lower, String.valueOf(newValue++));
-    if(length >= 0) {
-      while(upper <= upperLimit) {
-        addValueMapEntry(lower, upper, String.valueOf(newValue++));
-        lower = upper;
-        upper += length;
-      }
-    }
-    addValueMapEntry(lower, null, String.valueOf(newValue++));
   }
 
   private void newDerivationHelper() {
@@ -235,6 +143,133 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   //
   // Interfaces
   //
+
+  /**
+   *
+   */
+  private final class MethodStepValidationHandler implements ValidationHandler {
+    @Override
+    public boolean validate() {
+      List<String> errorMessages = new ArrayList<String>();
+      if(getDisplay().rangeSelected()) {
+        validateRangeForm(errorMessages);
+      }
+      if(!errorMessages.isEmpty()) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
+      }
+      return errorMessages.isEmpty();
+    }
+
+    private void validateRangeForm(List<String> errorMessages) {
+      validateRangeLimitsForm(errorMessages);
+      validateRangeDefinitionForm(errorMessages);
+    }
+
+    private void validateRangeLimitsForm(List<String> errorMessages) {
+      getDisplay().setLowerLimitError(false);
+      getDisplay().setUpperLimitError(false);
+
+      if(getDisplay().getLowerLimit() == null) {
+        errorMessages.add(translations.lowerValueLimitRequired());
+        getDisplay().setLowerLimitError(true);
+      }
+      if(getDisplay().getUpperLimit() == null) {
+        errorMessages.add(translations.upperValueLimitRequired());
+        getDisplay().setUpperLimitError(true);
+      }
+    }
+
+    private void validateRangeDefinitionForm(List<String> errorMessages) {
+      getDisplay().setRangeLengthError(false);
+      getDisplay().setRangeCountError(false);
+
+      if(getDisplay().rangeLengthSelected() && getDisplay().getRangeLength() == null) {
+        errorMessages.add(translations.rangesLengthRequired());
+        getDisplay().setRangeLengthError(true);
+      } else if(!getDisplay().rangeLengthSelected() && getDisplay().getRangeCount() == null) {
+        errorMessages.add(translations.rangesCountRequired());
+        getDisplay().setRangeCountError(true);
+      }
+    }
+  }
+
+  /**
+   *
+   */
+  private final class MapStepInHandler implements StepInHandler {
+    @Override
+    public void onStepIn() {
+      newDerivationHelper();
+      if(getDisplay().rangeSelected()) {
+        // ranges
+        if(getDisplay().rangeLengthSelected()) {
+          addRangesByLengthMapping();
+        } else {
+          addRangesByCountMapping();
+        }
+        getDisplay().enableFrequency(false);
+        getDisplay().populateValues(derivationHelper.getValueMapEntries());
+      } else if(getDisplay().discreteSelected()) {
+        addDisctinctValuesMapping();
+      } else {
+        getDisplay().enableFrequency(false);
+        getDisplay().populateValues(derivationHelper.getValueMapEntries());
+      }
+    }
+
+    private void addDisctinctValuesMapping() {
+      StringBuilder link = new StringBuilder(originalVariable.getLink())//
+      .append("/summary")//
+      .append("?nature=categorical")//
+      .append("&distinct=true");
+
+      ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
+      .forResource(link.toString()).get()//
+      .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+
+        @Override
+        public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
+          CategoricalSummaryDto categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+          double maxFreq = derivationHelper.addDistinctValues(categoricalSummaryDto);
+          getDisplay().setMaxFrequency(maxFreq);
+          getDisplay().enableFrequency(true);
+          getDisplay().populateValues(derivationHelper.getValueMapEntries());
+        }
+      }).send();
+    }
+
+    private void addRangesByCountMapping() {
+      double lowerLimit = getDisplay().getLowerLimit().doubleValue();
+      double upperLimit = getDisplay().getUpperLimit().doubleValue();
+      long count = getDisplay().getRangeCount().longValue();
+      long length = ((long) (upperLimit - lowerLimit)) / count;
+      addRangesByLength(length);
+    }
+
+    private void addRangesByLengthMapping() {
+      addRangesByLength(getDisplay().getRangeLength().longValue());
+    }
+
+    private void addRangesByLength(long length) {
+      double lowerLimit = getDisplay().getLowerLimit().doubleValue();
+      double upperLimit = getDisplay().getUpperLimit().doubleValue();
+
+      int newValue = 1;
+
+      double lower = lowerLimit;
+      double upper = lower + length;
+
+      addValueMapEntry(null, lower, String.valueOf(newValue++));
+      if(length >= 0) {
+        while(upper <= upperLimit) {
+          addValueMapEntry(lower, upper, String.valueOf(newValue++));
+          lower = upper;
+          upper += length;
+        }
+      }
+      addValueMapEntry(lower, null, String.valueOf(newValue++));
+    }
+  }
 
   private enum NumberType {
     INTEGER() {
@@ -321,6 +356,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
           double from = continuous.getSummary().getMin();
           double to = continuous.getSummary().getMax();
           getDisplay().setValueLimits(Long.valueOf((long) from), Long.valueOf((long) to + 1));
+
         }
       }
     }
@@ -348,6 +384,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
     DefaultWizardStepController.Builder getMethodStepController();
 
+    void setMaxFrequency(double maxFreq);
+
     void setRangeCountError(boolean error);
 
     void setRangeLengthError(boolean error);
@@ -365,6 +403,10 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     HandlerRegistration addValueMapEntryHandler(ClickHandler handler);
 
     boolean rangeSelected();
+
+    boolean discreteSelected();
+
+    void enableFrequency(boolean enable);
 
     void setValueLimits(Number from, Number to);
 

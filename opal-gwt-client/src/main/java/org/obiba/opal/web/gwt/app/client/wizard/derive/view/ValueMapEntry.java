@@ -17,6 +17,10 @@ import com.google.common.collect.Range;
 
 public class ValueMapEntry {
 
+  public static final String EMPTY_VALUES_VALUE = "N/A";
+
+  public static final String OTHER_VALUES_VALUE = "*";
+
   public enum ValueMapEntryType {
     CATEGORY_NAME, DISTINCT_VALUE, RANGE, EMPTY_VALUES, OTHER_VALUES
   }
@@ -82,6 +86,10 @@ public class ValueMapEntry {
     return count;
   }
 
+  public void setCount(double count) {
+    this.count = count;
+  }
+
   public static Builder fromCategory(CategoryDto cat) {
     return fromCategory(cat, 0);
   }
@@ -135,11 +143,11 @@ public class ValueMapEntry {
   }
 
   public static Builder createEmpties(String label) {
-    return new Builder(ValueMapEntryType.EMPTY_VALUES).value("null").label(label).missing();
+    return new Builder(ValueMapEntryType.EMPTY_VALUES).value(EMPTY_VALUES_VALUE).label(label).missing();
   }
 
   public static Builder createOthers(String label) {
-    return new Builder(ValueMapEntryType.OTHER_VALUES).value("*").label(label);
+    return new Builder(ValueMapEntryType.OTHER_VALUES).value(OTHER_VALUES_VALUE).label(label);
   }
 
   public static Builder create(ValueMapEntryType type) {

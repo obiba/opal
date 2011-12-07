@@ -49,7 +49,7 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
   private CategoricalSummaryDto categoricalSummaryDto;
 
-  private static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
+  public static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
 
   @Inject
   public DeriveOpenTextualVariableStepPresenter(Display display, EventBus eventBus) {
@@ -96,7 +96,7 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
               JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
               for(int i = 0; i < frequenciesArray.length(); i++) {
                 FrequencyDto frequencyDto = frequenciesArray.get(i);
-                display.addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()) + "");
+                display.addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()));
               }
               display.getValueMapGrid().setMaxFrequency(getMaxFrequency());
               display.populateValues(derivationHelper.getValueMapEntries());
