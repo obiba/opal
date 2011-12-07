@@ -256,8 +256,47 @@ img.clickable {
     z-index: 1000;
 }
 
+.gwt-MenuBarPopup .menuPopupTop,
+.gwt-MenuBarPopup .menuPopupBottom,
+.gwt-MenuBarPopup .menuPopupMiddleLeft,
+.gwt-MenuBarPopup .menuPopupMiddleRight {
+  display:none;
+}
+
+.gwt-MenuBarPopup .gwt-MenuBar {
+  -webkit-border-radius:2px;
+  -moz-border-radius:2px;
+  border-radius:2px;
+  border: 1px solid #ccc;
+  -webkit-box-shadow:0 2px 4px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow:0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow:0 2px 4px rgba(0, 0, 0, 0.2);
+  background-color:#fefefe;
+}
+
+.gwt-MenuBarPopup .gwt-MenuItem {
+  padding: 4px 15px;
+  text-shadow:0 1px 1px rgba(255, 255, 255, 0.75);
+  color:#333;
+}
+
+.gwt-MenuBarPopup .gwt-MenuItem-disabled {
+    color: #C0C0C0;
+}
+
+.gwt-MenuBarPopup .gwt-MenuItem-selected,
+.gwt-MenuBarPopup .subMenuIcon-selected {
+    background: none repeat scroll 0 0 #F3F4EB;
+    color: #000;
+}
+
+.gwt-MenuBar-vertical .gwt-MenuItemSeparator {
+  padding: 0;
+}
+
 .gwt-MenuBar-vertical .gwt-MenuItemSeparator .menuSeparatorInner {
     background: none repeat scroll 0 0 transparent;
+    border-color: #ddd;
 }
 
 .gwt-DisclosurePanel .header {
