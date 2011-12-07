@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -127,7 +128,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
     for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
       DerivationHelper derivator = null;
-      if(JsArrays.toSafeArray(variable.getCategoriesArray()).length() > 0) {
+      if(variable.getValueType().equals("text") && Variables.hasCategories(variable)) {
         CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
         d.initializeValueMapEntries();
         derivator = d;
