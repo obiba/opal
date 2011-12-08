@@ -197,8 +197,15 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
    *
    */
   private final class MapStepInHandler implements StepInHandler {
+
+    private MethodChoice lastChoice;
+
+    private String lastChoiceSignature = "";
+
     @Override
     public void onStepIn() {
+      if(!newMethodChoice()) return;
+
       newDerivationHelper();
       if(getDisplay().rangeSelected()) {
         // ranges
@@ -214,7 +221,23 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       } else {
         getDisplay().enableFrequency(false);
         getDisplay().populateValues(derivationHelper.getValueMapEntries());
+
       }
+    }
+
+    private boolean newMethodChoice() {
+      if(lastChoice != null && lastChoice.isCurrentChoice(display) && lastChoice.sign(display).equals(lastChoiceSignature)) {
+        return false;
+      } else {
+        for(MethodChoice method : MethodChoice.values()) {
+          if(method.isCurrentChoice(display)) {
+            lastChoice = method;
+            lastChoiceSignature = method.sign(display);
+            break;
+          }
+        }
+      }
+      return true;
     }
 
     private void addDisctinctValuesMapping() {
@@ -268,6 +291,42 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         }
       }
       addValueMapEntry(lower, null, String.valueOf(newValue++));
+    }
+  }
+
+  private enum MethodChoice {
+    RANGE {
+
+      @Override
+      public boolean isCurrentChoice(Display display) {
+        return display.rangeSelected();
+      }
+
+      @Override
+      public String sign(Display display) {
+        return super.sign(display) + ":" + display.getLowerLimit() + ":" + display.getUpperLimit() + ":" + (display.rangeLengthSelected() ? "lengh:" + display.getRangeLength() : "count" + display.getRangeCount());
+      }
+
+    },
+    DISCRETE {
+      @Override
+      public boolean isCurrentChoice(Display display) {
+        return display.discreteSelected();
+      }
+
+    },
+    MANUAL {
+      @Override
+      public boolean isCurrentChoice(Display display) {
+        return !display.rangeSelected() && !display.discreteSelected();
+      }
+
+    };
+
+    public abstract boolean isCurrentChoice(Display display);
+
+    public String sign(Display display) {
+      return toString().toLowerCase();
     }
   }
 
