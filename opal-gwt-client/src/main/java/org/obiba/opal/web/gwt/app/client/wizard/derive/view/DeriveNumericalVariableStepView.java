@@ -276,6 +276,7 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   public void setNumberType(String valueType) {
     fromBox.setNumberType(valueType);
     toBox.setNumberType(valueType);
+    lengthBox.setNumberType(valueType);
     addFromBox.setNumberType(valueType);
     addToBox.setNumberType(valueType);
     valueBox.setNumberType(valueType);
@@ -303,7 +304,7 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   }
 
   @Override
-  public Long getRangeLength() {
+  public Number getRangeLength() {
     return lengthBox.getNumberValue();
   }
 

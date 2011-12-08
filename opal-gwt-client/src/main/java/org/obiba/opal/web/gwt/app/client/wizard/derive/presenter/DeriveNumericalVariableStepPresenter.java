@@ -242,15 +242,15 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       double lowerLimit = getDisplay().getLowerLimit().doubleValue();
       double upperLimit = getDisplay().getUpperLimit().doubleValue();
       long count = getDisplay().getRangeCount().longValue();
-      long length = ((long) (upperLimit - lowerLimit)) / count;
+      double length = (upperLimit - lowerLimit) / count;
       addRangesByLength(length);
     }
 
     private void addRangesByLengthMapping() {
-      addRangesByLength(getDisplay().getRangeLength().longValue());
+      addRangesByLength(getDisplay().getRangeLength().doubleValue());
     }
 
-    private void addRangesByLength(long length) {
+    private void addRangesByLength(double length) {
       double lowerLimit = getDisplay().getLowerLimit().doubleValue();
       double upperLimit = getDisplay().getUpperLimit().doubleValue();
 
@@ -414,7 +414,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
     Number getUpperLimit();
 
-    Long getRangeLength();
+    Number getRangeLength();
 
     Long getRangeCount();
 
