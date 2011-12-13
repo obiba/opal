@@ -41,7 +41,7 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
 
         String value = frequencyDto.getValue();
         if(value.equals(NA)) continue;
-        ValueMapEntry.Builder entry = ValueMapEntry.fromDistinct(value).label(value).count(frequencyDto.getFreq());
+        ValueMapEntry.Builder entry = ValueMapEntry.fromDistinct(value).count(frequencyDto.getFreq());
 
         if(estimateIsMissing(value)) {
           entry.missing();
