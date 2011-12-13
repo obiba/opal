@@ -514,6 +514,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
 
     private void validateDestinationView(List<String> errorMessages, DatasourceDto ds) {
+      if(ds.getTableArray() == null) return;
+
       String viewName = getDisplay().getViewName();
       for(int i = 0; i < ds.getTableArray().length(); i++) {
         String tName = ds.getTableArray().get(i);
