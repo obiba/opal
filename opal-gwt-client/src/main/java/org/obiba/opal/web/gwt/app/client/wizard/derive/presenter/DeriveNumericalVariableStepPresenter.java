@@ -169,12 +169,20 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       getDisplay().setLowerLimitError(false);
       getDisplay().setUpperLimitError(false);
 
-      if(getDisplay().getLowerLimit() == null) {
+      Number lower = getDisplay().getLowerLimit();
+      Number upper = getDisplay().getUpperLimit();
+
+      if(lower == null) {
         errorMessages.add(translations.lowerValueLimitRequired());
         getDisplay().setLowerLimitError(true);
       }
-      if(getDisplay().getUpperLimit() == null) {
+      if(upper == null) {
         errorMessages.add(translations.upperValueLimitRequired());
+        getDisplay().setUpperLimitError(true);
+      }
+      if(lower != null && upper != null && lower.doubleValue() > upper.doubleValue()) {
+        errorMessages.add(translations.lowerLimitGreaterThanUpperLimit());
+        getDisplay().setLowerLimitError(true);
         getDisplay().setUpperLimitError(true);
       }
     }

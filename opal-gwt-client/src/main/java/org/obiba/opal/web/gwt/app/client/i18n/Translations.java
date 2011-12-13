@@ -1095,6 +1095,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Upper value limit is required.")
   String upperValueLimitRequired();
 
+  @Description("Lower Limit Greater Than Upper Limit label")
+  @DefaultStringValue("Lower value limit cannot be greater than upper value limit.")
+  String lowerLimitGreaterThanUpperLimit();
+
   @Description("Ranges Length Required label")
   @DefaultStringValue("Ranges Length is required.")
   String rangesLengthRequired();
