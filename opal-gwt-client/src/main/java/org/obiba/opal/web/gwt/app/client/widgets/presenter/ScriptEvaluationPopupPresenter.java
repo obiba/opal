@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationHideEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
@@ -23,6 +24,9 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -30,8 +34,6 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
   @Inject
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
-
-  private CloseCallback closeCallback;
 
   @Inject
   public ScriptEvaluationPopupPresenter(Display display, EventBus eventBus) {
@@ -45,16 +47,7 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
   @Override
   public void revealDisplay() {
-    display.showDialog();
-  }
-
-  class CloseHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      display.closeDialog();
-      if(closeCallback != null) closeCallback.onClose();
-    }
+    getDisplay().showDialog();
   }
 
   @Override
@@ -73,8 +66,14 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
         // ignore
       }
     });
-    display.getButton().addClickHandler(new CloseHandler());
-    display.addScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay().asWidget());
+    getDisplay().getButton().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        getDisplay().closeDialog();
+      }
+    });
+    getDisplay().addScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay().asWidget());
     addHandler();
   }
 
@@ -99,8 +98,18 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
       public void onScriptEvaluation(final ScriptEvaluationPopupEvent event) {
         scriptEvaluationPresenter.setTable(event.getTable());
         scriptEvaluationPresenter.setVariable(event.getVariable());
-        ScriptEvaluationPopupPresenter.this.closeCallback = event.getCloseCallback();      
+        if(event.getCloseHandler() != null) {
+          getDisplay().addCloseHandler(event.getCloseHandler());
+        }
         refreshDisplay();
+      }
+    }));
+
+    super.registerHandler(eventBus.addHandler(ScriptEvaluationHideEvent.getType(), new ScriptEvaluationHideEvent.Handler() {
+
+      @Override
+      public void onScriptEvaluationHide(ScriptEvaluationHideEvent event) {
+        getDisplay().closeDialog();
       }
     }));
   }
@@ -113,11 +122,10 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
     HasClickHandlers getButton();
 
+    HandlerRegistration addCloseHandler(CloseHandler<PopupPanel> handler);
+
     void closeDialog();
 
   }
 
-  public interface CloseCallback {
-    public void onClose();
-  }
 }

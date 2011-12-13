@@ -18,7 +18,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter.CloseCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
@@ -35,8 +34,11 @@ import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -71,10 +73,10 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
             variable.setIsRepeatable(false);
             Variables.setScript(variable, selectedScript);
           }
-          eventBus.fireEvent(new ScriptEvaluationPopupEvent(variable, table, new CloseCallback() {
+          eventBus.fireEvent(new ScriptEvaluationPopupEvent(variable, table, new CloseHandler<PopupPanel>() {
 
             @Override
-            public void onClose() {
+            public void onClose(CloseEvent<PopupPanel> event) {
               display.getScriptBox().focus();
             }
           }));

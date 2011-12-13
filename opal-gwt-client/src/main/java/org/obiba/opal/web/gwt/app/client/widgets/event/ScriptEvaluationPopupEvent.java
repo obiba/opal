@@ -9,12 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.event;
 
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter.CloseCallback;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.user.client.ui.PopupPanel;
 
 public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEvent.Handler> {
 
@@ -24,16 +25,16 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
 
   private TableDto table;
 
-  private CloseCallback closeCallback;
+  private CloseHandler<PopupPanel> closeHandler;
 
   public ScriptEvaluationPopupEvent(VariableDto variable, TableDto table) {
     this.variable = variable;
     this.table = table;
   }
 
-  public ScriptEvaluationPopupEvent(VariableDto variable, TableDto table, CloseCallback closeCallback) {
+  public ScriptEvaluationPopupEvent(VariableDto variable, TableDto table, CloseHandler<PopupPanel> handler) {
     this(variable, table);
-    this.closeCallback = closeCallback;
+    this.closeHandler = handler;
   }
 
   public static Type<Handler> getType() {
@@ -51,7 +52,7 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
   }
 
   public interface Handler extends EventHandler {
-    public void onScriptEvaluation(ScriptEvaluationPopupEvent scriptEvaluationEvent);
+    public void onScriptEvaluation(ScriptEvaluationPopupEvent event);
   }
 
   public TableDto getTable() {
@@ -62,8 +63,8 @@ public class ScriptEvaluationPopupEvent extends GwtEvent<ScriptEvaluationPopupEv
     return variable;
   }
 
-  public CloseCallback getCloseCallback() {
-    return closeCallback;
+  public CloseHandler<PopupPanel> getCloseHandler() {
+    return closeHandler;
   }
 
 }

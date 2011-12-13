@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequir
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationHideEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
@@ -309,6 +310,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     @Override
     public void onClick(ClickEvent arg0) {
       getDisplay().hideDialog();
+      eventBus.fireEvent(new ScriptEvaluationHideEvent());
     }
   }
 
@@ -478,6 +480,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     private void close(ViewDto view, VariableDto derived) {
       getDisplay().hideDialog();
+      eventBus.fireEvent(new ScriptEvaluationHideEvent());
       if(getDisplay().isOpenEditorSelected()) {
         eventBus.fireEvent(new ViewConfigurationRequiredEvent(view, derived));
       }

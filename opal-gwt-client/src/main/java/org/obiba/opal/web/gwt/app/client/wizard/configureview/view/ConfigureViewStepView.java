@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.Tooltip;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -76,13 +77,6 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
     resizeHandle.makeResizable(contentLayout);
-    close.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        dialog.hide();
-      }
-    });
     initHelpTooltip();
   }
 
@@ -165,6 +159,11 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   public void showDialog() {
     dialog.center();
     dialog.show();
+  }
+
+  @Override
+  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
+    return close.addClickHandler(handler);
   }
 
 }

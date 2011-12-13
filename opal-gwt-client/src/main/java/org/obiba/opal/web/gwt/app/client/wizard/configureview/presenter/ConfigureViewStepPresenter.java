@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationHideEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -28,10 +29,13 @@ import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DeckPanel;
@@ -160,6 +164,15 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
     }));
     super.registerHandler(eventBus.addHandler(ViewSavePendingEvent.getType(), new ViewSavePendingHandler()));
     super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+
+    super.registerHandler(getDisplay().addCloseClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        getDisplay().hideDialog();
+        eventBus.fireEvent(new ScriptEvaluationHideEvent());
+      }
+    }));
   }
 
   //
@@ -168,6 +181,8 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
 
   public interface Display extends WidgetDisplay {
     DeckPanel getHelpDeck();
+
+    HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
     void addDataTabWidget(Widget widget);
 
