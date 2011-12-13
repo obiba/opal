@@ -68,7 +68,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
         public void onResource(Response response, TableDto table) {
           String selectedScript = display.getScriptBox().getSelectedScript();
           VariableDto variable = getDerivedVariable();
-          if(!Strings.isNullOrEmpty(selectedScript)) {
+          if(!Strings.isNullOrEmpty(selectedScript) && !selectedScript.equals(display.getScriptBox().getValue())) {
             variable.setValueType(ValueType.TEXT.getLabel());
             variable.setIsRepeatable(false);
             Variables.setScript(variable, selectedScript);
