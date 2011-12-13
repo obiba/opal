@@ -97,7 +97,8 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       XStream xstream = getXStream();
       OutputStreamWriter writer = null;
       try {
-        File tmpFile = File.createTempFile(datasourceName, ".xml");
+        // OPAL-1285 tmp file prefix must be at least 3 chars
+        File tmpFile = File.createTempFile("opal-" + datasourceName, ".xml");
         writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
         xstream.toXML(views, writer);
 
