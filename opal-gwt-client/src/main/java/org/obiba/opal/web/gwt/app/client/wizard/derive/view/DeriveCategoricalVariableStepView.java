@@ -100,9 +100,7 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
       }
     };
     valuesMapGrid.setWidth("100%");
-    valuesMapGrid.setPageSizeMin(13);
-    valuesMapGrid.setPageSizeMax(100);
-    valuesMapGrid.setGridHeight("40em");
+    valuesMapGrid.setPageSize(100);
 
     initWidget(uiBinder.createAndBindUi(this));
   }

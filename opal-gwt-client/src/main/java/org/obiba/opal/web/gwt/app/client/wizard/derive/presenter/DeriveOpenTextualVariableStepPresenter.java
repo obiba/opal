@@ -84,6 +84,8 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
           .append("?nature=categorical")//
           .append("&distinct=true");
 
+          display.populateValues(new ArrayList<ValueMapEntry>());
+
           ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
           .forResource(link.toString()).get()//
           .withCallback(new ResourceCallback<SummaryStatisticsDto>() {

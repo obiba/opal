@@ -33,9 +33,7 @@ import com.google.gwt.view.client.ListDataProvider;
 
 public class ValueMapGrid extends FlowPanel {
 
-  private static final int DEFAULT_PAGE_SIZE_MIN = 10;
-
-  private static final int DEFAULT_PAGE_SIZE_MAX = 100;
+  private static final int DEFAULT_PAGE_SIZE = 100;
 
   private static Translations translations = GWT.create(Translations.class);
 
@@ -47,11 +45,7 @@ public class ValueMapGrid extends FlowPanel {
 
   private List<ValueMapEntry> valueMapEntries;
 
-  private int pageSizeMin = DEFAULT_PAGE_SIZE_MIN;
-
-  private int pageSizeMax = DEFAULT_PAGE_SIZE_MAX;
-
-  private String gridHeight = "30em";
+  private int pageSize = DEFAULT_PAGE_SIZE;
 
   private boolean allowRowDeletion = false;
 
@@ -66,7 +60,7 @@ public class ValueMapGrid extends FlowPanel {
   public ValueMapGrid() {
     super();
     this.pager = new SimplePager();
-    this.pager.setPageSize(DEFAULT_PAGE_SIZE_MAX);
+    this.pager.setPageSize(DEFAULT_PAGE_SIZE);
     this.pager.addStyleName("right-aligned");
     this.pager.setVisible(false);
     add(pager);
@@ -74,16 +68,8 @@ public class ValueMapGrid extends FlowPanel {
     add(loading);
   }
 
-  public void setPageSizeMin(int pageSizeMin) {
-    this.pageSizeMin = pageSizeMin;
-  }
-
-  public void setPageSizeMax(int pageSizeMax) {
-    this.pageSizeMax = pageSizeMax;
-  }
-
-  public void setGridHeight(String gridHeight) {
-    this.gridHeight = gridHeight;
+  public void setPageSize(int pageSize) {
+    this.pageSize = pageSize;
   }
 
   public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries) {
@@ -112,12 +98,13 @@ public class ValueMapGrid extends FlowPanel {
     }
 
     table = new Table<ValueMapEntry>(pager.getPageSize());
-    remove(loading);
+    table.setLoadingIndicator(loading);
+    table.setEmptyTableWidget(loading);
     table.addStyleName("clear");
-    table.setPageSize(pageSizeMax);
+    table.setPageSize(pageSize);
     table.setWidth("100%");
     add(table);
-    pager.setPageSize(pageSizeMax);
+    pager.setPageSize(pageSize);
     pager.setDisplay(table);
     pager.setVisible((valueMapEntries.size() > pager.getPageSize()));
 
@@ -167,8 +154,10 @@ public class ValueMapGrid extends FlowPanel {
 
   private void initializeFrequencyColumn() {
     if(allowFrequencyColumn) {
-      frequencyColumn = new ValueMapColum(new StatCell(maxFrequency));
-      table.addColumn(frequencyColumn, translations.frequency());
+      if(frequencyColumn == null) {
+        frequencyColumn = new ValueMapColum(new StatCell(maxFrequency));
+      }
+      table.insertColumn(1, frequencyColumn, translations.frequency());
       table.setColumnWidth(frequencyColumn, "120px");
     }
   }
@@ -258,7 +247,13 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   public void enableFrequencyColumn(boolean enable) {
+    if(allowFrequencyColumn == enable) return;
     allowFrequencyColumn = enable;
+    if(!allowFrequencyColumn) {
+      table.removeColumn(frequencyColumn);
+    } else if(table != null) {
+      initializeFrequencyColumn();
+    }
   }
 
   private void debug() {
@@ -270,6 +265,13 @@ public class ValueMapGrid extends FlowPanel {
 
   public void setMaxFrequency(double maxFrequency) {
     this.maxFrequency = maxFrequency;
+    if(frequencyColumn != null) {
+      if(allowFrequencyColumn) {
+        table.removeColumn(frequencyColumn);
+        frequencyColumn = null;
+      }
+      initializeFrequencyColumn();
+    }
   }
 
   private static class ValueMapColum extends Column<ValueMapEntry, ValueMapEntry> {

@@ -146,7 +146,7 @@
             </g:Grid>
                   
          </g:DisclosurePanel>
-        <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSizeMin="13" pageSizeMax="100" addStyleNames="top-margin"/>
+        <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="100" addStyleNames="top-margin"/>
       </g:FlowPanel>
      </o:WizardStep>
   </g:FlowPanel>

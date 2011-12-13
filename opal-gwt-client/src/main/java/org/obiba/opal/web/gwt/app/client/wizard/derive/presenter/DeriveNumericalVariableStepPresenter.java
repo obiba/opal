@@ -246,6 +246,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       .append("?nature=categorical")//
       .append("&distinct=true");
 
+      getDisplay().populateValues(new ArrayList<ValueMapEntry>());
+
       ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
       .forResource(link.toString()).get()//
       .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
