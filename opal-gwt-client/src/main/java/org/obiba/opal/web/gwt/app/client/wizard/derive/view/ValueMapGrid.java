@@ -15,7 +15,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Grid;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 
 import com.google.gwt.cell.client.Cell;
@@ -109,12 +108,7 @@ public class ValueMapGrid extends FlowPanel {
       table = null;
     }
 
-    if(valueMapEntries.size() > pageSizeMin) {
-      table = new Grid<ValueMapEntry>(pager.getPageSize());
-      table.setHeight(gridHeight);
-    } else {
-      table = new Table<ValueMapEntry>(pager.getPageSize());
-    }
+    table = new Table<ValueMapEntry>(pager.getPageSize());
     remove(loading);
     table.addStyleName("clear");
     table.setPageSize(pageSizeMax);
@@ -172,6 +166,7 @@ public class ValueMapGrid extends FlowPanel {
     if(allowFrequencyColumn) {
       frequencyColumn = new ValueMapColum(new StatCell(maxFrequency));
       table.addColumn(frequencyColumn, translations.frequency());
+      table.setColumnWidth(frequencyColumn, "120px");
     }
   }
 
