@@ -89,10 +89,13 @@ public class ValueMapGrid extends FlowPanel {
   public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries) {
     this.valueMapEntries = valueMapEntries;
 
-    initializeTable();
-
-    dataProvider = new ListDataProvider<ValueMapEntry>(valueMapEntries);
-    dataProvider.addDataDisplay(table);
+    if(dataProvider == null) {
+      initializeTable();
+      dataProvider = new ListDataProvider<ValueMapEntry>(valueMapEntries);
+      dataProvider.addDataDisplay(table);
+    } else {
+      dataProvider.setList(valueMapEntries);
+    }
     dataProvider.refresh();
 
     addStyleName("value-map");
