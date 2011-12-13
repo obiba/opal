@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -58,12 +59,12 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
   }
 
   public double addDistinctValues(CategoricalSummaryDto categoricalSummaryDto) {
-    JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+    List<FrequencyDto> frequenciesList = getFrequenciesList(categoricalSummaryDto);
     double maxFreq = 0;
-    for(int i = 0; i < frequenciesArray.length(); i++) {
-      FrequencyDto frequencyDto = frequenciesArray.get(i);
+    for(int i = 0; i < frequenciesList.size(); i++) {
+      FrequencyDto frequencyDto = frequenciesList.get(i);
       double freq = frequencyDto.getFreq();
-      if(!frequencyDto.getValue().equals("N/A")) {
+      if(!frequencyDto.getValue().equals(NA)) {
         ValueMapEntry entry;
         if(hasValueMapEntryWithValue(frequencyDto.getValue())) {
           entry = getValueMapEntryWithValue(frequencyDto.getValue());
@@ -81,6 +82,26 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     }
 
     return maxFreq;
+  }
+
+  private List<FrequencyDto> getFrequenciesList(CategoricalSummaryDto categoricalSummaryDto) {
+    JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+    // sort frequency dtos by value
+    List<FrequencyDto> frequenciesList = JsArrays.toList(frequenciesArray);
+
+    Collections.sort(frequenciesList, new Comparator<FrequencyDto>() {
+
+      @Override
+      public int compare(FrequencyDto o1, FrequencyDto o2) {
+        if(o1.getValue().equals(NA)) return -1;
+        try {
+          return Double.valueOf(o1.getValue()).compareTo(Double.valueOf(o2.getValue()));
+        } catch(Exception e) {
+          return -1;
+        }
+      }
+    });
+    return frequenciesList;
   }
 
   private void setEmptiesFrequency(double emptiesFrequency) {

@@ -42,8 +42,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private static final String FEMALE_REGEXP = "^FEMALE$";
 
-  protected static final String NA = "N/A";
-
   protected final CategoricalSummaryDto categoricalSummaryDto;
 
   private double maxFrequency;

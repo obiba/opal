@@ -23,6 +23,8 @@ import com.google.gwt.core.client.GWT;
  */
 public abstract class DerivationHelper {
 
+  protected static final String NA = "N/A";
+
   protected Translations translations = GWT.create(Translations.class);
 
   protected List<ValueMapEntry> valueMapEntries;
