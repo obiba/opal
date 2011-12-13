@@ -111,6 +111,8 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
   }
 
   private Double getMaxFrequency() {
+    if(categoricalSummaryDto.getFrequenciesArray() == null) return 0d;
+
     return Iterables.find(JsArrays.toList(categoricalSummaryDto.getFrequenciesArray()), new Predicate<FrequencyDto>() {
 
       @Override
