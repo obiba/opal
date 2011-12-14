@@ -29,6 +29,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
@@ -83,6 +84,9 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
   @UiField
   NumericTextBox countBox;
+
+  @UiField
+  DisclosurePanel addPanel;
 
   @UiField
   RadioButton addRangeRadio;
@@ -234,6 +238,14 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
   @Override
   public void populateValues(List<ValueMapEntry> valuesMap) {
+    // clear Add form
+    addFromBox.setText("");
+    addToBox.setText("");
+    valueBox.setText("");
+    newValueBox.setText("");
+    addRangeRadio.setValue(true, true);
+    addPanel.setOpen(false);
+    // populates
     valuesMapGrid.populate(valuesMap);
   }
 

@@ -19,7 +19,7 @@
      </o:WizardStep>
      <o:WizardStep ui:field="mapStep">
       	<g:FlowPanel>
-      	  <g:DisclosurePanel>
+      	  <g:DisclosurePanel ui:field="addPanel">
             <g:customHeader>
              <g:Label><ui:msg description="Add Value Mapping label">Add a value mapping</ui:msg></g:Label>
             </g:customHeader>

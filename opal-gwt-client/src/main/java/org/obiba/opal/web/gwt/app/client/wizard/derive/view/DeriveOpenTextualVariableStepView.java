@@ -27,6 +27,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.RadioButton;
@@ -63,6 +64,9 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   RadioGroup<Method> radioGroup;
 
   // --- Map fields ---
+
+  @UiField
+  DisclosurePanel addPanel;
 
   @UiField(provided = true)
   SuggestBox value;
@@ -120,6 +124,9 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
 
   @Override
   public void populateValues(List<ValueMapEntry> valueMapEntries) {
+    value.setText("");
+    newValue.setText("");
+    addPanel.setOpen(false);
     valuesMapGrid.populate(valueMapEntries);
   }
 
