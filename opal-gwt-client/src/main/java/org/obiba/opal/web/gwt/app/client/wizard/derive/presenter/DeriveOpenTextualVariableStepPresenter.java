@@ -200,6 +200,6 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
     void entryAdded();
 
-    void addValueSuggestion(String replacementString, String displayString);
+    void addValueSuggestion(String value, String frequency);
   }
 }

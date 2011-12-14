@@ -162,17 +162,17 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   }
 
   @Override
-  public void addValueSuggestion(String replacementString, String displayString) {
-    valueOracle.add(replacementString, displayString);
+  public void addValueSuggestion(String value, String frequency) {
+    valueOracle.add(value, frequency);
   }
 
   private static class MultiWordSuggestOracleWithDisplay extends MultiWordSuggestOracle {
 
     Map<String, String> map = new HashMap<String, String>();
 
-    public void add(String replacementString, String displayString) {
-      super.add(replacementString);
-      map.put(replacementString, displayString);
+    public void add(String value, String frequency) {
+      super.add(value);
+      map.put(value, frequency);
     }
 
     @Override
