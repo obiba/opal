@@ -2,6 +2,7 @@ package org.obiba.opal.core.domain;
 
 import org.obiba.magma.Category;
 import org.obiba.magma.Variable;
+import org.obiba.magma.type.BooleanType;
 
 /**
  * Determines the nature of a variable by inspecting its {@code ValueType} and any associated {@code Category} instance.
@@ -39,6 +40,9 @@ public enum VariableNature {
     }
     if(variable.getValueType().isDateTime()) {
       return TEMPORAL;
+    }
+    if(variable.getValueType().equals(BooleanType.get())) {
+      return CATEGORICAL;
     }
     return UNDETERMINED;
   }

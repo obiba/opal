@@ -23,6 +23,7 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
+import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.Math.FrequencyDto;
@@ -111,6 +112,12 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
    * Returns an iterator of category names
    */
   private Iterator<String> categoryNames() {
+    if(getVariable().getValueType().equals(BooleanType.get())) {
+      return ImmutableList.<String> builder()//
+      .add(BooleanType.get().trueValue().toString())//
+      .add(BooleanType.get().falseValue().toString()).build().iterator();
+    }
+
     return Iterables.transform(getVariable().getCategories(), new Function<Category, String>() {
 
       @Override
