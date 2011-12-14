@@ -29,7 +29,7 @@
       </table>
     </g:HTMLPanel>
                         
-     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">
 	  <g:Anchor><ui:msg description="Tables label">Tables</ui:msg></g:Anchor>
       <g:VerticalPanel width="100%">
         <g:InlineLabel ui:field="noTables"><ui:msg description="No Tables label">No Tables</ui:msg></g:InlineLabel>

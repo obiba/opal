@@ -101,7 +101,7 @@
       </table>
     </g:HTMLPanel>
 
-     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">
         <g:Anchor ui:field="categoryTableTitle" />
         <g:VerticalPanel width="100%">
           <g:InlineLabel ui:field="noCategories"><ui:msg description="No Categories label">No Categories</ui:msg></g:InlineLabel>

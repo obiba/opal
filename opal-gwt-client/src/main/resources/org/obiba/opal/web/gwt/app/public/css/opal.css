@@ -162,6 +162,26 @@ td.link {
   margin-left: 2.4em;
 }
 
+.xsmall-dual-indent {
+  margin-left: 0.4em;
+  margin-right: 0.4em;
+}
+
+.small-dual-indent {
+  margin-left: 0.8em;
+  margin-right: 0.8em;
+}
+
+.dual-indent {
+  margin-left: 1.6em;
+  margin-right: 1.6em;
+}
+
+.large-dual-indent {
+  margin-left: 2.4em;
+  margin-right: 2.4em;
+}
+
 .full-width {
   width: 100%;  
 }
