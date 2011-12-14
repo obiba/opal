@@ -6,7 +6,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
   
- <g:VerticalPanel width="100%" addStyleNames="navigator">
+ <g:FlowPanel width="100%" addStyleNames="navigator">
      <g:FlowPanel addStyleNames="titlebar">
        <g:Label addStyleNames="title" ui:field="datasourceName">opal-data</g:Label>
        <g:Label addStyleNames="small-indent"><ui:msg description="Datasource title in parentheses">(Datasource)</ui:msg></g:Label>
@@ -43,6 +43,6 @@
       
     </o:HorizontalTabLayout>
      
-  </g:VerticalPanel>
+  </g:FlowPanel>
   
 </ui:UiBinder>

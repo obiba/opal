@@ -6,7 +6,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <g:VerticalPanel width="100%" addStyleNames="navigator">
+  <g:FlowPanel width="100%" addStyleNames="navigator">
      <g:FlowPanel addStyleNames="titlebar">
        <g:Label addStyleNames="title" ui:field="tableName">Table Name</g:Label>
        <g:Label addStyleNames="small-indent" ui:field="tableOrView">(View)</g:Label>
@@ -60,6 +60,6 @@
       
      </o:HorizontalTabLayout>
      
-  </g:VerticalPanel>
+  </g:FlowPanel>
 
 </ui:UiBinder>

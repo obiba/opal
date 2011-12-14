@@ -13,7 +13,7 @@
     .left-aligned { float : left; margin-right : 0.5em }
   </ui:style>
 
-  <g:VerticalPanel width="100%" addStyleNames="navigator">
+  <g:FlowPanel width="100%" addStyleNames="navigator">
      <g:FlowPanel addStyleNames="titlebar">
        <g:Label addStyleNames="title" ui:field="variableName">Variable Name</g:Label>
        <g:Label addStyleNames="small-indent">(Variable)</g:Label>
@@ -131,6 +131,6 @@
          
      </o:HorizontalTabLayout>
      
-  </g:VerticalPanel>
+  </g:FlowPanel>
 
 </ui:UiBinder>
