@@ -161,33 +161,20 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   public void renderCategoryRows(JsArray<CategoryDto> rows) {
     categoryProvider.setArray(rows);
-
     int size = categoryProvider.getList().size();
-
     categoryTableTitle.setText(translations.categoriesLabel() + " (" + size + ")");
-
     categoryTablePager.firstPage();
-    categoryTablePager.setVisible(size > 0);
-    categoryTable.setVisible(size > 0);
-    noCategories.setVisible(size <= 0);
+    categoryTablePager.setVisible(size > NavigatorView.PAGE_SIZE);
     categoryProvider.refresh();
   }
 
   public void renderAttributeRows(final JsArray<AttributeDto> rows) {
     attributeProvider.setArray(rows);
-
     int size = attributeProvider.getList().size();
-
     attributeTableTitle.setText(translations.attributesLabel() + " (" + size + ")");
-
     attributeTablePager.firstPage();
-
     label.setText(VariableViewHelper.getLabelValue(rows));
-
-    attributeTablePager.setVisible(size > 0);
-    attributeTable.setVisible(size > 0);
-    noAttributes.setVisible(size == 0);
-
+    attributeTablePager.setVisible(size > NavigatorView.PAGE_SIZE);
     attributeProvider.refresh();
   }
 
@@ -326,7 +313,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
     addCategoryTableColumns();
 
-    categoryTable.setPageSize(50);
+    categoryTable.setPageSize(NavigatorView.PAGE_SIZE);
+    categoryTable.setEmptyTableWidget(noCategories);
     categoryTablePager.setDisplay(categoryTable);
     categoryProvider.addDataDisplay(categoryTable);
   }
@@ -363,7 +351,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
     addAttributeTableColumns();
 
-    attributeTable.setPageSize(50);
+    attributeTable.setPageSize(NavigatorView.PAGE_SIZE);
+    attributeTable.setEmptyTableWidget(noAttributes);
     attributeTablePager.setDisplay(attributeTable);
     attributeProvider.addDataDisplay(attributeTable);
   }

@@ -28,6 +28,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class NavigatorView extends Composite implements NavigatorPresenter.Display {
 
+  public static final int PAGE_SIZE = 100;
+
   @UiTemplate("NavigatorView.ui.xml")
   interface NavigatorViewUiBinder extends UiBinder<Widget, NavigatorView> {
   }

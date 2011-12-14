@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.CssResource.NotStrict;
 import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
@@ -38,5 +40,15 @@ public class Grid<T> extends DataGrid<T> {
   public Grid(int pageSize) {
     super(pageSize, resources);
     setStyleName(resources.dataGridStyle().dataGridWidget());
+    addStyleName("grid");
+    Image loading = new Image("image/loading.gif");
+    loading.addStyleName("loading");
+    setLoadingIndicator(loading);
+  }
+
+  @Override
+  public void setEmptyTableWidget(Widget widget) {
+    widget.addStyleName("empty-label");
+    super.setEmptyTableWidget(widget);
   }
 }

@@ -13,17 +13,16 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
+import org.obiba.opal.web.gwt.user.cellview.client.ClickableColumn;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
-import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -31,13 +30,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -76,9 +73,6 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   FlowPanel toolbarPanel;
 
   @UiField
-  Image loading;
-
-  @UiField
   Panel permissions;
 
   private NavigatorMenuBar toolbar;
@@ -89,7 +83,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   private ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
-  private TableNameColumn tableNameColumn;
+  private ClickableColumn<TableDto> tableNameColumn;
 
   private Translations translations = GWT.create(Translations.class);
 
@@ -102,7 +96,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   private void addTableColumns() {
 
-    table.addColumn(tableNameColumn = new TableNameColumn() {
+    table.addColumn(tableNameColumn = new ClickableColumn<TableDto>() {
 
       @Override
       public String getValue(TableDto object) {
@@ -136,7 +130,8 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
     dataProvider.addDataDisplay(table);
     table.setSelectionModel(new SingleSelectionModel<TableDto>());
-    table.setPageSize(50);
+    table.setPageSize(NavigatorView.PAGE_SIZE);
+    table.setEmptyTableWidget(noTables);
     pager.setDisplay(table);
   }
 
@@ -165,19 +160,14 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
-    table.setVisible(false);
-    noTables.setVisible(false);
-    loading.setVisible(true);
+    table.setEmptyTableWidget(table.getLoadingIndicator());
   }
 
   @Override
   public void afterRenderRows() {
-    boolean tableIsVisible = table.getRowCount() > 0;
-    pager.setVisible(tableIsVisible);
-    table.setVisible(tableIsVisible);
-    toolbar.setExportDataItemEnabled(tableIsVisible);
-    noTables.setVisible(tableIsVisible == false);
-    loading.setVisible(false);
+    pager.setVisible(table.getRowCount() > NavigatorView.PAGE_SIZE);
+    toolbar.setExportDataItemEnabled(table.getRowCount() > 0);
+    table.setEmptyTableWidget(noTables);
   }
 
   @Override
@@ -228,12 +218,6 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   @Override
   public void setAddViewCommand(Command cmd) {
     toolbar.setAddViewCommand(cmd);
-  }
-
-  private abstract class TableNameColumn extends Column<TableDto, String> implements HasFieldUpdater<TableDto, String> {
-    public TableNameColumn() {
-      super(new ClickableTextCell());
-    }
   }
 
   @Override

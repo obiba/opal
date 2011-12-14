@@ -34,8 +34,7 @@
       <g:VerticalPanel width="100%">
         <g:InlineLabel ui:field="noTables"><ui:msg description="No Tables label">No Tables</ui:msg></g:InlineLabel>
         <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
-        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable tableList"/>
-        <g:Image ui:field="loading" url="image/loading.gif" addStyleNames="loading"/>
+        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned"/>
       </g:VerticalPanel>
       
       <g:Anchor><ui:msg description="Permissions label" >Permissions</ui:msg></g:Anchor>

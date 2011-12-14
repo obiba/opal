@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.CssResource.NotStrict;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
@@ -37,6 +39,17 @@ public class Table<T> extends CellTable<T> {
    */
   public Table(int pageSize) {
     super(pageSize, resources);
+    setStyleName(resources.cellTableStyle().cellTableWidget());
+    addStyleName("table");
+    Image loading = new Image("image/loading.gif");
+    loading.addStyleName("loading");
+    setLoadingIndicator(loading);
+  }
+
+  @Override
+  public void setEmptyTableWidget(Widget widget) {
+    widget.addStyleName("empty-label");
+    super.setEmptyTableWidget(widget);
   }
 
 }

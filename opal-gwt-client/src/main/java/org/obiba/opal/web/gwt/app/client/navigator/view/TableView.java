@@ -42,7 +42,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -96,9 +95,6 @@ public class TableView extends Composite implements TablePresenter.Display {
   SuggestBox variableNameSuggestBox;
 
   MultiWordSuggestOracle suggestions;
-
-  @UiField
-  Image loading;
 
   @UiField
   Panel permissions;
@@ -166,7 +162,8 @@ public class TableView extends Composite implements TablePresenter.Display {
     }, translations.unitLabel());
 
     table.setSelectionModel(new SingleSelectionModel<VariableDto>());
-    table.setPageSize(50);
+    table.setPageSize(NavigatorView.PAGE_SIZE);
+    table.setEmptyTableWidget(noVariables);
     table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
@@ -175,20 +172,16 @@ public class TableView extends Composite implements TablePresenter.Display {
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
-    table.setVisible(false);
-    loading.setVisible(true);
     suggestions.clear();
     variableNameSuggestBox.setText("");
+    table.setEmptyTableWidget(table.getLoadingIndicator());
   }
 
   @Override
   public void afterRenderRows() {
-    boolean tableIsVisible = dataProvider.getList().size() > 0;
-    pager.setVisible(tableIsVisible);
-    table.setVisible(tableIsVisible);
-    toolbar.setExportDataItemEnabled(tableIsVisible);
-    noVariables.setVisible(tableIsVisible == false);
-    loading.setVisible(false);
+    pager.setVisible(dataProvider.getList().size() > NavigatorView.PAGE_SIZE);
+    toolbar.setExportDataItemEnabled(dataProvider.getList().size() > 0);
+    table.setEmptyTableWidget(noVariables);
   }
 
   @Override
