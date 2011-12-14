@@ -51,11 +51,19 @@ public class CategoricalSummaryView extends Composite {
     widget = uiBinder.createAndBindUi(this);
     initWidget(widget);
     frequencyElement.setId(HTMLPanel.createUniqueId());
+    frequencyElement.setAttribute("style", "width:400px;");
 
     obs.setText("" + categorical.getN());
     mode.setText(categorical.getMode());
 
     if(categorical.getFrequenciesArray() != null) {
+      int count = categorical.getFrequenciesArray().length();
+      int width = 400;
+      if(count > 10) {
+        width = 400 + 20 * (count - 10);
+      }
+      frequencyElement.setAttribute("style", "width:" + width + "px;");
+
       FrequencyPlot freqPlot = new FrequencyPlot(frequencyElement.getId());
       for(int i = 0; i < categorical.getFrequenciesArray().length(); i++) {
         FrequencyDto value = categorical.getFrequenciesArray().get(i);
