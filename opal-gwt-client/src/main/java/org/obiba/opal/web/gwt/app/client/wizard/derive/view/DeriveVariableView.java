@@ -101,8 +101,10 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
       @Override
       public void onChange(ChangeEvent event) {
         viewNameBox.getSuggestOracle().clear();
-        for(String viewName : viewSuggestions.get(getDatasourceName())) {
-          viewNameBox.getSuggestOracle().add(viewName);
+        if(viewSuggestions.containsKey(getDatasourceName())) {
+          for(String viewName : viewSuggestions.get(getDatasourceName())) {
+            viewNameBox.getSuggestOracle().add(viewName);
+          }
         }
       }
     });
