@@ -215,7 +215,6 @@ public class ValueMapGrid extends FlowPanel {
       @Override
       public void update(int index, ValueMapEntry entry, String value) {
         entry.setNewValue(value);
-        debug();
       }
     });
   }
@@ -236,8 +235,6 @@ public class ValueMapGrid extends FlowPanel {
       @Override
       public void update(int index, ValueMapEntry entry, Boolean value) {
         entry.setMissing(value);
-        debug();
-
       }
     });
   }
@@ -253,13 +250,6 @@ public class ValueMapGrid extends FlowPanel {
       table.removeColumn(frequencyColumn);
     } else if(table != null) {
       initializeFrequencyColumn();
-    }
-  }
-
-  private void debug() {
-    int i = 1;
-    for(ValueMapEntry entry : valueMapEntries) {
-      GWT.log((i++) + ": " + entry.getValue() + ", " + entry.getNewValue() + ", " + entry.isMissing());
     }
   }
 

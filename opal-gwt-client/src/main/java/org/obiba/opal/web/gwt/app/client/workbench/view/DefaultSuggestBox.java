@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -51,7 +50,6 @@ public class DefaultSuggestBox extends SuggestBox {
 
     @Override
     public void add(String suggestion) {
-      GWT.log(suggestion);
       super.add(suggestion);
       if(!defaults.contains(suggestion)) {
         defaults.add(suggestion);

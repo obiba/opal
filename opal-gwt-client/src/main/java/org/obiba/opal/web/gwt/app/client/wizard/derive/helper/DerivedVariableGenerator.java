@@ -23,7 +23,6 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 
 /**
@@ -296,9 +295,6 @@ public abstract class DerivedVariableGenerator {
   public static void mergeAttributes(JsArray<AttributeDto> origAttrs, JsArray<AttributeDto> attrs) {
     if(origAttrs == null || origAttrs.length() == 0) return;
 
-    debug("origAttrs", origAttrs);
-    debug("attrs", attrs);
-
     for(AttributeDto origAttr : JsArrays.toIterable(origAttrs)) {
       boolean found = false;
       for(AttributeDto attr : JsArrays.toIterable(attrs)) {
@@ -324,13 +320,6 @@ public abstract class DerivedVariableGenerator {
     attr.setLocale(origAttr.getLocale());
     attr.setValue(origAttr.getValue());
     return attr;
-  }
-
-  private static void debug(String message, JsArray<AttributeDto> attrs) {
-    for(int i = 0; i < attrs.length(); i++) {
-      AttributeDto attr = attrs.get(i);
-      GWT.log(message + "[" + (i + 1) + "]=" + attr.getName() + ", " + attr.getLocale() + ", " + attr.getValue());
-    }
   }
 
   public boolean isCategoryValuesAppended() {
