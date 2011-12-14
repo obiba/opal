@@ -157,11 +157,12 @@ public class ValueMapEntry {
   private static String buildLabel(String text) {
     if(Strings.isNullOrEmpty(text)) return "";
 
-    if(text.indexOf('_') == -1) return text;
+    if(text.indexOf('_') == -1) {
+      buildOpenTextLabel(text);
+    }
 
-    String label = text.toLowerCase();
     // Upper case for first letter of words following '_'
-    StringBuilder b = new StringBuilder(label);
+    StringBuilder b = new StringBuilder(text.toLowerCase());
     int i = 0;
     do {
       b.replace(i, i + 1, b.substring(i, i + 1).toUpperCase());
@@ -169,6 +170,17 @@ public class ValueMapEntry {
     } while(i > 0 && i < b.length());
 
     return b.toString().replace('_', ' ');
+  }
+
+  private static String buildOpenTextLabel(String text) {
+    // one word, normalize case
+    if(text.indexOf(' ') == -1 && text.length() > 0) {
+      StringBuilder b = new StringBuilder(text.toLowerCase());
+      b.replace(0, 1, b.substring(0, 1).toUpperCase());
+      return b.toString();
+    }
+    // multiple words: open text
+    return text;
   }
 
   public static class Builder {
