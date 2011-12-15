@@ -398,6 +398,17 @@ img.clickable {
     text-decoration: none;
 }
 
+/* Tree */
+
+.gwt-Tree .gwt-TreeItem-selected {
+  font-weight: bold;
+}
+
+.gwt-Tree img {
+  margin-left: 3px;
+  margin-right: 4px;
+}
+
 /* DialogBox */
 
 .gwt-DialogBox, .gwt-PopupPanelGlass {
@@ -791,10 +802,6 @@ margin-left:0.8em;
 .gwt-Tree .magma-view .gwt-TreeItem {
   background:transparent url(../image/16/view.png) no-repeat scroll left center;
   padding-left:20px;
-}
-
-.gwt-Tree .gwt-TreeItem-selected {
-  font-weight: bold;
 }
 
 .navigator {
