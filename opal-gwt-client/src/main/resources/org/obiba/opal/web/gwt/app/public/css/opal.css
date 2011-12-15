@@ -98,19 +98,23 @@ td.top {
   vertical-align: top;
 }
 
-td.xsmall-indent {
+td.xsmall-indent,
+table.styled td.xsmall-indent {
   padding-left: 0.4em;
 }
 
-td.small-indent {
+td.small-indent,
+table.styled td.small-indent {
   padding-left: 0.8em;
 }
 
-td.indent {
+td.indent,
+table.styled td.indent {
   padding-left: 1.6em;
 }
 
-td.large-indent {
+td.large-indent,
+table.styled td.large-indent {
   padding-left: 1.6em;
 }
 
@@ -831,7 +835,6 @@ margin-left:0.8em;
     padding-bottom:0.4em;
     padding-left:0.8em;
     padding-right: 0.8em;
-    margin-bottom:0.4em;
 }
 
 .navigator .toolbar-right img {
@@ -1135,6 +1138,22 @@ div.paging > span {
 
 .key {
   color: #444444;
+}
+
+table.styled {
+  margin-bottom: 0;
+}
+
+table.styled th {
+  color: #333;
+}
+
+.property-key {
+  color: #444444;
+  white-space: nowrap;
+}
+
+.property-value {
 }
 
 /* List-Details UI */

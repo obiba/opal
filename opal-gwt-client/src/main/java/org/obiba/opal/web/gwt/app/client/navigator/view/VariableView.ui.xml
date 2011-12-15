@@ -21,85 +21,39 @@
 
      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-     <g:HTMLPanel>
-      <table class="item-properties small-indent">
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Entity type label">Entity Type</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="entityType"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Value Type label">Value Type</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="valueType"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Unit label">Unit</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="unit"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Mime Type label">Mime Type</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="mimeType"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Repeatable label">Repeatable</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-             <g:Label ui:field="repeatable"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Occurrence Group label">Occurrence Group</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-             <g:Label ui:field="occurrenceGroup"/>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
-
-    <g:HTMLPanel>
-      <table class="item-properties small-indent small-top-margin">
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Label label">Label</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="label"/>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
+     <o:PropertiesTable condensed="true" bordered="true" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4">
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
+         <g:Label ui:field="entityType"/>
+       </g:FlowPanel>
+       
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Value Type label">Value Type</ui:msg></g:Label>
+         <g:Label ui:field="valueType"/>
+       </g:FlowPanel>
+       
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Unit label">Unit</ui:msg></g:Label>
+         <g:Label ui:field="unit"/>
+       </g:FlowPanel>
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Mime Type label">Mime Type</ui:msg></g:Label>
+         <g:Label ui:field="mimeType"/>
+       </g:FlowPanel>
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Repeatable label">Repeatable</ui:msg></g:Label>
+         <g:Label ui:field="repeatable"/>
+       </g:FlowPanel>
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Occurrence Group label">Occurrence Group</ui:msg></g:Label>
+         <g:Label ui:field="occurrenceGroup"/>
+       </g:FlowPanel>
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Label label">Label</ui:msg></g:Label>
+         <g:Label ui:field="label"/>
+       </g:FlowPanel>
+       
+     </o:PropertiesTable>
 
      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">
         <g:Anchor ui:field="categoryTableTitle" />

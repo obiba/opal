@@ -16,36 +16,17 @@
        <g:SuggestBox ui:field="variableNameSuggestBox" addStyleNames="right-aligned ui-corner-all"/>
      </g:FlowPanel>
      
-     <g:HTMLPanel>
-      <table class="item-properties small-indent">
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Entity type label">Entity Type</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="entityType"/>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
-    
-    <g:HTMLPanel>
-      <table class="item-properties small-indent small-top-margin">
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Current Entity Count label">Current Number of Entity</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="entityCount"/>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
-     
+     <o:PropertiesTable condensed="true" bordered="true" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4">
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
+         <g:Label ui:field="entityType"/>
+       </g:FlowPanel>
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Current Entity Count label">Current Number of Entity</ui:msg></g:Label>
+         <g:Label ui:field="entityCount"/>
+       </g:FlowPanel>
+     </o:PropertiesTable>
+          
      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">
 	  <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
       <g:FlowPanel>

@@ -1131,4 +1131,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("Script evaluation failed: check if value type is correct.")
   String scriptEvaluationFailed();
 
+  @Description("Property label")
+  @DefaultStringValue("Property")
+  String property();
+
+  @Description("Value label")
+  @DefaultStringValue("Value")
+  String value();
+
 }

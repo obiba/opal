@@ -13,21 +13,13 @@
      </g:FlowPanel>
       
      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
-                                  
-     <g:HTMLPanel>
-      <table class="item-properties small-indent">
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Type label">Type</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="datasourceType"/>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
+
+	 <o:PropertiesTable condensed="true" bordered="true" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4">
+       <g:FlowPanel>
+         <g:Label><ui:msg description="Type label">Type</ui:msg></g:Label>
+         <g:Label ui:field="datasourceType"/>
+       </g:FlowPanel>
+     </o:PropertiesTable>
                         
      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">
 	  <g:Anchor><ui:msg description="Tables label">Tables</ui:msg></g:Anchor>
