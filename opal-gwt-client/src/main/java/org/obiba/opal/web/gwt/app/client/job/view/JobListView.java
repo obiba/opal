@@ -92,17 +92,9 @@ public class JobListView extends Composite implements Display {
   }
 
   public void renderRows(final JsArray<CommandStateDto> rows) {
-
-    boolean jobListIsVisible = rows.length() > 0;
-
-    pager.setVisible(jobListIsVisible); // OPAL-901
+    pager.setVisible(rows.length() > 50); // OPAL-901
     pager.firstPage();
-
     dataProvider.setList(JsArrays.toList(rows));
-
-    pager.setVisible(jobListIsVisible);
-    table.setVisible(jobListIsVisible);
-    noJobs.setVisible(jobListIsVisible == false);
   }
 
   public void showClearJobsButton(boolean show) {
@@ -144,6 +136,7 @@ public class JobListView extends Composite implements Display {
   //
 
   private void initTable() {
+    table.setEmptyTableWidget(noJobs);
     addTableColumns();
     addTablePager();
 

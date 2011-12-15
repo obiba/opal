@@ -16,16 +16,16 @@
     </g:FlowPanel>
     
     <g:FlowPanel>
-	    <g:Label addStyleNames="p"><ui:msg description="Jobs list instructions">Check the status of the jobs that are currently running or that were completed.</ui:msg></g:Label>
+	  <g:Label addStyleNames="p"><ui:msg description="Jobs list instructions">Check the status of the jobs that are currently running or that were completed.</ui:msg></g:Label>
 	    
-	    <o:HorizontalTabLayout addStyleNames="small-indent top-margin not-so-full-width">
-		  <g:Anchor><ui:msg description="Jobs label">Jobs</ui:msg></g:Anchor>
-	      <g:VerticalPanel width="100%">
-	        <g:InlineLabel ui:field="noJobs"><ui:msg description="No Jobs label">No Jobs</ui:msg></g:InlineLabel>
-            <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
-	        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
-	      </g:VerticalPanel>
-	    </o:HorizontalTabLayout>
+	  <o:HorizontalTabLayout addStyleNames="small-dual-indent top-margin">
+		<g:Anchor><ui:msg description="Jobs label">Jobs</ui:msg></g:Anchor>
+	    <g:VerticalPanel width="100%">
+	      <g:InlineLabel ui:field="noJobs"><ui:msg description="No Jobs label">No Jobs</ui:msg></g:InlineLabel>
+          <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
+	      <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
+	    </g:VerticalPanel>
+	  </o:HorizontalTabLayout>
     </g:FlowPanel>
     
   </o:WorkbenchLayout>  
