@@ -7,7 +7,7 @@
   ui:generateLocales="default">
     	
   	<g:FlowPanel> 
-	     <o:WizardStep ui:field="deriveStep">
+	   <o:WizardStep ui:field="deriveStep">
 	     <g:FlowPanel>
 	       <g:FlowPanel styleName="input">
              <g:Label addStyleNames="key"><ui:msg description="Value Type label">Value Type</ui:msg></g:Label>
@@ -16,16 +16,20 @@
            <g:FlowPanel styleName="input">
              <g:CheckBox ui:field="repeatable" addStyleNames="key"><ui:msg description="Repeatable label">Repeatable</ui:msg></g:CheckBox>
            </g:FlowPanel>
-           <g:FlowPanel styleName="input">
-             <g:Label addStyleNames="key"><ui:msg description="Script label">Script</ui:msg></g:Label>
-             <o2:ScriptSuggestBox ui:field="scriptBox" addStyleNames="x-high full-width"/>
-             <g:Label styleName="help-block inline"><ui:msg description="Script Help label">Edit the script and test it. Or select a portion of the script and test it.</ui:msg></g:Label>
-             <g:Button ui:field="testButton" addStyleNames="btn info right-aligned" >
-  		       <ui:msg description="Test label">Test</ui:msg>
-  		     </g:Button>
-  		   </g:FlowPanel>
+           
+           <o:HorizontalTabLayout>
+             <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
+             <g:FlowPanel styleName="input">
+               <o2:ScriptSuggestBox ui:field="scriptBox" addStyleNames="x-high full-width"/>
+               <g:Label styleName="help-block inline"><ui:msg description="Script Help label">Edit the script and test it. Or select a portion of the script and test it.</ui:msg></g:Label>
+               <g:Button ui:field="testButton" addStyleNames="btn info right-aligned" >
+  		         <ui:msg description="Test label">Test</ui:msg>
+  		       </g:Button>
+  		     </g:FlowPanel>
+  		   </o:HorizontalTabLayout>
+  		   
 	     </g:FlowPanel>
-	     </o:WizardStep>
+	   </o:WizardStep>
     </g:FlowPanel>
     
 </ui:UiBinder>
