@@ -14,60 +14,28 @@
     
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-    <g:HTMLPanel ui:field="reportTemplatePanel">
-      <table class="item-properties small-indent">
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="BIRT Report Design label">BIRT Report Design:</ui:msg>
-            </g:Label>
-          </td>
-          <td>
-            <g:Anchor ui:field="design"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Schedule label">Schedule:</ui:msg>
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="schedule"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Format label">Format:</ui:msg>
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="format"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Parameters label">Parameters:</ui:msg>
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="parameters"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Notification emails label">Notifications Emails:</ui:msg>
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="emails"/>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
+    <o:PropertiesTable ui:field="reportTemplatePanel" condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
+      <g:FlowPanel>
+        <g:Label><ui:msg description="BIRT Report Design label">BIRT Report Design:</ui:msg></g:Label>
+        <g:Anchor ui:field="design"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label><ui:msg description="Schedule label">Schedule:</ui:msg></g:Label>
+        <g:Label ui:field="schedule"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label><ui:msg description="Format label">Format:</ui:msg></g:Label>
+        <g:Label ui:field="format"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label><ui:msg description="Parameters label">Parameters:</ui:msg></g:Label>
+        <g:Label ui:field="parameters"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label><ui:msg description="Notification emails label">Notifications Emails:</ui:msg></g:Label>
+        <g:Label ui:field="emails"/>
+      </g:FlowPanel>
+    </o:PropertiesTable>
     
     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
 	  <g:Anchor><ui:msg description="Reports title">Reports</ui:msg></g:Anchor>

@@ -45,12 +45,12 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ReportTemplateDetailsView extends Composite implements ReportTemplateDetailsPresenter.Display {
@@ -67,7 +67,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   Label noReportTemplatesLabel;
 
   @UiField
-  HTMLPanel reportTemplatePanel;
+  Panel reportTemplatePanel;
 
   @UiField
   HorizontalTabLayout tabs;
@@ -153,6 +153,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
     actionsColumn = new ActionsColumn<FileDto>(DOWNLOAD_ACTION, DELETE_ACTION);
     producedReportsTable.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());
+    producedReportsTable.setEmptyTableWidget(noReports);
     dataProvider.addDataDisplay(producedReportsTable);
     addTablePager();
   }
@@ -185,7 +186,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   @Override
   public void setProducedReports(final JsArray<FileDto> files) {
-    pager.setVisible(files.length() != 0); // OPAL-901
+    pager.setVisible(files.length() > 10); // OPAL-901
     renderProducedReports(files);
   }
 
@@ -193,10 +194,6 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
     dataProvider.setArray(files);
     pager.firstPage();
     dataProvider.refresh();
-
-    producedReportsTable.setVisible(files.length() > 0);
-    pager.setVisible(files.length() > 0);
-    noReports.setVisible(files.length() == 0);
   }
 
   @Override
