@@ -16,7 +16,7 @@
        <g:SuggestBox ui:field="variableNameSuggestBox" addStyleNames="right-aligned ui-corner-all"/>
      </g:FlowPanel>
      
-     <o:PropertiesTable condensed="true" bordered="true" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4">
+     <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4">
        <g:FlowPanel>
          <g:Label><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
          <g:Label ui:field="entityType"/>

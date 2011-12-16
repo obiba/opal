@@ -1144,6 +1144,10 @@ table.styled {
   margin-bottom: 0;
 }
 
+table.styled.no-bordered-cell td {
+  border: none;
+}
+
 table.styled th {
   color: #333;
 }

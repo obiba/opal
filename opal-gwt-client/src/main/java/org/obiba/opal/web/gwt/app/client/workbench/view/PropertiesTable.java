@@ -33,8 +33,6 @@ public class PropertiesTable extends FlowPanel {
   public PropertiesTable() {
     super();
     innerTable = new DefaultFlexTable();
-    setPropertyHeader(translations.property());
-    setValueHeader(translations.value());
     super.add(innerTable);
   }
 
@@ -42,32 +40,50 @@ public class PropertiesTable extends FlowPanel {
   public void add(Widget child) {
     if(child instanceof IndexedPanel) {
       IndexedPanel children = (IndexedPanel) child;
+      int column = 0;
+      int span = 1;
+      if(child instanceof PropertyPanel) {
+        column = ((PropertyPanel) child).getColumn();
+        span = ((PropertyPanel) child).getSpan();
+      }
       if(children.getWidgetCount() != 2) {
         throw new IllegalArgumentException("PropertiesGrid expects a pair of key/value widgets at row " + innerTable.getRowCount());
       }
-      addProperty(children.getWidget(0), children.getWidget(1));
+      addProperty(children.getWidget(0), children.getWidget(1), column, span);
     } else {
       throw new IllegalArgumentException("PropertiesGrid expects child widgets being IndexedPanels");
     }
   }
 
   public void addProperty(Widget key, Widget value) {
-    int numRows = innerTable.getRowCount();
+    addProperty(key, value, 0, 1);
+  }
 
+  public void addProperty(Widget key, Widget value, int column) {
+    addProperty(key, value, column, 1);
+  }
+
+  public void addProperty(Widget key, Widget value, int column, int span) {
+    int numRows = innerTable.getRowCount();
+    int col = 2 * column;
+    int row = col == 0 ? numRows : numRows - 1;
     if(key != null) {
       key.removeFromParent();
-      innerTable.setWidget(numRows, 0, key);
+      innerTable.setWidget(row, col, key);
       if(!Strings.isNullOrEmpty(keyStyleNames)) {
-        innerTable.getFlexCellFormatter().setStyleName(numRows, 0, keyStyleNames);
+        innerTable.getFlexCellFormatter().setStyleName(row, col, keyStyleNames);
       }
       key.addStyleName("property-key");
     }
 
     if(value != null) {
       value.removeFromParent();
-      innerTable.setWidget(numRows, 1, value);
+      innerTable.setWidget(row, col + 1, value);
       if(!Strings.isNullOrEmpty(valueStyleNames)) {
-        innerTable.getFlexCellFormatter().setStyleName(numRows, 1, valueStyleNames);
+        innerTable.getFlexCellFormatter().setStyleName(row, col + 1, valueStyleNames);
+      }
+      if(span > 1) {
+        innerTable.getFlexCellFormatter().setColSpan(row, col + 1, span + 1);
       }
       value.addStyleName("property-value");
     }
@@ -79,6 +95,10 @@ public class PropertiesTable extends FlowPanel {
 
   public void setBordered(boolean bordered) {
     innerTable.setBordered(bordered);
+  }
+
+  public void setBorderedCell(boolean bordered) {
+    innerTable.setBorderedCell(bordered);
   }
 
   public void setCondensed(boolean condensed) {
@@ -97,6 +117,15 @@ public class PropertiesTable extends FlowPanel {
     innerTable.setHeaderWidget(0, widget);
   }
 
+  public void setHeaderVisible(boolean visible) {
+    if(visible) {
+      setPropertyHeader(translations.property());
+      setValueHeader(translations.value());
+    } else {
+      // TODO
+    }
+  }
+
   public void setValueHeader(String text) {
     innerTable.setHeader(1, text);
   }
@@ -108,14 +137,22 @@ public class PropertiesTable extends FlowPanel {
   public void setKeyStyleNames(String keyStyleNames) {
     this.keyStyleNames = keyStyleNames;
     for(int i = 0; i < innerTable.getRowCount(); i++) {
-      innerTable.getFlexCellFormatter().setStyleName(i, 0, keyStyleNames);
+      for(int j = 0; j < innerTable.getCellCount(i); j++) {
+        if(j % 2 == 0) {
+          innerTable.getFlexCellFormatter().setStyleName(i, j, keyStyleNames);
+        }
+      }
     }
   }
 
   public void setValueStyleNames(String valueStyleNames) {
     this.valueStyleNames = valueStyleNames;
     for(int i = 0; i < innerTable.getRowCount(); i++) {
-      innerTable.getFlexCellFormatter().setStyleName(i, 0, valueStyleNames);
+      for(int j = 0; j < innerTable.getCellCount(i); j++) {
+        if(j % 2 != 0) {
+          innerTable.getFlexCellFormatter().setStyleName(i, j, valueStyleNames);
+        }
+      }
     }
   }
 

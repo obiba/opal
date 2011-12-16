@@ -21,39 +21,44 @@
 
      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-     <o:PropertiesTable condensed="true" bordered="true" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4">
-       <g:FlowPanel>
+     <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4" valueStyleNames="span8">
+       <o:PropertyPanel>
          <g:Label><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
          <g:Label ui:field="entityType"/>
-       </g:FlowPanel>
+       </o:PropertyPanel>
        
-       <g:FlowPanel>
-         <g:Label><ui:msg description="Value Type label">Value Type</ui:msg></g:Label>
-         <g:Label ui:field="valueType"/>
-       </g:FlowPanel>
-       
-       <g:FlowPanel>
-         <g:Label><ui:msg description="Unit label">Unit</ui:msg></g:Label>
-         <g:Label ui:field="unit"/>
-       </g:FlowPanel>
-       <g:FlowPanel>
+       <o:PropertyPanel column="1">
          <g:Label><ui:msg description="Mime Type label">Mime Type</ui:msg></g:Label>
          <g:Label ui:field="mimeType"/>
-       </g:FlowPanel>
-       <g:FlowPanel>
+       </o:PropertyPanel>
+       
+       <o:PropertyPanel>
+         <g:Label><ui:msg description="Value Type label">Value Type</ui:msg></g:Label>
+         <g:Label ui:field="valueType"/>
+       </o:PropertyPanel>
+       
+       <o:PropertyPanel column="1">
          <g:Label><ui:msg description="Repeatable label">Repeatable</ui:msg></g:Label>
          <g:Label ui:field="repeatable"/>
-       </g:FlowPanel>
-       <g:FlowPanel>
+       </o:PropertyPanel>
+       
+       <o:PropertyPanel>
+         <g:Label><ui:msg description="Unit label">Unit</ui:msg></g:Label>
+         <g:Label ui:field="unit"/>
+       </o:PropertyPanel>
+       
+       <o:PropertyPanel column="1">
          <g:Label><ui:msg description="Occurrence Group label">Occurrence Group</ui:msg></g:Label>
          <g:Label ui:field="occurrenceGroup"/>
-       </g:FlowPanel>
-       <g:FlowPanel>
+       </o:PropertyPanel>
+       
+       <o:PropertyPanel span="2">
          <g:Label><ui:msg description="Label label">Label</ui:msg></g:Label>
          <g:Label ui:field="label"/>
-       </g:FlowPanel>
-       
+       </o:PropertyPanel>
      </o:PropertiesTable>
+
+
 
      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">
         <g:Anchor ui:field="categoryTableTitle" />

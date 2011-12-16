@@ -47,6 +47,14 @@ public class DefaultFlexTable extends FlexTable {
     }
   }
 
+  public void setBorderedCell(boolean bordered) {
+    if(bordered) {
+      removeStyleName("no-bordered-cell");
+    } else {
+      addStyleName("no-bordered-cell");
+    }
+  }
+
   public void setCondensed(boolean condensed) {
     if(condensed) {
       addStyleName("condensed-table");
@@ -98,4 +106,5 @@ public class DefaultFlexTable extends FlexTable {
                                                                      rowElem.appendChild(cell);   
                                                                      } 
                                                                      }-*/;
+
 }
