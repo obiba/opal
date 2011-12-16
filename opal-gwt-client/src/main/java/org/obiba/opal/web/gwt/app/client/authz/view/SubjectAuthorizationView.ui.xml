@@ -7,13 +7,14 @@
   ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:HTMLPanel>
-      <g:InlineLabel ui:field="typeLabel" addStyleNames="key"/>:
-      <g:SuggestBox ui:field="principal"/><g:Image ui:field="add" url="image/20/list-add.png" addStyleNames="clickable button"/>
-    </g:HTMLPanel>
+    <g:FlowPanel addStyleNames="input">
+      <g:InlineLabel ui:field="typeLabel" addStyleNames="key"/>
+      <g:SuggestBox ui:field="principal"/>
+      <g:Button ui:field="add" addStyleNames="btn primary xsmall-indent"><ui:msg description="Add button label">Add</ui:msg></g:Button>
+    </g:FlowPanel>
     <g:FlowPanel addStyleNames="top-margin">
       <c:SimplePager ui:field="pager" location="CENTER"/>
-      <o:Table ui:field="table" addStyleNames="gwt-CellTable" />
+      <o:Table ui:field="table" addStyleNames="full-width" />
     </g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>
