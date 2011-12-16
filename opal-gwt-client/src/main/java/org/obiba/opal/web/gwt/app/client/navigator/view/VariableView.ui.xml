@@ -21,7 +21,7 @@
 
      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-     <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4" valueStyleNames="span8">
+     <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent" valueStyleNames="span8">
        <o:PropertyPanel>
          <g:Label><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
          <g:Label ui:field="entityType"/>

@@ -14,7 +14,7 @@
       
      <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-	 <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span4">
+	 <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
        <g:FlowPanel>
          <g:Label><ui:msg description="Type label">Type</ui:msg></g:Label>
          <g:Label ui:field="datasourceType"/>
