@@ -22,7 +22,7 @@ set JAVA_DEBUG=-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=
 
 IF NOT EXIST "%OPAL_HOME%\logs" mkdir "%OPAL_HOME%\logs"
   rem Add %JAVA_DEBUG% to this line to enable remote JVM debugging (for developers)
-  java %JAVA_OPTS% -cp "%CLASSPATH%" -DOPAL_HOME="%OPAL_HOME%" -DOPAL_DIST=%OPAL_DIST% -DBIRT_HOME=%OPAL_DIST%\birt-runtime-2_6_1 org.obiba.opal.server.OpalServer %*
+  java %JAVA_OPTS% -cp "%CLASSPATH%" -DOPAL_HOME="%OPAL_HOME%" -DOPAL_DIST=%OPAL_DIST% -DBIRT_HOME=%OPAL_DIST%\birt-runtime-2_6_2 org.obiba.opal.server.OpalServer %*
 goto :END
 
 :DEFAULT_JAVA_OPTS
