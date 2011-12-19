@@ -36,7 +36,9 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -363,9 +365,17 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         eventBus.fireEvent(new ReportTemplateCreatedEvent(reportTemplate));
       } else {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-      }
+        String msg = "UnknownError";
+        if(response.getText() != null && response.getText().length() != 0) {
+          try {
+            ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+            msg = errorDto.getStatus();
+          } catch(Exception e) {
 
+          }
+        }
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(msg).build());
+      }
     }
   }
 

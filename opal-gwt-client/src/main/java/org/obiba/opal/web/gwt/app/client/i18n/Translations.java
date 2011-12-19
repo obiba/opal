@@ -264,7 +264,9 @@ public interface Translations extends Constants {
   "RConnectionFailed", "Connection with R server failed.", //
   "UnauthorizedOperation", "You are not allowed to perform this operation.",//
   "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
-  "DatesRangeInvalid", "The range of dates is invalid."//
+  "DatesRangeInvalid", "The range of dates is invalid.",//
+  "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
+  "ReportTemplateCannotBeFound", "The Report Template cannot be found."//
   })
   Map<String, String> userMessageMap();
 
