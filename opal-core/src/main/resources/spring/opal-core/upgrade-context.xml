@@ -153,6 +153,14 @@
           <property name="procedureName" value="update_var_index"/>
         </bean>
 
+		<bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="description" value="Alter some Quartz's column definitions." />
+          <property name="dataSource" ref="opalDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.7.0/" />
+          <property name="scriptBasename" value="quartz-blobs" />
+          <property name="appliesTo" value="1.7.0" />
+        </bean>
+        
         <bean class="org.obiba.opal.core.runtime.upgrade.CreateDataShieldEnvironmentsUpgradeStep"/>
       </list>
     </property>
