@@ -19,10 +19,12 @@ import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Value;
+import org.obiba.magma.ValueSequence;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
@@ -30,6 +32,7 @@ import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
+import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
@@ -47,7 +50,34 @@ public final class Dtos {
 
     @Override
     public ValueDto apply(Value from) {
+      if(from.getValueType().equals(BinaryType.get()) && from.isNull() == false) {
+        return applyBinary(from);
+      }
       return asDto(from).build();
+    }
+
+    private ValueDto applyBinary(Value from) {
+      if(from.isSequence() == false) {
+        return asDto(from).setValue(binaryToString(from)).build();
+      } else {
+        ValueSequence fromSeq = from.asSequence();
+        StringBuilder binStr = new StringBuilder();
+        boolean first = true;
+        for(Value fromVal : fromSeq.getValue()) {
+          if(!first) {
+            binStr.append(",");
+            first = false;
+          }
+          binStr.append(binaryToString(fromVal));
+        }
+        return asDto(from).setValue(binStr.toString()).build();
+      }
+    }
+
+    private String binaryToString(Value from) {
+      if(from.isNull()) return "";
+      int length = ((byte[]) from.getValue()).length;
+      return "binary[" + length + "]";
     }
 
   };
@@ -227,6 +257,18 @@ public final class Dtos {
       valueBuilder.setValue(value.toString());
     }
     return valueBuilder;
+  }
+
+  public static ValueSetsDto.ValueDto.Builder asValueSetsValueDto(String link, Value value) {
+    ValueSetsDto.ValueDto.Builder valueDto = ValueSetsDto.ValueDto.newBuilder();
+    if(value.isNull() == false && value.isSequence() == false) {
+      if(value.getValueType().equals(BinaryType.get())) {
+        valueDto.setLink(link);
+      } else {
+        valueDto.setValue(value.toString());
+      }
+    }
+    return valueDto;
   }
 
   public static VariableEntityDto.Builder asDto(VariableEntity from) {
