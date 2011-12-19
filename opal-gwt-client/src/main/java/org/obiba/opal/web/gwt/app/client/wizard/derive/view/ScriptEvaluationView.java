@@ -96,7 +96,7 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   @Override
   public void populateValues(JsArray<ValueDto> values) {
     JsArrayDataProvider<ValueDto> dataProvider = new JsArrayDataProvider<ValueDto>();
-    if(valuesTable.getPageSize() < values.length()) {
+    if(values != null && valuesTable.getPageSize() < values.length()) {
       valuesTable.setPageSize(values.length());
     }
     dataProvider.addDataDisplay(valuesTable);
