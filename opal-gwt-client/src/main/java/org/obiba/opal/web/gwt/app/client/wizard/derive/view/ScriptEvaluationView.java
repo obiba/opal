@@ -76,7 +76,7 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
 
   public ScriptEvaluationView() {
     initWidget(uiBinder.createAndBindUi(this));
-
+    valuesTable.setPageSize(20);
     valuesTable.addColumn(new TextColumn<ValueDto>() {
 
       @Override
@@ -96,6 +96,9 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   @Override
   public void populateValues(JsArray<ValueDto> values) {
     JsArrayDataProvider<ValueDto> dataProvider = new JsArrayDataProvider<ValueDto>();
+    if(valuesTable.getPageSize() < values.length()) {
+      valuesTable.setPageSize(values.length());
+    }
     dataProvider.addDataDisplay(valuesTable);
     dataProvider.setArray(JsArrays.toSafeArray(values));
     dataProvider.refresh();

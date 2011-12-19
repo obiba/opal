@@ -6,7 +6,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <o:WizardDialogBox autoHide="false" modal="true" height="55em" width="60em">
+  <o:WizardDialogBox autoHide="false" modal="true" height="56em" width="60em">
     <g:caption>
       <ui:msg description="Derive Variable title">Derive Variable</ui:msg>
     </g:caption>
