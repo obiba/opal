@@ -82,7 +82,7 @@ public abstract class DerivedVariableGenerator {
 
       if(entry.isType(ValueMapEntryType.CATEGORY_NAME)) {
         // script
-        scriptBuilder.append("\n    '" + entry.getValue() + "': ");
+        scriptBuilder.append("\n    '" + normalize(entry.getValue()) + "': ");
         appendNewValue(entry);
         if(i < nbCategories - 1) scriptBuilder.append(",");
 
@@ -101,7 +101,7 @@ public abstract class DerivedVariableGenerator {
         } else {
           scriptBuilder.append(",");
         }
-        scriptBuilder.append("\n    '" + entry.getValue() + "': ");
+        scriptBuilder.append("\n    '" + normalize(entry.getValue()) + "': ");
         appendNewValue(entry);
 
         // new category
@@ -113,10 +113,14 @@ public abstract class DerivedVariableGenerator {
   protected ValueMapEntry appendValueMapEntry(String value) {
     ValueMapEntry entry = getValueMapEntry(value);
     if(entry != null) {
-      scriptBuilder.append("\n    '" + value + "': ");
+      scriptBuilder.append("\n    '" + normalize(value) + "': ");
       appendNewValue(entry);
     }
     return entry;
+  }
+
+  private String normalize(String text) {
+    return text == null ? text : text.replace("'", "\\'");
   }
 
   protected ValueMapEntry getValueMapEntry(String value) {
@@ -179,7 +183,7 @@ public abstract class DerivedVariableGenerator {
   protected void appendNewValue(ValueMapEntry entry) {
     String value = entry.getNewValue();
     if(value != null && !value.isEmpty()) {
-      scriptBuilder.append("'" + value + "'");
+      scriptBuilder.append("'" + normalize(value) + "'");
     } else {
       scriptBuilder.append("null");
     }
