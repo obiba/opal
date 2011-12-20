@@ -778,17 +778,23 @@ margin-left:0.8em;
   font-weight: normal;
 }
 
-.dashboard #shortcuts a:hover {
+.dashboard .shortcuts a:hover {
   text-decoration: none;
 }
 
-.dashboard #shortcuts a img {
+.dashboard .shortcuts a img {
   margin-right: 0.8em;
 }
 
-.dashboard #shortcuts a {
+.dashboard .shortcuts a {
   font-weight: bold;
-  color: #000000;
+  color: #333;
+  display:block;
+}
+
+.dashboard .shortcuts span {
+  margin-left: 60px;
+  margin-top: -20px;
 }
 
 /* Variable browser */
@@ -1659,4 +1665,55 @@ textarea.error:focus {
   vertical-align: top;
   width: 20px;
   color: #666;
+}
+
+/* Suggest list box */
+
+.obiba-SuggestListBox {
+	border: 1px solid #CCCCCC;
+    border-radius: 3px 3px 3px 3px;
+    -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+}
+
+.obiba-SuggestListBox ul {
+  float: left;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+
+.obiba-SuggestListBox li {
+  float:left;
+  list-style: none outside none;
+  background-clip: padding-box;
+  background-color: #E4E4E4;
+  background-image: -moz-linear-gradient(center bottom , #E4E4E4 0%, #EEEEEE 70%);
+  border: 1px solid #B4B4B4;
+  border-radius: 3px 3px 3px 3px;
+  color: #333333;
+  margin: 3px 0 3px 5px;
+  padding: 3px 6px 3px 6px;
+}
+
+.obiba-SuggestListBox li span {
+  
+}
+
+.obiba-SuggestListBox li a {
+  color: #888888;
+  font-weight: bold;
+  padding-left: 6px;
+  text-decoration: none;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.obiba-SuggestListBox input {
+  border: none;
+  margin-top: 4px;
+  box-shadow: none;
+}
+
+.obiba-SuggestListBox input:focus {
+  border: none;
+  box-shadow: none;
 }
