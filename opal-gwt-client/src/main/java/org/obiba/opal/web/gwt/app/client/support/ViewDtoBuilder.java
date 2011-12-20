@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
-import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
@@ -60,13 +59,6 @@ public class ViewDtoBuilder {
       fromTables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
     }
     viewDto.setFromArray(fromTables);
-
-    return this;
-  }
-
-  public ViewDtoBuilder defaultJavaScriptView() {
-    JavaScriptViewDto jsDto = JavaScriptViewDto.create();
-    viewDto.setExtension(JavaScriptViewDto.ViewDtoExtensions.view, jsDto);
 
     return this;
   }

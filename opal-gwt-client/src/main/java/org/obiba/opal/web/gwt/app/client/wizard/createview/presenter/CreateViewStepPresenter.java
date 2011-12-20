@@ -211,9 +211,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   private ViewDto createViewDto(ViewDtoBuilder viewDtoBuilder) {
     // Get the view name and datasource name.
-    if(getDisplay().getApplyGlobalVariableFilterOption().getValue()) {
-      viewDtoBuilder.defaultJavaScriptView();
-    } else if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
+    if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
       viewDtoBuilder.defaultVariableListView();
     } else if(getDisplay().getFileViewOption().getValue() || getDisplay().getExcelFileOption().getValue()) {
       FileViewDto fileView = FileViewDto.create();
@@ -241,8 +239,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
 
     HasText getViewName();
-
-    HasValue<Boolean> getApplyGlobalVariableFilterOption();
 
     HasValue<Boolean> getAddVariablesOneByOneOption();
 
@@ -344,7 +340,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
       validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
       validators.add(new DisallowedCharactersValidator(getDisplay().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getApplyGlobalVariableFilterOption(), getDisplay().getAddVariablesOneByOneOption(), getDisplay().getFileViewOption(), getDisplay().getExcelFileOption()), "VariableDefinitionMethodRequired"));
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getAddVariablesOneByOneOption(), getDisplay().getFileViewOption(), getDisplay().getExcelFileOption()), "VariableDefinitionMethodRequired"));
       validators.add(new ConditionalValidator(getDisplay().getFileViewOption(), new RequiredFileSelectionValidator("XMLFileRequired")));
       validators.add(new ConditionalValidator(getDisplay().getExcelFileOption(), new RequiredFileSelectionValidator("ExcelFileRequired")));
       return validators;

@@ -76,9 +76,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   TextBox viewNameTextBox;
 
   @UiField
-  RadioButton applyingGlobalVariableFilterRadioButton;
-
-  @UiField
   RadioButton addingVariablesOneByOneRadioButton;
 
   @UiField
@@ -129,7 +126,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
         fileSelection.setEnabled(useAnExistingView.getValue() || useAnExcelFile.getValue());
       }
     };
-    applyingGlobalVariableFilterRadioButton.addValueChangeHandler(handler);
     addingVariablesOneByOneRadioButton.addValueChangeHandler(handler);
     useAnExistingView.addValueChangeHandler(handler);
     useAnExcelFile.addValueChangeHandler(handler);
@@ -238,11 +234,6 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   @Override
   public HandlerRegistration addConfigureHandler(ClickHandler handler) {
     return configureLink.addClickHandler(handler);
-  }
-
-  @Override
-  public HasValue<Boolean> getApplyGlobalVariableFilterOption() {
-    return applyingGlobalVariableFilterRadioButton;
   }
 
   @Override
