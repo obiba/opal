@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Strings;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
@@ -20,13 +22,15 @@ import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,7 +44,7 @@ public class SuggestListBox extends FlowPanel {
 
   private List<ListItem> items;
 
-  private SuggestBox suggestBox;
+  private DefaultSuggestBox suggestBox;
 
   public SuggestListBox() {
     super();
@@ -72,6 +76,15 @@ public class SuggestListBox extends FlowPanel {
       }
     });
 
+    suggestBox.getTextBox().addKeyUpHandler(new KeyUpHandler() {
+
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        String width = (25 + 6 * suggestBox.getText().length()) + "px";
+        suggestBox.setWidth(width);
+      }
+    });
+
     suggestBox.getTextBox().addFocusHandler(new FocusHandler() {
 
       @Override
@@ -82,10 +95,24 @@ public class SuggestListBox extends FlowPanel {
 
     suggestBox.setWidth("25px");
 
+    suggestBox.getTextBox().addBlurHandler(new BlurHandler() {
+
+      @Override
+      public void onBlur(BlurEvent event) {
+        suggestBox.setText("");
+      }
+    });
+
     items = new ArrayList<ListItem>();
   }
 
+  public MultiWordSuggestOracle getSuggestOracle() {
+    return suggestBox.getSuggestOracle();
+  }
+
   public void addItem(final String text) {
+    if(Strings.isNullOrEmpty(text)) return;
+
     final ListItem item = new ListItem();
 
     item.add(new InlineLabel(text));
