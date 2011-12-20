@@ -18,6 +18,7 @@ import org.obiba.opal.datashield.DataShieldEnvironment;
 import org.obiba.opal.datashield.DataShieldMethod;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 public class DatashieldConfiguration implements OpalConfigurationExtension, Serializable {
 
@@ -58,12 +59,14 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
     return getEnvironment(Environment.ASSIGN);
   }
 
-  public DataShieldEnvironment getEnvironment(Environment env) {
+  public synchronized DataShieldEnvironment getEnvironment(Environment env) {
     Preconditions.checkArgument(env != null, "env cannot be null");
     for(DataShieldEnvironment environment : this.environments) {
       if(environment.getEnvironment() == env) return environment;
     }
-    throw new IllegalArgumentException("Unknown environment " + env);
+    DataShieldEnvironment e = new DataShieldEnvironment(env, Lists.<DataShieldMethod> newArrayList());
+    this.environments.add(e);
+    return e;
   }
 
   private Object readResolve() throws ObjectStreamException {

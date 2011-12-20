@@ -19,6 +19,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class DataShieldEnvironment {
 
@@ -35,7 +36,7 @@ public class DataShieldEnvironment {
     Preconditions.checkArgument(environment != null);
     Preconditions.checkArgument(methods != null);
     this.environment = environment;
-    this.methods = ImmutableList.copyOf(methods);
+    this.methods = Lists.newArrayList(methods);
   }
 
   public Environment getEnvironment() {
