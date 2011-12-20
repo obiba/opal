@@ -16,7 +16,7 @@
       <g:Label>
         <ui:msg description="Participant count label">Number of Participants:</ui:msg>
       </g:Label>
-      <g:Label addStyleNames="count" ui:field="participantCount" />
+      <g:Label addStyleNames="count small-indent" ui:field="participantCount" />
     </g:FlowPanel>
     <g:FlowPanel addStyleNames="shortcuts">
 	    <g:FlowPanel ui:field="datasources">
