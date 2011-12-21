@@ -81,6 +81,10 @@ public class SuggestListBox extends FocusPanel {
             addItem(suggestBox.getText());
             suggestBox.setText("");
           }
+        } else if(event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE) {
+          if(Strings.isNullOrEmpty(suggestBox.getText())) {
+            menu.focusOrRemoveLastItem();
+          }
         }
       }
     });

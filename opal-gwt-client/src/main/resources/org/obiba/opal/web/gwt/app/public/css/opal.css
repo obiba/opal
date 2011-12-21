@@ -1688,6 +1688,10 @@ ul.closeables li {
   padding: 3px 6px 3px 6px;
 }
 
+ul.closeables li.focus {
+  background: #d4d4d4;
+}
+
 ul.closeables li span {
   
 }

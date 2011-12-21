@@ -46,6 +46,8 @@ public class CloseableList extends UList {
     });
     item.add(close);
 
+    clearLastItemFocus();
+
     add(item);
   }
 
@@ -80,5 +82,23 @@ public class CloseableList extends UList {
       }
     }
     return builder.build();
+  }
+
+  public void clearLastItemFocus() {
+    if(getWidgetCount() > 0) {
+      Widget lastItem = getWidget(getWidgetCount() - 1);
+      lastItem.removeStyleName("focus");
+    }
+  }
+
+  public void focusOrRemoveLastItem() {
+    if(getWidgetCount() > 0) {
+      Widget lastItem = getWidget(getWidgetCount() - 1);
+      if(lastItem.getStyleName().indexOf("focus") != -1) {
+        remove(lastItem);
+      } else {
+        lastItem.addStyleName("focus");
+      }
+    }
   }
 }
