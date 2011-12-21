@@ -41,7 +41,7 @@ public class CloseableList extends UList {
 
       @Override
       public void onClick(ClickEvent event) {
-        CloseableList.this.remove(item);
+        removeItem(item);
       }
     });
     item.add(close);
@@ -55,8 +55,13 @@ public class CloseableList extends UList {
     ListItem it = getItem(text);
 
     if(it != null) {
-      remove(it);
+      removeItem(it);
     }
+  }
+
+  private void removeItem(ListItem item) {
+    remove(item);
+    clearLastItemFocus();
   }
 
   private ListItem getItem(String text) {
@@ -95,7 +100,7 @@ public class CloseableList extends UList {
     if(getWidgetCount() > 0) {
       Widget lastItem = getWidget(getWidgetCount() - 1);
       if(lastItem.getStyleName().indexOf("focus") != -1) {
-        remove(lastItem);
+        removeItem((ListItem) lastItem);
       } else {
         lastItem.addStyleName("focus");
       }
