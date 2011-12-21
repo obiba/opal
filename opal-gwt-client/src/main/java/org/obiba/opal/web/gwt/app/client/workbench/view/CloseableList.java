@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Strings;
@@ -24,6 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
  * A list of closeable items.
  */
 public class CloseableList extends UList {
+  private List<ItemRemovedHandler> itemRemovedHandlers = new ArrayList<CloseableList.ItemRemovedHandler>();
 
   public CloseableList() {
     super();
@@ -62,14 +64,21 @@ public class CloseableList extends UList {
   private void removeItem(ListItem item) {
     remove(item);
     clearLastItemFocus();
+    for(ItemRemovedHandler handler : itemRemovedHandlers) {
+      handler.onItemRemoved(getItemText(item));
+    }
+  }
+
+  private String getItemText(ListItem item) {
+    Widget label = item.getWidget(0);
+    return ((HasText) label).getText();
   }
 
   private ListItem getItem(String text) {
     ListItem it = null;
     for(int i = 0; i < getWidgetCount(); i++) {
       ListItem item = (ListItem) getWidget(i);
-      Widget label = item.getWidget(0);
-      if(label instanceof HasText && ((HasText) label).getText().equals(text)) {
+      if(getItemText(item).equals(text)) {
         it = item;
         break;
       }
@@ -80,11 +89,7 @@ public class CloseableList extends UList {
   public List<String> getItemTexts() {
     ImmutableList.Builder<String> builder = ImmutableList.<String> builder();
     for(int i = 0; i < getWidgetCount(); i++) {
-      ListItem item = (ListItem) getWidget(i);
-      Widget label = item.getWidget(0);
-      if(label instanceof HasText) {
-        builder.add(((HasText) label).getText());
-      }
+      builder.add(getItemText((ListItem) getWidget(i)));
     }
     return builder.build();
   }
@@ -105,5 +110,18 @@ public class CloseableList extends UList {
         lastItem.addStyleName("focus");
       }
     }
+  }
+
+  public void addItemRemovedHandler(ItemRemovedHandler handler) {
+    if(itemRemovedHandlers.contains(handler)) return;
+    itemRemovedHandlers.add(handler);
+  }
+
+  public void removeItemRemovedHandler(ItemRemovedHandler handler) {
+    itemRemovedHandlers.remove(handler);
+  }
+
+  public interface ItemRemovedHandler {
+    public void onItemRemoved(String text);
   }
 }

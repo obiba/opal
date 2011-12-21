@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemRemovedHandler;
+
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -34,9 +36,13 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
  */
 public class SuggestListBox extends FocusPanel {
 
-  private CloseableList menu;
+  private CloseableList closeables;
 
   private DefaultSuggestBox suggestBox;
+
+  private ItemValidator itemValidator;
+
+  private ItemAddHandler itemAddHandler;
 
   public SuggestListBox() {
     super();
@@ -45,8 +51,8 @@ public class SuggestListBox extends FocusPanel {
     FlowPanel content = new FlowPanel();
     add(content);
 
-    menu = new CloseableList();
-    content.add(menu);
+    closeables = new CloseableList();
+    content.add(closeables);
 
     content.add(suggestBox = new DefaultSuggestBox());
     suggestBox.setWidth("25px");
@@ -60,6 +66,7 @@ public class SuggestListBox extends FocusPanel {
       }
     });
 
+    setItemValidator(new DefaultItemValidator());
   }
 
   private void addSuggestBoxHandlers() {
@@ -78,12 +85,13 @@ public class SuggestListBox extends FocusPanel {
       public void onKeyDown(KeyDownEvent event) {
         if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
           if(!Strings.isNullOrEmpty(suggestBox.getText())) {
-            addItem(suggestBox.getText());
-            suggestBox.setText("");
+            if(addItem(suggestBox.getText())) {
+              suggestBox.setText("");
+            }
           }
         } else if(event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE) {
           if(Strings.isNullOrEmpty(suggestBox.getText())) {
-            menu.focusOrRemoveLastItem();
+            closeables.focusOrRemoveLastItem();
           }
         }
       }
@@ -115,20 +123,72 @@ public class SuggestListBox extends FocusPanel {
     });
   }
 
-  public void addItem(String text) {
-    menu.addItem(text);
+  public boolean addItem(String text) {
+    if(itemValidator != null && !itemValidator.validate(text)) return false;
+
+    if(itemAddHandler != null) {
+      itemAddHandler.apply(text);
+    } else {
+      closeables.addItem(text);
+    }
+    return true;
   }
 
   public void removeItem(String text) {
-    menu.removeItem(text);
+    closeables.removeItem(text);
   }
 
-  public List<String> getItemTexts() {
-    return menu.getItemTexts();
+  public List<String> getItems() {
+    return closeables.getItemTexts();
   }
 
   public MultiWordSuggestOracle getSuggestOracle() {
     return suggestBox.getSuggestOracle();
   }
 
+  public void setItemValidator(ItemValidator itemValidator) {
+    this.itemValidator = itemValidator;
+  }
+
+  public void setItemAddHandler(ItemAddHandler itemAddHandler) {
+    this.itemAddHandler = itemAddHandler;
+  }
+
+  public void addItemRemovedHandler(ItemRemovedHandler handler) {
+    closeables.addItemRemovedHandler(handler);
+  }
+
+  public void removeItemRemovedHandler(ItemRemovedHandler handler) {
+    closeables.removeItemRemovedHandler(handler);
+  }
+
+  public interface ItemValidator {
+    public boolean validate(String text);
+  }
+
+  public class DefaultItemValidator implements ItemValidator {
+
+    @Override
+    public boolean validate(String text) {
+      return text != null && !Strings.isNullOrEmpty(text.trim()) && !closeables.getItemTexts().contains(text);
+    }
+
+  }
+
+  public interface ItemAddHandler {
+    public void apply(String text);
+  }
+
+  public class DefaultItemAddHandler implements ItemAddHandler {
+
+    @Override
+    public void apply(String text) {
+      addItem(text);
+    }
+
+    protected void addItem(String text) {
+      closeables.addItem(text);
+    }
+
+  }
 }
