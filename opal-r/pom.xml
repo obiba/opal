@@ -15,13 +15,13 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.7.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal-r</artifactId>
-  <version>1.7-SNAPSHOT</version>
+  <version>1.7.0</version>
 
   <name>opal-r</name>
   <description>Opal R Module</description>
