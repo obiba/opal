@@ -1669,20 +1669,13 @@ textarea.error:focus {
 
 /* Suggest list box */
 
-.obiba-SuggestListBox {
-	border: 1px solid #CCCCCC;
-    border-radius: 3px 3px 3px 3px;
-    -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
-}
-
-.obiba-SuggestListBox ul {
+ul.closeables {
   float: left;
   margin-bottom: 0;
   margin-left: 0;
 }
 
-.obiba-SuggestListBox li {
+ul.closeables li {
   float:left;
   list-style: none outside none;
   background-clip: padding-box;
@@ -1695,16 +1688,23 @@ textarea.error:focus {
   padding: 3px 6px 3px 6px;
 }
 
-.obiba-SuggestListBox li span {
+ul.closeables li span {
   
 }
 
-.obiba-SuggestListBox li a {
+ul.closeables li a {
   color: #888888;
   font-weight: bold;
   padding-left: 6px;
   text-decoration: none;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.obiba-SuggestListBox {
+	border: 1px solid #CCCCCC;
+    border-radius: 3px 3px 3px 3px;
+    -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
 }
 
 .obiba-SuggestListBox input {

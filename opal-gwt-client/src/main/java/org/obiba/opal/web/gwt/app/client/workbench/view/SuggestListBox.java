@@ -9,10 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -40,9 +40,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class SuggestListBox extends FlowPanel {
 
-  private UList menu;
-
-  private List<ListItem> items;
+  private CloseableList menu;
 
   private DefaultSuggestBox suggestBox;
 
@@ -50,10 +48,15 @@ public class SuggestListBox extends FlowPanel {
     super();
     addStyleName("obiba-SuggestListBox");
 
-    menu = new UList();
-    super.add(getMenu());
+    menu = new CloseableList();
+    super.add(menu);
 
     super.add(suggestBox = new DefaultSuggestBox());
+    suggestBox.setWidth("25px");
+    addSuggestBoxHandlers();
+  }
+
+  private void addSuggestBoxHandlers() {
 
     suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 
@@ -93,8 +96,6 @@ public class SuggestListBox extends FlowPanel {
       }
     });
 
-    suggestBox.setWidth("25px");
-
     suggestBox.getTextBox().addBlurHandler(new BlurHandler() {
 
       @Override
@@ -102,55 +103,82 @@ public class SuggestListBox extends FlowPanel {
         suggestBox.setText("");
       }
     });
+  }
 
-    items = new ArrayList<ListItem>();
+  public void addItem(String text) {
+    menu.addItem(text);
+  }
+
+  public void removeItem(String text) {
+    menu.removeItem(text);
+  }
+
+  public List<String> getItemTexts() {
+    return menu.getItemTexts();
   }
 
   public MultiWordSuggestOracle getSuggestOracle() {
     return suggestBox.getSuggestOracle();
   }
 
-  public void addItem(final String text) {
-    if(Strings.isNullOrEmpty(text)) return;
+  private final class CloseableList extends UList {
 
-    final ListItem item = new ListItem();
+    public CloseableList() {
+      super();
+      addStyleName("closeables");
+    }
 
-    item.add(new InlineLabel(text));
-    Anchor close = new Anchor("x");
-    close.addClickHandler(new ClickHandler() {
+    public void addItem(final String text) {
+      if(Strings.isNullOrEmpty(text)) return;
 
-      @Override
-      public void onClick(ClickEvent event) {
-        if(items.contains(item)) {
-          items.remove(item);
-          menu.remove(item);
+      final ListItem item = new ListItem();
+
+      item.add(new InlineLabel(text));
+      Anchor close = new Anchor("x");
+      close.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          CloseableList.this.remove(item);
+        }
+      });
+      item.add(close);
+
+      add(item);
+    }
+
+    public void removeItem(String text) {
+      ListItem it = getItem(text);
+
+      if(it != null) {
+        remove(it);
+      }
+    }
+
+    private ListItem getItem(String text) {
+      ListItem it = null;
+      for(int i = 0; i < getWidgetCount(); i++) {
+        ListItem item = (ListItem) getWidget(i);
+        Widget label = item.getWidget(0);
+        if(label instanceof HasText && ((HasText) label).getText().equals(text)) {
+          it = item;
+          break;
         }
       }
-    });
-    item.add(close);
+      return it;
+    }
 
-    menu.add(item);
-    items.add(item);
-  }
-
-  public void removeItem(String text) {
-    ListItem it = null;
-    for(ListItem item : items) {
-      Widget label = item.getWidget(0);
-      if(label instanceof HasText && ((HasText) label).getText().equals(text)) {
-        it = item;
-        break;
+    public List<String> getItemTexts() {
+      ImmutableList.Builder<String> builder = ImmutableList.<String> builder();
+      for(int i = 0; i < getWidgetCount(); i++) {
+        ListItem item = (ListItem) getWidget(i);
+        Widget label = item.getWidget(0);
+        if(label instanceof HasText) {
+          builder.add(((HasText) label).getText());
+        }
       }
+      return builder.build();
     }
-
-    if(it != null) {
-      items.remove(it);
-      menu.remove(it);
-    }
-  }
-
-  protected Widget getMenu() {
-    return menu;
   }
 
 }
