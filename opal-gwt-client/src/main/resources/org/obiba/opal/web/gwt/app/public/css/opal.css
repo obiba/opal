@@ -1701,15 +1701,21 @@ ul.closeables li a {
 }
 
 .obiba-SuggestListBox {
-	border: 1px solid #CCCCCC;
-    border-radius: 3px 3px 3px 3px;
-    -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px 3px 3px 3px;
+  -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+}
+
+.obiba-SuggestListBox > div {
+  margin: 0;
+  padding: 0;
 }
 
 .obiba-SuggestListBox input {
   border: none;
   margin-top: 4px;
+  margin-left: 4px;
   box-shadow: none;
 }
 

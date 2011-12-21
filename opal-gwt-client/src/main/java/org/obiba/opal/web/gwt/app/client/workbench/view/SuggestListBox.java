@@ -24,6 +24,7 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
@@ -31,7 +32,7 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 /**
  *
  */
-public class SuggestListBox extends FlowPanel {
+public class SuggestListBox extends FocusPanel {
 
   private CloseableList menu;
 
@@ -41,12 +42,24 @@ public class SuggestListBox extends FlowPanel {
     super();
     addStyleName("obiba-SuggestListBox");
 
-    menu = new CloseableList();
-    super.add(menu);
+    FlowPanel content = new FlowPanel();
+    add(content);
 
-    super.add(suggestBox = new DefaultSuggestBox());
+    menu = new CloseableList();
+    content.add(menu);
+
+    content.add(suggestBox = new DefaultSuggestBox());
     suggestBox.setWidth("25px");
     addSuggestBoxHandlers();
+
+    addFocusHandler(new FocusHandler() {
+
+      @Override
+      public void onFocus(FocusEvent event) {
+        suggestBox.setFocus(true);
+      }
+    });
+
   }
 
   private void addSuggestBoxHandlers() {
