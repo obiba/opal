@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemRemovedHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemValidator;
 
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -39,10 +40,6 @@ public class SuggestListBox extends FocusPanel {
   private CloseableList closeables;
 
   private DefaultSuggestBox suggestBox;
-
-  private ItemValidator itemValidator;
-
-  private ItemAddHandler itemAddHandler;
 
   public SuggestListBox() {
     super();
@@ -124,14 +121,7 @@ public class SuggestListBox extends FocusPanel {
   }
 
   public boolean addItem(String text) {
-    if(itemValidator != null && !itemValidator.validate(text)) return false;
-
-    if(itemAddHandler != null) {
-      itemAddHandler.apply(text);
-    } else {
-      closeables.addItem(text);
-    }
-    return true;
+    return closeables.addItem(text);
   }
 
   public void removeItem(String text) {
@@ -146,12 +136,8 @@ public class SuggestListBox extends FocusPanel {
     return suggestBox.getSuggestOracle();
   }
 
-  public void setItemValidator(ItemValidator itemValidator) {
-    this.itemValidator = itemValidator;
-  }
-
-  public void setItemAddHandler(ItemAddHandler itemAddHandler) {
-    this.itemAddHandler = itemAddHandler;
+  public void setItemValidator(ItemValidator validator) {
+    closeables.setItemValidator(validator);
   }
 
   public void addItemRemovedHandler(ItemRemovedHandler handler) {
@@ -162,33 +148,16 @@ public class SuggestListBox extends FocusPanel {
     closeables.removeItemRemovedHandler(handler);
   }
 
-  public interface ItemValidator {
-    public boolean validate(String text);
-  }
-
+  /**
+   * Validates text is not empty or blank and is unique.
+   */
   public class DefaultItemValidator implements ItemValidator {
 
     @Override
     public boolean validate(String text) {
-      return text != null && !Strings.isNullOrEmpty(text.trim()) && !closeables.getItemTexts().contains(text);
+      return text != null && !Strings.isNullOrEmpty(text.trim()) && !getItems().contains(text);
     }
 
   }
 
-  public interface ItemAddHandler {
-    public void apply(String text);
-  }
-
-  public class DefaultItemAddHandler implements ItemAddHandler {
-
-    @Override
-    public void apply(String text) {
-      addItem(text);
-    }
-
-    protected void addItem(String text) {
-      closeables.addItem(text);
-    }
-
-  }
 }

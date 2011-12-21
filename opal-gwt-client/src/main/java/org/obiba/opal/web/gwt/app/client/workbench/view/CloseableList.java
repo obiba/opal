@@ -25,16 +25,27 @@ import com.google.gwt.user.client.ui.Widget;
  * A list of closeable items.
  */
 public class CloseableList extends UList {
+
   private List<ItemRemovedHandler> itemRemovedHandlers = new ArrayList<CloseableList.ItemRemovedHandler>();
+
+  private ItemValidator itemValidator;
 
   public CloseableList() {
     super();
     addStyleName("closeables");
   }
 
-  public void addItem(final String text) {
-    if(Strings.isNullOrEmpty(text)) return;
+  public boolean addItem(final String text) {
+    if(Strings.isNullOrEmpty(text)) return false;
 
+    if(itemValidator != null && !itemValidator.validate(text)) return false;
+
+    addItemInternal(text);
+
+    return true;
+  }
+
+  private void addItemInternal(final String text) {
     final ListItem item = new ListItem();
 
     item.add(new InlineLabel(text));
@@ -121,7 +132,20 @@ public class CloseableList extends UList {
     itemRemovedHandlers.remove(handler);
   }
 
+  public void setItemValidator(ItemValidator validator) {
+    this.itemValidator = validator;
+  }
+
   public interface ItemRemovedHandler {
     public void onItemRemoved(String text);
   }
+
+  public interface ItemValidator {
+    public boolean validate(String text);
+  }
+
+  public interface ItemTransformer {
+    public boolean addItem(String text);
+  }
+
 }
