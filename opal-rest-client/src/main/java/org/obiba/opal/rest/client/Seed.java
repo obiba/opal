@@ -42,7 +42,7 @@ public class Seed {
 
   private final JSONObject seed;
 
-  private Seed(File seedFile, String uri, String username, String password) throws URISyntaxException, IOException, JSONException {
+  public Seed(File seedFile, String uri, String username, String password) throws URISyntaxException, IOException, JSONException {
     this.seedFile = seedFile;
     String seedStr = readFully(seedFile);
     this.seed = new JSONObject(seedStr);

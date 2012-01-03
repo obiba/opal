@@ -92,6 +92,10 @@ public class OpalJavaClient {
 
     try {
       HttpResponse response = get(uri);
+      if(response.getStatusLine().getStatusCode() >= 400) {
+        response.getEntity().consumeContent();
+        throw new RuntimeException(response.getStatusLine().getReasonPhrase());
+      }
       is = response.getEntity().getContent();
 
       while(messageBuilder.mergeDelimitedFrom(is)) {
@@ -113,6 +117,10 @@ public class OpalJavaClient {
     InputStream is = null;
     try {
       HttpResponse response = get(uri);
+      if(response.getStatusLine().getStatusCode() >= 400) {
+        response.getEntity().consumeContent();
+        throw new RuntimeException(response.getStatusLine().getReasonPhrase());
+      }
       is = response.getEntity().getContent();
       return (T) builder.mergeFrom(is).build();
     } catch(IOException e) {
@@ -163,7 +171,7 @@ public class OpalJavaClient {
     return execute(new HttpGet(uri));
   }
 
-  public HttpResponse delete(URI uri)  throws ClientProtocolException, IOException{
+  public HttpResponse delete(URI uri) throws ClientProtocolException, IOException {
     return execute(new HttpDelete(uri));
   }
 
