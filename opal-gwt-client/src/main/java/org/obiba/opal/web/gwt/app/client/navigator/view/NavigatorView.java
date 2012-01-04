@@ -61,11 +61,17 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public void startProcessing() {
+  public void addToSlot(Object slot, Widget content) {
+
   }
 
   @Override
-  public void stopProcessing() {
+  public void removeFromSlot(Object slot, Widget content) {
+  };
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+
   }
 
   @Override

@@ -12,18 +12,13 @@ package org.obiba.opal.web.gwt.inject.client;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.view.DashboardView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
-/**
- *
- */
-public class DashboardModule extends AbstractGinModule {
+public class DashboardModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    // Bind concrete implementations to interfaces
-    bind(DashboardPresenter.Display.class).to(DashboardView.class).in(Singleton.class);
+    bindPresenter(DashboardPresenter.class, DashboardPresenter.Display.class, DashboardView.class, DashboardPresenter.Proxy.class);
   }
 
 }

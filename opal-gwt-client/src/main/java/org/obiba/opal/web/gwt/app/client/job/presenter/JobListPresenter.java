@@ -9,17 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.job.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.inject.client.GwtEventBusAdaptor;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -30,16 +27,23 @@ import org.obiba.opal.web.model.client.opal.CommandStateDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 /**
  *
  */
-public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> {
+public class JobListPresenter extends Presenter<JobListPresenter.Display, JobListPresenter.Proxy> {
   //
   // Constants
   //
@@ -61,12 +65,12 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   //
 
   @Inject
-  public JobListPresenter(Display display, EventBus eventBus, JobDetailsPresenter jobDetailsPresenter) {
-    super(display, eventBus);
+  public JobListPresenter(Display display, EventBus eventBus, Proxy proxy, JobDetailsPresenter jobDetailsPresenter) {
+    super(eventBus, display, proxy);
 
     this.jobDetailsPresenter = jobDetailsPresenter;
 
-    getDisplay().getActionsColumn().setActionHandler(new ActionHandler<CommandStateDto>() {
+    getView().getActionsColumn().setActionHandler(new ActionHandler<CommandStateDto>() {
       public void doAction(CommandStateDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
@@ -75,24 +79,16 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     });
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
-  public Place getPlace() {
-    return null;
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   @Override
   protected void onBind() {
-    super.registerHandler(getDisplay().addClearButtonHandler(new ClearButtonHandler()));
-    super.registerHandler(getDisplay().addRefreshButtonHandler(new RefreshButtonHandler()));
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+    super.registerHandler(getView().addClearButtonHandler(new ClearButtonHandler()));
+    super.registerHandler(getView().addRefreshButtonHandler(new RefreshButtonHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
   }
 
   @Override
@@ -100,12 +96,12 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
   }
 
   @Override
-  public void refreshDisplay() {
+  public void onReset() {
     updateTable();
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReveal() {
     updateTable();
   }
 
@@ -127,8 +123,8 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands").get().withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
       @Override
       public void onResource(Response response, JsArray<CommandStateDto> resource) {
-        getDisplay().renderRows(resource);
-        getDisplay().showClearJobsButton(containsClearableJobs(resource));
+        getView().renderRows(resource);
+        getView().showClearJobsButton(containsClearableJobs(resource));
       }
 
     }).send();
@@ -142,7 +138,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     if(LOG_ACTION.equals(actionName)) {
       jobDetailsPresenter.getDisplay().showDialog(dto);
     } else if(CANCEL_ACTION.equals(actionName)) {
-      authorizeCancelJob(dto, new Authorizer(eventBus) {
+      authorizeCancelJob(dto, new Authorizer(new GwtEventBusAdaptor(getEventBus())) {
 
         @Override
         public void authorized() {
@@ -160,11 +156,11 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
           @Override
           public void onResponseCode(Request request, Response response) {
             if(response.getStatusCode() == 200) {
-              eventBus.fireEvent(NotificationEvent.newBuilder().info("jobCancelled").build());
+              getEventBus().fireEvent(NotificationEvent.newBuilder().info("jobCancelled").build());
             } else {
-              eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
             }
-            refreshDisplay();
+            updateTable();
           }
         };
 
@@ -172,7 +168,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
       }
     };
 
-    eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
+    getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
   }
 
   private void deleteCompletedJobs() {
@@ -182,7 +178,7 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            refreshDisplay();
+            updateTable();
           }
         };
 
@@ -190,14 +186,14 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
       }
     };
 
-    eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
+    getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
   }
 
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     SelectionModel<CommandStateDto> getTableSelection();
 
@@ -210,6 +206,11 @@ public class JobListPresenter extends WidgetPresenter<JobListPresenter.Display> 
     HandlerRegistration addClearButtonHandler(ClickHandler handler);
 
     HandlerRegistration addRefreshButtonHandler(ClickHandler handler);
+  }
+
+  @ProxyStandard
+  @NameToken(Places.jobs)
+  public interface Proxy extends ProxyPlace<JobListPresenter> {
   }
 
   class ClearButtonHandler implements ClickHandler {

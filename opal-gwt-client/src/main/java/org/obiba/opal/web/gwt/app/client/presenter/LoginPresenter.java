@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
@@ -28,14 +22,22 @@ import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.NoGatekeeper;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealRootLayoutContentEvent;
 
-public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
+public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     public void focusOnUserName();
 
@@ -55,30 +57,31 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
   }
 
+  @ProxyStandard
+  @NameToken("login")
+  @NoGatekeeper
+  public interface Proxy extends ProxyPlace<LoginPresenter> {
+  }
+
   private final RequestCredentials credentials;
 
   private ResourceAuthorizationCache authorizationCache;
 
   @Inject
-  public LoginPresenter(Display display, EventBus eventBus, RequestCredentials credentials, ResourceAuthorizationCache authorizationCache) {
-    super(display, eventBus);
+  public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials, ResourceAuthorizationCache authorizationCache) {
+    super(eventBus, display, proxy);
     this.credentials = credentials;
     this.authorizationCache = authorizationCache;
   }
 
   @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
   protected void onBind() {
-    display.getSignIn().addClickHandler(new ClickHandler() {
+    getView().getSignIn().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         createSecurityResource();
       }
     });
-    display.getUserNameTextBox().addKeyUpHandler(new KeyUpHandler() {
+    getView().getUserNameTextBox().addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
         if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -86,7 +89,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
         }
       }
     });
-    display.getPasswordTextBox().addKeyUpHandler(new KeyUpHandler() {
+    getView().getPasswordTextBox().addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
         if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -97,11 +100,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
   }
 
   private void createSecurityResource() {
-    createSecurityResource(display.getUserName().getValue(), display.getPassword().getValue());
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+    createSecurityResource(getView().getUserName().getValue(), getView().getPassword().getValue());
   }
 
   @Override
@@ -109,14 +108,15 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
   }
 
   @Override
-  public void refreshDisplay() {
+  protected void revealInParent() {
+    RevealRootLayoutContentEvent.fire(this, this);
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReset() {
     // TODO: Temporarily commenting out the "focus on user name" behaviour.
     // This seems to lead to layout issues!
-    // display.focusOnUserName();
+    // getView().focusOnUserName();
     authorizationCache.clear();
   }
 
@@ -125,7 +125,7 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        display.showErrorMessageAndClearPassword();
+        getView().showErrorMessageAndClearPassword();
       }
     };
 
@@ -135,11 +135,11 @@ public class LoginPresenter extends WidgetPresenter<LoginPresenter.Display> {
       public void onResponseCode(Request request, Response response) {
         // When a 201 happens, we should have credentials, but we'll test anyway.
         if(credentials.hasCredentials()) {
-          display.clear();
+          getView().clear();
           credentials.setUsername(username);
-          eventBus.fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
+          getEventBus().fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
         } else {
-          display.showErrorMessageAndClearPassword();
+          getView().showErrorMessageAndClearPassword();
         }
       }
     }).withFormBody("username", username, "password", password).send();

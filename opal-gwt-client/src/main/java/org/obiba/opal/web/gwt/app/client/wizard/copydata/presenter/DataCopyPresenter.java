@@ -21,9 +21,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
@@ -44,15 +43,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.inject.Inject;
 
 public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display> implements Wizard {
 
   @Inject
   private TableListPresenter tableListPresenter;
-
-  @Inject
-  private JobListPresenter jobListPresenter;
 
   private String datasourceName;
 
@@ -95,7 +92,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
     super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
     super.registerHandler(getDisplay().addCloseClickHandler(new FinishClickHandler()));
     super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
-    super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler(eventBus, jobListPresenter)));
+    super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler(eventBus)));
     super.registerHandler(eventBus.addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
     getDisplay().setTablesValidator(new TablesValidator());
     getDisplay().setDestinationValidator(new DestinationValidator());
@@ -269,17 +266,14 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
 
     private final EventBus eventBus;
 
-    private final JobListPresenter jobListPresenter;
-
-    public JobLinkClickHandler(EventBus eventBus, JobListPresenter jobListPresenter) {
+    public JobLinkClickHandler(EventBus eventBus) {
       super();
       this.eventBus = eventBus;
-      this.jobListPresenter = jobListPresenter;
     }
 
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter).forResource("/shell/commands").build());
+      eventBus.fireEvent(new PlaceChangeEvent(Places.jobsPlace));
     }
   }
 

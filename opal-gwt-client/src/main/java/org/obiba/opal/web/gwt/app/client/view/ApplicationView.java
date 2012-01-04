@@ -22,9 +22,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Panel;
@@ -36,12 +36,12 @@ import com.google.gwt.user.client.ui.Widget;
 public class ApplicationView implements ApplicationPresenter.Display {
 
   @UiTemplate("ApplicationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DockLayoutPanel, ApplicationView> {
+  interface ViewUiBinder extends UiBinder<LayoutPanel, ApplicationView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private final DockLayoutPanel dock;
+  private final LayoutPanel dock;
 
   @UiField
   Panel topBar;
@@ -103,6 +103,20 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
+  public void addToSlot(Object slot, Widget content) {
+  }
+
+  @Override
+  public void removeFromSlot(Object slot, Widget content) {
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    this.workbench.clear();
+    this.workbench.add(content);
+  }
+
+  @Override
   public MenuItem getDashboardItem() {
     return dashboardItem;
   }
@@ -131,14 +145,6 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public HasClickHandlers getAdministration() {
     return administration;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   @Override
@@ -184,7 +190,19 @@ public class ApplicationView implements ApplicationPresenter.Display {
 
   @Override
   public HasAuthorization getAdministrationAuthorizer() {
-    return new UIObjectAuthorizer(administration);
+    return new UIObjectAuthorizer(administration) {
+      @Override
+      public void authorized() {
+        GWT.log("authorized");
+        super.authorized();
+      }
+
+      @Override
+      public void unauthorized() {
+        GWT.log("unauthorized");
+        super.unauthorized();
+      }
+    };
   }
 
   @Override

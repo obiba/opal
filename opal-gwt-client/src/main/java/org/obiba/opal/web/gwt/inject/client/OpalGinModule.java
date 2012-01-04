@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
-import net.customware.gwt.presenter.client.DefaultEventBus;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
@@ -18,6 +17,9 @@ import org.obiba.opal.web.gwt.app.client.authz.view.AuthorizationView;
 import org.obiba.opal.web.gwt.app.client.authz.view.SubjectAuthorizationView;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderDialogView;
+import org.obiba.opal.web.gwt.app.client.place.DefaultPlace;
+import org.obiba.opal.web.gwt.app.client.place.OpalPlaceManager;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
@@ -53,25 +55,30 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
-import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
+import com.gwtplatform.mvp.client.gin.DefaultModule;
 
 /**
  *
  */
-public class OpalGinModule extends AbstractGinModule {
+public class OpalGinModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
     // Bind concrete implementations to interfaces
-    bind(EventBus.class).to(DefaultEventBus.class).in(Singleton.class);
+    bind(EventBus.class).to(GwtEventBusAdaptor.class).in(Singleton.class);
     bind(RequestCredentials.class).in(Singleton.class);
     bind(ResourceAuthorizationCache.class).in(Singleton.class);
     bind(RequestUrlBuilder.class).to(DefaultRequestUrlBuilder.class).in(Singleton.class);
 
-    bind(ApplicationPresenter.Display.class).to(ApplicationView.class).in(Singleton.class);
-    bind(LoginPresenter.Display.class).to(LoginView.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
+
+    bindConstant().annotatedWith(DefaultPlace.class).to(Places.dashboard);
+
+    install(new DefaultModule(OpalPlaceManager.class));
+    bindPresenter(ApplicationPresenter.class, ApplicationPresenter.Display.class, ApplicationView.class, ApplicationPresenter.Proxy.class);
+    bindPresenter(LoginPresenter.class, LoginPresenter.Display.class, LoginView.class, LoginPresenter.Proxy.class);
 
     configureWidgets();
 

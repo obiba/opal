@@ -20,22 +20,21 @@ import org.obiba.opal.web.gwt.app.client.fs.view.FileSystemTreeView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadDialogView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FolderDetailsView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 /**
  *
  */
-public class FileSystemModule extends AbstractGinModule {
+public class FileSystemModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    // Bind concrete implementations to interfaces
+    bindPresenter(FileExplorerPresenter.class, FileExplorerPresenter.Display.class, FileExplorerView.class, FileExplorerPresenter.Proxy.class);
+
     bind(FolderDetailsPresenter.Display.class).to(FolderDetailsView.class);
     bind(FileSystemTreePresenter.Display.class).to(FileSystemTreeView.class);
-    bind(FileExplorerPresenter.Display.class).to(FileExplorerView.class).in(Singleton.class);
     bind(FileUploadDialogPresenter.Display.class).to(FileUploadDialogView.class);
     bind(FileDownloadPresenter.Display.class).to(FileDownloadView.class).in(Singleton.class);
   }
-
 }

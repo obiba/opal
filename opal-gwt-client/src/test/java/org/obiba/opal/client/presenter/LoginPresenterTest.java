@@ -14,7 +14,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import net.customware.gwt.presenter.client.EventBus;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +25,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.SimpleEventBus;
 
 public class LoginPresenterTest {
 
@@ -37,10 +38,11 @@ public class LoginPresenterTest {
   @Before
   public void setUp() {
     displayMock = createMock(LoginPresenter.Display.class);
-    EventBus eventBus = createMock(EventBus.class);
+    EventBus eventBus = new SimpleEventBus();
+    LoginPresenter.Proxy proxy = createMock(LoginPresenter.Proxy.class);
     RequestCredentials credentials = new RequestCredentials();
     ResourceAuthorizationCache authorizationCache = new ResourceAuthorizationCache();
-    loginPresenter = new LoginPresenter(displayMock, eventBus, credentials, authorizationCache);
+    loginPresenter = new LoginPresenter(displayMock, eventBus, proxy, credentials, authorizationCache);
   }
 
   @Test

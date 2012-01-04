@@ -79,8 +79,24 @@ public class JobListView extends Composite implements Display {
 
   public JobListView() {
     initWidget(uiBinder.createAndBindUi(this));
-
     initTable();
+  }
+
+  @Override
+  public Widget asWidget() {
+    return this;
+  }
+
+  @Override
+  public void addToSlot(Object slot, Widget content) {
+  }
+
+  @Override
+  public void removeFromSlot(Object slot, Widget content) {
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
   }
 
   //
@@ -112,23 +128,6 @@ public class JobListView extends Composite implements Display {
   @Override
   public HandlerRegistration addRefreshButtonHandler(ClickHandler handler) {
     return refreshButton.addClickHandler(handler);
-  }
-
-  //
-  // Composite Methods
-  //
-
-  @Override
-  public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   //

@@ -19,9 +19,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
@@ -51,14 +50,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.inject.Inject;
 
 public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPresenter.Display> {
 
   private static Translations translations = GWT.create(Translations.class);
-
-  @Inject
-  private JobListPresenter jobListPresenter;
 
   @Inject
   private ImportData importData;
@@ -300,7 +297,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter).forResource("/shell/commands").build());
+      eventBus.fireEvent(new PlaceChangeEvent(Places.jobsPlace));
     }
 
   }

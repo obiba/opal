@@ -18,12 +18,12 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
@@ -46,6 +46,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -248,7 +249,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         if(response.getStatusCode() != Response.SC_OK) {
           eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
-          eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
+          eventBus.fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
         }
       }
     };

@@ -9,15 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
@@ -27,13 +25,20 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Display> {
+public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, NavigatorPresenter.Proxy> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setTreeDisplay(NavigatorTreePresenter.Display treeDisplay);
 
@@ -52,57 +57,69 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
     HasAuthorization getExportDataAuthorizer();
   }
 
-  @Inject
+  @ProxyStandard
+  @NameToken(Places.navigator)
+  public interface Proxy extends ProxyPlace<NavigatorPresenter> {
+  }
+
   private NavigatorTreePresenter navigatorTreePresenter;
 
-  @Inject
   private DatasourcePresenter datasourcePresenter;
 
-  @Inject
   private TablePresenter tablePresenter;
 
-  @Inject
   private VariablePresenter variablePresenter;
 
   @Inject
-  public NavigatorPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public NavigatorPresenter(final Display display, final Proxy proxy, final EventBus eventBus, NavigatorTreePresenter navigatorTreePresenter, DatasourcePresenter datasourcePresenter, TablePresenter tablePresenter, VariablePresenter variablePresenter) {
+    super(eventBus, display, proxy);
+
+    this.navigatorTreePresenter = navigatorTreePresenter;
+    this.datasourcePresenter = datasourcePresenter;
+    this.tablePresenter = tablePresenter;
+    this.variablePresenter = variablePresenter;
+  }
+
+  @Override
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     navigatorTreePresenter.bind();
     datasourcePresenter.bind();
     tablePresenter.bind();
     variablePresenter.bind();
 
-    getDisplay().setTreeDisplay(navigatorTreePresenter.getDisplay());
+    getView().setTreeDisplay(navigatorTreePresenter.getDisplay());
 
-    super.registerHandler(getDisplay().addCreateDatasourceClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WizardRequiredEvent(WizardType.CREATE_DATASOURCE));
-      }
-    }));
-
-    super.registerHandler(getDisplay().addImportDataClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addCreateDatasourceClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_DATA));
+        getEventBus().fireEvent(new WizardRequiredEvent(WizardType.CREATE_DATASOURCE));
       }
     }));
 
-    super.registerHandler(getDisplay().addExportDataClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addImportDataClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA));
+        getEventBus().fireEvent(new WizardRequiredEvent(WizardType.IMPORT_DATA));
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+    super.registerHandler(getView().addExportDataClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA));
+      }
+    }));
+
+    super.registerHandler(getEventBus().addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
 
       @Override
       public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
@@ -110,7 +127,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
       @Override
       public void onTableSelectionChanged(TableSelectionChangeEvent event) {
@@ -118,7 +135,7 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
 
       @Override
       public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
@@ -137,45 +154,39 @@ public class NavigatorPresenter extends WidgetPresenter<NavigatorPresenter.Displ
   }
 
   @Override
-  public void refreshDisplay() {
+  protected void onReset() {
+    super.onReset();
     navigatorTreePresenter.refreshDisplay();
   }
 
   @Override
-  public void revealDisplay() {
+  protected void onReveal() {
+    super.onReveal();
     navigatorTreePresenter.revealDisplay();
     authorize();
   }
 
   private void authorize() {
     // create datasource
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getDisplay().getCreateDatasourceAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getView().getCreateDatasourceAuthorizer()).send();
     // import data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post()//
     .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
     .and("/functional-units", HttpMethod.GET)//
-    .authorize(getDisplay().getImportDataAuthorizer()).build())//
+    .authorize(getView().getImportDataAuthorizer()).build())//
     .send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
     .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
     .and("/functional-units", HttpMethod.GET)//
     .and("/functional-units/entities/table", HttpMethod.GET)//
-    .authorize(getDisplay().getExportDataAuthorizer()).build())//
+    .authorize(getView().getExportDataAuthorizer()).build())//
     .send();
   }
 
   private void displayDetails(WidgetDisplay detailsDisplay) {
-    getDisplay().getDetailsPanel().clear();
-    getDisplay().getDetailsPanel().add(detailsDisplay.asWidget());
+    getView().getDetailsPanel().clear();
+    getView().getDetailsPanel().add(detailsDisplay.asWidget());
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
 }

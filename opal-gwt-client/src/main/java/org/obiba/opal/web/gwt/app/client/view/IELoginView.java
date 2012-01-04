@@ -47,14 +47,6 @@ public class IELoginView extends LoginView {
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
   public HasValue<String> getPassword() {
     return new DummyHasValue();
   }

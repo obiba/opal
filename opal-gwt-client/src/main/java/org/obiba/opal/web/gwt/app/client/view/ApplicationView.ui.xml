@@ -1,8 +1,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <g:DockLayoutPanel unit="EM">
-    <g:north size="2.5">
+  <g:LayoutPanel>
+    <g:layer top="0" height="2.5em" right="0" left="0">
       <g:FlowPanel addStyleNames="top">
           <g:FlowPanel  ui:field="topBar" addStyleNames="topbar">
             <g:Image url="image/logo-opal-white.png"></g:Image>
@@ -32,20 +32,20 @@
             <g:InlineLabel ui:field="username"></g:InlineLabel>
           </g:FlowPanel>
       </g:FlowPanel>
-    </g:north>
-    <g:center>
+    </g:layer>
+    <g:layer top="2.5em" bottom="1.5em"  right="0" left="0">
       <g:LayoutPanel ui:field="workbench" addStyleNames="main-content ui-corner-all">
         <g:layer>
           <g:Label><ui:msg description="Workbench label">The Workbench</ui:msg></g:Label>
         </g:layer>
       </g:LayoutPanel>
-    </g:center>
-    <g:south size="1.5">
+    </g:layer>
+    <g:layer height="1.5em" bottom="0" right="0" left="0">
       <g:FlowPanel addStyleNames="footbar">
         <g:Label>copyright</g:Label>
         <g:Anchor ui:field="obiba">obiba.org</g:Anchor>
         <g:Label ui:field="version" addStyleNames="right-aligned"/>
       </g:FlowPanel>
-    </g:south>
-  </g:DockLayoutPanel>
+    </g:layer>
+  </g:LayoutPanel>
 </ui:UiBinder>

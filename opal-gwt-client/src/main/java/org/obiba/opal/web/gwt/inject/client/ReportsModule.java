@@ -18,19 +18,20 @@ import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateListView;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateUpdateDialogView;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
-public class ReportsModule extends AbstractGinModule {
+public class ReportsModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
+
+    bindPresenter(ReportTemplatePresenter.class, ReportTemplatePresenter.Display.class, ReportTemplateView.class, ReportTemplatePresenter.Proxy.class);
+
     bind(ReportTemplateListPresenter.class).in(Singleton.class);
     bind(ReportTemplateListPresenter.Display.class).to(ReportTemplateListView.class).in(Singleton.class);
     bind(ReportTemplateDetailsPresenter.class).in(Singleton.class);
     bind(ReportTemplateDetailsPresenter.Display.class).to(ReportTemplateDetailsView.class).in(Singleton.class);
-    bind(ReportTemplatePresenter.class).in(Singleton.class);
-    bind(ReportTemplatePresenter.Display.class).to(ReportTemplateView.class).in(Singleton.class);
     bind(ReportTemplateUpdateDialogPresenter.Display.class).to(ReportTemplateUpdateDialogView.class);
   }
 

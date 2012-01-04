@@ -15,9 +15,11 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.Administration
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
@@ -25,9 +27,12 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresen
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.LoggedInGatekeeper;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
@@ -59,11 +64,18 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.annotations.DefaultGatekeeper;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 @GinModules({ OpalGinModule.class, AdministrationModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class, ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class, ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
 public interface OpalGinjector extends Ginjector {
 
-  EventBus getEventBus();
+  EventBus getOldEventBus();
+
+  com.google.gwt.event.shared.EventBus getEventBus();
+
+  PlaceManager getPlaceManager();
 
   ResourceAuthorizationCache getResourceAuthorizationCache();
 
@@ -71,21 +83,32 @@ public interface OpalGinjector extends Ginjector {
 
   RequestUrlBuilder getRequestUrlBuilder();
 
-  ApplicationPresenter getApplicationPresenter();
+  @DefaultGatekeeper
+  LoggedInGatekeeper getLoginGateKeeper();
 
-  AdministrationPresenter getAdministrationPresenter();
-
-  DashboardPresenter getDashboardPresenter();
-
-  NavigatorPresenter getNavigatorPresenter();
-
-  VariablePresenter getVariablePresenter();
-
-  LoginPresenter getLoginPresenter();
+  Provider<LoginPresenter> getLoginPresenter();
 
   UnhandledResponseNotificationPresenter getUnhandledResponseNotificationPresenter();
 
   NotificationPresenter getErrorDialogPresenter();
+
+  Provider<ApplicationPresenter> getApplicationPresenter();
+
+  Provider<AdministrationPresenter> getAdministrationPresenter();
+
+  Provider<DashboardPresenter> getDashboardPresenter();
+
+  Provider<NavigatorPresenter> getNavigatorPresenter();
+
+  Provider<FunctionalUnitPresenter> getFunctionalUnitPresenter();
+
+  Provider<ReportTemplatePresenter> getReportTemplatePresenter();
+
+  Provider<JobListPresenter> getJobListPresenter();
+
+  Provider<FileExplorerPresenter> getFileExplorerPresenter();
+
+  VariablePresenter getVariablePresenter();
 
   NavigatorTreePresenter getNavigatorTreePresenter();
 

@@ -9,22 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
-import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -34,18 +26,27 @@ import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ContentSlot;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import com.gwtplatform.mvp.client.proxy.RevealRootLayoutContentEvent;
 
 /**
  *
  */
-public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.Display> {
+public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display, ApplicationPresenter.Proxy> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     HasClickHandlers getQuit();
 
@@ -79,120 +80,105 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
 
   }
 
-  @Inject
-  private RequestCredentials credentials;
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> WORKBENCH = new GwtEvent.Type<RevealContentHandler<?>>();
 
-  @Inject
-  private Provider<AdministrationPresenter> administrationPresenter;
+  @ProxyStandard
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<ApplicationPresenter> {
+  }
 
-  @Inject
-  private Provider<DashboardPresenter> dashboardPresenter;
+  private final RequestCredentials credentials;
 
-  @Inject
-  private Provider<ReportTemplatePresenter> reportTemplatePresenter;
+  private final NotificationPresenter messageDialog;
 
-  @Inject
-  private Provider<FunctionalUnitPresenter> functionalUnitPresenter;
-
-  @Inject
-  private Provider<NavigatorPresenter> navigationPresenter;
-
-  @Inject
-  private Provider<JobListPresenter> jobListPresenter;
-
-  @Inject
-  private NotificationPresenter messageDialog;
-
-  @Inject
-  private Provider<FileExplorerPresenter> fileExplorerPresenter;
+  private final Provider<AdministrationPresenter> administrationPresenter;
 
   private WidgetPresenter<?> workbench;
 
   private boolean unbindPreviousWorkbench;
 
-  /**
-   * @param display
-   * @param eventBus
-   */
   @Inject
-  public ApplicationPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<AdministrationPresenter> administrationPresenter) {
+    super(eventBus, display, proxy);
+    this.credentials = credentials;
+    this.messageDialog = messageDialog;
+    this.administrationPresenter = administrationPresenter;
   }
 
   @Override
-  public Place getPlace() {
-    return null;
+  protected void revealInParent() {
+    RevealRootLayoutContentEvent.fire(this, this);
   }
 
   @Override
   protected void onBind() {
 
-    getDisplay().getDashboardItem().setCommand(new Command() {
+    getView().getDashboardItem().setCommand(new Command() {
 
       @Override
       public void execute() {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(dashboardPresenter.get()).forResource("/participants/count").build());
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.dashboardPlace));
       }
     });
 
-    getDisplay().getReportsItem().setCommand(new Command() {
+    getView().getReportsItem().setCommand(new Command() {
 
       @Override
       public void execute() {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(reportTemplatePresenter.get()).forResource("/report-templates").build());
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.reportTemplatesPlace));
       }
     });
 
-    getDisplay().getUnitsItem().setCommand(new Command() {
+    getView().getUnitsItem().setCommand(new Command() {
 
       @Override
       public void execute() {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(functionalUnitPresenter.get()).forResource("/functional-units").build());
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.unitsPlace));
       }
     });
 
-    getDisplay().getDatasourcesItem().setCommand(new Command() {
+    getView().getDatasourcesItem().setCommand(new Command() {
 
       @Override
       public void execute() {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
       }
     });
 
-    getDisplay().getListJobsItem().setCommand(new Command() {
+    getView().getListJobsItem().setCommand(new Command() {
 
       @Override
       public void execute() {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter.get()).forResource("/shell/commands").build());
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
       }
     });
 
-    getDisplay().getFileExplorerItem().setCommand(new Command() {
+    getView().getFileExplorerItem().setCommand(new Command() {
 
       @Override
       public void execute() {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(fileExplorerPresenter.get()).forResource("/files/meta").build());
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.filesPlace));
       }
     });
 
-    getDisplay().getQuit().addClickHandler(new ClickHandler() {
+    getView().getQuit().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new SessionEndedEvent());
+        getEventBus().fireEvent(new SessionEndedEvent());
       }
     });
 
-    getDisplay().getHelp().addClickHandler(new ClickHandler() {
+    getView().getHelp().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         HelpUtil.openPage();
       }
     });
 
-    getDisplay().getAdministration().addClickHandler(new ClickHandler() {
+    getView().getAdministration().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(administrationPresenter.get()).build());
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
       }
     });
 
@@ -202,36 +188,28 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
   protected void onUnbind() {
   }
 
   @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().setUsername(credentials.getUsername());
-    getDisplay().setVersion(ResourceRequestBuilderFactory.newBuilder().getVersion());
+  protected void onReveal() {
+    getView().setUsername(credentials.getUsername());
+    getView().setVersion(ResourceRequestBuilderFactory.newBuilder().getVersion());
     authorize();
-    eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(dashboardPresenter.get()).forResource("/participants/count").build());
   }
 
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(new UIObjectAuthorizer(getDisplay().getDatasourcesItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(new UIObjectAuthorizer(getDisplay().getUnitsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(new UIObjectAuthorizer(getDisplay().getReportsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(new UIObjectAuthorizer(getDisplay().getFileExplorerItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(new UIObjectAuthorizer(getDisplay().getListJobsItem())).send();
-    administrationPresenter.get().authorize(getDisplay().getAdministrationAuthorizer());
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(new UIObjectAuthorizer(getView().getDatasourcesItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(new UIObjectAuthorizer(getView().getUnitsItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(new UIObjectAuthorizer(getView().getReportsItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(new UIObjectAuthorizer(getView().getFileExplorerItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(new UIObjectAuthorizer(getView().getListJobsItem())).send();
+
+    administrationPresenter.get().authorize(getView().getAdministrationAuthorizer());
   }
 
   private void registerWorkbenchChangeEventHandler() {
-    super.registerHandler(eventBus.addHandler(WorkbenchChangeEvent.getType(), new WorkbenchChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(WorkbenchChangeEvent.getType(), new WorkbenchChangeEvent.Handler() {
 
       @Override
       public void onWorkbenchChanged(WorkbenchChangeEvent event) {
@@ -252,7 +230,7 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
     }
 
     WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
-    getDisplay().updateWorkbench(wd.asWidget());
+    getView().updateWorkbench(wd.asWidget());
     workbench.revealDisplay();
 
     updateTabSelection(event);
@@ -261,24 +239,24 @@ public class ApplicationPresenter extends WidgetPresenter<ApplicationPresenter.D
   @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
   private void updateTabSelection(WorkbenchChangeEvent event) {
     if(event.resourceStartsWith("/files/meta")) {
-      getDisplay().setCurrentSelection(getDisplay().getFileExplorerItem());
+      getView().setCurrentSelection(getView().getFileExplorerItem());
     } else if(event.resourceStartsWith("/shell/commands")) {
-      getDisplay().setCurrentSelection(getDisplay().getListJobsItem());
+      getView().setCurrentSelection(getView().getListJobsItem());
     } else if(event.resourceStartsWith("/datasources")) {
-      getDisplay().setCurrentSelection(getDisplay().getDatasourcesItem());
+      getView().setCurrentSelection(getView().getDatasourcesItem());
     } else if(event.resourceStartsWith("/functional-units")) {
-      getDisplay().setCurrentSelection(getDisplay().getUnitsItem());
+      getView().setCurrentSelection(getView().getUnitsItem());
     } else if(event.resourceStartsWith("/report-templates")) {
-      getDisplay().setCurrentSelection(getDisplay().getReportsItem());
+      getView().setCurrentSelection(getView().getReportsItem());
     } else if(event.resourceStartsWith("/participants/count")) {
-      getDisplay().setCurrentSelection(getDisplay().getDashboardItem());
+      getView().setCurrentSelection(getView().getDashboardItem());
     } else {
-      getDisplay().clearSelection();
+      getView().clearSelection();
     }
   }
 
   private void registerUserMessageEventHandler() {
-    super.registerHandler(eventBus.addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
 
       @Override
       public void onUserMessage(NotificationEvent event) {

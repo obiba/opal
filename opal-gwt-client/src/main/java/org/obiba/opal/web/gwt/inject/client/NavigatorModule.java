@@ -50,18 +50,17 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveOpenTextualVar
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveTemporalVariableStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveVariableView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 /**
  *
  */
-public class NavigatorModule extends AbstractGinModule {
+public class NavigatorModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
     // Bind concrete implementations to interfaces
-    bind(NavigatorPresenter.Display.class).to(NavigatorView.class).in(Singleton.class);
+    bindPresenter(NavigatorPresenter.class, NavigatorPresenter.Display.class, NavigatorView.class, NavigatorPresenter.Proxy.class);
 
     // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
     bind(NavigatorTreePresenter.Display.class).to(NavigatorTreeView.class);

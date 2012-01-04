@@ -57,11 +57,15 @@ public class FunctionalUnitView extends Composite implements FunctionalUnitPrese
   }
 
   @Override
-  public void startProcessing() {
+  public void addToSlot(Object slot, Widget content) {
   }
 
   @Override
-  public void stopProcessing() {
+  public void removeFromSlot(Object slot, Widget content) {
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
   }
 
   @Override

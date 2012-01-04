@@ -9,18 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -33,14 +29,21 @@ import org.obiba.opal.web.model.client.opal.FileDto;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter.Display> {
+public class FileExplorerPresenter extends Presenter<FileExplorerPresenter.Display, FileExplorerPresenter.Proxy> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
     public HasWidgets getFileSystemTree();
 
     public HasWidgets getFolderDetailsPanel();
@@ -65,6 +68,11 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   }
 
+  @ProxyStandard
+  @NameToken(Places.files)
+  public interface Proxy extends ProxyPlace<FileExplorerPresenter> {
+  }
+
   FileSystemTreePresenter fileSystemTreePresenter;
 
   FolderDetailsPresenter folderDetailsPresenter;
@@ -76,8 +84,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   private Runnable actionRequiringConfirmation;
 
   @Inject
-  public FileExplorerPresenter(Display display, EventBus eventBus, FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter, FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
-    super(display, eventBus);
+  public FileExplorerPresenter(Display display, EventBus eventBus, Proxy proxy, FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter, FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
+    super(eventBus, display, proxy);
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.fileUploadDialogPresenter = fileUploadDialogPresenter;
@@ -85,8 +93,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   @Override
-  public Place getPlace() {
-    return null;
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   @Override
@@ -96,13 +104,9 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
   protected void onUnbind() {
-    getDisplay().getFileSystemTree().remove(fileSystemTreePresenter.getDisplay().asWidget());
-    getDisplay().getFolderDetailsPanel().remove(folderDetailsPresenter.getDisplay().asWidget());
+    getView().getFileSystemTree().remove(fileSystemTreePresenter.getDisplay().asWidget());
+    getView().getFolderDetailsPanel().remove(folderDetailsPresenter.getDisplay().asWidget());
     folderDetailsPresenter.unbind();
     fileSystemTreePresenter.unbind();
     createFolderDialogPresenter.unbind();
@@ -110,31 +114,31 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   }
 
   @Override
-  public void refreshDisplay() {
+  public void onReset() {
     folderDetailsPresenter.refreshDisplay();
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReveal() {
     fileSystemTreePresenter.revealDisplay();
     folderDetailsPresenter.revealDisplay();
   }
 
   private void authorizeFile(FileDto dto) {
     // download
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(getDisplay().getFileDownloadAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(getView().getFileDownloadAuthorizer()).send();
     // delete
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).delete().authorize(getDisplay().getFileDeleteAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).delete().authorize(getView().getFileDeleteAuthorizer()).send();
   }
 
   private void authorizeFolder(FileDto dto) {
     // create folder and upload
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).post()//
-    .authorize(new CompositeAuthorizer(getDisplay().getCreateFolderAuthorizer(), getDisplay().getFileUploadAuthorizer())).send();
+    .authorize(new CompositeAuthorizer(getView().getCreateFolderAuthorizer(), getView().getFileUploadAuthorizer())).send();
 
     if(!folderDetailsPresenter.hasSelection()) {
       // download
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(getDisplay().getFileDownloadAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(getView().getFileDownloadAuthorizer()).send();
       // delete
       setEnableFileDeleteButton();
     }
@@ -143,9 +147,9 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
   private void setEnableFileDeleteButton() {
     FileDto folder = folderDetailsPresenter.getCurrentFolder();
     if(folder.getPath().equals("/") || folder.getChildrenCount() > 0) {
-      getDisplay().setEnabledFileDeleteButton(false);
+      getView().setEnabledFileDeleteButton(false);
     } else {
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + folder.getPath()).delete().authorize(getDisplay().getFileDeleteAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + folder.getPath()).delete().authorize(getView().getFileDeleteAuthorizer()).send();
     }
   }
 
@@ -153,8 +157,8 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
     folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
 
-    getDisplay().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
-    getDisplay().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
+    getView().getFileSystemTree().add(fileSystemTreePresenter.getDisplay().asWidget());
+    getView().getFolderDetailsPanel().add(folderDetailsPresenter.getDisplay().asWidget());
 
     fileSystemTreePresenter.bind();
     folderDetailsPresenter.bind();
@@ -172,7 +176,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   private void addEventHandlers() {
 
-    super.registerHandler(getDisplay().getFileDeleteButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getFileDeleteButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         // We are either deleting a file or a folder
@@ -183,18 +187,18 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
           }
         };
 
-        eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+        getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
       }
     }));
 
-    super.registerHandler(getDisplay().getFileDownloadButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getFileDownloadButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         downloadFile(getCurrentSelectionOrFolder());
       }
     }));
 
-    super.registerHandler(getDisplay().getCreateFolderButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
@@ -203,7 +207,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       }
     }));
 
-    super.registerHandler(getDisplay().getFileUploadButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getFileUploadButton().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -213,18 +217,18 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
 
       @Override
       public void onFileSelectionChange(FileSelectionChangeEvent event) {
-        getDisplay().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
+        getView().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
         if(folderDetailsPresenter.hasSelection()) {
           authorizeFile(event.getFile());
         }
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
       @Override
       public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
@@ -233,7 +237,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
     }));
 
-    super.registerHandler(eventBus.addHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
 
       @Override
       public void onFolderRefreshed(FolderRefreshedEvent event) {
@@ -241,7 +245,7 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
   }
 
@@ -261,9 +265,9 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
-          eventBus.fireEvent(new FileDeletedEvent(file));
+          getEventBus().fireEvent(new FileDeletedEvent(file));
         }
       }
     };
@@ -273,6 +277,6 @@ public class FileExplorerPresenter extends WidgetPresenter<FileExplorerPresenter
 
   private void downloadFile(final FileDto file) {
     String url = new StringBuilder("/files").append(file.getPath()).toString();
-    eventBus.fireEvent(new FileDownloadEvent(url));
+    getEventBus().fireEvent(new FileDownloadEvent(url));
   }
 }

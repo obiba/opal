@@ -9,172 +9,70 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.dashboard.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
-import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class DashboardPresenter extends WidgetPresenter<DashboardPresenter.Display> {
+public class DashboardPresenter extends Presenter<DashboardPresenter.Display, DashboardPresenter.Proxy> {
 
-  //
-  // Instance Variables
-  //
-
-  @Inject
-  private Provider<NavigatorPresenter> navigationPresenter;
-
-  @Inject
-  private Provider<FileExplorerPresenter> fileExplorerPresenter;
-
-  @Inject
-  private Provider<JobListPresenter> jobListPresenter;
-
-  @Inject
-  private Provider<ReportTemplatePresenter> reportTemplatePresenter;
-
-  @Inject
-  private Provider<FunctionalUnitPresenter> functionalUnitPresenter;
-
-  //
-  // Constructors
-  //
-
-  @Inject
-  public DashboardPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  @ProxyStandard
+  @NameToken(Places.dashboard)
+  public interface Proxy extends ProxyPlace<DashboardPresenter> {
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  public Place getPlace() {
-    return null;
+  @Inject
+  public DashboardPresenter(final Display display, final EventBus eventBus, final Proxy proxy) {
+    super(eventBus, display, proxy);
   }
 
   @Override
-  protected void onBind() {
-    addEventHandlers();
-  }
+  protected void onReveal() {
+    super.onReveal();
 
-  private void addEventHandlers() {
-
-    super.registerHandler(getDisplay().getDatasourcesLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(navigationPresenter.get()).forResource("/datasources").build());
-      }
-    }));
-
-    super.registerHandler(getDisplay().getFilesLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(fileExplorerPresenter.get()).forResource("/files/meta").build());
-      }
-    }));
-
-    super.registerHandler(getDisplay().getJobsLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(jobListPresenter.get()).forResource("/shell/commands").build());
-      }
-    }));
-
-    super.registerHandler(getDisplay().getReportsLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(reportTemplatePresenter.get()).forResource("/report-templates").build());
-      }
-    }));
-
-    super.registerHandler(getDisplay().getUnitsLink().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        eventBus.fireEvent(WorkbenchChangeEvent.newBuilder(functionalUnitPresenter.get()).forResource("/functional-units").build());
-      }
-    }));
-
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
     authorize();
     ResourceRequestBuilderFactory.newBuilder().forResource("/participants/count").get().withCallback(200, new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        getDisplay().setParticipantCount(Integer.parseInt(response.getText()));
+        getView().setParticipantCount(Integer.parseInt(response.getText()));
       }
     }).send();
 
   }
 
+  @Override
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+  }
+
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(getDisplay().getDatasourcesAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(getDisplay().getUnitsAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(getDisplay().getReportsAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getDisplay().getFilesAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(getDisplay().getJobsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(getView().getDatasourcesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(getView().getUnitsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(getView().getReportsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getView().getFilesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(getView().getJobsAuthorizer()).send();
   }
 
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
     void setParticipantCount(int count);
-
-    //
-    // Click handlers
-    //
-
-    HasClickHandlers getUnitsLink();
-
-    HasClickHandlers getDatasourcesLink();
-
-    HasClickHandlers getFilesLink();
-
-    HasClickHandlers getJobsLink();
-
-    HasClickHandlers getReportsLink();
 
     //
     // Authorization

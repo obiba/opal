@@ -9,8 +9,13 @@
   <!-- Sophisticated visualisations -->
   <inherits name='com.google.gwt.visualization.Visualization' />
   <!-- Use an MVP pattern framework -->
+  <inherits name="com.google.gwt.place.Place" />
   <inherits name='net.customware.gwt.presenter.Presenter' />
-
+  <inherits name="com.gwtplatform.mvp.Mvp" />
+ 
+  <define-configuration-property name="gin.ginjector" is-multi-valued="false" />
+  <set-configuration-property name="gin.ginjector" value="org.obiba.opal.web.gwt.inject.client.OpalGinjector" /> 
+  
   <!-- Dependency Injection -->
   <inherits name='org.obiba.opal.web.gwt.inject.Inject' />
   <!-- Client-side REST framework -->

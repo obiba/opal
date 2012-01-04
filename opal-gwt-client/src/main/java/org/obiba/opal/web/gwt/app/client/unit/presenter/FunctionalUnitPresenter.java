@@ -9,13 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
@@ -26,19 +22,20 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPresenter.Display> {
+public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
 
-  FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
-
-  FunctionalUnitListPresenter functionalUnitListPresenter;
-
-  FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
-
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
     ScrollPanel getFunctionalUnitDetailsPanel();
 
     ScrollPanel getFunctionalUnitListPanel();
@@ -56,33 +53,45 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
     HasAuthorization getImportIdentifiersAuthorizer();
   }
 
+  @ProxyStandard
+  @NameToken(Places.units)
+  public interface Proxy extends ProxyPlace<FunctionalUnitPresenter> {
+  }
+
+  final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
+
+  final FunctionalUnitListPresenter functionalUnitListPresenter;
+
+  final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
+
   @Inject
-  public FunctionalUnitPresenter(final Display display, final EventBus eventBus, FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter, FunctionalUnitListPresenter FunctionalUnitListPresenter, FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter) {
-    super(display, eventBus);
+  public FunctionalUnitPresenter(final Display display, final EventBus eventBus, final Proxy proxy, FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter, FunctionalUnitListPresenter FunctionalUnitListPresenter, FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter) {
+    super(eventBus, display, proxy);
     this.functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
     this.functionalUnitListPresenter = FunctionalUnitListPresenter;
     this.functionalUnitUpdateDialogPresenter = FunctionalUnitUpdateDialogPresenter;
   }
 
   @Override
-  public void refreshDisplay() {
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   @Override
-  public void revealDisplay() {
+  protected void onReveal() {
     authorize();
   }
 
   private void authorize() {
     // create unit
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").post().authorize(getDisplay().getAddFunctionalUnitAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").post().authorize(getView().getAddFunctionalUnitAuthorizer()).send();
     // export all identifiers
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/csv").get().authorize(getDisplay().getExportIdentifiersAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/csv").get().authorize(getView().getExportIdentifiersAuthorizer()).send();
     // map identifiers
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/table").get()//
     .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
     .and("/functional-units/entities/identifiers/map/units", HttpMethod.GET)//
-    .authorize(getDisplay().getImportIdentifiersAuthorizer()).build())//
+    .authorize(getView().getImportIdentifiersAuthorizer()).build())//
     .send();
   }
 
@@ -93,15 +102,15 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
   }
 
   private void addHandlers() {
-    super.registerHandler(getDisplay().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
-    super.registerHandler(getDisplay().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
-    super.registerHandler(getDisplay().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
+    super.registerHandler(getView().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
+    super.registerHandler(getView().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
+    super.registerHandler(getView().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
   }
 
   protected void initDisplayComponents() {
 
-    getDisplay().getFunctionalUnitDetailsPanel().add(functionalUnitDetailsPresenter.getDisplay().asWidget());
-    getDisplay().getFunctionalUnitListPanel().add(functionalUnitListPresenter.getDisplay().asWidget());
+    getView().getFunctionalUnitDetailsPanel().add(functionalUnitDetailsPresenter.getDisplay().asWidget());
+    getView().getFunctionalUnitListPanel().add(functionalUnitListPresenter.getDisplay().asWidget());
 
     functionalUnitListPresenter.bind();
     functionalUnitDetailsPresenter.bind();
@@ -109,20 +118,11 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
 
   @Override
   protected void onUnbind() {
-    getDisplay().getFunctionalUnitDetailsPanel().remove(functionalUnitDetailsPresenter.getDisplay().asWidget());
-    getDisplay().getFunctionalUnitListPanel().remove(functionalUnitListPresenter.getDisplay().asWidget());
+    getView().getFunctionalUnitDetailsPanel().remove(functionalUnitDetailsPresenter.getDisplay().asWidget());
+    getView().getFunctionalUnitListPanel().remove(functionalUnitListPresenter.getDisplay().asWidget());
 
     functionalUnitListPresenter.unbind();
     functionalUnitDetailsPresenter.unbind();
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   //
@@ -136,7 +136,7 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
       functionalUnitUpdateDialogPresenter.bind();
       functionalUnitUpdateDialogPresenter.setDialogMode(Mode.CREATE);
       functionalUnitUpdateDialogPresenter.getDisplay().clear();
-      // functionalUnitUpdateDialogPresenter.getDisplay().setEnabledFunctionalUnitName(true);
+      // functionalUnitUpdateDialogPresenter.getView().setEnabledFunctionalUnitName(true);
       functionalUnitUpdateDialogPresenter.revealDisplay();
     }
 
@@ -147,7 +147,7 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
     @Override
     public void onClick(ClickEvent event) {
       String url = new StringBuilder("/functional-units/entities/csv").toString();
-      eventBus.fireEvent(new FileDownloadEvent(url));
+      getEventBus().fireEvent(new FileDownloadEvent(url));
     }
 
   }
@@ -155,7 +155,7 @@ public class FunctionalUnitPresenter extends WidgetPresenter<FunctionalUnitPrese
   private final class ImportIdentifiersClickHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.MAP_IDENTIFIERS));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.MAP_IDENTIFIERS));
     }
   }
 

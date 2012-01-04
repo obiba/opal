@@ -9,24 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePresenter.Display> {
+public class ReportTemplatePresenter extends Presenter<ReportTemplatePresenter.Display, ReportTemplatePresenter.Proxy> {
 
   ReportTemplateDetailsPresenter reportTemplateDetailsPresenter;
 
@@ -34,7 +37,7 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
   Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
     ScrollPanel getReportTemplateDetailsPanel();
 
     ScrollPanel getReportTemplateListPanel();
@@ -46,20 +49,26 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
     HasAuthorization getAddReportTemplateAuthorizer();
   }
 
+  @ProxyStandard
+  @NameToken(Places.reportTemplates)
+  public interface Proxy extends ProxyPlace<ReportTemplatePresenter> {
+  }
+
   @Inject
-  public ReportTemplatePresenter(final Display display, final EventBus eventBus, ReportTemplateDetailsPresenter reportTemplateDetailsPresenter, ReportTemplateListPresenter reportTemplateListPresenter, Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter) {
-    super(display, eventBus);
+  public ReportTemplatePresenter(final Display display, final EventBus eventBus, Proxy proxy, ReportTemplateDetailsPresenter reportTemplateDetailsPresenter, ReportTemplateListPresenter reportTemplateListPresenter, Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter) {
+    super(eventBus, display, proxy);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateListPresenter = reportTemplateListPresenter;
     this.reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenter;
   }
 
   @Override
-  public void refreshDisplay() {
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReveal() {
     authorize();
   }
 
@@ -70,8 +79,8 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
   }
 
   private void addHandlers() {
-    super.registerHandler(getDisplay().addReportTemplateClickHandler(new AddReportTemplateClickHandler()));
-    super.registerHandler(getDisplay().refreshClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addReportTemplateClickHandler(new AddReportTemplateClickHandler()));
+    super.registerHandler(getView().refreshClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
@@ -82,8 +91,8 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
   protected void initDisplayComponents() {
 
-    getDisplay().getReportTemplateDetailsPanel().add(reportTemplateDetailsPresenter.getDisplay().asWidget());
-    getDisplay().getReportTemplateListPanel().add(reportTemplateListPresenter.getDisplay().asWidget());
+    getView().getReportTemplateDetailsPanel().add(reportTemplateDetailsPresenter.getDisplay().asWidget());
+    getView().getReportTemplateListPanel().add(reportTemplateListPresenter.getDisplay().asWidget());
 
     reportTemplateListPresenter.bind();
     reportTemplateDetailsPresenter.bind();
@@ -91,25 +100,16 @@ public class ReportTemplatePresenter extends WidgetPresenter<ReportTemplatePrese
 
   @Override
   protected void onUnbind() {
-    getDisplay().getReportTemplateDetailsPanel().remove(reportTemplateDetailsPresenter.getDisplay().asWidget());
-    getDisplay().getReportTemplateListPanel().remove(reportTemplateListPresenter.getDisplay().asWidget());
+    getView().getReportTemplateDetailsPanel().remove(reportTemplateDetailsPresenter.getDisplay().asWidget());
+    getView().getReportTemplateListPanel().remove(reportTemplateListPresenter.getDisplay().asWidget());
 
     reportTemplateListPresenter.unbind();
     reportTemplateDetailsPresenter.unbind();
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   private void authorize() {
     // create report templates
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").post().authorize(getDisplay().getAddReportTemplateAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").post().authorize(getView().getAddReportTemplateAuthorizer()).send();
   }
 
   public class AddReportTemplateClickHandler implements ClickHandler {

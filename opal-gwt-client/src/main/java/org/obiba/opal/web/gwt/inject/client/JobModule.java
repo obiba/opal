@@ -14,18 +14,15 @@ import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.job.view.JobDetailsView;
 import org.obiba.opal.web.gwt.app.client.job.view.JobListView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
-/**
- *
- */
-public class JobModule extends AbstractGinModule {
+public class JobModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
     // Bind concrete implementations to interfaces
-    bind(JobListPresenter.Display.class).to(JobListView.class).in(Singleton.class);
+    bindPresenter(JobListPresenter.class, JobListPresenter.Display.class, JobListView.class, JobListPresenter.Proxy.class);
     bind(JobDetailsPresenter.Display.class).to(JobDetailsView.class).in(Singleton.class);
   }
 

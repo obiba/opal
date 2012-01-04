@@ -15,7 +15,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import net.customware.gwt.presenter.client.EventBus;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -43,6 +42,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.OpenHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -80,20 +80,21 @@ public class FileExplorerPresenterTest extends AbstractGwtTestSetup {
     eventBusMock = createMock(EventBus.class);
 
     fileSystemTreeDisplayMock = createMock(FileSystemTreePresenter.Display.class);
-    fileSystemTreePresenter = new FileSystemTreePresenter(fileSystemTreeDisplayMock, eventBusMock);
+    fileSystemTreePresenter = new FileSystemTreePresenter(fileSystemTreeDisplayMock, null);
 
     folderDetailsDisplayMock = createMock(FolderDetailsPresenter.Display.class);
-    folderDetailsPresenter = new FolderDetailsPresenter(folderDetailsDisplayMock, eventBusMock);
+    folderDetailsPresenter = new FolderDetailsPresenter(folderDetailsDisplayMock, null);
 
     fileUploadDialogDisplayMock = createMock(FileUploadDialogPresenter.Display.class);
     urlBuilderMock = createMock(RequestUrlBuilder.class);
-    fileUploadDialogPresenter = new FileUploadDialogPresenter(fileUploadDialogDisplayMock, eventBusMock, urlBuilderMock);
+    fileUploadDialogPresenter = new FileUploadDialogPresenter(fileUploadDialogDisplayMock, null, urlBuilderMock);
 
     createFolderDialogDisplayMock = createMock(CreateFolderDialogPresenter.Display.class);
-    createFolderDialogPresenter = new CreateFolderDialogPresenter(createFolderDialogDisplayMock, eventBusMock);
+    createFolderDialogPresenter = new CreateFolderDialogPresenter(createFolderDialogDisplayMock, null);
 
     fileExplorerDisplayMock = createMock(FileExplorerPresenter.Display.class);
-    fileExplorerPresenter = new FileExplorerPresenter(fileExplorerDisplayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadDialogPresenter, createFolderDialogPresenter);
+    FileExplorerPresenter.Proxy proxy = createMock(FileExplorerPresenter.Proxy.class);
+    fileExplorerPresenter = new FileExplorerPresenter(fileExplorerDisplayMock, eventBusMock, proxy, fileSystemTreePresenter, folderDetailsPresenter, fileUploadDialogPresenter, createFolderDialogPresenter);
   }
 
   @SuppressWarnings("unchecked")

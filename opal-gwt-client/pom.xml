@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -51,6 +52,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.gwtplatform</groupId>
+      <artifactId>gwtp-mvp-client</artifactId>
+      <version>${gwtp.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>net.customware.gwt.presenter</groupId>
       <artifactId>gwt-presenter</artifactId>
       <version>${gwt-presenter.version}</version>
@@ -60,7 +67,7 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>
       <version>${guava.version}</version>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-web-model</artifactId>
@@ -154,7 +161,7 @@
             <exclude>**/*Gwt*Suite*.java</exclude>
           </excludes>
         </configuration>
-      </plugin>       
+      </plugin>
     </plugins>
   </build>
 
@@ -175,6 +182,7 @@
     <gwt.version>2.4.0</gwt.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
     <gwt-presenter.version>1.0.0</gwt-presenter.version>
+    <gwtp.version>0.6</gwtp.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
 
     <maven-war-plugin.version>2.1.1</maven-war-plugin.version>

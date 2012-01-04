@@ -10,11 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.dashboard.view;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -24,22 +24,11 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
-/**
- *
- */
 public class DashboardView extends Composite implements DashboardPresenter.Display {
 
   @UiTemplate("DashboardView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DashboardView> {
   }
-
-  //
-  // Constants
-  //
-
-  //
-  // Static Variables
-  //
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -76,22 +65,15 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @UiField
   Panel jobs;
 
-  //
-  // Instance Variables
-  //
-
-  //
-  // Constructors
-  //
-
   public DashboardView() {
     super();
     initWidget(uiBinder.createAndBindUi(this));
+    getDatasourcesLink().setHref("#" + Places.navigator);
+    getUnitsLink().setHref("#" + Places.units);
+    getReportsLink().setHref("#" + Places.reportTemplates);
+    getJobsLink().setHref("#" + Places.jobs);
+    getFilesLink().setHref("#" + Places.files);
   }
-
-  //
-  // DashboardPresenter.Display Methods
-  //
 
   @Override
   public Widget asWidget() {
@@ -99,15 +81,18 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   }
 
   @Override
-  public void startProcessing() {
-
+  public void addToSlot(Object slot, Widget content) {
   }
 
   @Override
-  public void stopProcessing() {
-
+  public void removeFromSlot(Object slot, Widget content) {
   }
 
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+  }
+
+  @Override
   public void setParticipantCount(int count) {
     participantCount.setText(String.valueOf(count));
   }
@@ -116,23 +101,19 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     return exploreVariablesLink;
   }
 
-  @Override
-  public HasClickHandlers getFilesLink() {
+  public Anchor getFilesLink() {
     return exploreFilesLink;
   }
 
-  @Override
-  public HasClickHandlers getJobsLink() {
+  public Anchor getJobsLink() {
     return jobsLink;
   }
 
-  @Override
-  public HasClickHandlers getReportsLink() {
+  public Anchor getReportsLink() {
     return reportsLink;
   }
 
-  @Override
-  public HasClickHandlers getUnitsLink() {
+  public Anchor getUnitsLink() {
     return unitsLink;
   }
 
@@ -160,9 +141,5 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   public HasAuthorization getReportsAuthorizer() {
     return new WidgetAuthorizer(reports);
   }
-
-  //
-  // Methods
-  //
 
 }

@@ -3,31 +3,28 @@ package org.obiba.opal.web.gwt.app.client.administration.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class AdministrationPresenter extends WidgetPresenter<AdministrationPresenter.Display> {
+public class AdministrationPresenter extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy> {
 
   private static final int ADMINISTRATION_ITEMS_COUNT = 2;
 
-  //
-  // Instance Variables
-  //
-
-  @Inject
   private DataShieldConfigPresenter dataShieldAdministrationPresenter;
 
-  @Inject
   private RAdministrationPresenter rAdministrationPresenter;
 
   private List<ItemAdministrationPresenter<?>> administrationPresenters = new ArrayList<ItemAdministrationPresenter<?>>();
@@ -36,14 +33,17 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
 
   private int unAuthorizedCount = 0;
 
-  //
-  // Constructors
-  //
-
   @Inject
-  public AdministrationPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public AdministrationPresenter(final Display display, final EventBus eventBus, final Proxy proxy, DataShieldConfigPresenter dataShieldAdministrationPresenter, RAdministrationPresenter rAdministrationPresenter) {
+    super(eventBus, display, proxy);
+    this.dataShieldAdministrationPresenter = dataShieldAdministrationPresenter;
+    this.rAdministrationPresenter = rAdministrationPresenter;
 
+  }
+
+  @Override
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   private void registerAdministrationPresenters() {
@@ -56,23 +56,10 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
     admin.authorize(new ItemAdministrationAuthorizer(admin));
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
   @Override
   protected void onBind() {
-    getDisplay().clearAdministrationDisplays();
+    getView().clearAdministrationDisplays();
     registerAdministrationPresenters();
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   @Override
@@ -84,32 +71,24 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
   }
 
   @Override
-  public void refreshDisplay() {
+  public void onReset() {
     for(ItemAdministrationPresenter<?> admin : administrationPresenters) {
       admin.refreshDisplay();
     }
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReveal() {
     for(ItemAdministrationPresenter<?> admin : administrationPresenters) {
       admin.revealDisplay();
     }
   }
-
-  //
-  //
-  //
 
   public void authorize(final HasAuthorization authorizer) {
     authorizer.beforeAuthorization();
     dataShieldAdministrationPresenter.authorize(new AdministrationAuthorizer(authorizer));
     rAdministrationPresenter.authorize(new AdministrationAuthorizer(authorizer));
   }
-
-  //
-  // Inner Classes / Interfaces
-  //
 
   private final class AdministrationAuthorizer implements HasAuthorization {
     private final HasAuthorization authorizer;
@@ -136,9 +115,7 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
     public void authorized() {
       authorizedCount++;
       // at least one administration item is authorized
-      if(authorizedCount == 1) {
-        authorizer.authorized();
-      }
+      authorizer.authorized();
     }
   }
 
@@ -162,17 +139,22 @@ public class AdministrationPresenter extends WidgetPresenter<AdministrationPrese
     public void authorized() {
       administrationPresenters.add(admin);
       admin.bind();
-      getDisplay().addAdministrationDisplay(admin.getName(), admin.getWidget());
+      getView().addAdministrationDisplay(admin.getName(), admin.getWidget());
     }
 
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void addAdministrationDisplay(String name, Widget w);
 
     void clearAdministrationDisplays();
 
+  }
+
+  @ProxyStandard
+  @NameToken(Places.administration)
+  public interface Proxy extends ProxyPlace<AdministrationPresenter> {
   }
 
 }

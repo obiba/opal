@@ -15,8 +15,9 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class LoginView implements LoginPresenter.Display {
+public class LoginView extends ViewImpl implements LoginPresenter.Display {
   @UiTemplate("LoginView.ui.xml")
   interface LoginViewUiBinder extends UiBinder<Widget, LoginView> {
   }
@@ -54,14 +55,6 @@ public class LoginView implements LoginPresenter.Display {
   @Override
   public Widget asWidget() {
     return panel;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   @Override

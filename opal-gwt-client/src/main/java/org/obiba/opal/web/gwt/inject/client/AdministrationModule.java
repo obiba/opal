@@ -20,18 +20,17 @@ import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrat
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.view.AdministrationView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 /**
  *
  */
-public class AdministrationModule extends AbstractGinModule {
+public class AdministrationModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    // Bind concrete implementations to interfaces
-    bind(AdministrationPresenter.Display.class).to(AdministrationView.class).in(Singleton.class);
+    bindPresenter(AdministrationPresenter.class, AdministrationPresenter.Display.class, AdministrationView.class, AdministrationPresenter.Proxy.class);
+
     bind(DataShieldAdministrationPresenter.Display.class).to(DataShieldAdministrationView.class);
     bind(DataShieldConfigPresenter.Display.class).to(DataShieldConfigView.class);
     bind(DataShieldMethodPresenter.Display.class).to(DataShieldMethodView.class);
