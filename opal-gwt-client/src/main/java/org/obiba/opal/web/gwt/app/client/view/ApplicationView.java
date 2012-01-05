@@ -193,13 +193,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
     return new UIObjectAuthorizer(administration) {
       @Override
       public void authorized() {
-        GWT.log("authorized");
         super.authorized();
       }
 
       @Override
       public void unauthorized() {
-        GWT.log("unauthorized");
         super.unauthorized();
       }
     };

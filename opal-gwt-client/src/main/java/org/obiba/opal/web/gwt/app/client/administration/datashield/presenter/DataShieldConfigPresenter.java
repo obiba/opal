@@ -25,7 +25,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto;
 import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto.Level;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.Response;
@@ -111,7 +110,6 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
       @Override
       public void onResource(Response response, DataShieldConfigDto resource) {
-        GWT.log(resource.getLevel().getName());
         getDisplay().levelSelector().setValue(resource.getLevel(), true);
       }
     }).get().send();

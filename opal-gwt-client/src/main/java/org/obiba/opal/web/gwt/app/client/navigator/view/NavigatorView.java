@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
@@ -62,24 +61,31 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
 
   @Override
   public void addToSlot(Object slot, Widget content) {
-
+    if(slot == NavigatorPresenter.LEFT_PANE) {
+      treePanel.add(content);
+    } else {
+      navigatorDisplayPanel.add(content);
+    }
   }
 
   @Override
   public void removeFromSlot(Object slot, Widget content) {
+    if(slot == NavigatorPresenter.LEFT_PANE) {
+      treePanel.remove(content);
+    } else {
+      navigatorDisplayPanel.remove(content);
+    }
   };
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-
-  }
-
-  @Override
-  public void setTreeDisplay(NavigatorTreePresenter.Display treeDisplay) {
-    if(treePanel.getWidget() != null) {
-      treePanel.remove(treePanel.getWidget());
+    if(slot == NavigatorPresenter.LEFT_PANE) {
+      treePanel.clear();
+      treePanel.add(content);
+    } else {
+      navigatorDisplayPanel.clear();
+      navigatorDisplayPanel.add(content);
     }
-    treePanel.add(treeDisplay.asWidget());
   }
 
   @Override
@@ -117,4 +123,10 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
     return new UIObjectAuthorizer(exportDataButton);
   }
 
+  private void setTreeDisplay(Widget content) {
+    if(treePanel.getWidget() != null) {
+      treePanel.remove(treePanel.getWidget());
+    }
+    treePanel.add(content);
+  }
 }

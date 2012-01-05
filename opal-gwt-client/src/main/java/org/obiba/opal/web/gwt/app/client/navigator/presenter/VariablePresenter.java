@@ -9,11 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
@@ -39,11 +35,17 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display> {
+public class VariablePresenter extends Presenter<VariablePresenter.Display, VariablePresenter.Proxy> {
 
   private final SummaryTabPresenter summaryTabPresenter;
 
@@ -51,7 +53,6 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   private VariableDto variable;
 
-  @Inject
   private ValuesTablePresenter valuesTablePresenter;
 
   /**
@@ -59,38 +60,40 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
    * @param eventBus
    */
   @Inject
-  public VariablePresenter(Display display, EventBus eventBus, SummaryTabPresenter summaryTabPresenter, AuthorizationPresenter authorizationPresenter) {
-    super(display, eventBus);
+  public VariablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter, AuthorizationPresenter authorizationPresenter) {
+    super(eventBus, display, proxy);
+    this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
     this.authorizationPresenter = authorizationPresenter;
   }
 
   @Override
-  public Place getPlace() {
-    return null;
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, NavigatorPresenter.CENTER_PANE, this);
+  }
+
+  @ProxyEvent
+  public void onVariableSelectionChanged(VariableSelectionChangeEvent e) {
+    forceReveal();
   }
 
   @Override
   protected void onBind() {
     authorizationPresenter.bind();
     valuesTablePresenter.bind();
-    getDisplay().setPermissionsTabWidget(authorizationPresenter.getDisplay());
-    getDisplay().setValuesDisplay(valuesTablePresenter.getDisplay());
+    getView().setPermissionsTabWidget(authorizationPresenter.getDisplay());
+    getView().setValuesDisplay(valuesTablePresenter.getDisplay());
 
-    super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
     summaryTabPresenter.bind();
-    getDisplay().setParentCommand(new ParentCommand());
-    getDisplay().setNextCommand(new NextCommand());
-    getDisplay().setPreviousCommand(new PreviousCommand());
-    getDisplay().setSummaryTabCommand(new SummaryCommand());
-    getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    getView().setParentCommand(new ParentCommand());
+    getView().setNextCommand(new NextCommand());
+    getView().setPreviousCommand(new PreviousCommand());
+    getView().setSummaryTabCommand(new SummaryCommand());
+    getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
     // TODO
-    getDisplay().setDeriveCategorizeCommand(new DeriveCategorizeCommand());
-    getDisplay().setDeriveCustomCommand(new DeriveCustomCommand());
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+    getView().setDeriveCategorizeCommand(new DeriveCategorizeCommand());
+    getView().setDeriveCustomCommand(new DeriveCustomCommand());
   }
 
   @Override
@@ -100,32 +103,24 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     valuesTablePresenter.unbind();
   }
 
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
   private void updateDisplay(TableDto table, VariableDto variableDto, VariableDto previous, VariableDto next) {
     if(variable == null || !isCurrentVariable(variableDto)) {
       variable = variableDto;
-      getDisplay().setVariableName(variable.getName());
-      getDisplay().setEntityType(variable.getEntityType());
-      getDisplay().setValueType(variable.getValueType());
-      getDisplay().setMimeType(variable.hasMimeType() ? variable.getMimeType() : "");
-      getDisplay().setUnit(variable.hasUnit() ? variable.getUnit() : "");
-      getDisplay().setRepeatable(variable.getIsRepeatable());
-      getDisplay().setOccurrenceGroup(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
+      getView().setVariableName(variable.getName());
+      getView().setEntityType(variable.getEntityType());
+      getView().setValueType(variable.getValueType());
+      getView().setMimeType(variable.hasMimeType() ? variable.getMimeType() : "");
+      getView().setUnit(variable.hasUnit() ? variable.getUnit() : "");
+      getView().setRepeatable(variable.getIsRepeatable());
+      getView().setOccurrenceGroup(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
 
-      getDisplay().setParentName(variable.getParentLink().getRel());
-      getDisplay().setPreviousName(previous != null ? previous.getName() : "");
-      getDisplay().setNextName(next != null ? next.getName() : "");
+      getView().setParentName(variable.getParentLink().getRel());
+      getView().setPreviousName(previous != null ? previous.getName() : "");
+      getView().setNextName(next != null ? next.getName() : "");
 
-      getDisplay().renderCategoryRows(variable.getCategoriesArray());
-      getDisplay().renderAttributeRows(variable.getAttributesArray());
-      getDisplay().setCategorizeMenuAvailable(!variable.getValueType().equals("binary"));
+      getView().renderCategoryRows(variable.getCategoriesArray());
+      getView().renderAttributeRows(variable.getAttributesArray());
+      getView().setCategorizeMenuAvailable(!variable.getValueType().equals("binary"));
 
       updateDerivedVariableDisplay(table);
 
@@ -135,13 +130,13 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   private void updateDerivedVariableDisplay(TableDto table) {
     // if table is a view, check for a script attribute
-    getDisplay().setDerivedVariable(false, "");
+    getView().setDerivedVariable(false, "");
     if(table == null || !table.hasViewLink()) return;
 
     for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
       if(attr.getName().equals("script")) {
-        getDisplay().setDerivedVariable(true, attr.getValue());
-        getDisplay().setEditCommand(new EditCommand());
+        getView().setDerivedVariable(true, attr.getValue());
+        getView().setEditCommand(new EditCommand());
         break;
       }
     }
@@ -149,15 +144,15 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   private void authorize(TableDto table) {
     // summary
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getDisplay().getSummaryAuthorizer(), new SummaryUpdate())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getView().getSummaryAuthorizer(), new SummaryUpdate())).send();
 
     // edit variable
     if(table.hasViewLink()) {
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put().authorize(getDisplay().getEditAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put().authorize(getView().getEditAuthorizer()).send();
     }
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private boolean isCurrentVariable(VariableDto variableDto) {
@@ -168,7 +163,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
    * @param selection
    */
   private void requestSummary(final VariableDto selection) {
-    eventBus.fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
+    getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
   }
 
   private String getViewLink() {
@@ -182,14 +177,14 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   final class DeriveCategorizeCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.DERIVE_CATEGORIZE_VARIABLE, variable));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.DERIVE_CATEGORIZE_VARIABLE, variable));
     }
   }
 
   final class DeriveCustomCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.DERIVE_CUSTOM_VARIABLE, variable));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.DERIVE_CUSTOM_VARIABLE, variable));
     }
   }
 
@@ -231,7 +226,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     @Override
     public void authorized() {
       requestSummary(variable);
-      if(getDisplay().isSummaryTabSelected()) {
+      if(getView().isSummaryTabSelected()) {
         summaryTabPresenter.refreshDisplay();
       }
     }
@@ -243,7 +238,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   final class PreviousCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.PREVIOUS));
+      getEventBus().fireEvent(new SiblingVariableSelectionEvent(variable, Direction.PREVIOUS));
     }
   }
 
@@ -253,7 +248,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   final class NextCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new SiblingVariableSelectionEvent(variable, Direction.NEXT));
+      getEventBus().fireEvent(new SiblingVariableSelectionEvent(variable, Direction.NEXT));
     }
   }
 
@@ -266,7 +261,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
       ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
         @Override
         public void onResource(Response response, TableDto resource) {
-          eventBus.fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, resource));
+          getEventBus().fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, resource));
         }
 
       }).send();
@@ -291,7 +286,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
         @Override
         public void onResource(Response response, ViewDto viewDto) {
-          eventBus.fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
+          getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
         }
       }).send();
     }
@@ -305,7 +300,11 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  @ProxyStandard
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<VariablePresenter> {
+  }
+
+  public interface Display extends View {
 
     void setVariableName(String name);
 

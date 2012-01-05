@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -46,10 +40,10 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -58,8 +52,13 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
+public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
   private JsArray<VariableDto> variables;
 
@@ -74,7 +73,6 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   @Inject
   private CodingViewDialogPresenter codingViewDialogPresenter;
 
-  @Inject
   private ValuesTablePresenter valuesTablePresenter;
 
   private Runnable removeConfirmation;
@@ -92,86 +90,82 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
    * @param eventBus
    */
   @Inject
-  public TablePresenter(final Display display, final EventBus eventBus, AuthorizationPresenter authorizationPresenter) {
-    super(display, eventBus);
+  public TablePresenter(final Display display, final EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, AuthorizationPresenter authorizationPresenter) {
+    super(eventBus, display, proxy);
+    this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
   }
 
   @Override
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, NavigatorPresenter.CENTER_PANE, this);
+  }
+
+  @ProxyEvent
+  public void onTableSelectionChanged(TableSelectionChangeEvent e) {
+    forceReveal();
+  }
+
+  @Override
   protected void onBind() {
+    super.onBind();
     authorizationPresenter.bind();
     valuesTablePresenter.bind();
-    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
-    getDisplay().setValuesDisplay(valuesTablePresenter.getDisplay());
+    getView().setPermissionsDisplay(authorizationPresenter.getDisplay());
+    getView().setValuesDisplay(valuesTablePresenter.getDisplay());
 
-    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
-    super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
-    getDisplay().setCreateCodingViewCommand(new CreateCodingViewCommand());
-    getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
-    getDisplay().setExportDataCommand(new ExportDataCommand());
-    getDisplay().setCopyDataCommand(new CopyDataCommand());
-    getDisplay().setParentCommand(new ParentCommand());
-    getDisplay().setPreviousCommand(new PreviousCommand());
-    getDisplay().setNextCommand(new NextCommand());
+    super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
+    super.registerHandler(getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
+    getView().setCreateCodingViewCommand(new CreateCodingViewCommand());
+    getView().setExcelDownloadCommand(new ExcelDownloadCommand());
+    getView().setExportDataCommand(new ExportDataCommand());
+    getView().setCopyDataCommand(new CopyDataCommand());
+    getView().setParentCommand(new ParentCommand());
+    getView().setPreviousCommand(new PreviousCommand());
+    getView().setNextCommand(new NextCommand());
 
     VariableNameFieldUpdater updater = new VariableNameFieldUpdater();
-    super.getDisplay().setVariableNameFieldUpdater(updater);
-    super.getDisplay().setVariableIndexFieldUpdater(updater);
-    super.registerHandler(getDisplay().addVariableSuggestionHandler(new VariableSuggestionHandler()));
-    super.registerHandler(getDisplay().addVariableSortHandler(new VariableSortHandler()));
+    super.getView().setVariableNameFieldUpdater(updater);
+    super.getView().setVariableIndexFieldUpdater(updater);
+    super.registerHandler(getView().addVariableSuggestionHandler(new VariableSuggestionHandler()));
+    super.registerHandler(getView().addVariableSortHandler(new VariableSortHandler()));
 
     // OPAL-975
-    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
   }
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     authorizationPresenter.unbind();
     valuesTablePresenter.unbind();
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
   private void authorize() {
     // export variables in excel
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/variables/excel").get().authorize(getDisplay().getExcelDownloadAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/variables/excel").get().authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
     .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
     .and("/functional-units", HttpMethod.GET)//
     .and("/functional-units/entities/table", HttpMethod.GET)//
-    .authorize(getDisplay().getExportDataAuthorizer()).build())//
+    .authorize(getView().getExportDataAuthorizer()).build())//
     .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getCopyDataAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getView().getCopyDataAuthorizer()).send();
     if(table.hasViewLink()) {
       // remove view
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().authorize(getDisplay().getRemoveAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().authorize(getView().getRemoveAuthorizer()).send();
       // edit view
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getDisplay().getEditAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getView().getEditAuthorizer()).send();
     } else {
       // Drop table
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName()).delete().authorize(getDisplay().getRemoveAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName()).delete().authorize(getView().getRemoveAuthorizer()).send();
     }
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
@@ -179,33 +173,28 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     this.next = next;
 
     table = tableDto;
-    GWT.log(tableDto.getVariablesArray().length() + "");
     valuesTablePresenter.setTable(table);
-    getDisplay().clear();
-    getDisplay().setTable(tableDto);
-    getDisplay().setParentName(tableDto.getDatasourceName());
-    getDisplay().setPreviousName(previous);
-    getDisplay().setNextName(next);
-    getDisplay().setRemoveCommand(new RemoveCommand());
+    getView().clear();
+    getView().setTable(tableDto);
+    getView().setParentName(tableDto.getDatasourceName());
+    getView().setPreviousName(previous);
+    getView().setNextName(next);
+    getView().setRemoveCommand(new RemoveCommand());
 
     if(tableIsView()) {
-      getDisplay().setDownloadViewCommand(new DownloadViewCommand());
-      getDisplay().setEditCommand(new EditCommand());
+      getView().setDownloadViewCommand(new DownloadViewCommand());
+      getView().setEditCommand(new EditCommand());
     } else {
-      getDisplay().setDownloadViewCommand(null);
-      getDisplay().setEditCommand(null);
+      getView().setDownloadViewCommand(null);
+      getView().setEditCommand(null);
     }
 
     updateVariables();
     authorize();
   }
 
-  private boolean isCurrentTable(TableDto tableDto) {
-    return table.getDatasourceName().equals(tableDto.getDatasourceName()) && table.getName().equals(tableDto.getName());
-  }
-
   private void updateVariables() {
-    String sortColumnName = getDisplay().getClickableColumnName(sortColumn);
+    String sortColumnName = getView().getClickableColumnName(sortColumn);
     String sortColumArg = (sortColumnName != null ? ("?sortField=" + sortColumnName) : "");
     String sortDirArg = (sortAscending != null ? (sortAscending ? "&sortDir=ASC" : "&sortDir=DESC") : "");
     ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables" + sortColumArg + sortDirArg).get().withCallback(new VariablesResourceCallback(table)).send();
@@ -213,7 +202,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
 
   private void downloadMetadata() {
     String downloadUrl = new StringBuilder(this.table.getLink()).append("/variables/excel").toString();
-    eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
+    getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
   private VariableDto getPreviousVariable(int index) {
@@ -240,9 +229,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
           String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
         } else {
-          eventBus.fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+          getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
         }
       }
     };
@@ -258,9 +247,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
           String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
         } else {
-          eventBus.fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+          getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
         }
       }
     };
@@ -306,9 +295,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       for(int i = 0; i < variables.length(); i++) {
         if(variables.get(i).getName().equals(value)) {
           VariableDto selection = variables.get(i);
-          eventBus.fireEvent(new VariableSelectionChangeEvent(table, selection, getPreviousVariable(i), getNextVariable(i)));
-          getDisplay().setVariableSelection(selection, i);
-          getDisplay().clearVariableSuggestion();
+          getEventBus().fireEvent(new VariableSelectionChangeEvent(table, selection, getPreviousVariable(i), getNextVariable(i)));
+          getView().setVariableSelection(selection, i);
+          getView().clearVariableSuggestion();
           break;
         }
       }
@@ -328,14 +317,14 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   final class NextCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
+      getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
     }
   }
 
   final class PreviousCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
+      getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
     }
   }
 
@@ -345,7 +334,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + table.getDatasourceName()).get().withCallback(new ResourceCallback<DatasourceDto>() {
         @Override
         public void onResource(Response response, DatasourceDto resource) {
-          eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource));
+          getEventBus().fireEvent(new DatasourceSelectionChangeEvent(resource));
         }
 
       }).send();
@@ -362,14 +351,14 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   final class ExportDataCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA, table));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA, table));
     }
   }
 
   final class CopyDataCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.COPY_DATA, table));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.COPY_DATA, table));
     }
   }
 
@@ -377,7 +366,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     @Override
     public void execute() {
       String downloadUrl = new StringBuilder(table.getViewLink()).append("/xml").toString();
-      eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
+      getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
     }
   }
 
@@ -401,7 +390,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
         event = new ConfirmationRequiredEvent(removeConfirmation, "removeTable", "confirmRemoveTable");
       }
 
-      eventBus.fireEvent(event);
+      getEventBus().fireEvent(event);
     }
   }
 
@@ -435,7 +424,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
           viewDto.setDatasourceName(table.getDatasourceName());
           viewDto.setName(table.getName());
 
-          eventBus.fireEvent(new ViewConfigurationRequiredEvent(viewDto));
+          getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto));
         }
       }).send();
     }
@@ -448,18 +437,18 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     public VariablesResourceCallback(TableDto table) {
       super();
       this.table = table;
-      getDisplay().beforeRenderRows();
+      getView().beforeRenderRows();
     }
 
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
       if(this.table.getLink().equals(TablePresenter.this.table.getLink())) {
         variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
-        getDisplay().renderRows(variables);
+        getView().renderRows(variables);
         for(int i = 0; i < variables.length(); i++) {
-          getDisplay().addVariableSuggestion(variables.get(i).getName());
+          getView().addVariableSuggestion(variables.get(i).getName());
         }
-        getDisplay().afterRenderRows();
+        getView().afterRenderRows();
       }
     }
   }
@@ -475,7 +464,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
-      eventBus.fireEvent(new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
     }
   }
 
@@ -501,8 +490,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
       }
       siblingSelection = variables.get(siblingIndex);
 
-      getDisplay().setVariableSelection(siblingSelection, siblingIndex);
-      eventBus.fireEvent(new VariableSelectionChangeEvent(table, siblingSelection, getPreviousVariable(siblingIndex), getNextVariable(siblingIndex)));
+      getView().setVariableSelection(siblingSelection, siblingIndex);
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(table, siblingSelection, getPreviousVariable(siblingIndex), getNextVariable(siblingIndex)));
     }
   }
 
@@ -517,7 +506,11 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  @ProxyStandard
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<TablePresenter> {
+  }
+
+  public interface Display extends View {
 
     void setVariableSelection(VariableDto variable, int index);
 

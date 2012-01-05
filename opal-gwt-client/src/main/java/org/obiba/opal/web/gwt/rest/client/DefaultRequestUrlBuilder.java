@@ -26,7 +26,6 @@ public class DefaultRequestUrlBuilder implements RequestUrlBuilder {
   public String buildAbsoluteUrl(String relativeUrl) {
     boolean startsWithSlash = relativeUrl.startsWith("/");
     String absolutePath = URL.encode("/ws" + (startsWithSlash ? relativeUrl : '/' + relativeUrl));
-    GWT.log("hashing [" + absolutePath + "]");
     credentials.provideCredentials(absolutePath);
     return GWT.getModuleBaseURL().replace("/" + GWT.getModuleName() + "/", "") + absolutePath;
   }

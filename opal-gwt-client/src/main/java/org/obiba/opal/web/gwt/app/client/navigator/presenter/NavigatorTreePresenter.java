@@ -12,15 +12,10 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -31,53 +26,62 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 /**
  * Presenter for a Tree displaying Opal datasources and tables.
  */
-public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresenter.Display> {
+public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Display, NavigatorTreePresenter.Proxy> {
 
   @Inject
-  public NavigatorTreePresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public NavigatorTreePresenter(final Display display, final EventBus eventBus, final Proxy proxy) {
+    super(eventBus, display, proxy);
   }
 
   @Override
-  public Place getPlace() {
-    return null;
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, NavigatorPresenter.LEFT_PANE, this);
   }
 
   @Override
   protected void onBind() {
-    super.registerHandler(getDisplay().getTree().addSelectionHandler(new TreeSelectionHandler()));
+    super.onBind();
+    super.registerHandler(getView().getTree().addSelectionHandler(new TreeSelectionHandler()));
 
-    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
       @Override
       public void onTableSelectionChanged(TableSelectionChangeEvent event) {
         if(!NavigatorTreePresenter.this.equals(event.getSource())) {
-          getDisplay().selectTable(event.getSelection().getDatasourceName(), event.getSelection().getName());
+          getView().selectTable(event.getSelection().getDatasourceName(), event.getSelection().getName());
         }
       }
 
     }));
 
-    super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
 
       @Override
       public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-        if(!getDisplay().hasDatasource(event.getSelection().getName())) {
+        if(!getView().hasDatasource(event.getSelection().getName())) {
           updateTree(event.getSelection().getName(), false);
-        } else
-          getDisplay().selectDatasource(event.getSelection().getName());
+        } else {
+          getView().selectDatasource(event.getSelection().getName(), false);
+        }
       }
 
     }));
 
-    super.registerHandler(eventBus.addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEvent.Handler() {
 
       @Override
       public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
@@ -85,24 +89,13 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
       }
 
     }));
-  }
 
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-    updateTree(null, true);
-  }
-
-  @Override
-  public void revealDisplay() {
     updateTree(null, false);
+  }
+
+  @Override
+  protected void onReveal() {
+    updateTree(null, true);
   }
 
   private void updateTree(final String datasourceName, final boolean keepCurrentSelection) {
@@ -112,11 +105,13 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
         if(datasources != null) {
           ArrayList<TreeItem> items = new ArrayList<TreeItem>(datasources.length());
           addDatasources(datasources, items);
-          getDisplay().setItems(items);
+          getView().setItems(items);
           if(!keepCurrentSelection) {
-            if(datasourceName != null) getDisplay().selectDatasource(datasourceName);
-            else
-              getDisplay().selectFirstDatasource();
+            if(datasourceName != null) {
+              getView().selectDatasource(datasourceName, true);
+            } else {
+              getView().selectFirstDatasource(true);
+            }
           }
         }
       }
@@ -177,7 +172,7 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
       ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + item.getText()).get().withCallback(new ResourceCallback<DatasourceDto>() {
         @Override
         public void onResource(Response response, DatasourceDto resource) {
-          eventBus.fireEvent(new DatasourceSelectionChangeEvent(resource));
+          getEventBus().fireEvent(new DatasourceSelectionChangeEvent(resource));
         }
       }).send();
     }
@@ -196,13 +191,19 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
           if(index < parentItem.getChildCount() - 1) {
             next = item.getParentItem().getChild(index + 1).getText();
           }
-          eventBus.fireEvent(new TableSelectionChangeEvent(NavigatorTreePresenter.this, resource, previous, next));
+          getEventBus().fireEvent(new TableSelectionChangeEvent(NavigatorTreePresenter.this, resource, previous, next));
         }
       }).send();
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  @ProxyStandard
+  @NameToken(Places.navigator)
+  public interface Proxy extends ProxyPlace<NavigatorTreePresenter> {
+
+  }
+
+  public interface Display extends View {
 
     HasSelectionHandlers<TreeItem> getTree();
 
@@ -210,11 +211,11 @@ public class NavigatorTreePresenter extends WidgetPresenter<NavigatorTreePresent
 
     void clear();
 
-    void selectFirstDatasource();
+    void selectFirstDatasource(boolean fireEvent);
 
     void selectTable(String datasourceName, String tableName);
 
-    void selectDatasource(String datasourceName);
+    void selectDatasource(String datasourceName, boolean fireEvent);
 
     boolean hasDatasource(String datasourceName);
 

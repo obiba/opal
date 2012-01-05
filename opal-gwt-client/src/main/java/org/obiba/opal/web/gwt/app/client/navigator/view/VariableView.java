@@ -36,7 +36,6 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -44,11 +43,12 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class VariableView extends Composite implements VariablePresenter.Display {
+public class VariableView extends ViewImpl implements VariablePresenter.Display {
 
   @UiTemplate("VariableView.ui.xml")
   interface VariableViewUiBinder extends UiBinder<Widget, VariableView> {
@@ -65,6 +65,8 @@ public class VariableView extends Composite implements VariablePresenter.Display
   //
   // Instance Variables
   //
+
+  private final Widget widget;
 
   @UiField
   FlowPanel toolbarPanel;
@@ -153,7 +155,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   //
 
   public VariableView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    this.widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     initCategoryTable();
     initAttributeTable();
@@ -206,13 +208,7 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   public Widget asWidget() {
-    return this;
-  }
-
-  public void startProcessing() {
-  }
-
-  public void stopProcessing() {
+    return widget;
   }
 
   //

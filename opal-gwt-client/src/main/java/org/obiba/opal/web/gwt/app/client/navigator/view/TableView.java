@@ -41,7 +41,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -54,14 +53,17 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class TableView extends Composite implements TablePresenter.Display {
+public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiTemplate("TableView.ui.xml")
   interface TableViewUiBinder extends UiBinder<Widget, TableView> {
   }
 
   private static TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   FlowPanel toolbarPanel;
@@ -119,7 +121,7 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   public TableView() {
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
-    initWidget(uiBinder.createAndBindUi(this));
+    this.widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
   }
@@ -212,15 +214,7 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

@@ -59,13 +59,11 @@ public class NavigatorModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    // Bind concrete implementations to interfaces
     bindPresenter(NavigatorPresenter.class, NavigatorPresenter.Display.class, NavigatorView.class, NavigatorPresenter.Proxy.class);
-
-    // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
-    bind(NavigatorTreePresenter.Display.class).to(NavigatorTreeView.class);
-    bind(TablePresenter.Display.class).to(TableView.class);
-    bind(VariablePresenter.Display.class).to(VariableView.class);
+    bindPresenter(NavigatorTreePresenter.class, NavigatorTreePresenter.Display.class, NavigatorTreeView.class, NavigatorTreePresenter.Proxy.class);
+    bindPresenter(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class, DatasourcePresenter.Proxy.class);
+    bindPresenter(TablePresenter.class, TablePresenter.Display.class, TableView.class, TablePresenter.Proxy.class);
+    bindPresenter(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class, VariablePresenter.Proxy.class);
 
     configureDatasourcePresenters();
 
@@ -74,7 +72,6 @@ public class NavigatorModule extends AbstractPresenterModule {
 
   private void configureDatasourcePresenters() {
     bind(CreateDatasourcePresenter.Display.class).to(CreateDatasourceView.class);
-    bind(DatasourcePresenter.Display.class).to(DatasourceView.class);
     bind(CreateDatasourceConclusionStepPresenter.Display.class).to(CreateDatasourceConclusionStepView.class);
     bind(HibernateDatasourceFormPresenter.Display.class).to(HibernateDatasourceFormView.class);
     bind(ExcelDatasourceFormPresenter.Display.class).to(ExcelDatasourceFormView.class);

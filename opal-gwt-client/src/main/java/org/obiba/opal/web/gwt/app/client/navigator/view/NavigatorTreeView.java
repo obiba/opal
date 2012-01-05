@@ -14,17 +14,19 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  * View for a Tree displaying Opal datasources and tables.
  */
-public class NavigatorTreeView implements NavigatorTreePresenter.Display {
+public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresenter.Display {
 
   Tree tree;
 
@@ -75,7 +77,7 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
     String datasourceName = currentSelection.getParentItem().getText();
     currentSelection = getTableItem(datasourceName, currentSelection.getText());
     if(currentSelection == null) {
-      selectDatasource(datasourceName);
+      selectDatasource(datasourceName, true);
     } else {
       // soft selection (do not trigger event)
       currentSelection.addStyleName("selected");
@@ -86,7 +88,7 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
   private void reselectDatasource() {
     currentSelection = getDatasourceItem(currentSelection.getText());
     if(currentSelection == null) {
-      selectFirstDatasource();
+      selectFirstDatasource(true);
     } else {
       // soft selection (do not trigger event)
       currentSelection.addStyleName("selected");
@@ -110,16 +112,8 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void selectFirstDatasource() {
-    tree.setSelectedItem(tree.getItem(0), true);
+  public void selectFirstDatasource(boolean fireEvents) {
+    tree.setSelectedItem(tree.getItem(0), fireEvents);
   }
 
   @Override
@@ -144,11 +138,11 @@ public class NavigatorTreeView implements NavigatorTreePresenter.Display {
   }
 
   @Override
-  public void selectDatasource(String datasourceName) {
+  public void selectDatasource(String datasourceName, boolean fireEvents) {
     if(!isDatasourceSelected(datasourceName)) {
       TreeItem dsItem = getDatasourceItem(datasourceName);
       if(dsItem != null) {
-        tree.setSelectedItem(dsItem);
+        tree.setSelectedItem(dsItem, fireEvents);
       }
     }
   }

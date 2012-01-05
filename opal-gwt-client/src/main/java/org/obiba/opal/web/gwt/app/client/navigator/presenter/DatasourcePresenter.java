@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -44,14 +38,21 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Display> {
+public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, DatasourcePresenter.Proxy> {
 
   private String datasourceName;
 
@@ -61,52 +62,52 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   private Runnable removeDatasourceConfirmation;
 
-  @Inject
-  private Provider<NavigatorPresenter> navigationPresenter;
-
   private AuthorizationPresenter authorizationPresenter;
 
-  //
-  // Constructors
-  //
-
   @Inject
-  public DatasourcePresenter(Display display, EventBus eventBus, AuthorizationPresenter authorizationPresenter) {
-    super(display, eventBus);
+  public DatasourcePresenter(Display display, EventBus eventBus, Proxy proxy, AuthorizationPresenter authorizationPresenter) {
+    super(eventBus, display, proxy);
     this.authorizationPresenter = authorizationPresenter;
   }
 
   @Override
-  public Place getPlace() {
-    return null;
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, NavigatorPresenter.CENTER_PANE, this);
+  }
+
+  @ProxyEvent
+  public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent e) {
+    forceReveal();
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     authorizationPresenter.bind();
-    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+    getView().setPermissionsDisplay(authorizationPresenter.getDisplay());
 
-    super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
-    super.registerHandler(eventBus.addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    getDisplay().setExcelDownloadCommand(new ExcelDownloadCommand());
-    getDisplay().setExportDataCommand(new ExportDataCommand());
-    getDisplay().setCopyDataCommand(new CopyDataCommand());
-    getDisplay().setAddUpdateTablesCommand(new AddUpdateTablesCommand());
-    getDisplay().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
-    getDisplay().setAddViewCommand(new AddViewCommand());
-    getDisplay().setNextCommand(new NextCommand());
-    getDisplay().setPreviousCommand(new PreviousCommand());
-    super.registerHandler(eventBus.addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
-    super.getDisplay().setTableNameFieldUpdater(new TableNameFieldUpdater());
-    super.registerHandler(eventBus.addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
+    super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    getView().setExcelDownloadCommand(new ExcelDownloadCommand());
+    getView().setExportDataCommand(new ExportDataCommand());
+    getView().setCopyDataCommand(new CopyDataCommand());
+    getView().setAddUpdateTablesCommand(new AddUpdateTablesCommand());
+    getView().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
+    getView().setAddViewCommand(new AddViewCommand());
+    getView().setNextCommand(new NextCommand());
+    getView().setPreviousCommand(new PreviousCommand());
+    super.registerHandler(getEventBus().addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
+    super.getView().setTableNameFieldUpdater(new TableNameFieldUpdater());
+    super.registerHandler(getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
 
     // OPAL-975
-    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
   }
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     authorizationPresenter.unbind();
   }
 
@@ -122,38 +123,30 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  public void refreshDisplay() {
+  public void onReveal() {
     initDatasources();
-  }
-
-  @Override
-  public void revealDisplay() {
   }
 
   private void authorize() {
     // create tables
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getDisplay().getAddUpdateTablesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getView().getAddUpdateTablesAuthorizer()).send();
     // create views
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/views").post().authorize(getDisplay().getAddViewAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/views").post().authorize(getView().getAddViewAuthorizer()).send();
     // export variables in excel
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/tables/excel").get().authorize(getDisplay().getExcelDownloadAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName + "/tables/excel").get().authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
     .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
     .and("/functional-units", HttpMethod.GET)//
     .and("/functional-units/entities/table", HttpMethod.GET)//
-    .authorize(getDisplay().getExportDataAuthorizer()).build())//
+    .authorize(getView().getExportDataAuthorizer()).build())//
     .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getDisplay().getCopyDataAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getView().getCopyDataAuthorizer()).send();
     // remove
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().authorize(getDisplay().getRemoveDatasourceAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + datasourceName).delete().authorize(getView().getRemoveDatasourceAuthorizer()).send();
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void displayDatasource(String datasourceName) {
@@ -174,7 +167,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   private void displayDatasource(final DatasourceDto datasourceDto, final TableDto tableDto) {
     if(datasourceName == null || !isCurrentDatasource(datasourceDto)) {
       datasourceName = datasourceDto.getName();
-      getDisplay().setDatasource(datasourceDto);
+      getView().setDatasource(datasourceDto);
       updateTable(tableDto != null ? tableDto.getName() : null);
 
       // make sure the list of datasources is initialized before looking for siblings
@@ -201,8 +194,8 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   private void displayDatasourceSiblings(DatasourceDto datasourceDto) {
     int index = getDatasourceIndex(datasourceDto);
-    getDisplay().setPreviousName(index > 0 ? datasources.get(index - 1).getName() : null);
-    getDisplay().setNextName(index < datasources.length() - 1 ? datasources.get(index + 1).getName() : null);
+    getView().setPreviousName(index > 0 ? datasources.get(index - 1).getName() : null);
+    getView().setNextName(index < datasources.length() - 1 ? datasources.get(index + 1).getName() : null);
   }
 
   private int getDatasourceIndex(DatasourceDto datasourceDto) {
@@ -223,7 +216,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   private void selectTable(String tableName) {
     if(tableName != null) {
       int index = getTableIndex(tableName);
-      getDisplay().setTableSelection(tables.get(index), index);
+      getView().setTableSelection(tables.get(index), index);
     }
   }
 
@@ -233,11 +226,11 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
 
   private void downloadMetadata(String datasource) {
     String downloadUrl = new StringBuilder("/datasource/").append(datasource).append("/tables/excel").toString();
-    eventBus.fireEvent(new FileDownloadEvent(downloadUrl));
+    getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
   private void addView(String datasource) {
-    eventBus.fireEvent(new WizardRequiredEvent(WizardType.CREATE_VIEW, datasource));
+    getEventBus().fireEvent(new WizardRequiredEvent(WizardType.CREATE_VIEW, datasource));
   }
 
   private void removeDatasource(String datasource) {
@@ -247,9 +240,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
-          eventBus.fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
+          getEventBus().fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
         }
       }
     };
@@ -314,7 +307,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       for(int i = 0; i < datasources.length(); i++) {
         if(datasources.get(i).getName().equals(datasourceName)) {
           if(i != 0) {
-            eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i - 1)));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i - 1)));
           }
           break;
         }
@@ -328,7 +321,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       for(int i = 0; i < datasources.length(); i++) {
         if(datasources.get(i).getName().equals(datasourceName)) {
           if(i < datasources.length() - 1) {
-            eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i + 1)));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i + 1)));
           }
           break;
         }
@@ -352,7 +345,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
         }
       };
 
-      eventBus.fireEvent(new ConfirmationRequiredEvent(removeDatasourceConfirmation, "removeDatasource", "confirmRemoveDatasource"));
+      getEventBus().fireEvent(new ConfirmationRequiredEvent(removeDatasourceConfirmation, "removeDatasource", "confirmRemoveDatasource"));
     }
   }
 
@@ -376,21 +369,21 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   final class ExportDataCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA, datasourceName));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA, datasourceName));
     }
   }
 
   final class CopyDataCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.COPY_DATA, datasourceName));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.COPY_DATA, datasourceName));
     }
   }
 
   final class AddUpdateTablesCommand implements Command {
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_VARIABLES, datasourceName));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.IMPORT_VARIABLES, datasourceName));
     }
   }
 
@@ -403,16 +396,16 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     private TablesResourceCallback(String datasourceName, String selectTableName) {
       this.datasourceName = datasourceName;
       this.selectTableName = selectTableName;
-      getDisplay().beforeRenderRows();
+      getView().beforeRenderRows();
     }
 
     @Override
     public void onResource(Response response, JsArray<TableDto> resource) {
       if(this.datasourceName.equals(DatasourcePresenter.this.datasourceName)) {
         tables = (resource != null) ? resource : (JsArray<TableDto>) JsArray.createArray();
-        getDisplay().renderRows(resource);
+        getView().renderRows(resource);
         selectTable(selectTableName);
-        getDisplay().afterRenderRows();
+        getView().afterRenderRows();
       }
     }
   }
@@ -420,7 +413,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
   class TableNameFieldUpdater implements FieldUpdater<TableDto, String> {
     @Override
     public void update(int index, TableDto tableDto, String value) {
-      eventBus.fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index), getNextTableName(index)));
+      getEventBus().fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index), getNextTableName(index)));
     }
   }
 
@@ -466,9 +459,9 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       }
       siblingSelection = tables.get(siblingIndex);
 
-      getDisplay().setTableSelection(siblingSelection, siblingIndex);
+      getView().setTableSelection(siblingSelection, siblingIndex);
 
-      eventBus.fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTableName(siblingIndex), getNextTableName(siblingIndex)));
+      getEventBus().fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTableName(siblingIndex), getNextTableName(siblingIndex)));
     }
   }
 
@@ -485,7 +478,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       for(int i = 0; i < datasources.length(); i++) {
         if(datasources.get(i).getName().equals(datasourceName)) {
           if(i != 0) {
-            eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i - 1)));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i - 1)));
           }
           break;
         }
@@ -499,7 +492,7 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
       for(int i = 0; i < datasources.length(); i++) {
         if(datasources.get(i).getName().equals(datasourceName)) {
           if(i < datasources.length() - 1) {
-            eventBus.fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i + 1)));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasources.get(i + 1)));
           }
           break;
         }
@@ -532,7 +525,12 @@ public class DatasourcePresenter extends WidgetPresenter<DatasourcePresenter.Dis
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  @ProxyStandard
+  @NameToken("navigator.datasource")
+  public interface Proxy extends ProxyPlace<DatasourcePresenter> {
+  }
+
+  public interface Display extends View {
 
     void setTableSelection(TableDto variable, int index);
 

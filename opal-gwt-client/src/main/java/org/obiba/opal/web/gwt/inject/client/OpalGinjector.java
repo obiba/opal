@@ -108,13 +108,13 @@ public interface OpalGinjector extends Ginjector {
 
   Provider<FileExplorerPresenter> getFileExplorerPresenter();
 
-  VariablePresenter getVariablePresenter();
+  Provider<VariablePresenter> getVariablePresenter();
 
-  NavigatorTreePresenter getNavigatorTreePresenter();
+  Provider<NavigatorTreePresenter> getNavigatorTreePresenter();
 
-  DatasourcePresenter getDatasourcePresenter();
+  Provider<DatasourcePresenter> getDatasourcePresenter();
 
-  TablePresenter getTablePresenter();
+  Provider<TablePresenter> getTablePresenter();
 
   FileSystemTreePresenter getFileSystemTreePresenter();
 

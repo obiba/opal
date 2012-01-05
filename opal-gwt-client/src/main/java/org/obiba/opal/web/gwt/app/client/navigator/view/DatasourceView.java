@@ -33,7 +33,6 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -43,13 +42,17 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class DatasourceView extends Composite implements DatasourcePresenter.Display {
+public class DatasourceView extends ViewImpl implements DatasourcePresenter.Display {
+
   @UiTemplate("DatasourceView.ui.xml")
   interface DatasourceViewUiBinder extends UiBinder<Widget, DatasourceView> {
   }
 
   private static DatasourceViewUiBinder uiBinder = GWT.create(DatasourceViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   Label datasourceName;
@@ -88,7 +91,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
   private Translations translations = GWT.create(Translations.class);
 
   public DatasourceView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     toolbar.setParentName(null);
     addTableColumns();
@@ -137,15 +140,7 @@ public class DatasourceView extends Composite implements DatasourcePresenter.Dis
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override
