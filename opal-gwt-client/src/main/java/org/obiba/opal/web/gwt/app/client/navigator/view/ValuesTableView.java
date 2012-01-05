@@ -20,6 +20,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ActionCell.Delegate;
+import com.google.gwt.cell.client.ImageCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -122,65 +123,99 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
       }
     }, translations.participant());
 
-    EmptyColumn<ValueSetDto> col = new EmptyColumn<ValueSetDto>();
-    valuesTable.addColumn(col, createPreviousHeader());
+    valuesTable.addColumn(createEmptyColumn(), createPreviousDisabledHeader());
   }
 
   private void initAfter() {
-    valuesTable.addColumn(new EmptyColumn<ValueSetDto>(), createNextHeader());
+    valuesTable.addColumn(createEmptyColumn(), createNextEnabledHeader());
   }
 
-  private Header<String> createNextHeader() {
+  private void enablePrevious(boolean enable) {
+    valuesTable.removeColumn(1);
+    valuesTable.insertColumn(1, createColumn(), enable ? createPreviousEnabledHeader() : createPreviousDisabledHeader());
+  }
 
-    SafeHtml safe = SafeHtmlUtils.fromSafeConstant("<img src=\"image/20/next.png\">");
-    ActionCell<String> nextActionCell = new ActionCell<String>(safe, new Delegate<String>() {
+  private void enableNext(boolean enable) {
+    valuesTable.removeColumn(valuesTable.getColumnCount() - 1);
+    valuesTable.insertColumn(valuesTable.getColumnCount(), createColumn(), enable ? createNextEnabledHeader() : createNextDisabledHeader());
+  }
 
-      @Override
-      public void execute(String object) {
-        if(firstVisibleIndex + MAX_VISIBLE_COLUMNS > listVariable.size() - 1) return;
-        valuesTable.removeColumn(2);
-        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(), getColumnLabel(++firstVisibleIndex + MAX_VISIBLE_COLUMNS));
-      }
-    });
-
-    Header<String> nextHeader = new Header<String>(nextActionCell) {
+  private Header<String> createNextDisabledHeader() {
+    return new Header<String>(new ImageCell()) {
 
       @Override
       public String getValue() {
-        return null;
+        return "image/20/next-disabled.png";
       }
     };
-    return nextHeader;
   }
 
-  private Header<String> createPreviousHeader() {
+  private Header<String> createPreviousDisabledHeader() {
+    return new Header<String>(new ImageCell()) {
+
+      @Override
+      public String getValue() {
+        return "image/20/previous-disabled.png";
+      }
+    };
+  }
+
+  private Header<String> createPreviousEnabledHeader() {
     SafeHtml safe = SafeHtmlUtils.fromSafeConstant("<img src=\"image/20/previous.png\">");
 
     ActionCell<String> previousActionCell = new ActionCell<String>(safe, new Delegate<String>() {
 
       @Override
       public void execute(String object) {
-        if(firstVisibleIndex == 0) return;
         valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
-        valuesTable.insertColumn(2, createColumn(), getColumnLabel(--firstVisibleIndex));
+        valuesTable.insertColumn(2, createColumn(), getColumnLabel(firstVisibleIndex--));
+        enableNext(true);
+        if(firstVisibleIndex == 0) {
+          enablePrevious(false);
+        }
       }
+
     });
 
-    Header<String> previousHeader = new Header<String>(previousActionCell) {
+    return createHeader(previousActionCell);
+  }
+
+  private Header<String> createNextEnabledHeader() {
+
+    SafeHtml safe = SafeHtmlUtils.fromSafeConstant("<img src=\"image/20/next.png\">");
+    ActionCell<String> nextActionCell = new ActionCell<String>(safe, new Delegate<String>() {
+
+      @Override
+      public void execute(String object) {
+        valuesTable.removeColumn(2);
+        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(), getColumnLabel(++firstVisibleIndex + MAX_VISIBLE_COLUMNS));
+        enablePrevious(true);
+        if(firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) {
+          enableNext(false);
+        }
+      }
+
+    });
+    return createHeader(nextActionCell);
+  }
+
+  private Header<String> createHeader(ActionCell<String> cell) {
+    return new Header<String>(cell) {
 
       @Override
       public String getValue() {
         return null;
       }
     };
-    return previousHeader;
   }
 
-  public static class EmptyColumn<T> extends TextColumn<T> {
+  private TextColumn<ValueSetDto> createEmptyColumn() {
+    return new TextColumn<ValueSetDto>() {
 
-    @Override
-    public String getValue(T object) {
-      return null;
-    }
+      @Override
+      public String getValue(ValueSetDto object) {
+        return null;
+      }
+    };
   }
 }
