@@ -14,6 +14,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
@@ -124,6 +125,9 @@ public class VariableView extends Composite implements VariablePresenter.Display
 
   @UiField
   Panel summary;
+
+  @UiField
+  Panel values;
 
   @UiField
   InlineLabel noCategories;
@@ -405,6 +409,11 @@ public class VariableView extends Composite implements VariablePresenter.Display
   }
 
   @Override
+  public void setValuesDisplay(Display display) {
+    values.add(display.asWidget());
+  }
+
+  @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new TabAuthorizer(tabs, SUMMARY_TAB_INDEX + 1);
   }
@@ -415,4 +424,5 @@ public class VariableView extends Composite implements VariablePresenter.Display
       categorizeItem.setEnabled(available);
     }
   }
+
 }

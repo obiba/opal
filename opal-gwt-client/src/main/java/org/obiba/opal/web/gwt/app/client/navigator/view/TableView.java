@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -87,6 +88,9 @@ public class TableView extends Composite implements TablePresenter.Display {
 
   @UiField
   CellTable<VariableDto> table;
+
+  @UiField
+  Panel values;
 
   @UiField
   SimplePager pager;
@@ -396,6 +400,11 @@ public class TableView extends Composite implements TablePresenter.Display {
   }
 
   @Override
+  public void setValuesDisplay(Display display) {
+    values.add(display.asWidget());
+  }
+
+  @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new TabAuthorizer(tabs, 1);
   }
@@ -407,4 +416,5 @@ public class TableView extends Composite implements TablePresenter.Display {
     }
     return null;
   }
+
 }

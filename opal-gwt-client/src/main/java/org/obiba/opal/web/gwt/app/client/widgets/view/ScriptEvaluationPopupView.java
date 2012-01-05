@@ -84,7 +84,7 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
   }
 
   @Override
-  public void addScriptEvaluationWidget(Widget display) {
+  public void setScriptEvaluationWidget(Widget display) {
     ScrollPanel scroll = new ScrollPanel();
     scroll.add(display);
     content.add(scroll);

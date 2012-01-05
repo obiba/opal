@@ -85,6 +85,9 @@
 	    <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>
         <g:SimplePanel ui:field="summary" width="100%" />
         
+        <g:Anchor><ui:msg description="Values label">Values</ui:msg></g:Anchor>
+     	<g:SimplePanel ui:field="values"></g:SimplePanel>
+
         <g:Anchor><ui:msg description="Permissions label" >Permissions</ui:msg></g:Anchor>
         <g:SimplePanel ui:field="permissions"></g:SimplePanel>
          

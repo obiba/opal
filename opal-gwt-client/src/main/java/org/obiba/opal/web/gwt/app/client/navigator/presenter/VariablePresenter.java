@@ -51,6 +51,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
 
   private VariableDto variable;
 
+  @Inject
+  private ValuesTablePresenter valuesTablePresenter;
+
   /**
    * @param display
    * @param eventBus
@@ -70,7 +73,9 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   @Override
   protected void onBind() {
     authorizationPresenter.bind();
+    valuesTablePresenter.bind();
     getDisplay().setPermissionsTabWidget(authorizationPresenter.getDisplay());
+    getDisplay().setValuesDisplay(valuesTablePresenter.getDisplay());
 
     super.registerHandler(eventBus.addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
     summaryTabPresenter.bind();
@@ -92,6 +97,7 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   protected void onUnbind() {
     authorizationPresenter.unbind();
     summaryTabPresenter.unbind();
+    valuesTablePresenter.unbind();
   }
 
   @Override
@@ -302,6 +308,8 @@ public class VariablePresenter extends WidgetPresenter<VariablePresenter.Display
   public interface Display extends WidgetDisplay {
 
     void setVariableName(String name);
+
+    void setValuesDisplay(ValuesTablePresenter.Display display);
 
     void setCategorizeMenuAvailable(boolean available);
 

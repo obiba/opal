@@ -46,6 +46,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -73,6 +74,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   @Inject
   private CodingViewDialogPresenter codingViewDialogPresenter;
 
+  @Inject
+  private ValuesTablePresenter valuesTablePresenter;
+
   private Runnable removeConfirmation;
 
   private Boolean sortAscending;
@@ -96,7 +100,9 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   @Override
   protected void onBind() {
     authorizationPresenter.bind();
+    valuesTablePresenter.bind();
     getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+    getDisplay().setValuesDisplay(valuesTablePresenter.getDisplay());
 
     super.registerHandler(eventBus.addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(eventBus.addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
@@ -122,6 +128,7 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   @Override
   protected void onUnbind() {
     authorizationPresenter.unbind();
+    valuesTablePresenter.unbind();
   }
 
   @Override
@@ -172,6 +179,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
     this.next = next;
 
     table = tableDto;
+    GWT.log(tableDto.getVariablesArray().length() + "");
+    valuesTablePresenter.setTable(table);
     getDisplay().clear();
     getDisplay().setTable(tableDto);
     getDisplay().setParentName(tableDto.getDatasourceName());
@@ -511,6 +520,8 @@ public class TablePresenter extends WidgetPresenter<TablePresenter.Display> {
   public interface Display extends WidgetDisplay {
 
     void setVariableSelection(VariableDto variable, int index);
+
+    void setValuesDisplay(ValuesTablePresenter.Display display);
 
     void setPermissionsDisplay(AuthorizationPresenter.Display display);
 

@@ -73,7 +73,7 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
         getDisplay().closeDialog();
       }
     });
-    getDisplay().addScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay().asWidget());
+    getDisplay().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay().asWidget());
     addHandler();
   }
 
@@ -118,7 +118,7 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
 
     void showDialog();
 
-    void addScriptEvaluationWidget(Widget display);
+    void setScriptEvaluationWidget(Widget display);
 
     HasClickHandlers getButton();
 
