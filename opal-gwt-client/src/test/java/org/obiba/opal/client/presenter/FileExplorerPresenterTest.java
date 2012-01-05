@@ -44,6 +44,7 @@ import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -94,7 +95,7 @@ public class FileExplorerPresenterTest extends AbstractGwtTestSetup {
 
     fileExplorerDisplayMock = createMock(FileExplorerPresenter.Display.class);
     FileExplorerPresenter.Proxy proxy = createMock(FileExplorerPresenter.Proxy.class);
-    fileExplorerPresenter = new FileExplorerPresenter(fileExplorerDisplayMock, eventBusMock, proxy, fileSystemTreePresenter, folderDetailsPresenter, fileUploadDialogPresenter, createFolderDialogPresenter);
+    fileExplorerPresenter = new FileExplorerPresenter(fileExplorerDisplayMock, new CountingEventBus(), proxy, fileSystemTreePresenter, folderDetailsPresenter, fileUploadDialogPresenter, createFolderDialogPresenter);
   }
 
   @SuppressWarnings("unchecked")
