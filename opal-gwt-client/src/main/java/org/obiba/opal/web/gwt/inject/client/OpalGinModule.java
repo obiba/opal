@@ -79,15 +79,14 @@ public class OpalGinModule extends AbstractPresenterModule {
     install(new DefaultModule(OpalPlaceManager.class));
     bindPresenter(ApplicationPresenter.class, ApplicationPresenter.Display.class, ApplicationView.class, ApplicationPresenter.Proxy.class);
     bindPresenter(LoginPresenter.class, LoginPresenter.Display.class, LoginView.class, LoginPresenter.Proxy.class);
-    bindPresenterWidget(NotificationPresenter.class, NotificationPresenter.Display.class, NotificationView.class);
+    bindSingletonPresenterWidget(NotificationPresenter.class, NotificationPresenter.Display.class, NotificationView.class);
+    bindPresenterWidget(FileSelectorPresenter.class, FileSelectorPresenter.Display.class, FileSelectorView.class);
 
     configureWidgets();
 
   }
 
   private void configureWidgets() {
-    // Don't bind as singleton because the ApplicationPresenter expects a new instance on every display
-    bind(FileSelectorPresenter.Display.class).to(FileSelectorView.class).in(Singleton.class);
     bind(TableSelectorPresenter.Display.class).to(TableSelectorView.class).in(Singleton.class);
     bind(TableListPresenter.Display.class).to(TableListView.class);
     bind(FileSelectionPresenter.Display.class).to(FileSelectionView.class);

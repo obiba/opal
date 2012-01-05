@@ -13,6 +13,8 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.Administration
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -87,14 +89,20 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final NotificationPresenter messageDialog;
 
+  // TODO: decouple these presenters. We need it here because it's the one that knows if the "Administration" link
+  // should be displayed.
   private final Provider<AdministrationPresenter> administrationPresenter;
 
+  // TODO: decouple these presenters. This should be moved to FileSelectionPresenter when it becomes a PresenterWidget
+  private final Provider<FileSelectorPresenter> fileSelectorPresenter;
+
   @Inject
-  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<AdministrationPresenter> administrationPresenter) {
+  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter, Provider<AdministrationPresenter> administrationPresenter) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
     this.administrationPresenter = administrationPresenter;
+    this.fileSelectorPresenter = fileSelectorPresenter;
   }
 
   @Override
@@ -104,6 +112,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void onBind() {
+
+    super.registerHandler(getEventBus().addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
+
+      @Override
+      public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
+        FileSelectorPresenter fsp = fileSelectorPresenter.get();
+        fsp.handle(event);
+        addToPopupSlot(fsp);
+      }
+    }));
+
     getView().getDashboardItem().setCommand(new Command() {
 
       @Override

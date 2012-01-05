@@ -124,7 +124,7 @@ public interface OpalGinjector extends Ginjector {
 
   FileDownloadPresenter getFileDownloadPresenter();
 
-  FileSelectorPresenter getFileSelectorPresenter();
+  Provider<FileSelectorPresenter> getFileSelectorPresenter();
 
   TableSelectorPresenter getTableSelectorPresenter();
 

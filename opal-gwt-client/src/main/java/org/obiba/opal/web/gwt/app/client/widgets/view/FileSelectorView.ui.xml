@@ -15,8 +15,8 @@
     }
     .name-input { width: 90%; }
   </ui:style>
-  
-  <g:DockLayoutPanel unit="EM">
+  <g:DialogBox>
+  <g:DockLayoutPanel ui:field="content" unit="EM">
     <g:center>
       <g:FlowPanel>
       
@@ -64,5 +64,5 @@
       </g:HTMLPanel>
     </g:south>
   </g:DockLayoutPanel>
-  
+  </g:DialogBox>
 </ui:UiBinder>

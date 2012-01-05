@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -29,11 +30,13 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class FileSelectorView extends DialogBox implements Display {
+public class FileSelectorView extends PopupViewImpl implements Display {
   //
   // Constants
   //
@@ -55,6 +58,11 @@ public class FileSelectorView extends DialogBox implements Display {
   //
   // Instance Variables
   //
+
+  private final DialogBox dialog;
+
+  @UiField
+  DockLayoutPanel content;
 
   @UiField
   HTMLPanel namePanel;
@@ -86,25 +94,25 @@ public class FileSelectorView extends DialogBox implements Display {
   @UiField
   Button cancelButton;
 
-  private DockLayoutPanel content;
-
   //
   // Constructors
   //
 
-  public FileSelectorView() {
-    setText(translations.fileSelectorTitle());
-    setHeight(DIALOG_HEIGHT);
-    setWidth(DIALOG_WIDTH);
+  @Inject
+  public FileSelectorView(EventBus eventBus) {
+    super(eventBus);
+    dialog = uiBinder.createAndBindUi(this);
 
-    content = uiBinder.createAndBindUi(this);
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
-    add(content);
+
+    dialog.setText(translations.fileSelectorTitle());
+    dialog.setHeight(DIALOG_HEIGHT);
+    dialog.setWidth(DIALOG_WIDTH);
   }
 
   private void updateHeight(String height) {
-    setHeight(height);
+    dialog.setHeight(height);
     content.setHeight(height);
   }
 
@@ -189,7 +197,7 @@ public class FileSelectorView extends DialogBox implements Display {
   }
 
   public Widget asWidget() {
-    return this;
+    return dialog;
   }
 
   //
@@ -197,7 +205,7 @@ public class FileSelectorView extends DialogBox implements Display {
   //
 
   @UiTemplate("FileSelectorView.ui.xml")
-  interface FileSelectorViewUiBinder extends UiBinder<DockLayoutPanel, FileSelectorView> {
+  interface FileSelectorViewUiBinder extends UiBinder<DialogBox, FileSelectorView> {
   }
 
   @Override

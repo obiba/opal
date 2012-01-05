@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
@@ -28,7 +27,6 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.SelectButtonHandler;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
@@ -37,6 +35,7 @@ import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -51,6 +50,8 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   //
 
   private EventBus eventBusMock;
+
+  private CountingEventBus countingEventBus;
 
   private FileSelectorPresenter.Display displayMock;
 
@@ -67,6 +68,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   @Before
   public void setUp() {
     eventBusMock = createMock(EventBus.class);
+    countingEventBus = new CountingEventBus();
     displayMock = createDisplay();
     fileSystemTreePresenter = createFileSystemTreePresenter(eventBusMock);
     folderDetailsPresenter = createFolderDetailsPresenter(eventBusMock);
@@ -91,7 +93,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
+    new FileSelectorPresenter(displayMock, countingEventBus, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
 
     // Verify
     verify(eventBusMock, displayMock, folderDetailsPresenter.getDisplay(), folderDetailsPresenter.getDisplay());
@@ -100,8 +102,6 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
   @Test
   public void testOnBind() {
     // Setup
-    expect(eventBusMock.addHandler(eq(FileSelectionRequiredEvent.getType()), isA(FileSelectionRequiredEvent.Handler.class))).andReturn(null).once();
-
     expect(displayMock.addSelectButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(displayMock.addCancelButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
     expect(displayMock.addCreateFolderButtonHandler((ClickHandler) anyObject())).andReturn(null).once();
@@ -110,7 +110,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, countingEventBus, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.onBind();
 
     // Verify
@@ -150,8 +150,8 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
-    sut.revealDisplay();
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, countingEventBus, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
+    sut.onReveal();
 
     // Verify
     assertEquals(1, fileSystemTreePresenter.getRevealDisplayCount());
@@ -165,8 +165,8 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
     // Exercise
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
-    sut.refreshDisplay();
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, countingEventBus, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
+    sut.onReset();
 
     // Verify
     assertEquals(1, fileSystemTreePresenter.getRefreshDisplayCount());
@@ -248,19 +248,6 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     testAllowsFolderCreation(FileSelectionType.EXISTING_FILE_OR_FOLDER, false);
   }
 
-  @Test
-  public void testGetPlace_ReturnsNull() {
-    // Setup
-    replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
-
-    // Exercise
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
-    Object place = sut.getPlace();
-
-    // Verify
-    assertEquals(null, place);
-  }
-
   @Ignore("No longer testable due to usage of FileDto in presenter")
   @Test
   public void testOnSelectButtonClicked_FiresFileSelectionEvent() {
@@ -277,7 +264,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
 
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
-    FileSelectorPresenter presenter = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
+    FileSelectorPresenter presenter = new FileSelectorPresenter(displayMock, countingEventBus, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     presenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
 
     // Exercise
@@ -326,7 +313,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     // Setup
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, countingEventBus, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.setFileSelectionType(fileSelectionType);
 
     // Exercise
@@ -340,7 +327,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     // Setup
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, countingEventBus, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.setFileSelectionType(fileSelectionType);
 
     // Exercise
@@ -354,7 +341,7 @@ public class FileSelectorPresenterTest extends AbstractGwtTestSetup {
     // Setup
     replay(eventBusMock, displayMock, folderDetailsPresenter.getDisplay());
 
-    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, eventBusMock, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
+    FileSelectorPresenter sut = new FileSelectorPresenter(displayMock, countingEventBus, fileSystemTreePresenter, folderDetailsPresenter, fileUploadPresenter);
     sut.setFileSelectionType(fileSelectionType);
 
     // Exercise
