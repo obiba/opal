@@ -38,10 +38,7 @@ import com.google.gwt.view.client.ListDataProvider;
 
 public class ValuesTableView extends Composite implements ValuesTablePresenter.Display {
 
-  /**
-   * 
-   */
-  private static final int VISIBLE_COLUMNS = 10;
+  private static final int MAX_VISIBLE_COLUMNS = 10;
 
   @UiTemplate("ValuesTableView.ui.xml")
   interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {
@@ -82,24 +79,15 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
-    initTable();
-
-    valuesTable.addColumn(new TextColumn<ValueSetDto>() {
-
-      @Override
-      public String getValue(ValueSetDto value) {
-        return value.getEntity().getIdentifier();
-      }
-    }, translations.participant());
-
-    valuesTable.addColumn(new EmptyColumn<ValueSetDto>(), createPreviousHeader());
+    initBefore();
 
     listVariable = JsArrays.toList(variables);
-    for(int i = 0; i < VISIBLE_COLUMNS; i++) {
+    int visible = listVariable.size() < MAX_VISIBLE_COLUMNS ? listVariable.size() : MAX_VISIBLE_COLUMNS;
+    for(int i = 0; i < visible; i++) {
       valuesTable.addColumn(createColumn(), getColumnLabel(i));
     }
 
-    valuesTable.addColumn(new EmptyColumn<ValueSetDto>(), createNextHeader());
+    initAfter();
   }
 
   private String getColumnLabel(int i) {
@@ -116,7 +104,7 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
     };
   }
 
-  private void initTable() {
+  private void initBefore() {
     if(valuesTable != null) valuesPanel.remove(valuesTable);
     valuesTable = new Table<ValueSetDto>();
     valuesPanel.add(valuesTable);
@@ -125,6 +113,21 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
     valuesTable.setWidth("100%");
     dataProvider.addDataDisplay(valuesTable);
     pager.setDisplay(valuesTable);
+
+    valuesTable.addColumn(new TextColumn<ValueSetDto>() {
+
+      @Override
+      public String getValue(ValueSetDto value) {
+        return value.getEntity().getIdentifier();
+      }
+    }, translations.participant());
+
+    EmptyColumn<ValueSetDto> col = new EmptyColumn<ValueSetDto>();
+    valuesTable.addColumn(col, createPreviousHeader());
+  }
+
+  private void initAfter() {
+    valuesTable.addColumn(new EmptyColumn<ValueSetDto>(), createNextHeader());
   }
 
   private Header<String> createNextHeader() {
@@ -134,8 +137,9 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
 
       @Override
       public void execute(String object) {
+        if(firstVisibleIndex + MAX_VISIBLE_COLUMNS > listVariable.size() - 1) return;
         valuesTable.removeColumn(2);
-        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(), getColumnLabel(++firstVisibleIndex + VISIBLE_COLUMNS));
+        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(), getColumnLabel(++firstVisibleIndex + MAX_VISIBLE_COLUMNS));
       }
     });
 
@@ -156,6 +160,7 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
 
       @Override
       public void execute(String object) {
+        if(firstVisibleIndex == 0) return;
         valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
         valuesTable.insertColumn(2, createColumn(), getColumnLabel(--firstVisibleIndex));
       }
@@ -171,7 +176,7 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
     return previousHeader;
   }
 
-  public class EmptyColumn<T> extends TextColumn<T> {
+  public static class EmptyColumn<T> extends TextColumn<T> {
 
     @Override
     public String getValue(T object) {
