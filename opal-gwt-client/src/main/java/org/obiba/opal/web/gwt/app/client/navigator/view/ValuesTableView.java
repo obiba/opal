@@ -127,17 +127,17 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
   }
 
   private void initAfter() {
-    valuesTable.addColumn(createEmptyColumn(), createNextEnabledHeader());
+    valuesTable.addColumn(createEmptyColumn(), listVariable.size() > MAX_VISIBLE_COLUMNS ? createNextEnabledHeader() : createNextDisabledHeader());
   }
 
   private void enablePrevious(boolean enable) {
     valuesTable.removeColumn(1);
-    valuesTable.insertColumn(1, createColumn(), enable ? createPreviousEnabledHeader() : createPreviousDisabledHeader());
+    valuesTable.insertColumn(1, createEmptyColumn(), enable ? createPreviousEnabledHeader() : createPreviousDisabledHeader());
   }
 
   private void enableNext(boolean enable) {
     valuesTable.removeColumn(valuesTable.getColumnCount() - 1);
-    valuesTable.insertColumn(valuesTable.getColumnCount(), createColumn(), enable ? createNextEnabledHeader() : createNextDisabledHeader());
+    valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), enable ? createNextEnabledHeader() : createNextDisabledHeader());
   }
 
   private Header<String> createNextDisabledHeader() {
@@ -162,7 +162,6 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
 
   private Header<String> createPreviousEnabledHeader() {
     SafeHtml safe = SafeHtmlUtils.fromSafeConstant("<img src=\"image/20/previous.png\">");
-
     ActionCell<String> previousActionCell = new ActionCell<String>(safe, new Delegate<String>() {
 
       @Override
@@ -174,14 +173,11 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
           enablePrevious(false);
         }
       }
-
     });
-
     return createHeader(previousActionCell);
   }
 
   private Header<String> createNextEnabledHeader() {
-
     SafeHtml safe = SafeHtmlUtils.fromSafeConstant("<img src=\"image/20/next.png\">");
     ActionCell<String> nextActionCell = new ActionCell<String>(safe, new Delegate<String>() {
 
@@ -194,7 +190,6 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
           enableNext(false);
         }
       }
-
     });
     return createHeader(nextActionCell);
   }
