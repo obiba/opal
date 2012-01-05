@@ -9,13 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
-import org.obiba.opal.web.gwt.app.client.event.WorkbenchChangeEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -93,10 +89,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final Provider<AdministrationPresenter> administrationPresenter;
 
-  private WidgetPresenter<?> workbench;
-
-  private boolean unbindPreviousWorkbench;
-
   @Inject
   public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<AdministrationPresenter> administrationPresenter) {
     super(eventBus, display, proxy);
@@ -112,7 +104,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void onBind() {
-
     getView().getDashboardItem().setCommand(new Command() {
 
       @Override
@@ -182,8 +173,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
-    registerWorkbenchChangeEventHandler();
-
     registerUserMessageEventHandler();
   }
 
@@ -208,61 +197,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     administrationPresenter.get().authorize(getView().getAdministrationAuthorizer());
   }
 
-  private void registerWorkbenchChangeEventHandler() {
-    super.registerHandler(getEventBus().addHandler(WorkbenchChangeEvent.getType(), new WorkbenchChangeEvent.Handler() {
-
-      @Override
-      public void onWorkbenchChanged(WorkbenchChangeEvent event) {
-        updateWorkbench(event);
-      }
-    }));
-  }
-
-  private void updateWorkbench(WorkbenchChangeEvent event) {
-    if(workbench != null && unbindPreviousWorkbench) {
-      workbench.unbind();
-    }
-    unbindPreviousWorkbench = event.shouldUnbindWorkbench();
-
-    workbench = event.getWorkbench();
-    if(event.shouldBindWorkbench()) {
-      workbench.bind();
-    }
-
-    WidgetDisplay wd = (WidgetDisplay) workbench.getDisplay();
-    getView().updateWorkbench(wd.asWidget());
-    workbench.revealDisplay();
-
-    updateTabSelection(event);
-  }
-
-  @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
-  private void updateTabSelection(WorkbenchChangeEvent event) {
-    if(event.resourceStartsWith("/files/meta")) {
-      getView().setCurrentSelection(getView().getFileExplorerItem());
-    } else if(event.resourceStartsWith("/shell/commands")) {
-      getView().setCurrentSelection(getView().getListJobsItem());
-    } else if(event.resourceStartsWith("/datasources")) {
-      getView().setCurrentSelection(getView().getDatasourcesItem());
-    } else if(event.resourceStartsWith("/functional-units")) {
-      getView().setCurrentSelection(getView().getUnitsItem());
-    } else if(event.resourceStartsWith("/report-templates")) {
-      getView().setCurrentSelection(getView().getReportsItem());
-    } else if(event.resourceStartsWith("/participants/count")) {
-      getView().setCurrentSelection(getView().getDashboardItem());
-    } else {
-      getView().clearSelection();
-    }
-  }
-
   private void registerUserMessageEventHandler() {
     super.registerHandler(getEventBus().addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
 
       @Override
       public void onUserMessage(NotificationEvent event) {
-        messageDialog.bind();
         messageDialog.setNotification(event);
-        messageDialog.revealDisplay();
+        // false : don't center the dialog
+        addToPopupSlot(messageDialog, false);
       }
     }));
   }

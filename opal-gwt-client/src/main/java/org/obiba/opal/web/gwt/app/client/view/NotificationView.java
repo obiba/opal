@@ -22,6 +22,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -29,17 +30,18 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  * View used to display error, warning and info messages in a dialog box.
  */
-public class NotificationView extends Composite implements NotificationPresenter.Display {
+public class NotificationView extends PopupViewImpl implements NotificationPresenter.Display {
 
   @UiTemplate("NotificationView.ui.xml")
   interface ViewUiBinder extends UiBinder<PopupPanel, NotificationView> {
@@ -69,7 +71,9 @@ public class NotificationView extends Composite implements NotificationPresenter
 
   private Timer nonStickyTimer;
 
-  public NotificationView() {
+  @Inject
+  public NotificationView(EventBus eventBus) {
+    super(eventBus);
     uiBinder.createAndBindUi(this);
 
     // Error dialog is initially hidden.
@@ -85,6 +89,11 @@ public class NotificationView extends Composite implements NotificationPresenter
     });
 
     resizeHandleSouth.makeResizable(contentLayout, 300, 100);
+  }
+
+  @Override
+  public void show() {
+    showPopup();
   }
 
   @Override
@@ -118,15 +127,7 @@ public class NotificationView extends Composite implements NotificationPresenter
 
   @Override
   public Widget asWidget() {
-    return null;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return dialog;
   }
 
   @Override

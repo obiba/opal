@@ -90,7 +90,7 @@ public interface OpalGinjector extends Ginjector {
 
   UnhandledResponseNotificationPresenter getUnhandledResponseNotificationPresenter();
 
-  NotificationPresenter getErrorDialogPresenter();
+  Provider<NotificationPresenter> getErrorDialogPresenter();
 
   Provider<ApplicationPresenter> getApplicationPresenter();
 

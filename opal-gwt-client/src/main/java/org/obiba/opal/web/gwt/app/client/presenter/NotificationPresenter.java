@@ -12,24 +12,21 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
  * Presenter used to display error, warning and info messages in a dialog box.
  */
-public class NotificationPresenter extends WidgetPresenter<NotificationPresenter.Display> {
+public class NotificationPresenter extends PresenterWidget<NotificationPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends PopupView {
 
     public void showPopup();
 
@@ -58,12 +55,7 @@ public class NotificationPresenter extends WidgetPresenter<NotificationPresenter
 
   @Inject
   public NotificationPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+    super(eventBus, display);
   }
 
   @Override
@@ -71,27 +63,19 @@ public class NotificationPresenter extends WidgetPresenter<NotificationPresenter
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
   protected void onUnbind() {
   }
 
   @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    display.showPopup();
+  public void onReveal() {
+    getView().showPopup();
   }
 
   public void setNotification(NotificationEvent event) {
     setMessageDialogType(event.getNotificationType());
 
     if(event.getTitle() != null) {
-      getDisplay().setCaption(event.getTitle());
+      getView().setCaption(event.getTitle());
     }
 
     List<String> translatedMessages = new ArrayList<String>();
@@ -104,33 +88,33 @@ public class NotificationPresenter extends WidgetPresenter<NotificationPresenter
     }
     setMessages(translatedMessages);
 
-    getDisplay().setSticky(event.isSticky());
+    getView().setSticky(event.isSticky());
 
     addNotificationCloseHandler(event.getNotificationCloseHandler());
   }
 
   private void setMessages(List<String> messages) {
-    display.setMessages(messages);
+    getView().setMessages(messages);
   }
 
   private void setMessageDialogType(NotificationType messageDialogType) {
-    getDisplay().setNotificationType(messageDialogType);
+    getView().setNotificationType(messageDialogType);
     switch(messageDialogType) {
     case ERROR:
-      getDisplay().setCaption(translations.errorDialogTitle());
+      getView().setCaption(translations.errorDialogTitle());
       break;
     case WARNING:
-      getDisplay().setCaption(translations.warningDialogTitle());
+      getView().setCaption(translations.warningDialogTitle());
       break;
     case INFO:
-      getDisplay().setCaption(translations.infoDialogTitle());
+      getView().setCaption(translations.infoDialogTitle());
       break;
     }
   }
 
   private void addNotificationCloseHandler(final NotificationCloseHandler handler) {
     if(handler != null) {
-      getDisplay().addNotificationCloseHandler(handler);
+      getView().addNotificationCloseHandler(handler);
     }
   }
 
