@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
@@ -159,6 +158,14 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     initCategoryTable();
     initAttributeTable();
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    permissions.clear();
+    if(content != null) {
+      permissions.add(content);
+    }
   }
 
   //
@@ -395,13 +402,6 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   @Override
   public HasAuthorization getSummaryAuthorizer() {
     return new TabAuthorizer(tabs, SUMMARY_TAB_INDEX);
-  }
-
-  @Override
-  public void setPermissionsTabWidget(AuthorizationPresenter.Display display) {
-    display.setExplanation(translations.variablePermissions());
-    permissions.clear();
-    permissions.add(display.asWidget());
   }
 
   @Override

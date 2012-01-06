@@ -103,7 +103,7 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
     getDisplay().addEnvironmentDisplay("Aggregate", aggregatePresenter.getDisplay());
     getDisplay().addEnvironmentDisplay("Assign", assignPresenter.getDisplay());
-    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+    // getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
 
     getDisplay().levelSelector().setValue(DataShieldConfigDto.Level.RESTRICTED);
     ResourceRequestBuilderFactory.<DataShieldConfigDto> newBuilder().forResource("/datashield/cfg").withCallback(new ResourceCallback<DataShieldConfigDto>() {
@@ -145,10 +145,10 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
     @Override
     public void authorized() {
-      authorizationPresenter.setAclRequest(AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"),//
+      authorizationPresenter.setAclRequest("datashield", AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"),//
       // AclRequest.newBuilder("Allow Users", "/authz/datashield", "*:GET/*")
       AclRequest.newBuilder("Administrate", "/datashield", "*:GET/*"));
-      authorizationPresenter.refreshDisplay();
+      // authorizationPresenter.refreshDisplay();
     }
   }
 

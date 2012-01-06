@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.inject.client;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
@@ -78,6 +79,8 @@ public interface OpalGinjector extends Ginjector {
   PlaceManager getPlaceManager();
 
   ResourceAuthorizationCache getResourceAuthorizationCache();
+
+  Provider<AuthorizationPresenter> getAuthorizationPresenter();
 
   RequestCredentials getRequestCredentials();
 

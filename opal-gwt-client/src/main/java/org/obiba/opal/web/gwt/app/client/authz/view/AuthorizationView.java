@@ -11,21 +11,28 @@ package org.obiba.opal.web.gwt.app.client.authz.view;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class AuthorizationView extends Composite implements AuthorizationPresenter.Display {
+public class AuthorizationView extends ViewImpl implements AuthorizationPresenter.Display {
+
+  @UiTemplate("AuthorizationView.ui.xml")
+  interface AuthorizationViewUiBinder extends UiBinder<Widget, AuthorizationView> {
+  }
+
+  private static AuthorizationViewUiBinder uiBinder = GWT.create(AuthorizationViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   Label explanation;
@@ -40,40 +47,13 @@ public class AuthorizationView extends Composite implements AuthorizationPresent
 
   private Display groupsDisplay;
 
-  //
-  // Static Variables
-  //
-
-  private static AuthorizationViewUiBinder uiBinder = GWT.create(AuthorizationViewUiBinder.class);
-
-  private static Translations translations = GWT.create(Translations.class);
-
-  //
-  // Constructors
-  //
-
   public AuthorizationView() {
-    initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  //
-  // WidgetDisplay methods
-  //
-
-  @Override
-  public void startProcessing() {
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
-  public void stopProcessing() {
-  }
-
-  //
-  // UiBinder
-  //
-
-  @UiTemplate("AuthorizationView.ui.xml")
-  interface AuthorizationViewUiBinder extends UiBinder<Widget, AuthorizationView> {
+  public Widget asWidget() {
+    return widget;
   }
 
   @Override

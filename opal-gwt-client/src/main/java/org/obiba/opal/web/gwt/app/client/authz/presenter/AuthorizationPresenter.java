@@ -9,63 +9,53 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.opal.Subject.SubjectType;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresenter.Display> {
+public class AuthorizationPresenter extends PresenterWidget<AuthorizationPresenter.Display> {
 
-  private SubjectAuthorizationPresenter userAuthzPresenter;
+  private final SubjectAuthorizationPresenter userAuthzPresenter;
 
-  private SubjectAuthorizationPresenter groupAuthzPresenter;
+  private final SubjectAuthorizationPresenter groupAuthzPresenter;
 
-  //
-  // Constructors
-  //
+  private final Translations translation;
+
+  private String translationKey;
 
   @Inject
-  public AuthorizationPresenter(Display display, EventBus eventBus, SubjectAuthorizationPresenter userAuthzPresenter, SubjectAuthorizationPresenter groupAuthzPresenter) {
-    super(display, eventBus);
+  public AuthorizationPresenter(Display display, EventBus eventBus, SubjectAuthorizationPresenter userAuthzPresenter, SubjectAuthorizationPresenter groupAuthzPresenter, Translations translation) {
+    super(eventBus, display);
     this.userAuthzPresenter = userAuthzPresenter;
     this.groupAuthzPresenter = groupAuthzPresenter;
+    this.translation = translation;
   }
 
-  public void setAclRequest(AclRequest.Builder... builders) {
+  public void setAclRequest(String key, AclRequest.Builder... builders) {
     userAuthzPresenter.setAclRequest(SubjectType.USER, builders);
     groupAuthzPresenter.setAclRequest(SubjectType.GROUP, builders);
   }
 
-  //
-  // WidgetPresenter methods
-  //
-
   @Override
-  public void refreshDisplay() {
-    userAuthzPresenter.refreshDisplay();
-    groupAuthzPresenter.refreshDisplay();
-  }
-
-  @Override
-  public void revealDisplay() {
+  public void onReveal() {
     userAuthzPresenter.revealDisplay();
     groupAuthzPresenter.revealDisplay();
+    getView().setExplanation(translation.permissionExplanationMap().get(translationKey));
   }
 
   @Override
   protected void onBind() {
     userAuthzPresenter.onBind();
-    getDisplay().setUserAuthorizationDisplay(userAuthzPresenter.getDisplay());
+    getView().setUserAuthorizationDisplay(userAuthzPresenter.getDisplay());
     groupAuthzPresenter.onBind();
-    getDisplay().setGroupAuthorizationDisplay(groupAuthzPresenter.getDisplay());
+    getView().setGroupAuthorizationDisplay(groupAuthzPresenter.getDisplay());
   }
 
   @Override
@@ -74,20 +64,7 @@ public class AuthorizationPresenter extends WidgetPresenter<AuthorizationPresent
     groupAuthzPresenter.onUnbind();
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // Interface and inner classes
-  //
-
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setUserAuthorizationDisplay(SubjectAuthorizationPresenter.Display display);
 

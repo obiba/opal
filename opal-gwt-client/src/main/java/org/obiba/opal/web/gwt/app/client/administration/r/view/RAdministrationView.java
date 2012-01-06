@@ -100,7 +100,6 @@ public class RAdministrationView extends Composite implements RAdministrationPre
 
   @Override
   public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
-    display.setExplanation(translations.rPermissions());
     permissions.add(display.asWidget());
   }
 

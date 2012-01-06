@@ -90,14 +90,18 @@ public class SubjectAuthorizationPresenter extends WidgetPresenter<SubjectAuthor
 
   @Override
   public void refreshDisplay() {
-    subjectPermissionsRequests.get();
-    subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
+    if(initialized) {
+      subjectPermissionsRequests.get();
+      subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
+    }
   }
 
   @Override
   public void revealDisplay() {
-    subjectPermissionsRequests.get();
-    subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
+    if(initialized) {
+      subjectPermissionsRequests.get();
+      subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
+    }
   }
 
   @Override

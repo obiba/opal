@@ -83,6 +83,7 @@ public class OpalGinModule extends AbstractPresenterModule {
     bindPresenter(LoginPresenter.class, LoginPresenter.Display.class, LoginView.class, LoginPresenter.Proxy.class);
     bindSingletonPresenterWidget(NotificationPresenter.class, NotificationPresenter.Display.class, NotificationView.class);
     bindPresenterWidget(FileSelectorPresenter.class, FileSelectorPresenter.Display.class, FileSelectorView.class);
+    bindPresenterWidget(AuthorizationPresenter.class, AuthorizationPresenter.Display.class, AuthorizationView.class);
 
     configureWidgets();
 
@@ -100,7 +101,7 @@ public class OpalGinModule extends AbstractPresenterModule {
     bind(ItemSelectorPresenter.Display.class).to(ItemSelectorView.class);
     bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);
     bind(ScriptEvaluationPresenter.Display.class).to(ScriptEvaluationView.class);
-    bind(AuthorizationPresenter.Display.class).to(AuthorizationView.class);
+
     bind(SubjectAuthorizationPresenter.Display.class).to(SubjectAuthorizationView.class);
     bind(ValuesTablePresenter.Display.class).to(ValuesTableView.class);
   }

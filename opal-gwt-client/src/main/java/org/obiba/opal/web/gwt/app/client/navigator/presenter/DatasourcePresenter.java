@@ -44,12 +44,11 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, DatasourcePresenter.Proxy> {
@@ -62,10 +61,10 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   private Runnable removeDatasourceConfirmation;
 
-  private AuthorizationPresenter authorizationPresenter;
+  private Provider<AuthorizationPresenter> authorizationPresenter;
 
   @Inject
-  public DatasourcePresenter(Display display, EventBus eventBus, Proxy proxy, AuthorizationPresenter authorizationPresenter) {
+  public DatasourcePresenter(Display display, EventBus eventBus, Proxy proxy, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
     this.authorizationPresenter = authorizationPresenter;
   }
@@ -77,14 +76,15 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   @ProxyEvent
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent e) {
-    forceReveal();
+    if(isVisible() == false) {
+      forceReveal();
+      displayDatasource(e.getSelection());
+    }
   }
 
   @Override
   protected void onBind() {
     super.onBind();
-    authorizationPresenter.bind();
-    getView().setPermissionsDisplay(authorizationPresenter.getDisplay());
 
     super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
     super.registerHandler(getEventBus().addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
@@ -103,12 +103,6 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     // OPAL-975
     super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
-  }
-
-  @Override
-  protected void onUnbind() {
-    super.onUnbind();
-    authorizationPresenter.unbind();
   }
 
   private int getTableIndex(String tableName) {
@@ -296,8 +290,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     @Override
     public void authorized() {
-      authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", "/datasource/" + datasourceName, "GET:GET/GET"));
-      authorizationPresenter.refreshDisplay();
+      AuthorizationPresenter authz = authorizationPresenter.get();
+      authz.setAclRequest("datasource", AclRequest.newBuilder("View", "/datasource/" + datasourceName, "GET:GET/GET"));
+      setInSlot(null, authz);
     }
   }
 
@@ -459,6 +454,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       }
       siblingSelection = tables.get(siblingIndex);
 
+      // This fires a TableSelectionChangeEvent if the selection changes
       getView().setTableSelection(siblingSelection, siblingIndex);
 
       getEventBus().fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTableName(siblingIndex), getNextTableName(siblingIndex)));
@@ -526,15 +522,12 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   }
 
   @ProxyStandard
-  @NameToken("navigator.datasource")
-  public interface Proxy extends ProxyPlace<DatasourcePresenter> {
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<DatasourcePresenter> {
   }
 
   public interface Display extends View {
 
     void setTableSelection(TableDto variable, int index);
-
-    void setPermissionsDisplay(AuthorizationPresenter.Display display);
 
     void beforeRenderRows();
 

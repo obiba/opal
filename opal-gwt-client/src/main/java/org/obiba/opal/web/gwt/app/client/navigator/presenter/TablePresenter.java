@@ -52,6 +52,7 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
@@ -68,7 +69,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private String next;
 
-  private AuthorizationPresenter authorizationPresenter;
+  private Provider<AuthorizationPresenter> authorizationPresenter;
 
   @Inject
   private CodingViewDialogPresenter codingViewDialogPresenter;
@@ -90,7 +91,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
    * @param eventBus
    */
   @Inject
-  public TablePresenter(final Display display, final EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, AuthorizationPresenter authorizationPresenter) {
+  public TablePresenter(final Display display, final EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
@@ -101,17 +102,19 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     RevealContentEvent.fire(this, NavigatorPresenter.CENTER_PANE, this);
   }
 
+  // This makes this presenter reveal itself whenever a TableSelectionChangeEvent occurs (anywhere for any reason).
   @ProxyEvent
   public void onTableSelectionChanged(TableSelectionChangeEvent e) {
-    forceReveal();
+    if(isVisible() == false) {
+      forceReveal();
+      updateDisplay(e.getSelection(), e.getPrevious(), e.getNext());
+    }
   }
 
   @Override
   protected void onBind() {
     super.onBind();
-    authorizationPresenter.bind();
     valuesTablePresenter.bind();
-    getView().setPermissionsDisplay(authorizationPresenter.getDisplay());
     getView().setValuesDisplay(valuesTablePresenter.getDisplay());
 
     super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
@@ -138,7 +141,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    authorizationPresenter.unbind();
     valuesTablePresenter.unbind();
   }
 
@@ -169,10 +171,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
+    this.table = tableDto;
     this.previous = previous;
     this.next = next;
 
-    table = tableDto;
     valuesTablePresenter.setTable(table);
     getView().clear();
     getView().setTable(tableDto);
@@ -261,10 +263,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     return table.hasViewLink();
   }
 
-  //
-  // Interfaces and classes
-  //
-
   /**
    * Update permissions on authorization.
    */
@@ -281,8 +279,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void authorized() {
-      authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", "/datasource/" + table.getDatasourceName() + "/table/" + table.getName(), "GET:GET/GET"));
-      authorizationPresenter.refreshDisplay();
+      AuthorizationPresenter authz = authorizationPresenter.get();
+      authz.setAclRequest("table", AclRequest.newBuilder("View", "/datasource/" + table.getDatasourceName() + "/table/" + table.getName(), "GET:GET/GET"));
+      setInSlot(null, authz);
     }
   }
 
@@ -456,8 +455,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   class TableSelectionChangeHandler implements TableSelectionChangeEvent.Handler {
     @Override
     public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-      table = event.getSelection();
-      updateDisplay(table, event.getPrevious(), event.getNext());
+      updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
     }
   }
 
@@ -515,8 +513,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     void setVariableSelection(VariableDto variable, int index);
 
     void setValuesDisplay(ValuesTablePresenter.Display display);
-
-    void setPermissionsDisplay(AuthorizationPresenter.Display display);
 
     void beforeRenderRows();
 

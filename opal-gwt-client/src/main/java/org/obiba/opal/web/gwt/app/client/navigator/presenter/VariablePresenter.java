@@ -39,6 +39,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
@@ -49,18 +50,14 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
   private final SummaryTabPresenter summaryTabPresenter;
 
-  private final AuthorizationPresenter authorizationPresenter;
+  private final Provider<AuthorizationPresenter> authorizationPresenter;
 
   private VariableDto variable;
 
   private ValuesTablePresenter valuesTablePresenter;
 
-  /**
-   * @param display
-   * @param eventBus
-   */
   @Inject
-  public VariablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter, AuthorizationPresenter authorizationPresenter) {
+  public VariablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
@@ -73,15 +70,17 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   }
 
   @ProxyEvent
-  public void onVariableSelectionChanged(VariableSelectionChangeEvent e) {
-    forceReveal();
+  public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+    if(isVisible() == false) {
+      forceReveal();
+      updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
+    }
   }
 
   @Override
   protected void onBind() {
-    authorizationPresenter.bind();
+    super.onBind();
     valuesTablePresenter.bind();
-    getView().setPermissionsTabWidget(authorizationPresenter.getDisplay());
     getView().setValuesDisplay(valuesTablePresenter.getDisplay());
 
     super.registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
@@ -98,7 +97,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
   @Override
   protected void onUnbind() {
-    authorizationPresenter.unbind();
+    super.onUnbind();
     summaryTabPresenter.unbind();
     valuesTablePresenter.unbind();
   }
@@ -204,8 +203,9 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
     @Override
     public void authorized() {
-      authorizationPresenter.setAclRequest(AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
-      authorizationPresenter.refreshDisplay();
+      AuthorizationPresenter authz = authorizationPresenter.get();
+      authz.setAclRequest("variable", AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
+      setInSlot(null, authz);
     }
   }
 
@@ -353,8 +353,6 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     HasAuthorization getEditAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
-
-    void setPermissionsTabWidget(AuthorizationPresenter.Display display);
 
     void setEditCommand(Command cmd);
 

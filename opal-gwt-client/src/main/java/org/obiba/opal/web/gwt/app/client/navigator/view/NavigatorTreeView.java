@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -117,21 +116,21 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
   }
 
   @Override
-  public void selectTable(String datasourceName, String tableName) {
+  public void selectTable(String datasourceName, String tableName, boolean fireEvents) {
     if(!isTableSelected(datasourceName, tableName)) {
       TreeItem dsItem = getDatasourceItem(datasourceName);
       if(dsItem != null) {
         dsItem.setState(true);
-        selectChildren(tableName, dsItem);
+        selectChildren(tableName, dsItem, fireEvents);
       }
     }
   }
 
-  private void selectChildren(String tableName, TreeItem dsItem) {
+  private void selectChildren(String tableName, TreeItem dsItem, boolean fireEvents) {
     for(int j = 0; j < dsItem.getChildCount(); j++) {
       TreeItem tableItem = dsItem.getChild(j);
       if(tableName.equals(tableItem.getText())) {
-        tree.setSelectedItem(tableItem);
+        tree.setSelectedItem(tableItem, fireEvents);
         break;
       }
     }

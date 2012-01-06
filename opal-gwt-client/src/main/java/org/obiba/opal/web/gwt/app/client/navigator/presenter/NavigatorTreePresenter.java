@@ -61,9 +61,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
       @Override
       public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-        if(!NavigatorTreePresenter.this.equals(event.getSource())) {
-          getView().selectTable(event.getSelection().getDatasourceName(), event.getSelection().getName());
-        }
+        getView().selectTable(event.getSelection().getDatasourceName(), event.getSelection().getName(), false);
       }
 
     }));
@@ -213,7 +211,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
     void selectFirstDatasource(boolean fireEvent);
 
-    void selectTable(String datasourceName, String tableName);
+    void selectTable(String datasourceName, String tableName, boolean fireEvent);
 
     void selectDatasource(String datasourceName, boolean fireEvent);
 

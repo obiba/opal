@@ -37,6 +37,7 @@ import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.gwt.user.client.Command;
+import com.google.inject.Provider;
 
 public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
@@ -45,10 +46,6 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
   private DatasourcePresenter.Display displayMock;
 
   private DatasourcePresenter datasourcePresenter;
-
-  private AuthorizationPresenter.Display authzDisplayMock;
-
-  private AuthorizationPresenter authorizationPresenter;
 
   private SubjectAuthorizationPresenter.Display usersAuthzDisplayMock;
 
@@ -59,12 +56,11 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     displayMock = createMock(DatasourcePresenter.Display.class);
     DatasourcePresenter.Proxy proxyMock = createMock(DatasourcePresenter.Proxy.class);
     eventBusMock = createMock(net.customware.gwt.presenter.client.EventBus.class);
-    authzDisplayMock = createMock(AuthorizationPresenter.Display.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
+    Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
-    authorizationPresenter = new AuthorizationPresenter(authzDisplayMock, eventBusMock, new SubjectAuthorizationPresenter(usersAuthzDisplayMock, eventBusMock), new SubjectAuthorizationPresenter(groupsAuthzDisplayMock, eventBusMock));
-    datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), proxyMock, authorizationPresenter);
+    datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), proxyMock, mockProvider);
   }
 
   @SuppressWarnings("unchecked")
@@ -88,7 +84,6 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     displayMock.setNextCommand((Command) EasyMock.anyObject());
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setTableNameFieldUpdater((FieldUpdater<TableDto, String>) EasyMock.anyObject());
-    displayMock.setPermissionsDisplay(authzDisplayMock);
 
     expect(usersAuthzDisplayMock.getActionsColumn()).andReturn(null).once();
     usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());

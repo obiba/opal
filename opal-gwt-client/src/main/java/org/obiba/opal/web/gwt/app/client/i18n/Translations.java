@@ -106,6 +106,16 @@ public interface Translations extends Constants {
   "Summary", "Summary" })
   Map<String, String> permissionMap();
 
+  @Description("Permission explanation map")
+  @DefaultStringMapValue({ //
+  "datasource", "Specify the access rights to the datasource and its content.", //
+  "table", "Specify the access rights to the table and its content. Induces the visibility of the parent datasource.", //
+  "variable", "Specify the access rights to the variable. Induces the visibility of the parent table and datasource.", //
+  "datashield", "Specify the access rights to the DataShield services.",//
+  "r", "Specify the access rights to the R services."//
+  })
+  Map<String, String> permissionExplanationMap();
+
   @Description("Size label")
   @DefaultStringValue("Size")
   String sizeLabel();
@@ -908,26 +918,6 @@ public interface Translations extends Constants {
   @Description("Who label")
   @DefaultStringValue("Who")
   String whoLabel();
-
-  @Description("Datasource Permissions label")
-  @DefaultStringValue("Specify the access rights to the datasource and its content.")
-  String datasourcePermissions();
-
-  @Description("Table Permissions label")
-  @DefaultStringValue("Specify the access rights to the table and its content. Induces the visibility of the parent datasource.")
-  String tablePermissions();
-
-  @Description("Variable Permissions label")
-  @DefaultStringValue("Specify the access rights to the variable. Induces the visibility of the parent table and datasource.")
-  String variablePermissions();
-
-  @Description("DataShield Permissions label")
-  @DefaultStringValue("Specify the access rights to the DataShield services.")
-  String datashieldPermissions();
-
-  @Description("R Permissions label")
-  @DefaultStringValue("Specify the access rights to the R services.")
-  String rPermissions();
 
   @Description("Subject Type map")
   @DefaultStringMapValue({ "USER", "User Name", //

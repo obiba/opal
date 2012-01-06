@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
@@ -95,6 +94,14 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     toolbar.setParentName(null);
     addTableColumns();
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    permissions.clear();
+    if(content != null) {
+      permissions.add(content);
+    }
   }
 
   private void addTableColumns() {
@@ -279,13 +286,6 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
     return new MenuItemAuthorizer(toolbar.getExcelDownloadItem());
-  }
-
-  @Override
-  public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
-    display.setExplanation(translations.datasourcePermissions());
-    permissions.clear();
-    permissions.add(display.asWidget());
   }
 
   @Override

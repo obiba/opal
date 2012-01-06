@@ -116,7 +116,6 @@ public class DataShieldConfigView implements DataShieldConfigPresenter.Display {
 
   @Override
   public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
-    display.setExplanation(translations.datashieldPermissions());
     permissions.add(display.asWidget());
   }
 

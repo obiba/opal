@@ -60,7 +60,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   @Override
   protected void onBind() {
     authorizationPresenter.bind();
-    getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
+    // getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
 
     addEventHandlers();
   }
@@ -127,8 +127,8 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
     @Override
     public void authorized() {
-      authorizationPresenter.setAclRequest(AclRequest.newBuilder("Use", "/r/session", "*:GET/*"));
-      authorizationPresenter.refreshDisplay();
+      authorizationPresenter.setAclRequest("r", AclRequest.newBuilder("Use", "/r/session", "*:GET/*"));
+      // authorizationPresenter.refreshDisplay();
     }
   }
 
