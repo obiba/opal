@@ -78,7 +78,6 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent e) {
     if(isVisible() == false) {
       forceReveal();
-      displayDatasource(e.getSelection());
     }
   }
 
@@ -118,10 +117,12 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   @Override
   public void onReveal() {
+    authorize();
     initDatasources();
   }
 
   private void authorize() {
+
     // create tables
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getView().getAddUpdateTablesAuthorizer()).send();
     // create views
@@ -178,7 +179,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
         displayDatasourceSiblings(datasourceDto);
       }
 
-      authorize();
+      // authorize();
     } else if(tableDto != null) {
       selectTable(tableDto.getName());
     } else {
@@ -285,7 +286,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     @Override
     public void beforeAuthorization() {
-
+      clearSlot(null);
     }
 
     @Override

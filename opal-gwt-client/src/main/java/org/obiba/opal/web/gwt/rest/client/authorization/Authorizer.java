@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.rest.client.authorization;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.inject.client.GwtEventBusAdaptor;
 
 /**
  * Dummy helper class with default implementation.
@@ -23,6 +24,11 @@ public abstract class Authorizer implements HasAuthorization {
   public Authorizer(EventBus eventBus) {
     super();
     this.eventBus = eventBus;
+  }
+
+  public Authorizer(com.google.gwt.event.shared.EventBus eventBus) {
+    super();
+    this.eventBus = new GwtEventBusAdaptor(eventBus);
   }
 
   @Override

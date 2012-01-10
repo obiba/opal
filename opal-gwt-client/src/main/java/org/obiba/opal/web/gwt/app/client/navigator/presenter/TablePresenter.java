@@ -144,6 +144,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     valuesTablePresenter.unbind();
   }
 
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+    authorize();
+  }
+
   private void authorize() {
     // export variables in excel
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/variables/excel").get().authorize(getView().getExcelDownloadAuthorizer()).send();
@@ -192,7 +198,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
 
     updateVariables();
-    authorize();
   }
 
   private void updateVariables() {

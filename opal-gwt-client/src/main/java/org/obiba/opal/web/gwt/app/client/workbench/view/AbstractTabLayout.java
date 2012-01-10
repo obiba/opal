@@ -99,13 +99,14 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     }
   }
 
-  public void add(Widget w, String text) {
-    add(w, new Anchor(text));
+  public int add(Widget w, String text) {
+    return add(w, new Anchor(text));
   }
 
-  public void add(Widget w, HasClickHandlers item) {
+  public int add(Widget w, HasClickHandlers item) {
     add((Widget) item);
     add(w);
+    return contents.size() - 1;
   }
 
   private void setSelectedIndex(int index) {

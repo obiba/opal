@@ -11,10 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import java.util.Comparator;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
@@ -33,8 +30,9 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class DataShieldConfigView implements DataShieldConfigPresenter.Display {
+public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPresenter.Display {
 
   @UiTemplate("DataShieldConfigView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DataShieldConfigView> {
@@ -95,28 +93,26 @@ public class DataShieldConfigView implements DataShieldConfigPresenter.Display {
   }
 
   @Override
-  public void startProcessing() {
-
+  public void addToSlot(Object slot, Widget content) {
+    if(slot == DataShieldConfigPresenter.AggregateEnvironmentSlot) {
+      environments.add(content, translations.dataShieldLabelsMap().get("Aggregate"));
+    }
+    if(slot == DataShieldConfigPresenter.AssignEnvironmentSlot) {
+      environments.add(content, translations.dataShieldLabelsMap().get("Assign"));
+    }
   }
 
   @Override
-  public void stopProcessing() {
-
+  public void setInSlot(Object slot, Widget content) {
+    if(slot == DataShieldConfigPresenter.PermissionSlot) {
+      permissions.clear();
+      permissions.add(content);
+    }
   }
 
   @Override
   public HasValue<Level> levelSelector() {
     return radioGroup;
-  }
-
-  @Override
-  public void addEnvironmentDisplay(String name, WidgetDisplay display) {
-    environments.add(display.asWidget(), translations.dataShieldLabelsMap().get(name));
-  }
-
-  @Override
-  public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
-    permissions.add(display.asWidget());
   }
 
   @Override

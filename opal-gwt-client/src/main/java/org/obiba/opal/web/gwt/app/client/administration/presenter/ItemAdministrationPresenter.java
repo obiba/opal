@@ -9,29 +9,24 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.shared.EventBus;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.Proxy;
 
 /**
  * Base class for presenting administration widgets.
  */
-public abstract class ItemAdministrationPresenter<D extends WidgetDisplay> extends WidgetPresenter<D> {
+public abstract class ItemAdministrationPresenter<D extends View, P extends Proxy<? extends Presenter<?, ?>>> extends Presenter<D, P> implements RequestAdministrationPermissionEvent.Handler {
 
-  public ItemAdministrationPresenter(D display, EventBus eventBus) {
-    super(display, eventBus);
+  public ItemAdministrationPresenter(EventBus eventBus, D display, P p) {
+    super(eventBus, display, p);
   }
 
   public abstract String getName();
 
   public abstract void authorize(HasAuthorization authorizer);
-
-  public Widget getWidget() {
-    return super.getDisplay().asWidget();
-  }
 
 }

@@ -16,52 +16,111 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.Tab;
+import com.gwtplatform.mvp.client.TabData;
 
-/**
- *
- */
-public class AdministrationView extends Composite implements AdministrationPresenter.Display {
+public class AdministrationView implements AdministrationPresenter.Display {
+
+  private class AdminTab implements Tab {
+
+    private final TabData tabData;
+
+    private final SimplePanel tabContent;
+
+    private final int tabIndex;
+
+    private AdminTab(TabData tabData, String token) {
+      this.tabData = tabData;
+      this.tabContent = new SimplePanel();
+      Hyperlink hl = new Hyperlink();
+      hl.setTargetHistoryToken(token);
+      hl.setText(tabData.getLabel());
+      this.tabIndex = administrationDisplays.add(tabContent, hl);
+    }
+
+    public int getTabIndex() {
+      return tabIndex;
+    }
+
+    @Override
+    public void activate() {
+      administrationDisplays.selectTab(tabContent);
+    }
+
+    @Override
+    public Widget asWidget() {
+      return tabContent;
+    }
+
+    @Override
+    public void deactivate() {
+    }
+
+    @Override
+    public float getPriority() {
+      return tabData.getPriority();
+    }
+
+    @Override
+    public String getText() {
+      return tabData.getLabel();
+    }
+
+    @Override
+    public void setTargetHistoryToken(String historyToken) {
+
+    }
+
+    @Override
+    public void setText(String text) {
+
+    }
+
+  }
 
   @UiTemplate("AdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, AdministrationView> {
   }
 
-  //
-  // Constants
-  //
-
-  //
-  // Static Variables
-  //
-
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   HorizontalTabLayout administrationDisplays;
 
-  //
-  // Constructors
-  //
+  private Widget currentTabContent;
 
   public AdministrationView() {
     super();
-    initWidget(uiBinder.createAndBindUi(this));
-
+    widget = uiBinder.createAndBindUi(this);
   }
 
-  //
-  // AdministrationPresenter.Display Methods
-  //
+  @Override
+  public Tab addTab(final TabData tabData, final String historyToken) {
+    return new AdminTab(tabData, historyToken);
+  }
 
   @Override
-  public Widget asWidget() {
-    return this;
+  public void removeTab(Tab tab) {
+    administrationDisplays.remove(((AdminTab) tab).getTabIndex());
+  }
+
+  @Override
+  public void removeTabs() {
+    administrationDisplays.clear();
+  }
+
+  @Override
+  public void setActiveTab(Tab tab) {
+    AdminTab adminTab = (AdminTab) tab;
+    adminTab.tabContent.clear();
+    adminTab.tabContent.add(currentTabContent);
+    administrationDisplays.selectTab(adminTab.getTabIndex());
+    currentTabContent = null;
   }
 
   @Override
@@ -74,20 +133,14 @@ public class AdministrationView extends Composite implements AdministrationPrese
 
   @Override
   public void setInSlot(Object slot, Widget content) {
+    if(slot == AdministrationPresenter.TabSlot) {
+      currentTabContent = content;
+    }
   }
 
   @Override
-  public void clearAdministrationDisplays() {
-    administrationDisplays.clear();
+  public Widget asWidget() {
+    return widget;
   }
-
-  @Override
-  public void addAdministrationDisplay(String name, Widget w) {
-    administrationDisplays.add(w, name);
-  }
-
-  //
-  // Methods
-  //
 
 }

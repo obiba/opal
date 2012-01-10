@@ -1,11 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
+import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -17,30 +14,35 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TabInfo;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
+import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
-/**
- * R related administration.
- */
-public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdministrationPresenter.Display> {
+public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy> {
 
-  //
-  // Instance Variables
-  //
+  public static final Object PermissionSlot = new Object();
 
-  private AuthorizationPresenter authorizationPresenter;
-
-  //
-  // Constructors
-  //
+  private final AuthorizationPresenter authorizationPresenter;
 
   @Inject
-  public RAdministrationPresenter(final Display display, final EventBus eventBus, AuthorizationPresenter authorizationPresenter) {
-    super(display, eventBus);
+  public RAdministrationPresenter(final Display display, final EventBus eventBus, final Proxy proxy, AuthorizationPresenter authorizationPresenter) {
+    super(eventBus, display, proxy);
     this.authorizationPresenter = authorizationPresenter;
+  }
+
+  @ProxyEvent
+  @Override
+  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+    authorize(event.getHasAuthorization());
   }
 
   @Override
@@ -48,25 +50,26 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
     return "R";
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
-  public Place getPlace() {
-    return null;
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, AdministrationPresenter.TabSlot, this);
   }
 
   @Override
   protected void onBind() {
-    authorizationPresenter.bind();
-    // getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
-
+    authorizationPresenter.setAclRequest("r", AclRequest.newBuilder("Use", "/r/session", "*:GET/*"));
     addEventHandlers();
   }
 
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+  }
+
   private void addEventHandlers() {
-    registerHandler(getDisplay().addTestRServerHandler(new ClickHandler() {
+    registerHandler(getView().addTestRServerHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -78,46 +81,15 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-    authorizationPresenter.unbind();
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-
-  }
-
-  //
-  // methods
-  //
-
-  @Override
   public void authorize(HasAuthorization authorizer) {
     // test r
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/r/sessions").post().authorize(authorizer).send();
-    // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
-  //
-  // Inner Classes / Interfaces
-  //
-
-  /**
-  *
-  */
   private final class PermissionsUpdate implements HasAuthorization {
     @Override
     public void unauthorized() {
-
+      clearSlot(PermissionSlot);
     }
 
     @Override
@@ -127,15 +99,14 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
     @Override
     public void authorized() {
-      authorizationPresenter.setAclRequest("r", AclRequest.newBuilder("Use", "/r/session", "*:GET/*"));
-      // authorizationPresenter.refreshDisplay();
+      setInSlot(PermissionSlot, authorizationPresenter);
     }
   }
 
   private final class RSessionCreatedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().info("RIsAlive").nonSticky().build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().info("RIsAlive").nonSticky().build());
       // clean up
       ResponseCodeCallback ignore = new ResponseCodeCallback() {
 
@@ -152,17 +123,21 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   private final class RConnectionFailedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed", response.getText()).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed", response.getText()).build());
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  @ProxyStandard
+  @NameToken("!admin.r")
+  @TabInfo(container = AdministrationPresenter.class, label = "R", priority = 1)
+  public interface Proxy extends TabContentProxyPlace<RAdministrationPresenter> {
+  }
+
+  public interface Display extends View {
 
     HandlerRegistration addTestRServerHandler(ClickHandler handler);
 
     HasAuthorization getPermissionsAuthorizer();
-
-    void setPermissionsDisplay(AuthorizationPresenter.Display display);
 
   }
 

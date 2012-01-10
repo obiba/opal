@@ -50,11 +50,11 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
   private final SummaryTabPresenter summaryTabPresenter;
 
+  private final ValuesTablePresenter valuesTablePresenter;
+
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
   private VariableDto variable;
-
-  private ValuesTablePresenter valuesTablePresenter;
 
   @Inject
   public VariablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {

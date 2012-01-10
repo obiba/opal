@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -89,19 +89,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final NotificationPresenter messageDialog;
 
-  // TODO: decouple these presenters. We need it here because it's the one that knows if the "Administration" link
-  // should be displayed.
-  private final Provider<AdministrationPresenter> administrationPresenter;
-
   // TODO: decouple these presenters. This should be moved to FileSelectionPresenter when it becomes a PresenterWidget
   private final Provider<FileSelectorPresenter> fileSelectorPresenter;
 
   @Inject
-  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter, Provider<AdministrationPresenter> administrationPresenter) {
+  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
-    this.administrationPresenter = administrationPresenter;
     this.fileSelectorPresenter = fileSelectorPresenter;
   }
 
@@ -213,7 +208,22 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(new UIObjectAuthorizer(getView().getFileExplorerItem())).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(new UIObjectAuthorizer(getView().getListJobsItem())).send();
 
-    administrationPresenter.get().authorize(getView().getAdministrationAuthorizer());
+    getEventBus().fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
+
+      @Override
+      public void unauthorized() {
+      }
+
+      @Override
+      public void beforeAuthorization() {
+        getView().getAdministrationAuthorizer().beforeAuthorization();
+      }
+
+      @Override
+      public void authorized() {
+        getView().getAdministrationAuthorizer().authorized();
+      }
+    }));
   }
 
   private void registerUserMessageEventHandler() {

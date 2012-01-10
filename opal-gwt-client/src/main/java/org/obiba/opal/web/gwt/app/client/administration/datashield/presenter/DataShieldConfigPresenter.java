@@ -9,12 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
+import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -27,23 +24,40 @@ import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto.Level;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TabInfo;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
+import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
-public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display> {
+public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy> {
 
-  public interface Display extends WidgetDisplay {
+  @ProxyStandard
+  @NameToken("!admin.datashield")
+  @TabInfo(container = AdministrationPresenter.class, label = "DataSHIELD", priority = 1)
+  public interface Proxy extends TabContentProxyPlace<DataShieldConfigPresenter> {
+  }
+
+  public interface Display extends View {
 
     HasValue<DataShieldConfigDto.Level> levelSelector();
 
-    void addEnvironmentDisplay(String name, WidgetDisplay display);
-
-    void setPermissionsDisplay(AuthorizationPresenter.Display display);
-
     HasAuthorization getPermissionsAuthorizer();
+
   }
+
+  public static final Object AggregateEnvironmentSlot = new Object();
+
+  public static final Object AssignEnvironmentSlot = new Object();
+
+  public static final Object PermissionSlot = new Object();
 
   private final DataShieldAdministrationPresenter aggregatePresenter;
 
@@ -52,8 +66,8 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
   private final AuthorizationPresenter authorizationPresenter;
 
   @Inject
-  public DataShieldConfigPresenter(Display display, EventBus eventBus, Provider<DataShieldAdministrationPresenter> adminPresenterProvider, AuthorizationPresenter authorizationPresenter) {
-    super(display, eventBus);
+  public DataShieldConfigPresenter(Display display, EventBus eventBus, Proxy proxy, Provider<DataShieldAdministrationPresenter> adminPresenterProvider, AuthorizationPresenter authorizationPresenter) {
+    super(eventBus, display, proxy);
     aggregatePresenter = adminPresenterProvider.get();
     assignPresenter = adminPresenterProvider.get();
     aggregatePresenter.setEnvironment("aggregate");
@@ -61,16 +75,15 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
     this.authorizationPresenter = authorizationPresenter;
   }
 
+  @ProxyEvent
   @Override
-  public void refreshDisplay() {
-    aggregatePresenter.refreshDisplay();
-    assignPresenter.refreshDisplay();
+  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+    aggregatePresenter.authorize(event.getHasAuthorization());
   }
 
   @Override
-  public void revealDisplay() {
-    aggregatePresenter.revealDisplay();
-    assignPresenter.revealDisplay();
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, AdministrationPresenter.TabSlot, this);
   }
 
   @Override
@@ -79,20 +92,33 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
   }
 
   @Override
+  protected void onReveal() {
+    ResourceRequestBuilderFactory.<DataShieldConfigDto> newBuilder().forResource("/datashield/cfg").withCallback(new ResourceCallback<DataShieldConfigDto>() {
+
+      @Override
+      public void onResource(Response response, DataShieldConfigDto resource) {
+        getView().levelSelector().setValue(resource.getLevel(), true);
+      }
+    }).get().send();
+
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+  }
+
+  @Override
   public void authorize(HasAuthorization authorizer) {
     // TODO: Need to test both environments
     aggregatePresenter.authorize(authorizer);
-    // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getDisplay().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   @Override
   protected void onBind() {
-    aggregatePresenter.onBind();
-    assignPresenter.onBind();
-    authorizationPresenter.bind();
+    authorizationPresenter.setAclRequest("datashield", AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"), AclRequest.newBuilder("Administrate", "/datashield", "*:GET/*"));
 
-    getDisplay().levelSelector().addValueChangeHandler(new ValueChangeHandler<DataShieldConfigDto.Level>() {
+    addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
+    addToSlot(AssignEnvironmentSlot, assignPresenter);
+
+    getView().levelSelector().addValueChangeHandler(new ValueChangeHandler<DataShieldConfigDto.Level>() {
       @Override
       public void onValueChange(ValueChangeEvent<Level> event) {
         DataShieldConfigDto dto = DataShieldConfigDto.create();
@@ -101,41 +127,13 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
       }
     });
 
-    getDisplay().addEnvironmentDisplay("Aggregate", aggregatePresenter.getDisplay());
-    getDisplay().addEnvironmentDisplay("Assign", assignPresenter.getDisplay());
-    // getDisplay().setPermissionsDisplay(authorizationPresenter.getDisplay());
-
-    getDisplay().levelSelector().setValue(DataShieldConfigDto.Level.RESTRICTED);
-    ResourceRequestBuilderFactory.<DataShieldConfigDto> newBuilder().forResource("/datashield/cfg").withCallback(new ResourceCallback<DataShieldConfigDto>() {
-
-      @Override
-      public void onResource(Response response, DataShieldConfigDto resource) {
-        getDisplay().levelSelector().setValue(resource.getLevel(), true);
-      }
-    }).get().send();
-
-  }
-
-  @Override
-  protected void onUnbind() {
-    aggregatePresenter.onUnbind();
-    assignPresenter.onUnbind();
-    authorizationPresenter.unbind();
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+    getView().levelSelector().setValue(DataShieldConfigDto.Level.RESTRICTED, false);
   }
 
   private final class PermissionsUpdate implements HasAuthorization {
     @Override
     public void unauthorized() {
-
+      clearSlot(PermissionSlot);
     }
 
     @Override
@@ -145,10 +143,7 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
     @Override
     public void authorized() {
-      authorizationPresenter.setAclRequest("datashield", AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"),//
-      // AclRequest.newBuilder("Allow Users", "/authz/datashield", "*:GET/*")
-      AclRequest.newBuilder("Administrate", "/datashield", "*:GET/*"));
-      // authorizationPresenter.refreshDisplay();
+      setInSlot(PermissionSlot, authorizationPresenter);
     }
   }
 

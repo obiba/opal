@@ -10,8 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
@@ -22,14 +20,14 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class RAdministrationView extends Composite implements RAdministrationPresenter.Display {
+public class RAdministrationView extends ViewImpl implements RAdministrationPresenter.Display {
 
   @UiTemplate("RAdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, RAdministrationView> {
@@ -45,11 +43,7 @@ public class RAdministrationView extends Composite implements RAdministrationPre
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
-
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   Button rTestButton;
@@ -66,26 +60,20 @@ public class RAdministrationView extends Composite implements RAdministrationPre
 
   public RAdministrationView() {
     super();
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
 
-  //
-  // RAdministrationPresenter.Display Methods
-  //
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    if(slot == RAdministrationPresenter.PermissionSlot) {
+      permissions.clear();
+      permissions.add(content);
+    }
+  }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-
-  }
-
-  @Override
-  public void stopProcessing() {
-
+    return widget;
   }
 
   @Override
@@ -97,14 +85,5 @@ public class RAdministrationView extends Composite implements RAdministrationPre
   public HasAuthorization getPermissionsAuthorizer() {
     return new WidgetAuthorizer(permissionsPanel);
   }
-
-  @Override
-  public void setPermissionsDisplay(AuthorizationPresenter.Display display) {
-    permissions.add(display.asWidget());
-  }
-
-  //
-  // Methods
-  //
 
 }

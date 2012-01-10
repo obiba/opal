@@ -34,14 +34,15 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class DataShieldAdministrationView extends Composite implements DataShieldAdministrationPresenter.Display {
+public class DataShieldAdministrationView extends ViewImpl implements DataShieldAdministrationPresenter.Display {
 
   @UiTemplate("DataShieldAdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DataShieldAdministrationView> {
@@ -49,7 +50,9 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
+
+  private final Widget widget;
 
   @UiField
   Panel methodsPanel;
@@ -67,25 +70,17 @@ public class DataShieldAdministrationView extends Composite implements DataShiel
 
   private ActionsColumn<DataShieldMethodDto> actionsColumn;
 
-  public DataShieldAdministrationView() {
+  @Inject
+  public DataShieldAdministrationView(Translations translations) {
     super();
-    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
+    widget = uiBinder.createAndBindUi(this);
     initMethodsTable();
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-
-  }
-
-  @Override
-  public void stopProcessing() {
-
+    return widget;
   }
 
   @Override

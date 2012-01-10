@@ -11,7 +11,9 @@ package org.obiba.opal.web.gwt.inject.client;
 
 import net.customware.gwt.presenter.client.EventBus;
 
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
@@ -20,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
@@ -180,4 +183,11 @@ public interface OpalGinjector extends Ginjector {
   CodingViewDialogPresenter getCodingViewDialogPresenter();
 
   WizardManager getWizardManager();
+
+  Translations getTranslations();
+
+  Provider<DataShieldConfigPresenter> getDataShieldConfigPresenter();
+
+  Provider<RAdministrationPresenter> getRAdministrationPresenter();
+
 }
