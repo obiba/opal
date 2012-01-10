@@ -84,6 +84,7 @@ public class FileExplorerPresenter extends Presenter<FileExplorerPresenter.Displ
   private Runnable actionRequiringConfirmation;
 
   @Inject
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   public FileExplorerPresenter(Display display, EventBus eventBus, Proxy proxy, FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter, FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
     super(eventBus, display, proxy);
     this.fileSystemTreePresenter = fileSystemTreePresenter;

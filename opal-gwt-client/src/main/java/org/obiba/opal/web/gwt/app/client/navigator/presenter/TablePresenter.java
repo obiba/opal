@@ -117,6 +117,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     valuesTablePresenter.bind();
     getView().setValuesDisplay(valuesTablePresenter.getDisplay());
 
+    addEventHandlers();
+  }
+
+  private void addEventHandlers() {
     super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     super.registerHandler(getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
