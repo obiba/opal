@@ -12,12 +12,6 @@ package org.obiba.opal.web.gwt.app.client.unit.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -38,9 +32,8 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -48,13 +41,14 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogPresenter.Display> {
+public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogPresenter.Display> {
 
   private FunctionalUnitDto functionalUnit;
 
-  public interface Display extends WidgetDisplay {
-    void showDialog();
+  public interface Display extends PopupView {
 
     void hideDialog();
 
@@ -123,12 +117,7 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
   @Inject
   public AddKeyPairDialogPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+    super(eventBus, display);
   }
 
   @Override
@@ -137,39 +126,22 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     addValidators();
   }
 
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
   private void addValidators() {
-    getDisplay().setKeyTypeValidationHandler(new KeyTypeValidationHandler(eventBus));
-    getDisplay().setCertificateStepHandler(new CertificateStepValidationHandler(eventBus));
-    getDisplay().setPrivateKeyValidationHandler(new PrivateKeyValidationHandler(eventBus));
-    getDisplay().setPublicKeyValidationHandler(new PublicKeyValidationHandler(eventBus));
+    getView().setKeyTypeValidationHandler(new KeyTypeValidationHandler());
+    getView().setCertificateStepHandler(new CertificateStepValidationHandler());
+    getView().setPrivateKeyValidationHandler(new PrivateKeyValidationHandler());
+    getView().setPublicKeyValidationHandler(new PublicKeyValidationHandler());
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().addFinishClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addFinishClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
         KeyForm form = null;
-        if(getDisplay().isKeyPair().getValue()) {
+        if(getView().isKeyPair().getValue()) {
           form = createKeyPair();
-        } else if(getDisplay().isCertificate().getValue()) {
+        } else if(getView().isCertificate().getValue()) {
           form = createCertificate();
         } else {
           throw new IllegalStateException("unknown key type");
@@ -181,16 +153,9 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
 
     }));
 
-    super.registerHandler(getDisplay().addCancelClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addCancelClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        getDisplay().hideDialog();
-      }
-    }));
-
-    super.registerHandler(getDisplay().getDialog().addCloseHandler(new CloseHandler<PopupPanel>() {
-      @Override
-      public void onClose(CloseEvent<PopupPanel> event) {
-        unbind();
+        getView().hideDialog();
       }
     }));
 
@@ -203,43 +168,43 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
   private KeyForm createCertificate() {
     KeyForm dto = KeyForm.create();
     dto.setKeyType(KeyType.CERTIFICATE);
-    dto.setAlias(getDisplay().getAlias().getText());
-    dto.setPublicImport(getDisplay().getCertificatePem().getValue());
+    dto.setAlias(getView().getAlias().getText());
+    dto.setPublicImport(getView().getCertificatePem().getValue());
     return dto;
   }
 
   private KeyForm createKeyPair() {
     KeyForm dto = KeyForm.create();
     dto.setKeyType(KeyType.KEY_PAIR);
-    dto.setAlias(getDisplay().getAlias().getText());
+    dto.setAlias(getView().getAlias().getText());
     setPrivateKey(dto);
     setPublicKey(dto);
     return dto;
   }
 
   private void setPrivateKey(KeyForm dto) {
-    if(getDisplay().isPrivateKeyCreate().getValue()) {
+    if(getView().isPrivateKeyCreate().getValue()) {
       PrivateKeyForm pkForm = PrivateKeyForm.create();
-      pkForm.setAlgo(getDisplay().getAlgorithm().getText());
-      pkForm.setSize(Integer.parseInt(getDisplay().getKeySize().getText()));
+      pkForm.setAlgo(getView().getAlgorithm().getText());
+      pkForm.setSize(Integer.parseInt(getView().getKeySize().getText()));
       dto.setPrivateForm(pkForm);
     } else {
-      dto.setPrivateImport(getDisplay().getPrivateKeyImport().getValue());
+      dto.setPrivateImport(getView().getPrivateKeyImport().getValue());
     }
   }
 
   private void setPublicKey(KeyForm dto) {
-    if(getDisplay().isPublicKeyCreate().getValue()) {
+    if(getView().isPublicKeyCreate().getValue()) {
       PublicKeyForm pkForm = PublicKeyForm.create();
-      pkForm.setName(getDisplay().getFirstAndLastName().getText());
-      pkForm.setOrganizationalUnit(getDisplay().getOrganizationalUnit().getText());
-      pkForm.setOrganization(getDisplay().getOrganizationName().getText());
-      pkForm.setLocality(getDisplay().getCity().getText());
-      pkForm.setState(getDisplay().getState().getText());
-      pkForm.setCountry(getDisplay().getCountry().getText());
+      pkForm.setName(getView().getFirstAndLastName().getText());
+      pkForm.setOrganizationalUnit(getView().getOrganizationalUnit().getText());
+      pkForm.setOrganization(getView().getOrganizationName().getText());
+      pkForm.setLocality(getView().getCity().getText());
+      pkForm.setState(getView().getState().getText());
+      pkForm.setCountry(getView().getCountry().getText());
       dto.setPublicForm(pkForm);
     } else {
-      dto.setPublicImport(getDisplay().getPublicKeyImport().getValue());
+      dto.setPublicImport(getView().getPublicKeyImport().getValue());
     }
   }
 
@@ -255,77 +220,77 @@ public class AddKeyPairDialogPresenter extends WidgetPresenter<AddKeyPairDialogP
     public void onResponseCode(Request request, Response response) {
 
       if(response.getStatusCode() == Response.SC_CREATED) {
-        eventBus.fireEvent(new KeyPairCreatedEvent(functionalUnit, KeyForm.getAlias()));
-        getDisplay().hideDialog();
+        getEventBus().fireEvent(new KeyPairCreatedEvent(functionalUnit, KeyForm.getAlias()));
+        getView().hideDialog();
       } else {
         ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
       }
     }
   }
 
   private class KeyTypeValidationHandler extends AbstractValidationHandler {
 
-    KeyTypeValidationHandler(EventBus eventBus) {
-      super(eventBus);
+    KeyTypeValidationHandler() {
+      super(getEventBus());
     }
 
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new RequiredTextValidator(getDisplay().getAlias(), "KeyPairAliasIsRequired"));
+      validators.add(new RequiredTextValidator(getView().getAlias(), "KeyPairAliasIsRequired"));
       return validators;
     }
   }
 
   private class CertificateStepValidationHandler extends AbstractValidationHandler {
-    CertificateStepValidationHandler(EventBus eventBus) {
-      super(eventBus);
+    CertificateStepValidationHandler() {
+      super(getEventBus());
     }
 
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new RequiredTextValidator(getDisplay().getCertificatePem(), "KeyPairPublicKeyPEMIsRequired"));
-      validators.add(new IsNotEqualValidator<String>(getDisplay().getCertificatePem(), getDisplay().getDefaultPublicKeyText(), "KeyPairPublicKeyPEMIsRequired"));
+      validators.add(new RequiredTextValidator(getView().getCertificatePem(), "KeyPairPublicKeyPEMIsRequired"));
+      validators.add(new IsNotEqualValidator<String>(getView().getCertificatePem(), getView().getDefaultPublicKeyText(), "KeyPairPublicKeyPEMIsRequired"));
       return validators;
     }
   }
 
   private class PrivateKeyValidationHandler extends AbstractValidationHandler {
 
-    public PrivateKeyValidationHandler(EventBus eventBus) {
-      super(eventBus);
+    public PrivateKeyValidationHandler() {
+      super(getEventBus());
     }
 
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new ConditionalValidator(getDisplay().isPrivateKeyCreate(), new RequiredTextValidator(getDisplay().getAlgorithm(), "KeyPairAlgorithmIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPrivateKeyCreate(), new RequiredTextValidator(getDisplay().getKeySize(), "KeyPairKeySizeIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPrivateKeyImport(), new RequiredTextValidator(getDisplay().getPrivateKeyImport(), "KeyPairPrivateKeyPEMIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPrivateKeyImport(), new IsNotEqualValidator<String>(getDisplay().getPrivateKeyImport(), getDisplay().getDefaultPrivateKeyText(), "KeyPairPrivateKeyPEMIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPrivateKeyCreate(), new RequiredTextValidator(getView().getAlgorithm(), "KeyPairAlgorithmIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPrivateKeyCreate(), new RequiredTextValidator(getView().getKeySize(), "KeyPairKeySizeIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPrivateKeyImport(), new RequiredTextValidator(getView().getPrivateKeyImport(), "KeyPairPrivateKeyPEMIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPrivateKeyImport(), new IsNotEqualValidator<String>(getView().getPrivateKeyImport(), getView().getDefaultPrivateKeyText(), "KeyPairPrivateKeyPEMIsRequired")));
       return validators;
     }
   }
 
   private class PublicKeyValidationHandler extends AbstractValidationHandler {
 
-    public PublicKeyValidationHandler(EventBus eventBus) {
-      super(eventBus);
+    public PublicKeyValidationHandler() {
+      super(getEventBus());
     }
 
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new ConditionalValidator(getDisplay().isPublicKeyCreate(), new RequiredTextValidator(getDisplay().getFirstAndLastName(), "KeyPairFirstAndLastNameIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPublicKeyCreate(), new RequiredTextValidator(getDisplay().getOrganizationalUnit(), "KeyPairOrganizationalUnitIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPublicKeyCreate(), new RequiredTextValidator(getDisplay().getOrganizationName(), "KeyPairOrganizationNameIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPublicKeyCreate(), new RequiredTextValidator(getDisplay().getCity(), "KeyPairCityNameIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPublicKeyCreate(), new RequiredTextValidator(getDisplay().getState(), "KeyPairStateNameIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPublicKeyCreate(), new RequiredTextValidator(getDisplay().getCountry(), "KeyPairCountryCodeIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPublicKeyImport(), new RequiredTextValidator(getDisplay().getPublicKeyImport(), "KeyPairPublicKeyPEMIsRequired")));
-      validators.add(new ConditionalValidator(getDisplay().isPublicKeyImport(), new IsNotEqualValidator<String>(getDisplay().getPublicKeyImport(), getDisplay().getDefaultPublicKeyText(), "KeyPairPrivateKeyPEMIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getFirstAndLastName(), "KeyPairFirstAndLastNameIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getOrganizationalUnit(), "KeyPairOrganizationalUnitIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getOrganizationName(), "KeyPairOrganizationNameIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getCity(), "KeyPairCityNameIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getState(), "KeyPairStateNameIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getCountry(), "KeyPairCountryCodeIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyImport(), new RequiredTextValidator(getView().getPublicKeyImport(), "KeyPairPublicKeyPEMIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyImport(), new IsNotEqualValidator<String>(getView().getPublicKeyImport(), getView().getDefaultPublicKeyText(), "KeyPairPrivateKeyPEMIsRequired")));
       return validators;
     }
 

@@ -93,11 +93,6 @@ public class NotificationView extends PopupViewImpl implements NotificationPrese
 
   @Override
   public void show() {
-    showPopup();
-  }
-
-  @Override
-  public void showPopup() {
     // reset the dimensions in the eventuallity of a resize
     contentLayout.setSize("300px", "100px");
     dialog.setPopupPosition(Window.getClientWidth() - 350, 50);

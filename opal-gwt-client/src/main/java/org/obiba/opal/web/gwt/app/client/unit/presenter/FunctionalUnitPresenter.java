@@ -24,7 +24,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
@@ -36,9 +35,6 @@ import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
 
   public interface Display extends View {
-    ScrollPanel getFunctionalUnitDetailsPanel();
-
-    ScrollPanel getFunctionalUnitListPanel();
 
     HandlerRegistration addFunctionalUnitClickHandler(ClickHandler handler);
 
@@ -57,6 +53,10 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   @NameToken(Places.units)
   public interface Proxy extends ProxyPlace<FunctionalUnitPresenter> {
   }
+
+  public static final Object CENTER = new Object();
+
+  public static final Object LEFT = new Object();
 
   final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
 
@@ -98,31 +98,15 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   @Override
   protected void onBind() {
     addHandlers();
-    initDisplayComponents();
+    setInSlot(CENTER, functionalUnitDetailsPresenter);
+    setInSlot(LEFT, functionalUnitListPresenter);
+
   }
 
   private void addHandlers() {
     super.registerHandler(getView().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
     super.registerHandler(getView().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
     super.registerHandler(getView().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
-  }
-
-  protected void initDisplayComponents() {
-
-    getView().getFunctionalUnitDetailsPanel().add(functionalUnitDetailsPresenter.getDisplay().asWidget());
-    getView().getFunctionalUnitListPanel().add(functionalUnitListPresenter.getDisplay().asWidget());
-
-    functionalUnitListPresenter.bind();
-    functionalUnitDetailsPresenter.bind();
-  }
-
-  @Override
-  protected void onUnbind() {
-    getView().getFunctionalUnitDetailsPanel().remove(functionalUnitDetailsPresenter.getDisplay().asWidget());
-    getView().getFunctionalUnitListPanel().remove(functionalUnitListPresenter.getDisplay().asWidget());
-
-    functionalUnitListPresenter.unbind();
-    functionalUnitDetailsPresenter.unbind();
   }
 
   //
@@ -133,11 +117,9 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
 
     @Override
     public void onClick(ClickEvent event) {
-      functionalUnitUpdateDialogPresenter.bind();
       functionalUnitUpdateDialogPresenter.setDialogMode(Mode.CREATE);
-      functionalUnitUpdateDialogPresenter.getDisplay().clear();
-      // functionalUnitUpdateDialogPresenter.getView().setEnabledFunctionalUnitName(true);
-      functionalUnitUpdateDialogPresenter.revealDisplay();
+      functionalUnitUpdateDialogPresenter.getView().clear();
+      addToPopupSlot(functionalUnitUpdateDialogPresenter);
     }
 
   }

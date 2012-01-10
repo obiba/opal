@@ -14,12 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
@@ -33,16 +27,17 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<FunctionalUnitUpdateDialogPresenter.Display> {
+public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<FunctionalUnitUpdateDialogPresenter.Display> {
 
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
@@ -52,8 +47,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
     CREATE, UPDATE
   }
 
-  public interface Display extends WidgetDisplay {
-    void showDialog();
+  public interface Display extends PopupView {
 
     void hideDialog();
 
@@ -81,70 +75,45 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
   @Inject
   public FunctionalUnitUpdateDialogPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+    super(eventBus, display);
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     addEventHandlers();
     addValidators();
   }
 
   private void addValidators() {
-    validators.add(new RequiredTextValidator(getDisplay().getName(), "FunctionalUnitNameIsRequired"));
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+    validators.add(new RequiredTextValidator(getView().getName(), "FunctionalUnitNameIsRequired"));
   }
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     validators.clear();
   }
 
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().getUpdateFunctionalUnitButton().addClickHandler(new CreateOrUpdateFunctionalUnitClickHandler()));
-
-    super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getUpdateFunctionalUnitButton().addClickHandler(new CreateOrUpdateFunctionalUnitClickHandler()));
+    super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        getDisplay().hideDialog();
+        getView().hideDialog();
       }
     }));
-
-    super.registerHandler(getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
-      @Override
-      public void onClose(CloseEvent<DialogBox> event) {
-        unbind();
-      }
-    }));
-
   }
 
   public void setDialogMode(Mode dialogMode) {
     this.dialogMode = dialogMode;
-    getDisplay().setDialogMode(dialogMode);
+    getView().setDialogMode(dialogMode);
   }
 
   private void updateFunctionalUnit() {
     if(validFunctionalUnit()) {
       FunctionalUnitDto functionalUnit = getFunctionalUnitDto();
       CreateOrUpdateFunctionalUnitCallBack callbackHandler = new CreateOrUpdateFunctionalUnitCallBack(functionalUnit);
-      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getDisplay().getName().getText()).put().withResourceBody(FunctionalUnitDto.stringify(functionalUnit)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getView().getName().getText()).put().withResourceBody(FunctionalUnitDto.stringify(functionalUnit)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
     }
   }
 
@@ -152,7 +121,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
     if(validFunctionalUnit()) {
       CreateFunctionalUnitCallBack createFunctionalUnitCallback = new CreateFunctionalUnitCallBack();
       AlreadyExistFunctionalUnitCallBack alreadyExistFunctionalUnitCallback = new AlreadyExistFunctionalUnitCallBack();
-      ResourceRequestBuilderFactory.<FunctionalUnitDto> newBuilder().forResource("/functional-unit/" + getDisplay().getName().getText()).get().withCallback(alreadyExistFunctionalUnitCallback).withCallback(Response.SC_NOT_FOUND, createFunctionalUnitCallback).send();
+      ResourceRequestBuilderFactory.<FunctionalUnitDto> newBuilder().forResource("/functional-unit/" + getView().getName().getText()).get().withCallback(alreadyExistFunctionalUnitCallback).withCallback(Response.SC_NOT_FOUND, createFunctionalUnitCallback).send();
     }
   }
 
@@ -167,7 +136,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
@@ -176,10 +145,10 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
   private FunctionalUnitDto getFunctionalUnitDto() {
     FunctionalUnitDto functionalUnit = FunctionalUnitDto.create();
-    functionalUnit.setName(getDisplay().getName().getText());
-    functionalUnit.setKeyVariableName(getDisplay().getName().getText());
-    if(getDisplay().getSelect().getText().trim().length() > 0) {
-      functionalUnit.setKeyVariableName(getDisplay().getSelect().getText());
+    functionalUnit.setName(getView().getName().getText());
+    functionalUnit.setKeyVariableName(getView().getName().getText());
+    if(getView().getSelect().getText().trim().length() > 0) {
+      functionalUnit.setKeyVariableName(getView().getSelect().getText());
     }
     return functionalUnit;
   }
@@ -188,7 +157,7 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
     @Override
     public void onResource(Response response, FunctionalUnitDto resource) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitAlreadyExistWithTheSpecifiedName").build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitAlreadyExistWithTheSpecifiedName").build());
     }
 
   }
@@ -226,13 +195,13 @@ public class FunctionalUnitUpdateDialogPresenter extends WidgetPresenter<Functio
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getDisplay().hideDialog();
+      getView().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
-        eventBus.fireEvent(new FunctionalUnitUpdatedEvent(functionalUnit));
+        getEventBus().fireEvent(new FunctionalUnitUpdatedEvent(functionalUnit));
       } else if(response.getStatusCode() == Response.SC_CREATED) {
-        eventBus.fireEvent(new FunctionalUnitCreatedEvent(functionalUnit));
+        getEventBus().fireEvent(new FunctionalUnitCreatedEvent(functionalUnit));
       } else {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
 
     }

@@ -36,7 +36,6 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -45,8 +44,9 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class FunctionalUnitDetailsView extends Composite implements FunctionalUnitDetailsPresenter.Display {
+public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUnitDetailsPresenter.Display {
 
   @UiTemplate("FunctionalUnitDetailsView.ui.xml")
   interface FunctionalUnitDetailsViewUiBinder extends UiBinder<Widget, FunctionalUnitDetailsView> {
@@ -55,6 +55,8 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   private static FunctionalUnitDetailsViewUiBinder uiBinder = GWT.create(FunctionalUnitDetailsViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   Label noUnit;
@@ -126,7 +128,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
   private MenuItemSeparator keyPairSeparator;
 
   public FunctionalUnitDetailsView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
     initKeystoreTable();
     initActionToolbar();
   }
@@ -171,15 +173,7 @@ public class FunctionalUnitDetailsView extends Composite implements FunctionalUn
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

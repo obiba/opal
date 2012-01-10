@@ -20,11 +20,14 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class FunctionalUnitView extends Composite implements FunctionalUnitPresenter.Display {
+public class FunctionalUnitView extends ViewImpl implements FunctionalUnitPresenter.Display {
+
+  private final Widget widget;
 
   @UiField
   Button functionalUnitButton;
@@ -48,34 +51,27 @@ public class FunctionalUnitView extends Composite implements FunctionalUnitPrese
   private static FunctionalUnitViewUiBinder uiBinder = GWT.create(FunctionalUnitViewUiBinder.class);
 
   public FunctionalUnitView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void addToSlot(Object slot, Widget content) {
-  }
-
-  @Override
-  public void removeFromSlot(Object slot, Widget content) {
+    return widget;
   }
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-  }
-
-  @Override
-  public ScrollPanel getFunctionalUnitDetailsPanel() {
-    return functionalUnitDetailsPanel;
-  }
-
-  @Override
-  public ScrollPanel getFunctionalUnitListPanel() {
-    return functionalUnitListPanel;
+    HasWidgets panel;
+    if(slot == FunctionalUnitPresenter.LEFT) {
+      panel = functionalUnitListPanel;
+    } else {
+      panel = functionalUnitDetailsPanel;
+    }
+    if(content == null) {
+      panel.clear();
+    } else {
+      panel.add(content);
+    }
   }
 
   @Override

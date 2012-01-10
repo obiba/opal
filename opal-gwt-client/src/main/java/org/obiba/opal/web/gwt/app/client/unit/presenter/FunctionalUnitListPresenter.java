@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
@@ -24,14 +18,17 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitListPresenter.Display> {
+public class FunctionalUnitListPresenter extends PresenterWidget<FunctionalUnitListPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
     void setFunctionalUnits(JsArray<FunctionalUnitDto> templates);
 
     FunctionalUnitDto getSelectedFunctionalUnit();
@@ -42,16 +39,12 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
   @Inject
   public FunctionalUnitListPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+    super(eventBus, display);
   }
 
   @Override
-  public void refreshDisplay() {
+  public void onReveal() {
     refreshFunctionalUnits();
-  }
-
-  @Override
-  public void revealDisplay() {
   }
 
   @Override
@@ -60,27 +53,14 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
     addHandlers();
   }
 
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   private void refreshFunctionalUnits() {
     ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new FunctionalUnitsResourceCallback()).send();
   }
 
   private void addHandlers() {
-    super.registerHandler(getDisplay().addSelectFunctionalUnitHandler(new FunctionalUnitSelectionChangeHandler()));
-    super.registerHandler(eventBus.addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
-    super.registerHandler(eventBus.addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
+    super.registerHandler(getView().addSelectFunctionalUnitHandler(new FunctionalUnitSelectionChangeHandler()));
+    super.registerHandler(getEventBus().addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
+    super.registerHandler(getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
   }
 
   private class FunctionalUnitCreatedHandler implements FunctionalUnitCreatedEvent.Handler {
@@ -105,8 +85,8 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
 
     @Override
     public void onSelectionChange(SelectionChangeEvent event) {
-      FunctionalUnitDto selectedFunctionalUnit = getDisplay().getSelectedFunctionalUnit();
-      eventBus.fireEvent(new FunctionalUnitSelectedEvent(selectedFunctionalUnit));
+      FunctionalUnitDto selectedFunctionalUnit = getView().getSelectedFunctionalUnit();
+      getEventBus().fireEvent(new FunctionalUnitSelectedEvent(selectedFunctionalUnit));
     }
 
   }
@@ -116,7 +96,7 @@ public class FunctionalUnitListPresenter extends WidgetPresenter<FunctionalUnitL
     @Override
     public void onResource(Response response, JsArray<FunctionalUnitDto> resource) {
       JsArray<FunctionalUnitDto> units = JsArrays.toSafeArray(resource);
-      getDisplay().setFunctionalUnits(units);
+      getView().setFunctionalUnits(units);
     }
   }
 

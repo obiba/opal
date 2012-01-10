@@ -36,7 +36,10 @@ import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitListPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
@@ -121,6 +124,12 @@ public interface OpalGinjector extends Ginjector {
   Provider<DatasourcePresenter> getDatasourcePresenter();
 
   Provider<TablePresenter> getTablePresenter();
+
+  Provider<FunctionalUnitListPresenter> getFunctionalUnitListPresenter();
+
+  Provider<FunctionalUnitDetailsPresenter> getFunctionalUnitDetailsPresenter();
+
+  Provider<FunctionalUnitUpdateDialogPresenter> getFunctionalUnitUpdateDialogPresenter();
 
   FileSystemTreePresenter getFileSystemTreePresenter();
 

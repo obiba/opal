@@ -28,6 +28,7 @@ import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -40,11 +41,13 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class AddCryptoKeyDialogView implements AddKeyPairDialogPresenter.Display {
+public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairDialogPresenter.Display {
 
   @UiTemplate("AddCryptoKeyDialogView.ui.xml")
   interface ViewUiBinder extends UiBinder<WizardDialogBox, AddCryptoKeyDialogView> {
@@ -135,7 +138,9 @@ public class AddCryptoKeyDialogView implements AddKeyPairDialogPresenter.Display
 
   private WizardStepChain stepChain;
 
-  public AddCryptoKeyDialogView() {
+  @Inject
+  public AddCryptoKeyDialogView(EventBus eventBus) {
+    super(eventBus);
     this.dialog = uiBinder.createAndBindUi(this);
   }
 
@@ -419,15 +424,14 @@ public class AddCryptoKeyDialogView implements AddKeyPairDialogPresenter.Display
   }
 
   @Override
-  public void showDialog() {
+  public void show() {
     if(stepChain == null) {
       initWizardDialog();
     }
 
     stepChain.reset();
     clear();
-    dialog.center();
-    dialog.show();
+    super.show();
   }
 
   @Override
@@ -438,14 +442,6 @@ public class AddCryptoKeyDialogView implements AddKeyPairDialogPresenter.Display
   @Override
   public Widget asWidget() {
     return dialog;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   @Override

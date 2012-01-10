@@ -21,18 +21,20 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class FunctionalUnitListView extends Composite implements FunctionalUnitListPresenter.Display {
+public class FunctionalUnitListView extends ViewImpl implements FunctionalUnitListPresenter.Display {
 
   @UiTemplate("FunctionalUnitListView.ui.xml")
   interface FunctionalUnitListViewUiBinder extends UiBinder<Widget, FunctionalUnitListView> {
   }
 
   private static FunctionalUnitListViewUiBinder uiBinder = GWT.create(FunctionalUnitListViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   CellTable<FunctionalUnitDto> functionalUnitTable;
@@ -43,21 +45,13 @@ public class FunctionalUnitListView extends Composite implements FunctionalUnitL
 
   public FunctionalUnitListView() {
     selectionModel = new SingleSelectionModel<FunctionalUnitDto>();
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
     initTable();
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
@@ -42,12 +36,15 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUnitDetailsPresenter.Display> {
+public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUnitDetailsPresenter.Display> {
 
   public static final String DELETE_ACTION = "Delete";
 
@@ -65,7 +62,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private Request countIdentifiersRequest;
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
     void setKeyPairs(JsArray<KeyDto> keyPairs);
 
     HasActionHandler<KeyDto> getActionColumn();
@@ -112,18 +109,14 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   @Inject
   public FunctionalUnitDetailsPresenter(final Display display, final EventBus eventBus, FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter, AddKeyPairDialogPresenter addKeyPairDialogPresenter) {
-    super(display, eventBus);
+    super(eventBus, display);
     this.functionalUnitUpdateDialogPresenter = functionalUnitUpdateDialogPresenter;
     this.addKeyPairDialogPresenter = addKeyPairDialogPresenter;
   }
 
   @Override
-  public void refreshDisplay() {
-    updateCurrentCountOfIdentifiers();
-  }
-
-  @Override
-  public void revealDisplay() {
+  protected void onReveal() {
+    super.onReveal();
     updateCurrentCountOfIdentifiers();
   }
 
@@ -134,26 +127,13 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     setCommands();
   }
 
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   private void initUiComponents() {
-    getDisplay().setKeyPairs((JsArray<KeyDto>) JsArray.createArray());
-    getDisplay().setAvailable(false);
+    getView().setKeyPairs((JsArray<KeyDto>) JsArray.createArray());
+    getView().setAvailable(false);
   }
 
   private void addHandlers() {
-    getDisplay().getActionColumn().setActionHandler(new ActionHandler<KeyDto>() {
+    getView().getActionColumn().setActionHandler(new ActionHandler<KeyDto>() {
       public void doAction(KeyDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
@@ -161,7 +141,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       }
     });
 
-    super.registerHandler(eventBus.addHandler(FunctionalUnitSelectedEvent.getType(), new FunctionalUnitSelectedEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FunctionalUnitSelectedEvent.getType(), new FunctionalUnitSelectedEvent.Handler() {
 
       @Override
       public void onFunctionalUnitSelected(FunctionalUnitSelectedEvent event) {
@@ -169,22 +149,22 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(eventBus.addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
-    super.registerHandler(eventBus.addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(getEventBus().addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
+    super.registerHandler(getEventBus().addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
   }
 
   private void setCommands() {
-    getDisplay().setDownloadIdentifiersCommand(new DownloadIdentifiersCommand());
-    getDisplay().setExportIdentifiersCommand(new ExportIdentifiersCommand());
-    getDisplay().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
+    getView().setDownloadIdentifiersCommand(new DownloadIdentifiersCommand());
+    getView().setExportIdentifiersCommand(new ExportIdentifiersCommand());
+    getView().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
 
-    getDisplay().setGenerateIdentifiersCommand(new GenerateIdentifiersCommand());
-    getDisplay().setImportIdentifiersFromDataCommand(new ImportIdentifiersCommand());
+    getView().setGenerateIdentifiersCommand(new GenerateIdentifiersCommand());
+    getView().setImportIdentifiersFromDataCommand(new ImportIdentifiersCommand());
 
-    getDisplay().setAddKeyPairCommand(new AddKeyPairCommand());
+    getView().setAddKeyPairCommand(new AddKeyPairCommand());
 
-    getDisplay().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
+    getView().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
   }
 
   private void updateCurrentCountOfIdentifiers() {
@@ -192,15 +172,15 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
       countIdentifiersRequest.cancel();
       countIdentifiersRequest = null;
     }
-    getDisplay().setCurrentCountOfIdentifiers("");
+    getView().setCurrentCountOfIdentifiers("");
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_OK) {
-          getDisplay().setCurrentCountOfIdentifiers(response.getText());
+          getView().setCurrentCountOfIdentifiers(response.getText());
         } else {
-          getDisplay().setCurrentCountOfIdentifiers("");
+          getView().setCurrentCountOfIdentifiers("");
         }
       }
 
@@ -214,28 +194,28 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   private void authorize() {
     // export identifiers
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").get().authorize(getDisplay().getDownloadIdentifiersAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").get().authorize(getView().getDownloadIdentifiersAuthorizer()).send();
     // export identifiers mapping
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/csv").get().authorize(getDisplay().getExportIdentifiersAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/csv").get().authorize(getView().getExportIdentifiersAuthorizer()).send();
     // remove
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).delete().authorize(getDisplay().getRemoveFunctionalUnitAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).delete().authorize(getView().getRemoveFunctionalUnitAuthorizer()).send();
 
     // generate identifiers
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").post().authorize(getDisplay().getGenerateIdentifiersAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").post().authorize(getView().getGenerateIdentifiersAuthorizer()).send();
     // add identifiers
     ResourceAuthorizationRequestBuilderFactory.newBuilder()//
     .forResource("/functional-unit/" + functionalUnit.getName() + "/entities").post()//
     .authorize(CascadingAuthorizer.newBuilder().and("/functional-units/entities/table", HttpMethod.GET)//
-    .authorize(getDisplay().getImportIdentifiersFromDataAuthorizer()).build())//
+    .authorize(getView().getImportIdentifiersFromDataAuthorizer()).build())//
     .send();
     // add key pair
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().authorize(getDisplay().getAddKeyPairAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().authorize(getView().getAddKeyPairAuthorizer()).send();
 
     // edit
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).put().authorize(getDisplay().getUpdateFunctionalUnitAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).put().authorize(getView().getUpdateFunctionalUnitAuthorizer()).send();
 
     // display key pairs
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").get().authorize(getDisplay().getListKeyPairsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").get().authorize(getView().getListKeyPairsAuthorizer()).send();
   }
 
   private void authorizeDownloadCertificate(KeyDto dto, HasAuthorization authorizer) {
@@ -248,7 +228,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
   protected void doActionImpl(final KeyDto dto, String actionName) {
     if(actionName.equals(DOWNLOAD_ACTION)) {
-      authorizeDownloadCertificate(dto, new Authorizer(eventBus) {
+      authorizeDownloadCertificate(dto, new Authorizer(getEventBus()) {
 
         @Override
         public void authorized() {
@@ -256,7 +236,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
         }
       });
     } else if(actionName.equals(DELETE_ACTION)) {
-      authorizeDeleteKeyPair(dto, new Authorizer(eventBus) {
+      authorizeDeleteKeyPair(dto, new Authorizer(getEventBus()) {
 
         @Override
         public void authorized() {
@@ -265,7 +245,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
               deleteKeyPair(dto);
             }
           };
-          eventBus.fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
+          getEventBus().fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
         }
       });
     }
@@ -280,7 +260,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
           refreshKeyPairs(functionalUnit);
         } else {
           ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
         }
       }
 
@@ -295,12 +275,12 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
   private void downloadCertificate(final KeyDto dto) {
     String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
     .append("/key/").append(dto.getAlias()).append("/certificate").toString();
-    eventBus.fireEvent(new FileDownloadEvent(url));
+    getEventBus().fireEvent(new FileDownloadEvent(url));
   }
 
   private void refreshFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
     if(functionalUnit == null) {
-      getDisplay().setAvailable(false);
+      getView().setAvailable(false);
     } else {
       String name = functionalUnit.getName();
       ResourceRequestBuilderFactory.<FunctionalUnitDto> newBuilder().forResource("/functional-unit/" + name).get().withCallback(new FunctionalUnitFoundCallBack()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
@@ -317,9 +297,8 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     @Override
     public void execute() {
-      addKeyPairDialogPresenter.bind();
       addKeyPairDialogPresenter.setFunctionalUnit(functionalUnit);
-      addKeyPairDialogPresenter.revealDisplay();
+      addToPopupSlot(addKeyPairDialogPresenter);
     }
 
   }
@@ -329,10 +308,10 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     @Override
     public void execute() {
       if(generateConfirmation != null) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
       } else {
         generateConfirmation = new GenerateConfirmationRunnable();
-        eventBus.fireEvent(new ConfirmationRequiredEvent(generateConfirmation, "generateFunctionalUnitIdentifiers", "confirmGenerateFunctionalUnitIdentifiers"));
+        getEventBus().fireEvent(new ConfirmationRequiredEvent(generateConfirmation, "generateFunctionalUnitIdentifiers", "confirmGenerateFunctionalUnitIdentifiers"));
       }
     }
   }
@@ -342,7 +321,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     public void execute() {
       String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
       .append("/entities/identifiers").toString();
-      eventBus.fireEvent(new FileDownloadEvent(url));
+      getEventBus().fireEvent(new FileDownloadEvent(url));
     }
   }
 
@@ -359,15 +338,15 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
             } catch(NumberFormatException e) {
             }
             if(count > 0) {
-              eventBus.fireEvent(NotificationEvent.newBuilder().info("IdentifiersGenerationCompleted").args(functionalUnit.getName(), response.getText()).nonSticky().build());
+              getEventBus().fireEvent(NotificationEvent.newBuilder().info("IdentifiersGenerationCompleted").args(functionalUnit.getName(), response.getText()).nonSticky().build());
             } else {
-              eventBus.fireEvent(NotificationEvent.newBuilder().info("NoIdentifiersGenerated").args(functionalUnit.getName()).nonSticky().build());
+              getEventBus().fireEvent(NotificationEvent.newBuilder().info("NoIdentifiersGenerated").args(functionalUnit.getName()).nonSticky().build());
             }
           } else {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationFailed").args(functionalUnit.getName()).build());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationFailed").args(functionalUnit.getName()).build());
           }
           generateConfirmation = null;
-          refreshDisplay();
+          onReveal();
         }
 
       };
@@ -384,7 +363,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     public void execute() {
       String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
       .append("/entities/csv").toString();
-      eventBus.fireEvent(new FileDownloadEvent(url));
+      getEventBus().fireEvent(new FileDownloadEvent(url));
     }
   }
 
@@ -392,13 +371,12 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     @Override
     public void execute() {
-      functionalUnitUpdateDialogPresenter.bind();
       functionalUnitUpdateDialogPresenter.setDialogMode(Mode.UPDATE);
-      FunctionalUnitUpdateDialogPresenter.Display display = functionalUnitUpdateDialogPresenter.getDisplay();
-      FunctionalUnitDto functionalUnit = getDisplay().getFunctionalUnitDetails();
+      FunctionalUnitUpdateDialogPresenter.Display display = functionalUnitUpdateDialogPresenter.getView();
+      FunctionalUnitDto functionalUnit = getView().getFunctionalUnitDetails();
       display.setName(functionalUnit.getName());
       display.setSelect(functionalUnit.getSelect());
-      functionalUnitUpdateDialogPresenter.revealDisplay();
+      addToPopupSlot(functionalUnitUpdateDialogPresenter);
     }
 
   }
@@ -413,7 +391,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
           ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
         }
       };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
+      getEventBus().fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
     }
 
   }
@@ -422,7 +400,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     @Override
     public void execute() {
-      eventBus.fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS, functionalUnit));
+      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS, functionalUnit));
     }
 
   }
@@ -457,7 +435,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == Response.SC_OK) { // unit was deleted
-        eventBus.fireEvent(new FunctionalUnitDeletedEvent(getDisplay().getFunctionalUnitDetails()));
+        getEventBus().fireEvent(new FunctionalUnitDeletedEvent(getView().getFunctionalUnitDetails()));
       }
     }
   }
@@ -467,7 +445,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     @Override
     public void onResource(Response response, FunctionalUnitDto resource) {
       functionalUnit = resource;
-      getDisplay().setFunctionalUnitDetails(functionalUnit);
+      getView().setFunctionalUnitDetails(functionalUnit);
       updateCurrentCountOfIdentifiers();
       authorize();
     }
@@ -478,7 +456,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
     @Override
     public void onResource(Response response, JsArray<KeyDto> resource) {
       JsArray<KeyDto> keyPairs = (resource != null) ? resource : (JsArray<KeyDto>) JsArray.createArray();
-      getDisplay().setKeyPairs(keyPairs);
+      getView().setKeyPairs(keyPairs);
     }
 
   }
@@ -493,7 +471,7 @@ public class FunctionalUnitDetailsPresenter extends WidgetPresenter<FunctionalUn
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitCannotBeFound").args(functionalUnitName).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitCannotBeFound").args(functionalUnitName).build());
     }
 
   }

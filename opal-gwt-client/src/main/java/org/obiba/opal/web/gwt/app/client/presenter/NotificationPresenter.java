@@ -28,8 +28,6 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
 
   public interface Display extends PopupView {
 
-    public void showPopup();
-
     public void setMessages(List<String> messages);
 
     public void setCaption(String txt);
@@ -50,25 +48,12 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
     void onClose(CloseEvent<?> event);
   }
 
-  @Inject
-  private Translations translations;
+  private final Translations translations;
 
   @Inject
-  public NotificationPresenter(Display display, EventBus eventBus) {
+  public NotificationPresenter(Display display, EventBus eventBus, Translations translations) {
     super(eventBus, display);
-  }
-
-  @Override
-  protected void onBind() {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void onReveal() {
-    getView().showPopup();
+    this.translations = translations;
   }
 
   public void setNotification(NotificationEvent event) {

@@ -20,20 +20,17 @@ import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitListView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitUpdateDialogView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitView;
 
-import com.google.inject.Singleton;
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 public class UnitsModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-
     bindPresenter(FunctionalUnitPresenter.class, FunctionalUnitPresenter.Display.class, FunctionalUnitView.class, FunctionalUnitPresenter.Proxy.class);
-
-    bind(FunctionalUnitListPresenter.Display.class).to(FunctionalUnitListView.class).in(Singleton.class);
-    bind(FunctionalUnitDetailsPresenter.Display.class).to(FunctionalUnitDetailsView.class).in(Singleton.class);
-    bind(FunctionalUnitUpdateDialogPresenter.Display.class).to(FunctionalUnitUpdateDialogView.class).in(Singleton.class);
-    bind(AddKeyPairDialogPresenter.Display.class).to(AddCryptoKeyDialogView.class).in(Singleton.class);
+    bindPresenterWidget(FunctionalUnitListPresenter.class, FunctionalUnitListPresenter.Display.class, FunctionalUnitListView.class);
+    bindPresenterWidget(FunctionalUnitDetailsPresenter.class, FunctionalUnitDetailsPresenter.Display.class, FunctionalUnitDetailsView.class);
+    bindPresenterWidget(FunctionalUnitUpdateDialogPresenter.class, FunctionalUnitUpdateDialogPresenter.Display.class, FunctionalUnitUpdateDialogView.class);
+    bindPresenterWidget(AddKeyPairDialogPresenter.class, AddKeyPairDialogPresenter.Display.class, AddCryptoKeyDialogView.class);
   }
 
 }

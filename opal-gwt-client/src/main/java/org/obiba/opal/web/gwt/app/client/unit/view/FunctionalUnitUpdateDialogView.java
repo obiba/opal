@@ -17,19 +17,21 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class FunctionalUnitUpdateDialogView extends Composite implements Display {
+public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Display {
 
   @UiTemplate("FunctionalUnitUpdateDialogView.ui.xml")
   interface FunctionalUnitUpdateDialogUiBinder extends UiBinder<DialogBox, FunctionalUnitUpdateDialogView> {
@@ -57,8 +59,9 @@ public class FunctionalUnitUpdateDialogView extends Composite implements Display
   @UiField
   CheckBox selectEnabled;
 
-  public FunctionalUnitUpdateDialogView() {
-    initWidget(uiBinder.createAndBindUi(this));
+  @Inject
+  public FunctionalUnitUpdateDialogView(EventBus eventBus) {
+    super(eventBus);
     uiBinder.createAndBindUi(this);
     dialog.hide();
     selectEnabled.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -77,21 +80,12 @@ public class FunctionalUnitUpdateDialogView extends Composite implements Display
 
   @Override
   public Widget asWidget() {
-    return this;
+    return dialog;
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showDialog() {
-    dialog.center();
-    dialog.show();
+  public void show() {
+    super.show();
     functionalUnitName.setFocus(true);
   }
 

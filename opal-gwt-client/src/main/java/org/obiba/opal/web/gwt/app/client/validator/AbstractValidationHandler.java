@@ -16,6 +16,7 @@ import java.util.Set;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.inject.client.GwtEventBusAdaptor;
 
 public abstract class AbstractValidationHandler implements ValidationHandler {
 
@@ -26,6 +27,10 @@ public abstract class AbstractValidationHandler implements ValidationHandler {
   public AbstractValidationHandler(EventBus eventBus) {
     super();
     this.eventBus = eventBus;
+  }
+
+  public AbstractValidationHandler(com.google.gwt.event.shared.EventBus eventBus) {
+    this(new GwtEventBusAdaptor(eventBus));
   }
 
   @Override
