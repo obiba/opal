@@ -142,6 +142,8 @@ message ValueSetsDto {
   }
   message ValueDto {
     optional string value = 1;
+    optional string link = 2; // link to the value
+    repeated ValueDto values = 3; // value sequence
   }
   repeated string variables = 1;
   repeated ValueSetDto valueSets = 2;  
@@ -162,6 +164,8 @@ message ValueDto {
   required string valueType = 1;
   required bool isSequence = 2;
   optional string value = 3;
+  optional string link = 4; // link to the value
+  repeated ValueDto values = 5; // value sequence
 }
 
 message LinkDto {

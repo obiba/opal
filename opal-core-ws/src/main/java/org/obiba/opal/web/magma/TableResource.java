@@ -30,6 +30,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.mozilla.javascript.Scriptable;
 import org.obiba.magma.Value;
+import org.obiba.magma.ValueSequence;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
@@ -130,7 +131,7 @@ public class TableResource extends AbstractValueTableResource {
    */
   @GET
   @Path("/valueSets")
-  public ValueSetsDto getValueSets(@QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
+  public ValueSetsDto getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
     final Iterable<Variable> variables = filterVariables(select, 0, null);
     final Iterable<VariableEntity> entities = filterEntities(getValueTable(), where, offset, limit);
 
@@ -144,16 +145,20 @@ public class TableResource extends AbstractValueTableResource {
     })).addAllValueSets(Iterables.transform(entities, new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
 
       @Override
-      public ValueSetsDto.ValueSetDto apply(VariableEntity from) {
-        final ValueSet valueSet = getValueTable().getValueSet(from);
-        return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(from.getIdentifier()).addAllValues(Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
+      public ValueSetsDto.ValueSetDto apply(final VariableEntity fromEntity) {
+        final ValueSet valueSet = getValueTable().getValueSet(fromEntity);
+        return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addAllValues(Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
 
           @Override
           public ValueSetsDto.ValueDto apply(Variable from) {
+            String link = uriInfo.getPath().replace("valueSets", "variable/" + from.getName() + "/value/" + fromEntity.getIdentifier());
             Value value = getValueTable().getVariableValueSource(from.getName()).getValue(valueSet);
-            ValueSetsDto.ValueDto.Builder valueDto = ValueSetsDto.ValueDto.newBuilder();
-            if(value.isNull() == false) {
-              valueDto.setValue(value.toString());
+            ValueSetsDto.ValueDto.Builder valueDto = Dtos.asValueSetsValueDto(link, value);
+            if(value.isNull() == false && value.isSequence()) {
+              ValueSequence valueSeq = value.asSequence();
+              for(int i = 0; i < valueSeq.getSize(); i++) {
+                valueDto.addValues(Dtos.asValueSetsValueDto(link + "?pos=" + i, valueSeq.get(i)).build());
+              }
             }
             return valueDto.build();
           }
