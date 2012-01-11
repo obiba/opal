@@ -241,4 +241,14 @@ public class VariablesResource extends AbstractValueTableResource {
     });
   }
 
+  private UriBuilder tableUriBuilder(UriInfo uriInfo) {
+    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
+    segments.remove(segments.size() - 1);
+    final UriBuilder ub = UriBuilder.fromPath("/");
+    for(PathSegment segment : segments) {
+      ub.segment(segment.getPath());
+    }
+    return ub;
+  }
+
 }

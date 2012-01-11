@@ -56,6 +56,11 @@ public class VariableResource {
     return Dtos.asDto(vvs.getVariable()).build();
   }
 
+  @Path("/valueSets")
+  public ValueSetsResource getValueSets() {
+    return new ValueSetsResource(valueTable, vvs.getVariable());
+  }
+
   @GET
   @Path("/value/{identifier}")
   public Response getValue(@PathParam("identifier") String identifier, @QueryParam("pos") Integer pos) {

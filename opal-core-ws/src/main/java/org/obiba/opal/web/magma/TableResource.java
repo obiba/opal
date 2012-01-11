@@ -11,11 +11,9 @@ package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.ws.rs.DefaultValue;
@@ -28,9 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
-import org.mozilla.javascript.Scriptable;
 import org.obiba.magma.Value;
-import org.obiba.magma.ValueSequence;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
@@ -40,20 +36,15 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
-import org.obiba.magma.js.MagmaContext;
-import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
-import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -87,7 +78,7 @@ public class TableResource extends AbstractValueTableResource {
   @GET
   @Path("/entities")
   public Set<VariableEntityDto> getEntities(@QueryParam("script") String script) {
-    Iterable<VariableEntity> entities = filterEntities(getValueTable(), script);
+    Iterable<VariableEntity> entities = filterEntities(script);
 
     return ImmutableSet.copyOf(Iterables.transform(entities, new Function<VariableEntity, VariableEntityDto>() {
       @Override
@@ -121,52 +112,9 @@ public class TableResource extends AbstractValueTableResource {
     return builder.build();
   }
 
-  /**
-   * Get a chunk of value sets, optionally filters the variables and/or the entities.
-   * @param select script for filtering the variables
-   * @param where script for filtering the entities
-   * @param offset
-   * @param limit
-   * @return
-   */
-  @GET
   @Path("/valueSets")
-  public ValueSetsDto getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("where") String where, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
-    final Iterable<Variable> variables = filterVariables(select, 0, null);
-    final Iterable<VariableEntity> entities = filterEntities(getValueTable(), where, offset, limit);
-
-    ValueSetsDto.Builder valueSets = ValueSetsDto.newBuilder().addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
-
-      @Override
-      public String apply(Variable from) {
-        return from.getName();
-      }
-
-    })).addAllValueSets(Iterables.transform(entities, new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
-
-      @Override
-      public ValueSetsDto.ValueSetDto apply(final VariableEntity fromEntity) {
-        final ValueSet valueSet = getValueTable().getValueSet(fromEntity);
-        return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addAllValues(Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
-
-          @Override
-          public ValueSetsDto.ValueDto apply(Variable from) {
-            String link = uriInfo.getPath().replace("valueSets", "variable/" + from.getName() + "/value/" + fromEntity.getIdentifier());
-            Value value = getValueTable().getVariableValueSource(from.getName()).getValue(valueSet);
-            ValueSetsDto.ValueDto.Builder valueDto = Dtos.asValueSetsValueDto(link, value);
-            if(value.isNull() == false && value.isSequence()) {
-              ValueSequence valueSeq = value.asSequence();
-              for(int i = 0; i < valueSeq.getSize(); i++) {
-                valueDto.addValues(Dtos.asValueSetsValueDto(link + "?pos=" + i, valueSeq.get(i)).build());
-              }
-            }
-            return valueDto.build();
-          }
-        })).build();
-      }
-    }));
-
-    return valueSets.build();
+  public ValueSetsResource getValueSets() {
+    return new ValueSetsResource(getValueTable());
   }
 
   @GET
@@ -212,6 +160,11 @@ public class TableResource extends AbstractValueTableResource {
     return super.getLocalesResource();
   }
 
+  // @Path("/dictionary")
+  // public TableResource getDictionary() {
+  // return new TableResource(new VariableValueTable(getValueTable()), getLocales());
+  // }
+
   //
   // private methods
   //
@@ -228,61 +181,6 @@ public class TableResource extends AbstractValueTableResource {
 
   private VariableResource getVariableResource(VariableValueSource source) {
     return new VariableResource(this.getValueTable(), source);
-  }
-
-  private Iterable<VariableEntity> filterEntities(ValueTable valueTable, String script) {
-    return filterEntities(valueTable, script, null, null);
-  }
-
-  private Iterable<VariableEntity> filterEntities(ValueTable valueTable, String script, Integer offset, Integer limit) {
-    Iterable<VariableEntity> entities;
-    if(script == null) {
-      entities = valueTable.getVariableEntities();
-    } else {
-      entities = getFilteredEntities(valueTable, script);
-    }
-    // Apply offset then limit (in that order)
-    if(offset != null) {
-      entities = Iterables.skip(entities, offset);
-    }
-    if(limit != null) {
-      entities = Iterables.limit(entities, limit);
-    }
-    return entities;
-  }
-
-  private Iterable<VariableEntity> getFilteredEntities(ValueTable valueTable, String script) {
-    if(script == null) {
-      throw new IllegalArgumentException("Entities filter script cannot be null.");
-    }
-
-    JavascriptValueSource jvs = newJavaScriptValueSource(BooleanType.get(), script);
-
-    final SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
-    final Iterator<Value> values = jvs.asVectorSource().getValues(entities).iterator();
-
-    return Iterables.filter(entities, new Predicate<VariableEntity>() {
-
-      @Override
-      public boolean apply(VariableEntity input) {
-        return values.next().getValue() == Boolean.TRUE;
-      }
-    });
-  }
-
-  private JavascriptValueSource newJavaScriptValueSource(ValueType valueType, String script) {
-    JavascriptValueSource jvs = new JavascriptValueSource(valueType, script) {
-      @Override
-      protected void enterContext(MagmaContext ctx, Scriptable scope) {
-        if(getValueTable() instanceof ValueTableWrapper) {
-          ctx.push(ValueTable.class, ((ValueTableWrapper) getValueTable()).getWrappedValueTable());
-        } else {
-          ctx.push(ValueTable.class, getValueTable());
-        }
-      }
-    };
-    jvs.initialise();
-    return jvs;
   }
 
   private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
