@@ -38,7 +38,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -311,7 +310,7 @@ public class FilesResource {
 
     compressFolder(compressedFolder, folder);
 
-    return Response.ok(compressedFolder, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
+    return Response.ok(compressedFolder, mimeType).header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
   }
 
   private Response getFileDetails(FileObject file) throws FileSystemException {
