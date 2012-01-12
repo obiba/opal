@@ -10,11 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclGetCallback;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -26,13 +21,16 @@ import org.obiba.opal.web.model.client.opal.Subject;
 import org.obiba.opal.web.model.client.opal.Subject.SubjectType;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class SubjectAuthorizationPresenter extends WidgetPresenter<SubjectAuthorizationPresenter.Display> {
+public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthorizationPresenter.Display> {
 
   private SubjectPermissionsRequest subjectPermissionsRequests;
 
@@ -42,62 +40,26 @@ public class SubjectAuthorizationPresenter extends WidgetPresenter<SubjectAuthor
 
   private SubjectType type;
 
-  //
-  // Constructors
-  //
-
   @Inject
   public SubjectAuthorizationPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+    super(eventBus, display);
   }
 
   public void setAclRequest(SubjectType type, AclRequest.Builder... builders) {
     this.type = type;
-    this.subjectPermissionsRequests = new SubjectPermissionsRequest(type, new AclCallbackImpl(eventBus), builders);
+    this.subjectPermissionsRequests = new SubjectPermissionsRequest(type, new AclCallbackImpl(getEventBus()), builders);
 
     if(!initialized) {
       for(String header : subjectPermissionsRequests.getHeaders()) {
-        getDisplay().initColumn(header, new PermissionHandlerImpl());
+        getView().initColumn(header, new PermissionHandlerImpl());
       }
       initialized = true;
     }
-    getDisplay().renderSubjectType(type.toString());
-  }
-
-  private void addEventHandlers() {
-    if(getDisplay().getActionsColumn() != null) {
-      getDisplay().getActionsColumn().setActionHandler(new ActionHandler<Acls>() {
-        public void doAction(Acls perms, String actionName) {
-          if(actionName != null && actionName.equals(DELETE_ACTION)) {
-            subjectPermissionsRequests.delete(perms.getSubject());
-          }
-        }
-      });
-    }
-    getDisplay().addPrincipalHandler(new AddPrincipalHandlerImpl());
-  }
-
-  private boolean hasSubject(String subject) {
-    for(Acls perms : JsArrays.toIterable(subjectPermissions)) {
-      if(perms.getSubject().getPrincipal().equals(subject)) return true;
-    }
-    return false;
-  }
-
-  //
-  // WidgetPresenter methods
-  //
-
-  @Override
-  public void refreshDisplay() {
-    if(initialized) {
-      subjectPermissionsRequests.get();
-      subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
-    }
+    getView().renderSubjectType(type.toString());
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReveal() {
     if(initialized) {
       subjectPermissionsRequests.get();
       subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
@@ -106,25 +68,24 @@ public class SubjectAuthorizationPresenter extends WidgetPresenter<SubjectAuthor
 
   @Override
   protected void onBind() {
-    addEventHandlers();
+    if(getView().getActionsColumn() != null) {
+      getView().getActionsColumn().setActionHandler(new ActionHandler<Acls>() {
+        public void doAction(Acls perms, String actionName) {
+          if(actionName != null && actionName.equals(DELETE_ACTION)) {
+            subjectPermissionsRequests.delete(perms.getSubject());
+          }
+        }
+      });
+    }
+    getView().addPrincipalHandler(new AddPrincipalHandlerImpl());
   }
 
-  @Override
-  protected void onUnbind() {
+  private boolean hasSubject(String subject) {
+    for(Acls perms : JsArrays.toIterable(subjectPermissions)) {
+      if(perms.getSubject().getPrincipal().equals(subject)) return true;
+    }
+    return false;
   }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // Interface and inner classes
-  //
 
   /**
    *
@@ -140,7 +101,7 @@ public class SubjectAuthorizationPresenter extends WidgetPresenter<SubjectAuthor
           s.setType(type);
           subjectPermissionsRequests.add(s);
         }
-        getDisplay().clear();
+        getView().clear();
       }
     }
   }
@@ -152,12 +113,12 @@ public class SubjectAuthorizationPresenter extends WidgetPresenter<SubjectAuthor
     @SuppressWarnings("unchecked")
     @Override
     public void onGetFailed(Response response) {
-      getDisplay().renderSubjectSuggestions((JsArray<Acls>) JsArray.createArray());
+      getView().renderSubjectSuggestions((JsArray<Acls>) JsArray.createArray());
     }
 
     @Override
     public void onGet(JsArray<Acls> resource) {
-      getDisplay().renderSubjectSuggestions(resource);
+      getView().renderSubjectSuggestions(resource);
     }
   }
 
@@ -170,17 +131,17 @@ public class SubjectAuthorizationPresenter extends WidgetPresenter<SubjectAuthor
     @Override
     public void onGet(JsArray<Acls> resource) {
       subjectPermissions = resource;
-      getDisplay().renderPermissions(subjectPermissions);
+      getView().renderPermissions(subjectPermissions);
     }
 
     @Override
     public void onDelete(Subject subject) {
-      refreshDisplay();
+      onReveal();
     }
 
     @Override
     public void onAdd(Acl resource) {
-      refreshDisplay();
+      onReveal();
     }
   }
 
@@ -204,7 +165,7 @@ public class SubjectAuthorizationPresenter extends WidgetPresenter<SubjectAuthor
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void renderSubjectType(String type);
 

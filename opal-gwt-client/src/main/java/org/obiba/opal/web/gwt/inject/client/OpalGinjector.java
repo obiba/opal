@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.Dat
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
@@ -75,7 +76,7 @@ import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.annotations.DefaultGatekeeper;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
-@GinModules({ OpalGinModule.class, AdministrationModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class, ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class, ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
+@GinModules({ OpalGinModule.class, AuthorizationModule.class, AdministrationModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class, ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class, ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
 public interface OpalGinjector extends Ginjector {
 
   EventBus getOldEventBus();
@@ -87,6 +88,8 @@ public interface OpalGinjector extends Ginjector {
   ResourceAuthorizationCache getResourceAuthorizationCache();
 
   Provider<AuthorizationPresenter> getAuthorizationPresenter();
+
+  Provider<SubjectAuthorizationPresenter> getSubjectAuthorizationPresenter();
 
   RequestCredentials getRequestCredentials();
 

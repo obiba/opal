@@ -9,14 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 
 public class DefaultAclCallback implements AclCallback {

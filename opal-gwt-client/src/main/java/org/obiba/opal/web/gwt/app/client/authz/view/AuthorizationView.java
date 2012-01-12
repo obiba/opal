@@ -10,12 +10,13 @@
 package org.obiba.opal.web.gwt.app.client.authz.view;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,6 +33,8 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
 
   private static AuthorizationViewUiBinder uiBinder = GWT.create(AuthorizationViewUiBinder.class);
 
+  private final Translations translation = GWT.create(Translations.class);
+
   private final Widget widget;
 
   @UiField
@@ -43,10 +46,6 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
   @UiField
   SimplePanel groups;
 
-  private Display usersDisplay;
-
-  private Display groupsDisplay;
-
   public AuthorizationView() {
     widget = uiBinder.createAndBindUi(this);
   }
@@ -57,29 +56,26 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
   }
 
   @Override
-  public void clear() {
-    usersDisplay.clear();
-    groupsDisplay.clear();
+  public void setInSlot(Object slot, Widget content) {
+    HasWidgets panel = null;
+    if(slot == Slots.User) {
+      panel = this.users;
+    } else if(slot == Slots.Group) {
+      panel = this.groups;
+    }
+    if(panel != null) {
+      panel.clear();
+      if(content != null) {
+        panel.add(content);
+      }
+    }
   }
 
   @Override
-  public void setExplanation(String text) {
+  public void setExplanation(String key) {
+    String text = translation.permissionExplanationMap().get(key);
     explanation.setText(text);
     explanation.setVisible(text != null && text.length() > 0);
-  }
-
-  @Override
-  public void setUserAuthorizationDisplay(Display display) {
-    this.usersDisplay = display;
-    users.clear();
-    users.add(display.asWidget());
-  }
-
-  @Override
-  public void setGroupAuthorizationDisplay(Display display) {
-    this.groupsDisplay = display;
-    groups.clear();
-    groups.add(display.asWidget());
   }
 
 }

@@ -19,6 +19,10 @@ import org.obiba.opal.web.gwt.app.client.fs.view.FileExplorerView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileSystemTreeView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadDialogView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FolderDetailsView;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectionView;
+import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectorView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
@@ -34,5 +38,8 @@ public class FileSystemModule extends AbstractPresenterModule {
     bindPresenterWidget(FileSystemTreePresenter.class, FileSystemTreePresenter.Display.class, FileSystemTreeView.class);
     bindPresenterWidget(CreateFolderDialogPresenter.class, CreateFolderDialogPresenter.Display.class, CreateFolderDialogView.class);
     bindPresenterWidget(FileUploadDialogPresenter.class, FileUploadDialogPresenter.Display.class, FileUploadDialogView.class);
+    bindPresenterWidget(FileSelectorPresenter.class, FileSelectorPresenter.Display.class, FileSelectorView.class);
+
+    bind(FileSelectionPresenter.Display.class).to(FileSelectionView.class);
   }
 }

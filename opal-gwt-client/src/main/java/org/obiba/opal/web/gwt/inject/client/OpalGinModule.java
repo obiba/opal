@@ -11,25 +11,17 @@ package org.obiba.opal.web.gwt.inject.client;
 
 import net.customware.gwt.presenter.client.EventBus;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.view.AuthorizationView;
-import org.obiba.opal.web.gwt.app.client.authz.view.SubjectAuthorizationView;
 import org.obiba.opal.web.gwt.app.client.place.DefaultPlace;
 import org.obiba.opal.web.gwt.app.client.place.OpalPlaceManager;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
-import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.app.client.view.NotificationView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
@@ -37,8 +29,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ConfirmationView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.DatasourceSelectorView;
-import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectionView;
-import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ItemSelectorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ScriptEvaluationPopupView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.SummaryTabView;
@@ -49,9 +39,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptVi
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ScriptEvaluationView;
 import org.obiba.opal.web.gwt.rest.client.DefaultRequestUrlBuilder;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
 import com.google.inject.Singleton;
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
@@ -64,22 +52,15 @@ public class OpalGinModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    // Bind concrete implementations to interfaces
     bind(EventBus.class).to(GwtEventBusAdaptor.class).in(Singleton.class);
-    bind(RequestCredentials.class).in(Singleton.class);
-    bind(ResourceAuthorizationCache.class).in(Singleton.class);
     bind(RequestUrlBuilder.class).to(DefaultRequestUrlBuilder.class).in(Singleton.class);
-
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class).in(Singleton.class);
 
     bindConstant().annotatedWith(DefaultPlace.class).to(Places.dashboard);
 
     install(new DefaultModule(OpalPlaceManager.class));
     bindPresenter(ApplicationPresenter.class, ApplicationPresenter.Display.class, ApplicationView.class, ApplicationPresenter.Proxy.class);
-    bindPresenter(LoginPresenter.class, LoginPresenter.Display.class, LoginView.class, LoginPresenter.Proxy.class);
     bindSingletonPresenterWidget(NotificationPresenter.class, NotificationPresenter.Display.class, NotificationView.class);
-    bindPresenterWidget(FileSelectorPresenter.class, FileSelectorPresenter.Display.class, FileSelectorView.class);
-    bindPresenterWidget(AuthorizationPresenter.class, AuthorizationPresenter.Display.class, AuthorizationView.class);
 
     configureWidgets();
 
@@ -88,7 +69,6 @@ public class OpalGinModule extends AbstractPresenterModule {
   private void configureWidgets() {
     bind(TableSelectorPresenter.Display.class).to(TableSelectorView.class).in(Singleton.class);
     bind(TableListPresenter.Display.class).to(TableListView.class);
-    bind(FileSelectionPresenter.Display.class).to(FileSelectionView.class);
     bind(ConfirmationPresenter.Display.class).to(ConfirmationView.class).in(Singleton.class);
     bind(ScriptEvaluationPopupPresenter.Display.class).to(ScriptEvaluationPopupView.class).in(Singleton.class);
     bind(DatasourceSelectorPresenter.Display.class).to(DatasourceSelectorView.class);
@@ -96,8 +76,6 @@ public class OpalGinModule extends AbstractPresenterModule {
     bind(ItemSelectorPresenter.Display.class).to(ItemSelectorView.class);
     bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);
     bind(ScriptEvaluationPresenter.Display.class).to(ScriptEvaluationView.class);
-
-    bind(SubjectAuthorizationPresenter.Display.class).to(SubjectAuthorizationView.class);
   }
 
 }

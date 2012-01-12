@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.opal.Subject.SubjectType;
 
 import com.google.gwt.event.shared.EventBus;
@@ -17,62 +16,39 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-/**
- *
- */
 public class AuthorizationPresenter extends PresenterWidget<AuthorizationPresenter.Display> {
 
   private final SubjectAuthorizationPresenter userAuthzPresenter;
 
   private final SubjectAuthorizationPresenter groupAuthzPresenter;
 
-  private final Translations translation;
-
-  private String translationKey;
-
   @Inject
-  public AuthorizationPresenter(Display display, EventBus eventBus, SubjectAuthorizationPresenter userAuthzPresenter, SubjectAuthorizationPresenter groupAuthzPresenter, Translations translation) {
+  public AuthorizationPresenter(Display display, EventBus eventBus, SubjectAuthorizationPresenter userAuthzPresenter, SubjectAuthorizationPresenter groupAuthzPresenter) {
     super(eventBus, display);
     this.userAuthzPresenter = userAuthzPresenter;
     this.groupAuthzPresenter = groupAuthzPresenter;
-    this.translation = translation;
   }
 
   public void setAclRequest(String key, AclRequest.Builder... builders) {
     userAuthzPresenter.setAclRequest(SubjectType.USER, builders);
     groupAuthzPresenter.setAclRequest(SubjectType.GROUP, builders);
-  }
-
-  @Override
-  public void onReveal() {
-    userAuthzPresenter.revealDisplay();
-    groupAuthzPresenter.revealDisplay();
-    getView().setExplanation(translation.permissionExplanationMap().get(translationKey));
+    getView().setExplanation(key);
   }
 
   @Override
   protected void onBind() {
-    userAuthzPresenter.onBind();
-    getView().setUserAuthorizationDisplay(userAuthzPresenter.getDisplay());
-    groupAuthzPresenter.onBind();
-    getView().setGroupAuthorizationDisplay(groupAuthzPresenter.getDisplay());
-  }
-
-  @Override
-  protected void onUnbind() {
-    userAuthzPresenter.onUnbind();
-    groupAuthzPresenter.onUnbind();
+    super.onBind();
+    setInSlot(Display.Slots.User, userAuthzPresenter);
+    setInSlot(Display.Slots.Group, groupAuthzPresenter);
   }
 
   public interface Display extends View {
 
-    void setUserAuthorizationDisplay(SubjectAuthorizationPresenter.Display display);
+    enum Slots {
+      User, Group
+    }
 
-    void setGroupAuthorizationDisplay(SubjectAuthorizationPresenter.Display display);
-
-    void setExplanation(String text);
-
-    void clear();
+    void setExplanation(String key);
 
   }
 

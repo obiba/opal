@@ -41,7 +41,6 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -49,13 +48,16 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class SubjectAuthorizationView extends Composite implements SubjectAuthorizationPresenter.Display {
+public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthorizationPresenter.Display {
 
   private static final int PAGER_SIZE = 20;
+
+  private final Widget widget;
 
   @UiField
   InlineLabel typeLabel;
@@ -96,49 +98,20 @@ public class SubjectAuthorizationView extends Composite implements SubjectAuthor
 
   public SubjectAuthorizationView() {
     principal = new SuggestBox(suggestions = new MultiWordSuggestOracle(), new TextBox(), suggestionDisplay = new SubjectSuggestionDisplay());
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
     initAclsTable();
   }
 
-  private void initAclsTable() {
-    table.addColumn(new TextColumn<Acls>() {
-      @Override
-      public String getValue(Acls object) {
-        return object.getSubject().getPrincipal();
-      }
-    }, translations.whoLabel());
-
-    actionsColumn = new ActionsColumn<Acls>(new ConstantActionsProvider<Acls>(DELETE_ACTION));
-
-    actionsColumnAdded = false;
-
-    table.setPageSize(PAGER_SIZE);
-    pager.setDisplay(table);
-    subjectPermissionsDataProvider.addDataDisplay(table);
-
-    table.setVisible(false);
-    pager.setVisible(false);
-  }
-
-  //
-  // WidgetDisplay methods
-  //
-
   @Override
-  public void startProcessing() {
+  public Widget asWidget() {
+    return widget;
   }
 
   @Override
-  public void stopProcessing() {
+  public void renderSubjectType(String type) {
+    typeLabel.setText(translations.subjectTypeMap().get(type));
   }
 
-  //
-  // UiBinder
-  //
-
-  /**
-   *
-   */
   private final class SubjectSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
     public boolean hasSelection() {
       return getCurrentSelection() != null;
@@ -225,6 +198,26 @@ public class SubjectAuthorizationView extends Composite implements SubjectAuthor
     table.setVisible(count > 0);
   }
 
+  private void initAclsTable() {
+    table.addColumn(new TextColumn<Acls>() {
+      @Override
+      public String getValue(Acls object) {
+        return object.getSubject().getPrincipal();
+      }
+    }, translations.whoLabel());
+
+    actionsColumn = new ActionsColumn<Acls>(new ConstantActionsProvider<Acls>(DELETE_ACTION));
+
+    actionsColumnAdded = false;
+
+    table.setPageSize(PAGER_SIZE);
+    pager.setDisplay(table);
+    subjectPermissionsDataProvider.addDataDisplay(table);
+
+    table.setVisible(false);
+    pager.setVisible(false);
+  }
+
   private void addPermissionColumn(final String header, final PermissionSelectionHandler permHandler) {
     Column<Acls, Boolean> column = new Column<Acls, Boolean>(new CheckboxCell()) {
 
@@ -249,11 +242,6 @@ public class SubjectAuthorizationView extends Composite implements SubjectAuthor
     column.setFieldUpdater(fieldUpdater);
     table.addColumn(column, translations.permissionMap().get(header));
 
-  }
-
-  @Override
-  public void renderSubjectType(String type) {
-    typeLabel.setText(translations.subjectTypeMap().get(type));
   }
 
 }

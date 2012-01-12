@@ -78,6 +78,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent e) {
     if(isVisible() == false) {
       forceReveal();
+      displayDatasource(e.getSelection());
     }
   }
 
@@ -117,7 +118,6 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   @Override
   public void onReveal() {
-    authorize();
     initDatasources();
   }
 
@@ -179,7 +179,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
         displayDatasourceSiblings(datasourceDto);
       }
 
-      // authorize();
+      authorize();
     } else if(tableDto != null) {
       selectTable(tableDto.getName());
     } else {
