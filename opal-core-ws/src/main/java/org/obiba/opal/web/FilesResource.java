@@ -299,7 +299,7 @@ public class FilesResource {
     File localFile = opalRuntime.getFileSystem().getLocalFile(file);
     String mimeType = mimeTypes.getContentType(localFile);
 
-    return Response.ok(localFile, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(localFile.getName())).build();
+    return Response.ok(localFile, mimeType).header("Content-Disposition", getContentDispositionOfAttachment(localFile.getName())).build();
   }
 
   private Response getFolder(FileObject folder) throws IOException {
