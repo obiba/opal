@@ -14,12 +14,14 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.view.CodingViewDialogView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.DatasourceView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorTreeView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.TableView;
+import org.obiba.opal.web.gwt.app.client.navigator.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
@@ -64,7 +66,7 @@ public class NavigatorModule extends AbstractPresenterModule {
     bindPresenter(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class, DatasourcePresenter.Proxy.class);
     bindPresenter(TablePresenter.class, TablePresenter.Display.class, TableView.class, TablePresenter.Proxy.class);
     bindPresenter(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class, VariablePresenter.Proxy.class);
-
+    bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
     configureDatasourcePresenters();
 
     configureDeriveVariablePresenters();

@@ -80,8 +80,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   @Override
   protected void onBind() {
     super.onBind();
-    valuesTablePresenter.bind();
-    getView().setValuesDisplay(valuesTablePresenter.getDisplay());
+    setInSlot(Display.Slots.Values, valuesTablePresenter);
 
     super.registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
     summaryTabPresenter.bind();
@@ -99,7 +98,6 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   protected void onUnbind() {
     super.onUnbind();
     summaryTabPresenter.unbind();
-    valuesTablePresenter.unbind();
   }
 
   private void updateDisplay(TableDto table, VariableDto variableDto, VariableDto previous, VariableDto next) {
@@ -205,7 +203,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
       authz.setAclRequest("variable", AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
-      setInSlot(null, authz);
+      setInSlot(Display.Slots.Permissions, authz);
     }
   }
 
@@ -306,9 +304,11 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
   public interface Display extends View {
 
-    void setVariableName(String name);
+    enum Slots {
+      Permissions, Values
+    }
 
-    void setValuesDisplay(ValuesTablePresenter.Display display);
+    void setVariableName(String name);
 
     void setCategorizeMenuAvailable(boolean available);
 

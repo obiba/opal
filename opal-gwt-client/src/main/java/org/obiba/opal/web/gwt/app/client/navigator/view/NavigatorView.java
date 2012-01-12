@@ -123,10 +123,4 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
     return new UIObjectAuthorizer(exportDataButton);
   }
 
-  private void setTreeDisplay(Widget content) {
-    if(treePanel.getWidget() != null) {
-      treePanel.remove(treePanel.getWidget());
-    }
-    treePanel.add(content);
-  }
 }

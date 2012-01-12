@@ -41,6 +41,7 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -127,9 +128,15 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    permissions.clear();
+    HasWidgets panel = null;
+    if(slot == Slots.Permissions) {
+      panel = permissions;
+    } else if(slot == Slots.Values) {
+      panel = values;
+    }
+    panel.clear();
     if(content != null) {
-      permissions.add(content);
+      panel.add(content);
     }
   }
 

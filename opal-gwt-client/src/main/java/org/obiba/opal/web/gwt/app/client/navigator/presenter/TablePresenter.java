@@ -82,10 +82,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private Column<?, ?> sortColumn;
 
-  //
-  // Constructors
-  //
-
   /**
    * @param display
    * @param eventBus
@@ -114,8 +110,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   @Override
   protected void onBind() {
     super.onBind();
-    valuesTablePresenter.bind();
-    getView().setValuesDisplay(valuesTablePresenter.getDisplay());
+    setInSlot(Display.Slots.Values, valuesTablePresenter);
 
     addEventHandlers();
   }
@@ -140,12 +135,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     // OPAL-975
     super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
-  }
-
-  @Override
-  protected void onUnbind() {
-    super.onUnbind();
-    valuesTablePresenter.unbind();
   }
 
   @Override
@@ -290,7 +279,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
       authz.setAclRequest("table", AclRequest.newBuilder("View", "/datasource/" + table.getDatasourceName() + "/table/" + table.getName(), "GET:GET/GET"));
-      setInSlot(null, authz);
+      setInSlot(Display.Slots.Permissions, authz);
     }
   }
 
@@ -518,6 +507,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   public interface Display extends View {
+
+    enum Slots {
+      Permissions, Values
+    }
 
     void setVariableSelection(VariableDto variable, int index);
 

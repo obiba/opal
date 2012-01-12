@@ -15,8 +15,6 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.view.AuthorizationView;
 import org.obiba.opal.web.gwt.app.client.authz.view.SubjectAuthorizationView;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.place.DefaultPlace;
 import org.obiba.opal.web.gwt.app.client.place.OpalPlaceManager;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -100,7 +98,6 @@ public class OpalGinModule extends AbstractPresenterModule {
     bind(ScriptEvaluationPresenter.Display.class).to(ScriptEvaluationView.class);
 
     bind(SubjectAuthorizationPresenter.Display.class).to(SubjectAuthorizationView.class);
-    bind(ValuesTablePresenter.Display.class).to(ValuesTableView.class);
   }
 
 }

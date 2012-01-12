@@ -9,57 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class ValuesTablePresenter extends WidgetPresenter<ValuesTablePresenter.Display> {
+public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display> {
+
+  public interface Display extends View {
+    void setVariables(JsArray<VariableDto> variables);
+  }
 
   private TableDto table;
 
   @Inject
   public ValuesTablePresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  protected void onBind() {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  public interface Display extends WidgetDisplay {
-    void setVariables(JsArray<VariableDto> variables);
+    super(eventBus, display);
   }
 
   public void setTable(TableDto table) {
@@ -80,7 +52,7 @@ public class ValuesTablePresenter extends WidgetPresenter<ValuesTablePresenter.D
     public void onResource(Response response, JsArray<VariableDto> resource) {
       if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
         JsArray<VariableDto> variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
-        getDisplay().setVariables(variables);
+        getView().setVariables(variables);
       }
     }
   }

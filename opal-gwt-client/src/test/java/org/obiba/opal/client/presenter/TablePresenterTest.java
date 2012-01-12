@@ -62,10 +62,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
-    ValuesTablePresenter values = new ValuesTablePresenter(null, null) {
-      public void bind() {
-      };
-    };
+    ValuesTablePresenter values = new ValuesTablePresenter(null, null);
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider);
   }
 

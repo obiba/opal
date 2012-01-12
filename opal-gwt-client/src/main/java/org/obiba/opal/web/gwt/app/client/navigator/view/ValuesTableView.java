@@ -31,13 +31,13 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class ValuesTableView extends Composite implements ValuesTablePresenter.Display {
+public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Display {
 
   private static final int MAX_VISIBLE_COLUMNS = 10;
 
@@ -48,6 +48,8 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
   private static ValuesTableViewUiBinder uiBinder = GWT.create(ValuesTableViewUiBinder.class);
 
   private Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   SimplePager pager;
@@ -67,15 +69,12 @@ public class ValuesTableView extends Composite implements ValuesTablePresenter.D
   private int firstVisibleIndex = 0;
 
   public ValuesTableView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+  public Widget asWidget() {
+    return widget;
   }
 
   @Override

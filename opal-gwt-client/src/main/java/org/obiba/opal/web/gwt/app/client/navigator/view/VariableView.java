@@ -13,7 +13,6 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
@@ -36,6 +35,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -162,9 +162,15 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    permissions.clear();
+    HasWidgets panel = null;
+    if(slot == Slots.Permissions) {
+      panel = permissions;
+    } else if(slot == Slots.Values) {
+      panel = values;
+    }
+    panel.clear();
     if(content != null) {
-      permissions.add(content);
+      panel.add(content);
     }
   }
 
@@ -402,11 +408,6 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   @Override
   public HasAuthorization getSummaryAuthorizer() {
     return new TabAuthorizer(tabs, SUMMARY_TAB_INDEX);
-  }
-
-  @Override
-  public void setValuesDisplay(Display display) {
-    values.add(display.asWidget());
   }
 
   @Override
