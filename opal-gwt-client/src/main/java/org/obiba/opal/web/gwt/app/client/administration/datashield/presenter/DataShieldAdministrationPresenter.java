@@ -71,8 +71,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
       @Override
       public void onClick(ClickEvent event) {
-        dataShieldMethodPresenter.bind();
-        dataShieldMethodPresenter.revealDisplay();
+        dataShieldMethodPresenter.createNewMethod();
+        addToPopupSlot(dataShieldMethodPresenter);
       }
     }));
     registerHandler(getEventBus().addHandler(DataShieldMethodCreatedEvent.getType(), new DataShieldMethodCreatedEvent.Handler() {
@@ -156,9 +156,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
         @Override
         public void authorized() {
-          dataShieldMethodPresenter.bind();
           dataShieldMethodPresenter.updateMethod(dto);
-          dataShieldMethodPresenter.revealDisplay();
+          addToPopupSlot(dataShieldMethodPresenter);
         }
       });
 

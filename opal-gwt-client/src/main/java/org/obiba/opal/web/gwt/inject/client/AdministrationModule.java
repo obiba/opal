@@ -33,8 +33,7 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenter(DataShieldConfigPresenter.class, DataShieldConfigPresenter.Display.class, DataShieldConfigView.class, DataShieldConfigPresenter.Proxy.class);
     bindPresenter(RAdministrationPresenter.class, RAdministrationPresenter.Display.class, RAdministrationView.class, RAdministrationPresenter.Proxy.class);
     bindPresenterWidget(DataShieldAdministrationPresenter.class, DataShieldAdministrationPresenter.Display.class, DataShieldAdministrationView.class);
-
-    bind(DataShieldMethodPresenter.Display.class).to(DataShieldMethodView.class);
+    bindPresenterWidget(DataShieldMethodPresenter.class, DataShieldMethodPresenter.Display.class, DataShieldMethodView.class);
   }
 
 }

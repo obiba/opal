@@ -20,26 +20,28 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class DataShieldMethodView extends Composite implements Display {
+public class DataShieldMethodView extends PopupViewImpl implements Display {
 
   @UiTemplate("DataShieldMethodView.ui.xml")
   interface DataShieldMethodViewUiBinder extends UiBinder<DialogBox, DataShieldMethodView> {
@@ -49,9 +51,7 @@ public class DataShieldMethodView extends Composite implements Display {
 
   private static Translations translations = GWT.create(Translations.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   DialogBox dialog;
@@ -90,9 +90,10 @@ public class DataShieldMethodView extends Composite implements Display {
   // Constructors
   //
 
-  public DataShieldMethodView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public DataShieldMethodView(EventBus eventBus) {
+    super(eventBus);
+    widget = uiBinder.createAndBindUi(this);
     initWidgets();
   }
 
@@ -121,22 +122,18 @@ public class DataShieldMethodView extends Composite implements Display {
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
 
   @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showDialog() {
-    dialog.center();
-    dialog.show();
+  public void show() {
     name.setFocus(true);
+    super.show();
   }
 
   @Override
@@ -163,11 +160,6 @@ public class DataShieldMethodView extends Composite implements Display {
   @Override
   public HasClickHandlers getCancelButton() {
     return cancelButton;
-  }
-
-  @Override
-  public HasCloseHandlers getDialog() {
-    return dialog;
   }
 
   @Override

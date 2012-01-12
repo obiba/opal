@@ -12,12 +12,6 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -35,17 +29,16 @@ import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodPresenter.Display> {
+public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodPresenter.Display> {
 
   private Mode dialogMode;
 
@@ -57,25 +50,13 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
     RSCRIPT, RFUNCTION
   }
 
-  //
-  // Instance Variables
-  //
   private String environement;
 
   private MethodValidationHandler methodValidationHandler;
 
-  //
-  // Constructors
-  //
-
   @Inject
   public DataShieldMethodPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+    super(eventBus, display);
   }
 
   public void setEnvironement(String environement) {
@@ -85,78 +66,60 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
   @Override
   protected void onBind() {
     setDialogMode(Mode.CREATE);
-    getDisplay().clear();
-    addEventHandlers();
-    this.methodValidationHandler = new MethodValidationHandler(eventBus);
-  }
 
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
+    registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
 
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
-  private void addEventHandlers() {
-    registerHandler(getDisplay().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
-
-    registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        getDisplay().hideDialog();
+        getView().hideDialog();
       }
     }));
 
-    registerHandler(getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
-      @Override
-      public void onClose(CloseEvent<DialogBox> event) {
-        unbind();
-      }
-    }));
-
+    this.methodValidationHandler = new MethodValidationHandler(getEventBus());
   }
 
   private void setDialogMode(Mode dialogMode) {
     this.dialogMode = dialogMode;
-    getDisplay().setDialogMode(dialogMode);
+    getView().setDialogMode(dialogMode);
   }
 
+  /**
+   * Setup the dialog for creating a method
+   */
+  public void createNewMethod() {
+    setDialogMode(Mode.CREATE);
+    getView().clear();
+  }
+
+  /**
+   * Setup the dialog for updating an existing method
+   * @param dto method to update
+   */
   public void updateMethod(DataShieldMethodDto dto) {
     setDialogMode(Mode.UPDATE);
     displayMethod(dto.getName(), dto);
   }
 
+  /**
+   * Setup the dialog for copying an existing method
+   * @param dto method to copy
+   */
   public void copyMethod(DataShieldMethodDto dto) {
     setDialogMode(Mode.CREATE);
     displayMethod("copy_of_" + dto.getName(), dto);
   }
 
   private void displayMethod(String name, DataShieldMethodDto dto) {
-    getDisplay().setName(name);
+    getView().setName(name);
     MethodType type;
     if(dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
       type = MethodType.RSCRIPT;
-      getDisplay().setScript(((RScriptDataShieldMethodDto) dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript());
+      getView().setScript(((RScriptDataShieldMethodDto) dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript());
     } else {
       type = MethodType.RFUNCTION;
-      getDisplay().setFunction(((RFunctionDataShieldMethodDto) dto.getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getFunc());
+      getView().setFunction(((RFunctionDataShieldMethodDto) dto.getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getFunc());
     }
-    getDisplay().setType(type);
-  }
-
-  private void updateMethod() {
-    if(methodValidationHandler.validate()) {
-      putMethod(getDataShieldMethodDto());
-    }
+    getView().setType(type);
   }
 
   private String method(String method) {
@@ -167,11 +130,17 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
     return "/datashield/env/" + this.environement + "/methods";
   }
 
+  private void updateMethod() {
+    if(methodValidationHandler.validate()) {
+      putMethod(getDataShieldMethodDto());
+    }
+  }
+
   private void createMethod() {
     if(methodValidationHandler.validate()) {
       CreateMethodCallBack createCallback = new CreateMethodCallBack();
       AlreadyExistMethodCallBack alreadyExistCallback = new AlreadyExistMethodCallBack();
-      ResourceRequestBuilderFactory.<DataShieldMethodDto> newBuilder().forResource(method(getDisplay().getName().getText())).get()//
+      ResourceRequestBuilderFactory.<DataShieldMethodDto> newBuilder().forResource(method(getView().getName().getText())).get()//
       .withCallback(alreadyExistCallback)//
       .withCallback(Response.SC_NOT_FOUND, createCallback).send();
     }
@@ -188,7 +157,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
   private void putMethod(DataShieldMethodDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource(method(getDisplay().getName().getText())).put()//
+    ResourceRequestBuilderFactory.newBuilder().forResource(method(getView().getName().getText())).put()//
     .withResourceBody(DataShieldMethodDto.stringify(dto))//
     .withCallback(Response.SC_OK, callbackHandler)//
     .withCallback(Response.SC_CREATED, callbackHandler)//
@@ -197,15 +166,15 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
   private DataShieldMethodDto getDataShieldMethodDto() {
     DataShieldMethodDto dto = DataShieldMethodDto.create();
-    dto.setName(getDisplay().getName().getText());
+    dto.setName(getView().getName().getText());
 
-    if(getDisplay().isScript().getValue()) {
+    if(getView().isScript().getValue()) {
       RScriptDataShieldMethodDto method = RScriptDataShieldMethodDto.create();
-      method.setScript(getDisplay().getScript().getText());
+      method.setScript(getView().getScript().getText());
       dto.setExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method, method);
     } else {
       RFunctionDataShieldMethodDto method = RFunctionDataShieldMethodDto.create();
-      method.setFunc(getDisplay().getFunction().getText());
+      method.setFunc(getView().getFunction().getText());
       dto.setExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method, method);
     }
 
@@ -228,9 +197,9 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
-        validators.add(new RequiredTextValidator(getDisplay().getName(), "DataShieldMethodNameIsRequired"));
-        validators.add(new ConditionalValidator(getDisplay().isScript(), new RequiredTextValidator(getDisplay().getScript(), "DataShieldRScriptIsRequired")));
-        validators.add(new ConditionalValidator(getDisplay().isFunction(), new RequiredTextValidator(getDisplay().getFunction(), "DataShieldRFunctionIsRequired")));
+        validators.add(new RequiredTextValidator(getView().getName(), "DataShieldMethodNameIsRequired"));
+        validators.add(new ConditionalValidator(getView().isScript(), new RequiredTextValidator(getView().getScript(), "DataShieldRScriptIsRequired")));
+        validators.add(new ConditionalValidator(getView().isFunction(), new RequiredTextValidator(getView().getFunction(), "DataShieldRFunctionIsRequired")));
       }
       return validators;
     }
@@ -241,7 +210,7 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
     @Override
     public void onResource(Response response, DataShieldMethodDto resource) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("DataShieldMethodAlreadyExistWithTheSpecifiedName").build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("DataShieldMethodAlreadyExistWithTheSpecifiedName").build());
     }
 
   }
@@ -277,19 +246,18 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getDisplay().hideDialog();
+      getView().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
-        eventBus.fireEvent(new DataShieldMethodUpdatedEvent(dto));
+        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(dto));
       } else if(response.getStatusCode() == Response.SC_CREATED) {
-        eventBus.fireEvent(new DataShieldMethodCreatedEvent(dto));
+        getEventBus().fireEvent(new DataShieldMethodCreatedEvent(dto));
       } else {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
     }
   }
 
-  public interface Display extends WidgetDisplay {
-    void showDialog();
+  public interface Display extends PopupView {
 
     void hideDialog();
 
@@ -298,8 +266,6 @@ public class DataShieldMethodPresenter extends WidgetPresenter<DataShieldMethodP
     HasClickHandlers getSaveButton();
 
     HasClickHandlers getCancelButton();
-
-    HasCloseHandlers<DialogBox> getDialog();
 
     void setName(String name);
 

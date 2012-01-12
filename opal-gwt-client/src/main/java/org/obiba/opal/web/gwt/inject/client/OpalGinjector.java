@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.inject.client;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
@@ -196,4 +197,5 @@ public interface OpalGinjector extends Ginjector {
 
   Provider<RAdministrationPresenter> getRAdministrationPresenter();
 
+  Provider<DataShieldMethodPresenter> getDataShieldMethodPresenter();
 }
