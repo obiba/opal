@@ -19,15 +19,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Value;
-import org.obiba.magma.ValueSequence;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 /**
@@ -35,15 +34,15 @@ import com.google.common.collect.Iterables;
  */
 public class ValueSetsResource extends AbstractValueTableResource {
 
-  private Variable variable;
+  private VariableValueSource vvs;
 
   public ValueSetsResource(ValueTable valueTable) {
     this(valueTable, null);
   }
 
-  public ValueSetsResource(ValueTable valueTable, Variable variable) {
+  public ValueSetsResource(ValueTable valueTable, VariableValueSource vvs) {
     super(valueTable, new HashSet<Locale>());
-    this.variable = variable;
+    this.vvs = vvs;
   }
 
   /**
@@ -55,12 +54,21 @@ public class ValueSetsResource extends AbstractValueTableResource {
    */
   @GET
   public ValueSetsDto getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
-    // ignore select parameter if value sets are accessed by variable
-    final Iterable<Variable> variables = variable == null ? filterVariables(select, 0, null) : ImmutableList.<Variable> builder().add(variable).build();
     // filter entities
     final Iterable<VariableEntity> entities = filterEntities(null, offset, limit);
 
-    ValueSetsDto.Builder valueSets = ValueSetsDto.newBuilder().addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
+    if(vvs == null) {
+      return getValueSetsDto(uriInfo, select, entities);
+    } else {
+      // ignore select parameter if value sets are accessed by variable value source
+      return getValueSetsDto(uriInfo, entities);
+    }
+  }
+
+  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final String select, final Iterable<VariableEntity> entities) {
+    final Iterable<Variable> variables = filterVariables(select, 0, null);
+
+    return ValueSetsDto.newBuilder().addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
 
       @Override
       public String apply(Variable from) {
@@ -75,29 +83,27 @@ public class ValueSetsResource extends AbstractValueTableResource {
         return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addAllValues(Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
 
           @Override
-          public ValueSetsDto.ValueDto apply(Variable from) {
-            // TODO use uri builder
-            String link;
-            if(variable == null) {
-              link = uriInfo.getPath().replace("valueSets", "variable/" + from.getName() + "/value/" + fromEntity.getIdentifier());
-            } else {
-              link = uriInfo.getPath().replace("valueSets", "value/" + fromEntity.getIdentifier());
-            }
-            Value value = getValueTable().getVariableValueSource(from.getName()).getValue(valueSet);
-            ValueSetsDto.ValueDto.Builder valueDto = Dtos.asValueSetsValueDto(link, value);
-            if(value.isNull() == false && value.isSequence()) {
-              ValueSequence valueSeq = value.asSequence();
-              for(int i = 0; i < valueSeq.getSize(); i++) {
-                valueDto.addValues(Dtos.asValueSetsValueDto(link + "?pos=" + i, valueSeq.get(i)).build());
-              }
-            }
-            return valueDto.build();
+          public ValueSetsDto.ValueDto apply(Variable fromVariable) {
+            String link = uriInfo.getPath().replace("valueSets", "variable/" + fromVariable.getName() + "/value/" + fromEntity.getIdentifier());
+            Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
+            return Dtos.asValueSetsValueDto(link, value).build();
           }
         })).build();
       }
-    }));
+    })).build();
+  }
 
-    return valueSets.build();
+  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final Iterable<VariableEntity> entities) {
+    return ValueSetsDto.newBuilder().addVariables(vvs.getVariable().getName()).addAllValueSets(Iterables.transform(entities, new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
+
+      @Override
+      public ValueSetsDto.ValueSetDto apply(final VariableEntity fromEntity) {
+        final ValueSet valueSet = getValueTable().getValueSet(fromEntity);
+        String link = uriInfo.getPath().replace("valueSets", "value/" + fromEntity.getIdentifier());
+        Value value = vvs.getValue(valueSet);
+        return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addValues(Dtos.asValueSetsValueDto(link, value)).build();
+      }
+    })).build();
   }
 
 }

@@ -268,6 +268,14 @@ public final class Dtos {
         valueDto.setValue(value.toString());
       }
     }
+
+    if(value.isNull() == false && value.isSequence()) {
+      ValueSequence valueSeq = value.asSequence();
+      for(int i = 0; i < valueSeq.getSize(); i++) {
+        valueDto.addValues(Dtos.asValueSetsValueDto(link + "?pos=" + i, valueSeq.get(i)).build());
+      }
+    }
+
     return valueDto;
   }
 

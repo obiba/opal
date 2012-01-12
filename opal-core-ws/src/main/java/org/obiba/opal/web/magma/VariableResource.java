@@ -58,7 +58,7 @@ public class VariableResource {
 
   @Path("/valueSets")
   public ValueSetsResource getValueSets() {
-    return new ValueSetsResource(valueTable, vvs.getVariable());
+    return new ValueSetsResource(valueTable, vvs);
   }
 
   @GET
