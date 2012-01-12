@@ -4,7 +4,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotification
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -12,13 +12,17 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class UnhandledResponseNotificationView extends PopupPanel implements UnhandledResponseNotificationPresenter.Display {
+public class UnhandledResponseNotificationView extends PopupViewImpl implements UnhandledResponseNotificationPresenter.Display {
   @UiTemplate("UnhandledResponseNotificationView.ui.xml")
   interface UnhandledResponseNotificationViewUiBinder extends UiBinder<Widget, UnhandledResponseNotificationView> {
   }
 
   private static UnhandledResponseNotificationViewUiBinder uiBinder = GWT.create(UnhandledResponseNotificationViewUiBinder.class);
+
+  private PopupPanel popup = new PopupPanel(false, true);
 
   @UiField
   Label titleMessage;
@@ -29,10 +33,11 @@ public class UnhandledResponseNotificationView extends PopupPanel implements Unh
   @UiField
   Button okay;
 
-  public UnhandledResponseNotificationView() {
-    // Clicking outside of the popupPanel will not dismiss the panel, panel is modal
-    super(false, true);
-    add(uiBinder.createAndBindUi(this));
+  @Inject
+  public UnhandledResponseNotificationView(EventBus eventBus) {
+    super(eventBus);
+    popup.add(uiBinder.createAndBindUi(this));
+    popup.setGlassEnabled(true);
   }
 
   @Override
@@ -42,35 +47,7 @@ public class UnhandledResponseNotificationView extends PopupPanel implements Unh
 
   @Override
   public Widget asWidget() {
-    return null;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showPopup() {
-    setGlassEnabled(true);
-    center();
-    show();
-  }
-
-  @Override
-  public void closePopup() {
-    hide();
-  }
-
-  @Override
-  public boolean onKeyUpPreview(char key, int modifiers) {
-    if(key == KeyCodes.KEY_ESCAPE) {
-      hide();
-    }
-    return true;
+    return popup;
   }
 
 }

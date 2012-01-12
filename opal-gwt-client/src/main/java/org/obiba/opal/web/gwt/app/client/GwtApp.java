@@ -5,7 +5,6 @@ import net.customware.gwt.presenter.client.EventBus;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
@@ -31,6 +30,7 @@ import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.Window.ClosingHandler;
 import com.gwtplatform.mvp.client.DelayedBindRegistry;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -93,8 +93,6 @@ public class GwtApp implements EntryPoint {
   }
 
   private void registerHandlers() {
-    final UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter = opalGinjector.getUnhandledResponseNotificationPresenter();
-    unhandledResponseNotificationPresenter.bind();
 
     opalGinjector.getEventBus().addHandler(PlaceChangeEvent.TYPE, new PlaceChangeEvent.Handler() {
 
@@ -107,10 +105,10 @@ public class GwtApp implements EntryPoint {
     opalGinjector.getEventBus().addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
       @Override
       public void onUnhandledResponse(UnhandledResponseEvent e) {
-        unhandledResponseNotificationPresenter.revealDisplay();
-        GWT.log("Unhandled request response: " + e.getRequest().toString());
+        RevealRootPopupContentEvent.fire(opalGinjector.getEventBus(), opalGinjector.getUnhandledResponseNotificationPresenter());
       }
     });
+
     opalGinjector.getEventBus().addHandler(RequestErrorEvent.getType(), new RequestErrorEvent.Handler() {
       @Override
       public void onRequestError(RequestErrorEvent e) {
