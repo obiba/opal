@@ -9,9 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
@@ -37,9 +36,10 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
  *
  */
 public class FileSelectorView extends PopupViewImpl implements Display {
-  //
-  // Constants
-  //
+
+  @UiTemplate("FileSelectorView.ui.xml")
+  interface FileSelectorViewUiBinder extends UiBinder<DialogBox, FileSelectorView> {
+  }
 
   private static final String DIALOG_HEIGHT = "38.5em";
 
@@ -47,17 +47,9 @@ public class FileSelectorView extends PopupViewImpl implements Display {
 
   private static final String DIALOG_WIDTH = "60em";
 
-  //
-  // Static Variables
-  //
-
   private static FileSelectorViewUiBinder uiBinder = GWT.create(FileSelectorViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
-
-  //
-  // Instance Variables
-  //
 
   private final DialogBox dialog;
 
@@ -94,10 +86,6 @@ public class FileSelectorView extends PopupViewImpl implements Display {
   @UiField
   Button cancelButton;
 
-  //
-  // Constructors
-  //
-
   @Inject
   public FileSelectorView(EventBus eventBus) {
     super(eventBus);
@@ -116,35 +104,32 @@ public class FileSelectorView extends PopupViewImpl implements Display {
     content.setHeight(height);
   }
 
-  //
-  // FileSelectorPresenter.Display Methods
-  //
-
   @Override
-  public void showDialog() {
-    center();
-    show();
+  public void setInSlot(Object slot, Widget content) {
+    HasWidgets panel;
+    if(slot == FileSelectorPresenter.LEFT) {
+      panel = this.fileSystemTreePanel;
+    } else {
+      panel = this.folderDetailsPanel;
+    }
+    panel.clear();
+    if(content != null) {
+      panel.add(content);
+    }
   }
 
+  @Override
   public void hideDialog() {
     hide();
   }
 
-  public void setTreeDisplay(FileSystemTreePresenter.Display treeDisplay) {
-    getFileSystemTreePanel().clear();
-    getFileSystemTreePanel().add(treeDisplay.asWidget());
-  }
-
-  public void setDetailsDisplay(FolderDetailsPresenter.Display detailsDisplay) {
-    getFolderDetailsPanel().clear();
-    getFolderDetailsPanel().add(detailsDisplay.asWidget());
-  }
-
+  @Override
   public void setNewFilePanelVisible(boolean visible) {
     namePanel.setVisible(visible);
     updateHeight(visible ? DIALOG_HEIGHT : DIALOG_SHORT_HEIGHT);
   }
 
+  @Override
   public void setNewFolderPanelVisible(boolean visible) {
     createFolderPanel.setVisible(visible);
   }
@@ -154,58 +139,44 @@ public class FileSelectorView extends PopupViewImpl implements Display {
     uploadButton.setVisible(visible);
   }
 
-  public HasWidgets getFileSystemTreePanel() {
-    return fileSystemTreePanel;
-  }
-
-  public HasWidgets getFolderDetailsPanel() {
-    return folderDetailsPanel;
-  }
-
+  @Override
   public HandlerRegistration addSelectButtonHandler(ClickHandler handler) {
     return selectButton.addClickHandler(handler);
   }
 
+  @Override
   public HandlerRegistration addCancelButtonHandler(ClickHandler handler) {
     return cancelButton.addClickHandler(handler);
   }
 
+  @Override
   public HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler) {
     return createFolderButton.addClickHandler(handler);
   }
 
+  @Override
   public String getNewFileName() {
     return newFileName.getText();
   }
 
+  @Override
   public void clearNewFileName() {
     newFileName.setText("");
   }
 
+  @Override
   public HasText getCreateFolderName() {
     return createFolderName;
   }
 
+  @Override
   public void clearNewFolderName() {
     createFolderName.setText("");
   }
 
-  public void startProcessing() {
-  }
-
-  public void stopProcessing() {
-  }
-
+  @Override
   public Widget asWidget() {
     return dialog;
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  @UiTemplate("FileSelectorView.ui.xml")
-  interface FileSelectorViewUiBinder extends UiBinder<DialogBox, FileSelectorView> {
   }
 
   @Override

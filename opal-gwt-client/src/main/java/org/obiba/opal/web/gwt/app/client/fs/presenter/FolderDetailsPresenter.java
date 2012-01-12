@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
@@ -25,19 +19,20 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresenter.Display> {
+public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setDisplaysFiles(boolean include);
-
-    void setSelectionEnabled(boolean enabled);
 
     void clearSelection();
 
@@ -62,73 +57,60 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
 
   @Inject
   public FolderDetailsPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+    super(eventBus, display);
   }
 
   @Override
   protected void onBind() {
 
-    super.getDisplay().addFileSelectionHandler(new FileSelectionHandler() {
+    super.getView().addFileSelectionHandler(new FileSelectionHandler() {
 
       public void onFileSelection(FileDto fileDto) {
         if(!fileDto.getType().isFileType(FileType.FILE)) {
-          eventBus.fireEvent(new FolderSelectionChangeEvent(fileDto));
+          getEventBus().fireEvent(new FolderSelectionChangeEvent(fileDto));
           updateTable(fileDto.getPath());
         }
       }
     });
 
-    super.registerHandler(getDisplay().getTableSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+    super.registerHandler(getView().getTableSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        FileDto selectedFile = getDisplay().getTableSelectionModel().getSelectedObject();
+        FileDto selectedFile = getView().getTableSelectionModel().getSelectedObject();
         if(selectedFile != null) {
-          eventBus.fireEvent(new FileSelectionChangeEvent(selectedFile));
+          getEventBus().fireEvent(new FileSelectionChangeEvent(selectedFile));
         }
       }
 
     }));
 
-    super.registerHandler(eventBus.addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
       public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
         updateTable(event.getFolder().getPath());
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
 
       public void onFileUploaded(FileUploadedEvent event) {
         // Refresh the current folder since a new file was probably added to it.
-        refreshDisplay();
+        updateTable(currentFolder.getPath());
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 
       public void onFolderCreation(FolderCreationEvent event) {
-        eventBus.fireEvent(new FolderSelectionChangeEvent(event.getFolder()));
+        getEventBus().fireEvent(new FolderSelectionChangeEvent(event.getFolder()));
         updateTable(event.getFolder().getPath());
       }
     }));
   }
 
   @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  public void refreshDisplay() {
+  public void onReveal() {
     if(currentFolder != null) {
       updateTable(currentFolder.getPath());
     } else {
@@ -137,7 +119,7 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReset() {
     updateTable("/");
   }
 
@@ -146,22 +128,22 @@ public class FolderDetailsPresenter extends WidgetPresenter<FolderDetailsPresent
   }
 
   public boolean hasSelection() {
-    return getDisplay().getTableSelectionModel().getSelectedObject() != null;
+    return getView().getTableSelectionModel().getSelectedObject() != null;
   }
 
   public FileDto getSelectedFile() {
-    return getDisplay().getTableSelectionModel().getSelectedObject();
+    return getView().getTableSelectionModel().getSelectedObject();
   }
 
   private void updateTable(final String path) {
-    getDisplay().clearSelection();
+    getView().clearSelection();
 
-    FileResourceRequest.newBuilder(eventBus).path(path).withCallback(new ResourceCallback<FileDto>() {
+    FileResourceRequest.newBuilder(getEventBus()).path(path).withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto file) {
         currentFolder = file;
-        getDisplay().renderRows(file);
-        eventBus.fireEvent(new FolderRefreshedEvent(currentFolder));
+        getView().renderRows(file);
+        getEventBus().fireEvent(new FolderRefreshedEvent(currentFolder));
       }
     }).send();
 

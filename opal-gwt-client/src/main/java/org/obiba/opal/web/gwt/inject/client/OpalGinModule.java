@@ -15,8 +15,6 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.view.AuthorizationView;
 import org.obiba.opal.web.gwt.app.client.authz.view.SubjectAuthorizationView;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderDialogView;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.place.DefaultPlace;
@@ -96,7 +94,6 @@ public class OpalGinModule extends AbstractPresenterModule {
     bind(ConfirmationPresenter.Display.class).to(ConfirmationView.class).in(Singleton.class);
     bind(ScriptEvaluationPopupPresenter.Display.class).to(ScriptEvaluationPopupView.class).in(Singleton.class);
     bind(DatasourceSelectorPresenter.Display.class).to(DatasourceSelectorView.class);
-    bind(CreateFolderDialogPresenter.Display.class).to(CreateFolderDialogView.class).in(Singleton.class);
     bind(EvaluateScriptPresenter.Display.class).to(EvaluateScriptView.class);
     bind(ItemSelectorPresenter.Display.class).to(ItemSelectorView.class);
     bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);

@@ -12,24 +12,28 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class CreateFolderDialogView extends Composite implements Display {
+public class CreateFolderDialogView extends PopupViewImpl implements Display {
 
   @UiTemplate("CreateFolderDialogView.ui.xml")
   interface CreateFolderDialogUiBinder extends UiBinder<DialogBox, CreateFolderDialogView> {
   }
 
   private static CreateFolderDialogUiBinder uiBinder = GWT.create(CreateFolderDialogUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   DialogBox dialog;
@@ -43,8 +47,10 @@ public class CreateFolderDialogView extends Composite implements Display {
   @UiField
   TextBox folderToCreate;
 
-  public CreateFolderDialogView() {
-    initWidget(uiBinder.createAndBindUi(this));
+  @Inject
+  public CreateFolderDialogView(EventBus eventBus) {
+    super(eventBus);
+    widget = uiBinder.createAndBindUi(this);
     uiBinder.createAndBindUi(this);
     dialog.setGlassEnabled(false);
     dialog.hide();
@@ -52,22 +58,18 @@ public class CreateFolderDialogView extends Composite implements Display {
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
 
   @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showDialog() {
-    dialog.center();
-    dialog.show();
+  public void show() {
     folderToCreate.setFocus(true);
+    super.show();
   }
 
   @Override
@@ -88,11 +90,6 @@ public class CreateFolderDialogView extends Composite implements Display {
   @Override
   public HasText getFolderToCreate() {
     return folderToCreate;
-  }
-
-  @Override
-  public HasCloseHandlers getDialog() {
-    return dialog;
   }
 
 }

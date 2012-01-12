@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
@@ -22,6 +23,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -88,6 +90,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @UiField
   Panel workbench;
 
+  @UiField
+  Frame frame;
+
   MenuItem currentSelection;
 
   public ApplicationView() {
@@ -127,9 +132,13 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
-  public void updateWorkbench(Widget workbench) {
-    this.workbench.clear();
-    this.workbench.add(workbench);
+  public HasUrl getDownloder() {
+    return new HasUrl() {
+
+      public void setUrl(String url) {
+        frame.setUrl(url);
+      }
+    };
   }
 
   @Override

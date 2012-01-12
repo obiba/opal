@@ -27,8 +27,9 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class FileSystemTreeView implements Display {
+public class FileSystemTreeView extends ViewImpl implements Display {
 
   private final Translations translations = GWT.create(Translations.class);
 
@@ -59,14 +60,6 @@ public class FileSystemTreeView implements Display {
   @Override
   public Widget asWidget() {
     return fileSystemTree;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   @Override

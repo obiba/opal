@@ -957,17 +957,17 @@ margin-left:0.8em;
 }
 
 /* File Explorer Styles */ 
- 
-table.folder-details td:first-child span:hover {
-  cursor: pointer;
-}
-
-.folder-details .folder {
+.folder-details .folder a {
   background:transparent url(../image/16/folder.png) no-repeat scroll left center;
   padding-left:20px;
 }
 
-.folder-details .file {
+.folder-details .folder-up a {
+  background:transparent url(../image/folder-up.png) no-repeat scroll left center;
+  padding-left:20px;
+}
+
+.folder-details .file a {
   background:transparent url(../image/16/document.png) no-repeat scroll left center;
   padding-left:20px;
 }

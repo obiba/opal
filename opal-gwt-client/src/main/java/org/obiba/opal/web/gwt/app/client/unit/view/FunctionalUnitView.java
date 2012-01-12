@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
@@ -62,14 +63,13 @@ public class FunctionalUnitView extends ViewImpl implements FunctionalUnitPresen
   @Override
   public void setInSlot(Object slot, Widget content) {
     HasWidgets panel;
-    if(slot == FunctionalUnitPresenter.LEFT) {
+    if(slot == SplitPaneWorkbenchPresenter.Slot.LEFT) {
       panel = functionalUnitListPanel;
     } else {
       panel = functionalUnitDetailsPanel;
     }
-    if(content == null) {
-      panel.clear();
-    } else {
+    panel.clear();
+    if(content != null) {
       panel.add(content);
     }
   }

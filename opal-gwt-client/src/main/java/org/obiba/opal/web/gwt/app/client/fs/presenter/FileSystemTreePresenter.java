@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
@@ -30,14 +24,17 @@ import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePresenter.Display> {
+public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
     void initTree(FileDto root);
 
     void addBranch(TreeItem treeItem, FileDto folderToAdd);
@@ -60,12 +57,7 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
 
   @Inject
   public FileSystemTreePresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+    super(eventBus, display);
   }
 
   @Override
@@ -74,32 +66,18 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-    // TODO Reveal display should refresh the tree content, not completely resets its content
-    revealDisplay();
-  }
-
-  @Override
-  public void revealDisplay() {
+  public void onReveal() {
     ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta").get().withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto root) {
-        getDisplay().initTree(root);
-        getDisplay().selectFile(root, false);
+        getView().initTree(root);
+        getView().selectFile(root, false);
       }
     }).send();
   }
 
   private void addTreeItemSelectionHandler() {
-    super.registerHandler(getDisplay().getFileSystemTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
+    super.registerHandler(getView().getFileSystemTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
 
       @Override
       public void onSelection(SelectionEvent<TreeItem> event) {
@@ -107,16 +85,16 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
         final TreeItem selectedItem = event.getSelectedItem();
         FileDto selectedFile = ((FileDto) selectedItem.getUserObject());
 
-        eventBus.fireEvent(new FileSystemTreeFolderSelectionChangeEvent(selectedFile));
-        eventBus.fireEvent(new FileSelectionChangeEvent(selectedFile));
-        getDisplay().selectFile(selectedFile, false);
+        getEventBus().fireEvent(new FileSystemTreeFolderSelectionChangeEvent(selectedFile));
+        getEventBus().fireEvent(new FileSelectionChangeEvent(selectedFile));
+        getView().selectFile(selectedFile, false);
 
         if(childrenNotAdded(selectedItem)) {
 
-          FileResourceRequest.newBuilder(eventBus).path(selectedFile.getPath()).withCallback(new ResourceCallback<FileDto>() {
+          FileResourceRequest.newBuilder(getEventBus()).path(selectedFile.getPath()).withCallback(new ResourceCallback<FileDto>() {
             @Override
             public void onResource(Response response, FileDto file) {
-              getDisplay().addBranch(selectedItem, file);
+              getView().addBranch(selectedItem, file);
             }
           }).send();
 
@@ -133,33 +111,33 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
   private void addEventHandlers() {
     addTreeItemSelectionHandler();
 
-    super.registerHandler(eventBus.addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
 
       public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-        getDisplay().selectFile(event.getFolder(), false);
+        getView().selectFile(event.getFolder(), false);
       }
 
     }));
 
-    super.registerHandler(eventBus.addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 
       public void onFolderCreation(FolderCreationEvent event) {
         // Refresh the file system since a new folder was added.
-        getDisplay().addBranch(event.getFolder());
+        getView().addBranch(event.getFolder());
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
 
       @Override
       public void onFileDeleted(FileDeletedEvent event) {
-        getDisplay().selectFile(FileDtos.getParent(event.getFile()));
-        getDisplay().removeBranch(event.getFile());
+        getView().selectFile(FileDtos.getParent(event.getFile()));
+        getView().removeBranch(event.getFile());
       }
 
     }));
 
-    super.registerHandler(getDisplay().addFileSystemTreeOpenHandler(new OpenHandler<TreeItem>() {
+    super.registerHandler(getView().addFileSystemTreeOpenHandler(new OpenHandler<TreeItem>() {
 
       @Override
       public void onOpen(final OpenEvent<TreeItem> event) {
@@ -173,12 +151,12 @@ public class FileSystemTreePresenter extends WidgetPresenter<FileSystemTreePrese
   private void refreshTreeNode(final TreeItem treeItem) {
     FileDto folder = (FileDto) treeItem.getUserObject();
 
-    FileResourceRequest.newBuilder(eventBus).path(folder.getPath()).withCallback(new ResourceCallback<FileDto>() {
+    FileResourceRequest.newBuilder(getEventBus()).path(folder.getPath()).withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto file) {
         treeItem.removeItems();
-        getDisplay().addBranch(treeItem, file);
-        getDisplay().selectFile(getDisplay().getSelectedFile(), false);
+        getView().addBranch(treeItem, file);
+        getView().selectFile(getView().getSelectedFile(), false);
       }
     }).send();
 

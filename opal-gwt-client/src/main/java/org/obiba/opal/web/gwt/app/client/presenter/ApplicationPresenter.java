@@ -12,10 +12,13 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -29,7 +32,6 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.Presenter;
@@ -52,9 +54,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     HasClickHandlers getAdministration();
 
-    MenuItem getDatasourcesItem();
+    HasUrl getDownloder();
 
-    void updateWorkbench(Widget workbench);
+    MenuItem getDatasourcesItem();
 
     HasAuthorization getAdministrationAuthorizer();
 
@@ -89,15 +91,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final NotificationPresenter messageDialog;
 
-  // TODO: decouple these presenters. This should be moved to FileSelectionPresenter when it becomes a PresenterWidget
   private final Provider<FileSelectorPresenter> fileSelectorPresenter;
 
+  private final RequestUrlBuilder urlBuilder;
+
   @Inject
-  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter) {
+  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter, RequestUrlBuilder urlBuilder) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
     this.fileSelectorPresenter = fileSelectorPresenter;
+    this.urlBuilder = urlBuilder;
   }
 
   @Override
@@ -115,6 +119,12 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         FileSelectorPresenter fsp = fileSelectorPresenter.get();
         fsp.handle(event);
         addToPopupSlot(fsp);
+      }
+    }));
+    super.registerHandler(getEventBus().addHandler(FileDownloadEvent.getType(), new FileDownloadEvent.Handler() {
+
+      public void onFileDownload(FileDownloadEvent event) {
+        getView().getDownloder().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
       }
     }));
 
@@ -188,10 +198,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     });
 
     registerUserMessageEventHandler();
-  }
-
-  @Override
-  protected void onUnbind() {
   }
 
   @Override

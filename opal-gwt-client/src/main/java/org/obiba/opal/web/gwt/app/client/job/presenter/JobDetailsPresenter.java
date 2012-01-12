@@ -9,81 +9,28 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.job.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
-import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-/**
- *
- */
-public class JobDetailsPresenter extends WidgetPresenter<JobDetailsPresenter.Display> {
+public class JobDetailsPresenter extends PresenterWidget<JobDetailsPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
-    HasCloseHandlers<PopupPanel> getDialogBox();
+  public interface Display extends PopupView {
 
-    void showDialog(CommandStateDto commandStateDto);
+    void setJob(CommandStateDto commandStateDto);
 
-    void hideDialog();
   }
-
-  //
-  // Constructors
-  //
 
   @Inject
   public JobDetailsPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+    super(eventBus, display);
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  public Place getPlace() {
-    return null;
+  public void setJob(CommandStateDto dto) {
+    getView().setJob(dto);
   }
 
-  @Override
-  protected void onBind() {
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  //
-  // Methods
-  //
-
-  protected void addEventHandlers() {
-    getDisplay().getDialogBox().addCloseHandler(new CloseHandler<PopupPanel>() {
-      @Override
-      public void onClose(CloseEvent<PopupPanel> event) {
-        unbind();
-      }
-    });
-  }
 }

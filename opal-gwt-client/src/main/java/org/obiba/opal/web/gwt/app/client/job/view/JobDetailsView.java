@@ -22,7 +22,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -31,13 +31,11 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-/**
- *
- */
-public class JobDetailsView extends DialogBox implements Display {
+public class JobDetailsView extends PopupViewImpl implements Display {
 
   private static final String DIALOG_HEIGHT = "30em";
 
@@ -49,73 +47,47 @@ public class JobDetailsView extends DialogBox implements Display {
 
   private static JobDetailsViewUiBinder uiBinder = GWT.create(JobDetailsViewUiBinder.class);
 
+  private Translations translations = GWT.create(Translations.class);
+
+  private final DialogBox dialog;
+
   @UiField
   CellTable<Message> table;
 
   @UiField
   Button close;
 
-  private Translations translations = GWT.create(Translations.class);
-
-  //
-  // Constructors
-  //
-
-  public JobDetailsView() {
-    setModal(true);
-    setGlassEnabled(true);
+  @Inject
+  public JobDetailsView(EventBus eventBus) {
+    super(eventBus);
+    dialog = new DialogBox();
+    dialog.setModal(true);
+    dialog.setGlassEnabled(true);
 
     DockLayoutPanel content = uiBinder.createAndBindUi(this);
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
-    add(content);
+    dialog.add(content);
 
     initTable();
 
     addDialogCloseHandler();
   }
 
-  //
-  // JobListPresenter.Display Methods
-  //
+  @Override
+  public void setJob(CommandStateDto commandStateDto) {
+    dialog.setText(translations.jobLabel() + " #" + commandStateDto.getId());
 
-  public HasCloseHandlers<PopupPanel> getDialogBox() {
-    return this;
-  }
-
-  @SuppressWarnings("unchecked")
-  public void showDialog(CommandStateDto commandStateDto) {
-    setText(translations.jobLabel() + " #" + commandStateDto.getId());
-
-    JsArray<Message> jobMessages = commandStateDto.getMessagesArray();
-    if(jobMessages == null) {
-      jobMessages = (JsArray<Message>) JsArray.createArray();
-    }
+    JsArray<Message> jobMessages = JsArrays.toSafeArray(commandStateDto.getMessagesArray());
 
     table.setRowData(0, JsArrays.toList(jobMessages));
     table.setRowCount(jobMessages.length(), true);
-
-    center();
-    show();
   }
 
-  public void hideDialog() {
-    hide();
-  }
-
+  @Override
   public Widget asWidget() {
-    return null;
+    return dialog;
   }
-
-  public void startProcessing() {
-  }
-
-  public void stopProcessing() {
-  }
-
-  //
-  // Methods
-  //
 
   private void initTable() {
     addTableColumns();
@@ -142,7 +114,7 @@ public class JobDetailsView extends DialogBox implements Display {
 
       @Override
       public void onClick(ClickEvent event) {
-        hideDialog();
+        hide();
       }
     });
   }

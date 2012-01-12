@@ -44,25 +44,14 @@ import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
  *
  */
 public class JobListPresenter extends Presenter<JobListPresenter.Display, JobListPresenter.Proxy> {
-  //
-  // Constants
-  //
 
   public static final String LOG_ACTION = "Log";
 
   public static final String CANCEL_ACTION = "Cancel";
 
-  //
-  // Instance Variables
-  //
-
   private JobDetailsPresenter jobDetailsPresenter;
 
   private Runnable actionRequiringConfirmation;
-
-  //
-  // Constructors
-  //
 
   @Inject
   public JobListPresenter(Display display, EventBus eventBus, Proxy proxy, JobDetailsPresenter jobDetailsPresenter) {
@@ -92,10 +81,6 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   }
 
   @Override
-  protected void onUnbind() {
-  }
-
-  @Override
   public void onReset() {
     updateTable();
   }
@@ -104,10 +89,6 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   public void onReveal() {
     updateTable();
   }
-
-  //
-  // Methods
-  //
 
   public boolean containsClearableJobs(JsArray<CommandStateDto> jobs) {
     for(int i = 0; i < jobs.length(); i++) {
@@ -136,7 +117,8 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   private void doActionImpl(final CommandStateDto dto, String actionName) {
     if(LOG_ACTION.equals(actionName)) {
-      jobDetailsPresenter.getDisplay().showDialog(dto);
+      jobDetailsPresenter.setJob(dto);
+      addToPopupSlot(jobDetailsPresenter);
     } else if(CANCEL_ACTION.equals(actionName)) {
       authorizeCancelJob(dto, new Authorizer(new GwtEventBusAdaptor(getEventBus())) {
 

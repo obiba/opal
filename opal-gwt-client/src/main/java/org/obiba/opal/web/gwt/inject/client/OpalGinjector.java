@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrat
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileDownloadPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
@@ -131,13 +130,11 @@ public interface OpalGinjector extends Ginjector {
 
   Provider<FunctionalUnitUpdateDialogPresenter> getFunctionalUnitUpdateDialogPresenter();
 
-  FileSystemTreePresenter getFileSystemTreePresenter();
+  Provider<FileSystemTreePresenter> getFileSystemTreePresenter();
 
-  FolderDetailsPresenter getFolderDetailsPresenter();
+  Provider<FolderDetailsPresenter> getFolderDetailsPresenter();
 
   FileUploadDialogPresenter getFileUploadDialogPresenter();
-
-  FileDownloadPresenter getFileDownloadPresenter();
 
   Provider<FileSelectorPresenter> getFileSelectorPresenter();
 
@@ -151,7 +148,7 @@ public interface OpalGinjector extends Ginjector {
 
   ScriptEvaluationPopupPresenter getScriptEvaluationPopupPresenter();
 
-  CreateFolderDialogPresenter getCreateFolderDialogPresenter();
+  Provider<CreateFolderDialogPresenter> getCreateFolderDialogPresenter();
 
   DataImportPresenter getDataImportPresenter();
 

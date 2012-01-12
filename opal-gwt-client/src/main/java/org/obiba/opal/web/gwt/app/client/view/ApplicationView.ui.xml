@@ -45,6 +45,7 @@
         <g:Label>copyright</g:Label>
         <g:Anchor ui:field="obiba">obiba.org</g:Anchor>
         <g:Label ui:field="version" addStyleNames="right-aligned"/>
+        <g:Frame ui:field="frame" visible="false"></g:Frame>
       </g:FlowPanel>
     </g:layer>
   </g:LayoutPanel>

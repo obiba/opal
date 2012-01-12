@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.FocusWidgetAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -20,17 +21,20 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class FileExplorerView extends Composite implements Display {
+public class FileExplorerView extends ViewImpl implements Display {
 
   private static FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
 
   @UiTemplate("FileExplorerView.ui.xml")
   interface FileExplorerUiBinder extends UiBinder<WorkbenchLayout, FileExplorerView> {
   }
+
+  private final Widget widget;
 
   @UiField
   ScrollPanel fileSystemTreePanel;
@@ -51,7 +55,7 @@ public class FileExplorerView extends Composite implements Display {
   Button createFolderButton;
 
   public FileExplorerView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    this.widget = uiBinder.createAndBindUi(this);
   }
 
   public Button getFileDeleteButton() {
@@ -67,35 +71,27 @@ public class FileExplorerView extends Composite implements Display {
   }
 
   @Override
-  public ScrollPanel getFileSystemTree() {
-    return fileSystemTreePanel;
-  }
-
-  @Override
-  public ScrollPanel getFolderDetailsPanel() {
-    return folderDetailsPanel;
-  }
-
-  @Override
   public HasClickHandlers getFileUploadButton() {
     return fileUploadButton;
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void addToSlot(Object slot, Widget content) {
-  }
-
-  @Override
-  public void removeFromSlot(Object slot, Widget content) {
+    return widget;
   }
 
   @Override
   public void setInSlot(Object slot, Widget content) {
+    HasWidgets panel;
+    if(slot == SplitPaneWorkbenchPresenter.Slot.LEFT) {
+      panel = this.fileSystemTreePanel;
+    } else {
+      panel = this.folderDetailsPanel;
+    }
+    panel.clear();
+    if(content != null) {
+      panel.add(content);
+    }
   }
 
   @Override

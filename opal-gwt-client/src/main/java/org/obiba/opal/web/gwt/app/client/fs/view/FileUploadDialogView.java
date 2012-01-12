@@ -12,12 +12,12 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -26,15 +26,20 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class FileUploadDialogView extends Composite implements Display {
+public class FileUploadDialogView extends PopupViewImpl implements Display {
 
   @UiTemplate("FileUploadDialogView.ui.xml")
   interface FileUploadDialogUiBinder extends UiBinder<DialogBox, FileUploadDialogView> {
   }
 
   private static FileUploadDialogUiBinder uiBinder = GWT.create(FileUploadDialogUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   DialogBox dialog;
@@ -60,33 +65,30 @@ public class FileUploadDialogView extends Composite implements Display {
   @UiField
   Image uploadingText;
 
-  public FileUploadDialogView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public FileUploadDialogView(EventBus eventBus) {
+    super(eventBus);
+    widget = uiBinder.createAndBindUi(this);
     dialog.setGlassEnabled(false);
     dialog.hide();
   }
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
 
   @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showDialog() {
+  public void show() {
     setUploading(false);
     // Clears the fileUpload field as there's no way to do this on the widget itself.
     form.reset();
-    dialog.center();
-    dialog.show();
+    super.show();
   }
 
   @Override
@@ -130,7 +132,6 @@ public class FileUploadDialogView extends Composite implements Display {
     inputFieldPanel.setVisible(isUploading == false);
     cancelButton.setEnabled(isUploading == false);
     uploadButton.setEnabled(isUploading == false);
-
     uploadingText.setVisible(isUploading);
   }
 

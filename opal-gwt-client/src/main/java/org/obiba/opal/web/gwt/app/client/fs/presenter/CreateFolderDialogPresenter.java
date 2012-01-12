@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
@@ -27,17 +21,17 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDialogPresenter.Display> {
+public class CreateFolderDialogPresenter extends PresenterWidget<CreateFolderDialogPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
-    void showDialog();
+  public interface Display extends PopupView {
 
     void hideDialog();
 
@@ -47,8 +41,6 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
 
     HasText getFolderToCreate();
 
-    HasCloseHandlers<DialogBox> getDialog();
-
   }
 
   private Translations translations = GWT.create(Translations.class);
@@ -57,59 +49,36 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
 
   @Inject
   public CreateFolderDialogPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+    super(eventBus, display);
   }
 
   @Override
   protected void onBind() {
-    initDisplayComponents();
     addEventHandlers();
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    initDisplayComponents();
-    getDisplay().showDialog();
-  }
-
-  protected void initDisplayComponents() {
-    getDisplay().getFolderToCreate().setText("");
+  public void onReveal() {
+    getView().getFolderToCreate().setText("");
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().getCreateFolderButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        String folderToCreate = getDisplay().getFolderToCreate().getText();
+        String folderToCreate = getView().getFolderToCreate().getText();
         if(folderToCreate.equals("")) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
         } else if(folderToCreate.equals(".") || folderToCreate.equals("..")) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
         } else {
           createFolder(currentFolder.getPath(), folderToCreate);
         }
       }
     }));
 
-    super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        getDisplay().hideDialog();
+        getView().hideDialog();
       }
     }));
 
@@ -121,8 +90,8 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
 
       @Override
       public void onResource(Response response, FileDto resource) {
-        eventBus.fireEvent(new FolderCreationEvent(resource));
-        getDisplay().hideDialog();
+        getEventBus().fireEvent(new FolderCreationEvent(resource));
+        getView().hideDialog();
       }
     };
 
@@ -130,7 +99,7 @@ public class CreateFolderDialogPresenter extends WidgetPresenter<CreateFolderDia
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
     };
 

@@ -31,12 +31,15 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter.Display> {
+
+  public static final Object LEFT = new Object();
+
+  public static final Object CENTER = new Object();
 
   FileSystemTreePresenter fileSystemTreePresenter;
 
@@ -56,11 +59,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
-    this.folderDetailsPresenter.getDisplay().setSelectionEnabled(true);
     this.fileUploadDialogPresenter = fileUploadDialogPresenter;
-
-    getView().setTreeDisplay(fileSystemTreePresenter.getDisplay());
-    getView().setDetailsDisplay(folderDetailsPresenter.getDisplay());
 
     selectionResolverChain = new ArrayList<SelectionResolver>();
     selectionResolverChain.add(new FileSelectionResolver());
@@ -75,48 +74,26 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     setFileSelectionType(event.getFileSelectionType());
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
   protected void onBind() {
-    fileSystemTreePresenter.bind();
-    folderDetailsPresenter.bind();
-    fileUploadDialogPresenter.bind();
+    setInSlot(LEFT, fileSystemTreePresenter);
+    setInSlot(CENTER, folderDetailsPresenter);
 
     addEventHandlers();
   }
 
   @Override
-  protected void onUnbind() {
-    fileSystemTreePresenter.unbind();
-    folderDetailsPresenter.unbind();
-    fileUploadDialogPresenter.unbind();
-  }
-
-  @Override
   public void onReveal() {
-    fileSystemTreePresenter.revealDisplay();
-    folderDetailsPresenter.revealDisplay();
-
     // Clear previous state.
-    folderDetailsPresenter.getDisplay().clearSelection(); // clear previous selection (highlighted row)
+    folderDetailsPresenter.getView().clearSelection(); // clear previous selection (highlighted row)
     getView().clearNewFileName(); // clear previous new file name
     getView().clearNewFolderName(); // clear previous new folder name
 
     // Adjust display based on file selection type.
-    folderDetailsPresenter.getDisplay().setDisplaysFiles(displaysFiles());
+    folderDetailsPresenter.getView().setDisplaysFiles(displaysFiles());
     getView().setNewFilePanelVisible(allowsFileCreation());
     getView().setNewFolderPanelVisible(allowsFolderCreation());
     getView().setDisplaysUploadFile(displaysFiles());
-
-    getView().showDialog();
-  }
-
-  @Override
-  public void onReset() {
-    fileSystemTreePresenter.refreshDisplay();
   }
 
   public void setFileSelectionSource(Object fileSelectionSource) {
@@ -148,7 +125,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
       @Override
       public void onClick(ClickEvent event) {
         fileUploadDialogPresenter.setCurrentFolder(getCurrentFolder());
-        fileUploadDialogPresenter.revealDisplay();
+        addToPopupSlot(fileUploadDialogPresenter);
       }
     }));
   }
@@ -208,33 +185,19 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     return selection;
   }
 
-  //
-  // Inner Classes / Interfaces
-  //
-
   public enum FileSelectionType {
     FILE, EXISTING_FILE, FOLDER, EXISTING_FOLDER, FILE_OR_FOLDER, EXISTING_FILE_OR_FOLDER
   }
 
   public interface Display extends PopupView {
 
-    void showDialog();
-
     void setDisplaysUploadFile(boolean displaysFiles);
 
     void hideDialog();
 
-    void setTreeDisplay(FileSystemTreePresenter.Display treeDisplay);
-
-    void setDetailsDisplay(FolderDetailsPresenter.Display detailsDisplay);
-
     void setNewFilePanelVisible(boolean visible);
 
     void setNewFolderPanelVisible(boolean visible);
-
-    HasWidgets getFileSystemTreePanel();
-
-    HasWidgets getFolderDetailsPanel();
 
     HandlerRegistration addUploadButtonHandler(ClickHandler handler);
 

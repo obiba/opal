@@ -23,13 +23,14 @@ import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
+import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -37,11 +38,11 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class FolderDetailsView extends Composite implements Display {
+public class FolderDetailsView extends ViewImpl implements Display {
 
   private static final long KB = 1024l;
 
@@ -49,13 +50,13 @@ public class FolderDetailsView extends Composite implements Display {
 
   private static final long GB = MB * KB;
 
-  private static final String FOLDER_UP_HTML = "<img src=\"image/folder-up.png\" />";
-
   @UiTemplate("FolderDetailsView.ui.xml")
   interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {
   }
 
   private static FolderDetailsUiBinder uiBinder = GWT.create(FolderDetailsUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   CellTable<FileDto> table;
@@ -67,7 +68,7 @@ public class FolderDetailsView extends Composite implements Display {
   private boolean displaysFiles = true;
 
   public FolderDetailsView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
     initTable();
   }
 
@@ -75,16 +76,13 @@ public class FolderDetailsView extends Composite implements Display {
     displaysFiles = display;
   }
 
-  public void setSelectionEnabled(boolean enabled) {
-    if(enabled) {
-      table.setSelectionModel(new SingleSelectionModel<FileDto>());
-    }
+  public void clearSelection() {
+    getTableSelectionModel().setSelected(getTableSelectionModel().getSelectedObject(), false);
   }
 
-  public void clearSelection() {
-    if(table.getSelectionModel() != null) {
-      getTableSelectionModel().setSelected(getTableSelectionModel().getSelectedObject(), false);
-    }
+  @SuppressWarnings("unchecked")
+  public SingleSelectionModel<FileDto> getTableSelectionModel() {
+    return (SingleSelectionModel<FileDto>) table.getSelectionModel();
   }
 
   @SuppressWarnings("unchecked")
@@ -126,50 +124,17 @@ public class FolderDetailsView extends Composite implements Display {
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   private void initTable() {
     addTableColumns();
-
     table.addStyleName("folder-details");
+    table.setSelectionModel(new SingleSelectionModel<FileDto>());
   }
 
   private void addTableColumns() {
-    table.addColumn(fileNameColumn = new FileNameColumn() {
-
-      @Override
-      public String getValue(FileDto dto) {
-        if(dto.getName().equals("..")) {
-          return FOLDER_UP_HTML;
-        } else {
-          return createFolderChildHtml(dto);
-        }
-      }
-
-      private String createFolderChildHtml(FileDto dto) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("<span class=\"");
-        if(dto.getType().isFileType(FileDto.FileType.FILE)) {
-          sb.append("file\">");
-        } else {
-          sb.append("folder\">");
-        }
-        sb.append(dto.getName());
-        sb.append("</span>");
-
-        return sb.toString();
-      }
-    }, translations.nameLabel());
+    table.addColumn(fileNameColumn = new FileNameColumn(), translations.nameLabel());
 
     table.addColumn(new TextColumn<FileDto>() {
 
@@ -238,7 +203,7 @@ public class FolderDetailsView extends Composite implements Display {
     return sortedList;
   }
 
-  private abstract class FileNameColumn extends Column<FileDto, String> {
+  private class FileNameColumn extends Column<FileDto, String> {
 
     private List<FileSelectionHandler> fileSelectionHandlers;
 
@@ -246,7 +211,7 @@ public class FolderDetailsView extends Composite implements Display {
       super(new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
         @Override
         public SafeHtml render(String object) {
-          return SafeHtmlUtils.fromTrustedString(object);
+          return new SafeHtmlBuilder().appendHtmlConstant("<a>").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
         }
       }));
 
@@ -261,6 +226,15 @@ public class FolderDetailsView extends Composite implements Display {
       });
     }
 
+    @Override
+    public String getCellStyleNames(Context context, FileDto dto) {
+      FileType type = dto.getType();
+      if(type.isFileType(FileType.FOLDER) && dto.getName().equals("..")) {
+        return "folder-up";
+      }
+      return dto.getType().getName().toLowerCase();
+    }
+
     public HandlerRegistration addFileSelectionHandler(final FileSelectionHandler handler) {
       fileSelectionHandlers.add(handler);
 
@@ -271,10 +245,12 @@ public class FolderDetailsView extends Composite implements Display {
         }
       };
     }
-  }
 
-  public SingleSelectionModel<FileDto> getTableSelectionModel() {
-    return (SingleSelectionModel<FileDto>) table.getSelectionModel();
+    @Override
+    public String getValue(FileDto dto) {
+      return dto.getName();
+    }
+
   }
 
 }

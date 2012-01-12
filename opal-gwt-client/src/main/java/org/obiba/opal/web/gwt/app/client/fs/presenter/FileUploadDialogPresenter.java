@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -23,21 +17,22 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogPresenter.Display> {
+public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
-    void showDialog();
+  public interface Display extends PopupView {
 
     void hideDialog();
 
@@ -54,7 +49,7 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
     HasText getRemoteFolderName();
   }
 
-  private Translations translations = GWT.create(Translations.class);
+  private Translations translations;
 
   private FileDto currentFolder;
 
@@ -63,66 +58,45 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
   private final RequestUrlBuilder urlBuilder;
 
   @Inject
-  public FileUploadDialogPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder) {
-    super(display, eventBus);
+  public FileUploadDialogPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder, Translations translations) {
+    super(eventBus, display);
+    this.translations = translations;
     this.urlBuilder = urlBuilder;
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
+  public void setCurrentFolder(FileDto currentFolder) {
+    this.currentFolder = currentFolder;
   }
 
   @Override
   protected void onBind() {
-    initDisplayComponents();
-    addEventHandlers();
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    String folderName = currentFolder.getName();
-    getDisplay().getRemoteFolderName().setText(folderName.equals("root") ? translations.fileSystemLabel() : folderName);
-    getDisplay().showDialog();
-  }
-
-  protected void initDisplayComponents() {
-  }
-
-  private void addEventHandlers() {
-    super.registerHandler(getDisplay().getUploadButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getUploadButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         uploadFile();
       }
     }));
 
-    super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        getDisplay().hideDialog();
+        getView().hideDialog();
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
-    super.registerHandler(getDisplay().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
+    super.registerHandler(getView().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
       public void onSubmitComplete(SubmitCompleteEvent event) {
-        getDisplay().hideDialog();
-        eventBus.fireEvent(new FileUploadedEvent());
+        getView().hideDialog();
+        getEventBus().fireEvent(new FileUploadedEvent());
       }
     }));
 
+  }
+
+  @Override
+  public void onReveal() {
+    String folderName = currentFolder.getName();
+    getView().getRemoteFolderName().setText(folderName.equals("root") ? translations.fileSystemLabel() : folderName);
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -162,11 +136,11 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
       }
     };
 
-    String fileName = getDisplay().getFilename();
+    String fileName = getView().getFilename();
     if(fileName.equals("")) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
     } else if(fileExist(fileName)) {
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
+      getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
     } else {
       submitFile();
     }
@@ -174,10 +148,7 @@ public class FileUploadDialogPresenter extends WidgetPresenter<FileUploadDialogP
   }
 
   private void submitFile() {
-    getDisplay().submit(urlBuilder.buildAbsoluteUrl("/files" + currentFolder.getPath()));
+    getView().submit(urlBuilder.buildAbsoluteUrl("/files" + currentFolder.getPath()));
   }
 
-  public void setCurrentFolder(FileDto currentFolder) {
-    this.currentFolder = currentFolder;
-  }
 }

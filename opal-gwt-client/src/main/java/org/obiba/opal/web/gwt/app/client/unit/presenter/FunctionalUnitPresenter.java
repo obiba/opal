@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
@@ -25,14 +25,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
+public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
 
   public interface Display extends View {
 
@@ -54,10 +53,6 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   public interface Proxy extends ProxyPlace<FunctionalUnitPresenter> {
   }
 
-  public static final Object CENTER = new Object();
-
-  public static final Object LEFT = new Object();
-
   final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
 
   final FunctionalUnitListPresenter functionalUnitListPresenter;
@@ -73,16 +68,18 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   }
 
   @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+  protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
+    switch(slot) {
+    case CENTER:
+      return functionalUnitDetailsPresenter;
+    case LEFT:
+      return functionalUnitListPresenter;
+    }
+    return null;
   }
 
   @Override
-  protected void onReveal() {
-    authorize();
-  }
-
-  private void authorize() {
+  protected void authorize() {
     // create unit
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").post().authorize(getView().getAddFunctionalUnitAuthorizer()).send();
     // export all identifiers
@@ -96,14 +93,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   }
 
   @Override
-  protected void onBind() {
-    addHandlers();
-    setInSlot(CENTER, functionalUnitDetailsPresenter);
-    setInSlot(LEFT, functionalUnitListPresenter);
-
-  }
-
-  private void addHandlers() {
+  protected void addHandlers() {
     super.registerHandler(getView().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
     super.registerHandler(getView().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
     super.registerHandler(getView().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
