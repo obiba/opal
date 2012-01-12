@@ -15,10 +15,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.magma.Attribute;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
@@ -30,6 +32,7 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
+import org.obiba.opal.web.magma.support.MimetypesFileExtensionsMap;
 import org.obiba.opal.web.magma.support.PagingVectorSource;
 import org.obiba.opal.web.math.AbstractSummaryStatisticsResource;
 import org.obiba.opal.web.math.SummaryStatisticsResourceFactory;
@@ -110,7 +113,7 @@ public class VariableResource {
     if(variable.getValueType().equals(BinaryType.get())) {
       return getBinaryValueResponse(identifier, value);
     }
-    return Response.ok(value.toString());
+    return Response.ok(value.toString(), value.isSequence() ? "text/csv" : MediaType.TEXT_PLAIN);
   }
 
   private ResponseBuilder getBinaryValueResponse(String identifier, Value value) {
@@ -123,12 +126,50 @@ public class VariableResource {
     if(variable.getMimeType() != null && !variable.getMimeType().isEmpty()) {
       builder = Response.ok(value.getValue(), variable.getMimeType());
     } else {
-      builder = Response.ok(value.getValue());
+      // TODO use mime-util library to detect mime type from byte array content
+      builder = Response.ok(value.getValue(), MediaType.APPLICATION_OCTET_STREAM);
     }
-    // TODO find a way to reverse mime-type to file extension
-    builder.header("Content-Disposition", "attachment; filename=\"" + variable.getName() + "-" + identifier + ".bin\"");
+
+    builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier) + "\"");
 
     return builder;
+  }
+
+  private String getFileName(Variable variable, String identifier) {
+    // first look in variables attributes
+    for(Attribute attr : variable.getAttributes()) {
+      if(attr.getName().equalsIgnoreCase("filename") || attr.getName().equalsIgnoreCase("file-name")) {
+        String name = variable.getAttributeStringValue(attr.getName());
+        if(name.length() > 0) {
+          int dot = name.lastIndexOf('.');
+          if(dot != -1) {
+            StringBuilder builder = new StringBuilder(name);
+            return builder.insert(dot, "-" + identifier).toString();
+          } else {
+            return name + "-" + identifier + "." + getFileExtension(variable);
+          }
+        }
+      }
+    }
+
+    return variable.getName() + "-" + identifier + "." + getFileExtension(variable);
+  }
+
+  private String getFileExtension(Variable variable) {
+    // first look in variables attributes
+    for(Attribute attr : variable.getAttributes()) {
+      if(attr.getName().equalsIgnoreCase("fileextension") || attr.getName().equalsIgnoreCase("file-extension")) {
+        String extension = variable.getAttributeStringValue(attr.getName());
+        if(extension.startsWith(".")) {
+          extension = extension.substring(1);
+        }
+        if(extension.length() > 0) {
+          return extension;
+        }
+      }
+    }
+
+    return MimetypesFileExtensionsMap.get().getPreferedFileExtension(variable.getMimeType());
   }
 
   @GET
