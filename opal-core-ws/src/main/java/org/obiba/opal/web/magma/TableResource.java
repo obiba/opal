@@ -184,7 +184,7 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
-    Variable.Builder builder = new Variable.Builder("transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
+    Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {
       builder.repeatable();
