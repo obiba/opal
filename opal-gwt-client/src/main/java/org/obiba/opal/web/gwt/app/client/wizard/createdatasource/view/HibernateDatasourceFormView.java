@@ -14,50 +14,29 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Datas
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class HibernateDatasourceFormView extends Composite implements DatasourceFormPresenter.Display {
-  //
-  // Static Variables
-  //
-
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  //
-  // Constructors
-  //
-
-  public HibernateDatasourceFormView() {
-    initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  //
-  // Display Methods
-  //
-
-  @Override
-  public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
+public class HibernateDatasourceFormView extends ViewImpl implements DatasourceFormPresenter.Display {
 
   @UiTemplate("HibernateDatasourceFormView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, HibernateDatasourceFormView> {
+  }
+
+  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget widget;
+
+  public HibernateDatasourceFormView() {
+    widget = uiBinder.createAndBindUi(this);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
   }
 
 }

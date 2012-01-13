@@ -16,58 +16,30 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-/**
- *
- */
-public class FsDatasourceFormView extends Composite implements FsDatasourceFormPresenter.Display {
-  //
-  // Static Variables
-  //
+public class FsDatasourceFormView extends ViewImpl implements FsDatasourceFormPresenter.Display {
+
+  @UiTemplate("FsDatasourceFormView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, FsDatasourceFormView> {
+  }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   SimplePanel fileSelectionPanel;
 
-  //
-  // Constructors
-  //
-
   public FsDatasourceFormView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
-
-  //
-  // Display Methods
-  //
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  @UiTemplate("FsDatasourceFormView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, FsDatasourceFormView> {
+    return widget;
   }
 
   @Override

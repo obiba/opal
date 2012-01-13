@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -24,12 +25,14 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
 public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, NavigatorPresenter.Proxy> {
 
@@ -60,9 +63,12 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
   public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<NavigatorPresenter> {
   }
 
+  private final Provider<CreateDatasourcePresenter> createDatasourceProvider;
+
   @Inject
-  public NavigatorPresenter(final Display display, final Proxy proxy, final EventBus eventBus) {
+  public NavigatorPresenter(final Display display, final Proxy proxy, final EventBus eventBus, Provider<CreateDatasourcePresenter> createDatasourceProvider) {
     super(eventBus, display, proxy);
+    this.createDatasourceProvider = createDatasourceProvider;
   }
 
   @Override
@@ -78,7 +84,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
       @Override
       public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new WizardRequiredEvent(WizardType.CREATE_DATASOURCE));
+        RevealRootPopupContentEvent.fire(getEventBus(), createDatasourceProvider.get());
       }
     }));
 

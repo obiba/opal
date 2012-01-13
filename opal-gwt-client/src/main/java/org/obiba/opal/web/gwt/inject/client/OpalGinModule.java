@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.ScriptEvaluationPopupView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.SummaryTabView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableListView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.TableSelectorView;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardManager;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
@@ -61,6 +62,8 @@ public class OpalGinModule extends AbstractPresenterModule {
     install(new DefaultModule(OpalPlaceManager.class));
     bindPresenter(ApplicationPresenter.class, ApplicationPresenter.Display.class, ApplicationView.class, ApplicationPresenter.Proxy.class);
     bindSingletonPresenterWidget(NotificationPresenter.class, NotificationPresenter.Display.class, NotificationView.class);
+
+    bind(WizardManager.class).asEagerSingleton();
 
     configureWidgets();
 

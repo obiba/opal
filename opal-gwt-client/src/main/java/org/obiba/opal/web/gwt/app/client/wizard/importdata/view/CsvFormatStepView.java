@@ -27,6 +27,8 @@ public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvForm
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
+  private final Widget widget;
+
   //
   // Instance Variables
   //
@@ -42,7 +44,12 @@ public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvForm
   //
 
   public CsvFormatStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
   }
 
   //

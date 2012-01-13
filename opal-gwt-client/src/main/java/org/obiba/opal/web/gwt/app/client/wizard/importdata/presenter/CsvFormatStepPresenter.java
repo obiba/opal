@@ -15,6 +15,7 @@ import java.util.List;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -174,7 +175,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
   // Inner classes
   //
 
-  public interface Display extends CsvOptionsDisplay, DataImportPresenter.DataImportStepDisplay {
+  public interface Display extends CsvOptionsDisplay, WidgetDisplay, DataImportPresenter.DataImportStepDisplay {
 
   }
 

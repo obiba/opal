@@ -18,7 +18,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
@@ -26,20 +25,20 @@ import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class JdbcDatasourceFormView extends Composite implements JdbcDatasourceFormPresenter.Display {
-  //
-  // Static Variables
-  //
+public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFormPresenter.Display {
+
+  @UiTemplate("JdbcDatasourceFormView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, JdbcDatasourceFormView> {
+  }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   ListBox driver;
@@ -65,17 +64,9 @@ public class JdbcDatasourceFormView extends Composite implements JdbcDatasourceF
   @UiField
   RadioButton doNotUseMetadataTablesOption;
 
-  //
-  // Constructors
-  //
-
   public JdbcDatasourceFormView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
-
-  //
-  // JdbcDatasourceFormPresenter.Display Methods
-  //
 
   public HasText getDriver() {
     return new HasText() {
@@ -135,22 +126,7 @@ public class JdbcDatasourceFormView extends Composite implements JdbcDatasourceF
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  @UiTemplate("JdbcDatasourceFormView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, JdbcDatasourceFormView> {
-  }
 }

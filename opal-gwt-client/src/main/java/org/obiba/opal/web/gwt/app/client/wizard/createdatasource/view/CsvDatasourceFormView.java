@@ -23,49 +23,33 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class CsvDatasourceFormView extends AbstractCsvOptionsView implements CsvDatasourceFormPresenter.Display {
-  //
-  // Static Variables
-  //
+  @UiTemplate("CsvDatasourceFormView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, CsvDatasourceFormView> {
+  }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   CsvOptionsView csvOptions;
 
-  //
-  // Constructors
-  //
-
   public CsvDatasourceFormView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    this.widget = uiBinder.createAndBindUi(this);
   }
 
-  //
-  // AbstractCsvOptionsView Methods
-  //
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
   @Override
   protected CsvOptionsView getCsvOptions() {
     return csvOptions;
   }
 
-  //
-  // CsvDatasourceFormPresenter.Display Methods
-  //
-
   public void clearForm() {
     getCsvOptions().clear();
   }
 
-  //
-  // Inner Classes / Interfaces
-  //
-
-  @UiTemplate("CsvDatasourceFormView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, CsvDatasourceFormView> {
-  }
 }

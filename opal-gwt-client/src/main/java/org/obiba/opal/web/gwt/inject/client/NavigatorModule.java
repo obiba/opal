@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CsvDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenterSubscriber;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.ExcelDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.FsDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.HibernateDatasourceFormPresenter;
@@ -52,6 +53,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveOpenTextualVar
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveTemporalVariableStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.DeriveVariableView;
 
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 /**
@@ -67,19 +70,27 @@ public class NavigatorModule extends AbstractPresenterModule {
     bindPresenter(TablePresenter.class, TablePresenter.Display.class, TableView.class, TablePresenter.Proxy.class);
     bindPresenter(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class, VariablePresenter.Proxy.class);
     bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
+
+    bindPresenterWidget(CreateDatasourcePresenter.class, CreateDatasourcePresenter.Display.class, CreateDatasourceView.class);
+
+    bindDatasourceFormPresenter(ExcelDatasourceFormPresenter.class, ExcelDatasourceFormPresenter.Display.class, ExcelDatasourceFormView.class, ExcelDatasourceFormPresenter.Subscriber.class);
+    bindDatasourceFormPresenter(HibernateDatasourceFormPresenter.class, HibernateDatasourceFormPresenter.Display.class, HibernateDatasourceFormView.class, HibernateDatasourceFormPresenter.Subscriber.class);
+    bindDatasourceFormPresenter(FsDatasourceFormPresenter.class, FsDatasourceFormPresenter.Display.class, FsDatasourceFormView.class, FsDatasourceFormPresenter.Subscriber.class);
+    bindDatasourceFormPresenter(JdbcDatasourceFormPresenter.class, JdbcDatasourceFormPresenter.Display.class, JdbcDatasourceFormView.class, JdbcDatasourceFormPresenter.Subscriber.class);
+    bindDatasourceFormPresenter(CsvDatasourceFormPresenter.class, CsvDatasourceFormPresenter.Display.class, CsvDatasourceFormView.class, CsvDatasourceFormPresenter.Subscriber.class);
+
     configureDatasourcePresenters();
 
     configureDeriveVariablePresenters();
   }
 
+  private <V extends View> void bindDatasourceFormPresenter(Class<? extends PresenterWidget<V>> presenter, Class<V> display, Class<? extends V> view, Class<? extends DatasourceFormPresenterSubscriber> subscriber) {
+    bind(subscriber).asEagerSingleton();
+    bindPresenterWidget(presenter, display, view);
+  }
+
   private void configureDatasourcePresenters() {
-    bind(CreateDatasourcePresenter.Display.class).to(CreateDatasourceView.class);
     bind(CreateDatasourceConclusionStepPresenter.Display.class).to(CreateDatasourceConclusionStepView.class);
-    bind(HibernateDatasourceFormPresenter.Display.class).to(HibernateDatasourceFormView.class);
-    bind(ExcelDatasourceFormPresenter.Display.class).to(ExcelDatasourceFormView.class);
-    bind(FsDatasourceFormPresenter.Display.class).to(FsDatasourceFormView.class);
-    bind(JdbcDatasourceFormPresenter.Display.class).to(JdbcDatasourceFormView.class);
-    bind(CsvDatasourceFormPresenter.Display.class).to(CsvDatasourceFormView.class);
   }
 
   private void configureDeriveVariablePresenters() {

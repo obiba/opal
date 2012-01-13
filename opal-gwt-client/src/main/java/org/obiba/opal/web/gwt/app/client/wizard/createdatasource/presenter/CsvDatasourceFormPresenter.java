@@ -12,15 +12,11 @@ package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
+import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -32,17 +28,25 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
-  //
-  // Constants
-  //
+public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+
+  public static class Subscriber extends DatasourceFormPresenterSubscriber {
+
+    @Inject
+    public Subscriber(com.google.gwt.event.shared.EventBus eventBus, CsvDatasourceFormPresenter presenter) {
+      super(eventBus, presenter);
+    }
+
+  }
 
   private static final String DEFAULT_TABLE_NAME = "table";
 
@@ -50,10 +54,9 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
   // Instance Variables
   //
 
-  @Inject
-  private FileSelectionPresenter csvFileSelectionPresenter;
+  private final FileSelectionPresenter csvFileSelectionPresenter;
 
-  private List<String> availableCharsets = new ArrayList<String>();
+  private final List<String> availableCharsets = new ArrayList<String>();
 
   private HasText selectedFile;
 
@@ -64,25 +67,27 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
   //
 
   @Inject
-  public CsvDatasourceFormPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public CsvDatasourceFormPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter csvFileSelectionPresenter) {
+    super(eventBus, display);
+    this.csvFileSelectionPresenter = csvFileSelectionPresenter;
 
     addValidator(new RequiredTextValidator(getSelectedFile(), "NoDataFileSelected"));
-    addValidator(new RegExValidator(getDisplay().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
-    addValidator(new ConditionalValidator(getDisplay().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
-    addValidator(new ConditionalValidator(getDisplay().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
+    addValidator(new RegExValidator(getView().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
+    addValidator(new ConditionalValidator(getView().isCharsetSpecify(), new RequiredTextValidator(getView().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
+    addValidator(new ConditionalValidator(getView().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
   }
 
-  //
-  // WidgetPresenter Methods
-  //
+  @Override
+  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
+    return this;
+  }
 
   @Override
   protected void onBind() {
     csvFileSelectionPresenter.bind();
     csvFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
 
-    getDisplay().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getDisplay());
+    getView().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getDisplay());
 
     getDefaultCharset();
     getAvailableCharsets();
@@ -92,27 +97,6 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
   protected void onUnbind() {
     csvFileSelectionPresenter.unbind();
   }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // DatasourceFormPresenter Methods
-  //
 
   public DatasourceFactoryDto getDatasourceFactory() {
     CsvDatasourceFactoryDto extensionDto = createCsvDatasourceFactoryDto();
@@ -127,19 +111,15 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
     return type.equalsIgnoreCase("csv");
   }
 
-  //
-  // Methods
-  //
-
   private CsvDatasourceFactoryDto createCsvDatasourceFactoryDto() {
     CsvDatasourceFactoryDto extensionDto = CsvDatasourceFactoryDto.create();
 
-    if(getDisplay().getRowText().getText().trim().length() != 0) {
-      extensionDto.setFirstRow(Integer.parseInt(getDisplay().getRowText().getText()));
+    if(getView().getRowText().getText().trim().length() != 0) {
+      extensionDto.setFirstRow(Integer.parseInt(getView().getRowText().getText()));
     }
 
-    extensionDto.setSeparator(getDisplay().getFieldSeparator());
-    extensionDto.setQuote(getDisplay().getQuote());
+    extensionDto.setSeparator(getView().getFieldSeparator());
+    extensionDto.setQuote(getView().getQuote());
 
     String charset = getCharset();
     if(charset != null) {
@@ -167,11 +147,11 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
   private String getCharset() {
     String charset = null;
 
-    if(!getDisplay().isDefaultCharacterSet().getValue()) {
-      if(getDisplay().isCharsetCommonList().getValue()) {
-        charset = getDisplay().getCharsetCommonList();
-      } else if(getDisplay().isCharsetSpecify().getValue()) {
-        charset = getDisplay().getCharsetSpecifyText().getText();
+    if(!getView().isDefaultCharacterSet().getValue()) {
+      if(getView().isCharsetCommonList().getValue()) {
+        charset = getView().getCharsetCommonList();
+      } else if(getView().isCharsetSpecify().getValue()) {
+        charset = getView().getCharsetSpecifyText().getText();
       }
     }
 
@@ -184,7 +164,7 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
       @Override
       public void onResource(Response response, JsArrayString resource) {
         String charset = resource.get(0);
-        getDisplay().setDefaultCharset(charset);
+        getView().setDefaultCharset(charset);
       }
     }).send();
 
@@ -222,7 +202,7 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
       isSpecificCharsetAvailable = new HasValue<Boolean>() {
 
         public Boolean getValue() {
-          return availableCharsets.contains(getDisplay().getCharsetSpecifyText().getText());
+          return availableCharsets.contains(getView().getCharsetSpecifyText().getText());
         }
 
         public void setValue(Boolean arg0) {
@@ -283,6 +263,6 @@ public class CsvDatasourceFormPresenter extends ValidatableWidgetPresenter<CsvDa
 
   @Override
   public void clearForm() {
-    getDisplay().clearForm();
+    getView().clearForm();
   }
 }

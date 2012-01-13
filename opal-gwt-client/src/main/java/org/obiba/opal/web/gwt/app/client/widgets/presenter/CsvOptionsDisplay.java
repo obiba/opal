@@ -9,15 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.gwtplatform.mvp.client.View;
 
-/**
- *
- */
-public interface CsvOptionsDisplay extends WidgetDisplay {
+public interface CsvOptionsDisplay extends View {
 
   void setCsvFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 

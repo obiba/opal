@@ -9,19 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
-import net.customware.gwt.presenter.client.Presenter;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public interface DatasourceFormPresenter extends Presenter {
+public interface DatasourceFormPresenter {
 
   public boolean isForType(String type);
 
-  public WidgetDisplay getDisplay();
+  public PresenterWidget<? extends Display> getPresenter();
 
   public DatasourceFactoryDto getDatasourceFactory();
 
@@ -33,7 +33,7 @@ public interface DatasourceFormPresenter extends Presenter {
 
   public void clearForm();
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
   }
 

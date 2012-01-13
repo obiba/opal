@@ -27,30 +27,28 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class CreateDatasourceView extends Composite implements CreateDatasourcePresenter.Display {
-  //
-  // Static Variables
-  //
+public class CreateDatasourceView extends PopupViewImpl implements CreateDatasourcePresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   WizardDialogBox dialog;
@@ -79,16 +77,21 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
   private WizardStepChain stepChain;
 
-  //
-  // Constructors
-  //
-
-  public CreateDatasourceView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public CreateDatasourceView(EventBus eventBus) {
+    super(eventBus);
+    this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
     for(int i = 0; i < datasourceType.getItemCount(); i++) {
       datasourceType.setItemText(i, translations.datasourceTypeMap().get(datasourceType.getValue(i)));
+    }
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    datasourceFormStep.removeStepContent();
+    if(content != null) {
+      datasourceFormStep.add(content);
     }
   }
 
@@ -156,15 +159,12 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
 
   //
@@ -176,15 +176,9 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
   }
 
   @Override
-  public void showDialog() {
+  public void show() {
     stepChain.reset();
-    dialog.center();
-    dialog.show();
-  }
-
-  @Override
-  public void hideDialog() {
-    dialog.hide();
+    super.show();
   }
 
   @Override
@@ -195,19 +189,6 @@ public class CreateDatasourceView extends Composite implements CreateDatasourceP
   @Override
   public String getDatasourceType() {
     return datasourceType.getValue(datasourceType.getSelectedIndex());
-  }
-
-  @Override
-  public void setDatasourceForm(DatasourceFormPresenter formPresenter) {
-    if(datasourceFormPresenter != null) {
-      datasourceFormPresenter.unbind();
-      datasourceFormStep.removeStepContent();
-    }
-    datasourceFormPresenter = formPresenter;
-    if(datasourceFormPresenter != null) {
-      datasourceFormPresenter.bind();
-      datasourceFormStep.add(formPresenter.getDisplay().asWidget());
-    }
   }
 
   @Override

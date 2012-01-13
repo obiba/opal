@@ -9,21 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
+
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-/**
- *
- */
-public abstract class AbstractCsvOptionsView extends Composite implements CsvOptionsDisplay {
-  //
-  // CsvFormatStepPresenter.Display Methods
-  //
+public abstract class AbstractCsvOptionsView extends ViewImpl implements CsvOptionsDisplay, WidgetDisplay {
 
   @Override
   public void setCsvFileSelectorWidgetDisplay(Display display) {
@@ -98,11 +93,6 @@ public abstract class AbstractCsvOptionsView extends Composite implements CsvOpt
   @Override
   public void clear() {
     getCsvOptions().clear();
-  }
-
-  @Override
-  public Widget asWidget() {
-    return this;
   }
 
   @Override

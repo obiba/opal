@@ -15,7 +15,6 @@ import java.util.Map;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
@@ -25,69 +24,19 @@ import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.Iden
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
 
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-/**
- *
- */
 public class WizardManager {
-  //
-  // Instance Variables
-  //
 
-  private final EventBus eventBus;
-
-  @Inject
-  private Provider<CreateDatasourcePresenter> createDatasourceWizardProvider;
-
-  @Inject
-  private Provider<CreateViewStepPresenter> createViewWizardProvider;
-
-  @Inject
-  private Provider<VariablesImportPresenter> variablesImportWizardProvider;
-
-  @Inject
-  private Provider<DataImportPresenter> dataImportWizardProvider;
-
-  @Inject
-  private Provider<DataExportPresenter> dataExportWizardProvider;
-
-  @Inject
-  private Provider<IdentifiersImportPresenter> identifiersImportWizardProvider;
-
-  @Inject
-  private Provider<IdentifiersMapPresenter> identifiersMapWizardProvider;
-
-  @Inject
-  private Provider<DataCopyPresenter> dataCopyWizardProvider;
-
-  @Inject
-  private Provider<DeriveVariablePresenter> deriveVariableWizardProvider;
-
-  private Map<WizardType, Provider<? extends Wizard>> wizardProviders;
+  private final Map<WizardType, Provider<? extends Wizard>> wizardProviders;
 
   private Wizard lastBoundWizard;
 
-  private HandlerRegistration handlerRegistration;
-
-  //
-  // Constructors
-  //
-
   @Inject
-  public WizardManager(EventBus eventBus) {
-    this.eventBus = eventBus;
-  }
-
-  //
-  // Methods
-  //
-
-  public void bind() {
+  @SuppressWarnings("PMD.ExcessiveParameterList")
+  public WizardManager(EventBus eventBus, Provider<CreateViewStepPresenter> createViewWizardProvider, Provider<VariablesImportPresenter> variablesImportWizardProvider, Provider<DataImportPresenter> dataImportWizardProvider, Provider<DataExportPresenter> dataExportWizardProvider, Provider<IdentifiersImportPresenter> identifiersImportWizardProvider, Provider<IdentifiersMapPresenter> identifiersMapWizardProvider, Provider<DataCopyPresenter> dataCopyWizardProvider, Provider<DeriveVariablePresenter> deriveVariableWizardProvider) {
     wizardProviders = new HashMap<WizardType, Provider<? extends Wizard>>();
-    wizardProviders.put(WizardType.CREATE_DATASOURCE, createDatasourceWizardProvider);
     wizardProviders.put(WizardType.CREATE_VIEW, createViewWizardProvider);
     wizardProviders.put(WizardType.IMPORT_VARIABLES, variablesImportWizardProvider);
     wizardProviders.put(WizardType.IMPORT_DATA, dataImportWizardProvider);
@@ -97,21 +46,8 @@ public class WizardManager {
     wizardProviders.put(WizardType.COPY_DATA, dataCopyWizardProvider);
     wizardProviders.put(WizardType.DERIVE_CATEGORIZE_VARIABLE, deriveVariableWizardProvider);
     wizardProviders.put(WizardType.DERIVE_CUSTOM_VARIABLE, deriveVariableWizardProvider);
-
-    handlerRegistration = eventBus.addHandler(WizardRequiredEvent.getType(), new WizardRequiredEventHandler());
+    eventBus.addHandler(WizardRequiredEvent.getType(), new WizardRequiredEventHandler());
   }
-
-  public void unbind() {
-    // TODO: This method is currently never being called (maybe it is not needed at all?). Note that
-    // WizardManager is a singleton whose bind() method is called by GwtApp.
-    if(handlerRegistration != null) {
-      handlerRegistration.removeHandler();
-    }
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
 
   class WizardRequiredEventHandler implements WizardRequiredEvent.Handler {
 

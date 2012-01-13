@@ -13,12 +13,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -37,89 +31,66 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourcePresenter.Display> implements Wizard {
-  //
-  // Instance Variables
-  //
+public class CreateDatasourcePresenter extends PresenterWidget<CreateDatasourcePresenter.Display> implements Wizard, HasDatasourceForms {
 
-  @Inject
-  private CreateDatasourceConclusionStepPresenter createDatasourceConclusionStepPresenter;
+  private final CreateDatasourceConclusionStepPresenter createDatasourceConclusionStepPresenter;
 
-  @Inject
-  private HibernateDatasourceFormPresenter hibernateDatasourceFormPresenter;
+  private final Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
 
   @Inject
-  private ExcelDatasourceFormPresenter excelDatasourceFormPresenter;
-
-  @Inject
-  private FsDatasourceFormPresenter fsDatasourceFormPresenter;
-
-  @Inject
-  private JdbcDatasourceFormPresenter jdbcDatasourceFormPresenter;
-
-  @Inject
-  private CsvDatasourceFormPresenter csvDatasourceFormPresenter;
-
-  private Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
-
-  //
-  // Constructors
-  //
-
-  @Inject
-  public CreateDatasourcePresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public CreateDatasourcePresenter(final Display display, final EventBus eventBus, CreateDatasourceConclusionStepPresenter createDatasourceConclusionStepPresenter) {
+    super(eventBus, display);
+    this.createDatasourceConclusionStepPresenter = createDatasourceConclusionStepPresenter;
   }
 
-  //
-  // WidgetPresenter Methods
-  //
+  @Override
+  public void addDatasourceForm(DatasourceFormPresenter p) {
+    datasourceFormPresenters.add(p);
+  }
 
   @Override
   protected void onBind() {
     createDatasourceConclusionStepPresenter.bind();
     addEventHandlers();
-    registerDatasourceFormPresenters();
+    getEventBus().fireEvent(new RequestDatasourceFormsEvent(this));
   }
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     createDatasourceConclusionStepPresenter.unbind();
     datasourceFormPresenters.clear();
   }
 
-  private void registerDatasourceFormPresenters() {
-    // FIXME: Is there a way of registering these automatically ? Injecting the set fails.
-    datasourceFormPresenters.add(hibernateDatasourceFormPresenter);
-    datasourceFormPresenters.add(excelDatasourceFormPresenter);
-    datasourceFormPresenters.add(fsDatasourceFormPresenter);
-    datasourceFormPresenters.add(jdbcDatasourceFormPresenter);
-    datasourceFormPresenters.add(csvDatasourceFormPresenter);
+  @Override
+  protected void onReveal() {
     updateDatasourceFormDisplay();
   }
 
   private void updateDatasourceFormDisplay() {
-    // GWT.log(getDisplay().getDatasourceType());
     for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
-      if(formPresenter.isForType(getDisplay().getDatasourceType())) {
-        getDisplay().setDatasourceForm(formPresenter);
+      if(formPresenter.isForType(getView().getDatasourceType())) {
+        setInSlot(null, formPresenter.getPresenter());
         return;
       }
     }
-    getDisplay().setDatasourceForm(null);
+    setInSlot(null, null);
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getDisplay().addFinishClickHandler(new FinishClickHandler()));
-    super.registerHandler(getDisplay().addCreateClickHandler(new CreateClickHandler()));
-    super.registerHandler(getDisplay().addDatasourceTypeChangeHandler(new DatasourceTypeChangeHandler()));
-    getDisplay().setDatasourceSelectionTypeValidationHandler(new DatasourceSelectionTypeValidationHandler(eventBus));
+    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getView().addFinishClickHandler(new FinishClickHandler()));
+    super.registerHandler(getView().addCreateClickHandler(new CreateClickHandler()));
+    super.registerHandler(getView().addDatasourceTypeChangeHandler(new DatasourceTypeChangeHandler()));
+    getView().setDatasourceSelectionTypeValidationHandler(new DatasourceSelectionTypeValidationHandler(getEventBus()));
   }
 
   @Override
@@ -127,33 +98,11 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
     for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
       formPresenter.clearForm();
     }
-    getDisplay().showDialog();
   }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // Wizard Methods
-  //
 
   public void onWizardRequired(WizardRequiredEvent event) {
     // nothing to do
   }
-
-  //
-  // Inner Classes / Interfaces
-  //
 
   final class DatasourceTypeChangeHandler implements ChangeHandler {
     @Override
@@ -162,7 +111,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends PopupView {
 
     HasText getDatasourceName();
 
@@ -178,13 +127,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
 
     HandlerRegistration addDatasourceTypeChangeHandler(ChangeHandler handler);
 
-    void setDatasourceForm(DatasourceFormPresenter formPresenter);
-
     DatasourceFormPresenter getDatasourceForm();
-
-    void showDialog();
-
-    void hideDialog();
 
     void setConclusion(CreateDatasourceConclusionStepPresenter presenter);
   }
@@ -198,7 +141,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new RequiredTextValidator(getDisplay().getDatasourceName(), "DatasourceNameRequired"));
+      validators.add(new RequiredTextValidator(getView().getDatasourceName(), "DatasourceNameRequired"));
       return validators;
     }
   }
@@ -206,15 +149,15 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
   class CancelClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      getDisplay().hideDialog();
+      getView().hide();
     }
   }
 
   class FinishClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new DatasourceSelectionChangeEvent(createDatasourceConclusionStepPresenter.getDatasource()));
-      getDisplay().hideDialog();
+      getEventBus().fireEvent(new DatasourceSelectionChangeEvent(createDatasourceConclusionStepPresenter.getDatasource()));
+      getView().hide();
     }
   }
 
@@ -223,7 +166,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
     public void onClick(ClickEvent arg0) {
       final String datasourceName = getDatasourceName();
       if(datasourceName.length() == 0) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("DatasourceNameRequired").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatasourceNameRequired").build());
       } else {
         // check datasource name does not already exist
         ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
@@ -239,7 +182,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
     }
 
     private String getDatasourceName() {
-      return getDisplay().getDatasourceName().getText().trim();
+      return getView().getDatasourceName().getText().trim();
     }
 
     private boolean validateDatasourceNameUnicity(final String datasourceName, JsArray<DatasourceDto> datasources) {
@@ -247,7 +190,7 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
         for(int i = 0; i < datasources.length(); i++) {
           DatasourceDto ds = datasources.get(i);
           if(ds.getName().equals(datasourceName)) {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error("DatasourceAlreadyExistsWithThisName").build());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatasourceAlreadyExistsWithThisName").build());
             return false;
           }
         }
@@ -256,15 +199,15 @@ public class CreateDatasourcePresenter extends WidgetPresenter<CreateDatasourceP
     }
 
     private boolean validateDatasourceForm() {
-      return getDisplay().getDatasourceForm().validateFormData();
+      return getView().getDatasourceForm().validateFormData();
     }
 
     private void createDatasource() {
-      DatasourceFactoryDto dto = getDisplay().getDatasourceForm().getDatasourceFactory();
+      DatasourceFactoryDto dto = getView().getDatasourceForm().getDatasourceFactory();
       dto.setName(getDatasourceName());
 
       createDatasourceConclusionStepPresenter.setDatasourceFactory(dto);
-      getDisplay().setConclusion(createDatasourceConclusionStepPresenter);
+      getView().setConclusion(createDatasourceConclusionStepPresenter);
     }
   }
 }

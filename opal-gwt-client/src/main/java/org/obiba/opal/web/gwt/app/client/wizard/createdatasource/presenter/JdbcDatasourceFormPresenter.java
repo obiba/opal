@@ -12,13 +12,9 @@ package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
+import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -27,29 +23,38 @@ import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-/**
- *
- */
-public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<JdbcDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<JdbcDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
 
-  //
-  // Constructors
-  //
+  public static class Subscriber extends DatasourceFormPresenterSubscriber {
+
+    @Inject
+    public Subscriber(com.google.gwt.event.shared.EventBus eventBus, JdbcDatasourceFormPresenter presenter) {
+      super(eventBus, presenter);
+    }
+
+  }
 
   @SuppressWarnings("unchecked")
   @Inject
   public JdbcDatasourceFormPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+    super(eventBus, display);
 
-    addValidator(new RequiredTextValidator(getDisplay().getUrl(), "UrlRequired"));
-    addValidator(new RequiredTextValidator(getDisplay().getUsername(), "UsernameRequired"));
-    addValidator(new RequiredTextValidator(getDisplay().getPassword(), "PasswordRequired"));
-    addValidator(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getUseMetadataTablesOption(), getDisplay().getDoNotUseMetadataTablesOption()), "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables"));
+    addValidator(new RequiredTextValidator(getView().getUrl(), "UrlRequired"));
+    addValidator(new RequiredTextValidator(getView().getUsername(), "UsernameRequired"));
+    addValidator(new RequiredTextValidator(getView().getPassword(), "PasswordRequired"));
+    addValidator(new RequiredOptionValidator(RequiredOptionValidator.asSet(getView().getUseMetadataTablesOption(), getView().getDoNotUseMetadataTablesOption()), "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables"));
+  }
+
+  @Override
+  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
+    return this;
   }
 
   //
@@ -58,40 +63,25 @@ public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<Jdbc
 
   @Override
   protected void onBind() {
-    setJdbcDrivers();
-  }
+    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>> newBuilder().forResource("/system/jdbcDrivers").get().withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
 
-  @Override
-  protected void onUnbind() {
+      @Override
+      public void onResource(Response response, JsArray<JdbcDriverDto> drivers) {
+        List<JdbcDriverDto> driverList = new ArrayList<JdbcDriverDto>();
+        for(int i = 0; i < drivers.length(); i++) {
+          driverList.add(drivers.get(i));
+        }
+        getView().setJdbcDrivers(driverList);
+      }
+    }).send();
   }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // DatasourceFormPresenter Methods
-  //
 
   public DatasourceFactoryDto getDatasourceFactory() {
     JdbcDatasourceFactoryDto extensionDto = JdbcDatasourceFactoryDto.create();
-    extensionDto.setDriver(getDisplay().getDriver().getText());
-    extensionDto.setUrl(getDisplay().getUrl().getText());
-    extensionDto.setUsername(getDisplay().getUsername().getText());
-    extensionDto.setPassword(getDisplay().getPassword().getText());
+    extensionDto.setDriver(getView().getDriver().getText());
+    extensionDto.setUrl(getView().getUrl().getText());
+    extensionDto.setUsername(getView().getUsername().getText());
+    extensionDto.setPassword(getView().getPassword().getText());
     extensionDto.setSettings(getSettings());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
@@ -111,31 +101,17 @@ public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<Jdbc
   private JdbcDatasourceSettingsDto getSettings() {
     JdbcDatasourceSettingsDto settingsDto = JdbcDatasourceSettingsDto.create();
     settingsDto.setDefaultEntityType("Participant");
-    settingsDto.setUseMetadataTables(getDisplay().getUseMetadataTablesOption().getValue());
+    settingsDto.setUseMetadataTables(getView().getUseMetadataTablesOption().getValue());
 
-    if(getDisplay().getDefaultCreatedTimestampColumnName().getText().trim().length() != 0) {
-      settingsDto.setDefaultCreatedTimestampColumnName(getDisplay().getDefaultCreatedTimestampColumnName().getText());
+    if(getView().getDefaultCreatedTimestampColumnName().getText().trim().length() != 0) {
+      settingsDto.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumnName().getText());
     }
 
-    if(getDisplay().getDefaultUpdatedTimestampColumnName().getText().trim().length() != 0) {
-      settingsDto.setDefaultUpdatedTimestampColumnName(getDisplay().getDefaultUpdatedTimestampColumnName().getText());
+    if(getView().getDefaultUpdatedTimestampColumnName().getText().trim().length() != 0) {
+      settingsDto.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumnName().getText());
     }
 
     return settingsDto;
-  }
-
-  private void setJdbcDrivers() {
-    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>> newBuilder().forResource("/system/jdbcDrivers").get().withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
-
-      @Override
-      public void onResource(Response response, JsArray<JdbcDriverDto> drivers) {
-        List<JdbcDriverDto> driverList = new ArrayList<JdbcDriverDto>();
-        for(int i = 0; i < drivers.length(); i++) {
-          driverList.add(drivers.get(i));
-        }
-        getDisplay().setJdbcDrivers(driverList);
-      }
-    }).send();
   }
 
   //
@@ -170,13 +146,13 @@ public class JdbcDatasourceFormPresenter extends ValidatableWidgetPresenter<Jdbc
 
   @Override
   public void clearForm() {
-    getDisplay().getUrl().setText("");
-    getDisplay().getUsername().setText("");
-    getDisplay().getPassword().setText("");
-    getDisplay().getDefaultCreatedTimestampColumnName().setText("");
-    getDisplay().getDefaultUpdatedTimestampColumnName().setText("");
-    getDisplay().getDoNotUseMetadataTablesOption().setValue(true);
-    getDisplay().getUseMetadataTablesOption().setValue(false);
-    getDisplay().getDriver().setText("");
+    getView().getUrl().setText("");
+    getView().getUsername().setText("");
+    getView().getPassword().setText("");
+    getView().getDefaultCreatedTimestampColumnName().setText("");
+    getView().getDefaultUpdatedTimestampColumnName().setText("");
+    getView().getDoNotUseMetadataTablesOption().setValue(true);
+    getView().getUseMetadataTablesOption().setValue(false);
+    getView().getDriver().setText("");
   }
 }

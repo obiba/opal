@@ -9,48 +9,35 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.HibernateDatasourceFactoryDto;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
  *
  */
-public class HibernateDatasourceFormPresenter extends WidgetPresenter<DatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+public class HibernateDatasourceFormPresenter extends PresenterWidget<DatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+
+  public static class Subscriber extends DatasourceFormPresenterSubscriber {
+
+    @Inject
+    public Subscriber(com.google.gwt.event.shared.EventBus eventBus, HibernateDatasourceFormPresenter presenter) {
+      super(eventBus, presenter);
+    }
+
+  }
 
   @Inject
   public HibernateDatasourceFormPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+    super(eventBus, display);
   }
 
   @Override
-  public Place getPlace() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  protected void onBind() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  protected void onUnbind() {
-    // TODO Auto-generated method stub
-
+  public PresenterWidget<? extends Display> getPresenter() {
+    return this;
   }
 
   @Override
@@ -66,18 +53,6 @@ public class HibernateDatasourceFormPresenter extends WidgetPresenter<Datasource
   @Override
   public boolean isForType(String type) {
     return type.equalsIgnoreCase("hibernate");
-  }
-
-  @Override
-  public void refreshDisplay() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void revealDisplay() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override

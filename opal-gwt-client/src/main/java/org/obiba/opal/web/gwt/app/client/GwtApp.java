@@ -8,7 +8,6 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardManager;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder;
@@ -59,7 +58,6 @@ public class GwtApp implements EntryPoint {
     initConfirmationPresenter();
     initScriptEvaluationPopupPresenter();
     initViewWizards();
-    initWizardManager();
 
     DelayedBindRegistry.bind(opalGinjector);
     opalGinjector.getPlaceManager().revealCurrentPlace();
@@ -85,11 +83,6 @@ public class GwtApp implements EntryPoint {
   private void initViewWizards() {
     ConfigureViewStepPresenter configureViewStepPresenter = opalGinjector.getConfigureViewStepPresenter();
     configureViewStepPresenter.bind();
-  }
-
-  private void initWizardManager() {
-    WizardManager wizardManager = opalGinjector.getWizardManager();
-    wizardManager.bind();
   }
 
   private void registerHandlers() {

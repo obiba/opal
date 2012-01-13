@@ -40,10 +40,6 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  //
-  // Instance Variables
-  //
-
   private FileSelectionPresenter.Display fileSelection;
 
   @UiField
@@ -98,6 +94,20 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     for(String s : new String[] { "\"", "'" }) {
       quote.addItem(s);
     }
+  }
+
+  @Override
+  public void addToSlot(Object slot, Widget content) {
+  }
+
+  @Override
+  public void removeFromSlot(Object slot, Widget content) {
+
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+
   }
 
   public void setAdvancedOptionsVisible(boolean visible) {
@@ -165,14 +175,6 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
 
   public Widget asWidget() {
     return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   @Override

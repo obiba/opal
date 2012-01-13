@@ -9,60 +9,48 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
  *
  */
-public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
-  //
-  // Instance Variables
-  //
+public class FsDatasourceFormPresenter extends PresenterWidget<FsDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+
+  public static class Subscriber extends DatasourceFormPresenterSubscriber {
+
+    @Inject
+    public Subscriber(com.google.gwt.event.shared.EventBus eventBus, FsDatasourceFormPresenter presenter) {
+      super(eventBus, presenter);
+    }
+
+  }
+
+  private final FileSelectionPresenter fileSelectionPresenter;
 
   @Inject
-  private FileSelectionPresenter fileSelectionPresenter;
-
-  //
-  // Constructors
-  //
-
-  @Inject
-  public FsDatasourceFormPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public FsDatasourceFormPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
+    super(eventBus, display);
+    this.fileSelectionPresenter = fileSelectionPresenter;
   }
 
   @Override
-  public Place getPlace() {
-    return null;
+  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
+    return this;
   }
 
   @Override
   protected void onBind() {
     fileSelectionPresenter.bind();
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
-    getDisplay().setFileSelectorWidgetDisplay(fileSelectionPresenter.getDisplay());
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  protected void onUnbind() {
-    // fileSelectionPresenter.unbind();
+    getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getDisplay());
   }
 
   @Override
@@ -81,22 +69,6 @@ public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormP
     return type.equalsIgnoreCase("fs");
   }
 
-  @Override
-  public void refreshDisplay() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void revealDisplay() {
-    // TODO Auto-generated method stub
-
-  }
-
-  //
-  // Interfaces and Inner Classes
-  //
-
   public interface Display extends DatasourceFormPresenter.Display {
 
     void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
@@ -104,7 +76,7 @@ public class FsDatasourceFormPresenter extends WidgetPresenter<FsDatasourceFormP
   }
 
   private void fireErrorEvent(String error) {
-    eventBus.fireEvent(NotificationEvent.newBuilder().error(error).build());
+    getEventBus().fireEvent(NotificationEvent.newBuilder().error(error).build());
   }
 
   @Override
