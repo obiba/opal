@@ -96,6 +96,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   private final RequestUrlBuilder urlBuilder;
 
   @Inject
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter, RequestUrlBuilder urlBuilder) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
