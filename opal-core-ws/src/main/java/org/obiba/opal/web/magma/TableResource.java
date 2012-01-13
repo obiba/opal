@@ -9,12 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -33,14 +31,12 @@ import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.js.JavascriptValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.TableDto;
-import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
@@ -115,17 +111,6 @@ public class TableResource extends AbstractValueTableResource {
   @Path("/valueSets")
   public ValueSetsResource getValueSets() {
     return new ValueSetsResource(getValueTable());
-  }
-
-  @GET
-  @Path("/eval")
-  public Iterable<ValueDto> eval(@QueryParam("valueType") String valueType, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit) {
-    JavascriptValueSource jvs = newJavaScriptValueSource(ValueType.Factory.forName(valueType), script);
-
-    List<VariableEntity> entities = new ArrayList<VariableEntity>(getValueTable().getVariableEntities());
-    int end = Math.min(offset + limit, entities.size());
-    Iterable<Value> values = jvs.asVectorSource().getValues(new TreeSet<VariableEntity>(entities.subList(offset, end)));
-    return Iterables.transform(values, Dtos.valueAsDtoFunc);
   }
 
   @Path("/variable/{variable}")
