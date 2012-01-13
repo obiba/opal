@@ -50,34 +50,7 @@ public final class Dtos {
 
     @Override
     public ValueDto apply(Value from) {
-      if(from.getValueType().equals(BinaryType.get()) && from.isNull() == false) {
-        return applyBinary(from);
-      }
       return asDto(from).build();
-    }
-
-    private ValueDto applyBinary(Value from) {
-      if(from.isSequence() == false) {
-        return asDto(from).setValue(binaryToString(from)).build();
-      } else {
-        ValueSequence fromSeq = from.asSequence();
-        StringBuilder binStr = new StringBuilder();
-        boolean first = true;
-        for(Value fromVal : fromSeq.getValue()) {
-          if(!first) {
-            binStr.append(",");
-            first = false;
-          }
-          binStr.append(binaryToString(fromVal));
-        }
-        return asDto(from).setValue(binStr.toString()).build();
-      }
-    }
-
-    private String binaryToString(Value from) {
-      if(from.isNull()) return "";
-      int length = ((byte[]) from.getValue()).length;
-      return "binary[" + length + "]";
     }
 
   };
@@ -253,9 +226,25 @@ public final class Dtos {
 
   public static ValueDto.Builder asDto(Value value) {
     ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(value.getValueType().getName()).setIsSequence(value.isSequence());
-    if(value.isNull() == false) {
-      valueBuilder.setValue(value.toString());
+    if(value.isNull() == false && value.isSequence() == false) {
+      if(value.getValueType().equals(BinaryType.get())) {
+        // TODO link
+        // valueBuilder.setLink();
+        int length = ((byte[]) value.getValue()).length;
+        valueBuilder.setValue("binary[" + length + "]");
+      } else {
+        valueBuilder.setValue(value.toString());
+      }
     }
+
+    if(value.isNull() == false && value.isSequence()) {
+      ValueSequence valueSeq = value.asSequence();
+      for(int i = 0; i < valueSeq.getSize(); i++) {
+        // TODO link
+        valueBuilder.addValues(Dtos.asDto(/* link + "?pos=" + i, */valueSeq.get(i)).build());
+      }
+    }
+
     return valueBuilder;
   }
 
