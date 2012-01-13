@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 
 import javax.ws.rs.DefaultValue;
@@ -24,9 +27,12 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.VectorSource;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
+import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 
 /**
@@ -94,16 +100,45 @@ public class ValueSetsResource extends AbstractValueTableResource {
   }
 
   private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final Iterable<VariableEntity> entities) {
-    return ValueSetsDto.newBuilder().addVariables(vvs.getVariable().getName()).addAllValueSets(Iterables.transform(entities, new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
+    ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().addVariables(vvs.getVariable().getName());
 
-      @Override
-      public ValueSetsDto.ValueSetDto apply(final VariableEntity fromEntity) {
-        final ValueSet valueSet = getValueTable().getValueSet(fromEntity);
-        String link = uriInfo.getPath().replace("valueSets", "value/" + fromEntity.getIdentifier());
-        Value value = vvs.getValue(valueSet);
-        return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addValues(Dtos.asValueSetsValueDto(link, value)).build();
-      }
-    })).build();
+    VectorSource vector = vvs.asVectorSource();
+    if(vector != null) {
+      addValueSetDtosFromVectorSource(uriInfo, entities, vector, builder);
+    } else {
+      builder.addAllValueSets(Iterables.transform(entities, new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
+
+        @Override
+        public ValueSetsDto.ValueSetDto apply(final VariableEntity fromEntity) {
+          final ValueSet valueSet = getValueTable().getValueSet(fromEntity);
+          Value value = vvs.getValue(valueSet);
+          return getValueSetDto(uriInfo, fromEntity, value);
+        }
+      }));
+    }
+
+    return builder.build();
+  }
+
+  private void addValueSetDtosFromVectorSource(UriInfo uriInfo, Iterable<VariableEntity> entities, VectorSource vector, ValueSetsDto.Builder builder) {
+    ImmutableSortedSet<VariableEntity> sortedEntities = ImmutableSortedSet.<VariableEntity> naturalOrder().addAll(entities).build();
+    Iterable<Value> values = vector.getValues(sortedEntities);
+
+    HashMap<VariableEntity, Value> results = new LinkedHashMap<VariableEntity, Value>();
+    Iterator<VariableEntity> entitiesIterator = sortedEntities.iterator();
+    for(Value value : values) {
+      VariableEntity entity = entitiesIterator.next();
+      results.put(entity, value);
+    }
+
+    for(VariableEntity entity : entities) {
+      builder.addValueSets(getValueSetDto(uriInfo, entity, results.get(entity)));
+    }
+  }
+
+  private ValueSetDto getValueSetDto(final UriInfo uriInfo, VariableEntity fromEntity, Value value) {
+    String link = uriInfo.getPath().replace("valueSets", "value/" + fromEntity.getIdentifier());
+    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addValues(Dtos.asValueSetsValueDto(link, value)).build();
   }
 
 }
