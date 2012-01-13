@@ -134,9 +134,11 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     } else if(slot == Slots.Values) {
       panel = values;
     }
-    panel.clear();
-    if(content != null) {
-      panel.add(content);
+    if(panel != null) {
+      panel.clear();
+      if(content != null) {
+        panel.add(content);
+      }
     }
   }
 

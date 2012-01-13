@@ -61,10 +61,6 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   private static Translations translations = GWT.create(Translations.class);
 
-  //
-  // Instance Variables
-  //
-
   private final Widget widget;
 
   @UiField
@@ -168,9 +164,11 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     } else if(slot == Slots.Values) {
       panel = values;
     }
-    panel.clear();
-    if(content != null) {
-      panel.add(content);
+    if(panel != null) {
+      panel.clear();
+      if(content != null) {
+        panel.add(content);
+      }
     }
   }
 
