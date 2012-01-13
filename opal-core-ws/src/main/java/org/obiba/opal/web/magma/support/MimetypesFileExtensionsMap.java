@@ -10,6 +10,7 @@
 package org.obiba.opal.web.magma.support;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,6 +45,8 @@ public class MimetypesFileExtensionsMap {
 
   private Multimap<String, String> mimetypes;
 
+  private MimetypesFileTypeMap activationMimetypes;
+
   public static MimetypesFileExtensionsMap get() {
     if(singleton == null) {
       singleton = new MimetypesFileExtensionsMap();
@@ -72,10 +75,19 @@ public class MimetypesFileExtensionsMap {
     return mimetypes.get(mimetype);
   }
 
+  public String getMimeType(String filename) {
+    return activationMimetypes.getContentType(filename);
+  }
+
+  public String getMimeType(File file) {
+    return activationMimetypes.getContentType(file);
+  }
+
   private MimetypesFileExtensionsMap() {
     mimetypes = LinkedHashMultimap.create();
     initFromStream(ClassLoader.getSystemResourceAsStream("META-INF/mime.types"));
     initFromStream(ClassLoader.getSystemResourceAsStream("META-INF/mimetypes.default"));
+    activationMimetypes = new MimetypesFileTypeMap();
   }
 
   private void initFromStream(InputStream in) {

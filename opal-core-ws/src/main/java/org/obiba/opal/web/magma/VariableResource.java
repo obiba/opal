@@ -95,6 +95,36 @@ public class VariableResource {
     }
   }
 
+  @GET
+  @POST
+  @Path("/values")
+  public Iterable<ValueDto> getValues(@QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") @DefaultValue("10") Integer limit) {
+    if(limit < 0) {
+      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
+    }
+    return Iterables.transform(getPagingVectorSource().getValues(offset, limit), Dtos.valueAsDtoFunc);
+  }
+
+  @Path("/summary")
+  public AbstractSummaryStatisticsResource getSummary(@QueryParam("nature") String nature) {
+    return new SummaryStatisticsResourceFactory().getResource(this.valueTable, this.vvs, nature);
+  }
+
+  VariableValueSource getVariableValueSource() {
+    return vvs;
+  }
+
+  PagingVectorSource getPagingVectorSource() {
+    if(pagingVectorSource == null) {
+      pagingVectorSource = new DefaultPagingVectorSourceImpl(valueTable, vvs);
+    }
+    return pagingVectorSource;
+  }
+
+  //
+  // private methods
+  //
+
   private Value extractValue(String identifier) {
     Variable variable = vvs.getVariable();
     VariableEntity entity = new VariableEntityBean(valueTable.getEntityType(), identifier);
@@ -123,32 +153,44 @@ public class VariableResource {
     ResponseBuilder builder;
 
     // download as a file
-    if(variable.getMimeType() != null && !variable.getMimeType().isEmpty()) {
-      builder = Response.ok(value.getValue(), variable.getMimeType());
-    } else {
-      // TODO use mime-util library to detect mime type from byte array content
-      builder = Response.ok(value.getValue(), MediaType.APPLICATION_OCTET_STREAM);
-    }
-
+    builder = Response.ok(value.getValue(), getVariableMimeType(variable));
     builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier) + "\"");
 
     return builder;
   }
 
+  private String getVariableMimeType(Variable variable) {
+    // first, get it from variable mime-type
+    if(variable.getMimeType() != null && !variable.getMimeType().isEmpty()) {
+      return variable.getMimeType();
+    }
+
+    // if file extension is defined, get the mime-type from it
+    String name = getFileExtensionFromAttributes(variable);
+    if(name != null) {
+      name = "patate." + name;
+    } else {
+      // if file name is defined, get the mime-type from it
+      name = getFileNameFromAttributes(variable);
+    }
+
+    if(name != null) {
+      return MimetypesFileExtensionsMap.get().getMimeType(name);
+    }
+
+    return MediaType.APPLICATION_OCTET_STREAM;
+  }
+
   private String getFileName(Variable variable, String identifier) {
     // first look in variables attributes
-    for(Attribute attr : variable.getAttributes()) {
-      if(attr.getName().equalsIgnoreCase("filename") || attr.getName().equalsIgnoreCase("file-name")) {
-        String name = variable.getAttributeStringValue(attr.getName());
-        if(name.length() > 0) {
-          int dot = name.lastIndexOf('.');
-          if(dot != -1) {
-            StringBuilder builder = new StringBuilder(name);
-            return builder.insert(dot, "-" + identifier).toString();
-          } else {
-            return name + "-" + identifier + "." + getFileExtension(variable);
-          }
-        }
+    String name = getFileNameFromAttributes(variable);
+    if(name != null) {
+      int dot = name.lastIndexOf('.');
+      if(dot != -1) {
+        StringBuilder builder = new StringBuilder(name);
+        return builder.insert(dot, "-" + identifier).toString();
+      } else {
+        return name + "-" + identifier + "." + getFileExtension(variable);
       }
     }
 
@@ -157,6 +199,25 @@ public class VariableResource {
 
   private String getFileExtension(Variable variable) {
     // first look in variables attributes
+    String extension = getFileExtensionFromAttributes(variable);
+    if(extension != null) return extension;
+
+    return MimetypesFileExtensionsMap.get().getPreferedFileExtension(variable.getMimeType());
+  }
+
+  private String getFileNameFromAttributes(Variable variable) {
+    for(Attribute attr : variable.getAttributes()) {
+      if(attr.getName().equalsIgnoreCase("filename") || attr.getName().equalsIgnoreCase("file-name")) {
+        String name = variable.getAttributeStringValue(attr.getName());
+        if(name.length() > 0) {
+          return name;
+        }
+      }
+    }
+    return null;
+  }
+
+  private String getFileExtensionFromAttributes(Variable variable) {
     for(Attribute attr : variable.getAttributes()) {
       if(attr.getName().equalsIgnoreCase("fileextension") || attr.getName().equalsIgnoreCase("file-extension")) {
         String extension = variable.getAttributeStringValue(attr.getName());
@@ -168,34 +229,7 @@ public class VariableResource {
         }
       }
     }
-
-    return MimetypesFileExtensionsMap.get().getPreferedFileExtension(variable.getMimeType());
-  }
-
-  @GET
-  @POST
-  @Path("/values")
-  public Iterable<ValueDto> getValues(@QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") @DefaultValue("10") Integer limit) {
-    if(limit < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
-    }
-    return Iterables.transform(getPagingVectorSource().getValues(offset, limit), Dtos.valueAsDtoFunc);
-  }
-
-  @Path("/summary")
-  public AbstractSummaryStatisticsResource getSummary(@QueryParam("nature") String nature) {
-    return new SummaryStatisticsResourceFactory().getResource(this.valueTable, this.vvs, nature);
-  }
-
-  VariableValueSource getVariableValueSource() {
-    return vvs;
-  }
-
-  PagingVectorSource getPagingVectorSource() {
-    if(pagingVectorSource == null) {
-      pagingVectorSource = new DefaultPagingVectorSourceImpl(valueTable, vvs);
-    }
-    return pagingVectorSource;
+    return null;
   }
 
 }
