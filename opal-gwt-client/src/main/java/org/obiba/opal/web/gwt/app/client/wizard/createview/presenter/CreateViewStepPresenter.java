@@ -13,12 +13,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
@@ -37,7 +31,9 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -54,23 +50,32 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
 
-public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPresenter.Display> implements Wizard {
-  //
-  // Instance Variables
-  //
+public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewStepPresenter.Display> {
 
-  @Inject
-  private TableListPresenter tableListPresenter;
+  public static final WizardType WizardType = new WizardType();
 
-  @Inject
-  private FileSelectionPresenter fileSelectionPresenter;
+  public static class Wizard extends WizardProxy<CreateViewStepPresenter> {
+
+    @Inject
+    protected Wizard(EventBus eventBus, Provider<CreateViewStepPresenter> wizardProvider) {
+      super(eventBus, WizardType, wizardProvider);
+    }
+
+  }
+
+  private final TableListPresenter tableListPresenter;
+
+  private final FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
 
@@ -81,8 +86,10 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   //
 
   @Inject
-  public CreateViewStepPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public CreateViewStepPresenter(final Display display, final EventBus eventBus, TableListPresenter tableListPresenter, FileSelectionPresenter fileSelectionPresenter) {
+    super(eventBus, display);
+    this.tableListPresenter = tableListPresenter;
+    this.fileSelectionPresenter = fileSelectionPresenter;
   }
 
   //
@@ -92,55 +99,40 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   @Override
   protected void onBind() {
     tableListPresenter.bind();
-    getDisplay().setTableSelector(tableListPresenter.getDisplay());
+    getView().setTableSelector(tableListPresenter.getDisplay());
 
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
-    getDisplay().setFileSelectionDisplay(fileSelectionPresenter.getDisplay());
+    getView().setFileSelectionDisplay(fileSelectionPresenter.getDisplay());
 
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     tableListPresenter.unbind();
     fileSelectionPresenter.unbind();
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addCancelHandler(new CancelHandler()));
-    super.registerHandler(getDisplay().addCreateHandler(new CreateHandler()));
-    super.registerHandler(getDisplay().addCloseHandler(new CloseHandler()));
-    super.registerHandler(getDisplay().addConfigureHandler(new ConfigureHandler()));
-    getDisplay().setTablesValidator(new TablesValidator());
-    getDisplay().setSelectTypeValidator(new SelectTypeValidator());
+    super.registerHandler(getView().addCancelHandler(new CancelHandler()));
+    super.registerHandler(getView().addCreateHandler(new CreateHandler()));
+    super.registerHandler(getView().addCloseHandler(new CloseHandler()));
+    super.registerHandler(getView().addConfigureHandler(new ConfigureHandler()));
+    getView().setTablesValidator(new TablesValidator());
+    getView().setSelectTypeValidator(new SelectTypeValidator());
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReveal() {
+    super.onReveal();
     tableListPresenter.getTables().clear();
 
-    getDisplay().clear();
-    getDisplay().showDialog();
+    getView().clear();
   }
 
   @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // Wizard Methods
-  //
-
   public void onWizardRequired(WizardRequiredEvent event) {
     if(event.getEventParameters().length != 0) {
       if(event.getEventParameters()[0] instanceof String) {
@@ -160,13 +152,9 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
     }
   }
 
-  //
-  // Methods
-  //
-
   private void createViewIfDoesNotExist() {
     // Get the view name and datasource name.
-    String viewName = getDisplay().getViewName().getText();
+    String viewName = getView().getViewName().getText();
 
     ViewFoundDoNotCreateCallback doNotCreate = new ViewFoundDoNotCreateCallback();
     ViewNotFoundCreateCallback create = new ViewNotFoundCreateCallback();
@@ -184,12 +172,12 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   }
 
   private void createView() {
-    getDisplay().renderPendingConclusion();
+    getView().renderPendingConclusion();
 
     CompletedCallback completed = new CompletedCallback();
     FailedCallback failed = new FailedCallback();
 
-    String viewName = getDisplay().getViewName().getText();
+    String viewName = getView().getViewName().getText();
 
     // Build the ViewDto for the request.
     ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
@@ -211,14 +199,14 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
   private ViewDto createViewDto(ViewDtoBuilder viewDtoBuilder) {
     // Get the view name and datasource name.
-    if(getDisplay().getAddVariablesOneByOneOption().getValue()) {
+    if(getView().getAddVariablesOneByOneOption().getValue()) {
       viewDtoBuilder.defaultVariableListView();
-    } else if(getDisplay().getFileViewOption().getValue() || getDisplay().getExcelFileOption().getValue()) {
+    } else if(getView().getFileViewOption().getValue() || getView().getExcelFileOption().getValue()) {
       FileViewDto fileView = FileViewDto.create();
       fileView.setFilename(fileSelectionPresenter.getSelectedFile());
-      if(getDisplay().getFileViewOption().getValue()) {
+      if(getView().getFileViewOption().getValue()) {
         fileView.setType(FileViewType.SERIALIZED_XML);
-      } else if(getDisplay().getExcelFileOption().getValue()) {
+      } else if(getView().getExcelFileOption().getValue()) {
         fileView.setType(FileViewType.EXCEL);
       }
       viewDtoBuilder.fileView(fileView);
@@ -230,7 +218,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends PopupView {
 
     void clear();
 
@@ -256,10 +244,6 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     HandlerRegistration addCloseHandler(ClickHandler handler);
 
-    void showDialog();
-
-    void hideDialog();
-
     void renderPendingConclusion();
 
     void renderFailedConclusion(String msg);
@@ -273,31 +257,31 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   class CancelHandler implements ClickHandler {
 
     public void onClick(ClickEvent event) {
-      getDisplay().hideDialog();
+      getView().hide();
     }
   }
 
   final class CloseHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent evt) {
-      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceDto));
-      getDisplay().hideDialog();
+      getEventBus().fireEvent(new DatasourceUpdatedEvent(datasourceDto));
+      getView().hide();
     }
   }
 
   final class ConfigureHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent evt) {
-      eventBus.fireEvent(new DatasourceUpdatedEvent(datasourceDto));
+      getEventBus().fireEvent(new DatasourceUpdatedEvent(datasourceDto));
 
       // Get the new view dto
-      getViewRequest(datasourceName, getDisplay().getViewName().getText())//
+      getViewRequest(datasourceName, getView().getViewName().getText())//
       .withCallback(new ResourceCallback<ViewDto>() {
 
         @Override
         public void onResource(Response response, ViewDto resource) {
-          getDisplay().hideDialog();
-          eventBus.fireEvent(new ViewConfigurationRequiredEvent(resource));
+          getView().hide();
+          getEventBus().fireEvent(new ViewConfigurationRequiredEvent(resource));
         }
       }).send();
 
@@ -316,33 +300,33 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
         }
       }
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(msg).build());
-      getDisplay().renderFailedConclusion(msg);
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(msg).build());
+      getView().renderFailedConclusion(msg);
     }
   }
 
   private class CompletedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      getDisplay().renderCompletedConclusion();
+      getView().renderCompletedConclusion();
     }
   }
 
   class SelectTypeValidator extends AbstractValidationHandler {
 
     public SelectTypeValidator() {
-      super(eventBus);
+      super(getEventBus());
     }
 
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-      validators.add(new RequiredTextValidator(getDisplay().getViewName(), "ViewNameRequired"));
-      validators.add(new DisallowedCharactersValidator(getDisplay().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getDisplay().getAddVariablesOneByOneOption(), getDisplay().getFileViewOption(), getDisplay().getExcelFileOption()), "VariableDefinitionMethodRequired"));
-      validators.add(new ConditionalValidator(getDisplay().getFileViewOption(), new RequiredFileSelectionValidator("XMLFileRequired")));
-      validators.add(new ConditionalValidator(getDisplay().getExcelFileOption(), new RequiredFileSelectionValidator("ExcelFileRequired")));
+      validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired"));
+      validators.add(new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getView().getAddVariablesOneByOneOption(), getView().getFileViewOption(), getView().getExcelFileOption()), "VariableDefinitionMethodRequired"));
+      validators.add(new ConditionalValidator(getView().getFileViewOption(), new RequiredFileSelectionValidator("XMLFileRequired")));
+      validators.add(new ConditionalValidator(getView().getExcelFileOption(), new RequiredFileSelectionValidator("ExcelFileRequired")));
       return validators;
     }
   }
@@ -350,7 +334,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
   class TablesValidator extends AbstractValidationHandler {
 
     public TablesValidator() {
-      super(eventBus);
+      super(getEventBus());
     }
 
     @Override
@@ -379,7 +363,7 @@ public class CreateViewStepPresenter extends WidgetPresenter<CreateViewStepPrese
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExists").build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExists").build());
     }
   }
 

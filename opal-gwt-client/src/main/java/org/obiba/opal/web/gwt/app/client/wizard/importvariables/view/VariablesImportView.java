@@ -32,30 +32,28 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class VariablesImportView extends Composite implements VariablesImportPresenter.Display {
-  //
-  // Static Variables
-  //
+public class VariablesImportView extends PopupViewImpl implements VariablesImportPresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   WizardDialogBox dialog;
@@ -102,13 +100,10 @@ public class VariablesImportView extends Composite implements VariablesImportPre
 
   private ValidationHandler importableValidator;
 
-  //
-  // Constructors
-  //
-
-  public VariablesImportView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public VariablesImportView(EventBus eventBus) {
+    super(eventBus);
+    widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
   }
 
@@ -151,10 +146,6 @@ public class VariablesImportView extends Composite implements VariablesImportPre
     }
   }
 
-  //
-  // UploadVariablesStepPresenter.Display Methods
-  //
-
   @Override
   public String getSelectedDatasource() {
     return datasources.getValue(datasources.getSelectedIndex());
@@ -175,15 +166,9 @@ public class VariablesImportView extends Composite implements VariablesImportPre
   }
 
   @Override
-  public void hideDialog() {
-    dialog.hide();
-  }
-
-  @Override
-  public void showDialog() {
+  public void show() {
     stepChain.reset();
-    dialog.center();
-    dialog.show();
+    super.show();
   }
 
   @Override
@@ -286,14 +271,14 @@ public class VariablesImportView extends Composite implements VariablesImportPre
     return datasourceCreatedCallback;
   }
 
+  @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
-  public void startProcessing() {
-  }
-
-  public void stopProcessing() {
+  @Override
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
 
   //

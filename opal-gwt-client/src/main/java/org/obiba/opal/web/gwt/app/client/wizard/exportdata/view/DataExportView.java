@@ -25,26 +25,29 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  * View of the dialog used to export data from Opal.
  */
-public class DataExportView extends Composite implements DataExportPresenter.Display {
+public class DataExportView extends PopupViewImpl implements DataExportPresenter.Display {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -53,6 +56,8 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   private static DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   WizardDialogBox dialog;
@@ -118,9 +123,10 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   private WizardStepChain stepChain;
 
-  public DataExportView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public DataExportView(EventBus eventBus) {
+    super(eventBus);
+    this.widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
   }
@@ -194,20 +200,13 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  //
-  // DataExport Display
-  //
 
   @Override
   public String getSelectedUnit() {
@@ -318,15 +317,9 @@ public class DataExportView extends Composite implements DataExportPresenter.Dis
   }
 
   @Override
-  public void hideDialog() {
-    dialog.hide();
-  }
-
-  @Override
-  public void showDialog() {
+  public void show() {
     stepChain.reset();
-    dialog.center();
-    dialog.show();
+    super.show();
   }
 
   private void clearTablesStep() {

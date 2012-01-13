@@ -9,15 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
-import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 
@@ -25,37 +20,46 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
 
-public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Display> implements Wizard {
+public class DataImportPresenter extends WizardPresenterWidget<DataImportPresenter.Display> {
 
-  @Inject
-  private CsvFormatStepPresenter csvFormatStepPresenter;
+  public static final WizardType WizardType = new WizardType();
 
-  @Inject
-  private XmlFormatStepPresenter xmlFormatStepPresenter;
+  public static class Wizard extends WizardProxy<DataImportPresenter> {
 
-  @Inject
-  private DestinationSelectionStepPresenter destinationSelectionStepPresenter;
+    @Inject
+    protected Wizard(EventBus eventBus, Provider<DataImportPresenter> wizardProvider) {
+      super(eventBus, WizardType, wizardProvider);
+    }
 
-  @Inject
-  private IdentityArchiveStepPresenter identityArchiveStepPresenter;
+  }
 
-  @Inject
-  private ConclusionStepPresenter conclusionStepPresenter;
+  private final CsvFormatStepPresenter csvFormatStepPresenter;
+
+  private final XmlFormatStepPresenter xmlFormatStepPresenter;
+
+  private final DestinationSelectionStepPresenter destinationSelectionStepPresenter;
+
+  private final IdentityArchiveStepPresenter identityArchiveStepPresenter;
+
+  private final ConclusionStepPresenter conclusionStepPresenter;
 
   private DataImportFormatStepPresenter formatStepPresenter;
 
   @Inject
-  public DataImportPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+  public DataImportPresenter(final Display display, final EventBus eventBus, CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, DestinationSelectionStepPresenter destinationSelectionStepPresenter, IdentityArchiveStepPresenter identityArchiveStepPresenter, ConclusionStepPresenter conclusionStepPresenter) {
+    super(eventBus, display);
+    this.csvFormatStepPresenter = csvFormatStepPresenter;
+    this.xmlFormatStepPresenter = xmlFormatStepPresenter;
+    this.destinationSelectionStepPresenter = destinationSelectionStepPresenter;
+    this.identityArchiveStepPresenter = identityArchiveStepPresenter;
+    this.conclusionStepPresenter = conclusionStepPresenter;
   }
 
   @Override
@@ -66,28 +70,28 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
     identityArchiveStepPresenter.bind();
     conclusionStepPresenter.bind();
 
-    getDisplay().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
-    getDisplay().setIdentityArchiveStepDisplay(identityArchiveStepPresenter.getDisplay());
+    getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
+    getView().setIdentityArchiveStepDisplay(identityArchiveStepPresenter.getDisplay());
 
     addEventHandlers();
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addCancelClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addCancelClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
-        getDisplay().hideDialog();
+        getView().hide();
       }
     }));
-    super.registerHandler(getDisplay().addCloseClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addCloseClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
-        getDisplay().hideDialog();
+        getView().hide();
       }
     }));
-    super.registerHandler(getDisplay().addImportClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addImportClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
@@ -95,18 +99,18 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
         identityArchiveStepPresenter.updateImportData(importData);
         destinationSelectionStepPresenter.updateImportData(importData);
         conclusionStepPresenter.launchImport(importData);
-        getDisplay().renderConclusion(conclusionStepPresenter);
+        getView().renderConclusion(conclusionStepPresenter);
       }
     }));
 
-    super.registerHandler(getDisplay().addFormatChangeHandler(new ChangeHandler() {
+    super.registerHandler(getView().addFormatChangeHandler(new ChangeHandler() {
 
       @Override
       public void onChange(ChangeEvent evt) {
         updateFormatStepDisplay();
       }
     }));
-    getDisplay().setFormatStepValidator(new ValidationHandler() {
+    getView().setFormatStepValidator(new ValidationHandler() {
 
       @Override
       public boolean validate() {
@@ -117,63 +121,35 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
   }
 
   private void updateFormatStepDisplay() {
-    destinationSelectionStepPresenter.setImportFormat(getDisplay().getImportFormat());
-    if(getDisplay().getImportFormat().equals(ImportFormat.CSV)) {
+    destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
+    if(getView().getImportFormat().equals(ImportFormat.CSV)) {
       csvFormatStepPresenter.clear();
       this.formatStepPresenter = csvFormatStepPresenter;
-      getDisplay().setFormatStepDisplay(csvFormatStepPresenter.getDisplay());
-    } else if(getDisplay().getImportFormat().equals(ImportFormat.XML)) {
+      getView().setFormatStepDisplay(csvFormatStepPresenter.getDisplay());
+    } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
       this.formatStepPresenter = xmlFormatStepPresenter;
-      getDisplay().setFormatStepDisplay(xmlFormatStepPresenter.getDisplay());
+      getView().setFormatStepDisplay(xmlFormatStepPresenter.getDisplay());
     } else {
       this.formatStepPresenter = null;
-      throw new IllegalStateException("Unknown format: " + getDisplay().getImportFormat());
+      throw new IllegalStateException("Unknown format: " + getView().getImportFormat());
     }
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
   protected void onUnbind() {
+    super.onUnbind();
     csvFormatStepPresenter.unbind();
     xmlFormatStepPresenter.unbind();
     destinationSelectionStepPresenter.unbind();
   }
 
   @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
+  public void onReveal() {
     destinationSelectionStepPresenter.refreshDisplay(); // to refresh the datasources
     updateFormatStepDisplay();
-    getDisplay().showDialog();
   }
 
-  //
-  // Wizard Methods
-  //
-
-  public void onWizardRequired(WizardRequiredEvent event) {
-    // nothing to do
-  }
-
-  //
-  // Inner classes
-  //
-
-  //
-  // Interfaces
-  //
-
-  public interface Display extends WidgetDisplay {
-
-    void showDialog();
-
-    void hideDialog();
+  public interface Display extends PopupView {
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 
@@ -183,35 +159,15 @@ public class DataImportPresenter extends WidgetPresenter<DataImportPresenter.Dis
 
     HandlerRegistration addCloseClickHandler(ClickHandler clickHandler);
 
-    //
-    // Format selection step
-    //
-
     HandlerRegistration addFormatChangeHandler(ChangeHandler handler);
-
-    //
-    // Format step
-    //
 
     void setFormatStepDisplay(DataImportStepDisplay display);
 
     void setFormatStepValidator(ValidationHandler handler);
 
-    //
-    // Destination selection step
-    //
-
     void setDestinationSelectionDisplay(DataImportStepDisplay display);
 
-    //
-    // Identity / Archive step
-    //
-
     void setIdentityArchiveStepDisplay(DataImportStepDisplay display);
-
-    //
-    // Conclusion step
-    //
 
     public void renderConclusion(ConclusionStepPresenter presenter);
 

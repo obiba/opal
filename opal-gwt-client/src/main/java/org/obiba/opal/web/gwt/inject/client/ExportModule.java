@@ -14,16 +14,14 @@ import org.obiba.opal.web.gwt.app.client.wizard.copydata.view.DataCopyView;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.view.DataExportView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-
 /**
  * Bind concrete implementations to interfaces within the export wizard.
  */
-public class ExportModule extends AbstractGinModule {
+public class ExportModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bind(DataExportPresenter.Display.class).to(DataExportView.class);
-    bind(DataCopyPresenter.Display.class).to(DataCopyView.class);
+    bindWizardPresenterWidget(DataExportPresenter.class, DataExportPresenter.Display.class, DataExportView.class, DataExportPresenter.Wizard.class);
+    bindWizardPresenterWidget(DataCopyPresenter.class, DataCopyPresenter.Display.class, DataCopyView.class, DataCopyPresenter.Wizard.class);
   }
 }

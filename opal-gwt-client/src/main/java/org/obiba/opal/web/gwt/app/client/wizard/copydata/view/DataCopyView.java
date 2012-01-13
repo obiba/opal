@@ -24,23 +24,26 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  * View of the dialog used to export data from Opal.
  */
-public class DataCopyView extends Composite implements DataCopyPresenter.Display {
+public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Display {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -49,6 +52,8 @@ public class DataCopyView extends Composite implements DataCopyPresenter.Display
   }
 
   private static DataCopyUiBinder uiBinder = GWT.create(DataCopyUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   WizardDialogBox dialog;
@@ -88,10 +93,10 @@ public class DataCopyView extends Composite implements DataCopyPresenter.Display
 
   private WizardStepChain stepChain;
 
-  public DataCopyView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
-    initWidgets();
+  @Inject
+  public DataCopyView(EventBus eventBus) {
+    super(eventBus);
+    this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
   }
 
@@ -136,25 +141,15 @@ public class DataCopyView extends Composite implements DataCopyPresenter.Display
     .onNext().onPrevious().build();
   }
 
-  private void initWidgets() {
-  }
-
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  //
-  // DataCopy Display
-  //
 
   @Override
   public String getSelectedDatasource() {
@@ -230,15 +225,9 @@ public class DataCopyView extends Composite implements DataCopyPresenter.Display
   }
 
   @Override
-  public void hideDialog() {
-    dialog.hide();
-  }
-
-  @Override
-  public void showDialog() {
+  public void show() {
     stepChain.reset();
-    dialog.center();
-    dialog.show();
+    super.show();
   }
 
   private void clearTablesStep() {

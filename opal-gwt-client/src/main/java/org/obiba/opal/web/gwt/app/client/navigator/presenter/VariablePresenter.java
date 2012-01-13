@@ -21,7 +21,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChange
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -174,14 +174,14 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class DeriveCategorizeCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.DERIVE_CATEGORIZE_VARIABLE, variable));
+      getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CategorizeWizardType, variable));
     }
   }
 
   final class DeriveCustomCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.DERIVE_CUSTOM_VARIABLE, variable));
+      getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CustomWizardType, variable));
     }
   }
 

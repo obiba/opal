@@ -24,12 +24,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
@@ -37,19 +37,16 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class CreateViewStepView extends Composite implements CreateViewStepPresenter.Display {
-  //
-  // Static Variables
-  //
+public class CreateViewStepView extends PopupViewImpl implements CreateViewStepPresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   WizardDialogBox dialog;
@@ -103,13 +100,10 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
 
   private ValidationHandler tablesValidator;
 
-  //
-  // Constructors
-  //
-
-  public CreateViewStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public CreateViewStepView(EventBus eventBus) {
+    super(eventBus);
+    this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
 
     ValueChangeHandler<Boolean> handler = new ValueChangeHandler<Boolean>() {
@@ -252,33 +246,15 @@ public class CreateViewStepView extends Composite implements CreateViewStepPrese
   }
 
   @Override
-  public void showDialog() {
+  public void show() {
     clear();
-    dialog.center();
-    dialog.show();
-  }
-
-  @Override
-  public void hideDialog() {
-    dialog.hide();
+    super.show();
   }
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
 
   @UiTemplate("CreateViewStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, CreateViewStepView> {

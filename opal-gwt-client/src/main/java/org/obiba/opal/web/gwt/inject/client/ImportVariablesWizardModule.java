@@ -16,16 +16,14 @@ import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ComparedDat
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ConclusionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.VariablesImportView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-
 /**
  * Bind concrete implementations to interfaces within the Import Variables wizard.
  */
-public class ImportVariablesWizardModule extends AbstractGinModule {
+public class ImportVariablesWizardModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bind(VariablesImportPresenter.Display.class).to(VariablesImportView.class);
+    bindWizardPresenterWidget(VariablesImportPresenter.class, VariablesImportPresenter.Display.class, VariablesImportView.class, VariablesImportPresenter.Wizard.class);
     bind(ComparedDatasourcesReportStepPresenter.Display.class).to(ComparedDatasourcesReportStepView.class);
     bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class);
   }

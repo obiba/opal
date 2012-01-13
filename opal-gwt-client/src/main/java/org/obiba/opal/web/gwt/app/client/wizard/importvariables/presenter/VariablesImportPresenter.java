@@ -9,19 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -37,42 +33,58 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
 
-public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPresenter.Display> implements Wizard {
+public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display> {
+
+  public static final WizardType WizardType = new WizardType();
+
+  public static class Wizard extends WizardProxy<VariablesImportPresenter> {
+
+    @Inject
+    protected Wizard(EventBus eventBus, Provider<VariablesImportPresenter> wizardProvider) {
+      super(eventBus, WizardType, wizardProvider);
+    }
+
+  }
 
   private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
 
-  @Inject
-  private ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
+  private final ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
 
-  @Inject
-  private ConclusionStepPresenter conclusionPresenter;
+  private final ConclusionStepPresenter conclusionPresenter;
 
-  @Inject
-  private FileSelectionPresenter fileSelectionPresenter;
+  private final FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
 
   @Inject
-  public VariablesImportPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  @SuppressWarnings("PMD.ExcessiveParameterList")
+  public VariablesImportPresenter(final Display display, final EventBus eventBus, ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, ConclusionStepPresenter conclusionPresenter, FileSelectionPresenter fileSelectionPresenter) {
+    super(eventBus, display);
+    this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
+    this.conclusionPresenter = conclusionPresenter;
+    this.fileSelectionPresenter = fileSelectionPresenter;
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     comparedDatasourcesReportPresenter.bind();
-    getDisplay().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
+    getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
 
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
-    getDisplay().setFileSelectionDisplay(fileSelectionPresenter.getDisplay());
+    getView().setFileSelectionDisplay(fileSelectionPresenter.getDisplay());
 
     conclusionPresenter.bind();
-    getDisplay().setConclusionDisplay(conclusionPresenter.getDisplay());
+    getView().setConclusionDisplay(conclusionPresenter.getDisplay());
 
     initDatasources();
     addEventHandlers();
@@ -80,6 +92,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     datasourceName = null;
   }
 
@@ -92,46 +105,29 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
           if(resource != null) {
             datasources.push(resource);
           }
-          getDisplay().setDatasources(datasources);
+          getView().setDatasources(datasources);
         }
       }).send();
     } else {
       ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
         @Override
         public void onResource(Response response, JsArray<DatasourceDto> resource) {
-          getDisplay().setDatasources(JsArrays.toSafeArray(resource));
+          getView().setDatasources(JsArrays.toSafeArray(resource));
         }
       }).send();
     }
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
-    super.registerHandler(getDisplay().addFileSelectedClickHandler(new FileSelectedHandler()));
-    getDisplay().setFileSelectionValidator(new FileSelectionValidator());
-    getDisplay().addImportClickHandler(new ImportHandler());
-    getDisplay().setImportableValidator(new ImportableValidator());
+    super.registerHandler(getView().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
+    super.registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
+    getView().setFileSelectionValidator(new FileSelectionValidator());
+    getView().addImportClickHandler(new ImportHandler());
+    getView().setImportableValidator(new ImportableValidator());
 
   }
 
   @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   public void onWizardRequired(WizardRequiredEvent event) {
     if(event.getEventParameters().length > 0) {
       datasourceName = (String) event.getEventParameters()[0];
@@ -142,14 +138,14 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
     @Override
     public boolean validate() {
       if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("NotIgnoredConlicts").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("NotIgnoredConlicts").build());
         return false;
       }
 
       conclusionPresenter.clearResourceRequests();
       comparedDatasourcesReportPresenter.addUpdateVariablesResourceRequests(conclusionPresenter);
       if(conclusionPresenter.getResourceRequestCount() == 0) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("NoVariablesToBeImported").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("NoVariablesToBeImported").build());
         return false;
       }
 
@@ -160,16 +156,16 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
   private final class FileSelectionValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(getDisplay().getSelectedFile().length() > 0 && (getDisplay().getSelectedFile().endsWith(".xls") || getDisplay().getSelectedFile().endsWith(".xlsx"))) {
+      if(getView().getSelectedFile().length() > 0 && (getView().getSelectedFile().endsWith(".xls") || getView().getSelectedFile().endsWith(".xlsx"))) {
         return true;
       } else {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("ExcelFileRequired").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExcelFileRequired").build());
         return false;
       }
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends PopupView {
 
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
 
@@ -189,10 +185,6 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
 
     void hideErrors();
 
-    void hideDialog();
-
-    void showDialog();
-
     String getSelectedDatasource();
 
     void setDatasources(JsArray<DatasourceDto> datasources);
@@ -207,7 +199,7 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
 
     public void onClick(ClickEvent event) {
       String url = new StringBuilder("/templates").append(EXCEL_TEMPLATE).toString();
-      eventBus.fireEvent(new FileDownloadEvent(url));
+      getEventBus().fireEvent(new FileDownloadEvent(url));
     }
   }
 
@@ -215,15 +207,15 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
 
     @Override
     public void onClick(ClickEvent arg0) {
-      getDisplay().hideErrors();
+      getView().hideErrors();
 
-      final DatasourceFactoryDto factory = createDatasourceFactoryDto(getDisplay().getSelectedFile());
+      final DatasourceFactoryDto factory = createDatasourceFactoryDto(getView().getSelectedFile());
 
       ResourceCallback<DatasourceDto> callback = new ResourceCallback<DatasourceDto>() {
 
         public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == 201) {
-            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getDisplay().getSelectedDatasource(), getDisplay(), factory, resource);
+            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getView().getSelectedDatasource(), getView(), factory, resource);
           }
         }
       };
@@ -234,9 +226,9 @@ public class VariablesImportPresenter extends WidgetPresenter<VariablesImportPre
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
 
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) == null) {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
           }
-          getDisplay().getDatasourceCreatedCallback().onFailure(factory, errorDto);
+          getView().getDatasourceCreatedCallback().onFailure(factory, errorDto);
         }
       };
 

@@ -14,16 +14,14 @@ import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.view.Identifie
 import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.view.IdentifiersMapView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-
 /**
  * Bind concrete implementations to interfaces within the Identifier Import Variables wizard.
  */
-public class ImportIdentifiersWizardModule extends AbstractGinModule {
+public class ImportIdentifiersWizardModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bind(IdentifiersImportPresenter.Display.class).to(IdentifiersImportView.class);
-    bind(IdentifiersMapPresenter.Display.class).to(IdentifiersMapView.class);
+    bindWizardPresenterWidget(IdentifiersImportPresenter.class, IdentifiersImportPresenter.Display.class, IdentifiersImportView.class, IdentifiersImportPresenter.Wizard.class);
+    bindWizardPresenterWidget(IdentifiersMapPresenter.class, IdentifiersMapPresenter.Display.class, IdentifiersMapView.class, IdentifiersMapPresenter.Wizard.class);
   }
 }

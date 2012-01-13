@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.event;
 
-import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
-
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -20,17 +18,8 @@ import com.google.gwt.event.shared.GwtEvent;
  * The <code>getWizardType</code> method returns the type of wizard required.
  */
 public class WizardRequiredEvent extends GwtEvent<WizardRequiredEvent.Handler> {
-  //
-  // Static Variables
-  //
 
-  private static Type<Handler> TYPE;
-
-  //
-  // Instance Variables
-  //
-
-  private final WizardType wizardType;
+  private final Type<Handler> type;
 
   private Object[] eventParameters;
 
@@ -38,9 +27,8 @@ public class WizardRequiredEvent extends GwtEvent<WizardRequiredEvent.Handler> {
   // Constructors
   //
 
-  public WizardRequiredEvent(WizardType type, Object... eventParameters) {
-    wizardType = type;
-
+  public WizardRequiredEvent(Type<Handler> type, Object... eventParameters) {
+    this.type = type;
     if(eventParameters != null) {
       this.eventParameters = new Object[eventParameters.length];
       System.arraycopy(eventParameters, 0, this.eventParameters, 0, eventParameters.length);
@@ -60,19 +48,7 @@ public class WizardRequiredEvent extends GwtEvent<WizardRequiredEvent.Handler> {
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
-  }
-
-  //
-  // Methods
-  //
-
-  public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
-  }
-
-  public WizardType getWizardType() {
-    return wizardType;
+    return type;
   }
 
   public Object[] getEventParameters() {

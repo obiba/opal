@@ -12,12 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -25,7 +19,9 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -41,19 +37,31 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
 
-public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Display> implements Wizard {
+public class DataExportPresenter extends WizardPresenterWidget<DataExportPresenter.Display> {
 
-  @Inject
-  private TableListPresenter tableListPresenter;
+  public static final WizardType WizardType = new WizardType();
 
-  @Inject
-  private FileSelectionPresenter fileSelectionPresenter;
+  public static class Wizard extends WizardProxy<DataExportPresenter> {
+
+    @Inject
+    protected Wizard(EventBus eventBus, Provider<DataExportPresenter> wizardProvider) {
+      super(eventBus, WizardType, wizardProvider);
+    }
+
+  }
+
+  private final TableListPresenter tableListPresenter;
+
+  private final FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
 
@@ -61,24 +69,11 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   protected String identifierEntityType;
 
-  /**
-   * @param display
-   * @param eventBus
-   */
   @Inject
-  public DataExportPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
   public DataExportPresenter(Display display, EventBus eventBus, TableListPresenter tableListPresenter, FileSelectionPresenter fileSelectionPresenter) {
-    this(display, eventBus);
+    super(eventBus, display);
     this.tableListPresenter = tableListPresenter;
     this.fileSelectionPresenter = fileSelectionPresenter;
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
   }
 
   @Override
@@ -94,23 +89,23 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
   protected void initDisplayComponents() {
     tableListPresenter.bind();
-    getDisplay().setTableWidgetDisplay(tableListPresenter.getDisplay());
+    getView().setTableWidgetDisplay(tableListPresenter.getDisplay());
 
     initFileSelectionType();
     fileSelectionPresenter.bind();
-    super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getDisplay().addCloseClickHandler(new FinishClickHandler()));
-    super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
-    super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler(eventBus)));
-    super.registerHandler(getDisplay().addFileFormatChangeHandler(new FileFormatChangeHandler()));
-    super.registerHandler(eventBus.addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
-    getDisplay().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
-    getDisplay().setTablesValidator(new TablesValidator());
-    getDisplay().setDestinationValidator(new DestinationValidator());
+    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getView().addCloseClickHandler(new FinishClickHandler()));
+    super.registerHandler(getView().addSubmitClickHandler(new SubmitClickHandler()));
+    super.registerHandler(getView().addJobLinkClickHandler(new JobLinkClickHandler()));
+    super.registerHandler(getView().addFileFormatChangeHandler(new FileFormatChangeHandler()));
+    super.registerHandler(getEventBus().addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
+    getView().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
+    getView().setTablesValidator(new TablesValidator());
+    getView().setDestinationValidator(new DestinationValidator());
   }
 
   private void initFileSelectionType() {
-    if(getDisplay().getFileFormat().equalsIgnoreCase("csv")) {
+    if(getView().getFileFormat().equalsIgnoreCase("csv")) {
       fileSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
     } else {
       fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
@@ -118,11 +113,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
   protected void onUnbind() {
+    super.onUnbind();
     tableListPresenter.unbind();
     fileSelectionPresenter.unbind();
     datasourceName = null;
@@ -130,20 +122,15 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   }
 
   @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
+  public void onReveal() {
     initUnits();
-    getDisplay().showDialog();
   }
 
   private void initUnits() {
     ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
       @Override
       public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getDisplay().setUnits(units);
+        getView().setUnits(units);
       }
     }).send();
     ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/functional-units/entities/table").get().withCallback(new ResourceCallback<TableDto>() {
@@ -154,10 +141,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     }).send();
   }
 
-  //
-  // Wizard Methods
-  //
-
+  @Override
   public void onWizardRequired(WizardRequiredEvent event) {
     if(event.getEventParameters().length != 0) {
       if(event.getEventParameters()[0] instanceof String) {
@@ -179,7 +163,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     public boolean validate() {
       List<String> errors = formValidationErrors();
       if(errors.size() > 0) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(errors).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errors).build());
         return false;
       }
       return true;
@@ -188,12 +172,12 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     private List<String> formValidationErrors() {
       List<String> result = new ArrayList<String>();
 
-      String filename = getDisplay().getOutFile();
+      String filename = getView().getOutFile();
       if(filename == null || filename.equals("")) {
         result.add("DestinationFileIsMissing");
-      } else if(getDisplay().getFileFormat().equalsIgnoreCase("excel") && !filename.endsWith(".xls") && !filename.endsWith(".xlsx")) {
+      } else if(getView().getFileFormat().equalsIgnoreCase("excel") && !filename.endsWith(".xls") && !filename.endsWith(".xlsx")) {
         result.add("ExcelFileSuffixInvalid");
-      } else if(getDisplay().getFileFormat().equalsIgnoreCase("xml") && !filename.endsWith(".zip")) {
+      } else if(getView().getFileFormat().equalsIgnoreCase("xml") && !filename.endsWith(".zip")) {
         result.add("ZipFileSuffixInvalid");
       }
       return result;
@@ -204,7 +188,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     @Override
     public boolean validate() {
       if(tableListPresenter.getTables().size() == 0) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
         return false;
       } else {
         boolean identifierEntityTable = false;
@@ -214,7 +198,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
             break;
           }
         }
-        getDisplay().renderUnitSelection(identifierEntityTable);
+        getView().renderUnitSelection(identifierEntityTable);
       }
       return true;
     }
@@ -232,7 +216,7 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
 
     @Override
     public void onClick(ClickEvent event) {
-      getDisplay().renderPendingConclusion();
+      getView().renderPendingConclusion();
       ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
       .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
       .withCallback(400, new ClientFailureResponseCodeCallBack()) //
@@ -252,12 +236,12 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
       }
 
       dto.setTablesArray(selectedTables);
-      dto.setFormat(getDisplay().getFileFormat());
-      dto.setOut(getDisplay().getOutFile());
-      dto.setNonIncremental(!getDisplay().isIncremental());
-      dto.setNoVariables(!getDisplay().isWithVariables());
-      if(getDisplay().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
-      if(getDisplay().isUnitId()) dto.setUnit(getDisplay().getSelectedUnit());
+      dto.setFormat(getView().getFileFormat());
+      dto.setOut(getView().getOutFile());
+      dto.setNonIncremental(!getView().isIncremental());
+      dto.setNoVariables(!getView().isWithVariables());
+      if(getView().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
+      if(getView().isUnitId()) dto.setUnit(getView().getSelectedUnit());
 
       return dto;
     }
@@ -266,8 +250,8 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-      getDisplay().renderFailedConclusion();
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      getView().renderFailedConclusion();
     }
   }
 
@@ -276,38 +260,33 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     public void onResponseCode(Request request, Response response) {
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
-      getDisplay().renderCompletedConclusion(jobId);
+      getView().renderCompletedConclusion(jobId);
     }
   }
 
-  static class JobLinkClickHandler implements ClickHandler {
+  class JobLinkClickHandler implements ClickHandler {
 
-    private final EventBus eventBus;
-
-    public JobLinkClickHandler(EventBus eventBus) {
+    public JobLinkClickHandler() {
       super();
-      this.eventBus = eventBus;
     }
 
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new PlaceChangeEvent(Places.jobsPlace));
+      getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
     }
   }
 
   class CancelClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      getDisplay().hideDialog();
-      unbind();
+      getView().hide();
     }
   }
 
   class FinishClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      getDisplay().hideDialog();
-      unbind();
+      getView().hide();
     }
   }
 
@@ -319,13 +298,9 @@ public class DataExportPresenter extends WidgetPresenter<DataExportPresenter.Dis
     }
   }
 
-  public interface Display extends WidgetDisplay {
-
-    void showDialog();
+  public interface Display extends PopupView {
 
     void renderUnitSelection(boolean identifierEntityTable);
-
-    void hideDialog();
 
     void setTablesValidator(ValidationHandler validationHandler);
 

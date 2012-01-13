@@ -12,15 +12,13 @@ package org.obiba.opal.web.gwt.inject.client;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-
 /**
  * Bind concrete implementations to interfaces within the Create View wizard.
  */
-public class CreateViewWizardModule extends AbstractGinModule {
+public class CreateViewWizardModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bind(CreateViewStepPresenter.Display.class).to(CreateViewStepView.class);
+    bindWizardPresenterWidget(CreateViewStepPresenter.class, CreateViewStepPresenter.Display.class, CreateViewStepView.class, CreateViewStepPresenter.Wizard.class);
   }
 }

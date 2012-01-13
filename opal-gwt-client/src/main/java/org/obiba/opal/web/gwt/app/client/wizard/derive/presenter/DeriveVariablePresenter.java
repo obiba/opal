@@ -12,11 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -28,8 +24,10 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationHideEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
@@ -47,40 +45,55 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
 
-/**
- *
- */
-public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePresenter.Display> implements Wizard {
+public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariablePresenter.Display> {
+
+  public static final WizardType CategorizeWizardType = new WizardType();
+
+  public static class CategorizeWizard extends WizardProxy<DeriveVariablePresenter> {
+
+    @Inject
+    protected CategorizeWizard(EventBus eventBus, Provider<DeriveVariablePresenter> wizardProvider) {
+      super(eventBus, CategorizeWizardType, wizardProvider);
+    }
+
+  }
+
+  public static final WizardType CustomWizardType = new WizardType();
+
+  public static class CustomWizard extends WizardProxy<DeriveVariablePresenter> {
+
+    @Inject
+    protected CustomWizard(EventBus eventBus, Provider<DeriveVariablePresenter> wizardProvider) {
+      super(eventBus, CustomWizardType, wizardProvider);
+    }
+
+  }
 
   public static final int PAGE_SIZE = 20;
 
-  private static Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
 
-  @Inject
-  private DeriveCategoricalVariableStepPresenter categoricalPresenter;
+  private final DeriveCategoricalVariableStepPresenter categoricalPresenter;
 
-  @Inject
-  private DeriveBooleanVariableStepPresenter booleanPresenter;
+  private final DeriveBooleanVariableStepPresenter booleanPresenter;
 
-  @Inject
-  private DeriveNumericalVariableStepPresenter numericalPresenter;
+  private final DeriveNumericalVariableStepPresenter numericalPresenter;
 
-  @Inject
-  private DeriveTemporalVariableStepPresenter temporalPresenter;
+  private final DeriveTemporalVariableStepPresenter temporalPresenter;
 
-  @Inject
-  private DeriveOpenTextualVariableStepPresenter openTextualPresenter;
+  private final DeriveOpenTextualVariableStepPresenter openTextualPresenter;
 
-  @Inject
-  private ScriptEvaluationPresenter scriptEvaluationPresenter;
+  private final ScriptEvaluationPresenter scriptEvaluationPresenter;
 
-  @Inject
-  private DeriveCustomVariablePresenter deriveCustomVariablePresenter;
+  private final DeriveCustomVariablePresenter deriveCustomVariablePresenter;
 
   private VariableDto variable;
 
@@ -94,18 +107,19 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
   private Runnable viewCreationConfirmation;
 
-  //
-  // Constructors
-  //
-
   @Inject
-  public DeriveVariablePresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  @SuppressWarnings("PMD.ExcessiveParameterList")
+  public DeriveVariablePresenter(final Display display, final EventBus eventBus, Translations translations, DeriveTemporalVariableStepPresenter temporalPresenter, DeriveCategoricalVariableStepPresenter categoricalPresenter, DeriveBooleanVariableStepPresenter booleanPresenter, DeriveNumericalVariableStepPresenter numericalPresenter, DeriveOpenTextualVariableStepPresenter openTextualPresenter, ScriptEvaluationPresenter scriptEvaluationPresenter, DeriveCustomVariablePresenter deriveCustomVariablePresenter) {
+    super(eventBus, display);
+    this.translations = translations;
+    this.categoricalPresenter = categoricalPresenter;
+    this.booleanPresenter = booleanPresenter;
+    this.numericalPresenter = numericalPresenter;
+    this.temporalPresenter = temporalPresenter;
+    this.openTextualPresenter = openTextualPresenter;
+    this.scriptEvaluationPresenter = scriptEvaluationPresenter;
+    this.deriveCustomVariablePresenter = deriveCustomVariablePresenter;
   }
-
-  //
-  // Wizard Methods
-  //
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
@@ -118,7 +132,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
 
     variable = (VariableDto) event.getEventParameters()[0];
-    getDisplay().setDefaultDerivedName(variable.getName());
+    getView().setDefaultDerivedName(variable.getName());
 
     ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
       @Override
@@ -131,23 +145,20 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     updateDatasources();
 
-    switch(event.getWizardType()) {
-    case DERIVE_CATEGORIZE_VARIABLE:
+    if(event.getAssociatedType() == CategorizeWizardType) {
       updateDerivationPresenter();
-      break;
-    case DERIVE_CUSTOM_VARIABLE:
+    } else if(event.getAssociatedType() == CustomWizardType) {
       setCustomDerivationPresenter();
-      break;
-    default:
-      // TODO
-      break;
+    } else {
+      GWT.log("unknown wizard type");
     }
+
   }
 
   private void setCustomDerivationPresenter() {
     derivationPresenter = deriveCustomVariablePresenter;
     derivationPresenter.initialize(variable);
-    getDisplay().appendWizardSteps(derivationPresenter.getWizardSteps());
+    getView().appendWizardSteps(derivationPresenter.getWizardSteps());
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
@@ -157,7 +168,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     derivationPresenter = null;
     if(valueType.equals("binary")) {
       // should not arrive here
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("Cannot categorize binary values.").build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("Cannot categorize binary values.").build());
     } else if(valueType.equals("text") && Variables.allCategoriesMissing(variable)) {
       derivationPresenter = openTextualPresenter;
     } else if(valueType.equals("integer") || valueType.equals("decimal")) {
@@ -174,7 +185,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     if(derivationPresenter != null) {
       derivationPresenter.initialize(variable);
-      getDisplay().appendWizardSteps(derivationPresenter.getWizardSteps());
+      getView().appendWizardSteps(derivationPresenter.getWizardSteps());
     }
   }
 
@@ -194,19 +205,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     return false;
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
   @Override
   protected void onBind() {
     categoricalPresenter.bind();
@@ -221,16 +219,16 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
       @Override
       public void onSuccess(VariableDto variable) {
-        getDisplay().setScriptEvaluationSuccess(true);
+        getView().setScriptEvaluationSuccess(true);
       }
 
       @Override
       public void onFailure(VariableDto variable) {
-        getDisplay().setScriptEvaluationSuccess(false);
+        getView().setScriptEvaluationSuccess(false);
       }
     });
-    getDisplay().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay());
-    getDisplay().setScriptEvaluationStepInHandler(new ScriptEvaluationStepInHandler());
+    getView().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay());
+    getView().setScriptEvaluationStepInHandler(new ScriptEvaluationStepInHandler());
     addEventHandlers();
   }
 
@@ -246,19 +244,10 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     scriptEvaluationPresenter.unbind();
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   protected void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getDisplay().addFinishClickHandler(new FinishClickHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getView().addFinishClickHandler(new FinishClickHandler()));
   }
 
   //
@@ -269,7 +258,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     @Override
     public void onResource(Response response, JsArray<DatasourceDto> resources) {
       datasources = JsArrays.toSafeArray(resources);
-      getDisplay().populateDatasources(datasources);
+      getView().populateDatasources(datasources);
       for(DatasourceDto ds : JsArrays.toIterable(datasources)) {
         addViewSuggestions(ds);
       }
@@ -285,7 +274,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
             @Override
             public void onResource(Response response, ViewDto resource) {
               if(hasTableInFrom(resource)) {
-                getDisplay().addViewSuggestion(ds, viewName);
+                getView().addViewSuggestion(ds, viewName);
               }
             }
 
@@ -309,8 +298,8 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
 
     @Override
     public void onClick(ClickEvent arg0) {
-      getDisplay().hideDialog();
-      eventBus.fireEvent(new ScriptEvaluationHideEvent());
+      getView().hide();
+      getEventBus().fireEvent(new ScriptEvaluationHideEvent());
     }
   }
 
@@ -321,21 +310,21 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
       // validation
       List<String> errorMessages = validate();
       if(errorMessages.size() > 0) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
         return;
       }
 
-      final String datasourceName = getDisplay().getDatasourceName();
-      final String viewName = getDisplay().getViewName();
+      final String datasourceName = getView().getDatasourceName();
+      final String viewName = getView().getViewName();
       final VariableDto derived = derivationPresenter.getDerivedVariable();
-      derived.setName(getDisplay().getDerivedName());
+      derived.setName(getView().getDerivedName());
 
       ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + datasourceName + "/view/" + viewName).get().withCallback(new ResourceCallback<ViewDto>() {
 
         @Override
         public void onResource(Response response, final ViewDto resource) {
           if(!hasTableInFrom(resource)) {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.invalidDestinationView()).build());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.invalidDestinationView()).build());
           } else {
             if(getVariablePosition(resource, derived) != -1) {
               overwriteConfirmation = new Runnable() {
@@ -344,7 +333,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
                   saveVariable(resource, derived);
                 }
               };
-              eventBus.fireEvent(new ConfirmationRequiredEvent(overwriteConfirmation, "overwriteVariable", "confirmOverwriteVariable"));
+              getEventBus().fireEvent(new ConfirmationRequiredEvent(overwriteConfirmation, "overwriteVariable", "confirmOverwriteVariable"));
             } else {
               saveVariable(resource, derived);
             }
@@ -361,7 +350,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
               saveVariable(datasourceName, viewName, derived);
             }
           };
-          eventBus.fireEvent(new ConfirmationRequiredEvent(viewCreationConfirmation, "createView", "confirmCreateView"));
+          getEventBus().fireEvent(new ConfirmationRequiredEvent(viewCreationConfirmation, "createView", "confirmCreateView"));
         }
       }).send();
 
@@ -412,7 +401,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
           if(response.getStatusCode() == Response.SC_OK) {
             close(view, derived);
           } else {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
           }
         }
       };
@@ -456,10 +445,10 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
-            eventBus.fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
+            getEventBus().fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
             close(view, derived);
           } else {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
           }
         }
       };
@@ -479,26 +468,26 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
 
     private void close(ViewDto view, VariableDto derived) {
-      getDisplay().hideDialog();
-      eventBus.fireEvent(new ScriptEvaluationHideEvent());
-      if(getDisplay().isOpenEditorSelected()) {
-        eventBus.fireEvent(new ViewConfigurationRequiredEvent(view, derived));
+      getView().hide();
+      getEventBus().fireEvent(new ScriptEvaluationHideEvent());
+      if(getView().isOpenEditorSelected()) {
+        getEventBus().fireEvent(new ViewConfigurationRequiredEvent(view, derived));
       }
     }
 
     private List<String> validate() {
-      getDisplay().setDerivedNameError(false);
-      getDisplay().setViewNameError(false);
+      getView().setDerivedNameError(false);
+      getView().setViewNameError(false);
 
-      String viewName = getDisplay().getViewName();
+      String viewName = getView().getViewName();
 
       List<String> errorMessages = new ArrayList<String>();
-      if(getDisplay().getDerivedName().isEmpty()) {
-        getDisplay().setDerivedNameError(true);
+      if(getView().getDerivedName().isEmpty()) {
+        getView().setDerivedNameError(true);
         errorMessages.add(translations.derivedVariableNameRequired());
       }
       if(viewName.isEmpty()) {
-        getDisplay().setViewNameError(true);
+        getView().setViewNameError(true);
         errorMessages.add(translations.destinationViewNameRequired());
       } else {
         // if destination table exists, it must be a view
@@ -508,7 +497,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
 
     private void validateDestinationView(List<String> errorMessages) {
-      String datasourceName = getDisplay().getDatasourceName();
+      String datasourceName = getView().getDatasourceName();
       for(DatasourceDto ds : JsArrays.toIterable(datasources)) {
         if(ds.getName().equals(datasourceName)) {
           validateDestinationView(errorMessages, ds);
@@ -519,12 +508,12 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     private void validateDestinationView(List<String> errorMessages, DatasourceDto ds) {
       if(ds.getTableArray() == null) return;
 
-      String viewName = getDisplay().getViewName();
+      String viewName = getView().getViewName();
       for(int i = 0; i < ds.getTableArray().length(); i++) {
         String tName = ds.getTableArray().get(i);
         if(tName.equals(viewName)) {
           if(!isView(ds, viewName)) {
-            getDisplay().setViewNameError(true);
+            getView().setViewNameError(true);
             errorMessages.add(translations.addDerivedVariableToViewOnly());
           }
           break;
@@ -559,7 +548,7 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends PopupView {
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
@@ -570,10 +559,6 @@ public class DeriveVariablePresenter extends WidgetPresenter<DeriveVariablePrese
     void populateDatasources(JsArray<DatasourceDto> datasources);
 
     HandlerRegistration addFinishClickHandler(ClickHandler handler);
-
-    void showDialog();
-
-    void hideDialog();
 
     void clear();
 

@@ -32,21 +32,23 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class DeriveVariableView extends Composite implements DeriveVariablePresenter.Display {
+public class DeriveVariableView extends PopupViewImpl implements DeriveVariablePresenter.Display {
 
   @UiTemplate("DeriveVariableView.ui.xml")
   interface ViewUiBinder extends UiBinder<WizardDialogBox, DeriveVariableView> {
@@ -93,7 +95,9 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
 
   private Map<String, List<String>> viewSuggestions;
 
-  public DeriveVariableView() {
+  @Inject
+  public DeriveVariableView(EventBus eventBus) {
+    super(eventBus);
     this.dialog = uiBinder.createAndBindUi(this);
 
     datasourceNameBox.addChangeHandler(new ChangeHandler() {
@@ -163,20 +167,14 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
   }
 
   @Override
-  public void showDialog() {
+  public void show() {
     if(stepChainBuilder != null) {
       initWizardDialog();
     }
 
     stepChain.reset();
     clear();
-    dialog.center();
-    dialog.show();
-  }
-
-  @Override
-  public void hideDialog() {
-    dialog.hide();
+    super.show();
   }
 
   @Override
@@ -206,15 +204,7 @@ public class DeriveVariableView extends Composite implements DeriveVariablePrese
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return dialog;
   }
 
   @Override

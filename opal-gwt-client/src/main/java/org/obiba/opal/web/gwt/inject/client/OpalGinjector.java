@@ -47,7 +47,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardManager;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
@@ -191,8 +190,6 @@ public interface OpalGinjector extends Ginjector {
   DeriveVariablePresenter getDeriveVariablePresenter();
 
   CodingViewDialogPresenter getCodingViewDialogPresenter();
-
-  WizardManager getWizardManager();
 
   Translations getTranslations();
 

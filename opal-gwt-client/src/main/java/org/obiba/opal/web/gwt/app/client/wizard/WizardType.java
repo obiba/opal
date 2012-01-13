@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard;
 
-public enum WizardType {
-  CREATE_DATASOURCE, CREATE_VIEW, IMPORT_VARIABLES, IMPORT_DATA, EXPORT_DATA, IMPORT_IDENTIFIERS, COPY_DATA, MAP_IDENTIFIERS, DERIVE_CATEGORIZE_VARIABLE, DERIVE_CUSTOM_VARIABLE, CREATE_CODING_VIEW
+import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+
+import com.google.gwt.event.shared.GwtEvent.Type;
+
+public class WizardType extends Type<WizardRequiredEvent.Handler> {
 }

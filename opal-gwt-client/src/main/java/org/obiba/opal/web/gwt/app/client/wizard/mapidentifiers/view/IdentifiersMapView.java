@@ -24,17 +24,20 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class IdentifiersMapView extends Composite implements IdentifiersMapPresenter.Display {
+public class IdentifiersMapView extends PopupViewImpl implements IdentifiersMapPresenter.Display {
 
   @UiTemplate("IdentifiersMapView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, IdentifiersMapView> {
@@ -43,6 +46,8 @@ public class IdentifiersMapView extends Composite implements IdentifiersMapPrese
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   WizardDialogBox dialog;
@@ -69,9 +74,10 @@ public class IdentifiersMapView extends Composite implements IdentifiersMapPrese
 
   private ValidationHandler fileSelectionValidator;
 
-  public IdentifiersMapView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public IdentifiersMapView(EventBus eventBus) {
+    super(eventBus);
+    this.widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
   }
@@ -96,27 +102,18 @@ public class IdentifiersMapView extends Composite implements IdentifiersMapPrese
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
 
   @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showDialog() {
+  public void show() {
     stepChain.reset();
-    dialog.center();
-    dialog.show();
-  }
-
-  @Override
-  public void hideDialog() {
-    dialog.hide();
+    super.show();
   }
 
   @Override

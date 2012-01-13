@@ -20,9 +20,12 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEve
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -225,7 +228,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   }
 
   private void addView(String datasource) {
-    getEventBus().fireEvent(new WizardRequiredEvent(WizardType.CREATE_VIEW, datasource));
+    getEventBus().fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasource));
   }
 
   private void removeDatasource(String datasource) {
@@ -365,21 +368,21 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   final class ExportDataCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA, datasourceName));
+      getEventBus().fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, datasourceName));
     }
   }
 
   final class CopyDataCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.COPY_DATA, datasourceName));
+      getEventBus().fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, datasourceName));
     }
   }
 
   final class AddUpdateTablesCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.IMPORT_VARIABLES, datasourceName));
+      getEventBus().fireEvent(new WizardRequiredEvent(VariablesImportPresenter.WizardType, datasourceName));
     }
   }
 

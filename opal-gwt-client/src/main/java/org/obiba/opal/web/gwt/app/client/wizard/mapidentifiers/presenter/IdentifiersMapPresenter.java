@@ -14,12 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -32,8 +26,9 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
-import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
-import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -49,6 +44,7 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
@@ -56,18 +52,23 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
 
-public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPresenter.Display> implements Wizard {
+public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMapPresenter.Display> {
 
-  @Inject
-  public IdentifiersMapPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public static final WizardType WizardType = new WizardType();
+
+  public static class Wizard extends WizardProxy<IdentifiersMapPresenter> {
+
+    @Inject
+    protected Wizard(EventBus eventBus, Provider<IdentifiersMapPresenter> wizardProvider) {
+      super(eventBus, WizardType, wizardProvider);
+    }
+
   }
 
-  public interface Display extends WidgetDisplay {
-    void showDialog();
-
-    void hideDialog();
+  public interface Display extends PopupView {
 
     HandlerRegistration addCancelClickHandler(ClickHandler handler);
 
@@ -99,53 +100,32 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
 
   }
 
-  @Inject
-  private FileSelectionPresenter csvOptionsFileSelectionPresenter;
+  private final FileSelectionPresenter csvOptionsFileSelectionPresenter;
 
-  private List<String> availableCharsets = new ArrayList<String>();
+  private final List<String> availableCharsets = new ArrayList<String>();
 
   protected TableDto identifiersTable;
 
-  @Override
-  public void onWizardRequired(WizardRequiredEvent event) {
-    // nothing to do
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
-  @Override
-  public void refreshDisplay() {
+  @Inject
+  public IdentifiersMapPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter csvOptionsFileSelectionPresenter) {
+    super(eventBus, display);
+    this.csvOptionsFileSelectionPresenter = csvOptionsFileSelectionPresenter;
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     getIdentifiersTable();
     getDefaultCharset();
     getAvailableCharsets();
 
     csvOptionsFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     csvOptionsFileSelectionPresenter.bind();
-    getDisplay().setCsvOptionsFileSelectorWidgetDisplay(csvOptionsFileSelectionPresenter.getDisplay());
+    getView().setCsvOptionsFileSelectorWidgetDisplay(csvOptionsFileSelectionPresenter.getDisplay());
 
-    getDisplay().setFileSelectionValidator(new FileValidator());
+    getView().setFileSelectionValidator(new FileValidator());
 
     addEventHandlers();
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   private void getIdentifiersTable() {
@@ -161,22 +141,22 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().addCancelClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addCancelClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
-        getDisplay().hideDialog();
+        getView().hide();
       }
     }));
-    super.registerHandler(getDisplay().addCloseClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addCloseClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
-        getDisplay().hideDialog();
+        getView().hide();
       }
     }));
 
-    super.registerHandler(getDisplay().addFinishClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addFinishClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
@@ -184,13 +164,13 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
       }
     }));
 
-    super.registerHandler(getDisplay().addFileSelectedClickHandler(new FileSelectedHandler()));
+    super.registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
   }
 
   class FileValidator extends AbstractValidationHandler {
 
     public FileValidator() {
-      super(eventBus);
+      super(getEventBus());
     }
 
     @Override
@@ -198,9 +178,9 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
       validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "CSVFileRequired"));
-      validators.add(new RegExValidator(getDisplay().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
-      validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new RequiredTextValidator(getDisplay().getCsvOptions().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
-      validators.add(new ConditionalValidator(getDisplay().getCsvOptions().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
+      validators.add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
+      validators.add(new ConditionalValidator(getView().getCsvOptions().isCharsetSpecify(), new RequiredTextValidator(getView().getCsvOptions().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
+      validators.add(new ConditionalValidator(getView().getCsvOptions().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
 
       return validators;
     }
@@ -226,10 +206,10 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
     public void onResource(Response response, JsArray<FunctionalUnitDto> resource) {
       JsArray<FunctionalUnitDto> units = JsArrays.toSafeArray(resource);
       if(units.length() != 2) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("TwoMappedUnitsExpected").build());
-        getDisplay().renderMappedUnitsFailed();
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("TwoMappedUnitsExpected").build());
+        getView().renderMappedUnitsFailed();
       } else {
-        getDisplay().renderMappedUnits(units);
+        getView().renderMappedUnits(units);
       }
     }
   }
@@ -238,25 +218,25 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == Response.SC_NOT_FOUND) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("MappedUnitsCannotBeIdentified").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("MappedUnitsCannotBeIdentified").build());
       } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
         try {
           ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).build());
         } catch(Exception e) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
         }
       }
-      getDisplay().renderMappedUnitsFailed();
+      getView().renderMappedUnitsFailed();
     }
   }
 
   private void finish() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getDisplay().getSelectedUnitName() + "/entities/identifiers/map").put().authorize(new Authorizer(eventBus) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getView().getSelectedUnitName() + "/entities/identifiers/map").put().authorize(new Authorizer(getEventBus()) {
 
       @Override
       public void authorized() {
-        getDisplay().renderPendingConclusion();
+        getView().renderPendingConclusion();
         mapIdentifiers();
       }
     }).send();
@@ -267,22 +247,22 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
 
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
-          getDisplay().renderCompletedConclusion(response.getText());
+          getView().renderCompletedConclusion(response.getText());
         } else {
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          getDisplay().renderFailedConclusion();
+          getView().renderFailedConclusion();
           if(errorDto != null) {
-            // eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).build());
+            // getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).build());
             JsArrayString errors = JsArrays.toSafeArray(errorDto.getArgumentsArray());
             for(int i = 0; i < errors.length(); i++) {
-              eventBus.fireEvent(NotificationEvent.newBuilder().error(errors.get(i)).build());
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(errors.get(i)).build());
             }
           }
         }
       }
     };
 
-    String path = "/functional-unit/" + getDisplay().getSelectedUnitName() + "/entities/identifiers/map?path=" + getSelectedCsvFile().getText();
+    String path = "/functional-unit/" + getView().getSelectedUnitName() + "/entities/identifiers/map?path=" + getSelectedCsvFile().getText();
 
     ResourceRequestBuilderFactory.newBuilder().forResource(path).put()//
     .accept("application/x-protobuf+json").accept("text/plain").withCallback(200, callbackHandler)//
@@ -296,7 +276,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
       @Override
       public void onResource(Response response, JsArrayString resource) {
         String charset = resource.get(0);
-        getDisplay().setDefaultCharset(charset);
+        getView().setDefaultCharset(charset);
       }
     }).send();
 
@@ -331,7 +311,7 @@ public class IdentifiersMapPresenter extends WidgetPresenter<IdentifiersMapPrese
     HasValue<Boolean> result = new HasValue<Boolean>() {
 
       public Boolean getValue() {
-        return availableCharsets.contains(getDisplay().getCsvOptions().getCharsetSpecifyText().getText());
+        return availableCharsets.contains(getView().getCsvOptions().getCharsetSpecifyText().getText());
       }
 
       public void setValue(Boolean arg0) {

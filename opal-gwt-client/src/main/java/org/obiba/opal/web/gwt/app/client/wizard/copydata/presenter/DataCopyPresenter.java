@@ -14,19 +14,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -40,16 +36,29 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
 
-public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display> implements Wizard {
+public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.Display> {
 
-  @Inject
-  private TableListPresenter tableListPresenter;
+  public static final WizardType WizardType = new WizardType();
+
+  public static class Wizard extends WizardProxy<DataCopyPresenter> {
+
+    @Inject
+    protected Wizard(EventBus eventBus, Provider<DataCopyPresenter> wizardProvider) {
+      super(eventBus, WizardType, wizardProvider);
+    }
+
+  }
+
+  private final TableListPresenter tableListPresenter;
 
   private String datasourceName;
 
@@ -60,22 +69,14 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
    * @param eventBus
    */
   @Inject
-  public DataCopyPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
   public DataCopyPresenter(Display display, EventBus eventBus, TableListPresenter tableListPresenter) {
-    this(display, eventBus);
+    super(eventBus, display);
     this.tableListPresenter = tableListPresenter;
   }
 
   @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
   protected void onBind() {
+    super.onBind();
     initDisplayComponents();
     tableListPresenter.clear();
     if(datasourceName != null) {
@@ -87,36 +88,28 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
 
   protected void initDisplayComponents() {
     tableListPresenter.bind();
-    getDisplay().setTableWidgetDisplay(tableListPresenter.getDisplay());
+    getView().setTableWidgetDisplay(tableListPresenter.getDisplay());
 
-    super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getDisplay().addCloseClickHandler(new FinishClickHandler()));
-    super.registerHandler(getDisplay().addSubmitClickHandler(new SubmitClickHandler()));
-    super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler(eventBus)));
-    super.registerHandler(eventBus.addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
-    getDisplay().setTablesValidator(new TablesValidator());
-    getDisplay().setDestinationValidator(new DestinationValidator());
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getView().addCloseClickHandler(new FinishClickHandler()));
+    super.registerHandler(getView().addSubmitClickHandler(new SubmitClickHandler()));
+    super.registerHandler(getView().addJobLinkClickHandler(new JobLinkClickHandler()));
+    super.registerHandler(getEventBus().addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
+    getView().setTablesValidator(new TablesValidator());
+    getView().setDestinationValidator(new DestinationValidator());
   }
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     tableListPresenter.unbind();
     datasourceName = null;
     table = null;
   }
 
   @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
+  public void onReveal() {
     initDatasources();
-    getDisplay().showDialog();
   }
 
   private void initDatasources() {
@@ -129,9 +122,9 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
 
         }
         if(datasources != null && datasources.size() > 0) {
-          getDisplay().setDatasources(datasources);
+          getView().setDatasources(datasources);
         } else {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error("NoDataToCopy").build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error("NoDataToCopy").build());
         }
       }
     }).send();
@@ -188,7 +181,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
     public boolean validate() {
       List<String> errors = formValidationErrors();
       if(errors.size() > 0) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(errors).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errors).build());
         return false;
       }
       return true;
@@ -205,7 +198,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
     @Override
     public boolean validate() {
       if(tableListPresenter.getTables().size() == 0) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
         return false;
       }
       return true;
@@ -216,7 +209,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
 
     @Override
     public void onClick(ClickEvent event) {
-      getDisplay().renderPendingConclusion();
+      getView().renderPendingConclusion();
       ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
       .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
       .withCallback(400, new ClientFailureResponseCodeCallBack()) //
@@ -236,10 +229,10 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
       }
 
       dto.setTablesArray(selectedTables);
-      dto.setDestination(getDisplay().getSelectedDatasource());
-      dto.setNonIncremental(!getDisplay().isIncremental());
-      dto.setNoVariables(!getDisplay().isWithVariables());
-      if(getDisplay().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
+      dto.setDestination(getView().getSelectedDatasource());
+      dto.setNonIncremental(!getView().isIncremental());
+      dto.setNoVariables(!getView().isWithVariables());
+      if(getView().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
 
       return dto;
     }
@@ -248,8 +241,8 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-      getDisplay().renderFailedConclusion();
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      getView().renderFailedConclusion();
     }
   }
 
@@ -258,38 +251,33 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
     public void onResponseCode(Request request, Response response) {
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
-      getDisplay().renderCompletedConclusion(jobId);
+      getView().renderCompletedConclusion(jobId);
     }
   }
 
-  static class JobLinkClickHandler implements ClickHandler {
+  class JobLinkClickHandler implements ClickHandler {
 
-    private final EventBus eventBus;
-
-    public JobLinkClickHandler(EventBus eventBus) {
+    public JobLinkClickHandler() {
       super();
-      this.eventBus = eventBus;
     }
 
     @Override
     public void onClick(ClickEvent arg0) {
-      eventBus.fireEvent(new PlaceChangeEvent(Places.jobsPlace));
+      getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
     }
   }
 
   class CancelClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      getDisplay().hideDialog();
-      unbind();
+      getView().hide();
     }
   }
 
   class FinishClickHandler implements ClickHandler {
 
     public void onClick(ClickEvent arg0) {
-      getDisplay().hideDialog();
-      unbind();
+      getView().hide();
     }
   }
 
@@ -301,11 +289,7 @@ public class DataCopyPresenter extends WidgetPresenter<DataCopyPresenter.Display
     }
   }
 
-  public interface Display extends WidgetDisplay {
-
-    void showDialog();
-
-    void hideDialog();
+  public interface Display extends PopupView {
 
     void setTablesValidator(ValidationHandler validationHandler);
 

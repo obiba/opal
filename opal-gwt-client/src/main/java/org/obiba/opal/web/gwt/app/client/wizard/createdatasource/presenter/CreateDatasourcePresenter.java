@@ -19,8 +19,9 @@ import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.wizard.Wizard;
-import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -36,14 +37,25 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class CreateDatasourcePresenter extends PresenterWidget<CreateDatasourcePresenter.Display> implements Wizard, HasDatasourceForms {
+public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatasourcePresenter.Display> implements HasDatasourceForms {
 
   private final CreateDatasourceConclusionStepPresenter createDatasourceConclusionStepPresenter;
 
   private final Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
+
+  public static final WizardType WizardType = new WizardType();
+
+  public static class Wizard extends WizardProxy<CreateDatasourcePresenter> {
+
+    @Inject
+    protected Wizard(EventBus eventBus, Provider<CreateDatasourcePresenter> wizardProvider) {
+      super(eventBus, WizardType, wizardProvider);
+    }
+
+  }
 
   @Inject
   public CreateDatasourcePresenter(final Display display, final EventBus eventBus, CreateDatasourceConclusionStepPresenter createDatasourceConclusionStepPresenter) {
@@ -72,6 +84,11 @@ public class CreateDatasourcePresenter extends PresenterWidget<CreateDatasourceP
 
   @Override
   protected void onReveal() {
+
+    for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
+      formPresenter.clearForm();
+    }
+
     updateDatasourceFormDisplay();
   }
 
@@ -91,17 +108,6 @@ public class CreateDatasourcePresenter extends PresenterWidget<CreateDatasourceP
     super.registerHandler(getView().addCreateClickHandler(new CreateClickHandler()));
     super.registerHandler(getView().addDatasourceTypeChangeHandler(new DatasourceTypeChangeHandler()));
     getView().setDatasourceSelectionTypeValidationHandler(new DatasourceSelectionTypeValidationHandler(getEventBus()));
-  }
-
-  @Override
-  public void revealDisplay() {
-    for(DatasourceFormPresenter formPresenter : datasourceFormPresenters) {
-      formPresenter.clearForm();
-    }
-  }
-
-  public void onWizardRequired(WizardRequiredEvent event) {
-    // nothing to do
   }
 
   final class DatasourceTypeChangeHandler implements ChangeHandler {

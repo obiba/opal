@@ -21,18 +21,21 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class IdentifiersImportView extends Composite implements IdentifiersImportPresenter.Display {
+public class IdentifiersImportView extends PopupViewImpl implements IdentifiersImportPresenter.Display {
 
   @UiTemplate("IdentifiersImportView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, IdentifiersImportView> {
@@ -41,6 +44,8 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   WizardDialogBox dialog;
@@ -73,9 +78,10 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
 
   private WizardStepChain stepChain;
 
-  public IdentifiersImportView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public IdentifiersImportView(EventBus eventBus) {
+    super(eventBus);
+    this.widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
   }
@@ -102,27 +108,18 @@ public class IdentifiersImportView extends Composite implements IdentifiersImpor
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
 
   @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showDialog() {
+  public void show() {
     stepChain.reset();
-    dialog.center();
-    dialog.show();
-  }
-
-  @Override
-  public void hideDialog() {
-    dialog.hide();
+    super.show();
   }
 
   @Override

@@ -13,8 +13,8 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
@@ -127,7 +127,7 @@ public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<Functio
   private final class ImportIdentifiersClickHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent arg0) {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.MAP_IDENTIFIERS));
+      getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersMapPresenter.WizardType));
     }
   }
 

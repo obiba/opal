@@ -27,16 +27,19 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class DataImportView extends Composite implements DataImportPresenter.Display {
+public class DataImportView extends PopupViewImpl implements DataImportPresenter.Display {
 
   @UiTemplate("DataImportView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DataImportView> {
@@ -45,6 +48,8 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   WizardDialogBox dialog;
@@ -81,9 +86,10 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
 
   private ValidationHandler formatStepValidator;
 
-  public DataImportView() {
-    initWidget(uiBinder.createAndBindUi(this));
-    uiBinder.createAndBindUi(this);
+  @Inject
+  public DataImportView(EventBus eventBus) {
+    super(eventBus);
+    widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
   }
@@ -91,7 +97,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
     .append(formatSelectionStep, formatSelectionHelp)//
-    .title(translations.dataImportFormatStep())// 
+    .title(translations.dataImportFormatStep())//
 
     .append(formatStep)//
     .help(new WidgetProvider() {
@@ -107,10 +113,10 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
       public boolean validate() {
         return formatStepValidator.validate();
       }
-    }).title(translations.dataImportFileStep())// 
+    }).title(translations.dataImportFileStep())//
 
     .append(identityArchiveStep)//
-    .title(translations.dataImportUnitStep())// 
+    .title(translations.dataImportUnitStep())//
     .help(new WidgetProvider() {
 
       @Override
@@ -120,7 +126,7 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
     }) //
 
     .append(destinationSelectionStep, destinationSelectionHelp)//
-    .title(translations.dataImportDestinationStep())// 
+    .title(translations.dataImportDestinationStep())//
 
     .append(conclusionStep)//
     .conclusion()//
@@ -136,15 +142,12 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
 
   @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+  protected PopupPanel asPopupPanel() {
+    return dialog;
   }
 
   @Override
@@ -169,15 +172,9 @@ public class DataImportView extends Composite implements DataImportPresenter.Dis
   }
 
   @Override
-  public void hideDialog() {
-    dialog.hide();
-  }
-
-  @Override
-  public void showDialog() {
+  public void show() {
     stepChain.reset();
-    dialog.center();
-    dialog.show();
+    super.show();
   }
 
   @Override

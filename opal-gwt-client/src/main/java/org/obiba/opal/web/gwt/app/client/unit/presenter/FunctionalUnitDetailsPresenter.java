@@ -20,8 +20,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -400,7 +400,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.IMPORT_IDENTIFIERS, functionalUnit));
+      getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersImportPresenter.WizardType, functionalUnit));
     }
 
   }

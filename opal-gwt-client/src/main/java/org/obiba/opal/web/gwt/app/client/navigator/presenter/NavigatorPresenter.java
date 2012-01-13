@@ -10,9 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
@@ -25,14 +26,12 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
-import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
 public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, NavigatorPresenter.Proxy> {
 
@@ -63,12 +62,9 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
   public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<NavigatorPresenter> {
   }
 
-  private final Provider<CreateDatasourcePresenter> createDatasourceProvider;
-
   @Inject
-  public NavigatorPresenter(final Display display, final Proxy proxy, final EventBus eventBus, Provider<CreateDatasourcePresenter> createDatasourceProvider) {
+  public NavigatorPresenter(final Display display, final Proxy proxy, final EventBus eventBus) {
     super(eventBus, display, proxy);
-    this.createDatasourceProvider = createDatasourceProvider;
   }
 
   @Override
@@ -84,15 +80,16 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
       @Override
       public void onClick(ClickEvent event) {
-        RevealRootPopupContentEvent.fire(getEventBus(), createDatasourceProvider.get());
+        getEventBus().fireEvent(new WizardRequiredEvent(CreateDatasourcePresenter.WizardType));
       }
+
     }));
 
     super.registerHandler(getView().addImportDataClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new WizardRequiredEvent(WizardType.IMPORT_DATA));
+        getEventBus().fireEvent(new WizardRequiredEvent(DataImportPresenter.WizardType));
       }
     }));
 
@@ -100,7 +97,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
       @Override
       public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA));
+        getEventBus().fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType));
       }
     }));
 

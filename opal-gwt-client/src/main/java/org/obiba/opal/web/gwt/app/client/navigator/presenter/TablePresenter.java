@@ -23,9 +23,10 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChange
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -348,14 +349,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   final class ExportDataCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.EXPORT_DATA, table));
+      getEventBus().fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, table));
     }
   }
 
   final class CopyDataCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(WizardType.COPY_DATA, table));
+      getEventBus().fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, table));
     }
   }
 

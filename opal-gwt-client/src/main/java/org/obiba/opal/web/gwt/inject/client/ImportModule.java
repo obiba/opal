@@ -22,16 +22,15 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DestinationSelec
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.IdentityArchiveStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.XmlFormatStepView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-
 /**
  * Bind concrete implementations to interfaces within the import wizard.
  */
-public class ImportModule extends AbstractGinModule {
+public class ImportModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bind(DataImportPresenter.Display.class).to(DataImportView.class);
+    bindWizardPresenterWidget(DataImportPresenter.class, DataImportPresenter.Display.class, DataImportView.class, DataImportPresenter.Wizard.class);
+
     bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class);
     bind(DestinationSelectionStepPresenter.Display.class).to(DestinationSelectionStepView.class);
     bind(XmlFormatStepPresenter.Display.class).to(XmlFormatStepView.class);
