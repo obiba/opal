@@ -26,6 +26,7 @@ application/cdmi-object cdmio
 application/cdmi-queue cdmiq
 application/cu-seeme cu
 application/davmount+xml davmount
+application/dicom dcm dicom
 application/dssc+der dssc
 application/dssc+xml xdssc
 application/ecmascript ecma
