@@ -65,7 +65,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   private final RequestCredentials credentials;
 
-  private ResourceAuthorizationCache authorizationCache;
+  private final ResourceAuthorizationCache authorizationCache;
 
   @Inject
   public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials, ResourceAuthorizationCache authorizationCache) {
@@ -101,10 +101,6 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   private void createSecurityResource() {
     createSecurityResource(getView().getUserName().getValue(), getView().getPassword().getValue());
-  }
-
-  @Override
-  protected void onUnbind() {
   }
 
   @Override
