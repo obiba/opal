@@ -231,7 +231,7 @@ public final class Dtos {
         // TODO link
         // valueBuilder.setLink();
         int length = ((byte[]) value.getValue()).length;
-        valueBuilder.setValue("binary[" + length + "]");
+        valueBuilder.setValue("byte[" + length + "]");
       } else {
         valueBuilder.setValue(value.toString());
       }
