@@ -85,7 +85,7 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
     };
     Command<ReportCommandOptions> reportCommand = commandRegistry.newCommand("report");
     reportCommand.setOptions(reportOptions);
-    commandSchedulerService.addCommand(name, "reports", reportCommand);
+    commandSchedulerService.addCommand(name, REPORT_SCHEDULING_GROUP, reportCommand);
   }
 
   @Override
