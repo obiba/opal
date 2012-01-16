@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -58,7 +59,6 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewStepPresenter.Display> {
 
@@ -116,9 +116,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getView().addCancelHandler(new CancelHandler()));
-    super.registerHandler(getView().addCreateHandler(new CreateHandler()));
-    super.registerHandler(getView().addCloseHandler(new CloseHandler()));
     super.registerHandler(getView().addConfigureHandler(new ConfigureHandler()));
     getView().setTablesValidator(new TablesValidator());
     getView().setSelectTypeValidator(new SelectTypeValidator());
@@ -130,6 +127,18 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     tableListPresenter.getTables().clear();
 
     getView().clear();
+  }
+
+  @Override
+  protected void onFinish() {
+    super.onFinish();
+    createViewIfDoesNotExist();
+  }
+
+  @Override
+  protected void onClose() {
+    super.onClose();
+    getEventBus().fireEvent(new DatasourceUpdatedEvent(datasourceDto));
   }
 
   @Override
@@ -218,7 +227,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends PopupView {
+  public interface Display extends WizardView {
 
     void clear();
 
@@ -238,12 +247,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
     void setTablesValidator(ValidationHandler validator);
 
-    HandlerRegistration addCancelHandler(ClickHandler handler);
-
-    HandlerRegistration addCreateHandler(ClickHandler handler);
-
-    HandlerRegistration addCloseHandler(ClickHandler handler);
-
     void renderPendingConclusion();
 
     void renderFailedConclusion(String msg);
@@ -252,21 +255,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
     HandlerRegistration addConfigureHandler(ClickHandler handler);
 
-  }
-
-  class CancelHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      getView().hide();
-    }
-  }
-
-  final class CloseHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent evt) {
-      getEventBus().fireEvent(new DatasourceUpdatedEvent(datasourceDto));
-      getView().hide();
-    }
   }
 
   final class ConfigureHandler implements ClickHandler {
@@ -350,13 +338,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       return validators;
     }
 
-  }
-
-  class CreateHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      createViewIfDoesNotExist();
-    }
   }
 
   class ViewFoundDoNotCreateCallback implements ResponseCodeCallback {

@@ -203,7 +203,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   }
 
   @Override
-  public HandlerRegistration addImportClickHandler(final ClickHandler handler) {
+  public HandlerRegistration addFinishClickHandler(final ClickHandler handler) {
     return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override
@@ -215,6 +215,16 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
         }
       }
     });
+  }
+
+  @Override
+  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
+    return dialog.addCancelClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
+    return dialog.addCloseClickHandler(handler);
   }
 
   @Override

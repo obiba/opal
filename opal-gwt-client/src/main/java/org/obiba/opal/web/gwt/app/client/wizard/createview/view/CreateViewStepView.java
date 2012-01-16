@@ -208,12 +208,12 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   }
 
   @Override
-  public HandlerRegistration addCancelHandler(ClickHandler handler) {
+  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return dialog.addCancelClickHandler(handler);
   }
 
   @Override
-  public HandlerRegistration addCreateHandler(final ClickHandler handler) {
+  public HandlerRegistration addFinishClickHandler(final ClickHandler handler) {
     return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override
@@ -221,6 +221,17 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
         if(tablesValidator.validate()) {
           handler.onClick(evt);
         }
+      }
+    });
+  }
+
+  @Override
+  public HandlerRegistration addCloseClickHandler(final ClickHandler handler) {
+    return dialog.addCloseClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        handler.onClick(evt);
       }
     });
   }
@@ -282,17 +293,6 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
     dialog.setProgress(false);
     dialog.setCancelEnabled(true);
     conclusionStep.setStepTitle(translations.addViewFailed());
-  }
-
-  @Override
-  public HandlerRegistration addCloseHandler(final ClickHandler handler) {
-    return dialog.addCloseClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent evt) {
-        handler.onClick(evt);
-      }
-    });
   }
 
 }

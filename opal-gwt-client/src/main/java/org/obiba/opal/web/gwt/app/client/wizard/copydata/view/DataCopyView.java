@@ -165,7 +165,7 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   }
 
   @Override
-  public HandlerRegistration addSubmitClickHandler(final ClickHandler submitHandler) {
+  public HandlerRegistration addFinishClickHandler(final ClickHandler submitHandler) {
     return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override

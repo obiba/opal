@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -43,7 +44,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.Display> {
 
@@ -79,20 +79,12 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     super.onBind();
     initDisplayComponents();
     tableListPresenter.clear();
-    if(datasourceName != null) {
-      tableListPresenter.selectDatasourceTables(datasourceName);
-    } else if(table != null) {
-      tableListPresenter.selectTable(table);
-    }
+
   }
 
   protected void initDisplayComponents() {
     tableListPresenter.bind();
     getView().setTableWidgetDisplay(tableListPresenter.getDisplay());
-
-    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getView().addCloseClickHandler(new FinishClickHandler()));
-    super.registerHandler(getView().addSubmitClickHandler(new SubmitClickHandler()));
     super.registerHandler(getView().addJobLinkClickHandler(new JobLinkClickHandler()));
     super.registerHandler(getEventBus().addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
     getView().setTablesValidator(new TablesValidator());
@@ -110,6 +102,42 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
   @Override
   public void onReveal() {
     initDatasources();
+    if(datasourceName != null) {
+      tableListPresenter.selectDatasourceTables(datasourceName);
+    } else if(table != null) {
+      tableListPresenter.selectTable(table);
+    }
+  }
+
+  @Override
+  protected void onFinish() {
+    super.onFinish();
+    getView().renderPendingConclusion();
+    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
+    .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
+    .withCallback(400, new ClientFailureResponseCodeCallBack()) //
+    .withCallback(201, new SuccessResponseCodeCallBack()).send();
+  }
+
+  private CopyCommandOptionsDto createCopycommandOptions() {
+    CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
+
+    JsArrayString selectedTables = JavaScriptObject.createArray().cast();
+    if(table != null) {
+      selectedTables.push(table.getDatasourceName() + "." + table.getName());
+    } else {
+      for(TableDto table : tableListPresenter.getTables()) {
+        selectedTables.push(table.getDatasourceName() + "." + table.getName());
+      }
+    }
+
+    dto.setTablesArray(selectedTables);
+    dto.setDestination(getView().getSelectedDatasource());
+    dto.setNonIncremental(!getView().isIncremental());
+    dto.setNoVariables(!getView().isWithVariables());
+    if(getView().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
+
+    return dto;
   }
 
   private void initDatasources() {
@@ -205,39 +233,6 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     }
   }
 
-  class SubmitClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getView().renderPendingConclusion();
-      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
-      .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
-      .withCallback(400, new ClientFailureResponseCodeCallBack()) //
-      .withCallback(201, new SuccessResponseCodeCallBack()).send();
-    }
-
-    private CopyCommandOptionsDto createCopycommandOptions() {
-      CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
-
-      JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-      if(table != null) {
-        selectedTables.push(table.getDatasourceName() + "." + table.getName());
-      } else {
-        for(TableDto table : tableListPresenter.getTables()) {
-          selectedTables.push(table.getDatasourceName() + "." + table.getName());
-        }
-      }
-
-      dto.setTablesArray(selectedTables);
-      dto.setDestination(getView().getSelectedDatasource());
-      dto.setNonIncremental(!getView().isIncremental());
-      dto.setNoVariables(!getView().isWithVariables());
-      if(getView().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
-
-      return dto;
-    }
-  }
-
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
@@ -267,20 +262,6 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     }
   }
 
-  class CancelClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent arg0) {
-      getView().hide();
-    }
-  }
-
-  class FinishClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent arg0) {
-      getView().hide();
-    }
-  }
-
   public class TablesToExportChangedHandler implements TableListUpdateEvent.Handler {
 
     @Override
@@ -289,7 +270,7 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     }
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends WizardView {
 
     void setTablesValidator(ValidationHandler validationHandler);
 
@@ -300,9 +281,6 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
 
     /** Get the datasource selected by the user. */
     String getSelectedDatasource();
-
-    /** Get the form submit button. */
-    HandlerRegistration addSubmitClickHandler(ClickHandler handler);
 
     /** Display the conclusion step */
     void renderCompletedConclusion(String jobId);
@@ -321,10 +299,6 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     boolean isUseAlias();
 
     void setTableWidgetDisplay(TableListPresenter.Display display);
-
-    HandlerRegistration addCancelClickHandler(ClickHandler handler);
-
-    HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
   }
 

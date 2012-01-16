@@ -224,7 +224,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   }
 
   @Override
-  public HandlerRegistration addSubmitClickHandler(final ClickHandler submitHandler) {
+  public HandlerRegistration addFinishClickHandler(final ClickHandler submitHandler) {
     return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override

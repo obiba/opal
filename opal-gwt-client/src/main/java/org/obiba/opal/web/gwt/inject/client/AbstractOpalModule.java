@@ -11,13 +11,13 @@ package org.obiba.opal.web.gwt.inject.client;
 
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 
-import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 public abstract class AbstractOpalModule extends AbstractPresenterModule {
 
-  protected <V extends PopupView, W extends WizardPresenterWidget<V>, P extends WizardProxy<W>> void bindWizardPresenterWidget(Class<W> presenter, Class<V> view, Class<? extends V> impl, Class<P> proxy) {
+  protected <V extends WizardView, W extends WizardPresenterWidget<V>, P extends WizardProxy<W>> void bindWizardPresenterWidget(Class<W> presenter, Class<V> view, Class<? extends V> impl, Class<P> proxy) {
     bind(proxy).asEagerSingleton();
     bindPresenterWidget(presenter, view, impl);
   }

@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -44,7 +45,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class DataExportPresenter extends WizardPresenterWidget<DataExportPresenter.Display> {
 
@@ -78,13 +78,9 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
   @Override
   protected void onBind() {
+    super.onBind();
     initDisplayComponents();
     tableListPresenter.clear();
-    if(datasourceName != null) {
-      tableListPresenter.selectDatasourceTables(datasourceName);
-    } else if(table != null) {
-      tableListPresenter.selectTable(table);
-    }
   }
 
   protected void initDisplayComponents() {
@@ -93,9 +89,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
     initFileSelectionType();
     fileSelectionPresenter.bind();
-    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getView().addCloseClickHandler(new FinishClickHandler()));
-    super.registerHandler(getView().addSubmitClickHandler(new SubmitClickHandler()));
     super.registerHandler(getView().addJobLinkClickHandler(new JobLinkClickHandler()));
     super.registerHandler(getView().addFileFormatChangeHandler(new FileFormatChangeHandler()));
     super.registerHandler(getEventBus().addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
@@ -124,6 +117,11 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   @Override
   public void onReveal() {
     initUnits();
+    if(datasourceName != null) {
+      tableListPresenter.selectDatasourceTables(datasourceName);
+    } else if(table != null) {
+      tableListPresenter.selectTable(table);
+    }
   }
 
   private void initUnits() {
@@ -152,6 +150,39 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
         throw new IllegalArgumentException("unexpected event parameter type (expected String)");
       }
     }
+  }
+
+  @Override
+  protected void onFinish() {
+    super.onFinish();
+    getView().renderPendingConclusion();
+    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
+    .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
+    .withCallback(400, new ClientFailureResponseCodeCallBack()) //
+    .withCallback(201, new SuccessResponseCodeCallBack()).send();
+  }
+
+  private CopyCommandOptionsDto createCopycommandOptions() {
+    CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
+
+    JsArrayString selectedTables = JavaScriptObject.createArray().cast();
+    if(table != null) {
+      selectedTables.push(table.getDatasourceName() + "." + table.getName());
+    } else {
+      for(TableDto table : tableListPresenter.getTables()) {
+        selectedTables.push(table.getDatasourceName() + "." + table.getName());
+      }
+    }
+
+    dto.setTablesArray(selectedTables);
+    dto.setFormat(getView().getFileFormat());
+    dto.setOut(getView().getOutFile());
+    dto.setNonIncremental(!getView().isIncremental());
+    dto.setNoVariables(!getView().isWithVariables());
+    if(getView().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
+    if(getView().isUnitId()) dto.setUnit(getView().getSelectedUnit());
+
+    return dto;
   }
 
   //
@@ -212,41 +243,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     }
   }
 
-  class SubmitClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getView().renderPendingConclusion();
-      ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
-      .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
-      .withCallback(400, new ClientFailureResponseCodeCallBack()) //
-      .withCallback(201, new SuccessResponseCodeCallBack()).send();
-    }
-
-    private CopyCommandOptionsDto createCopycommandOptions() {
-      CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
-
-      JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-      if(table != null) {
-        selectedTables.push(table.getDatasourceName() + "." + table.getName());
-      } else {
-        for(TableDto table : tableListPresenter.getTables()) {
-          selectedTables.push(table.getDatasourceName() + "." + table.getName());
-        }
-      }
-
-      dto.setTablesArray(selectedTables);
-      dto.setFormat(getView().getFileFormat());
-      dto.setOut(getView().getOutFile());
-      dto.setNonIncremental(!getView().isIncremental());
-      dto.setNoVariables(!getView().isWithVariables());
-      if(getView().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
-      if(getView().isUnitId()) dto.setUnit(getView().getSelectedUnit());
-
-      return dto;
-    }
-  }
-
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
@@ -276,20 +272,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     }
   }
 
-  class CancelClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent arg0) {
-      getView().hide();
-    }
-  }
-
-  class FinishClickHandler implements ClickHandler {
-
-    public void onClick(ClickEvent arg0) {
-      getView().hide();
-    }
-  }
-
   public class TablesToExportChangedHandler implements TableListUpdateEvent.Handler {
 
     @Override
@@ -298,7 +280,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     }
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends WizardView {
 
     void renderUnitSelection(boolean identifierEntityTable);
 
@@ -311,9 +293,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
     /** Get the Opal unit selected by the user. */
     String getSelectedUnit();
-
-    /** Get the form submit button. */
-    HandlerRegistration addSubmitClickHandler(ClickHandler handler);
 
     /** Display the conclusion step */
     void renderCompletedConclusion(String jobId);
@@ -342,10 +321,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     void setTableWidgetDisplay(TableListPresenter.Display display);
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
-
-    HandlerRegistration addCancelClickHandler(ClickHandler handler);
-
-    HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
   }
 

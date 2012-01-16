@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
@@ -55,7 +56,6 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class IdentifiersImportPresenter extends WizardPresenterWidget<IdentifiersImportPresenter.Display> {
 
@@ -70,17 +70,11 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends WizardView {
 
     HandlerRegistration addNextClickHandler(ClickHandler handler);
 
-    HandlerRegistration addCancelClickHandler(ClickHandler handler);
-
-    HandlerRegistration addCloseClickHandler(ClickHandler handler);
-
     HandlerRegistration addPreviousClickHandler(ClickHandler handler);
-
-    HandlerRegistration addFinishClickHandler(ClickHandler handler);
 
     void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
@@ -147,6 +141,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
   @Override
   protected void onBind() {
+    super.onBind();
     getIdentifiersTable();
     getDefaultCharset();
     getAvailableCharsets();
@@ -180,37 +175,29 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
     }).send();
   }
 
+  @Override
+  protected void onClose() {
+    super.onClose();
+    getEventBus().fireEvent(new FunctionalUnitUpdatedEvent(functionalUnit));
+  }
+
+  @Override
+  protected void onFinish() {
+    super.onFinish();
+    FileValidator validator = new FileValidator();
+    if(validator.validate()) {
+      getView().renderPendingConclusion();
+      populateImportData();
+      importIdentifiers();
+    }
+  }
+
   private void addEventHandlers() {
-    super.registerHandler(getView().addCancelClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getView().hide();
-      }
-    }));
-    super.registerHandler(getView().addCloseClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getEventBus().fireEvent(new FunctionalUnitUpdatedEvent(functionalUnit));
-        getView().hide();
-      }
-    }));
     super.registerHandler(getView().addNextClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
         update();
-      }
-    }));
-    super.registerHandler(getView().addFinishClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        FileValidator validator = new FileValidator();
-        if(validator.validate()) {
-          finish();
-        }
       }
     }));
   }
@@ -247,12 +234,6 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
       return validators;
     }
-  }
-
-  private void finish() {
-    getView().renderPendingConclusion();
-    populateImportData();
-    importIdentifiers();
   }
 
   private void populateImportData() {

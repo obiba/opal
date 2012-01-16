@@ -125,6 +125,11 @@ public class DeriveVariableView extends PopupViewImpl implements DeriveVariableP
   }
 
   @Override
+  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
+    return dialog.addCloseClickHandler(handler);
+  }
+
+  @Override
   public void appendWizardSteps(List<DefaultWizardStepController> stepCtrls) {
     for(DefaultWizardStepController stepCtrl : stepCtrls) {
       appendWizardStep(stepCtrl);

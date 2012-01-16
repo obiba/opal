@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -53,7 +54,6 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMapPresenter.Display> {
 
@@ -68,13 +68,7 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
 
   }
 
-  public interface Display extends PopupView {
-
-    HandlerRegistration addCancelClickHandler(ClickHandler handler);
-
-    HandlerRegistration addCloseClickHandler(ClickHandler handler);
-
-    HandlerRegistration addFinishClickHandler(ClickHandler handler);
+  public interface Display extends WizardView {
 
     void setCsvOptionsFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
@@ -125,7 +119,19 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
 
     getView().setFileSelectionValidator(new FileValidator());
 
-    addEventHandlers();
+    super.registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
+  }
+
+  @Override
+  protected void onFinish() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getView().getSelectedUnitName() + "/entities/identifiers/map").put().authorize(new Authorizer(getEventBus()) {
+
+      @Override
+      public void authorized() {
+        getView().renderPendingConclusion();
+        mapIdentifiers();
+      }
+    }).send();
   }
 
   private void getIdentifiersTable() {
@@ -138,33 +144,6 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
         }
       }
     }).send();
-  }
-
-  private void addEventHandlers() {
-    super.registerHandler(getView().addCancelClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getView().hide();
-      }
-    }));
-    super.registerHandler(getView().addCloseClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getView().hide();
-      }
-    }));
-
-    super.registerHandler(getView().addFinishClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        finish();
-      }
-    }));
-
-    super.registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
   }
 
   class FileValidator extends AbstractValidationHandler {
@@ -229,17 +208,6 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
       }
       getView().renderMappedUnitsFailed();
     }
-  }
-
-  private void finish() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getView().getSelectedUnitName() + "/entities/identifiers/map").put().authorize(new Authorizer(getEventBus()) {
-
-      @Override
-      public void authorized() {
-        getView().renderPendingConclusion();
-        mapIdentifiers();
-      }
-    }).send();
   }
 
   private void mapIdentifiers() {

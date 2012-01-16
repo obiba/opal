@@ -240,6 +240,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
         if(response.getStatusCode() != Response.SC_OK) {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
+          // TODO: this is not sufficient to update the UI. We need to send an evet to get presenters to update
+          // themselves
           getEventBus().fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
         }
       }

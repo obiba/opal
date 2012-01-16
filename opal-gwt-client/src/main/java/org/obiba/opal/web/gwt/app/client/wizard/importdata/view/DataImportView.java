@@ -151,11 +151,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
-  public HandlerRegistration addNextClickHandler(ClickHandler handler) {
-    return null;
-  }
-
-  @Override
   public ImportFormat getImportFormat() {
     String formatString = formatListBox.getValue(formatListBox.getSelectedIndex());
     return ImportFormat.valueOf(formatString);
@@ -208,7 +203,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
-  public HandlerRegistration addImportClickHandler(final ClickHandler handler) {
+  public HandlerRegistration addFinishClickHandler(final ClickHandler handler) {
     return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override

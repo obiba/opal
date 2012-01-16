@@ -16,7 +16,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandle
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -70,8 +69,6 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
 
   @UiField
   HTMLPanel helpPanel;
-
-  private DatasourceFormPresenter datasourceFormPresenter;
 
   private ValidationHandler selectTypeValidator;
 
@@ -136,12 +133,12 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   }
 
   @Override
-  public HandlerRegistration addFinishClickHandler(ClickHandler handler) {
+  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
     return dialog.addCloseClickHandler(handler);
   }
 
   @Override
-  public HandlerRegistration addCreateClickHandler(final ClickHandler handler) {
+  public HandlerRegistration addFinishClickHandler(final ClickHandler handler) {
     return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override
@@ -189,11 +186,6 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   @Override
   public String getDatasourceType() {
     return datasourceType.getValue(datasourceType.getSelectedIndex());
-  }
-
-  @Override
-  public DatasourceFormPresenter getDatasourceForm() {
-    return datasourceFormPresenter;
   }
 
   @Override

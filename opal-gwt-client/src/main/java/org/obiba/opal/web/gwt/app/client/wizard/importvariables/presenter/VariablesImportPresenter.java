@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -39,7 +40,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display> {
 
@@ -122,7 +122,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     super.registerHandler(getView().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
     super.registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
     getView().setFileSelectionValidator(new FileSelectionValidator());
-    getView().addImportClickHandler(new ImportHandler());
     getView().setImportableValidator(new ImportableValidator());
 
   }
@@ -132,6 +131,12 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     if(event.getEventParameters().length > 0) {
       datasourceName = (String) event.getEventParameters()[0];
     }
+  }
+
+  @Override
+  protected void onFinish() {
+    super.onFinish();
+    conclusionPresenter.sendResourceRequests();
   }
 
   private final class ImportableValidator implements ValidationHandler {
@@ -165,7 +170,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     }
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends WizardView {
 
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
 
@@ -190,8 +195,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     void setDatasources(JsArray<DatasourceDto> datasources);
 
     void setConclusionDisplay(ConclusionStepPresenter.Display display);
-
-    HandlerRegistration addImportClickHandler(ClickHandler handler);
 
   }
 
@@ -248,14 +251,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
       return dto;
     }
-  }
-
-  class ImportHandler implements ClickHandler {
-
-    public void onClick(ClickEvent event) {
-      conclusionPresenter.sendResourceRequests();
-    }
-
   }
 
 }

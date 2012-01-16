@@ -11,11 +11,12 @@ package org.obiba.opal.web.gwt.app.client.wizard;
 
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public abstract class WizardPresenterWidget<V extends PopupView> extends PresenterWidget<V> implements WizardRequiredEvent.Handler {
+public abstract class WizardPresenterWidget<V extends WizardView> extends PresenterWidget<V> implements WizardRequiredEvent.Handler {
 
   protected WizardPresenterWidget(EventBus eventBus, V view) {
     super(eventBus, view);
@@ -25,4 +26,68 @@ public abstract class WizardPresenterWidget<V extends PopupView> extends Present
   public void onWizardRequired(WizardRequiredEvent event) {
   }
 
+  /**
+   * When this method returns true, the dialog is hidden when {@code finish} is clicked.
+   * @return
+   */
+  protected boolean hideOnFinish() {
+    return false;
+  }
+
+  @Override
+  protected void onBind() {
+    super.onBind();
+    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getView().addFinishClickHandler(new FinishClickHandler()));
+    super.registerHandler(getView().addCloseClickHandler(new CloseClickHandler()));
+  }
+
+  /**
+   * Called when the finish button is clicked.
+   */
+  protected void onFinish() {
+
+  }
+
+  /**
+   * Called when the cancel button is clicked and after the wizard dialog has been closed.
+   */
+  protected void onCancel() {
+
+  }
+
+  /**
+   * Called when the close button is clicked and after the wizard dialog has been closed.
+   */
+  protected void onClose() {
+
+  }
+
+  class CancelClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent e) {
+      getView().hide();
+      onCancel();
+    }
+  }
+
+  class FinishClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent e) {
+      if(hideOnFinish()) {
+        getView().hide();
+      }
+      onFinish();
+    }
+  }
+
+  class CloseClickHandler implements ClickHandler {
+
+    public void onClick(ClickEvent e) {
+      if(hideOnFinish() == false) {
+        getView().hide();
+      }
+      onClose();
+    }
+  }
 }
