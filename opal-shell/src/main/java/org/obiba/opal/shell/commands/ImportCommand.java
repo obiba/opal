@@ -91,8 +91,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     StringBuffer sb = new StringBuffer();
 
     sb.append("import");
-    sb.append(" --unit ");
-    sb.append(options.getUnit());
+    if(options.isUnit()) {
+      sb.append(" --unit ");
+      sb.append(options.getUnit());
+    }
+    if(options.isSource()) {
+      sb.append(" --source ");
+      sb.append(options.getSource());
+    }
     sb.append(" --destination ");
     sb.append(options.getDestination());
 
