@@ -20,7 +20,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ActionCell.Delegate;
-import com.google.gwt.cell.client.ImageCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -29,6 +28,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Header;
+import com.google.gwt.user.cellview.client.SafeHtmlHeader;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -38,6 +38,14 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Display {
+
+  private static final String IMG_NEXT = "<img src=\"image/20/next.png\">";
+
+  private static final String IMG_PREVIOUS = "<img src=\"image/20/previous.png\">";
+
+  private static final String IMAGE_PREVIOUS_DISABLED = "<img src=\"image/20/previous-disabled.png\">";
+
+  private static final String IMAGE_NEXT_DISABLED = "<img src=\"image/20/next-disabled.png\">";
 
   private static final int MAX_VISIBLE_COLUMNS = 10;
 
@@ -139,28 +147,16 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), enable ? createNextEnabledHeader() : createNextDisabledHeader());
   }
 
-  private Header<String> createNextDisabledHeader() {
-    return new Header<String>(new ImageCell()) {
-
-      @Override
-      public String getValue() {
-        return "image/20/next-disabled.png";
-      }
-    };
+  private SafeHtmlHeader createNextDisabledHeader() {
+    return new SafeHtmlHeader(SafeHtmlUtils.fromSafeConstant(IMAGE_NEXT_DISABLED));
   }
 
-  private Header<String> createPreviousDisabledHeader() {
-    return new Header<String>(new ImageCell()) {
-
-      @Override
-      public String getValue() {
-        return "image/20/previous-disabled.png";
-      }
-    };
+  private SafeHtmlHeader createPreviousDisabledHeader() {
+    return new SafeHtmlHeader(SafeHtmlUtils.fromSafeConstant(IMAGE_PREVIOUS_DISABLED));
   }
 
   private Header<String> createPreviousEnabledHeader() {
-    SafeHtml safe = SafeHtmlUtils.fromSafeConstant("<img src=\"image/20/previous.png\">");
+    SafeHtml safe = SafeHtmlUtils.fromSafeConstant(IMG_PREVIOUS);
     ActionCell<String> previousActionCell = new ActionCell<String>(safe, new Delegate<String>() {
 
       @Override
@@ -177,7 +173,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   private Header<String> createNextEnabledHeader() {
-    SafeHtml safe = SafeHtmlUtils.fromSafeConstant("<img src=\"image/20/next.png\">");
+    SafeHtml safe = SafeHtmlUtils.fromSafeConstant(IMG_NEXT);
     ActionCell<String> nextActionCell = new ActionCell<String>(safe, new Delegate<String>() {
 
       @Override
