@@ -22,11 +22,13 @@ import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.SafeHtmlHeader;
 import com.google.gwt.user.cellview.client.SimplePager;
@@ -122,14 +124,16 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     dataProvider.addDataDisplay(valuesTable);
     pager.setDisplay(valuesTable);
 
-    valuesTable.addColumn(new TextColumn<ValueSetDto>() {
+    TextColumn<ValueSetDto> participantColumn = new TextColumn<ValueSetDto>() {
 
       @Override
       public String getValue(ValueSetDto value) {
         return value.getEntity().getIdentifier();
       }
-    }, translations.participant());
+    };
+    setMinimumWidth(participantColumn);
 
+    valuesTable.addColumn(participantColumn, translations.participant());
     valuesTable.addColumn(createEmptyColumn(), createPreviousDisabledHeader());
   }
 
@@ -200,12 +204,18 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   private TextColumn<ValueSetDto> createEmptyColumn() {
-    return new TextColumn<ValueSetDto>() {
+    TextColumn<ValueSetDto> emptyColumn = new TextColumn<ValueSetDto>() {
 
       @Override
       public String getValue(ValueSetDto object) {
         return null;
       }
     };
+    setMinimumWidth(emptyColumn);
+    return emptyColumn;
+  }
+
+  private void setMinimumWidth(Column<ValueSetDto, ?> column) {
+    valuesTable.setColumnWidth(column, 1, Unit.PX);
   }
 }
