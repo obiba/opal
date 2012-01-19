@@ -10,6 +10,8 @@
 package org.obiba.opal.server.httpd.security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.cert.X509Certificate;
 
 import javax.servlet.FilterChain;
@@ -165,7 +167,16 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   private Subject authenticateByCookie(HttpServletRequest request) {
     String sessionId = extractSessionId(request);
     String requestId = extractRequestId(request);
-    HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionId, request.getRequestURI(), requestId);
+    String url = request.getRequestURI();
+    if(request.getQueryString() != null) {
+      try {
+        String query = URLDecoder.decode(request.getQueryString().replace("+", "%2B"), "UTF-8").replace("%2B", "+");
+        url = url + "?" + query;
+      } catch(UnsupportedEncodingException e) {
+      }
+    }
+    log.info("authenticateByCookie({})", url);
+    HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionId, url, requestId);
     Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
     subject.login(token);
     return subject;
