@@ -126,10 +126,9 @@ public class VariableResource {
   //
 
   private Value extractValue(String identifier) {
-    Variable variable = vvs.getVariable();
     VariableEntity entity = new VariableEntityBean(valueTable.getEntityType(), identifier);
     ValueSet valueSet = valueTable.getValueSet(entity);
-    return valueTable.getValue(variable, valueSet);
+    return vvs.getValue(valueSet);
   }
 
   private Value getValueAt(Value value, Integer pos) {
