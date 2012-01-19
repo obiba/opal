@@ -30,6 +30,7 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -76,6 +77,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
   public void setTable(TableDto table) {
     this.table = table;
+    getDisplay().setEntityType(table.getEntityType());
   }
 
   /**
@@ -100,7 +102,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
     StringBuilder link = new StringBuilder();
     appendTable(link);
-    link.append("/variable/_transient/values?limit=").append(PAGE_SIZE)//
+    link.append("/variable/_transient/valueSets?limit=").append(PAGE_SIZE)//
     .append("&offset=").append(offset).append("&");
     appendVariableLimitArguments(link);
 
@@ -232,7 +234,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
       boolean success = false;
       switch(response.getStatusCode()) {
       case Response.SC_OK:
-        updateValuesDisplay((JsArray<ValueDto>) JsonUtils.unsafeEval(response.getText()));
+        updateValuesDisplay((ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
         success = true;
         break;
       case Response.SC_BAD_REQUEST:
@@ -249,7 +251,11 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
       }
     }
 
-    private void updateValuesDisplay(JsArray<ValueDto> resource) {
+    private void updateValuesDisplay(ValueSetsDto resource) {
+      updateValuesDisplay(resource.getValueSetsArray());
+    }
+
+    private void updateValuesDisplay(JsArray<ValueSetsDto.ValueSetDto> resource) {
       int high = offset + PAGE_SIZE;
       if(resource != null && resource.length() < high) {
         high = offset + resource.length();
@@ -316,7 +322,9 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
     void setSummaryTabWidget(WidgetDisplay widget);
 
-    void populateValues(JsArray<ValueDto> values);
+    void setEntityType(String entityType);
+
+    void populateValues(JsArray<ValueSetsDto.ValueSetDto> values);
 
     void setValueType(String type);
 

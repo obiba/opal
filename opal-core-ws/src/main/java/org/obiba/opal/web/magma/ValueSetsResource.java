@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -59,6 +60,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
    * @return
    */
   @GET
+  @POST
   public ValueSetsDto getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
     // filter entities
     final Iterable<VariableEntity> entities = filterEntities(null, offset, limit);

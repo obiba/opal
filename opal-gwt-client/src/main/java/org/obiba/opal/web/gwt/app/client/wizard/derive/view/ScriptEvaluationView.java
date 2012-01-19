@@ -17,7 +17,9 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
-import org.obiba.opal.web.model.client.magma.ValueDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -51,7 +53,7 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   Panel summary;
 
   @UiField
-  CellTable<ValueDto> valuesTable;
+  CellTable<ValueSetsDto.ValueSetDto> valuesTable;
 
   @UiField
   Anchor previousPage;
@@ -77,14 +79,8 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   public ScriptEvaluationView() {
     initWidget(uiBinder.createAndBindUi(this));
     valuesTable.setPageSize(20);
-    valuesTable.addColumn(new TextColumn<ValueDto>() {
-
-      @Override
-      public String getValue(ValueDto value) {
-        return value.getValue();
-      }
-    }, translations.valueLabel());
-
+    valuesTable.addColumn(new EntityColumn(), translations.idLabel());
+    valuesTable.addColumn(new ValueColumn(), translations.valueLabel());
   }
 
   @Override
@@ -94,8 +90,8 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   }
 
   @Override
-  public void populateValues(JsArray<ValueDto> values) {
-    JsArrayDataProvider<ValueDto> dataProvider = new JsArrayDataProvider<ValueDto>();
+  public void populateValues(JsArray<ValueSetsDto.ValueSetDto> values) {
+    JsArrayDataProvider<ValueSetsDto.ValueSetDto> dataProvider = new JsArrayDataProvider<ValueSetsDto.ValueSetDto>();
     if(values != null && valuesTable.getPageSize() < values.length()) {
       valuesTable.setPageSize(values.length());
     }
@@ -157,4 +153,53 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
     pageHigh.setText(Integer.toString(high));
   }
 
+  @Override
+  public void setEntityType(String entityType) {
+    valuesTable.removeColumn(0);
+    valuesTable.insertColumn(0, new EntityColumn(), entityType);
+  }
+
+  private final class ValueColumn extends TextColumn<ValueSetsDto.ValueSetDto> {
+
+    @Override
+    public String getValue(ValueSetDto valueSet) {
+      if(valueSet.getValuesArray() == null || valueSet.getValuesArray().length() == 0) return "";
+      ValueDto value = valueSet.getValuesArray().get(0);
+      if(value.getValuesArray() != null) {
+        return getValueSequence(value);
+      } else {
+        return getValue(value);
+      }
+    }
+
+    private String getValueSequence(ValueDto value) {
+      JsArray<ValueDto> values = value.getValuesArray();
+      StringBuilder builder = new StringBuilder();
+      boolean first = true;
+      for(ValueDto val : JsArrays.toIterable(values)) {
+        if(!first) {
+          builder.append(", ");
+        } else {
+          first = false;
+        }
+        builder.append(val.getValue());
+      }
+      return builder.toString();
+    }
+
+    private String getValue(ValueDto value) {
+      if(value.hasLink()) {
+        return value.getLink();
+      } else {
+        return value.getValue();
+      }
+    }
+  }
+
+  private final class EntityColumn extends TextColumn<ValueSetsDto.ValueSetDto> {
+    @Override
+    public String getValue(ValueSetDto valueSet) {
+      return valueSet.getIdentifier();
+    }
+  }
 }
