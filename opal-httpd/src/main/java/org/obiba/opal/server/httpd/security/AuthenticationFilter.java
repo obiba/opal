@@ -175,7 +175,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       } catch(UnsupportedEncodingException e) {
       }
     }
-    log.info("authenticateByCookie({})", url);
     HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionId, url, requestId);
     Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
     subject.login(token);
