@@ -19,7 +19,9 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
@@ -31,6 +33,7 @@ import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -73,6 +76,20 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   @Inject
   public ScriptEvaluationPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
+
+    getDisplay().setValueSelectionHandler(new ValueSelectionHandler() {
+
+      @Override
+      public void onValueSelection(int row, int column, ValueSetDto valueSet) {
+        StringBuilder link = new StringBuilder(valueSet.getValuesArray().get(column).getLink());
+        link.append("?");
+        appendVariableLimitArguments(link);
+        // TODO won't work with long script
+        link.append("&script=" + Variables.getScript(variable));
+        eventBus.fireEvent(new FileDownloadEvent(link.toString()));
+      }
+    });
+
   }
 
   public void setTable(TableDto table) {
@@ -324,11 +341,13 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
     void setEntityType(String entityType);
 
-    void populateValues(JsArray<ValueSetsDto.ValueSetDto> values);
-
     void setValueType(String type);
 
     void setScript(String text);
+
+    HandlerRegistration setValueSelectionHandler(ValueSelectionHandler handler);
+
+    void populateValues(JsArray<ValueSetsDto.ValueSetDto> values);
 
     HandlerRegistration addNextPageClickHandler(ClickHandler handler);
 

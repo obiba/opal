@@ -14,11 +14,12 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 
 import com.google.gwt.core.client.GWT;
@@ -76,6 +77,8 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   @UiField
   PrettyPrintLabel script;
 
+  private ValueSelectionHandler valueSelectionHandler;
+
   public ScriptEvaluationView() {
     initWidget(uiBinder.createAndBindUi(this));
     valuesTable.setPageSize(20);
@@ -103,11 +106,35 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   @Override
   public void setValueType(String type) {
     valueType.setText(type);
+    ValueColumn col = new ValueColumn(type);
+    col.setValueSelectionHandler(valueSelectionHandler);
+    valuesTable.removeColumn(1);
+    valuesTable.insertColumn(1, col, translations.valueLabel());
+  }
+
+  @Override
+  public void setEntityType(String entityType) {
+    valuesTable.removeColumn(0);
+    valuesTable.insertColumn(0, new EntityColumn(), entityType);
   }
 
   @Override
   public void setScript(String text) {
     script.setText(text);
+  }
+
+  @Override
+  public HandlerRegistration setValueSelectionHandler(ValueSelectionHandler handler) {
+    this.valueSelectionHandler = handler;
+    ((ValueColumn) valuesTable.getColumn(1)).setValueSelectionHandler(handler);
+    return new HandlerRegistration() {
+
+      @Override
+      public void removeHandler() {
+        ((ValueColumn) valuesTable.getColumn(1)).setValueSelectionHandler(null);
+        valueSelectionHandler = null;
+      }
+    };
   }
 
   //
@@ -153,50 +180,7 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
     pageHigh.setText(Integer.toString(high));
   }
 
-  @Override
-  public void setEntityType(String entityType) {
-    valuesTable.removeColumn(0);
-    valuesTable.insertColumn(0, new EntityColumn(), entityType);
-  }
-
-  private final class ValueColumn extends TextColumn<ValueSetsDto.ValueSetDto> {
-
-    @Override
-    public String getValue(ValueSetDto valueSet) {
-      if(valueSet.getValuesArray() == null || valueSet.getValuesArray().length() == 0) return "";
-      ValueDto value = valueSet.getValuesArray().get(0);
-      if(value.getValuesArray() != null) {
-        return getValueSequence(value);
-      } else {
-        return getValue(value);
-      }
-    }
-
-    private String getValueSequence(ValueDto value) {
-      JsArray<ValueDto> values = value.getValuesArray();
-      StringBuilder builder = new StringBuilder();
-      boolean first = true;
-      for(ValueDto val : JsArrays.toIterable(values)) {
-        if(!first) {
-          builder.append(", ");
-        } else {
-          first = false;
-        }
-        builder.append(val.getValue());
-      }
-      return builder.toString();
-    }
-
-    private String getValue(ValueDto value) {
-      if(value.hasLink()) {
-        return value.getLink();
-      } else {
-        return value.getValue();
-      }
-    }
-  }
-
-  private final class EntityColumn extends TextColumn<ValueSetsDto.ValueSetDto> {
+  private static final class EntityColumn extends TextColumn<ValueSetsDto.ValueSetDto> {
     @Override
     public String getValue(ValueSetDto valueSet) {
       return valueSet.getIdentifier();
