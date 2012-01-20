@@ -1,3 +1,15 @@
+/* Fonts */
+@font-face{ 
+  font-family: 'WebSymbolsRegular';
+  src: url('../fonts/websymbols-regular-webfont.eot');
+  src: url('../fonts/websymbols-regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/websymbols-regular-webfont.woff') format('woff'),
+       url('../fonts/websymbols-regular-webfont.ttf') format('truetype'),
+       url('../fonts/websymbols-regular-webfont.svg#WebSymbolsRegular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* Corner radius */
 .ui-corner-tl { -moz-border-radius-topleft: 0.5em; -webkit-border-top-left-radius: 0.5em; }
 .ui-corner-tr { -moz-border-radius-topright: 0.5em; -webkit-border-top-right-radius: 0.5em; }
@@ -1727,3 +1739,96 @@ ul.closeables li a {
   border: none;
   box-shadow: none;
 }
+
+/* Icons : http://www.justbenicestudio.com/studio/websymbols/*/
+.icon:before { 
+  font-family: 'WebSymbolsRegular';
+  margin-right: 5px;
+  color: #888;
+}
+
+a.icon {
+  text-decoration: none;
+}
+
+.disabled.icon:before {
+  color: #bbb;
+}
+
+/* Icons for content management systems */
+.icon-image:before { content: "I"; }
+.icon-settings:before { content: "S"; }
+.icon-cloud:before { content: "C"; }
+.icon-folder:before { content: "F"; }
+.icon-archive:before { content: "Z"; }
+.icon-movie:before { content: "M"; }
+.icon-xml:before { content: "H"; }
+.icon-text:before { content: "T"; }
+.icon-terminal:before { content: "_"; }
+.icon-attachment:before { content: "A"; }
+.icon-logout:before { content: "X"; }
+.icon-indent:before { content: "n"; }
+.icon-outdent:before { content: "o"; }
+.icon-bulletlist:before { content: "p"; }
+.icon-numberlist:before { content: "q"; }
+.icon-move:before { content: "~"; }
+.icon-user:before {  content: "U"; }
+.icon-openedlock:before { content: "w"; }
+.icon-closedlock:before { content: "x"; }
+.icon-portraitview:before { content: "a"; }
+.icon-albumview:before { content: "b"; }
+.icon-center:before { content: "`"; }
+
+/* Gallery navigation icons */
+.icon-zoomin:before { content: "+"; }
+.icon-zoomout:before { content: "-"; }
+.icon-up:before { content: ":"; }
+.icon-down:before { content: ";"; }
+.icon-disapprove:before { content: "x"; }
+.icon-scale:before { content: "&"; }
+.icon-previous:before { content: "("; }
+.icon-next:before { content: ")"; }
+.icon-lower:before { content: "<"; }
+.icon-greater:before { content: ">"; }
+.icon-rotate:before { content: "*"; }
+.icon-close:before { content: "'"; }
+
+/* Social networks icons */
+.icon-rss:before { content: "r"; }
+.icon-rsslarge:before { content: "R"; }
+
+/* Icons for service sites */
+.icon-favorite:before { content: "R"; }
+.icon-tag:before { content: ","; }
+.icon-comment:before { content: "c"; }
+.icon-chat:before { content: "d"; }
+.icon-openedChat:before { content: "e"; }
+.icon-rating:before { content: "u"; }
+.icon-mappin:before { content: "?"; }
+.icon-like:before { content: "N"; }
+.icon-unlike:before { content: "O"; }
+.icon-search:before { content: "L"; }
+.icon-reblog:before { content: "J"; }
+.icon-openinnewwindow:before { content: "D"; }
+.icon-clock:before { content: "P"; }
+.icon-link:before { content: "K"; }
+
+/* Other icons */
+.icon-mail:before { content: "@"; }
+.icon-sortasc:before { content: "{"; }
+.icon-sortdesc:before { content: "}"; }
+.icon-unfold:before { content: "["; }
+.icon-fold:before { content: "]"; }
+.icon-icon:before { content: "¹"; }
+.icon-list:before { content: "²"; }
+.icon-listwithicons:before { content: "³"; }
+.icon-reply:before { content: "h"; }
+.icon-replyall:before { content: "i"; }
+.icon-forward:before { content: "j"; }
+.icon-fullscreen:before { content: "%"; }
+.icon-done:before { content: "."; }
+.icon-approved:before { content: "/"; }
+.icon-loading:before { content: "0—7"; }
+.icon-alert:before { content: "W"; }
+.icon-synchronize:before { content: "V"; }
+
