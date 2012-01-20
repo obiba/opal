@@ -25,7 +25,9 @@ public class DefaultRequestUrlBuilder implements RequestUrlBuilder {
   @Override
   public String buildAbsoluteUrl(String relativeUrl) {
     boolean startsWithSlash = relativeUrl.startsWith("/");
-    String absolutePath = URL.encode("/ws" + (startsWithSlash ? relativeUrl : '/' + relativeUrl));
+    String uri = "/ws" + (startsWithSlash ? relativeUrl : '/' + relativeUrl);
+    // OPAL-1346 query is encoded, so decode %
+    String absolutePath = URL.encode(uri).replace("%25", "%");
     credentials.provideCredentials(absolutePath);
     return GWT.getModuleBaseURL().replace("/" + GWT.getModuleName() + "/", "") + absolutePath;
   }

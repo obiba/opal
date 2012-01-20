@@ -47,6 +47,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 
 /**
@@ -85,11 +86,16 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
         link.append("?");
         appendVariableLimitArguments(link);
         // TODO won't work with long script
-        link.append("&script=" + Variables.getScript(variable));
+        link.append("&script=" + encodeScript(Variables.getScript(variable)));
         eventBus.fireEvent(new FileDownloadEvent(link.toString()));
       }
     });
 
+  }
+
+  private String encodeScript(String script) {
+    // OPAL-1346
+    return URL.encodePathSegment(script);
   }
 
   public void setTable(TableDto table) {
