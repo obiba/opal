@@ -24,6 +24,8 @@ import com.gwtplatform.mvp.client.View;
 public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display> {
 
   public interface Display extends View {
+    void setEntityType(String type);
+
     void setVariables(JsArray<VariableDto> variables);
   }
 
@@ -36,6 +38,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   public void setTable(TableDto table) {
     this.table = table;
+    getView().setEntityType(table.getEntityType());
     ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new VariablesResourceCallback(table)).send();
   }
 

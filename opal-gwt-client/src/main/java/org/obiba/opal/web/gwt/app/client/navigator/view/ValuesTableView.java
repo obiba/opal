@@ -14,23 +14,22 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
-import org.obiba.opal.web.model.client.magma.ValueSetDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.ActionCell;
-import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.cellview.client.SafeHtmlHeader;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -41,15 +40,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Display {
 
-  private static final String IMG_NEXT = "<img src=\"image/20/next.png\">";
-
-  private static final String IMG_PREVIOUS = "<img src=\"image/20/previous.png\">";
-
-  private static final String IMAGE_PREVIOUS_DISABLED = "<img src=\"image/20/previous-disabled.png\">";
-
-  private static final String IMAGE_NEXT_DISABLED = "<img src=\"image/20/next-disabled.png\">";
-
-  private static final int MAX_VISIBLE_COLUMNS = 10;
+  private static final int MAX_VISIBLE_COLUMNS = 5;
 
   @UiTemplate("ValuesTableView.ui.xml")
   interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {
@@ -76,6 +67,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private List<VariableDto> listVariable;
 
+  private String entityType;
+
   private int firstVisibleIndex = 0;
 
   public ValuesTableView() {
@@ -88,13 +81,18 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   @Override
+  public void setEntityType(String type) {
+    this.entityType = type;
+  }
+
+  @Override
   public void setVariables(JsArray<VariableDto> variables) {
     initBefore();
 
     listVariable = JsArrays.toList(variables);
     int visible = listVariable.size() < MAX_VISIBLE_COLUMNS ? listVariable.size() : MAX_VISIBLE_COLUMNS;
     for(int i = 0; i < visible; i++) {
-      valuesTable.addColumn(createColumn(), getColumnLabel(i));
+      valuesTable.addColumn(createColumn(i, listVariable.get(i).getValueType()), getColumnLabel(i));
     }
 
     initAfter();
@@ -104,14 +102,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     return listVariable.get(i).getName();
   }
 
-  private TextColumn<ValueSetDto> createColumn() {
-    return new TextColumn<ValueSetDto>() {
+  private String getColumnValueType(int i) {
+    return listVariable.get(i).getValueType();
+  }
 
-      @Override
-      public String getValue(ValueSetDto value) {
-        return null;
-      }
-    };
+  private ValueColumn createColumn(int pos, String type) {
+    return new ValueColumn(pos, type);
   }
 
   private void initBefore() {
@@ -128,69 +124,17 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
       @Override
       public String getValue(ValueSetDto value) {
-        return value.getEntity().getIdentifier();
+        return value.getIdentifier();
       }
     };
     setMinimumWidth(participantColumn);
 
-    valuesTable.addColumn(participantColumn, translations.participant());
-    valuesTable.addColumn(createEmptyColumn(), createPreviousDisabledHeader());
+    valuesTable.addColumn(participantColumn, entityType);
+    valuesTable.addColumn(createEmptyColumn(), createHeader(new PreviousActionCell()));
   }
 
   private void initAfter() {
-    valuesTable.addColumn(createEmptyColumn(), listVariable.size() > MAX_VISIBLE_COLUMNS ? createNextEnabledHeader() : createNextDisabledHeader());
-  }
-
-  private void enablePrevious(boolean enable) {
-    valuesTable.removeColumn(1);
-    valuesTable.insertColumn(1, createEmptyColumn(), enable ? createPreviousEnabledHeader() : createPreviousDisabledHeader());
-  }
-
-  private void enableNext(boolean enable) {
-    valuesTable.removeColumn(valuesTable.getColumnCount() - 1);
-    valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), enable ? createNextEnabledHeader() : createNextDisabledHeader());
-  }
-
-  private SafeHtmlHeader createNextDisabledHeader() {
-    return new SafeHtmlHeader(SafeHtmlUtils.fromSafeConstant(IMAGE_NEXT_DISABLED));
-  }
-
-  private SafeHtmlHeader createPreviousDisabledHeader() {
-    return new SafeHtmlHeader(SafeHtmlUtils.fromSafeConstant(IMAGE_PREVIOUS_DISABLED));
-  }
-
-  private Header<String> createPreviousEnabledHeader() {
-    SafeHtml safe = SafeHtmlUtils.fromSafeConstant(IMG_PREVIOUS);
-    ActionCell<String> previousActionCell = new ActionCell<String>(safe, new Delegate<String>() {
-
-      @Override
-      public void execute(String object) {
-        valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
-        valuesTable.insertColumn(2, createColumn(), getColumnLabel(firstVisibleIndex--));
-        enableNext(true);
-        if(firstVisibleIndex == 0) {
-          enablePrevious(false);
-        }
-      }
-    });
-    return createHeader(previousActionCell);
-  }
-
-  private Header<String> createNextEnabledHeader() {
-    SafeHtml safe = SafeHtmlUtils.fromSafeConstant(IMG_NEXT);
-    ActionCell<String> nextActionCell = new ActionCell<String>(safe, new Delegate<String>() {
-
-      @Override
-      public void execute(String object) {
-        valuesTable.removeColumn(2);
-        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(), getColumnLabel(++firstVisibleIndex + MAX_VISIBLE_COLUMNS));
-        enablePrevious(true);
-        if(firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) {
-          enableNext(false);
-        }
-      }
-    });
-    return createHeader(nextActionCell);
+    valuesTable.addColumn(createEmptyColumn(), createHeader(new NextActionCell()));
   }
 
   private Header<String> createHeader(ActionCell<String> cell) {
@@ -218,4 +162,73 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private void setMinimumWidth(Column<ValueSetDto, ?> column) {
     valuesTable.setColumnWidth(column, 1, Unit.PX);
   }
+
+  //
+  // Inner classes
+  //
+
+  private final class PreviousActionCell extends ActionCell<String> {
+
+    private static final String IMG_PREVIOUS = "<a class=\"icon icon-previous\"/>";
+
+    private static final String IMAGE_PREVIOUS_DISABLED = "<span class=\"icon icon-previous disabled\"/>";
+
+    private PreviousActionCell() {
+      super("", new Delegate<String>() {
+
+        @Override
+        public void execute(String object) {
+          if(firstVisibleIndex == 0) return;
+
+          valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
+          int idx = firstVisibleIndex--;
+          valuesTable.insertColumn(2, createColumn(idx, getColumnValueType(idx)), getColumnLabel(idx));
+          valuesTable.redrawHeaders();
+        }
+      });
+    }
+
+    @Override
+    public void render(com.google.gwt.cell.client.Cell.Context context, String value, SafeHtmlBuilder sb) {
+      if(firstVisibleIndex == 0) {
+        sb.append(SafeHtmlUtils.fromSafeConstant(IMAGE_PREVIOUS_DISABLED));
+      } else {
+        sb.append(SafeHtmlUtils.fromSafeConstant(IMG_PREVIOUS));
+      }
+    }
+
+  }
+
+  private final class NextActionCell extends ActionCell<String> {
+
+    private static final String IMG_NEXT = "<a class=\"icon icon-next\"/>";
+
+    private static final String IMAGE_NEXT_DISABLED = "<span class=\"icon icon-next disabled\"/>";
+
+    private NextActionCell() {
+      super("", new Delegate<String>() {
+
+        @Override
+        public void execute(String object) {
+          if(firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) return;
+
+          valuesTable.removeColumn(2);
+          int idx = ++firstVisibleIndex + MAX_VISIBLE_COLUMNS;
+          valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(idx, getColumnValueType(idx)), getColumnLabel(idx));
+          valuesTable.redrawHeaders();
+        }
+
+      });
+    }
+
+    @Override
+    public void render(com.google.gwt.cell.client.Cell.Context context, String value, SafeHtmlBuilder sb) {
+      if(firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) {
+        sb.append(SafeHtmlUtils.fromSafeConstant(IMAGE_NEXT_DISABLED));
+      } else {
+        sb.append(SafeHtmlUtils.fromSafeConstant(IMG_NEXT));
+      }
+    }
+  }
+
 }
