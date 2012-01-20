@@ -12,10 +12,12 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -97,6 +99,22 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     initAfter();
   }
+
+  @Override
+  public void populateValues(ValueSetsDto valueSets) {
+    JsArrayDataProvider<ValueSetsDto.ValueSetDto> dataProvider = new JsArrayDataProvider<ValueSetsDto.ValueSetDto>();
+    JsArray<ValueSetsDto.ValueSetDto> values = valueSets.getValueSetsArray();
+    if(values != null && valuesTable.getPageSize() < values.length()) {
+      valuesTable.setPageSize(values.length());
+    }
+    dataProvider.addDataDisplay(valuesTable);
+    dataProvider.setArray(JsArrays.toSafeArray(values));
+    dataProvider.refresh();
+  }
+
+  //
+  // Private methods
+  //
 
   private String getColumnLabel(int i) {
     return listVariable.get(i).getName();
