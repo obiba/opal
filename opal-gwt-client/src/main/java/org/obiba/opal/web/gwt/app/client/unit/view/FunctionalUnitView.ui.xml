@@ -10,13 +10,13 @@
     <g:Label><ui:msg description="Functional Units title">Units</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="functionalUnitButton" styleName="btn">
+      <g:Button ui:field="functionalUnitButton" styleName="btn icon icon-zoomin">
         <ui:msg description="Add Functional Unit label">Add Unit</ui:msg>
       </g:Button>
-      <g:Button ui:field="exportButton" styleName="btn">
+      <g:Button ui:field="exportButton" styleName="btn icon icon-down">
         <ui:msg description="Export All Identifiers label">Export All Identifiers</ui:msg>
       </g:Button>
-      <g:Button ui:field="importButton" styleName="btn">
+      <g:Button ui:field="importButton" styleName="btn icon icon-scale">
         <ui:msg description="Map Identifiers label">Map Identifiers</ui:msg>
       </g:Button>
       <o:HelpImage page="Working+with+Units"></o:HelpImage>

@@ -1784,7 +1784,7 @@ a.icon {
 .icon-zoomout:before { content: "-"; }
 .icon-up:before { content: ":"; }
 .icon-down:before { content: ";"; }
-.icon-disapprove:before { content: "x"; }
+.icon-disapprove:before { content: "×"; }
 .icon-scale:before { content: "&"; }
 .icon-previous:before { content: "("; }
 .icon-next:before { content: ")"; }
@@ -1830,5 +1830,5 @@ a.icon {
 .icon-approved:before { content: "/"; }
 .icon-loading:before { content: "0—7"; }
 .icon-alert:before { content: "W"; }
-.icon-synchronize:before { content: "V"; }
+.icon-sync:before { content: "V"; }
 
