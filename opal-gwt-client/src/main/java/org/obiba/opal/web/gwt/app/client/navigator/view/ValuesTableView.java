@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -32,10 +33,11 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -55,7 +57,16 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final Widget widget;
 
   @UiField
-  SimplePager pager;
+  Anchor previousPage;
+
+  @UiField
+  Anchor nextPage;
+
+  @UiField
+  Label pageLow;
+
+  @UiField
+  Label pageHigh;
 
   @UiField
   InlineLabel noValues;
@@ -70,6 +81,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private List<VariableDto> listVariable;
 
   private String entityType;
+
+  private ValueSetsProvider provider;
 
   private int firstVisibleIndex = 0;
 
@@ -98,6 +111,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     initAfter();
+
+    provider.request(listVariable, 0, 10);
   }
 
   @Override
@@ -110,6 +125,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     dataProvider.addDataDisplay(valuesTable);
     dataProvider.setArray(JsArrays.toSafeArray(values));
     dataProvider.refresh();
+  }
+
+  @Override
+  public void setValueSetsProvider(ValueSetsProvider provider) {
+    this.provider = provider;
   }
 
   //
@@ -136,7 +156,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     valuesTable.addStyleName("left-aligned");
     valuesTable.setWidth("100%");
     dataProvider.addDataDisplay(valuesTable);
-    pager.setDisplay(valuesTable);
 
     TextColumn<ValueSetDto> participantColumn = new TextColumn<ValueSetDto>() {
 

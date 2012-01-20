@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -34,6 +36,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   public void setTable(TableDto table) {
     this.table = table;
     getView().setEntityType(table.getEntityType());
+    getView().setValueSetsProvider(new ValueSetsProviderImpl());
     ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new VariablesResourceCallback(table)).send();
   }
 
@@ -55,7 +58,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
         JsArray<VariableDto> variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
         getView().setVariables(variables);
-        ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(table.getLink() + "/valueSets").get().withCallback(new ValueSetsResourceCallback(table)).send();
+
       }
     }
   }
@@ -77,12 +80,27 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
+  private class ValueSetsProviderImpl implements ValueSetsProvider {
+    @Override
+    public void request(List<VariableDto> variables, int offset, int limit) {
+      String link = table.getLink() + "/valueSets";
+      link += "?offset=" + offset + "&limit=" + limit;
+      ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get().withCallback(new ValueSetsResourceCallback(table)).send();
+    }
+  }
+
   public interface Display extends View {
     void setEntityType(String type);
 
     void setVariables(JsArray<VariableDto> variables);
 
     void populateValues(ValueSetsDto valueSets);
+
+    void setValueSetsProvider(ValueSetsProvider provider);
+  }
+
+  public interface ValueSetsProvider {
+    void request(List<VariableDto> variables, int offset, int limit);
   }
 
 }
