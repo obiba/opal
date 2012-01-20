@@ -54,7 +54,13 @@ public class RequestCredentials {
     if(hasCredentials()) {
       Md5Digest digest = new Md5Digest();
       digest.update(extractCredentials().getBytes());
-      String urlHash = toHexString(digest.digest(url.getBytes()));
+      String urlToHash = url;
+      int queryIdx = url.indexOf('?');
+      if(queryIdx != -1) {
+        // remove query string
+        urlToHash = url.substring(0, queryIdx);
+      }
+      String urlHash = toHexString(digest.digest(urlToHash.getBytes()));
       long time = new Date().getTime();
       // Cookie will be valid for 1 second
       Cookies.setCookie(OPALRID, urlHash, new Date(time + 1000), null, "/", false);
