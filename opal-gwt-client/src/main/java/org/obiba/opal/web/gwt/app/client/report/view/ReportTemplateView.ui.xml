@@ -10,7 +10,7 @@
     <g:Label><ui:msg description="Reports title">Reports</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="reportTemplateButton" styleName="btn icon icon-zoomin">
+      <g:Button ui:field="reportTemplateButton" styleName="btn icon icon-plus">
         <ui:msg description="Add Report Template label">Add Report Template</ui:msg>
       </g:Button>
       <g:Button ui:field="refreshButton" styleName="btn icon icon-sync"><ui:msg description="Refresh jobs list">Refresh</ui:msg></g:Button>

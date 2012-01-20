@@ -1780,8 +1780,8 @@ a.icon {
 .icon-center:before { content: "`"; }
 
 /* Gallery navigation icons */
-.icon-zoomin:before { content: "+"; }
-.icon-zoomout:before { content: "-"; }
+.icon-plus:before { content: "+"; }
+.icon-minus:before { content: "-"; }
 .icon-up:before { content: ":"; }
 .icon-down:before { content: ";"; }
 .icon-disapprove:before { content: "×"; }
@@ -1809,7 +1809,7 @@ a.icon {
 .icon-unlike:before { content: "O"; }
 .icon-search:before { content: "L"; }
 .icon-reblog:before { content: "J"; }
-.icon-openinnewwindow:before { content: "D"; }
+.icon-openwindow:before { content: "D"; }
 .icon-clock:before { content: "P"; }
 .icon-link:before { content: "K"; }
 

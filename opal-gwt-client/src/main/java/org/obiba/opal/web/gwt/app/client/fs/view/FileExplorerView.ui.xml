@@ -10,7 +10,7 @@
     <g:Label><ui:msg description="Explorer">File Explorer</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="createFolderButton" styleName="btn icon icon-zoomin">
+      <g:Button ui:field="createFolderButton" styleName="btn icon icon-plus">
         <ui:msg description="Create Folder label">Create Folder</ui:msg>
       </g:Button>          
       <g:Button ui:field="fileUploadButton" styleName="btn icon icon-up">

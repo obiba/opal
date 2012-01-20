@@ -10,7 +10,7 @@
     <g:Label><ui:msg description="Datasources label">Datasources</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="createDatasourceButton" styleName="btn icon icon-zoomin">
+      <g:Button ui:field="createDatasourceButton" styleName="btn icon icon-plus">
         <ui:msg description="Create Datasource label">Create Datasource</ui:msg>
       </g:Button>
       <g:Button ui:field="importDataButton" styleName="btn icon icon-up">
