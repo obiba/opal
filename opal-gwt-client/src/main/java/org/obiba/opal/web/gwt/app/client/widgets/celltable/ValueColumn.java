@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
@@ -17,6 +18,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -24,6 +26,8 @@ import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.Column;
 
 public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
+
+  private static Translations translations = GWT.create(Translations.class);
 
   private ValueSelectionHandler valueSelectionHandler = null;
 
@@ -45,7 +49,8 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     super(type.equalsIgnoreCase("binary") ? new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
       @Override
       public SafeHtml render(String object) {
-        return new SafeHtmlBuilder().appendHtmlConstant("<a>").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
+        if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
+        return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"icon icon-down\">").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
       }
     }) : new TextCell());
 
@@ -96,7 +101,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   private String getValue(ValueDto value) {
     if(value.hasLink()) {
-      return "download";
+      return translations.downloadLabel();
     } else {
       return value.getValue();
     }

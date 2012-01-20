@@ -1135,4 +1135,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("Participant")
   String participant();
 
+  @Description("Download label")
+  @DefaultStringValue("Download")
+  String downloadLabel();
+
 }
