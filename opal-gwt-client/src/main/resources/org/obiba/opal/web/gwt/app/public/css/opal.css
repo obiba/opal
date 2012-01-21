@@ -1679,6 +1679,10 @@ textarea.error:focus {
   color: #666;
 }
 
+.obiba-DropdownSuggestBox .btn.icon:before {
+  margin-right:0;
+}
+
 /* Suggest list box */
 
 ul.closeables {

@@ -29,8 +29,7 @@ public class DropdownSuggestBox extends Composite implements HasText {
     this.suggestBox = new DefaultSuggestBox();
     FlowPanel layout = new FlowPanel();
     final Button ddBtn = new Button();
-    ddBtn.setStyleName("btn");
-    ddBtn.setText("v");
+    ddBtn.setStyleName("btn icon icon-sortasc");
     ddBtn.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
