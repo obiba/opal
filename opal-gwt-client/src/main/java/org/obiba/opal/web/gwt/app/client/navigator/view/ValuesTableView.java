@@ -39,7 +39,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Display {
@@ -74,9 +73,10 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @UiField
   FlowPanel valuesPanel;
 
+  @UiField
   Table<ValueSetDto> valuesTable;
 
-  private ListDataProvider<ValueSetDto> dataProvider = new ListDataProvider<ValueSetDto>();
+  private JsArrayDataProvider<ValueSetsDto.ValueSetDto> dataProvider;
 
   private List<VariableDto> listVariable;
 
@@ -88,6 +88,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   public ValuesTableView() {
     widget = uiBinder.createAndBindUi(this);
+    valuesTable.setEmptyTableWidget(noValues);
+    dataProvider = new JsArrayDataProvider<ValueSetsDto.ValueSetDto>();
+    dataProvider.addDataDisplay(valuesTable);
   }
 
   @Override
@@ -102,27 +105,23 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
-    initBefore();
+    initValuesTable();
 
     listVariable = JsArrays.toList(variables);
     int visible = listVariable.size() < MAX_VISIBLE_COLUMNS ? listVariable.size() : MAX_VISIBLE_COLUMNS;
     for(int i = 0; i < visible; i++) {
-      valuesTable.addColumn(createColumn(i, listVariable.get(i).getValueType()), getColumnLabel(i));
+      valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(i, listVariable.get(i).getValueType()), getColumnLabel(i));
     }
-
-    initAfter();
 
     provider.request(listVariable, 0, 10);
   }
 
   @Override
   public void populateValues(ValueSetsDto valueSets) {
-    JsArrayDataProvider<ValueSetsDto.ValueSetDto> dataProvider = new JsArrayDataProvider<ValueSetsDto.ValueSetDto>();
     JsArray<ValueSetsDto.ValueSetDto> values = valueSets.getValueSetsArray();
     if(values != null && valuesTable.getPageSize() < values.length()) {
       valuesTable.setPageSize(values.length());
     }
-    dataProvider.addDataDisplay(valuesTable);
     dataProvider.setArray(JsArrays.toSafeArray(values));
     dataProvider.refresh();
   }
@@ -148,29 +147,26 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     return new ValueColumn(pos, type);
   }
 
-  private void initBefore() {
-    if(valuesTable != null) valuesPanel.remove(valuesTable);
-    valuesTable = new Table<ValueSetDto>();
-    valuesPanel.add(valuesTable);
-    valuesTable.setEmptyTableWidget(noValues);
-    valuesTable.addStyleName("left-aligned");
-    valuesTable.setWidth("100%");
-    dataProvider.addDataDisplay(valuesTable);
+  private void initValuesTable() {
+    dataProvider.setArray(JsArrays.<ValueSetsDto.ValueSetDto> create());
+    dataProvider.refresh();
 
-    TextColumn<ValueSetDto> participantColumn = new TextColumn<ValueSetDto>() {
+    while(valuesTable.getColumnCount() > 0) {
+      valuesTable.removeColumn(0);
+    }
+    firstVisibleIndex = 0;
+
+    TextColumn<ValueSetDto> entityColumn = new TextColumn<ValueSetDto>() {
 
       @Override
       public String getValue(ValueSetDto value) {
         return value.getIdentifier();
       }
     };
-    setMinimumWidth(participantColumn);
+    setMinimumWidth(entityColumn);
 
-    valuesTable.addColumn(participantColumn, entityType);
+    valuesTable.addColumn(entityColumn, entityType);
     valuesTable.addColumn(createEmptyColumn(), createHeader(new PreviousActionCell()));
-  }
-
-  private void initAfter() {
     valuesTable.addColumn(createEmptyColumn(), createHeader(new NextActionCell()));
   }
 

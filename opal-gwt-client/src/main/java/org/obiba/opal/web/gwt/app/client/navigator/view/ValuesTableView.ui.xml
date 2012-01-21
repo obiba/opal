@@ -15,7 +15,7 @@
 		<g:InlineLabel ui:field="pageHigh">10</g:InlineLabel>
 		<g:Anchor ui:field="nextPage" addStyleNames="icon icon-next"></g:Anchor>
       </g:FlowPanel>
-     <o:Table ui:field="valuesTable" addStyleNames="left-aligned"></o:Table>
+     <o:Table ui:field="valuesTable" addStyleNames="full-width left-aligned"></o:Table>
   </g:FlowPanel>
   
 </ui:UiBinder>
