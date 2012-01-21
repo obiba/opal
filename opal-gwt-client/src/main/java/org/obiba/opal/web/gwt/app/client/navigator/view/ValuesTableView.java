@@ -113,6 +113,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(i, listVariable.get(i).getValueType()), getColumnLabel(i));
     }
 
+    valuesTable.setEmptyTableWidget(valuesTable.getLoadingIndicator());
     provider.request(listVariable, 0, 10);
   }
 
@@ -124,6 +125,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
     dataProvider.setArray(JsArrays.toSafeArray(values));
     dataProvider.refresh();
+    valuesTable.setEmptyTableWidget(noValues);
   }
 
   @Override
