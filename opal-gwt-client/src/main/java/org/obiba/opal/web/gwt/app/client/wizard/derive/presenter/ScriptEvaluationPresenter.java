@@ -31,7 +31,6 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -86,16 +85,12 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
         link.append("?");
         appendVariableLimitArguments(link);
         // TODO won't work with long script
-        link.append("&script=" + encodeScript(Variables.getScript(variable)));
+        // OPAL-1346 encode script
+        link.append("&script=" + URL.encodePathSegment(Variables.getScript(variable)));
         eventBus.fireEvent(new FileDownloadEvent(link.toString()));
       }
     });
 
-  }
-
-  private String encodeScript(String script) {
-    // OPAL-1346
-    return URL.encodePathSegment(script);
   }
 
   public void setTable(TableDto table) {
@@ -131,7 +126,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
     ValuesRequestCallback callback = new ValuesRequestCallback(offset);
 
-    ResourceRequestBuilder<JsArray<ValueDto>> requestBuilder = ResourceRequestBuilderFactory.<JsArray<ValueDto>> newBuilder() //
+    ResourceRequestBuilder<ValueSetsDto> requestBuilder = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder() //
     .forResource(link.toString()).post().withFormBody("script", script) //
     .withCallback(200, callback).withCallback(400, callback).withCallback(500, callback)//
     .accept("application/x-protobuf+json");
