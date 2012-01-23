@@ -20,6 +20,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -35,8 +36,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   public void setTable(TableDto table) {
     this.table = table;
-    getView().setEntityType(table.getEntityType());
-    getView().setValueSetsProvider(new ValueSetsProviderImpl());
+    getView().setTable(table);
+    getView().setValueSetsFetcher(new ValueSetsFetcherImpl());
     ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new VariablesResourceCallback(table)).send();
   }
 
@@ -65,42 +66,81 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private class ValueSetsResourceCallback implements ResourceCallback<ValueSetsDto> {
 
+    private int offset;
+
     private TableDto table;
 
-    public ValueSetsResourceCallback(TableDto table) {
+    public ValueSetsResourceCallback(int offset, TableDto table) {
       super();
+      this.offset = offset;
       this.table = table;
     }
 
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
       if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        getView().populateValues(resource);
+        getView().getValueSetsProvider().populateValues(offset, resource);
       }
     }
   }
 
-  private class ValueSetsProviderImpl implements ValueSetsProvider {
+  private class ValueSetsFetcherImpl implements ValueSetsFetcher {
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
-      String link = table.getLink() + "/valueSets";
-      link += "?offset=" + offset + "&limit=" + limit;
-      ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get().withCallback(new ValueSetsResourceCallback(table)).send();
+      StringBuilder link = getLinkBuilder(offset, limit);
+      if(table.getVariableCount() > variables.size()) {
+        link.append("&select=");
+        StringBuilder script = new StringBuilder();
+        for(int i = 0; i < variables.size(); i++) {
+          String eval = "name().eq(" + variables.get(i).getName() + ")";
+          if(i > 0) {
+            script.append("or(").append(eval).append(")");
+          } else {
+            script.append(eval);
+          }
+        }
+        link.append(URL.encodePathSegment(script.toString()));
+      }
+      doRequest(offset, link.toString());
+    }
+
+    @Override
+    public void request(String filter, int offset, int limit) {
+      StringBuilder link = getLinkBuilder(offset, limit);
+      if(filter != null && filter.isEmpty() == false) {
+        link.append("&select=").append(URL.encodePathSegment("name().matches(/" + filter + "/)"));
+      }
+
+      doRequest(offset, link.toString());
+    }
+
+    private void doRequest(int offset, String link) {
+      ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get().withCallback(new ValueSetsResourceCallback(offset, table)).send();
+    }
+
+    private StringBuilder getLinkBuilder(int offset, int limit) {
+      return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=").append(limit);
     }
   }
 
   public interface Display extends View {
-    void setEntityType(String type);
+    void setTable(TableDto table);
 
     void setVariables(JsArray<VariableDto> variables);
 
-    void populateValues(ValueSetsDto valueSets);
+    ValueSetsProvider getValueSetsProvider();
 
-    void setValueSetsProvider(ValueSetsProvider provider);
+    void setValueSetsFetcher(ValueSetsFetcher fetcher);
+  }
+
+  public interface ValueSetsFetcher {
+    void request(List<VariableDto> variables, int offset, int limit);
+
+    void request(String filter, int offset, int limit);
   }
 
   public interface ValueSetsProvider {
-    void request(List<VariableDto> variables, int offset, int limit);
+    void populateValues(int offset, ValueSetsDto valueSets);
   }
 
 }

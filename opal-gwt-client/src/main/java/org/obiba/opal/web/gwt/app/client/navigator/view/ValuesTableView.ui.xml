@@ -8,13 +8,7 @@
   
   <g:FlowPanel ui:field="valuesPanel">
      <g:InlineLabel ui:field="noValues"><ui:msg description="No Variables label">No Values</ui:msg></g:InlineLabel>
-     <g:FlowPanel addStyleNames="paging right-aligned">
-        <g:Anchor ui:field="previousPage" addStyleNames="icon icon-previous"></g:Anchor>
-		<g:InlineLabel ui:field="pageLow">1</g:InlineLabel>
-		<g:InlineLabel> ... </g:InlineLabel>
-		<g:InlineLabel ui:field="pageHigh">10</g:InlineLabel>
-		<g:Anchor ui:field="nextPage" addStyleNames="icon icon-next"></g:Anchor>
-      </g:FlowPanel>
+     <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"></c:SimplePager>
      <o:Table ui:field="valuesTable" addStyleNames="full-width left-aligned"></o:Table>
   </g:FlowPanel>
   
