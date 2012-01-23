@@ -35,10 +35,27 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table) {
+    setTable(table, "");
+  }
+
+  public void setTable(TableDto table, VariableDto variable) {
     this.table = table;
     getView().setTable(table);
     getView().setValueSetsFetcher(new ValueSetsFetcherImpl());
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new VariablesResourceCallback(table)).send();
+    JsArray<VariableDto> variables = JsArray.createArray().<JsArray<VariableDto>> cast();
+    variables.push(variable);
+    getView().setVariables(variables);
+  }
+
+  public void setTable(TableDto table, String select) {
+    this.table = table;
+    getView().setTable(table);
+    getView().setValueSetsFetcher(new ValueSetsFetcherImpl());
+    String link = table.getLink() + "/variables";
+    if(select != null && select.isEmpty() == false) {
+      link += "?select=" + URL.encodePathSegment(select);
+    }
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get().withCallback(new VariablesResourceCallback(table)).send();
   }
 
   //
@@ -92,9 +109,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         link.append("&select=");
         StringBuilder script = new StringBuilder();
         for(int i = 0; i < variables.size(); i++) {
-          String eval = "name().eq(" + variables.get(i).getName() + ")";
+          String eval = "name().eq('" + variables.get(i).getName() + "')";
           if(i > 0) {
-            script.append("or(").append(eval).append(")");
+            script.append("or('").append(eval).append("')");
           } else {
             script.append(eval);
           }

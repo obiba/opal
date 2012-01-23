@@ -120,6 +120,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
       getView().setCategorizeMenuAvailable(!variable.getValueType().equals("binary"));
 
       updateDerivedVariableDisplay(table);
+      valuesTablePresenter.setTable(table, variable);
 
       authorize(table);
     }

@@ -95,6 +95,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   public void setTable(TableDto table) {
     this.table = table;
     valuesTable.setRowCount(table.getValueSetCount());
+    valuesTable.setPageStart(0);
   }
 
   @Override
