@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -30,7 +31,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private TableDto table;
 
   @Inject
-  public ValuesTablePresenter(Display display, EventBus eventBus) {
+  public ValuesTablePresenter(Display display, final EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -138,6 +139,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     private StringBuilder getLinkBuilder(int offset, int limit) {
       return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=").append(limit);
     }
+
+    @Override
+    public void request(VariableDto variable, String entityIdentifier) {
+      StringBuilder link = new StringBuilder(table.getLink());
+      link.append("/variable/").append(variable.getName()).append("/value/").append(entityIdentifier);
+      getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
+    }
+
   }
 
   public interface Display extends View {
@@ -154,6 +163,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void request(List<VariableDto> variables, int offset, int limit);
 
     void request(String filter, int offset, int limit);
+
+    void request(VariableDto variable, String entityIdentifier);
   }
 
   public interface ValueSetsProvider {

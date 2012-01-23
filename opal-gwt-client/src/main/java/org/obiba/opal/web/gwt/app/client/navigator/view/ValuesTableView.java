@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresente
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsFetcher;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -96,6 +97,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     this.table = table;
     valuesTable.setRowCount(table.getValueSetCount());
     valuesTable.setPageStart(0);
+
+    if(dataProvider != null) {
+      dataProvider.removeDataDisplay(valuesTable);
+      dataProvider = null;
+    }
   }
 
   @Override
@@ -110,6 +116,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     if(dataProvider != null) {
       dataProvider.removeDataDisplay(valuesTable);
+      dataProvider = null;
     }
     dataProvider = new ValueSetsDataProvider();
     dataProvider.addDataDisplay(valuesTable);
@@ -138,7 +145,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   private ValueColumn createColumn(int pos, String type) {
-    return new ValueColumn(pos, type);
+    ValueColumn col = new ValueColumn(pos, type);
+    col.setValueSelectionHandler(new VariableValueSelectionHandler());
+    return col;
   }
 
   private void initValuesTable() {
@@ -277,6 +286,13 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
       updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
+    }
+  }
+
+  private final class VariableValueSelectionHandler implements ValueSelectionHandler {
+    @Override
+    public void onValueSelection(int row, int column, ValueSetDto valueSet) {
+      fetcher.request(listVariable.get(column), valueSet.getIdentifier());
     }
   }
 
