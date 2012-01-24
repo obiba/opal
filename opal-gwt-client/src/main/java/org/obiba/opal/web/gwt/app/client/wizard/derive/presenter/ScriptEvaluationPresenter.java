@@ -104,6 +104,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
    */
   public void setVariable(VariableDto variable) {
     this.variable = variable;
+    getDisplay().setVariable(variable);
   }
 
   public void setScriptEvaluationCallback(ScriptEvaluationCallback scriptEvaluationCallback) {
@@ -113,8 +114,6 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   private void populateValues(final int offset) {
     String script = Variables.getScript(variable);
 
-    getDisplay().setValueType(variable.getValueType());
-    getDisplay().setScript(script);
     getDisplay().populateValues(null);
     currentOffset = offset;
 
@@ -340,11 +339,9 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
     void setSummaryTabWidget(WidgetDisplay widget);
 
+    void setVariable(VariableDto variable);
+
     void setEntityType(String entityType);
-
-    void setValueType(String type);
-
-    void setScript(String text);
 
     HandlerRegistration setValueSelectionHandler(ValueSelectionHandler handler);
 

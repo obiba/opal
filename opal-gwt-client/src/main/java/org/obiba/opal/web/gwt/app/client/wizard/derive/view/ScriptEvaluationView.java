@@ -17,10 +17,12 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -79,11 +81,12 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
 
   private ValueSelectionHandler valueSelectionHandler;
 
+  private VariableDto variable;
+
   public ScriptEvaluationView() {
     initWidget(uiBinder.createAndBindUi(this));
     valuesTable.setPageSize(20);
     valuesTable.addColumn(new EntityColumn(), translations.idLabel());
-    valuesTable.addColumn(new ValueColumn(), translations.valueLabel());
   }
 
   @Override
@@ -104,29 +107,33 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   }
 
   @Override
-  public void setValueType(String type) {
-    valueType.setText(type);
-    ValueColumn col = new ValueColumn(type);
-    col.setValueSelectionHandler(valueSelectionHandler);
-    valuesTable.removeColumn(1);
-    valuesTable.insertColumn(1, col, translations.valueLabel());
-  }
-
-  @Override
   public void setEntityType(String entityType) {
     valuesTable.removeColumn(0);
     valuesTable.insertColumn(0, new EntityColumn(), entityType);
   }
 
   @Override
-  public void setScript(String text) {
-    script.setText(text);
+  public void setVariable(VariableDto variable) {
+    this.variable = variable;
+    String type = variable.getValueType();
+
+    valueType.setText(type);
+    ValueColumn col = new ValueColumn(variable);
+    col.setValueSelectionHandler(valueSelectionHandler);
+    if(valuesTable.getColumnCount() > 1) {
+      valuesTable.removeColumn(1);
+    }
+    valuesTable.insertColumn(1, col, translations.valueLabel());
+
+    script.setText(Variables.getScript(variable));
   }
 
   @Override
   public HandlerRegistration setValueSelectionHandler(ValueSelectionHandler handler) {
     this.valueSelectionHandler = handler;
-    ((ValueColumn) valuesTable.getColumn(1)).setValueSelectionHandler(handler);
+    if(valuesTable.getColumnCount() > 1) {
+      ((ValueColumn) valuesTable.getColumn(1)).setValueSelectionHandler(handler);
+    }
     return new HandlerRegistration() {
 
       @Override

@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -33,20 +34,14 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   private int pos = 0;
 
-  public ValueColumn() {
-    this(0);
+  private VariableDto variable;
+
+  public ValueColumn(VariableDto variable) {
+    this(0, variable);
   }
 
-  public ValueColumn(int pos) {
-    this(0, "");
-  }
-
-  public ValueColumn(String type) {
-    this(0, type);
-  }
-
-  public ValueColumn(int pos, String type) {
-    super(type.equalsIgnoreCase("binary") ? new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
+  public ValueColumn(int pos, VariableDto variable) {
+    super(variable.getValueType().equalsIgnoreCase("binary") ? new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
       @Override
       public SafeHtml render(String object) {
         if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
@@ -55,8 +50,9 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     }) : new TextCell());
 
     this.pos = pos;
+    this.variable = variable;
 
-    if(type.equalsIgnoreCase("binary")) {
+    if(variable.getValueType().equalsIgnoreCase("binary")) {
       setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
 
         @Override

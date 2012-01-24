@@ -111,7 +111,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     listVariable = JsArrays.toList(variables);
     int visible = listVariable.size() < MAX_VISIBLE_COLUMNS ? listVariable.size() : MAX_VISIBLE_COLUMNS;
     for(int i = 0; i < visible; i++) {
-      valuesTable.addColumn(createColumn(i, listVariable.get(i).getValueType()), getColumnLabel(i));
+      valuesTable.addColumn(createColumn(i, getVariableAt(i)), getColumnLabel(i));
     }
 
     if(listVariable.size() > 1) {
@@ -145,12 +145,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     return listVariable.get(i).getName();
   }
 
-  private String getColumnValueType(int i) {
-    return listVariable.get(i).getValueType();
+  private VariableDto getVariableAt(int i) {
+    return listVariable.get(i);
   }
 
-  private ValueColumn createColumn(int pos, String type) {
-    ValueColumn col = new ValueColumn(pos, type);
+  private ValueColumn createColumn(int pos, VariableDto variable) {
+    ValueColumn col = new ValueColumn(pos, variable);
     col.setValueSelectionHandler(new VariableValueSelectionHandler());
     return col;
   }
@@ -218,7 +218,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
           valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
           int idx = firstVisibleIndex--;
-          valuesTable.insertColumn(2, createColumn(idx, getColumnValueType(idx)), getColumnLabel(idx));
+          valuesTable.insertColumn(2, createColumn(idx, getVariableAt(idx)), getColumnLabel(idx));
           valuesTable.redrawHeaders();
         }
       });
@@ -250,7 +250,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
           valuesTable.removeColumn(2);
           int idx = ++firstVisibleIndex + MAX_VISIBLE_COLUMNS;
-          valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(idx, getColumnValueType(idx)), getColumnLabel(idx));
+          valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(idx, getVariableAt(idx)), getColumnLabel(idx));
           valuesTable.redrawHeaders();
         }
 
