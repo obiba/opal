@@ -97,7 +97,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
       if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        getView().getValueSetsProvider().populateValues(offset, resource);
+        if(getView().getValueSetsProvider() != null) {
+          getView().getValueSetsProvider().populateValues(offset, resource);
+        }
       }
     }
   }
