@@ -36,9 +36,9 @@ public class IconActionCell<C> extends AbstractCell<C> {
      * 
      * @param value the value to be acted upon
      */
-    void executeClick(T value);
+    void executeClick(NativeEvent event, T value);
 
-    void executeMouseDown(T value);
+    void executeMouseDown(NativeEvent event, T value);
   }
 
   private final String iconClass;
@@ -93,9 +93,9 @@ public class IconActionCell<C> extends AbstractCell<C> {
   @Override
   protected void onEnterKeyDown(Context context, Element parent, C value, NativeEvent event, ValueUpdater<C> valueUpdater) {
     if("click".equals(event.getType())) {
-      delegate.executeClick(value);
+      delegate.executeClick(event, value);
     } else {
-      delegate.executeMouseDown(value);
+      delegate.executeMouseDown(event, value);
     }
   }
 }
