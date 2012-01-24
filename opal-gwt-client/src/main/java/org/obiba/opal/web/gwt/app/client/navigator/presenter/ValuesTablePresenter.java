@@ -54,7 +54,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setValueSetsFetcher(new ValueSetsFetcherImpl());
     String link = table.getLink() + "/variables";
     if(select != null && select.isEmpty() == false) {
-      link += "?select=" + URL.encodePathSegment(select);
+      link += "?script=" + URL.encodePathSegment(select);
     }
     ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get().withCallback(new VariablesResourceCallback(table)).send();
   }
