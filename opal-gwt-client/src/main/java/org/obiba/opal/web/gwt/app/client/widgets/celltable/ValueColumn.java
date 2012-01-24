@@ -36,10 +36,19 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   private VariableDto variable;
 
+  /**
+   * Value column, with only one value expected in the value set.
+   * @param variable
+   */
   public ValueColumn(VariableDto variable) {
     this(0, variable);
   }
 
+  /**
+   * Value column with expected position of the value in the value set.
+   * @param pos
+   * @param variable
+   */
   public ValueColumn(int pos, VariableDto variable) {
     super(variable.getValueType().equalsIgnoreCase("binary") ? new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
       @Override
@@ -58,7 +67,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
         @Override
         public void update(int index, ValueSetDto valueSet, String value) {
           if(valueSelectionHandler != null) {
-            valueSelectionHandler.onValueSelection(index, ValueColumn.this.pos, valueSet);
+            valueSelectionHandler.onValueSelection(index, getPosition(), valueSet);
           }
         }
       });
@@ -71,13 +80,21 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   @Override
   public String getValue(ValueSetDto valueSet) {
-    if(valueSet.getValuesArray() == null || valueSet.getValuesArray().length() <= pos) return "";
-    ValueDto value = valueSet.getValuesArray().get(pos);
+    if(valueSet.getValuesArray() == null || valueSet.getValuesArray().length() <= getPosition()) return "";
+    ValueDto value = valueSet.getValuesArray().get(getPosition());
     if(value.getValuesArray() != null) {
       return getValueSequence(value);
     } else {
       return getValue(value);
     }
+  }
+
+  /**
+   * Get the position of the variable's value in the value set
+   * @return
+   */
+  protected int getPosition() {
+    return pos;
   }
 
   private String getValueSequence(ValueDto value) {
