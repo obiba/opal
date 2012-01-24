@@ -8,6 +8,7 @@
   
   <g:FlowPanel ui:field="valuesPanel">
      <g:InlineLabel ui:field="noValues"><ui:msg description="No Variables label">No Values</ui:msg></g:InlineLabel>
+     <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"></g:PopupPanel>
      <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"></c:SimplePager>
      <o:Table ui:field="valuesTable" addStyleNames="full-width left-aligned"></o:Table>
   </g:FlowPanel>

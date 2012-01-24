@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresente
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.IconActionCell;
+import org.obiba.opal.web.gwt.app.client.workbench.view.IconActionCell.Delegate;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -27,6 +28,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -35,8 +37,13 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
@@ -67,6 +74,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   FlowPanel valuesPanel;
 
   @UiField
+  PopupPanel navigationPopup;
+
+  @UiField
   Table<ValueSetDto> valuesTable;
 
   private ValueSetsDataProvider dataProvider;
@@ -84,6 +94,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     valuesTable.setEmptyTableWidget(noValues);
     pager.setDisplay(valuesTable);
     pager.setPageSize(PAGE_SIZE);
+    navigationPopup.hide();
   }
 
   @Override
@@ -210,22 +221,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final class PreviousActionCell extends IconActionCell<String> {
 
     private PreviousActionCell() {
-      super("icon-previous", new Delegate<String>() {
-
-        @Override
-        public void executeClick(String value) {
-          valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
-          int idx = firstVisibleIndex--;
-          valuesTable.insertColumn(2, createColumn(getVariableAt(idx)), getColumnLabel(idx));
-          valuesTable.redrawHeaders();
-        }
-
-        @Override
-        public void executeMouseDown(String value) {
-          // TODO Auto-generated method stub
-
-        }
-      });
+      super("icon-previous", new PreviousDelegate());
     }
 
     @Override
@@ -238,28 +234,129 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final class NextActionCell extends IconActionCell<String> {
 
     private NextActionCell() {
-      super("icon-next", new Delegate<String>() {
-
-        @Override
-        public void executeClick(String value) {
-          valuesTable.removeColumn(2);
-          int idx = ++firstVisibleIndex + MAX_VISIBLE_COLUMNS;
-          valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
-          valuesTable.redrawHeaders();
-        }
-
-        @Override
-        public void executeMouseDown(String value) {
-          // TODO Auto-generated method stub
-
-        }
-
-      });
+      super("icon-next", new NextDelegate());
     }
 
     @Override
     public boolean isEnabled() {
       return (firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) == false;
+    }
+
+  }
+
+  private abstract class NavigationDelegate implements Delegate<String> {
+
+    protected static final int MAX_NUMBER_OF_ITEMS = 15;
+
+    private static final int POPUP_DELAY = 500;
+
+    private Timer timer;
+
+    @Override
+    public void executeClick(NativeEvent event, String value) {
+      if(timer != null) {
+        timer.cancel();
+      }
+      if(navigationPopup.isShowing()) return;
+
+      navigate(1);
+    }
+
+    @Override
+    public void executeMouseDown(final NativeEvent event, String value) {
+      navigationPopup.hide();
+      timer = new Timer() {
+
+        @Override
+        public void run() {
+          showMenu(event);
+        }
+
+      };
+      timer.schedule(POPUP_DELAY);
+    }
+
+    protected void showMenu(NativeEvent event) {
+      navigationPopup.clear();
+
+      MenuBar menuBar = createMenuBar();
+      menuBar.setVisible(true);
+      navigationPopup.add(menuBar);
+
+      navigationPopup.setPopupPosition(event.getClientX(), event.getClientY());
+      navigationPopup.show();
+    }
+
+    protected Command createCommand(final int steps) {
+      return new Command() {
+
+        @Override
+        public void execute() {
+          navigate(steps);
+          navigationPopup.hide();
+        }
+      };
+    }
+
+    protected abstract MenuBar createMenuBar();
+
+    protected abstract void navigate(int steps);
+
+  }
+
+  private final class NextDelegate extends NavigationDelegate {
+
+    @Override
+    protected MenuBar createMenuBar() {
+      MenuBar menuBar = new MenuBar(true);
+      int currentIdx = firstVisibleIndex + MAX_VISIBLE_COLUMNS;
+      for(int i = currentIdx + 1; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS + 1, listVariable.size()); i++) {
+        final int increment = i - currentIdx;
+        menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(increment)));
+      }
+      return menuBar;
+    }
+
+    @Override
+    protected void navigate(int steps) {
+      for(int i = 0; i < steps; i++) {
+        valuesTable.removeColumn(2);
+        int idx = ++firstVisibleIndex + MAX_VISIBLE_COLUMNS;
+        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
+      }
+      valuesTable.redrawHeaders();
+    }
+
+    @Override
+    protected void showMenu(NativeEvent event) {
+      super.showMenu(event);
+      // adjust the position when we know the popup width
+      navigationPopup.setPopupPosition(event.getClientX() - navigationPopup.getOffsetWidth(), event.getClientY());
+    }
+
+  }
+
+  private final class PreviousDelegate extends NavigationDelegate {
+
+    @Override
+    protected MenuBar createMenuBar() {
+      MenuBar menuBar = new MenuBar(true);
+      int currentIdx = firstVisibleIndex + 1;
+      for(int i = currentIdx - 1; i >= Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0); i--) {
+        final int decrement = currentIdx - i;
+        menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(decrement)));
+      }
+      return menuBar;
+    }
+
+    @Override
+    protected void navigate(int steps) {
+      for(int i = 0; i < steps; i++) {
+        valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
+        int idx = firstVisibleIndex--;
+        valuesTable.insertColumn(2, createColumn(getVariableAt(idx)), getColumnLabel(idx));
+      }
+      valuesTable.redrawHeaders();
     }
 
   }
