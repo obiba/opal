@@ -17,18 +17,17 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresente
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -178,7 +177,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     valuesTable.addColumn(entityColumn, table.getEntityType());
   }
 
-  private Header<String> createHeader(ActionCell<String> cell) {
+  private Header<String> createHeader(AbstractCell<String> cell) {
     return new Header<String>(cell) {
 
       @Override
@@ -208,17 +207,13 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   // Inner classes
   //
 
-  private final class PreviousActionCell extends ActionCell<String> {
-
-    private static final String IMG_PREVIOUS = "<a class=\"icon icon-previous\"/>";
-
-    private static final String IMAGE_PREVIOUS_DISABLED = "<span class=\"icon icon-previous disabled\"/>";
+  private final class PreviousActionCell extends IconActionCell<String> {
 
     private PreviousActionCell() {
-      super("", new Delegate<String>() {
+      super("icon-previous", new Delegate<String>() {
 
         @Override
-        public void execute(String object) {
+        public void executeClick(String value) {
           if(firstVisibleIndex == 0) return;
 
           valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
@@ -226,31 +221,29 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
           valuesTable.insertColumn(2, createColumn(getVariableAt(idx)), getColumnLabel(idx));
           valuesTable.redrawHeaders();
         }
+
+        @Override
+        public void executeMouseDown(String value) {
+          // TODO Auto-generated method stub
+
+        }
       });
     }
 
     @Override
-    public void render(com.google.gwt.cell.client.Cell.Context context, String value, SafeHtmlBuilder sb) {
-      if(firstVisibleIndex == 0) {
-        sb.append(SafeHtmlUtils.fromSafeConstant(IMAGE_PREVIOUS_DISABLED));
-      } else {
-        sb.append(SafeHtmlUtils.fromSafeConstant(IMG_PREVIOUS));
-      }
+    public boolean isEnabled() {
+      return firstVisibleIndex > 0;
     }
 
   }
 
-  private final class NextActionCell extends ActionCell<String> {
-
-    private static final String IMG_NEXT = "<a class=\"icon icon-next\"/>";
-
-    private static final String IMAGE_NEXT_DISABLED = "<span class=\"icon icon-next disabled\"/>";
+  private final class NextActionCell extends IconActionCell<String> {
 
     private NextActionCell() {
-      super("", new Delegate<String>() {
+      super("icon-next", new Delegate<String>() {
 
         @Override
-        public void execute(String object) {
+        public void executeClick(String value) {
           if(firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) return;
 
           valuesTable.removeColumn(2);
@@ -259,17 +252,20 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
           valuesTable.redrawHeaders();
         }
 
+        @Override
+        public void executeMouseDown(String value) {
+          // TODO Auto-generated method stub
+
+        }
+
       });
     }
 
     @Override
-    public void render(com.google.gwt.cell.client.Cell.Context context, String value, SafeHtmlBuilder sb) {
-      if(firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) {
-        sb.append(SafeHtmlUtils.fromSafeConstant(IMAGE_NEXT_DISABLED));
-      } else {
-        sb.append(SafeHtmlUtils.fromSafeConstant(IMG_NEXT));
-      }
+    public boolean isEnabled() {
+      return (firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) == false;
     }
+
   }
 
   private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements ValuesTablePresenter.ValueSetsProvider {
