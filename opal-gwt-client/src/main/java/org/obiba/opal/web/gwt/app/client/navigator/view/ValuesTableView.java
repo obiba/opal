@@ -111,7 +111,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     listVariable = JsArrays.toList(variables);
     int visible = listVariable.size() < MAX_VISIBLE_COLUMNS ? listVariable.size() : MAX_VISIBLE_COLUMNS;
     for(int i = 0; i < visible; i++) {
-      valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(i, listVariable.get(i).getValueType()), getColumnLabel(i));
+      valuesTable.addColumn(createColumn(i, listVariable.get(i).getValueType()), getColumnLabel(i));
+    }
+
+    if(listVariable.size() > 1) {
+      valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
+      valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
     }
 
     if(dataProvider != null) {
@@ -166,8 +171,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     setMinimumWidth(entityColumn);
 
     valuesTable.addColumn(entityColumn, table.getEntityType());
-    valuesTable.addColumn(createEmptyColumn(), createHeader(new PreviousActionCell()));
-    valuesTable.addColumn(createEmptyColumn(), createHeader(new NextActionCell()));
   }
 
   private Header<String> createHeader(ActionCell<String> cell) {
