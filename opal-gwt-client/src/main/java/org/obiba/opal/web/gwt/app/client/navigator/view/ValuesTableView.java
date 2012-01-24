@@ -214,8 +214,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
         @Override
         public void executeClick(String value) {
-          if(firstVisibleIndex == 0) return;
-
           valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
           int idx = firstVisibleIndex--;
           valuesTable.insertColumn(2, createColumn(getVariableAt(idx)), getColumnLabel(idx));
@@ -244,8 +242,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
         @Override
         public void executeClick(String value) {
-          if(firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) return;
-
           valuesTable.removeColumn(2);
           int idx = ++firstVisibleIndex + MAX_VISIBLE_COLUMNS;
           valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));

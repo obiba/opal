@@ -60,6 +60,7 @@ public class IconActionCell<C> extends AbstractCell<C> {
   @Override
   public void onBrowserEvent(Context context, Element parent, C value, NativeEvent event, ValueUpdater<C> valueUpdater) {
     super.onBrowserEvent(context, parent, value, event, valueUpdater);
+    if(isEnabled() == false) return;
     if("click".equals(event.getType()) || "mousedown".equals(event.getType())) {
       EventTarget eventTarget = event.getEventTarget();
       if(!Element.is(eventTarget)) {
@@ -72,6 +73,10 @@ public class IconActionCell<C> extends AbstractCell<C> {
     }
   }
 
+  /**
+   * Method to be overridden in order to enable dynamically the icon. Default is enabled.
+   * @return
+   */
   public boolean isEnabled() {
     return true;
   }
