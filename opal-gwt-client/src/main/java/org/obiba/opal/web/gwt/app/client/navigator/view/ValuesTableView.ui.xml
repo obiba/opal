@@ -9,6 +9,17 @@
   <g:FlowPanel ui:field="valuesPanel">
      <g:InlineLabel ui:field="noValues"><ui:msg description="No Variables label">No Values</ui:msg></g:InlineLabel>
      <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"></g:PopupPanel>
+     
+     <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
+       <g:customHeader>
+         <g:Label><ui:msg description="Display Options label">Display Options</ui:msg></g:Label>
+       </g:customHeader>
+       <g:FlowPanel styleName="input">
+         <g:Label addStyleNames="key"><ui:msg description="Filter Variables label">Variables filter</ui:msg></g:Label>
+         <g:TextBox ui:field="filter"></g:TextBox>
+         <g:Label styleName="help-block"><ui:msg description="Variable name filter label">Display the variables which name matches the provided text. Empty filter will show all variables.</ui:msg></g:Label>
+       </g:FlowPanel>
+     </g:DisclosurePanel>
      <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"></c:SimplePager>
      <o:Table ui:field="valuesTable" addStyleNames="full-width left-aligned"></o:Table>
   </g:FlowPanel>

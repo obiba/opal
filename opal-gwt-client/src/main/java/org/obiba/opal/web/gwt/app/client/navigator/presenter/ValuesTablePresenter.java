@@ -112,7 +112,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         for(int i = 0; i < variables.size(); i++) {
           String eval = "name().eq('" + variables.get(i).getName() + "')";
           if(i > 0) {
-            script.append("or('").append(eval).append("')");
+            script.append(".or('").append(eval).append("')");
           } else {
             script.append(eval);
           }
@@ -147,6 +147,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
 
+    @Override
+    public void updateVariables(String filter) {
+      if(filter.isEmpty()) {
+        setTable(table);
+      } else {
+        setTable(table, "name().matches(/" + filter + "/)");
+      }
+    }
+
   }
 
   public interface Display extends View {
@@ -165,6 +174,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void request(String filter, int offset, int limit);
 
     void request(VariableDto variable, String entityIdentifier);
+
+    void updateVariables(String filter);
   }
 
   public interface ValueSetsProvider {

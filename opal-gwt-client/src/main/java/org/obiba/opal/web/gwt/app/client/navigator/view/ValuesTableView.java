@@ -30,6 +30,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -44,6 +46,7 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
@@ -52,9 +55,9 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Display {
 
-  private static final int MAX_VISIBLE_COLUMNS = 5;
+  private static final int DEFAULT_MAX_VISIBLE_COLUMNS = 5;
 
-  private static final int PAGE_SIZE = 20;
+  private static final int DEFAULT_PAGE_SIZE = 20;
 
   @UiTemplate("ValuesTableView.ui.xml")
   interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {
@@ -79,6 +82,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @UiField
   Table<ValueSetDto> valuesTable;
 
+  @UiField
+  TextBox filter;
+
   private ValueSetsDataProvider dataProvider;
 
   private List<VariableDto> listVariable;
@@ -93,8 +99,16 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     widget = uiBinder.createAndBindUi(this);
     valuesTable.setEmptyTableWidget(noValues);
     pager.setDisplay(valuesTable);
-    pager.setPageSize(PAGE_SIZE);
+    pager.setPageSize(DEFAULT_PAGE_SIZE);
     navigationPopup.hide();
+
+    filter.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        fetcher.updateVariables(filter.getText());
+      }
+    });
   }
 
   @Override
@@ -119,7 +133,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     initValuesTable();
 
     listVariable = JsArrays.toList(variables);
-    int visible = listVariable.size() < MAX_VISIBLE_COLUMNS ? listVariable.size() : MAX_VISIBLE_COLUMNS;
+    int visible = listVariable.size() < DEFAULT_MAX_VISIBLE_COLUMNS ? listVariable.size() : DEFAULT_MAX_VISIBLE_COLUMNS;
     for(int i = 0; i < visible; i++) {
       valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnLabel(i));
     }
@@ -239,7 +253,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return (firstVisibleIndex + MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) == false;
+      return (firstVisibleIndex + DEFAULT_MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) == false;
     }
 
   }
@@ -309,7 +323,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     protected MenuBar createMenuBar() {
       MenuBar menuBar = new MenuBar(true);
-      int currentIdx = firstVisibleIndex + MAX_VISIBLE_COLUMNS;
+      int currentIdx = firstVisibleIndex + DEFAULT_MAX_VISIBLE_COLUMNS;
       for(int i = currentIdx + 1; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS + 1, listVariable.size()); i++) {
         final int increment = i - currentIdx;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(increment)));
@@ -321,7 +335,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     protected void navigate(int steps) {
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(2);
-        int idx = ++firstVisibleIndex + MAX_VISIBLE_COLUMNS;
+        int idx = ++firstVisibleIndex + DEFAULT_MAX_VISIBLE_COLUMNS;
         valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
       }
       valuesTable.redrawHeaders();
@@ -377,7 +391,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       if(start + length > table.getValueSetCount()) {
         length = table.getValueSetCount() - start;
       }
-      fetcher.request(listVariable, start, length);
+      if(filter.getText().isEmpty()) {
+        fetcher.request(listVariable, start, length);
+      } else {
+        fetcher.request(filter.getText(), start, length);
+      }
     }
 
     @Override
