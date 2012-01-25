@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Dis
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 

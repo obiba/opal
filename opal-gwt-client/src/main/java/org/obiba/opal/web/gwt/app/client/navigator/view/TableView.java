@@ -13,13 +13,13 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
-import org.obiba.opal.web.gwt.user.cellview.client.ClickableColumn;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 

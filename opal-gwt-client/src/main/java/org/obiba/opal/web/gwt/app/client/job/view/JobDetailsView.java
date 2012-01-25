@@ -14,7 +14,7 @@ import java.util.Date;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.user.cellview.client.DateTimeColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 import org.obiba.opal.web.model.client.opal.Message;
 
