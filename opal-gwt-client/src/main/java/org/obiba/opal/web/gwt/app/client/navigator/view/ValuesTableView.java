@@ -373,6 +373,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         final int increment = i - currentIdx;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(increment)));
       }
+      if(Math.min(currentIdx + MAX_NUMBER_OF_ITEMS + 1, listVariable.size()) < listVariable.size()) {
+        MenuItem more = new MenuItem("...", (Command) null);
+        more.setEnabled(false);
+        menuBar.addItem(more);
+      }
       return menuBar;
     }
 
@@ -404,6 +409,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       for(int i = currentIdx - 1; i >= Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0); i--) {
         final int decrement = currentIdx - i;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(decrement)));
+      }
+      if(Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0) > 0) {
+        MenuItem more = new MenuItem("...", (Command) null);
+        more.setEnabled(false);
+        menuBar.addItem(more);
       }
       return menuBar;
     }
