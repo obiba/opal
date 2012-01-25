@@ -16,6 +16,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
@@ -50,13 +51,25 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
    * @param variable
    */
   public ValueColumn(int pos, VariableDto variable) {
-    super(variable.getValueType().equalsIgnoreCase("binary") ? new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
-      @Override
-      public SafeHtml render(String object) {
-        if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
-        return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"icon icon-down\">").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
-      }
-    }) : new TextCell());
+    this(pos, variable, createCell(variable));
+  }
+
+  private static Cell<String> createCell(final VariableDto variable) {
+    if(variable.getValueType().equalsIgnoreCase("binary")) {
+      return new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
+        @Override
+        public SafeHtml render(String object) {
+          if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
+          return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"icon icon-down\">").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
+        }
+      });
+    } else {
+      return new TextCell();
+    }
+  }
+
+  private ValueColumn(int pos, VariableDto variable, Cell<String> cell) {
+    super(cell);
 
     this.pos = pos;
     this.variable = variable;
