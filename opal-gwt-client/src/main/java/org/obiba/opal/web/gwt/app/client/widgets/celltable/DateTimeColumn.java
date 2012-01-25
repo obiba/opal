@@ -13,11 +13,12 @@ import java.util.Date;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.Column;
 
 public abstract class DateTimeColumn<T> extends Column<T, Date> {
   public DateTimeColumn() {
-    super(new DateCell(DateTimeFormat.getShortDateTimeFormat()));
+    super(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT)));
   }
 
   public DateTimeColumn(DateTimeFormat dateFormat) {
