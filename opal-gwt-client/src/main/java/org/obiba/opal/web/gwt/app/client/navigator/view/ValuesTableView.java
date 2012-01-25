@@ -432,8 +432,10 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         length = table.getValueSetCount() - start;
       }
       if(filter.getText().isEmpty()) {
+        refreshPending.setVisible(true);
         fetcher.request(listVariable, start, length);
       } else {
+        refreshPending.setVisible(true);
         fetcher.request(filter.getText(), start, length);
       }
     }
