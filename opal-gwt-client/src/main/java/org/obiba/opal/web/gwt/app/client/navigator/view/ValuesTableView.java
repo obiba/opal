@@ -129,11 +129,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
           if(filter.getText().isEmpty() == false) {
             select = "name().matches(/" + filter.getText() + "/)";
           }
-          refreshPending.setVisible(true);
+          setRefreshing(true);
           fetcher.updateVariables(select);
         } else if(valuesTable.getPageSize() != pageSize.getNumberValue().intValue()) {
           // page size only has changed
-          refreshPending.setVisible(true);
+          setRefreshing(true);
           valuesTable.setPageSize(pageSize.getNumberValue().intValue());
         }
         // else nothing to refresh
@@ -159,7 +159,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     lastFilter = "";
     filter.setValue(lastFilter, false);
-    refreshPending.setVisible(false);
+    setRefreshing(false);
   }
 
   @Override
@@ -178,7 +178,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getText().isEmpty()) {
-      lastFilter = listVariable.get(0).getName();
+      lastFilter = "^" + listVariable.get(0).getName() + "$";
       filter.setValue(lastFilter, false);
     }
 
@@ -204,6 +204,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   //
   // Private methods
   //
+
+  private void setRefreshing(boolean refresh) {
+    refreshPending.setVisible(refresh);
+    refreshButton.setEnabled(refresh == false);
+  }
 
   private String getColumnLabel(int i) {
     return listVariable.get(i).getName();
@@ -432,17 +437,17 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         length = table.getValueSetCount() - start;
       }
       if(filter.getText().isEmpty()) {
-        refreshPending.setVisible(true);
+        setRefreshing(true);
         fetcher.request(listVariable, start, length);
       } else {
-        refreshPending.setVisible(true);
+        setRefreshing(true);
         fetcher.request(filter.getText(), start, length);
       }
     }
 
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
-      refreshPending.setVisible(false);
+      setRefreshing(false);
       updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
     }
   }
