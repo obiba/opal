@@ -97,6 +97,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @UiField
   Image refreshPending;
 
+  @UiField
+  NumericTextBox visibleColumns;
+
   private ValueSetsDataProvider dataProvider;
 
   private List<VariableDto> listVariable;
@@ -109,6 +112,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private String lastFilter = "";
 
+  private int maxVisibleColumns = DEFAULT_MAX_VISIBLE_COLUMNS;
+
   public ValuesTableView() {
     widget = uiBinder.createAndBindUi(this);
     valuesTable.setEmptyTableWidget(noValues);
@@ -117,14 +122,19 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     navigationPopup.hide();
 
     pageSize.setValue(Integer.toString(DEFAULT_PAGE_SIZE), false);
+    pageSize.setMin(1);
+
+    visibleColumns.setValue(Integer.toString(DEFAULT_MAX_VISIBLE_COLUMNS), false);
+    visibleColumns.setMin(1);
 
     refreshButton.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        if(lastFilter.equals(filter.getText()) == false) {
+        if(lastFilter.equals(filter.getText()) == false || maxVisibleColumns != visibleColumns.getNumberValue().intValue()) {
           // variables list has changed so update all
           lastFilter = filter.getText();
+          maxVisibleColumns = visibleColumns.getNumberValue().intValue();
           String select = "";
           if(filter.getText().isEmpty() == false) {
             select = "name().matches(/" + filter.getText() + "/)";
@@ -167,12 +177,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     initValuesTable();
 
     listVariable = JsArrays.toList(variables);
-    int visible = listVariable.size() < DEFAULT_MAX_VISIBLE_COLUMNS ? listVariable.size() : DEFAULT_MAX_VISIBLE_COLUMNS;
+    int visible = listVariable.size() < getMaxVisibleColumns() ? listVariable.size() : getMaxVisibleColumns();
     for(int i = 0; i < visible; i++) {
       valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnLabel(i));
     }
 
-    if(listVariable.size() > DEFAULT_MAX_VISIBLE_COLUMNS + 1) {
+    if(listVariable.size() > getMaxVisibleColumns() + 1) {
       valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
       valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
     }
@@ -204,6 +214,10 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   //
   // Private methods
   //
+
+  public int getMaxVisibleColumns() {
+    return maxVisibleColumns;
+  }
 
   private void setRefreshing(boolean refresh) {
     refreshPending.setVisible(refresh);
@@ -298,7 +312,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return (firstVisibleIndex + DEFAULT_MAX_VISIBLE_COLUMNS >= listVariable.size() - 1) == false;
+      return (firstVisibleIndex + getMaxVisibleColumns() >= listVariable.size() - 1) == false;
     }
 
   }
@@ -368,7 +382,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     protected MenuBar createMenuBar() {
       MenuBar menuBar = new MenuBar(true);
-      int currentIdx = firstVisibleIndex + DEFAULT_MAX_VISIBLE_COLUMNS;
+      int currentIdx = firstVisibleIndex + getMaxVisibleColumns();
       for(int i = currentIdx + 1; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS + 1, listVariable.size()); i++) {
         final int increment = i - currentIdx;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(increment)));
@@ -385,7 +399,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     protected void navigate(int steps) {
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(2);
-        int idx = ++firstVisibleIndex + DEFAULT_MAX_VISIBLE_COLUMNS;
+        int idx = ++firstVisibleIndex + getMaxVisibleColumns();
         valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
       }
       valuesTable.redrawHeaders();

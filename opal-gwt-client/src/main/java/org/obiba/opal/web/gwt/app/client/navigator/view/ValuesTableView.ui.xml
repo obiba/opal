@@ -209,6 +209,12 @@
            </g:customCell>
            <g:customCell styleName="top-aligned small-indent">
              <g:FlowPanel styleName="input block">
+               <g:Label addStyleNames="key"><ui:msg description="Number of Visible Variables label">Number of visible variables</ui:msg></g:Label>
+               <o:NumericTextBox ui:field="visibleColumns" addStyleNames="span1"></o:NumericTextBox>         
+             </g:FlowPanel>
+           </g:customCell>
+           <g:customCell styleName="top-aligned small-indent">
+             <g:FlowPanel styleName="input block">
                <g:Label addStyleNames="key"><ui:msg description="Number of Rows label">Number of rows</ui:msg></g:Label>
                <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"></o:NumericTextBox>         
              </g:FlowPanel>
