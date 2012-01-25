@@ -30,9 +30,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private TableDto table;
 
+  private DataFetcher fetcher;
+
   @Inject
   public ValuesTablePresenter(Display display, final EventBus eventBus) {
     super(eventBus, display);
+    getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
   }
 
   public void setTable(TableDto table) {
@@ -42,7 +45,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   public void setTable(TableDto table, VariableDto variable) {
     this.table = table;
     getView().setTable(table);
-    getView().setValueSetsFetcher(new ValueSetsFetcherImpl());
     JsArray<VariableDto> variables = JsArray.createArray().<JsArray<VariableDto>> cast();
     variables.push(variable);
     getView().setVariables(variables);
@@ -51,12 +53,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   public void setTable(TableDto table, String select) {
     this.table = table;
     getView().setTable(table);
-    getView().setValueSetsFetcher(new ValueSetsFetcherImpl());
-    String link = table.getLink() + "/variables";
-    if(select != null && select.isEmpty() == false) {
-      link += "?script=" + URL.encodePathSegment(select);
-    }
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get().withCallback(new VariablesResourceCallback(table)).send();
+    fetcher.updateVariables(select);
   }
 
   //
@@ -104,7 +101,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
-  private class ValueSetsFetcherImpl implements ValueSetsFetcher {
+  private class DataFetcherImpl implements DataFetcher {
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
       StringBuilder link = getLinkBuilder(offset, limit);
@@ -150,12 +147,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
-    public void updateVariables(String filter) {
-      if(filter.isEmpty()) {
-        setTable(table);
-      } else {
-        setTable(table, "name().matches(/" + filter + "/)");
+    public void updateVariables(String select) {
+      String link = table.getLink() + "/variables";
+      if(select != null && select.isEmpty() == false) {
+        link += "?script=" + URL.encodePathSegment(select);
       }
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get().withCallback(new VariablesResourceCallback(table)).send();
     }
 
   }
@@ -167,17 +164,17 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     ValueSetsProvider getValueSetsProvider();
 
-    void setValueSetsFetcher(ValueSetsFetcher fetcher);
+    void setValueSetsFetcher(DataFetcher fetcher);
   }
 
-  public interface ValueSetsFetcher {
+  public interface DataFetcher {
     void request(List<VariableDto> variables, int offset, int limit);
 
     void request(String filter, int offset, int limit);
 
     void request(VariableDto variable, String entityIdentifier);
 
-    void updateVariables(String filter);
+    void updateVariables(String select);
   }
 
   public interface ValueSetsProvider {

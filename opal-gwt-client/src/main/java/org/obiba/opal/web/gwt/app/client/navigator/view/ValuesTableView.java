@@ -13,12 +13,12 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsFetcher;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.IconActionCell;
-import org.obiba.opal.web.gwt.app.client.workbench.view.IconActionCell.Delegate;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -91,7 +91,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private TableDto table;
 
-  private ValueSetsFetcher fetcher;
+  private DataFetcher fetcher;
 
   private int firstVisibleIndex = 0;
 
@@ -106,7 +106,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
       @Override
       public void onChange(ChangeEvent event) {
-        fetcher.updateVariables(filter.getText());
+        String select = "";
+        if(filter.getText().isEmpty() == false) {
+          select = "name().matches(/" + filter.getText() + "/)";
+        }
+        fetcher.updateVariables(select);
       }
     });
   }
@@ -126,6 +130,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       dataProvider.removeDataDisplay(valuesTable);
       dataProvider = null;
     }
+
+    filter.setValue("", false);
   }
 
   @Override
@@ -138,7 +144,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnLabel(i));
     }
 
-    if(listVariable.size() > 1) {
+    if(listVariable.size() > DEFAULT_MAX_VISIBLE_COLUMNS + 1) {
       valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
       valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
     }
@@ -157,7 +163,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   @Override
-  public void setValueSetsFetcher(ValueSetsFetcher provider) {
+  public void setValueSetsFetcher(DataFetcher provider) {
     this.fetcher = provider;
   }
 

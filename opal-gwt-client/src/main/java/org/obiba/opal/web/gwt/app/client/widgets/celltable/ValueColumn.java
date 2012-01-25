@@ -82,7 +82,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
   public String getValue(ValueSetDto valueSet) {
     if(valueSet.getValuesArray() == null || valueSet.getValuesArray().length() <= getPosition()) return "";
     ValueDto value = valueSet.getValuesArray().get(getPosition());
-    if(value.getValuesArray() != null) {
+    if(variable.getIsRepeatable()) {
       return getValueSequence(value);
     } else {
       return getValue(value);
@@ -99,6 +99,8 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   private String getValueSequence(ValueDto value) {
     JsArray<ValueDto> values = value.getValuesArray();
+    if(values == null) return getValue(value);
+
     StringBuilder builder = new StringBuilder();
     boolean first = true;
     for(ValueDto val : JsArrays.toIterable(values)) {
