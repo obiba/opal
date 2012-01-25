@@ -12,13 +12,35 @@
      
      <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
        <g:customHeader>
-         <g:Label><ui:msg description="Display Options label">Display Options</ui:msg></g:Label>
+         <g:Label><ui:msg description="Display Options label">Display options</ui:msg></g:Label>
        </g:customHeader>
-       <g:FlowPanel styleName="input">
-         <g:Label addStyleNames="key"><ui:msg description="Filter Variables label">Variables filter</ui:msg></g:Label>
-         <g:TextBox ui:field="filter"></g:TextBox>
-         <g:Label styleName="help-block"><ui:msg description="Variable name filter label">Display the variables which name matches the provided text. Empty filter will show all variables.</ui:msg></g:Label>
-       </g:FlowPanel>
+       
+       <g:Grid>
+         <g:row>
+           <g:customCell styleName="top-aligned">
+             <g:FlowPanel styleName="input block">
+               <g:Label addStyleNames="key"><ui:msg description="Filter Variables label">Variables filter</ui:msg></g:Label>
+               <g:TextBox ui:field="filter"></g:TextBox>
+               <g:Label styleName="help-block"><ui:msg description="Variable name filter label">Display the variables which name matches the provided text.</ui:msg></g:Label>         
+             </g:FlowPanel>        
+           </g:customCell>
+           <g:customCell styleName="top-aligned small-indent">
+             <g:FlowPanel styleName="input block">
+               <g:Label addStyleNames="key"><ui:msg description="Number of Rows label">Number of rows</ui:msg></g:Label>
+               <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"></o:NumericTextBox>         
+             </g:FlowPanel>
+           </g:customCell>
+         </g:row>
+         <g:row>
+           <g:customCell>
+             <g:FlowPanel>
+               <g:Button styleName="btn small-bottom-margin info icon icon-sync" ui:field="refreshButton"><ui:msg description="Refresh label">Refresh</ui:msg></g:Button>
+               <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
+             </g:FlowPanel> 
+           </g:customCell>
+         </g:row>
+       </g:Grid>
+       
      </g:DisclosurePanel>
      <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"></c:SimplePager>
      <o:Table ui:field="valuesTable" addStyleNames="full-width left-aligned"></o:Table>

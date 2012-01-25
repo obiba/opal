@@ -35,7 +35,7 @@
 	-moz-border-radius: 0em; -webkit-border-radius: 0em;
 }
 
-.workbench .top {
+.workbench div.top {
     background-color:#F3F4EB;
     color:#402817;
 }

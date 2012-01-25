@@ -74,7 +74,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
         JsArray<VariableDto> variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
         getView().setVariables(variables);
-
       }
     }
   }

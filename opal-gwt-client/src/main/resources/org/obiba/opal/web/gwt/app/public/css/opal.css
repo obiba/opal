@@ -106,7 +106,7 @@ textarea[disabled] {
   color: #888888;
 }
 
-td.top {
+td.top, td.top-aligned {
   vertical-align: top;
 }
 
@@ -689,7 +689,7 @@ margin-left:0.8em;
 
 /* Workbench */
 
-.workbench .top {
+.workbench div.top {
     padding: 0.5em 0 0 1em;
     float: left;
     background:#F3F4EB;
@@ -698,32 +698,32 @@ margin-left:0.8em;
     color:#ffffff;
 }
 
-.workbench .top .header {
+.workbench div.top .header {
     float: left;
     margin-right:1.6em;
     margin-top: 0.2em;
 }
 
-.workbench .top .header .title {
+.workbench div.top .header .title {
   font-size:1.2em;
   font-weight:bold;
 }
   
-.workbench .top .summary { 
+.workbench div.top .summary { 
     margin-top:0.25em;
 }
     
-.workbench .top .control {
+.workbench div.top .control {
     margin-right: 0.8em;   
 }
     
-.workbench .top .control button {
+.workbench div.top .control button {
     margin-left: 0.8em;
     font-size: 0.9em;
     padding:0.3em 0.8em;
 }
 
-.workbench .top .control .help {
+.workbench div.top .control .help {
     cursor: pointer;
     float: right;
 }
@@ -1749,6 +1749,11 @@ ul.closeables li a {
   font-family: 'WebSymbolsRegular';
   margin-right: 5px;
   color: #888;
+}
+
+.info.icon:before,
+.primary.icon:before {
+  color: #fff;
 }
 
 a.icon {

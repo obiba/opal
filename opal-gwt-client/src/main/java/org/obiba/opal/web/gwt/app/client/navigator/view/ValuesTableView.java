@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -30,8 +31,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -41,7 +42,9 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -85,6 +88,15 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @UiField
   TextBox filter;
 
+  @UiField
+  NumericTextBox pageSize;
+
+  @UiField
+  Button refreshButton;
+
+  @UiField
+  Image refreshPending;
+
   private ValueSetsDataProvider dataProvider;
 
   private List<VariableDto> listVariable;
@@ -95,6 +107,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private int firstVisibleIndex = 0;
 
+  private String lastFilter = "";
+
   public ValuesTableView() {
     widget = uiBinder.createAndBindUi(this);
     valuesTable.setEmptyTableWidget(noValues);
@@ -102,15 +116,27 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     pager.setPageSize(DEFAULT_PAGE_SIZE);
     navigationPopup.hide();
 
-    filter.addChangeHandler(new ChangeHandler() {
+    pageSize.setValue(Integer.toString(DEFAULT_PAGE_SIZE), false);
+
+    refreshButton.addClickHandler(new ClickHandler() {
 
       @Override
-      public void onChange(ChangeEvent event) {
-        String select = "";
-        if(filter.getText().isEmpty() == false) {
-          select = "name().matches(/" + filter.getText() + "/)";
+      public void onClick(ClickEvent event) {
+        if(lastFilter.equals(filter.getText()) == false) {
+          // variables list has changed so update all
+          lastFilter = filter.getText();
+          String select = "";
+          if(filter.getText().isEmpty() == false) {
+            select = "name().matches(/" + filter.getText() + "/)";
+          }
+          refreshPending.setVisible(true);
+          fetcher.updateVariables(select);
+        } else if(valuesTable.getPageSize() != pageSize.getNumberValue().intValue()) {
+          // page size only has changed
+          refreshPending.setVisible(true);
+          valuesTable.setPageSize(pageSize.getNumberValue().intValue());
         }
-        fetcher.updateVariables(select);
+        // else nothing to refresh
       }
     });
   }
@@ -131,7 +157,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       dataProvider = null;
     }
 
-    filter.setValue("", false);
+    lastFilter = "";
+    filter.setValue(lastFilter, false);
+    refreshPending.setVisible(false);
   }
 
   @Override
@@ -149,10 +177,16 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
     }
 
+    if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getText().isEmpty()) {
+      lastFilter = listVariable.get(0).getName();
+      filter.setValue(lastFilter, false);
+    }
+
     if(dataProvider != null) {
       dataProvider.removeDataDisplay(valuesTable);
       dataProvider = null;
     }
+    valuesTable.setPageSize(pageSize.getNumberValue().intValue());
     dataProvider = new ValueSetsDataProvider();
     dataProvider.addDataDisplay(valuesTable);
   }
@@ -406,6 +440,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
+      refreshPending.setVisible(false);
       updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
     }
   }
