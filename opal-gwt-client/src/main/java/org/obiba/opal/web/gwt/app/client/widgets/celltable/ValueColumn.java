@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
@@ -20,7 +19,6 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -29,13 +27,13 @@ import com.google.gwt.user.cellview.client.Column;
 
 public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
-  private static Translations translations = GWT.create(Translations.class);
-
   private ValueSelectionHandler valueSelectionHandler = null;
 
   private int pos = 0;
 
   private VariableDto variable;
+
+  private ValueRenderer valueRenderer;
 
   /**
    * Value column, with only one value expected in the value set.
@@ -73,6 +71,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
     this.pos = pos;
     this.variable = variable;
+    this.valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
 
     if(variable.getValueType().equalsIgnoreCase("binary")) {
       setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
@@ -128,11 +127,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
   }
 
   private String getValue(ValueDto value) {
-    if(value.hasLink()) {
-      return translations.downloadLabel();
-    } else {
-      return value.getValue();
-    }
+    return valueRenderer.render(value);
   }
 
   public interface ValueSelectionHandler {
