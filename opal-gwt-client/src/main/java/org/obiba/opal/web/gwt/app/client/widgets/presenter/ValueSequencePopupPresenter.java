@@ -9,13 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -52,6 +57,15 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     this.variable = variable;
     this.entityIdentifier = entityIdentifier;
     getView().initialize(table, variable, entityIdentifier);
+    StringBuilder link = new StringBuilder(table.getLink());
+    link.append("/valueSet/").append(entityIdentifier).append("?select=").append(URL.encodePathSegment("name().eq('" + variable.getName() + "')"));
+    ResourceRequestBuilderFactory.<ValueSetDto> newBuilder().forResource(link.toString()).get().withCallback(new ResourceCallback<ValueSetDto>() {
+
+      @Override
+      public void onResource(Response response, ValueSetDto resource) {
+        getView().populate(resource);
+      }
+    }).send();
   }
 
   //
@@ -77,6 +91,9 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     void initialize(TableDto table, VariableDto variable, String entityIdentifier);
 
     HasClickHandlers getButton();
+
+    void populate(ValueSetDto valueSet);
+
   }
 
 }

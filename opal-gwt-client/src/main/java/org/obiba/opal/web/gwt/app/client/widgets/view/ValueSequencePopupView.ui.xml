@@ -11,7 +11,22 @@
       <g:DockLayoutPanel styleName="main" ui:field="content" unit="EM" height="50em" width="50em">
         <g:center>
           <g:ScrollPanel>
-            
+            <g:FlowPanel addStyleNames="small-dual-indent top-margin">
+              <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" keyStyleNames="span2 small-indent" valueStyleNames="span8">
+                <o:PropertyPanel>
+                  <g:Label><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
+                  <g:Label ui:field="entityType"/>
+                </o:PropertyPanel>
+                <o:PropertyPanel column="1">
+                  <g:Label><ui:msg description="Occurrence Group label">Occurrence Group</ui:msg></g:Label>
+                  <g:Label ui:field="occurrenceGroup"/>
+                </o:PropertyPanel>
+              </o:PropertiesTable>
+              <g:FlowPanel>
+                <g:InlineLabel ui:field="noValues"><ui:msg description="No Variables label">No Values</ui:msg></g:InlineLabel>
+                <o:Table width="100%" ui:field="valuesTable" addStyleNames="top-margin left-aligned"/>
+              </g:FlowPanel>
+            </g:FlowPanel>
           </g:ScrollPanel>
         </g:center>
         <g:south size="4">
