@@ -478,8 +478,14 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private final class VariableValueSelectionHandler implements ValueSelectionHandler {
     @Override
-    public void onValueSelection(int row, int column, ValueSetDto valueSet) {
-      fetcher.request(listVariable.get(column), valueSet.getIdentifier());
+    public void onBinaryValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
+      fetcher.request(variable, valueSet.getIdentifier());
+    }
+
+    @Override
+    public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
+      // TODO Auto-generated method stub
+
     }
   }
 

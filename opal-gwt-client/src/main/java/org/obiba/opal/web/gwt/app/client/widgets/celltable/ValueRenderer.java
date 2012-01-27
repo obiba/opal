@@ -10,30 +10,33 @@
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 
 enum ValueRenderer {
 
   DATE {
     @Override
-    public String render(ValueDto value) {
-      String valueStr = super.render(value);
+    protected String getValue(ValueDto value) {
+      String valueStr = super.getValue(value);
       return valueStr.isEmpty() ? valueStr : valueStr.substring(0, 10);
     }
   },
   DATETIME {
     @Override
-    public String render(ValueDto value) {
-      String valueStr = super.render(value);
+    protected String getValue(ValueDto value) {
+      String valueStr = super.getValue(value);
       return valueStr.isEmpty() ? valueStr : valueStr.substring(0, 19).replace('T', ' ');
     }
   },
   BINARY {
 
     @Override
-    public String render(ValueDto value) {
+    protected String getValue(ValueDto value) {
+      if(value.getLink().isEmpty()) return "";
       return translations.downloadLabel();
     }
   },
@@ -41,8 +44,37 @@ enum ValueRenderer {
 
   private static Translations translations = GWT.create(Translations.class);
 
-  public String render(ValueDto value) {
+  private static final int MAX_VALUES_IN_SEQUENCE = 3;
+
+  public String render(ValueDto value, boolean repeatable) {
+    if(repeatable) {
+      return getValueSequence(value);
+    }
+    return getValue(value);
+  }
+
+  protected String getValue(ValueDto value) {
     return value.getValue();
+  }
+
+  private String getValueSequence(ValueDto value) {
+    JsArray<ValueDto> values = value.getValuesArray();
+    if(values == null) return getValue(value);
+
+    StringBuilder builder = new StringBuilder();
+    int count = 0;
+    for(ValueDto val : JsArrays.toIterable(values)) {
+      if(count > 0) {
+        builder.append(", ");
+      }
+      if(count == MAX_VALUES_IN_SEQUENCE) {
+        builder.append("...");
+        break;
+      }
+      builder.append(getValue(val));
+      count++;
+    }
+    return builder.toString();
   }
 
 }

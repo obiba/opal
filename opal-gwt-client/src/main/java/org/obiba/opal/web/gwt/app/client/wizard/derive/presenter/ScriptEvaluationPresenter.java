@@ -80,7 +80,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     getDisplay().setValueSelectionHandler(new ValueSelectionHandler() {
 
       @Override
-      public void onValueSelection(int row, int column, ValueSetDto valueSet) {
+      public void onBinaryValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
         StringBuilder link = new StringBuilder(valueSet.getValuesArray().get(column).getLink());
         link.append("?");
         appendVariableLimitArguments(link);
@@ -89,6 +89,13 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
         link.append("&script=" + URL.encodePathSegment(Variables.getScript(variable)));
         eventBus.fireEvent(new FileDownloadEvent(link.toString()));
       }
+
+      @Override
+      public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
+        // TODO Auto-generated method stub
+
+      }
+
     });
 
   }

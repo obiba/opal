@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
@@ -19,7 +18,6 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
@@ -53,14 +51,10 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
   }
 
   private static Cell<String> createCell(final VariableDto variable) {
-    if(variable.getValueType().equalsIgnoreCase("binary")) {
-      return new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
-        @Override
-        public SafeHtml render(String object) {
-          if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
-          return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"icon icon-down\">").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
-        }
-      });
+    if(variable.getIsRepeatable()) {
+      return new ClickableTextCell(new ClickableIconRenderer("icon-list"));
+    } else if(variable.getValueType().equalsIgnoreCase("binary")) {
+      return new ClickableTextCell(new ClickableIconRenderer("icon-down"));
     } else {
       return new TextCell();
     }
@@ -73,13 +67,17 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     this.variable = variable;
     this.valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
 
-    if(variable.getValueType().equalsIgnoreCase("binary")) {
+    if(variable.getIsRepeatable() || variable.getValueType().equalsIgnoreCase("binary")) {
       setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
 
         @Override
         public void update(int index, ValueSetDto valueSet, String value) {
           if(valueSelectionHandler != null) {
-            valueSelectionHandler.onValueSelection(index, getPosition(), valueSet);
+            if(ValueColumn.this.variable.getIsRepeatable()) {
+              valueSelectionHandler.onValueSequenceSelection(ValueColumn.this.variable, index, getPosition(), valueSet);
+            } else {
+              valueSelectionHandler.onBinaryValueSelection(ValueColumn.this.variable, index, getPosition(), valueSet);
+            }
           }
         }
       });
@@ -94,11 +92,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
   public String getValue(ValueSetDto valueSet) {
     if(valueSet.getValuesArray() == null || valueSet.getValuesArray().length() <= getPosition()) return "";
     ValueDto value = valueSet.getValuesArray().get(getPosition());
-    if(variable.getIsRepeatable()) {
-      return getValueSequence(value);
-    } else {
-      return getValue(value);
-    }
+    return valueRenderer.render(value, variable.getIsRepeatable());
   }
 
   /**
@@ -109,30 +103,26 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     return pos;
   }
 
-  private String getValueSequence(ValueDto value) {
-    JsArray<ValueDto> values = value.getValuesArray();
-    if(values == null) return getValue(value);
+  private static final class ClickableIconRenderer extends AbstractSafeHtmlRenderer<String> {
 
-    StringBuilder builder = new StringBuilder();
-    boolean first = true;
-    for(ValueDto val : JsArrays.toIterable(values)) {
-      if(!first) {
-        builder.append(", ");
-      } else {
-        first = false;
-      }
-      builder.append(getValue(val));
+    private final String iconClass;
+
+    public ClickableIconRenderer(String iconClass) {
+      this.iconClass = iconClass;
     }
-    return builder.toString();
-  }
 
-  private String getValue(ValueDto value) {
-    return valueRenderer.render(value);
+    @Override
+    public SafeHtml render(String object) {
+      if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
+      return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"icon " + iconClass + "\">").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
+    }
   }
 
   public interface ValueSelectionHandler {
 
-    void onValueSelection(int row, int column, ValueSetsDto.ValueSetDto valueSet);
+    void onBinaryValueSelection(VariableDto variable, int row, int column, ValueSetsDto.ValueSetDto valueSet);
+
+    void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetsDto.ValueSetDto valueSet);
   }
 
 }
