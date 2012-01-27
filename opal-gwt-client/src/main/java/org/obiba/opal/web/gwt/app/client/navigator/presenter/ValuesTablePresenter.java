@@ -139,10 +139,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
-    public void request(VariableDto variable, String entityIdentifier) {
+    public void requestBinaryValue(VariableDto variable, String entityIdentifier) {
       StringBuilder link = new StringBuilder(table.getLink());
       link.append("/variable/").append(variable.getName()).append("/value/").append(entityIdentifier);
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
+    }
+
+    @Override
+    public void requestValueSequence(VariableDto variable, String entityIdentifier) {
+      // TODO Auto-generated method stub
+
     }
 
     @Override
@@ -171,7 +177,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void request(String filter, int offset, int limit);
 
-    void request(VariableDto variable, String entityIdentifier);
+    void requestBinaryValue(VariableDto variable, String entityIdentifier);
+
+    void requestValueSequence(VariableDto variable, String entityIdentifier);
 
     void updateVariables(String select);
   }

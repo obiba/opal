@@ -479,13 +479,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final class VariableValueSelectionHandler implements ValueSelectionHandler {
     @Override
     public void onBinaryValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
-      fetcher.request(variable, valueSet.getIdentifier());
+      fetcher.requestBinaryValue(variable, valueSet.getIdentifier());
     }
 
     @Override
     public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
-      // TODO Auto-generated method stub
-
+      fetcher.requestValueSequence(variable, valueSet.getIdentifier());
     }
   }
 
