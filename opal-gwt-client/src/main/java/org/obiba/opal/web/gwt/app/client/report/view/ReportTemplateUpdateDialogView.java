@@ -20,6 +20,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -27,7 +28,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
@@ -37,8 +37,10 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class ReportTemplateUpdateDialogView extends Composite implements Display {
+public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Display {
 
   @UiTemplate("ReportTemplateUpdateDialogView.ui.xml")
   interface ReportTemplateUpdateDialogUiBinder extends UiBinder<DialogBox, ReportTemplateUpdateDialogView> {
@@ -94,8 +96,9 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
 
   private FileSelectionPresenter.Display fileSelection;
 
-  public ReportTemplateUpdateDialogView() {
-    initWidget(uiBinder.createAndBindUi(this));
+  @Inject
+  public ReportTemplateUpdateDialogView(EventBus eventBus) {
+    super(eventBus);
     uiBinder.createAndBindUi(this);
     resizeHandle.makeResizable(contentLayout);
     dialog.hide();
@@ -110,27 +113,18 @@ public class ReportTemplateUpdateDialogView extends Composite implements Display
 
   @Override
   public Widget asWidget() {
-    return this;
+    return dialog;
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showDialog() {
-    dialog.center();
-    dialog.show();
+  public void show() {
     reportTemplateName.setFocus(true);
+    super.show();
   }
 
   @Override
   public void hideDialog() {
-    dialog.hide();
+    super.hide();
   }
 
   @Override

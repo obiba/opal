@@ -21,18 +21,20 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class ReportTemplateListView extends Composite implements ReportTemplateListPresenter.Display {
+public class ReportTemplateListView extends ViewImpl implements ReportTemplateListPresenter.Display {
 
   @UiTemplate("ReportTemplateListView.ui.xml")
   interface ReportTemplateListViewUiBinder extends UiBinder<Widget, ReportTemplateListView> {
   }
 
   private static ReportTemplateListViewUiBinder uiBinder = GWT.create(ReportTemplateListViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   CellTable<ReportTemplateDto> reportTemplateTable;
@@ -43,21 +45,13 @@ public class ReportTemplateListView extends Composite implements ReportTemplateL
 
   public ReportTemplateListView() {
     selectionModel = new SingleSelectionModel<ReportTemplateDto>();
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
     initTable();
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

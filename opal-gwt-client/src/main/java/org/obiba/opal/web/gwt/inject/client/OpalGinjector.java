@@ -36,6 +36,8 @@ import org.obiba.opal.web.gwt.app.client.presenter.LoggedInGatekeeper;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateListPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitListPresenter;
@@ -115,6 +117,10 @@ public interface OpalGinjector extends Ginjector {
   Provider<FunctionalUnitPresenter> getFunctionalUnitPresenter();
 
   Provider<ReportTemplatePresenter> getReportTemplatePresenter();
+
+  Provider<ReportTemplateListPresenter> getReportTemplateListPresenter();
+
+  Provider<ReportTemplateDetailsPresenter> getReportTemplateDetailsPresenter();
 
   Provider<JobListPresenter> getJobListPresenter();
 

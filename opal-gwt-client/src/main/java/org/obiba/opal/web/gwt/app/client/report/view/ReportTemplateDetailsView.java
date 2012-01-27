@@ -43,7 +43,6 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -52,8 +51,9 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class ReportTemplateDetailsView extends Composite implements ReportTemplateDetailsPresenter.Display {
+public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplateDetailsPresenter.Display {
 
   @UiTemplate("ReportTemplateDetailsView.ui.xml")
   interface ReportTemplateDetailsViewUiBinder extends UiBinder<Widget, ReportTemplateDetailsView> {
@@ -62,6 +62,8 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   private static ReportTemplateDetailsViewUiBinder uiBinder = GWT.create(ReportTemplateDetailsViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   Label noReportTemplatesLabel;
@@ -127,7 +129,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
   private MenuItemSeparator removeSeparator;
 
   public ReportTemplateDetailsView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
     initProducedReportsTable();
     initActionToolbar();
   }
@@ -165,15 +167,7 @@ public class ReportTemplateDetailsView extends Composite implements ReportTempla
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

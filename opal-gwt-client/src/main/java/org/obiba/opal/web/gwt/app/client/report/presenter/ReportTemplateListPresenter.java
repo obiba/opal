@@ -13,12 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
@@ -29,24 +23,20 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateListPresenter.Display> {
-  //
-  // Constructors
-  //
+public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateListPresenter.Display> {
 
   @Inject
   public ReportTemplateListPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+    super(eventBus, display);
   }
-
-  //
-  // WidgetPresenter Methods
-  //
 
   @Override
   protected void onBind() {
@@ -55,39 +45,18 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
   }
 
   @Override
-  protected void onUnbind() {
+  public void onReset() {
+    refreshReportTemplates(getView().getSelectedReportTemplate());
   }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-    refreshReportTemplates(getDisplay().getSelectedReportTemplate());
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // Methods
-  //
 
   private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
     ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get().withCallback(new ReportTemplatesResourceCallback(templateToSelect)).send();
   }
 
   private void addHandlers() {
-    super.registerHandler(eventBus.addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
-    super.registerHandler(eventBus.addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
-    super.registerHandler(getDisplay().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
+    super.registerHandler(getEventBus().addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
+    super.registerHandler(getEventBus().addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
+    super.registerHandler(getView().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
   }
 
   private JsArray<ReportTemplateDto> sortReportTemplates(JsArray<ReportTemplateDto> templates) {
@@ -110,11 +79,7 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
     return sortedTemplates;
   }
 
-  //
-  // Inner Classes / Interfaces
-  //
-
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setReportTemplates(JsArray<ReportTemplateDto> templates);
 
@@ -145,7 +110,7 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
 
     @Override
     public void onSelectionChange(SelectionChangeEvent event) {
-      eventBus.fireEvent(new ReportTemplateSelectedEvent(getDisplay().getSelectedReportTemplate()));
+      getEventBus().fireEvent(new ReportTemplateSelectedEvent(getView().getSelectedReportTemplate()));
     }
   }
 
@@ -161,13 +126,13 @@ public class ReportTemplateListPresenter extends WidgetPresenter<ReportTemplateL
     public void onResource(Response response, JsArray<ReportTemplateDto> templates) {
       JsArray<ReportTemplateDto> nonNullTemplates = JsArrays.toSafeArray(templates);
 
-      getDisplay().setReportTemplates(sortReportTemplates(nonNullTemplates));
+      getView().setReportTemplates(sortReportTemplates(nonNullTemplates));
 
       if(templateToSelect != null) {
-        getDisplay().select(templateToSelect);
+        getView().select(templateToSelect);
       }
 
-      eventBus.fireEvent(new ReportTemplateListReceivedEvent(nonNullTemplates));
+      getEventBus().fireEvent(new ReportTemplateListReceivedEvent(nonNullTemplates));
     }
   }
 }

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.report.view;
 
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
@@ -21,6 +22,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -63,16 +65,22 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-  }
-
-  @Override
-  public ScrollPanel getReportTemplateDetailsPanel() {
-    return reportTemplateDetailsPanel;
-  }
-
-  @Override
-  public ScrollPanel getReportTemplateListPanel() {
-    return reportTemplateListPanel;
+    HasWidgets panel = null;
+    SplitPaneWorkbenchPresenter.Slot splitSlot = (SplitPaneWorkbenchPresenter.Slot) slot;
+    switch(splitSlot) {
+    case LEFT:
+      panel = reportTemplateListPanel;
+      break;
+    case CENTER:
+      panel = reportTemplateDetailsPanel;
+      break;
+    }
+    if(panel != null) {
+      panel.clear();
+      if(content != null) {
+        panel.add(content);
+      }
+    }
   }
 
   @Override

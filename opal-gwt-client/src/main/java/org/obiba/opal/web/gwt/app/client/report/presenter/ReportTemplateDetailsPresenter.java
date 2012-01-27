@@ -12,12 +12,6 @@ package org.obiba.opal.web.gwt.app.client.report.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -46,14 +40,17 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTemplateDetailsPresenter.Display> {
+public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTemplateDetailsPresenter.Display> {
 
   public static final String DELETE_ACTION = "Delete";
 
@@ -65,7 +62,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   private ReportTemplateDto reportTemplate;
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setReportTemplatesAvailable(boolean available);
 
@@ -100,19 +97,19 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   @Inject
   public ReportTemplateDetailsPresenter(final Display display, final EventBus eventBus, Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider) {
-    super(display, eventBus);
+    super(eventBus, display);
     this.reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenterProvider;
   }
 
-  @Override
-  public void refreshDisplay() {
+  public void refresh() {
     if(reportTemplate != null) {
       refreshProducedReports(reportTemplate);
     }
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReset() {
+    refresh();
   }
 
   @Override
@@ -124,26 +121,18 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     reportTemplate = null;
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   @SuppressWarnings("unchecked")
   private void initUiComponents() {
-    getDisplay().setProducedReports((JsArray<FileDto>) JsArray.createArray());
-    getDisplay().setReportTemplateDetails(null);
+    getView().setProducedReports((JsArray<FileDto>) JsArray.createArray());
+    getView().setReportTemplateDetails(null);
   }
 
   private void addHandlers() {
-    getDisplay().getActionColumn().setActionHandler(new ActionHandler<FileDto>() {
+    getView().getActionColumn().setActionHandler(new ActionHandler<FileDto>() {
       public void doAction(FileDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
@@ -151,7 +140,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       }
     });
 
-    super.registerHandler(eventBus.addHandler(ReportTemplateSelectedEvent.getType(), new ReportTemplateSelectedEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(ReportTemplateSelectedEvent.getType(), new ReportTemplateSelectedEvent.Handler() {
 
       @Override
       public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
@@ -159,12 +148,12 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
         if(reportTemplate != null) {
           refreshReportTemplateDetails(reportTemplate);
         } else {
-          getDisplay().setReportTemplateDetails(null);
+          getView().setReportTemplateDetails(null);
         }
       }
     }));
 
-    super.registerHandler(eventBus.addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
 
       @Override
       public void onFileDeleted(FileDeletedEvent event) {
@@ -172,32 +161,32 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       }
     }));
 
-    super.registerHandler(getDisplay().addReportDesignClickHandler(new ReportDesignClickHandler()));
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(eventBus.addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
-    super.registerHandler(eventBus.addHandler(ReportTemplateListReceivedEvent.getType(), new ReportTemplateListReceivedEventHandler()));
+    super.registerHandler(getView().addReportDesignClickHandler(new ReportDesignClickHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(getEventBus().addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
+    super.registerHandler(getEventBus().addHandler(ReportTemplateListReceivedEvent.getType(), new ReportTemplateListReceivedEventHandler()));
   }
 
   private void setCommands() {
-    getDisplay().setRunReportCommand(new RunReportCommand());
-    getDisplay().setDownloadReportDesignCommand(new DownloadReportDesignCommand());
-    getDisplay().setRemoveReportTemplateCommand(new RemoveReportTemplateCommand());
-    getDisplay().setUpdateReportTemplateCommand(new EditReportTemplateCommand());
+    getView().setRunReportCommand(new RunReportCommand());
+    getView().setDownloadReportDesignCommand(new DownloadReportDesignCommand());
+    getView().setRemoveReportTemplateCommand(new RemoveReportTemplateCommand());
+    getView().setUpdateReportTemplateCommand(new EditReportTemplateCommand());
   }
 
   private void authorize() {
     // run report
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/report").post().authorize(getDisplay().getRunReportAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/report").post().authorize(getView().getRunReportAuthorizer()).send();
     // download report design
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + getDisplay().getReportTemplateDetails().getDesign()).get().authorize(getDisplay().getDownloadReportDesignAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + getView().getReportTemplateDetails().getDesign()).get().authorize(getView().getDownloadReportDesignAuthorizer()).send();
     // remove
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplate.getName()).delete().authorize(getDisplay().getRemoveReportTemplateAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplate.getName()).delete().authorize(getView().getRemoveReportTemplateAuthorizer()).send();
 
     // edit
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplate.getName()).put().authorize(getDisplay().getUpdateReportTemplateAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplate.getName()).put().authorize(getView().getUpdateReportTemplateAuthorizer()).send();
 
     // display reports
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta/reports/" + reportTemplate.getName()).get().authorize(getDisplay().getListReportsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta/reports/" + reportTemplate.getName()).get().authorize(getView().getListReportsAuthorizer()).send();
   }
 
   private void authorizeDownloadReport(FileDto dto, HasAuthorization authorizer) {
@@ -210,7 +199,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   protected void doActionImpl(final FileDto dto, String actionName) {
     if(actionName.equals(DOWNLOAD_ACTION)) {
-      authorizeDownloadReport(dto, new Authorizer(eventBus) {
+      authorizeDownloadReport(dto, new Authorizer(getEventBus()) {
 
         @Override
         public void authorized() {
@@ -218,7 +207,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
         }
       });
     } else if(actionName.equals(DELETE_ACTION)) {
-      authorizeDeleteReport(dto, new Authorizer(eventBus) {
+      authorizeDeleteReport(dto, new Authorizer(getEventBus()) {
 
         @Override
         public void authorized() {
@@ -227,7 +216,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
               deleteFile(dto);
             }
           };
-          eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+          getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
         }
       });
     }
@@ -239,9 +228,9 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() != Response.SC_OK) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
-          eventBus.fireEvent(new FileDeletedEvent(file));
+          getEventBus().fireEvent(new FileDeletedEvent(file));
         }
       }
     };
@@ -255,7 +244,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
   private void downloadFile(String filePath) {
     String url = new StringBuilder("/files").append(filePath).toString();
-    eventBus.fireEvent(new FileDownloadEvent(url));
+    getEventBus().fireEvent(new FileDownloadEvent(url));
   }
 
   private void refreshProducedReports(ReportTemplateDto reportTemplate) {
@@ -273,7 +262,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     public void execute() {
       ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
       ReportCommandOptionsDto reportCommandOptions = ReportCommandOptionsDto.create();
-      reportCommandOptions.setName(getDisplay().getReportTemplateDetails().getName());
+      reportCommandOptions.setName(getView().getReportTemplateDetails().getName());
       ResourceRequestBuilderFactory.newBuilder().forResource("/shell/report").post().withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)).withCallback(Response.SC_CREATED, callbackHandler).send();
     }
 
@@ -282,7 +271,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
   private class DownloadReportDesignCommand implements Command {
     @Override
     public void execute() {
-      downloadFile(getDisplay().getReportTemplateDetails().getDesign());
+      downloadFile(getView().getReportTemplateDetails().getDesign());
     }
   }
 
@@ -293,8 +282,8 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenterProvider.get();
       presenter.bind();
       presenter.setDialogMode(Mode.UPDATE);
-      ReportTemplateUpdateDialogPresenter.Display display = presenter.getDisplay();
-      ReportTemplateDto reportTemplate = getDisplay().getReportTemplateDetails();
+      ReportTemplateUpdateDialogPresenter.Display display = presenter.getView();
+      ReportTemplateDto reportTemplate = getView().getReportTemplateDetails();
       display.setDesignFile(reportTemplate.getDesign());
       display.setFormat(reportTemplate.getFormat());
       display.setName(reportTemplate.getName());
@@ -302,7 +291,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
       display.setReportParameters(asList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
       display.setSchedule(reportTemplate.getCron());
       display.setEnabledReportTemplateName(false);
-      presenter.revealDisplay();
+      addToPopupSlot(presenter);
     }
 
   }
@@ -329,11 +318,11 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     public void execute() {
       actionRequiringConfirmation = new Runnable() {
         public void run() {
-          String reportTemplateName = getDisplay().getReportTemplateDetails().getName();
+          String reportTemplateName = getView().getReportTemplateDetails().getName();
           ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + reportTemplateName).delete().withCallback(Response.SC_OK, new RemoveReportTemplateResponseCallBack()).withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
         }
       };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "removeReportTemplate", "confirmDeleteReportTemplate"));
+      getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "removeReportTemplate", "confirmDeleteReportTemplate"));
     }
 
   }
@@ -361,7 +350,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onClick(ClickEvent event) {
-      downloadFile(getDisplay().getReportTemplateDetails().getDesign());
+      downloadFile(getView().getReportTemplateDetails().getDesign());
     }
 
   }
@@ -371,7 +360,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     @SuppressWarnings("unchecked")
     @Override
     public void onResponseCode(Request request, Response response) {
-      getDisplay().setProducedReports((JsArray<FileDto>) JsArray.createArray());
+      getView().setProducedReports((JsArray<FileDto>) JsArray.createArray());
     }
   }
 
@@ -379,7 +368,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onResource(Response response, FileDto reportFolder) {
-      getDisplay().setProducedReports(JsArrays.toSafeArray(reportFolder.getChildrenArray()));
+      getView().setProducedReports(JsArrays.toSafeArray(reportFolder.getChildrenArray()));
     }
   }
 
@@ -388,7 +377,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == Response.SC_CREATED) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().info("ReportJobStarted").build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().info("ReportJobStarted").build());
       }
     }
   }
@@ -398,7 +387,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
     @Override
     public void onResource(Response response, ReportTemplateDto resource) {
       reportTemplate = resource;
-      getDisplay().setReportTemplateDetails(reportTemplate);
+      getView().setReportTemplateDetails(reportTemplate);
       refreshProducedReports(reportTemplate);
       authorize();
     }
@@ -414,7 +403,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("ReportTemplateCannotBeFound").args(templateName).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ReportTemplateCannotBeFound").args(templateName).build());
     }
   }
 
@@ -422,7 +411,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(new ReportTemplateDeletedEvent(getDisplay().getReportTemplateDetails()));
+      getEventBus().fireEvent(new ReportTemplateDeletedEvent(getView().getReportTemplateDetails()));
     }
 
   }
@@ -431,7 +420,7 @@ public class ReportTemplateDetailsPresenter extends WidgetPresenter<ReportTempla
 
     @Override
     public void onReportTemplateListReceived(ReportTemplateListReceivedEvent event) {
-      getDisplay().setReportTemplatesAvailable(event.getReportTemplates().length() != 0);
+      getView().setReportTemplatesAvailable(event.getReportTemplates().length() != 0);
     }
   }
 }

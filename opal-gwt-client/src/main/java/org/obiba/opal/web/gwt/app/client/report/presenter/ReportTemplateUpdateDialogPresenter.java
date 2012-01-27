@@ -14,12 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
@@ -42,9 +36,8 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -53,8 +46,10 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportTemplateUpdateDialogPresenter.Display> {
+public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportTemplateUpdateDialogPresenter.Display> {
 
   private FileSelectionPresenter fileSelectionPresenter;
 
@@ -70,8 +65,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
     CREATE, UPDATE
   }
 
-  public interface Display extends WidgetDisplay {
-    void showDialog();
+  public interface Display extends PopupView {
 
     void hideDialog();
 
@@ -123,17 +117,12 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
   @Inject
   public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus, Provider<FileSelectionPresenter> fileSelectionPresenterProvider, Provider<ItemSelectorPresenter> emailSelectorPresenterProvider, ItemSelectorPresenter parametersSelectorPresenter) {
-    super(display, eventBus);
+    super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenterProvider.get();
     this.emailSelectorPresenter = emailSelectorPresenterProvider.get();
     this.parametersSelectorPresenter = parametersSelectorPresenter;
     parametersSelectorPresenter.getDisplay().setItemInputDisplay(new KeyValueItemInputView());
     emailSelectorPresenter.getDisplay().setItemInputDisplay(new TextBoxItemInputView());
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
   }
 
   @Override
@@ -144,23 +133,23 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
   }
 
   private void addValidators() {
-    validators.add(new RequiredTextValidator(getDisplay().getName(), "ReportTemplateNameIsRequired"));
+    validators.add(new RequiredTextValidator(getView().getName(), "ReportTemplateNameIsRequired"));
     validators.add(new FieldValidator() {
 
       @Override
       public String validate() {
-        if(getDisplay().getDesignFile().equals("")) {
+        if(getView().getDesignFile().equals("")) {
           return "BirtReportDesignFileIsRequired";
         }
         return null;
       }
     });
-    validators.add(new ConditionalValidator(getDisplay().isScheduled(), new RequiredTextValidator(getDisplay().getShedule(), "CronExpressionIsRequired")));
+    validators.add(new ConditionalValidator(getView().isScheduled(), new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired")));
     validators.add(new FieldValidator() {
 
       @Override
       public String validate() {
-        List<String> emails = getDisplay().getNotificationEmails();
+        List<String> emails = getView().getNotificationEmails();
         for(String email : emails) {
           if(!email.matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*((\\.[A-Za-z]{2,}){1}$)")) {
             return "NotificationEmailsAreInvalid";
@@ -172,24 +161,12 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
   protected void onUnbind() {
+    super.onUnbind();
     emailSelectorPresenter.unbind();
     parametersSelectorPresenter.unbind();
     fileSelectionPresenter.unbind();
     validators.clear();
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
   }
 
   protected void initDisplayComponents() {
@@ -197,35 +174,29 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
     fileSelectionPresenter.bind();
     emailSelectorPresenter.bind();
     parametersSelectorPresenter.bind();
-    getDisplay().setNotificationEmailsWidgetDisplay(emailSelectorPresenter.getDisplay());
-    getDisplay().setReportParametersWidgetDisplay(parametersSelectorPresenter.getDisplay());
-    getDisplay().setDesignFileWidgetDisplay(fileSelectionPresenter.getDisplay());
+    getView().setNotificationEmailsWidgetDisplay(emailSelectorPresenter.getDisplay());
+    getView().setReportParametersWidgetDisplay(parametersSelectorPresenter.getDisplay());
+    getView().setDesignFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().getUpdateReportTemplateButton().addClickHandler(new CreateOrUpdateReportTemplateClickHandler()));
+    super.registerHandler(getView().getUpdateReportTemplateButton().addClickHandler(new CreateOrUpdateReportTemplateClickHandler()));
 
-    super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
+    super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        getDisplay().hideDialog();
+        getView().hideDialog();
       }
     }));
 
-    super.registerHandler(getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
-      @Override
-      public void onClose(CloseEvent<DialogBox> event) {
-        unbind();
-      }
-    }));
-
-    super.registerHandler(getDisplay().addEnableScheduleClickHandler(new EnableScheduleClickHandler()));
-    super.registerHandler(getDisplay().addDisableScheduleClickHandler(new DisableScheduleClickHandler()));
+    super.registerHandler(getView().addEnableScheduleClickHandler(new EnableScheduleClickHandler()));
+    super.registerHandler(getView().addDisableScheduleClickHandler(new DisableScheduleClickHandler()));
 
   }
 
   public void setDialogMode(Mode dialogMode) {
     this.dialogMode = dialogMode;
+    getView().setEnabledReportTemplateName(this.dialogMode == Mode.CREATE);
   }
 
   private void updateReportTemplate() {
@@ -238,7 +209,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
     if(validReportTemplate()) {
       CreateReportTemplateCallBack createReportTemplateCallback = new CreateReportTemplateCallBack();
       AlreadyExistReportTemplateCallBack alreadyExistReportTemplateCallback = new AlreadyExistReportTemplateCallBack();
-      ResourceRequestBuilderFactory.<ReportTemplateDto> newBuilder().forResource("/report-template/" + getDisplay().getName().getText()).get().withCallback(alreadyExistReportTemplateCallback).withCallback(Response.SC_NOT_FOUND, createReportTemplateCallback).send();
+      ResourceRequestBuilderFactory.<ReportTemplateDto> newBuilder().forResource("/report-template/" + getView().getName().getText()).get().withCallback(alreadyExistReportTemplateCallback).withCallback(Response.SC_NOT_FOUND, createReportTemplateCallback).send();
     }
   }
 
@@ -253,7 +224,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
@@ -262,19 +233,19 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
   private ReportTemplateDto getReportTemplateDto() {
     ReportTemplateDto reportTemplate = ReportTemplateDto.create();
-    reportTemplate.setName(getDisplay().getName().getText());
-    String schedule = getDisplay().getShedule().getText();
+    reportTemplate.setName(getView().getName().getText());
+    String schedule = getView().getShedule().getText();
     if(schedule != null && schedule.trim().length() > 0) {
-      reportTemplate.setCron(getDisplay().getShedule().getText());
+      reportTemplate.setCron(getView().getShedule().getText());
     }
-    reportTemplate.setFormat(getDisplay().getFormat());
-    reportTemplate.setDesign(getDisplay().getDesignFile());
+    reportTemplate.setFormat(getView().getFormat());
+    reportTemplate.setDesign(getView().getDesignFile());
     int i = 0;
-    for(String email : getDisplay().getNotificationEmails()) {
+    for(String email : getView().getNotificationEmails()) {
       reportTemplate.addEmailNotification(email);
     }
     ParameterDto parameterDto;
-    for(String parameterStr : getDisplay().getReportParameters()) {
+    for(String parameterStr : getView().getReportParameters()) {
       parameterDto = ParameterDto.create();
       parameterDto.setValue(getParameterValue(parameterStr));
       parameterDto.setKey(getParameterKey(parameterStr));
@@ -294,7 +265,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
   private void doUpdateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
     CreateOrUpdateReportTemplateCallBack callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + getDisplay().getName().getText()).put().withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + getView().getName().getText()).put().withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
   private void doCreateReportTemplate() {
@@ -307,7 +278,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
     @Override
     public void onResource(Response response, ReportTemplateDto resource) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
     }
 
   }
@@ -337,7 +308,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
     @Override
     public void onClick(ClickEvent event) {
-      getDisplay().isScheduled().setValue(true);
+      getView().isScheduled().setValue(true);
     }
   }
 
@@ -345,7 +316,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
     @Override
     public void onClick(ClickEvent event) {
-      getDisplay().getShedule().setText("");
+      getView().getShedule().setText("");
     }
   }
 
@@ -359,11 +330,11 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getDisplay().hideDialog();
+      getView().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
-        eventBus.fireEvent(new ReportTemplateUpdatedEvent(reportTemplate));
+        getEventBus().fireEvent(new ReportTemplateUpdatedEvent(reportTemplate));
       } else if(response.getStatusCode() == Response.SC_CREATED) {
-        eventBus.fireEvent(new ReportTemplateCreatedEvent(reportTemplate));
+        getEventBus().fireEvent(new ReportTemplateCreatedEvent(reportTemplate));
       } else {
         String msg = "UnknownError";
         if(response.getText() != null && response.getText().length() != 0) {
@@ -374,7 +345,7 @@ public class ReportTemplateUpdateDialogPresenter extends WidgetPresenter<ReportT
 
           }
         }
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(msg).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(msg).build());
       }
     }
   }
