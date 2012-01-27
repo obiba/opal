@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -32,10 +33,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private DataFetcher fetcher;
 
+  private ValueSequencePopupPresenter valueSequencePopupPresenter;
+
   @Inject
-  public ValuesTablePresenter(Display display, final EventBus eventBus) {
+  public ValuesTablePresenter(Display display, final EventBus eventBus, ValueSequencePopupPresenter valueSequencePopupPresenter) {
     super(eventBus, display);
-    getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+    this.valueSequencePopupPresenter = valueSequencePopupPresenter;
   }
 
   public void setTable(TableDto table) {
@@ -54,6 +57,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     this.table = table;
     getView().setTable(table);
     fetcher.updateVariables(select);
+  }
+
+  @Override
+  protected void onBind() {
+    super.onBind();
+    getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
   }
 
   //
@@ -147,8 +156,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestValueSequence(VariableDto variable, String entityIdentifier) {
-      // TODO Auto-generated method stub
-
+      valueSequencePopupPresenter.initialize(table, variable, entityIdentifier);
+      addToPopupSlot(valueSequencePopupPresenter);
     }
 
     @Override
