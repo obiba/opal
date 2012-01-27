@@ -15,6 +15,7 @@ import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
@@ -43,6 +44,8 @@ public class IconActionCell<C> extends AbstractCell<C> {
 
   private final String iconClass;
 
+  private final SafeHtml message;
+
   private final Delegate<C> delegate;
 
   /**
@@ -52,9 +55,18 @@ public class IconActionCell<C> extends AbstractCell<C> {
    * @param delegate the delegate that will handle events
    */
   public IconActionCell(String iconClass, Delegate<C> delegate) {
+    this(iconClass, "", delegate);
+  }
+
+  public IconActionCell(String iconClass, String text, Delegate<C> delegate) {
+    this(iconClass, SafeHtmlUtils.fromString(text), delegate);
+  }
+
+  public IconActionCell(String iconClass, SafeHtml message, Delegate<C> delegate) {
     super("click", "mousedown");
     this.delegate = delegate;
     this.iconClass = iconClass;
+    this.message = message;
   }
 
   @Override
@@ -84,9 +96,9 @@ public class IconActionCell<C> extends AbstractCell<C> {
   @Override
   public void render(Context context, C value, SafeHtmlBuilder sb) {
     if(isEnabled()) {
-      sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon " + iconClass + "\"/>"));
+      sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon " + iconClass + "\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
     } else {
-      sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon " + iconClass + " disabled\"/>"));
+      sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon " + iconClass + " disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
   }
 
