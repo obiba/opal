@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -32,16 +33,16 @@ import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -67,13 +68,15 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
   public interface Display extends PopupView {
 
+    enum Slots {
+      EMAIL, REPORT_PARAMS
+    }
+
     void hideDialog();
 
     HasClickHandlers getUpdateReportTemplateButton();
 
     HasClickHandlers getCancelButton();
-
-    HasCloseHandlers<DialogBox> getDialog();
 
     void setName(String name);
 
@@ -82,10 +85,6 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     void setFormat(String format);
 
     void setSchedule(String schedule);
-
-    void setNotificationEmails(List<String> emails);
-
-    void setReportParameters(List<String> params);
 
     HasText getName();
 
@@ -97,32 +96,24 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
     HasValue<Boolean> isScheduled();
 
-    List<String> getNotificationEmails();
-
-    List<String> getReportParameters();
-
     HandlerRegistration addDisableScheduleClickHandler(ClickHandler handler);
 
     HandlerRegistration addEnableScheduleClickHandler(ClickHandler handler);
 
     void setDesignFileWidgetDisplay(FileSelectionPresenter.Display display);
 
-    void setNotificationEmailsWidgetDisplay(ItemSelectorPresenter.Display display);
-
-    void setReportParametersWidgetDisplay(ItemSelectorPresenter.Display display);
-
     void setEnabledReportTemplateName(boolean enabled);
 
   }
 
   @Inject
-  public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus, Provider<FileSelectionPresenter> fileSelectionPresenterProvider, Provider<ItemSelectorPresenter> emailSelectorPresenterProvider, ItemSelectorPresenter parametersSelectorPresenter) {
+  public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus, Provider<FileSelectionPresenter> fileSelectionPresenterProvider, Provider<ItemSelectorPresenter> itemSelectorPresenterProvider) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenterProvider.get();
-    this.emailSelectorPresenter = emailSelectorPresenterProvider.get();
-    this.parametersSelectorPresenter = parametersSelectorPresenter;
-    parametersSelectorPresenter.getDisplay().setItemInputDisplay(new KeyValueItemInputView());
-    emailSelectorPresenter.getDisplay().setItemInputDisplay(new TextBoxItemInputView());
+    this.emailSelectorPresenter = itemSelectorPresenterProvider.get();
+    this.parametersSelectorPresenter = itemSelectorPresenterProvider.get();
+    parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView());
+    emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
   }
 
   @Override
@@ -149,8 +140,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
       @Override
       public String validate() {
-        List<String> emails = getView().getNotificationEmails();
-        for(String email : emails) {
+        for(String email : emailSelectorPresenter.getView().getItems()) {
           if(!email.matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*((\\.[A-Za-z]{2,}){1}$)")) {
             return "NotificationEmailsAreInvalid";
           }
@@ -163,19 +153,16 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    emailSelectorPresenter.unbind();
-    parametersSelectorPresenter.unbind();
     fileSelectionPresenter.unbind();
     validators.clear();
   }
 
   protected void initDisplayComponents() {
+    setInSlot(Display.Slots.EMAIL, emailSelectorPresenter);
+    setInSlot(Display.Slots.REPORT_PARAMS, parametersSelectorPresenter);
+
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
-    emailSelectorPresenter.bind();
-    parametersSelectorPresenter.bind();
-    getView().setNotificationEmailsWidgetDisplay(emailSelectorPresenter.getDisplay());
-    getView().setReportParametersWidgetDisplay(parametersSelectorPresenter.getDisplay());
     getView().setDesignFileWidgetDisplay(fileSelectionPresenter.getDisplay());
 
   }
@@ -240,12 +227,11 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     }
     reportTemplate.setFormat(getView().getFormat());
     reportTemplate.setDesign(getView().getDesignFile());
-    int i = 0;
-    for(String email : getView().getNotificationEmails()) {
+    for(String email : emailSelectorPresenter.getView().getItems()) {
       reportTemplate.addEmailNotification(email);
     }
     ParameterDto parameterDto;
-    for(String parameterStr : getView().getReportParameters()) {
+    for(String parameterStr : parametersSelectorPresenter.getView().getItems()) {
       parameterDto = ParameterDto.create();
       parameterDto.setValue(getParameterValue(parameterStr));
       parameterDto.setKey(getParameterKey(parameterStr));
@@ -348,6 +334,24 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
         getEventBus().fireEvent(NotificationEvent.newBuilder().error(msg).build());
       }
     }
+  }
+
+  /**
+   * @param reportTemplateDetails
+   */
+  public void setReportTemplate(ReportTemplateDto reportTemplate) {
+    getView().setDesignFile(reportTemplate.getDesign());
+    getView().setFormat(reportTemplate.getFormat());
+    getView().setName(reportTemplate.getName());
+    emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
+    parametersSelectorPresenter.getView().setItems(Iterables.transform(JsArrays.toIterable(reportTemplate.getParametersArray()), new Function<ParameterDto, String>() {
+
+      @Override
+      public String apply(ParameterDto input) {
+        return input.getKey() + "=" + input.getValue();
+      }
+    }));
+    getView().setSchedule(reportTemplate.getCron());
   }
 
 }

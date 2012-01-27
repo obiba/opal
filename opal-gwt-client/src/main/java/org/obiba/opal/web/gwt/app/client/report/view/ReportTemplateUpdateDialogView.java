@@ -9,17 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -90,10 +86,6 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   @UiField
   Anchor cronLink;
 
-  private ItemSelectorPresenter.Display emailsSelector;
-
-  private ItemSelectorPresenter.Display parametersSelector;
-
   private FileSelectionPresenter.Display fileSelection;
 
   @Inject
@@ -109,6 +101,19 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
         Window.open("http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html", "_blank", null);
       }
     });
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    Display.Slots s = (Display.Slots) slot;
+    switch(s) {
+    case EMAIL:
+      notificationEmailsPanel.add(content);
+      break;
+    case REPORT_PARAMS:
+      reportParametersPanel.add(content);
+      break;
+    }
   }
 
   @Override
@@ -138,11 +143,6 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   }
 
   @Override
-  public HasCloseHandlers getDialog() {
-    return dialog;
-  }
-
-  @Override
   public HasText getName() {
     return reportTemplateName;
   }
@@ -150,11 +150,6 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   @Override
   public String getDesignFile() {
     return fileSelection.getFile();
-  }
-
-  @Override
-  public List<String> getNotificationEmails() {
-    return emailsSelector.getItems();
   }
 
   @Override
@@ -176,12 +171,6 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   }
 
   @Override
-  public void setNotificationEmailsWidgetDisplay(ItemSelectorPresenter.Display display) {
-    notificationEmailsPanel.setWidget(display.asWidget());
-    emailsSelector = display;
-  }
-
-  @Override
   public HandlerRegistration addEnableScheduleClickHandler(ClickHandler handler) {
     return schedule.addClickHandler(handler);
   }
@@ -189,17 +178,6 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   @Override
   public HandlerRegistration addDisableScheduleClickHandler(ClickHandler handler) {
     return runManuallyRadio.addClickHandler(handler);
-  }
-
-  @Override
-  public void setReportParametersWidgetDisplay(ItemSelectorPresenter.Display display) {
-    reportParametersPanel.setWidget(display.asWidget());
-    parametersSelector = display;
-  }
-
-  @Override
-  public List<String> getReportParameters() {
-    return parametersSelector.getItems();
   }
 
   @Override
@@ -234,22 +212,6 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
     } else {
       scheduleRadio.setValue(false);
       runManuallyRadio.setValue(true);
-    }
-  }
-
-  @Override
-  public void setNotificationEmails(List<String> emails) {
-    emailsSelector.clear();
-    for(String email : emails) {
-      emailsSelector.addItem(email);
-    }
-  }
-
-  @Override
-  public void setReportParameters(List<String> params) {
-    parametersSelector.clear();
-    for(String param : params) {
-      parametersSelector.addItem(param);
     }
   }
 

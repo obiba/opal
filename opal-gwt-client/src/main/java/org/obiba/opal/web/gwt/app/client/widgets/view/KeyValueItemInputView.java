@@ -12,56 +12,39 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter.EnterKeyHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter.ItemInputDisplay;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class KeyValueItemInputView extends Composite implements ItemInputDisplay {
-  //
-  // Instance Variables
-  //
+public class KeyValueItemInputView implements ItemInputDisplay {
 
-  private TextBox keyTextBox;
+  @UiTemplate("KeyValueItemInputView.ui.xml")
+  interface MyUiBinder extends UiBinder<HTMLPanel, KeyValueItemInputView> {
+  }
 
-  private TextBox valueTextBox;
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  private final HTMLPanel container;
+
+  @UiField
+  TextBox keyTextBox;
+
+  @UiField
+  TextBox valueTextBox;
 
   private EnterKeyHandler enterKeyHandler;
 
-  //
-  // Constructors
-  //
-
   public KeyValueItemInputView() {
-    keyTextBox = new TextBox();
-    String keyTextBoxId = HTMLPanel.createUniqueId();
-    keyTextBox.getElement().setId(keyTextBoxId);
-
-    valueTextBox = new TextBox();
-    String valueTextBoxId = HTMLPanel.createUniqueId();
-    valueTextBox.getElement().setId(valueTextBoxId);
-
-    String html =
-    /**/"<span id='" + keyTextBoxId + "'></span>" +
-    /**/"<span>=</span>" +
-    /**/"<span id='" + valueTextBoxId + "'></span>";
-
-    HTMLPanel container = new HTMLPanel(html);
-    container.addStyleName("itemInput");
-    container.addStyleName("keyValue");
-    container.add(keyTextBox, keyTextBoxId);
-    container.add(valueTextBox, valueTextBoxId);
-    initWidget(container);
-
+    container = uiBinder.createAndBindUi(this);
     addEnterKeyHandler();
   }
-
-  //
-  // ItemInputDisplay Methods
-  //
 
   public void clear() {
     keyTextBox.setText("");
@@ -78,16 +61,12 @@ public class KeyValueItemInputView extends Composite implements ItemInputDisplay
   }
 
   public Widget asWidget() {
-    return this;
+    return container;
   }
 
   public void setEnterKeyHandler(EnterKeyHandler handler) {
     this.enterKeyHandler = handler;
   }
-
-  //
-  // Methods
-  //
 
   private void addEnterKeyHandler() {
     valueTextBox.addKeyDownHandler(new KeyDownHandler() {

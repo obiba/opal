@@ -18,36 +18,32 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-/**
- *
- */
-public class ItemSelectorView extends Composite implements ItemSelectorPresenter.Display {
-  //
-  // Instance Variables
-  //
+public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.Display {
+
+  private Widget widget;
 
   private Grid itemGrid;
 
   private ItemInputDisplay itemInputDisplay;
-
-  //
-  // Constructors
-  //
 
   public ItemSelectorView() {
     itemGrid = new Grid(0, 2);
     itemGrid.addStyleName("itemSelector");
   }
 
-  //
-  // ItemSelectorPresenter.Display Methods
-  //
+  @Override
+  public void setItems(Iterable<String> items) {
+    clear();
+    for(String s : items) {
+      addItem(s);
+    }
+  }
 
   @Override
   public void setItemInputDisplay(ItemInputDisplay itemInputDisplay) {
@@ -73,7 +69,7 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
     // Put the Grid in a FlowPanel (so that it doesn't expand to fill its parent) and set that as the widget.
     FlowPanel container = new FlowPanel();
     container.add(itemGrid);
-    initWidget(container);
+    widget = container;
 
     setEnterKeyHandler();
   }
@@ -137,15 +133,7 @@ public class ItemSelectorView extends Composite implements ItemSelectorPresenter
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   //

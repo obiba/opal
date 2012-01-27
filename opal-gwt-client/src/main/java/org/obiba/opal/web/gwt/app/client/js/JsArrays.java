@@ -56,12 +56,43 @@ public class JsArrays {
     return lhs;
   }
 
-  public static <T extends JavaScriptObject> Iterable<T> toIterable(final JsArray<T> values) {
+  public static Iterable<String> toIterable(JsArrayString values) {
+    final JsArrayString array = values != null ? values : (JsArrayString) JsArrayString.createArray();
+    return new Iterable<String>() {
+
+      @Override
+      public Iterator<String> iterator() {
+        return new Iterator<String>() {
+
+          private int next = 0;
+
+          @Override
+          public boolean hasNext() {
+            return next < array.length();
+          }
+
+          @Override
+          public String next() {
+            return array.get(next++);
+          }
+
+          @Override
+          public void remove() {
+
+          }
+        };
+      }
+
+    };
+  }
+
+  public static <T extends JavaScriptObject> Iterable<T> toIterable(JsArray<T> values) {
+    final JsArray<T> array = toSafeArray(values);
     return new Iterable<T>() {
 
       @Override
       public Iterator<T> iterator() {
-        return new JsArrayIterator<T>(values);
+        return new JsArrayIterator<T>(array);
       }
 
     };
@@ -80,7 +111,8 @@ public class JsArrays {
     return ret;
   }
 
-  public static <T extends JavaScriptObject> List<T> toList(final JsArray<T> array) {
+  public static <T extends JavaScriptObject> List<T> toList(JsArray<T> jsArray) {
+    final JsArray<T> array = toSafeArray(jsArray);
     return new AbstractList<T>() {
 
       @Override

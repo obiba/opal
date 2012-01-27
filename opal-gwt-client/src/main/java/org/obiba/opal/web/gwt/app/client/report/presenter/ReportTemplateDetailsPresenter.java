@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -32,12 +29,10 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
-import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -282,34 +277,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenterProvider.get();
       presenter.bind();
       presenter.setDialogMode(Mode.UPDATE);
-      ReportTemplateUpdateDialogPresenter.Display display = presenter.getView();
-      ReportTemplateDto reportTemplate = getView().getReportTemplateDetails();
-      display.setDesignFile(reportTemplate.getDesign());
-      display.setFormat(reportTemplate.getFormat());
-      display.setName(reportTemplate.getName());
-      display.setNotificationEmails(asList(JsArrays.toSafeArray(reportTemplate.getEmailNotificationArray())));
-      display.setReportParameters(asList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
-      display.setSchedule(reportTemplate.getCron());
-      display.setEnabledReportTemplateName(false);
+      presenter.setReportTemplate(getView().getReportTemplateDetails());
       addToPopupSlot(presenter);
     }
 
-  }
-
-  private List<String> asList(JsArray<ParameterDto> parametersArray) {
-    List<String> list = new ArrayList<String>();
-    for(int i = 0; i < parametersArray.length(); i++) {
-      list.add(parametersArray.get(i).getKey() + "=" + parametersArray.get(i).getValue());
-    }
-    return list;
-  }
-
-  private List<String> asList(JsArrayString array) {
-    List<String> list = new ArrayList<String>();
-    for(int i = 0; i < array.length(); i++) {
-      list.add(array.get(i));
-    }
-    return list;
   }
 
   private class RemoveReportTemplateCommand implements Command {

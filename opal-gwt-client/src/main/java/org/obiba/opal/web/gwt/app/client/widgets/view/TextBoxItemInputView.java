@@ -19,17 +19,10 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TextBoxItemInputView implements ItemInputDisplay {
-  //
-  // Instance Variables
-  //
 
   private TextBox textBox;
 
   private EnterKeyHandler enterKeyHandler;
-
-  //
-  // Constructors
-  //
 
   public TextBoxItemInputView() {
     textBox = new TextBox();
@@ -38,10 +31,6 @@ public class TextBoxItemInputView implements ItemInputDisplay {
 
     addEnterKeyHandler();
   }
-
-  //
-  // ItemInputDisplay Methods
-  //
 
   public void clear() {
     textBox.setText("");
@@ -58,10 +47,6 @@ public class TextBoxItemInputView implements ItemInputDisplay {
   public void setEnterKeyHandler(EnterKeyHandler handler) {
     this.enterKeyHandler = handler;
   }
-
-  //
-  // Methods
-  //
 
   private void addEnterKeyHandler() {
     textBox.addKeyDownHandler(new KeyDownHandler() {
