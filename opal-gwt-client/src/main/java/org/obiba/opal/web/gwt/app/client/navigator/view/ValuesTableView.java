@@ -419,7 +419,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     protected MenuBar createMenuBar() {
       MenuBar menuBar = new MenuBar(true);
-      int currentIdx = firstVisibleIndex + 1;
+      int currentIdx = firstVisibleIndex;
       for(int i = currentIdx - 1; i >= Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0); i--) {
         final int decrement = currentIdx - i;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(decrement)));
@@ -436,7 +436,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     protected void navigate(int steps) {
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
-        int idx = firstVisibleIndex--;
+        int idx = --firstVisibleIndex;
         valuesTable.insertColumn(2, createColumn(getVariableAt(idx)), getColumnLabel(idx));
       }
       valuesTable.redrawHeaders();
