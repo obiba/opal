@@ -383,11 +383,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     protected MenuBar createMenuBar() {
       MenuBar menuBar = new MenuBar(true);
       int currentIdx = firstVisibleIndex + getMaxVisibleColumns();
-      for(int i = currentIdx + 1; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS + 1, listVariable.size()); i++) {
-        final int increment = i - currentIdx;
+      for(int i = currentIdx; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()); i++) {
+        final int increment = i - currentIdx + 1;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(increment)));
       }
-      if(Math.min(currentIdx + MAX_NUMBER_OF_ITEMS + 1, listVariable.size()) < listVariable.size()) {
+      if(Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()) < listVariable.size()) {
         MenuItem more = new MenuItem("...", (Command) null);
         more.setEnabled(false);
         menuBar.addItem(more);
@@ -399,7 +399,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     protected void navigate(int steps) {
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(2);
-        int idx = ++firstVisibleIndex + getMaxVisibleColumns();
+        int idx = firstVisibleIndex++ + getMaxVisibleColumns();
         valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
       }
       valuesTable.redrawHeaders();
