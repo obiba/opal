@@ -110,6 +110,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private DataFetcher fetcher;
 
+  private VariableValueSelectionHandler variableValueSelectionHandler;
+
   private int firstVisibleIndex = 0;
 
   private String lastFilter = "";
@@ -242,7 +244,10 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         return listValueSetVariable.indexOf(variable.getName());
       }
     };
-    col.setValueSelectionHandler(new VariableValueSelectionHandler());
+    if(variableValueSelectionHandler == null) {
+      variableValueSelectionHandler = new VariableValueSelectionHandler();
+    }
+    col.setValueSelectionHandler(variableValueSelectionHandler);
     return col;
   }
 
