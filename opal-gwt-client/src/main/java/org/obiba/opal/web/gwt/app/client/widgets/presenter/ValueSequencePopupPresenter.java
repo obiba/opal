@@ -9,12 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -81,6 +87,27 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
   private final class ValueSetFetcherImpl implements ValueSetFetcher {
     @Override
     public void request(String filter) {
+      if(filter == null || filter.isEmpty()) {
+        requestValueSet(Arrays.asList(variable), filter);
+      } else {
+        requestVariablesAndValueSet(filter);
+      }
+    }
+
+    private void requestVariablesAndValueSet(final String filter) {
+      StringBuilder link = new StringBuilder(table.getLink());
+      link.append("/variables").append("?script=").append(URL.encodePathSegment(filter));
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link.toString()).get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+
+        @Override
+        public void onResource(Response response, JsArray<VariableDto> resource) {
+          requestValueSet(JsArrays.toList(JsArrays.toSafeArray(resource)), filter);
+        }
+
+      }).send();
+    }
+
+    private void requestValueSet(final List<VariableDto> variables, String filter) {
       StringBuilder link = new StringBuilder(table.getLink());
       link.append("/valueSet/").append(entityIdentifier).append("?select=");
       if(filter == null || filter.isEmpty()) {
@@ -92,9 +119,16 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
 
         @Override
         public void onResource(Response response, ValueSetDto resource) {
-          getView().populate(resource);
+          getView().populate(variables, resource);
         }
       }).send();
+    }
+
+    @Override
+    public void requestBinaryValue(VariableDto variable, String entityIdentifier, int index) {
+      StringBuilder link = new StringBuilder(table.getLink());
+      link.append("/variable/").append(variable.getName()).append("/value/").append(entityIdentifier).append("?pos=").append(index);
+      getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
   }
 
@@ -104,14 +138,17 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
 
     HasClickHandlers getButton();
 
-    void populate(ValueSetDto valueSet);
+    void populate(List<VariableDto> variables, ValueSetDto valueSet);
 
     void setValueSetFetcher(ValueSetFetcher fetcher);
 
   }
 
   public interface ValueSetFetcher {
+
     public void request(String filter);
+
+    void requestBinaryValue(VariableDto variable, String entityIdentifier, int index);
   }
 
 }

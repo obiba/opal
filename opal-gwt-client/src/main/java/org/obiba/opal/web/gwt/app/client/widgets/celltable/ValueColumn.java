@@ -18,9 +18,6 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.Column;
 
 public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
@@ -101,21 +98,6 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
    */
   protected int getPosition() {
     return pos;
-  }
-
-  private static final class ClickableIconRenderer extends AbstractSafeHtmlRenderer<String> {
-
-    private final String iconClass;
-
-    public ClickableIconRenderer(String iconClass) {
-      this.iconClass = iconClass;
-    }
-
-    @Override
-    public SafeHtml render(String object) {
-      if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
-      return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"icon " + iconClass + "\">").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
-    }
   }
 
   public interface ValueSelectionHandler {

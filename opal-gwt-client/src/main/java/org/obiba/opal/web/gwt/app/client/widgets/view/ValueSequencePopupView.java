@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter.ValueSetFetcher;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
@@ -89,6 +90,8 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
 
   private ValueSetFetcher fetcher;
 
+  private ValueSelectionHandler valueSelectionHandler;
+
   @Inject
   public ValueSequencePopupView(EventBus eventBus) {
     super(eventBus);
@@ -109,6 +112,7 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
         fetcher.request(null);
       }
     });
+
     initValuesTable();
   }
 
@@ -141,7 +145,7 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   }
 
   @Override
-  public void populate(ValueSetDto valueSet) {
+  public void populate(List<VariableDto> variables, ValueSetDto valueSet) {
     // remove previously added variable columns
     while(valuesTable.getColumnCount() > 1) {
       valuesTable.removeColumn(valuesTable.getColumnCount() - 1);
@@ -162,23 +166,46 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
     }
 
     // add the variables columns
-    JsArrayString variables = valueSet.getVariablesArray();
-    for(int i = 0; i < variables.length(); i++) {
-      final String varName = variables.get(i);
-      valuesTable.addColumn(new ValueOccurrenceColumn(i), new Header<String>(new TextCell()) {
+    JsArrayString variableNames = valueSet.getVariablesArray();
+    for(int i = 0; i < variableNames.length(); i++) {
+      final String varName = variableNames.get(i);
 
-        @Override
-        public String getValue() {
-          return varName;
+      // find the variable object and create+add the column
+      for(VariableDto var : variables) {
+        if(var.getName().equals(varName)) {
+          valuesTable.addColumn(createValueOccurrenceColumn(var, i), new Header<String>(new TextCell()) {
+
+            @Override
+            public String getValue() {
+              return varName;
+            }
+
+          });
+          break;
         }
+      }
 
-      });
     }
 
     // refresh data provider
     dataProvider.setList(occurrences);
     dataProvider.refresh();
     valuesTable.setEmptyTableWidget(noValues);
+  }
+
+  private ValueOccurrenceColumn createValueOccurrenceColumn(VariableDto variable, int pos) {
+    ValueOccurrenceColumn col = new ValueOccurrenceColumn(variable, pos);
+    if(valueSelectionHandler == null) {
+      valueSelectionHandler = new ValueSelectionHandler() {
+
+        @Override
+        public void onBinaryValueSelection(VariableDto variable, int index, ValueSetDto valueSet) {
+          fetcher.requestBinaryValue(variable, valueSet.getEntity().getIdentifier(), index);
+        }
+      };
+    }
+    col.setValueSelectionHandler(valueSelectionHandler);
+    return col;
   }
 
   private void initValuesTable() {
