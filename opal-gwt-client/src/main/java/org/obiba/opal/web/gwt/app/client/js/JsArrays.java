@@ -134,6 +134,29 @@ public class JsArrays {
     };
   }
 
+  public static List<String> toList(JsArrayString jsArray) {
+    final JsArrayString array = jsArray == null ? (JsArrayString) JsArrayString.createArray() : jsArray;
+    return new AbstractList<String>() {
+
+      @Override
+      public String get(int index) {
+        return array.get(index);
+      }
+
+      @Override
+      public String set(int index, String element) {
+        array.set(index, element);
+        return element;
+      }
+
+      @Override
+      public int size() {
+        return array.length();
+      }
+
+    };
+  }
+
   /**
    * Creates a {@code List} that is a view of a portion of the supplied array. This method does not copy the supplied
    * array. As such, any modifications made to the array will be reflected in the sub-list. The returned list is

@@ -104,6 +104,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private List<VariableDto> listVariable;
 
+  public List<String> listValueSetVariable;
+
   private TableDto table;
 
   private DataFetcher fetcher;
@@ -236,7 +238,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     ValueColumn col = new ValueColumn(variable) {
       @Override
       protected int getPosition() {
-        return listVariable.indexOf(variable);
+        // get the position from the list of variable names provided with the value sets
+        return listValueSetVariable.indexOf(variable.getName());
       }
     };
     col.setValueSelectionHandler(new VariableValueSelectionHandler());
@@ -472,6 +475,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
       setRefreshing(false);
+      listValueSetVariable = JsArrays.toList(valueSets.getVariablesArray());
       updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
     }
   }
