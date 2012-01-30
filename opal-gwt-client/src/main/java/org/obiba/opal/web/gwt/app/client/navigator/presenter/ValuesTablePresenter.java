@@ -46,7 +46,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, VariableDto variable) {
+    hideValueSequencePopup(table);
     this.table = table;
+
     getView().setTable(table);
     JsArray<VariableDto> variables = JsArray.createArray().<JsArray<VariableDto>> cast();
     variables.push(variable);
@@ -54,7 +56,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, String select) {
+    hideValueSequencePopup(table);
     this.table = table;
+
     getView().setTable(table);
     fetcher.updateVariables(select);
   }
@@ -63,6 +67,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   protected void onBind() {
     super.onBind();
     getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+  }
+
+  //
+  // Private methods
+  //
+
+  /**
+   * Hide value sequence popup if table is about to be changed.
+   */
+  private void hideValueSequencePopup(TableDto newTable) {
+    if(this.table != null && this.table.getName().equals(newTable.getName()) == false) {
+      valueSequencePopupPresenter.getView().hide();
+    }
   }
 
   //
