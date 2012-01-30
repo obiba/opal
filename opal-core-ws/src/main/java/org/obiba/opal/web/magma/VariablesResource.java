@@ -22,7 +22,6 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -138,39 +137,6 @@ public class VariablesResource extends AbstractValueTableResource {
     }));
 
     return valueDtos;
-  }
-
-  /**
-   * Get the variables in a occurrence group.
-   * @param uriInfo
-   * @param occurrenceGroup
-   * @return
-   */
-  @GET
-  @Path("/occurrenceGroup/{occurrenceGroup}")
-  @AuthorizeResource
-  public Iterable<VariableDto> getOccurrenceGroupVariables(@Context final UriInfo uriInfo, @PathParam("occurrenceGroup") String occurrenceGroup) {
-    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
-    final UriBuilder ub = uriInfo.getBaseUriBuilder();
-    final UriBuilder tableub = uriInfo.getBaseUriBuilder();
-    for(int i = 0; i < segments.size() - 3; i++) {
-      PathSegment segment = segments.get(i);
-      ub.segment(segment.getPath());
-      tableub.segment(segment.getPath());
-    }
-    ub.path(TableResource.class, "getVariable");
-    String tableUri = tableub.build().toString();
-    LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
-
-    List<Variable> group = Lists.newArrayList();
-    for(Variable var : getValueTable().getVariables()) {
-      String gp = var.getOccurrenceGroup();
-      if(gp != null && gp.equals(occurrenceGroup)) {
-        group.add(var);
-      }
-    }
-
-    return Iterables.transform(group, Dtos.asDtoFunc(tableLinkBuilder.build(), ub));
   }
 
   @POST
