@@ -12,9 +12,14 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter.ValueSetFetcher;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ToggleAnchor;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ToggleAnchor.Delegate;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetDto;
@@ -23,13 +28,13 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
@@ -45,6 +50,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
  *
  */
 public class ValueSequencePopupView extends PopupViewImpl implements ValueSequencePopupPresenter.Display {
+
   @UiTemplate("ValueSequencePopupView.ui.xml")
   interface ValueSequencePopupViewUiBinder extends UiBinder<Widget, ValueSequencePopupView> {
   }
@@ -60,10 +66,10 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   DockLayoutPanel content;
 
   @UiField
-  Label entityType;
+  Label occurrenceGroup;
 
   @UiField
-  Label occurrenceGroup;
+  ToggleAnchor toggleGroup;
 
   @UiField
   Table<ValueOccurrence> valuesTable;
@@ -77,17 +83,32 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   @UiField
   ResizeHandle resizeHandle;
 
-  private ValueSetDto valueSet;
-
   private VariableDto variable;
 
   private ListDataProvider<ValueOccurrence> dataProvider;
+
+  private ValueSetFetcher fetcher;
 
   @Inject
   public ValueSequencePopupView(EventBus eventBus) {
     super(eventBus);
     this.widget = uiBinder.createAndBindUi(this);
     resizeHandle.makeResizable(content);
+    toggleGroup.setShowHideTexts();
+    toggleGroup.setDelegate(new Delegate() {
+
+      @Override
+      public void executeOn() {
+        valuesTable.setEmptyTableWidget(valuesTable.getLoadingIndicator());
+        fetcher.request("occurrenceGroup().eq('" + variable.getOccurrenceGroup() + "')");
+      }
+
+      @Override
+      public void executeOff() {
+        valuesTable.setEmptyTableWidget(valuesTable.getLoadingIndicator());
+        fetcher.request(null);
+      }
+    });
     initValuesTable();
   }
 
@@ -104,26 +125,57 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   @Override
   public void initialize(TableDto table, VariableDto variable, String entityIdentifier) {
     dialogBox.setText(variable.getName() + " - " + entityIdentifier);
-    entityType.setText(variable.getEntityType());
     occurrenceGroup.setText(variable.getOccurrenceGroup());
+    toggleGroup.setVisible(variable.getOccurrenceGroup() != null && variable.getOccurrenceGroup().isEmpty() == false);
+    toggleGroup.setOn(true);
     this.variable = variable;
     valuesTable.setEmptyTableWidget(valuesTable.getLoadingIndicator());
-    dataProvider.setList(new ArrayList<ValueSequencePopupView.ValueOccurrence>());
+    dataProvider.setList(new ArrayList<ValueOccurrence>());
     dataProvider.refresh();
+    fetcher.request(null);
+  }
+
+  @Override
+  public void setValueSetFetcher(ValueSetFetcher fetcher) {
+    this.fetcher = fetcher;
   }
 
   @Override
   public void populate(ValueSetDto valueSet) {
-    this.valueSet = valueSet;
-
-    List<ValueOccurrence> occurrences = new ArrayList<ValueSequencePopupView.ValueOccurrence>();
-    JsArray<ValueDto> valueSequence = valueSet.getValuesArray().get(0).getValuesArray();
-    if(valueSequence != null) {
-      for(int i = 0; i < valueSequence.length(); i++) {
-        occurrences.add(new ValueOccurrence(i));
-      }
+    // remove previously added variable columns
+    while(valuesTable.getColumnCount() > 1) {
+      valuesTable.removeColumn(valuesTable.getColumnCount() - 1);
     }
 
+    // find the max number of occurrences among the group
+    // and build the dataset
+    List<ValueOccurrence> occurrences = new ArrayList<ValueOccurrence>();
+    int max = 0;
+    for(int i = 0; i < valueSet.getValuesArray().length(); i++) {
+      JsArray<ValueDto> valueSequence = valueSet.getValuesArray().get(i).getValuesArray();
+      if(valueSequence != null && valueSequence.length() > max) {
+        max = valueSequence.length();
+      }
+    }
+    for(int i = 0; i < max; i++) {
+      occurrences.add(new ValueOccurrence(valueSet, i));
+    }
+
+    // add the variables columns
+    JsArrayString variables = valueSet.getVariablesArray();
+    for(int i = 0; i < variables.length(); i++) {
+      final String varName = variables.get(i);
+      valuesTable.addColumn(new ValueOccurrenceColumn(i), new Header<String>(new TextCell()) {
+
+        @Override
+        public String getValue() {
+          return varName;
+        }
+
+      });
+    }
+
+    // refresh data provider
     dataProvider.setList(occurrences);
     dataProvider.refresh();
     valuesTable.setEmptyTableWidget(noValues);
@@ -142,44 +194,8 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
     valuesTable.addColumn(occColumn, "#");
     valuesTable.setColumnWidth(occColumn, 1, Unit.PX);
 
-    valuesTable.addColumn(createValueColumn(0), new Header<String>(new TextCell()) {
-
-      @Override
-      public String getValue() {
-        return variable.getName();
-      }
-
-    });
-
-    dataProvider = new ListDataProvider<ValueSequencePopupView.ValueOccurrence>();
+    dataProvider = new ListDataProvider<ValueOccurrence>();
     dataProvider.addDataDisplay(valuesTable);
   }
 
-  private Column<ValueOccurrence, String> createValueColumn(final int pos) {
-    return new TextColumn<ValueOccurrence>() {
-      @Override
-      public String getValue(ValueOccurrence value) {
-        return value.getValue(pos);
-      }
-    };
-  }
-
-  private final class ValueOccurrence {
-
-    private final int index;
-
-    public ValueOccurrence(int index) {
-      this.index = index;
-    }
-
-    public int getIndex() {
-      return index;
-    }
-
-    public String getValue(int pos) {
-      JsArray<ValueDto> valueSequence = valueSet.getValuesArray().get(pos).getValuesArray();
-      if(valueSequence == null || index >= valueSequence.length()) return "";
-      return valueSequence.get(index).getValue();
-    }
-  }
 }

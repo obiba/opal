@@ -14,12 +14,11 @@
             <g:FlowPanel addStyleNames="small-dual-indent top-margin">
               <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" keyStyleNames="span2 small-indent" valueStyleNames="span8">
                 <o:PropertyPanel>
-                  <g:Label><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
-                  <g:Label ui:field="entityType"/>
-                </o:PropertyPanel>
-                <o:PropertyPanel column="1">
-                  <g:Label><ui:msg description="Occurrence Group label">Occurrence Group</ui:msg></g:Label>
-                  <g:Label ui:field="occurrenceGroup"/>
+                  <g:FlowPanel>
+                    <g:InlineLabel><ui:msg description="Occurrence Group label">Occurrence Group</ui:msg></g:InlineLabel>
+                    <o:ToggleAnchor ui:field="toggleGroup" addStyleNames="small-indent"></o:ToggleAnchor>
+                  </g:FlowPanel>
+                  <g:InlineLabel ui:field="occurrenceGroup"/>
                 </o:PropertyPanel>
               </o:PropertiesTable>
               <g:FlowPanel>

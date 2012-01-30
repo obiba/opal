@@ -1139,4 +1139,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("Download")
   String downloadLabel();
 
+  @Description("Show label")
+  @DefaultStringValue("Show")
+  String showLabel();
+
+  @Description("Hide label")
+  @DefaultStringValue("Hide")
+  String hideLabel();
+
 }

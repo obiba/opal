@@ -43,6 +43,10 @@ a, a:visited, a:hover {
   color:#000000;
 }
 
+a.label, a.label:visited, a.label:hover {
+  color:#fff;
+}
+
 a:hover {
   cursor: pointer;
   text-decoration:underline;
@@ -1556,6 +1560,10 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
   background-image: url('../image/16/warning.png');
   background-repeat: no-repeat;
   padding-left: 18px;
+}
+
+.label.warning {
+  padding-left: 3px;
 }
 
 /* Inputs */

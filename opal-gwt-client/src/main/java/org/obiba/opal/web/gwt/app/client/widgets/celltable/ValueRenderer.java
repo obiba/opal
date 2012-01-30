@@ -11,28 +11,33 @@ package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
+import org.obiba.opal.web.model.client.magma.ValueDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 
-enum ValueRenderer {
+public enum ValueRenderer {
 
   DATE {
     @Override
-    protected String getValue(ValueDto value) {
-      String valueStr = super.getValue(value);
-      return valueStr.isEmpty() ? valueStr : valueStr.substring(0, 10);
+    protected String transform(String valueStr) {
+      return valueStr.length() < 10 ? valueStr : valueStr.substring(0, 10);
     }
   },
   DATETIME {
     @Override
-    protected String getValue(ValueDto value) {
-      String valueStr = super.getValue(value);
-      return valueStr.isEmpty() ? valueStr : valueStr.substring(0, 19).replace('T', ' ');
+    protected String transform(String valueStr) {
+      return valueStr.length() < 19 ? valueStr : valueStr.substring(0, 19).replace('T', ' ');
     }
   },
   BINARY {
+
+    @Override
+    protected String getValue(ValueSetsDto.ValueDto value) {
+      if(value.getLink().isEmpty()) return "";
+      return translations.downloadLabel();
+    }
 
     @Override
     protected String getValue(ValueDto value) {
@@ -46,24 +51,37 @@ enum ValueRenderer {
 
   private static final int MAX_VALUES_IN_SEQUENCE = 3;
 
-  public String render(ValueDto value, boolean repeatable) {
+  public String render(ValueDto value) {
+    if(value == null) return "";
+    return getValue(value);
+  }
+
+  public String render(ValueSetsDto.ValueDto value, boolean repeatable) {
     if(repeatable) {
       return getValueSequence(value);
     }
     return getValue(value);
   }
 
-  protected String getValue(ValueDto value) {
-    return value.getValue();
+  protected String transform(String valueStr) {
+    return valueStr;
   }
 
-  private String getValueSequence(ValueDto value) {
-    JsArray<ValueDto> values = value.getValuesArray();
+  protected String getValue(ValueDto value) {
+    return transform(value.getValue());
+  }
+
+  protected String getValue(ValueSetsDto.ValueDto value) {
+    return transform(value.getValue());
+  }
+
+  private String getValueSequence(ValueSetsDto.ValueDto value) {
+    JsArray<ValueSetsDto.ValueDto> values = value.getValuesArray();
     if(values == null) return getValue(value);
 
     StringBuilder builder = new StringBuilder();
     int count = 0;
-    for(ValueDto val : JsArrays.toIterable(values)) {
+    for(ValueSetsDto.ValueDto val : JsArrays.toIterable(values)) {
       if(count > 0) {
         builder.append(", ");
       }

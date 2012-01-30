@@ -49,6 +49,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
   @Override
   protected void onBind() {
     super.onBind();
+    getView().setValueSetFetcher(new ValueSetFetcherImpl());
     addHandler();
   }
 
@@ -57,15 +58,6 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     this.variable = variable;
     this.entityIdentifier = entityIdentifier;
     getView().initialize(table, variable, entityIdentifier);
-    StringBuilder link = new StringBuilder(table.getLink());
-    link.append("/valueSet/").append(entityIdentifier).append("?select=").append(URL.encodePathSegment("name().eq('" + variable.getName() + "')"));
-    ResourceRequestBuilderFactory.<ValueSetDto> newBuilder().forResource(link.toString()).get().withCallback(new ResourceCallback<ValueSetDto>() {
-
-      @Override
-      public void onResource(Response response, ValueSetDto resource) {
-        getView().populate(resource);
-      }
-    }).send();
   }
 
   //
@@ -86,6 +78,26 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
   // Inner classes and Interfaces
   //
 
+  private final class ValueSetFetcherImpl implements ValueSetFetcher {
+    @Override
+    public void request(String filter) {
+      StringBuilder link = new StringBuilder(table.getLink());
+      link.append("/valueSet/").append(entityIdentifier).append("?select=");
+      if(filter == null || filter.isEmpty()) {
+        link.append(URL.encodePathSegment("name().eq('" + variable.getName() + "')"));
+      } else {
+        link.append(URL.encodePathSegment(filter));
+      }
+      ResourceRequestBuilderFactory.<ValueSetDto> newBuilder().forResource(link.toString()).get().withCallback(new ResourceCallback<ValueSetDto>() {
+
+        @Override
+        public void onResource(Response response, ValueSetDto resource) {
+          getView().populate(resource);
+        }
+      }).send();
+    }
+  }
+
   public interface Display extends PopupView {
 
     void initialize(TableDto table, VariableDto variable, String entityIdentifier);
@@ -94,6 +106,12 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
 
     void populate(ValueSetDto valueSet);
 
+    void setValueSetFetcher(ValueSetFetcher fetcher);
+
+  }
+
+  public interface ValueSetFetcher {
+    public void request(String filter);
   }
 
 }
