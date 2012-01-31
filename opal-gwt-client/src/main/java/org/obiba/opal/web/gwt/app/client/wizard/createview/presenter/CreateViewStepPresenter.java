@@ -98,6 +98,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
   @Override
   protected void onBind() {
+    super.onBind();
     tableListPresenter.bind();
     getView().setTableSelector(tableListPresenter.getDisplay());
 
