@@ -12,19 +12,18 @@ package org.obiba.opal.web.gwt.app.client.validator;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 
-public abstract class ValidatableWidgetPresenter<D extends WidgetDisplay> extends WidgetPresenter<D> {
+import com.google.gwt.event.shared.EventBus;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-  private List<FieldValidator> validators;
+public abstract class ValidatableWidgetPresenter<D extends View> extends PresenterWidget<D> {
 
-  public ValidatableWidgetPresenter(D display, EventBus eventBus) {
-    super(display, eventBus);
-    validators = new ArrayList<FieldValidator>();
+  private List<FieldValidator> validators = new ArrayList<FieldValidator>();
+
+  public ValidatableWidgetPresenter(EventBus eventBus, D display) {
+    super(eventBus, display);
   }
 
   protected boolean validate() {
@@ -38,7 +37,7 @@ public abstract class ValidatableWidgetPresenter<D extends WidgetDisplay> extend
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;

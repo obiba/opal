@@ -9,11 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -29,16 +24,16 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
 
 public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresenter<AddDerivedVariableDialogPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
-
-    void showDialog();
+  public interface Display extends PopupView {
 
     void hideDialog();
 
@@ -55,17 +50,7 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
 
   @Inject
   public AddDerivedVariableDialogPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public void refreshDisplay() {
-
-  }
-
-  @Override
-  public void revealDisplay() {
-
+    super(eventBus, display);
   }
 
   @Override
@@ -75,41 +60,26 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
   }
 
   private void addValidators() {
-    addValidator(new RequiredTextValidator(getDisplay().getVariableName(), "CopyFromVariableNameIsRequired"));
+    addValidator(new RequiredTextValidator(getView().getVariableName(), "CopyFromVariableNameIsRequired"));
   }
 
   private void addHandlers() {
-    super.registerHandler(getDisplay().addAddVariableClickHandler(new AddVariableClickHandler()));
-    super.registerHandler(getDisplay().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
-  }
-
-  @Override
-  protected void onUnbind() {
-
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-
+    super.registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
+    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
   }
 
   private String getVariableName() {
-    return getDisplay().getVariableName().getText();
+    return getView().getVariableName().getText();
   }
 
   void refreshVariableNameSuggestions(ViewDto viewDto) {
-    getDisplay().clearVariableSuggestions();
+    getView().clearVariableSuggestions();
 
     // Add the derived variables to the suggestions.
     VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
     for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
-      getDisplay().addVariableSuggestion(variable.getName());
+      getView().addVariableSuggestion(variable.getName());
     }
 
     // Add the variables to the suggestions.
@@ -126,7 +96,7 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
       for(int i = 0; i < resource.length(); i++) {
-        getDisplay().addVariableSuggestion(resource.get(i).getName());
+        getView().addVariableSuggestion(resource.get(i).getName());
       }
     }
   }
@@ -149,7 +119,7 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
 
     @Override
     public void onClick(ClickEvent event) {
-      getDisplay().hideDialog();
+      getView().hideDialog();
     }
 
   }
@@ -159,8 +129,8 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     @Override
     public void onClick(ClickEvent event) {
       if(validate()) {
-        getDisplay().hideDialog();
-        eventBus.fireEvent(new VariableAddRequiredEvent(getVariableName()));
+        getView().hideDialog();
+        getEventBus().fireEvent(new VariableAddRequiredEvent(getVariableName()));
       }
     }
   }

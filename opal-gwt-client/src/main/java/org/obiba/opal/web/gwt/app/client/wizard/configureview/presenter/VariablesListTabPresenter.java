@@ -14,12 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -68,6 +62,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -77,23 +72,33 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  * Variables tab used to specify a view's variables by defining each variable using a Javascript expression.
  */
-public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabPresenter.Display> {
-  //
-  // Constants
-  //
+public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabPresenter.Display> {
 
   private static enum Tabs {
     /* These should be in the same order as in the UI */
     SCRIPT, CATEGORIES, ATTRIBUTES, OPTIONS, SUMMARY;
   }
 
-  //
-  // Instance Variables
-  //
+  private final CategoriesPresenter categoriesPresenter;
+
+  private final AttributesPresenter attributesPresenter;
+
+  private final SummaryTabPresenter summaryPresenter;
+
+  private final AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter;
+
+  private final Translations translations;
+
+  /**
+   * Widget for entering, and testing, the "select" script.
+   */
+  private final EvaluateScriptPresenter scriptWidget;
 
   private ViewDto viewDto;
 
@@ -102,60 +107,36 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private boolean addVariable;
 
-  @Inject
-  private CategoriesPresenter categoriesPresenter;
-
-  @Inject
-  private AttributesPresenter attributesPresenter;
-
-  @Inject
-  private SummaryTabPresenter summaryPresenter;
-
-  @Inject
-  private AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter;
-
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-
-  private Translations translations = GWT.create(Translations.class);
-
-  /**
-   * Widget for entering, and testing, the "select" script.
-   */
-  @Inject
-  private EvaluateScriptPresenter scriptWidget;
 
   private Runnable actionRequiringConfirmation;
 
-  //
-  // Constructors
-  //
-
   @Inject
-  public VariablesListTabPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public VariablesListTabPresenter(final Display display, final EventBus eventBus, CategoriesPresenter categoriesPresenter, AttributesPresenter attributesPresenter, SummaryTabPresenter summaryPresenter, AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter, EvaluateScriptPresenter evaluateScriptPresenter, Translations translations) {
+    super(eventBus, display);
+    this.categoriesPresenter = categoriesPresenter;
+    this.attributesPresenter = attributesPresenter;
+    this.summaryPresenter = summaryPresenter;
+    this.addDerivedVariableDialogPresenter = addDerivedVariableDialogPresenter;
+    this.scriptWidget = evaluateScriptPresenter;
+    this.translations = translations;
   }
-
-  //
-  // WidgetPresenter Methods
-  //
 
   @Override
   protected void onBind() {
     scriptWidget.bind();
-    getDisplay().setScriptWidget(scriptWidget.getDisplay());
+    getView().setScriptWidget(scriptWidget.getDisplay());
 
     categoriesPresenter.bind();
     categoriesPresenter.getDisplay().setAddButtonText(translations.addNewCategory());
-    getDisplay().addCategoriesTabWidget(categoriesPresenter.getDisplay().asWidget());
+    getView().addCategoriesTabWidget(categoriesPresenter.getDisplay().asWidget());
 
     attributesPresenter.bind();
     attributesPresenter.getDisplay().setAddButtonText(translations.addNewAttribute());
-    getDisplay().addAttributesTabWidget(attributesPresenter.getDisplay().asWidget());
+    getView().addAttributesTabWidget(attributesPresenter.getDisplay().asWidget());
 
     summaryPresenter.bind();
-    getDisplay().addSummaryTabWidget(summaryPresenter.getDisplay().asWidget());
-
-    addDerivedVariableDialogPresenter.bind();
+    getView().addSummaryTabWidget(summaryPresenter.getDisplay().asWidget());
 
     addEventHandlers();
     addValidators();
@@ -169,27 +150,6 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     addDerivedVariableDialogPresenter.unbind();
     summaryPresenter.unbind();
   }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // Methods
-  //
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
@@ -205,29 +165,29 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     tableDto.setViewLink("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName());
     scriptWidget.setTable(tableDto);
 
-    getDisplay().saveChangesEnabled(false);
+    getView().saveChangesEnabled(false);
 
     // Always show the Categories detail tab first.
-    getDisplay().displayDetailTab(0);
+    getView().displayDetailTab(0);
 
     initDisplayComponents();
   }
 
   private void initDisplayComponents() {
-    getDisplay().addButtonEnabled(true);
-    getDisplay().navigationEnabled(true);
+    getView().addButtonEnabled(true);
+    getView().navigationEnabled(true);
 
     displayedVariableName = getVariableList().isEmpty() ? null : getVariableList().get(0).getName();
     refreshVariableSuggestions();
 
     if(getVariableList().isEmpty()) {
       // Clear variable selection.
-      getDisplay().setSelectedVariableName(null, null, getNextVariableName());
+      getView().setSelectedVariableName(null, null, getNextVariableName());
       formClear();
       formEnabled(false);
     } else {
       updateSelectedVariableName();
-      getDisplay().removeButtonEnabled(true);
+      getView().removeButtonEnabled(true);
     }
   }
 
@@ -241,8 +201,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
   private void updateSelectedVariableName() {
     if(!getVariableList().isEmpty()) {
-      getDisplay().setSelectedVariableName(displayedVariableName, getPreviousVariableName(), getNextVariableName());
-      eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(getVariableList().get(getVariableIndex(displayedVariableName))));
+      getView().setSelectedVariableName(displayedVariableName, getPreviousVariableName(), getNextVariableName());
+      getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(getVariableList().get(getVariableIndex(displayedVariableName))));
     }
   }
 
@@ -277,48 +237,48 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   }
 
   private void refreshVariableSuggestions() {
-    getDisplay().clearVariableNameSuggestions();
+    getView().clearVariableNameSuggestions();
     for(VariableDto variableDto : getVariableList()) {
-      getDisplay().addVariableNameSuggestion(variableDto.getName());
+      getView().addVariableNameSuggestion(variableDto.getName());
     }
   }
 
   private void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-    super.registerHandler(getDisplay().addPreviousVariableNameClickHandler(new PreviousVariableClickHandler()));
-    super.registerHandler(getDisplay().addNextVariableNameClickHandler(new NextVariableClickHandler()));
-    super.registerHandler(getDisplay().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
-    super.registerHandler(getDisplay().addVariableNameEnterKeyPressed(new VariableNameEnterKeyPressedHandler()));
-    super.registerHandler(getDisplay().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
-    super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
-    super.registerHandler(getDisplay().addAddVariableClickHandler(new AddVariableClickHandler()));
-    super.registerHandler(getDisplay().addRemoveVariableClickHandler(new RemoveVariableClickHandler()));
-    super.registerHandler(getDisplay().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
-    super.registerHandler(eventBus.addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
-    super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredHandler()));
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
+    super.registerHandler(getView().addPreviousVariableNameClickHandler(new PreviousVariableClickHandler()));
+    super.registerHandler(getView().addNextVariableNameClickHandler(new NextVariableClickHandler()));
+    super.registerHandler(getView().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
+    super.registerHandler(getView().addVariableNameEnterKeyPressed(new VariableNameEnterKeyPressedHandler()));
+    super.registerHandler(getView().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
+    super.registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    super.registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
+    super.registerHandler(getView().addRemoveVariableClickHandler(new RemoveVariableClickHandler()));
+    super.registerHandler(getView().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
+    super.registerHandler(getEventBus().addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
     registerFormChangedHandler();
   }
 
   private void registerFormChangedHandler() {
     FormChangedHandler formChangedHandler = new FormChangedHandler();
 
-    super.registerHandler(getDisplay().addNameChangedHandler(formChangedHandler));
-    super.registerHandler(getDisplay().addValueTypeChangedHandler(formChangedHandler));
-    super.registerHandler(getDisplay().addScriptChangeHandler(formChangedHandler));
-    super.registerHandler(getDisplay().addRepeatableValueChangeHandler(formChangedHandler));
-    super.registerHandler(getDisplay().addOccurrenceGroupChangedHandler(formChangedHandler));
-    super.registerHandler(getDisplay().addUnitChangedHandler(formChangedHandler));
-    super.registerHandler(getDisplay().addMimeTypeChangedHandler(formChangedHandler));
-    super.registerHandler(eventBus.addHandler(CategoryUpdateEvent.getType(), formChangedHandler));
-    super.registerHandler(eventBus.addHandler(AttributeUpdateEvent.getType(), formChangedHandler));
-    super.registerHandler(eventBus.addHandler(LocalizableDeleteEvent.getType(), formChangedHandler));
+    super.registerHandler(getView().addNameChangedHandler(formChangedHandler));
+    super.registerHandler(getView().addValueTypeChangedHandler(formChangedHandler));
+    super.registerHandler(getView().addScriptChangeHandler(formChangedHandler));
+    super.registerHandler(getView().addRepeatableValueChangeHandler(formChangedHandler));
+    super.registerHandler(getView().addOccurrenceGroupChangedHandler(formChangedHandler));
+    super.registerHandler(getView().addUnitChangedHandler(formChangedHandler));
+    super.registerHandler(getView().addMimeTypeChangedHandler(formChangedHandler));
+    super.registerHandler(getEventBus().addHandler(CategoryUpdateEvent.getType(), formChangedHandler));
+    super.registerHandler(getEventBus().addHandler(AttributeUpdateEvent.getType(), formChangedHandler));
+    super.registerHandler(getEventBus().addHandler(LocalizableDeleteEvent.getType(), formChangedHandler));
   }
 
   private void addValidators() {
-    validators.add(new ConditionalValidator(getDisplay().getRepeatable(), new RequiredTextValidator(getDisplay().getOccurenceGroup(), "OccurrenceGroupIsRequired")));
-    validators.add(new RequiredTextValidator(getDisplay().getName(), "NewVariableNameIsRequired"));
+    validators.add(new ConditionalValidator(getView().getRepeatable(), new RequiredTextValidator(getView().getOccurenceGroup(), "OccurrenceGroupIsRequired")));
+    validators.add(new RequiredTextValidator(getView().getName(), "NewVariableNameIsRequired"));
     validators.add(new UniqueVariableNameValidator("VariableNameNotUnique"));
   }
 
@@ -333,7 +293,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
@@ -352,14 +312,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   }
 
   private boolean isTabSelected(Tabs tab) {
-    return getDisplay().getSelectedTab() == tab.ordinal();
+    return getView().getSelectedTab() == tab.ordinal();
   }
 
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     HasBeforeSelectionHandlers<Integer> getDetailTabs();
 
@@ -467,8 +427,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
       formEnabled(true);
-      getDisplay().saveChangesEnabled(false);
-      getDisplay().setNewVariable(event.getVariable());
+      getView().saveChangesEnabled(false);
+      getView().setNewVariable(event.getVariable());
       updateSummaryLink(false);
       if(isTabSelected(Tabs.SUMMARY)) {
         summaryPresenter.refreshDisplay();
@@ -512,8 +472,8 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-      addDerivedVariableDialogPresenter.getDisplay().getVariableName().setText("");
-      addDerivedVariableDialogPresenter.getDisplay().showDialog();
+      addDerivedVariableDialogPresenter.getView().getVariableName().setText("");
+      addToPopupSlot(addDerivedVariableDialogPresenter);
     }
   }
 
@@ -522,7 +482,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onKeyDown(KeyDownEvent event) {
       if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-        GWT.log("Selection changed to (enter) " + getDisplay().getSelectedVariableName() + ", handler: " + this);
+        GWT.log("Selection changed to (enter) " + getView().getSelectedVariableName() + ", handler: " + this);
       }
     }
 
@@ -533,9 +493,9 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onValueChange(ValueChangeEvent<Boolean> event) {
       boolean enabled = event.getValue();
-      getDisplay().setEnabledOccurenceGroup(enabled);
+      getView().setEnabledOccurenceGroup(enabled);
       if(!enabled) {
-        getDisplay().clearOccurrenceGroup();
+        getView().clearOccurrenceGroup();
       }
     }
 
@@ -570,11 +530,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
       variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
 
-      currentVariableDto = getDisplay().getVariableDto();
+      currentVariableDto = getView().getVariableDto();
       if(isEmptyVariable()) {
         // This view has no variables. Clear the variable list and save.
         variableListViewDto.clearVariablesArray();
-        eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
+        getEventBus().fireEvent(new ViewSaveRequiredEvent(viewDto));
       } else {
         // Validate current variable and save to variable list.
         if(validate()) {
@@ -593,7 +553,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         addVariable();
       }
       displayedVariableName = currentVariableDto.getName(); // Must note this before form is refreshed.
-      eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
+      getEventBus().fireEvent(new ViewSaveRequiredEvent(viewDto));
     }
 
     private void updateCategories() {
@@ -668,7 +628,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
           @Override
           public void onResource(Response response, VariableDto variableDto) {
             variableDto.setName(translations.copyOf() + variableDto.getName());
-            eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+            getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
             setButtonsWhenAddingVariable();
           }
         })
@@ -685,7 +645,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         @Override
         public void onResource(Response response, TableDto firstTableDto) {
           VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
-          eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+          getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
           setButtonsWhenAddingVariable();
         }
       })
@@ -715,7 +675,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
           variablesList = JsArrays.toList(variableListDto.getVariablesArray());
           VariableDto variableDto = getVariableDto();
           variableDto.setName(translations.copyOf() + variableDto.getName());
-          eventBus.fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+          getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
           setButtonsWhenAddingVariable();
         }
 
@@ -745,11 +705,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     }
 
     private void setButtonsWhenAddingVariable() {
-      getDisplay().saveChangesEnabled(true);
-      getDisplay().removeButtonEnabled(false);
-      getDisplay().addButtonEnabled(false);
-      getDisplay().navigationEnabled(false);
-      eventBus.fireEvent(new ViewSavePendingEvent());
+      getView().saveChangesEnabled(true);
+      getView().removeButtonEnabled(false);
+      getView().addButtonEnabled(false);
+      getView().navigationEnabled(false);
+      getEventBus().fireEvent(new ViewSavePendingEvent());
     }
   }
 
@@ -762,7 +722,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
           deleteCurrentVariable();
         }
       };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteVariableTitle", "confirmVariableDelete"));
+      getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteVariableTitle", "confirmVariableDelete"));
     }
 
   }
@@ -780,7 +740,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
   private void deleteCurrentVariable() {
     String nextVariableName = variableToDisplayAfterCurrentVariableDeleted();
     VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-    VariableDto variableToDelete = getDisplay().getVariableDto();
+    VariableDto variableToDelete = getView().getVariableDto();
     @SuppressWarnings("unchecked")
     JsArray<VariableDto> newVariables = (JsArray<VariableDto>) JsArray.createArray();
     for(int i = 0; i < variableListViewDto.getVariablesArray().length(); i++) {
@@ -798,14 +758,14 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
       updateSelectedVariableName();
     } else {
       displayedVariableName = null;
-      getDisplay().setSelectedVariableName(null, null, getNextVariableName());
+      getView().setSelectedVariableName(null, null, getNextVariableName());
       formClear();
       formEnabled(false);
     }
-    getDisplay().saveChangesEnabled(true);
-    getDisplay().addButtonEnabled(false);
-    getDisplay().navigationEnabled(false);
-    eventBus.fireEvent(new ViewSavePendingEvent());
+    getView().saveChangesEnabled(true);
+    getView().addButtonEnabled(false);
+    getView().navigationEnabled(false);
+    getEventBus().fireEvent(new ViewSavePendingEvent());
   }
 
   private void updateSummaryLink(boolean hasChanges) {
@@ -815,7 +775,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     if(hasChanges) {
 
       // TODO: it would probably be simpler to add a VariableDto to the body instead of putting everything on the URL
-      summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() + "/from/variable/_transient/summary?valueType=" + getDisplay().getVariableDto().getValueType() + "&script=" + URL.encodeQueryString(scriptWidget.getScript()));
+      summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() + "/from/variable/_transient/summary?valueType=" + getView().getVariableDto().getValueType() + "&script=" + URL.encodeQueryString(scriptWidget.getScript()));
 
       if(categoriesPresenter.getVariableDto().getCategoriesArray() != null) {
         JsArray<CategoryDto> cats = categoriesPresenter.getVariableDto().getCategoriesArray();
@@ -824,7 +784,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
         }
       }
     }
-    eventBus.fireEvent(new SummaryRequiredEvent(summaryLink.toString()));
+    getEventBus().fireEvent(new SummaryRequiredEvent(summaryLink.toString()));
 
   }
 
@@ -850,11 +810,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     }
 
     private void formChange() {
-      eventBus.fireEvent(new ViewSavePendingEvent());
-      getDisplay().saveChangesEnabled(true);
-      getDisplay().addButtonEnabled(false);
-      getDisplay().navigationEnabled(false);
-      getDisplay().removeButtonEnabled(false);
+      getEventBus().fireEvent(new ViewSavePendingEvent());
+      getView().saveChangesEnabled(true);
+      getView().addButtonEnabled(false);
+      getView().navigationEnabled(false);
+      getView().removeButtonEnabled(false);
 
       updateSummaryLink(true);
       if(isTabSelected(Tabs.SUMMARY)) {
@@ -884,11 +844,11 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     @Override
     public void onViewSaved(ViewSavedEvent event) {
       addVariable = false;
-      getDisplay().saveChangesEnabled(false);
-      getDisplay().addButtonEnabled(true);
-      getDisplay().navigationEnabled(true);
+      getView().saveChangesEnabled(false);
+      getView().addButtonEnabled(true);
+      getView().navigationEnabled(true);
       updateSelectedVariableName();
-      if(getVariableList().size() > 0) getDisplay().removeButtonEnabled(true);
+      if(getVariableList().size() > 0) getView().removeButtonEnabled(true);
       addDerivedVariableDialogPresenter.refreshVariableNameSuggestions(viewDto);
     }
 
@@ -904,10 +864,10 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
     protected boolean hasError() {
       if(displayedVariableName != null) {
         // Edits can have the same name.
-        if(getDisplay().getName().getText().equals(displayedVariableName)) return false;
+        if(getView().getName().getText().equals(displayedVariableName)) return false;
       }
       for(VariableDto variableDto : getVariableList()) {
-        if(getDisplay().getName().getText().equals(variableDto.getName())) return true;
+        if(getView().getName().getText().equals(variableDto.getName())) return true;
       }
       return false;
     }
@@ -918,7 +878,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
    * Enables or disables the variable list form. The "Add" variable button is always enabled regardless of state.
    */
   private void formEnabled(boolean enabled) {
-    getDisplay().formEnable(enabled);
+    getView().formEnable(enabled);
     categoriesPresenter.getDisplay().formEnable(enabled);
     attributesPresenter.getDisplay().formEnable(enabled);
   }
@@ -927,7 +887,7 @@ public class VariablesListTabPresenter extends WidgetPresenter<VariablesListTabP
    * Clears the variable list form.
    */
   private void formClear() {
-    getDisplay().formClear();
+    getView().formClear();
     categoriesPresenter.formClear();
     attributesPresenter.formClear();
   }

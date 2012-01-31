@@ -13,19 +13,21 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AddDeriv
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class AddDerivedVariableDialogView extends Composite implements AddDerivedVariableDialogPresenter.Display {
+public class AddDerivedVariableDialogView extends PopupViewImpl implements AddDerivedVariableDialogPresenter.Display {
 
   @UiTemplate("AddDerivedVariableDialogView.ui.xml")
   interface AddDerivedVariableDialogUiBinder extends UiBinder<DialogBox, AddDerivedVariableDialogView> {
@@ -47,28 +49,16 @@ public class AddDerivedVariableDialogView extends Composite implements AddDerive
 
   MultiWordSuggestOracle suggestions;
 
-  public AddDerivedVariableDialogView() {
+  @Inject
+  public AddDerivedVariableDialogView(EventBus eventBus) {
+    super(eventBus);
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
     uiBinder.createAndBindUi(this);
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void showDialog() {
-    dialog.center();
-    dialog.show();
+    return dialog;
   }
 
   @Override

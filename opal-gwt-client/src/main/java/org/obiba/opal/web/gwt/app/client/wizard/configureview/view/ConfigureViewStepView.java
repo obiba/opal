@@ -17,28 +17,28 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.Tooltip;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class ConfigureViewStepView extends Composite implements ConfigureViewStepPresenter.Display {
-  //
-  // Static Variables
-  //
+public class ConfigureViewStepView extends PopupViewImpl implements ConfigureViewStepPresenter.Display {
+
+  @UiTemplate("ConfigureViewStepView.ui.xml")
+  interface ViewUiBinder extends UiBinder<DialogBox, ConfigureViewStepView> {
+  }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  //
-  // Instance Variables
-  //
   @UiField
   DialogBox dialog;
 
@@ -69,12 +69,9 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   @UiField
   Button help;
 
-  //
-  // Constructors
-  //
-
-  public ConfigureViewStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+  @Inject
+  public ConfigureViewStepView(EventBus eventBus) {
+    super(eventBus);
     uiBinder.createAndBindUi(this);
     resizeHandle.makeResizable(contentLayout);
     initHelpTooltip();
@@ -94,26 +91,19 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
     helpTooltip.add(helpPanelDecks);
   }
 
-  //
-  // ConfigureViewStepPresenter.Display Methods
-  //
-
+  @Override
   public Widget asWidget() {
-    return this;
+    return dialog;
   }
 
-  public void startProcessing() {
-  }
-
-  public void stopProcessing() {
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  @UiTemplate("ConfigureViewStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, ConfigureViewStepView> {
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    Slots s = (Slots) slot;
+    switch(s) {
+    case Variables:
+      variablesTabPanel.clear();
+      variablesTabPanel.add(content);
+    }
   }
 
   @Override
@@ -133,12 +123,6 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   }
 
   @Override
-  public void addVariablesTabWidget(Widget widget) {
-    variablesTabPanel.clear();
-    variablesTabPanel.add(widget);
-  }
-
-  @Override
   public void addEntitiesTabWidget(Widget widget) {
     entitiesTabPanel.clear();
     viewTabs.setTabVisible(2, false);
@@ -153,12 +137,6 @@ public class ConfigureViewStepView extends Composite implements ConfigureViewSte
   @Override
   public void hideDialog() {
     dialog.hide();
-  }
-
-  @Override
-  public void showDialog() {
-    dialog.center();
-    dialog.show();
   }
 
   @Override

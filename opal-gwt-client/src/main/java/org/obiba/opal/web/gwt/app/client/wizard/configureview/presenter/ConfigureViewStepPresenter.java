@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -35,29 +29,26 @@ import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
-public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewStepPresenter.Display> {
-  //
-  // Instance Variables
-  //
+public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewStepPresenter.Display> {
 
-  @Inject
-  private DataTabPresenter dataTabPresenter;
+  private final DataTabPresenter dataTabPresenter;
 
-  @Inject
-  private SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter;
+  private final SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter;
 
-  @Inject
-  private VariablesListTabPresenter variablesListTabPresenter;
+  private final VariablesListTabPresenter variablesListTabPresenter;
 
-  @Inject
-  private EntitiesTabPresenter entitiesTabPresenter;
+  private final EntitiesTabPresenter entitiesTabPresenter;
 
   /**
    * {@link ViewDto} of view being configured.
@@ -76,26 +67,23 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   //
 
   @Inject
-  public ConfigureViewStepPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public ConfigureViewStepPresenter(final Display display, final EventBus eventBus, DataTabPresenter dataTabPresenter, SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter, VariablesListTabPresenter variablesListTabPresenter, EntitiesTabPresenter entitiesTabPresenter) {
+    super(eventBus, display);
+    this.dataTabPresenter = dataTabPresenter;
+    this.selectScriptVariablesTabPresenter = selectScriptVariablesTabPresenter;
+    this.variablesListTabPresenter = variablesListTabPresenter;
+    this.entitiesTabPresenter = entitiesTabPresenter;
   }
-
-  //
-  // WidgetPresenter Methods
-  //
 
   @Override
   protected void onBind() {
     dataTabPresenter.bind();
-    getDisplay().addDataTabWidget(dataTabPresenter.getDisplay().asWidget());
-
-    selectScriptVariablesTabPresenter.bind();
-    variablesListTabPresenter.bind();
+    getView().addDataTabWidget(dataTabPresenter.getDisplay().asWidget());
 
     entitiesTabPresenter.bind();
-    getDisplay().addEntitiesTabWidget(entitiesTabPresenter.getDisplay().asWidget());
+    getView().addEntitiesTabWidget(entitiesTabPresenter.getDisplay().asWidget());
 
-    getDisplay().getHelpDeck().showWidget(0);
+    getView().getHelpDeck().showWidget(0);
     viewSavePending = false;
     addEventHandlers();
   }
@@ -103,36 +91,24 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   @Override
   protected void onUnbind() {
     dataTabPresenter.unbind();
-    selectScriptVariablesTabPresenter.unbind();
     entitiesTabPresenter.unbind();
-    variablesListTabPresenter.unbind();
   }
 
   @Override
-  public void revealDisplay() {
+  public void onReveal() {
     revealTab();
   }
 
   private void revealTab() {
     // Always reveal data tab first.
-    getDisplay().displayTab(0);
-    refreshDisplay();
+    getView().displayTab(0);
+    onReset();
   }
 
   @Override
-  public void refreshDisplay() {
+  public void onReset() {
     dataTabPresenter.refreshDisplay();
     entitiesTabPresenter.refreshDisplay();
-    variablesListTabPresenter.refreshDisplay();
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   //
@@ -140,37 +116,37 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   //
 
   private void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
-    super.registerHandler(eventBus.addHandler(ViewSaveRequiredEvent.getType(), new ViewSaveRequiredHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewSaveRequiredEvent.getType(), new ViewSaveRequiredHandler()));
 
-    super.registerHandler(getDisplay().getViewTabs().addSelectionHandler(new SelectionHandler<Integer>() {
+    super.registerHandler(getView().getViewTabs().addSelectionHandler(new SelectionHandler<Integer>() {
 
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
         // Switch help displayed.
-        getDisplay().getHelpDeck().showWidget(event.getSelectedItem());
+        getView().getHelpDeck().showWidget(event.getSelectedItem());
       }
     }));
-    super.registerHandler(getDisplay().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
+    super.registerHandler(getView().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
 
       @Override
       public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
         if(viewSavePending) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error("cannotSwitchTabBecauseOfUnsavedChanges").build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error("cannotSwitchTabBecauseOfUnsavedChanges").build());
           // Stop this event. If the user still wants to switch tabs we will handle it manually.
           event.cancel();
         }
       }
     }));
-    super.registerHandler(eventBus.addHandler(ViewSavePendingEvent.getType(), new ViewSavePendingHandler()));
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewSavePendingEvent.getType(), new ViewSavePendingHandler()));
+    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
-    super.registerHandler(getDisplay().addCloseClickHandler(new ClickHandler() {
+    super.registerHandler(getView().addCloseClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        getDisplay().hideDialog();
-        eventBus.fireEvent(new ScriptEvaluationHideEvent());
+        getView().hideDialog();
+        getEventBus().fireEvent(new ScriptEvaluationHideEvent());
       }
     }));
   }
@@ -179,22 +155,22 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends PopupView {
+    enum Slots {
+      Variables
+    }
+
     DeckPanel getHelpDeck();
 
     HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
     void addDataTabWidget(Widget widget);
 
-    void addVariablesTabWidget(Widget widget);
-
     void addEntitiesTabWidget(Widget widget);
 
     HorizontalTabLayout getViewTabs();
 
     void displayTab(int tabNumber);
-
-    void showDialog();
 
     void hideDialog();
   }
@@ -215,32 +191,30 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
       viewSavePending = false; // Save is not required when form is initially displayed.
       viewDto = event.getView();
 
-      refreshDisplay();
+      onReveal();
 
       // Set the variables tab widget according to the received ViewDto type.
-      getDisplay().addVariablesTabWidget(getVariablesTabWidget());
+      setInSlot(Display.Slots.Variables, getVariablesTabWidget());
 
-      getDisplay().showDialog();
+      RevealRootPopupContentEvent.fire(getEventBus(), ConfigureViewStepPresenter.this);
       if(event.getVariable() != null) {
-        getDisplay().displayTab(1);
+        getView().displayTab(1);
       }
     }
 
-    private Widget getVariablesTabWidget() {
-      Widget variablesTabWidget = null;
+    private PresenterWidget<?> getVariablesTabWidget() {
+      PresenterWidget<?> variablesTabWidget = null;
 
       JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
       VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
       if(jsViewDto != null) {
-        variablesTabWidget = selectScriptVariablesTabPresenter.getDisplay().asWidget();
-
+        variablesTabWidget = selectScriptVariablesTabPresenter;
         // Set the help widget for the current type of view (remove/insert).
-        getDisplay().getHelpDeck().remove(1);
-        getDisplay().getHelpDeck().insert(selectScriptVariablesTabPresenter.getDisplay().getHelpWidget(), 1);
-
+        getView().getHelpDeck().remove(1);
+        getView().getHelpDeck().insert(selectScriptVariablesTabPresenter.getView().getHelpWidget(), 1);
       } else if(variableListDto != null) {
-        variablesTabWidget = variablesListTabPresenter.getDisplay().asWidget();
+        variablesTabWidget = variablesListTabPresenter;
       }
 
       return variablesTabWidget;
@@ -277,11 +251,11 @@ public class ConfigureViewStepPresenter extends WidgetPresenter<ConfigureViewSte
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
           } else {
             // Send event so save button and asterisk can be cleared.
             viewSavePending = false;
-            eventBus.fireEvent(new ViewSavedEvent());
+            getEventBus().fireEvent(new ViewSavedEvent());
           }
         }
       };

@@ -14,12 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
@@ -36,10 +30,13 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  * Variables tab used to specify a view's variables by means of a JavaScript "select" script.
@@ -47,7 +44,7 @@ import com.google.inject.Inject;
  * The "select" script tests each variable in the view's underlying tables and returns <code>true</code> if the variable
  * is to be included in the view.
  */
-public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScriptVariablesTabPresenter.Display> {
+public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScriptVariablesTabPresenter.Display> {
   //
   // Instance Variables
   //
@@ -67,56 +64,28 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-  //
-  // Constructors
-  //
-
   @Inject
   public SelectScriptVariablesTabPresenter(final Display display, final EventBus eventBus, EvaluateScriptPresenter scriptWidget) {
-    super(display, eventBus);
+    super(eventBus, display);
     this.scriptWidget = scriptWidget;
   }
-
-  //
-  // WidgetPresenter Methods
-  //
 
   @Override
   protected void onBind() {
     scriptWidget.bind();
     scriptWidget.showTest(false);
-    getDisplay().setScriptWidget(scriptWidget.getDisplay());
+    getView().setScriptWidget(scriptWidget.getDisplay());
 
-    getDisplay().saveChangesEnabled(false);
+    getView().saveChangesEnabled(false);
 
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     scriptWidget.unbind();
   }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
-  // Methods
-  //
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
@@ -130,20 +99,20 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
     if(jsViewDto != null && jsViewDto.hasSelect()) {
-      getDisplay().setVariablesToView(VariablesToView.SCRIPT);
-      getDisplay().setScript(jsViewDto.getSelect());
+      getView().setVariablesToView(VariablesToView.SCRIPT);
+      getView().setScript(jsViewDto.getSelect());
     } else {
-      getDisplay().setVariablesToView(VariablesToView.ALL);
-      getDisplay().setScript("");
+      getView().setVariablesToView(VariablesToView.ALL);
+      getView().setScript("");
     }
   }
 
   private void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-    super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
-    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
-    super.registerHandler(getDisplay().addVariablestoViewChangeHandler(new VariablesToViewChangeHandler()));
-    super.registerHandler(getDisplay().addScriptChangeHandler(new ScriptChangeHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
+    super.registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
+    super.registerHandler(getView().addVariablestoViewChangeHandler(new VariablesToViewChangeHandler()));
+    super.registerHandler(getView().addScriptChangeHandler(new ScriptChangeHandler()));
   }
 
   private boolean validate() {
@@ -157,7 +126,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {
       return true;
@@ -168,7 +137,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     Widget getHelpWidget();
 
@@ -223,8 +192,8 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
     private void updateViewDto() {
       JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
 
-      if(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT)) {
-        String script = getDisplay().getScript().trim();
+      if(getView().getVariablesToView().equals(VariablesToView.SCRIPT)) {
+        String script = getView().getScript().trim();
         if(script.length() != 0) {
           jsViewDto.setSelect(script);
         } else {
@@ -234,7 +203,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
         jsViewDto.clearSelect();
       }
 
-      eventBus.fireEvent(new ViewSaveRequiredEvent(getViewDto()));
+      getEventBus().fireEvent(new ViewSaveRequiredEvent(getViewDto()));
     }
   }
 
@@ -242,7 +211,7 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     @Override
     public void onViewSaved(ViewSavedEvent event) {
-      getDisplay().saveChangesEnabled(false);
+      getView().saveChangesEnabled(false);
     }
   }
 
@@ -250,12 +219,12 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     @Override
     public void onChange(ChangeEvent event) {
-      if(getDisplay().getVariablesToView() == VariablesToView.ALL) {
-        getDisplay().setScript("");
+      if(getView().getVariablesToView() == VariablesToView.ALL) {
+        getView().setScript("");
       }
-      getDisplay().setScriptWidgetVisible(getDisplay().getVariablesToView().equals(VariablesToView.SCRIPT));
-      getDisplay().saveChangesEnabled(true);
-      eventBus.fireEvent(new ViewSavePendingEvent());
+      getView().setScriptWidgetVisible(getView().getVariablesToView().equals(VariablesToView.SCRIPT));
+      getView().saveChangesEnabled(true);
+      getEventBus().fireEvent(new ViewSavePendingEvent());
     }
   }
 
@@ -263,8 +232,8 @@ public class SelectScriptVariablesTabPresenter extends WidgetPresenter<SelectScr
 
     @Override
     public void onChange(ChangeEvent event) {
-      getDisplay().saveChangesEnabled(true);
-      eventBus.fireEvent(new ViewSavePendingEvent());
+      getView().saveChangesEnabled(true);
+      getEventBus().fireEvent(new ViewSavePendingEvent());
     }
   }
 }

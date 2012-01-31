@@ -30,25 +30,26 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.LocalizablesV
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SelectScriptVariablesTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.VariablesListTabView;
 
-import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 /**
  * Bind concrete implementations to interfaces within the Configure View wizard.
  */
-public class ConfigureViewWizardModule extends AbstractGinModule {
+public class ConfigureViewWizardModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    bind(ConfigureViewStepPresenter.Display.class).to(ConfigureViewStepView.class).in(Singleton.class);
+    bindSingletonPresenterWidget(ConfigureViewStepPresenter.class, ConfigureViewStepPresenter.Display.class, ConfigureViewStepView.class);
+
+    bindPresenterWidget(AddDerivedVariableDialogPresenter.class, AddDerivedVariableDialogPresenter.Display.class, AddDerivedVariableDialogView.class);
+    bindPresenterWidget(VariablesListTabPresenter.class, VariablesListTabPresenter.Display.class, VariablesListTabView.class);
+    bindPresenterWidget(SelectScriptVariablesTabPresenter.class, SelectScriptVariablesTabPresenter.Display.class, SelectScriptVariablesTabView.class);
+
     bind(AttributeDialogPresenter.Display.class).to(AttributeDialogView.class);
     bind(CategoryDialogPresenter.Display.class).to(CategoryDialogView.class);
     bind(DataTabPresenter.Display.class).to(DataTabView.class);
     bind(EntitiesTabPresenter.Display.class).to(EntitiesTabView.class);
-    bind(SelectScriptVariablesTabPresenter.Display.class).to(SelectScriptVariablesTabView.class);
-    bind(VariablesListTabPresenter.Display.class).to(VariablesListTabView.class);
     bind(LocalizablesPresenter.Display.class).to(LocalizablesView.class);
     bind(LabelListPresenter.Display.class).to(LabelListView.class);
-    bind(AddDerivedVariableDialogPresenter.Display.class).to(AddDerivedVariableDialogView.class);
   }
 }

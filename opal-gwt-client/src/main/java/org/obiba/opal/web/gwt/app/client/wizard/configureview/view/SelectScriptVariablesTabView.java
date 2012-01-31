@@ -21,21 +21,20 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class SelectScriptVariablesTabView extends Composite implements SelectScriptVariablesTabPresenter.Display {
-  //
-  // Static Variables
-  //
+public class SelectScriptVariablesTabView extends ViewImpl implements SelectScriptVariablesTabPresenter.Display {
+
+  @UiTemplate("SelectScriptVariablesTabView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, SelectScriptVariablesTabView> {
+  }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  //
-  // Instance Variables
-  //
+  private final Widget widget;
 
   @UiField
   Button saveChangesButton;
@@ -50,12 +49,8 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
 
   private SelectScriptVariablesTabViewHelp helpWidget;
 
-  //
-  // Constructors
-  //
-
   public SelectScriptVariablesTabView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
 
   //
@@ -133,23 +128,7 @@ public class SelectScriptVariablesTabView extends Composite implements SelectScr
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  @UiTemplate("SelectScriptVariablesTabView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, SelectScriptVariablesTabView> {
+    return widget;
   }
 
   @Override

@@ -35,7 +35,6 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
@@ -45,12 +44,15 @@ import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class VariablesListTabView extends Composite implements VariablesListTabPresenter.Display {
+public class VariablesListTabView extends ViewImpl implements VariablesListTabPresenter.Display {
 
   public static final String SCRIPT_NAME = "script";
 
   private static VariablesListTabViewUiBinder uiBinder = GWT.create(VariablesListTabViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField(provided = true)
   SuggestBox variableNameSuggestBox;
@@ -111,21 +113,12 @@ public class VariablesListTabView extends Composite implements VariablesListTabP
 
   public VariablesListTabView() {
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-
+    return widget;
   }
 
   @Override
