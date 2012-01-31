@@ -12,32 +12,36 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ValueSetFetcher;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.AbstractDataProvider;
+import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.Range;
 
 /**
  *
@@ -52,6 +56,8 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
 
   private static Translations translations = GWT.create(Translations.class);
 
+  private static final int DEFAULT_PAGE_SIZE = 20;
+
   @UiField
   Panel summary;
 
@@ -59,16 +65,7 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   CellTable<ValueSetsDto.ValueSetDto> valuesTable;
 
   @UiField
-  Anchor previousPage;
-
-  @UiField
-  Anchor nextPage;
-
-  @UiField
-  Label pageLow;
-
-  @UiField
-  Label pageHigh;
+  SimplePager pager;
 
   @UiField
   HorizontalTabLayout tabs;
@@ -81,12 +78,18 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
 
   private ValueSelectionHandler valueSelectionHandler;
 
+  private ValueSetsDataProvider dataProvider;
+
+  private TableDto table;
+
+  private ValueSetFetcher fetcher;
+
   private VariableDto variable;
 
   public ScriptEvaluationView() {
     initWidget(uiBinder.createAndBindUi(this));
-    valuesTable.setPageSize(20);
-    valuesTable.addColumn(new EntityColumn(), translations.idLabel());
+    pager.setDisplay(valuesTable);
+    pager.setPageSize(DEFAULT_PAGE_SIZE);
   }
 
   @Override
@@ -96,36 +99,43 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   }
 
   @Override
-  public void populateValues(JsArray<ValueSetsDto.ValueSetDto> values) {
-    JsArrayDataProvider<ValueSetsDto.ValueSetDto> dataProvider = new JsArrayDataProvider<ValueSetsDto.ValueSetDto>();
-    if(values != null && valuesTable.getPageSize() < values.length()) {
-      valuesTable.setPageSize(values.length());
-    }
-    dataProvider.addDataDisplay(valuesTable);
-    dataProvider.setArray(JsArrays.toSafeArray(values));
-    dataProvider.refresh();
+  public ValueSetsProvider getValueSetsProvider() {
+    return dataProvider;
   }
 
   @Override
-  public void setEntityType(String entityType) {
-    valuesTable.removeColumn(0);
-    valuesTable.insertColumn(0, new EntityColumn(), entityType);
+  public void setTable(TableDto table) {
+    this.table = table;
+    valuesTable.setRowCount(table.getValueSetCount());
+
+    while(valuesTable.getColumnCount() > 0) {
+      valuesTable.removeColumn(0);
+    }
+    EntityColumn col;
+    valuesTable.insertColumn(0, col = new EntityColumn(), table.getEntityType());
+    valuesTable.setColumnWidth(col, 1, Unit.PX);
   }
 
   @Override
   public void setVariable(VariableDto variable) {
     this.variable = variable;
-    String type = variable.getValueType();
 
-    valueType.setText(type);
+    valueType.setText(variable.getValueType());
+    script.setText(Variables.getScript(variable));
+
+    if(dataProvider != null) {
+      dataProvider.removeDataDisplay(valuesTable);
+      dataProvider = null;
+    }
+    dataProvider = new ValueSetsDataProvider();
+    dataProvider.addDataDisplay(valuesTable);
+
     ValueColumn col = new ValueColumn(variable);
     col.setValueSelectionHandler(valueSelectionHandler);
     if(valuesTable.getColumnCount() > 1) {
       valuesTable.removeColumn(1);
     }
     valuesTable.insertColumn(1, col, translations.valueLabel());
-
-    script.setText(Variables.getScript(variable));
   }
 
   @Override
@@ -142,6 +152,11 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
         valueSelectionHandler = null;
       }
     };
+  }
+
+  @Override
+  public void setValueSetFetcher(ValueSetFetcher fetcher) {
+    this.fetcher = fetcher;
   }
 
   //
@@ -161,30 +176,35 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   public void stopProcessing() {
   }
 
-  @Override
-  public HandlerRegistration addNextPageClickHandler(ClickHandler handler) {
-    return nextPage.addClickHandler(handler);
-  }
+  //
+  // Inner classes
+  //
 
-  @Override
-  public HandlerRegistration addPreviousPageClickHandler(ClickHandler handler) {
-    return previousPage.addClickHandler(handler);
-  }
+  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements ValueSetsProvider {
 
-  @Override
-  public void setPageLimits(int low, int high, int count) {
-    if(low == 1) {
-      previousPage.addStyleName("disabled");
-    } else {
-      previousPage.removeStyleName("disabled");
+    @Override
+    protected void onRangeChanged(HasData<ValueSetDto> display) {
+      // Get the new range.
+      final Range range = display.getVisibleRange();
+
+      // query the valuesets
+      int start = range.getStart();
+
+      if(start > table.getValueSetCount()) return;
+
+      int length = range.getLength();
+      if(start + length > table.getValueSetCount()) {
+        length = table.getValueSetCount() - start;
+      }
+
+      fetcher.request(start, length);
     }
-    if(high >= count) {
-      nextPage.addStyleName("disabled");
-    } else {
-      nextPage.removeStyleName("disabled");
+
+    @Override
+    public void populateValues(int offset, ValueSetsDto valueSets) {
+      updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
     }
-    pageLow.setText(Integer.toString(low));
-    pageHigh.setText(Integer.toString(high));
+
   }
 
   private static final class EntityColumn extends TextColumn<ValueSetsDto.ValueSetDto> {
