@@ -6,7 +6,6 @@ import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
@@ -56,7 +55,6 @@ public class GwtApp implements EntryPoint {
 
     initTableSelectorPresenter();
     initConfirmationPresenter();
-    initScriptEvaluationPopupPresenter();
     initViewWizards();
 
     DelayedBindRegistry.bind(opalGinjector);
@@ -73,11 +71,6 @@ public class GwtApp implements EntryPoint {
   private void initConfirmationPresenter() {
     ConfirmationPresenter confirmationPresenter = opalGinjector.getConfirmationPresenter();
     confirmationPresenter.bind();
-  }
-
-  private void initScriptEvaluationPopupPresenter() {
-    ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter = opalGinjector.getScriptEvaluationPopupPresenter();
-    scriptEvaluationPopupPresenter.bind();
   }
 
   private void initViewWizards() {

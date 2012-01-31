@@ -12,11 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -41,22 +37,22 @@ import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationPresenter.Display> {
+public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationPresenter.Display> {
 
   private static Translations translations = GWT.create(Translations.class);
 
-  public static final int PAGE_SIZE = 20;
-
-  @Inject
   private SummaryTabPresenter summaryTabPresenter;
 
   private VariableDto variable;
@@ -70,10 +66,11 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   //
 
   @Inject
-  public ScriptEvaluationPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public ScriptEvaluationPresenter(final EventBus eventBus, final Display view, SummaryTabPresenter summaryTabPresenter) {
+    super(eventBus, view);
+    this.summaryTabPresenter = summaryTabPresenter;
 
-    getDisplay().setValueSelectionHandler(new ValueSelectionHandler() {
+    getView().setValueSelectionHandler(new ValueSelectionHandler() {
 
       @Override
       public void onBinaryValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
@@ -83,7 +80,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
         // TODO won't work with long script
         // OPAL-1346 encode script
         link.append("&script=" + URL.encodePathSegment(Variables.getScript(variable)));
-        eventBus.fireEvent(new FileDownloadEvent(link.toString()));
+        getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
       }
 
       @Override
@@ -94,13 +91,13 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
 
     });
 
-    getDisplay().setValueSetFetcher(new ValueSetFetcherImpl());
+    getView().setValueSetFetcher(new ValueSetFetcherImpl());
 
   }
 
   public void setTable(TableDto table) {
     this.table = table;
-    getDisplay().setTable(table);
+    getView().setTable(table);
   }
 
   /**
@@ -109,7 +106,8 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
    */
   public void setVariable(VariableDto variable) {
     this.variable = variable;
-    getDisplay().setVariable(variable);
+    getView().setVariable(variable);
+    requestSummary();
   }
 
   public void setScriptEvaluationCallback(ScriptEvaluationCallback scriptEvaluationCallback) {
@@ -183,32 +181,18 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
   //
 
   @Override
-  public void refreshDisplay() {
-    requestSummary();
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
   protected void onBind() {
+    super.onBind();
     summaryTabPresenter.bind();
-    getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    // TODO
+    // setInSlot(Display.Slots.Summary, summaryTabPresenter);
   }
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     summaryTabPresenter.unbind();
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   //
@@ -249,14 +233,14 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
       boolean success = false;
       switch(response.getStatusCode()) {
       case Response.SC_OK:
-        getDisplay().getValueSetsProvider().populateValues(offset, (ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
+        getView().getValueSetsProvider().populateValues(offset, (ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
         success = true;
         break;
       case Response.SC_BAD_REQUEST:
         scriptInterpretationFail(response);
         break;
       default:
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
         break;
       }
       if(scriptEvaluationCallback != null) {
@@ -272,7 +256,7 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
         for(JavaScriptErrorDto error : errors) {
           // TODO translate
-          eventBus.fireEvent(NotificationEvent.newBuilder().error("Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error.getMessage()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error("Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error.getMessage()).build());
         }
       }
     }
@@ -298,7 +282,11 @@ public class ScriptEvaluationPresenter extends WidgetPresenter<ScriptEvaluationP
     public void onFailure(VariableDto variable);
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
+
+    enum Slots {
+      Summary
+    }
 
     void setSummaryTabWidget(WidgetDisplay widget);
 

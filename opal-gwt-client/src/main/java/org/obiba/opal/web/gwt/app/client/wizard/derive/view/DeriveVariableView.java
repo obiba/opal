@@ -14,14 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -189,8 +188,10 @@ public class DeriveVariableView extends PopupViewImpl implements DeriveVariableP
   }
 
   @Override
-  public void setScriptEvaluationWidget(WidgetDisplay widget) {
-    scriptEvaluationStep.add(widget.asWidget());
+  public void setInSlot(Object slot, Widget content) {
+    if(slot == Display.Slots.Summary) {
+      scriptEvaluationStep.add(content);
+    }
   }
 
   @Override

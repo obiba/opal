@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -23,20 +24,23 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class ScriptEvaluationPopupView extends DialogBox implements Display {
+public class ScriptEvaluationPopupView extends PopupViewImpl implements Display {
 
   @UiTemplate("ScriptEvaluationPopupView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DockLayoutPanel, ScriptEvaluationPopupView> {
+  interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationPopupView> {
   }
-
-  private static String DIALOG_WIDTH = "45em";
-
-  private static String DIALOG_HEIGHT = "45em";
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
+
+  @UiField
+  DialogBox dialogBox;
 
   @UiField
   DockLayoutPanel content;
@@ -47,14 +51,17 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
   @UiField
   ResizeHandle resizeHandle;
 
-  public ScriptEvaluationPopupView() {
-    setModal(false);
-    setText(translations.scriptEvaluationLabel());
-    content = uiBinder.createAndBindUi(this);
-    content.setHeight(DIALOG_HEIGHT);
-    content.setWidth(DIALOG_WIDTH);
-    add(content);
+  @Inject
+  public ScriptEvaluationPopupView(EventBus eventBus) {
+    super(eventBus);
+    this.widget = uiBinder.createAndBindUi(this);
+    dialogBox.setText(translations.scriptEvaluationLabel());
     resizeHandle.makeResizable(content);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
   }
 
   @Override
@@ -63,30 +70,12 @@ public class ScriptEvaluationPopupView extends DialogBox implements Display {
   }
 
   @Override
-  public void showDialog() {
-    if(!isShowing()) {
-      center();
-      show();
+  public void setInSlot(Object slot, Widget display) {
+    if(slot == Slots.Evaluation) {
+      ScrollPanel scroll = new ScrollPanel();
+      scroll.add(display);
+      content.add(scroll);
     }
   }
 
-  @Override
-  public void closeDialog() {
-    hide();
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
-  public void setScriptEvaluationWidget(Widget display) {
-    ScrollPanel scroll = new ScrollPanel();
-    scroll.add(display);
-    content.add(scroll);
-  }
 }

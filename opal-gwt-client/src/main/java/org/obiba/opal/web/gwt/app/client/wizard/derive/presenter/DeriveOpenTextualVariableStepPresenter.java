@@ -12,11 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
@@ -38,10 +33,12 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.View;
 
 public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<DeriveOpenTextualVariableStepPresenter.Display> {
 
@@ -52,16 +49,8 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
   public static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
 
   @Inject
-  public DeriveOpenTextualVariableStepPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
+  public DeriveOpenTextualVariableStepPresenter(final EventBus eventBus, final Display view) {
+    super(eventBus, view);
   }
 
   @Override
@@ -73,18 +62,18 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
   List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMethodStepController().build());
-    stepCtrls.add(getDisplay().getMapStepController().onStepIn(new StepInHandler() {
+    stepCtrls.add(getView().getMethodStepController().build());
+    stepCtrls.add(getView().getMapStepController().onStepIn(new StepInHandler() {
 
       @Override
       public void onStepIn() {
-        if(derivationHelper == null || derivationHelper.getMethod() != getDisplay().getMethod()) {
+        if(derivationHelper == null || derivationHelper.getMethod() != getView().getMethod()) {
           StringBuilder link = new StringBuilder(originalVariable.getLink())//
           .append("/summary")//
           .append("?nature=categorical")//
           .append("&distinct=true");
 
-          display.populateValues(new ArrayList<ValueMapEntry>());
+          getView().populateValues(new ArrayList<ValueMapEntry>());
 
           ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
           .forResource(link.toString()).get()//
@@ -93,15 +82,15 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
             @Override
             public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
               categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-              derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, summaryStatisticsDto, getDisplay().getMethod());
+              derivationHelper = new OpenTextualVariableDerivationHelper(originalVariable, summaryStatisticsDto, getView().getMethod());
               derivationHelper.initializeValueMapEntries();
               JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
               for(int i = 0; i < frequenciesArray.length(); i++) {
                 FrequencyDto frequencyDto = frequenciesArray.get(i);
-                display.addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()));
+                getView().addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()));
               }
-              display.getValueMapGrid().setMaxFrequency(getMaxFrequency());
-              display.populateValues(derivationHelper.getValueMapEntries());
+              getView().getValueMapGrid().setMaxFrequency(getMaxFrequency());
+              getView().populateValues(derivationHelper.getValueMapEntries());
             }
           }).send();
         }
@@ -124,17 +113,17 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
   @Override
   protected void onBind() {
-    getDisplay().getValueMapGrid().enableRowDeletion(true);
-    getDisplay().getValueMapGrid().enableFrequencyColumn(true);
-    getDisplay().getAddButton().addClickHandler(new ClickHandler() {
+    getView().getValueMapGrid().enableRowDeletion(true);
+    getView().getValueMapGrid().enableFrequencyColumn(true);
+    getView().getAddButton().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        String newValue = getDisplay().getNewValue().getValue();
-        String valueValue = getDisplay().getValue().getValue();
+        String newValue = getView().getNewValue().getValue();
+        String valueValue = getView().getValue().getValue();
         if(addEntry(valueValue, newValue, newValue)) {
-          getDisplay().emptyValueFields();
-          display.entryAdded();
+          getView().emptyValueFields();
+          getView().entryAdded();
         }
       }
     });
@@ -169,16 +158,7 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
   protected void onUnbind() {
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     DefaultWizardStepController.Builder getMethodStepController();
 

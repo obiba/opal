@@ -23,11 +23,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class DeriveCustomVariableStepView extends Composite implements DeriveCustomVariablePresenter.Display {
+public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCustomVariablePresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -36,6 +36,8 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   @UiTemplate("DeriveCustomVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveCustomVariableStepView> {
   }
+
+  private final Widget widget;
 
   @UiField
   WizardStep deriveStep;
@@ -53,7 +55,8 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   HasClickHandlers testButton;
 
   public DeriveCustomVariableStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    super();
+    this.widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
@@ -62,11 +65,8 @@ public class DeriveCustomVariableStepView extends Composite implements DeriveCus
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+  public Widget asWidget() {
+    return widget;
   }
 
   @Override

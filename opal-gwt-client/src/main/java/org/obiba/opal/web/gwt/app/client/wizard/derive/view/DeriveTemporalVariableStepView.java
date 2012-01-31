@@ -25,7 +25,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
@@ -33,11 +32,12 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.user.datepicker.client.DateBox;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class DeriveTemporalVariableStepView extends Composite implements DeriveTemporalVariableStepPresenter.Display {
+public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTemporalVariableStepPresenter.Display {
 
   @UiTemplate("DeriveTemporalVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveTemporalVariableStepView> {
@@ -46,6 +46,8 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   WizardStep methodStep;
@@ -88,7 +90,8 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
   //
 
   public DeriveTemporalVariableStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    super();
+    this.widget = uiBinder.createAndBindUi(this);
 
     DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
 
@@ -150,15 +153,7 @@ public class DeriveTemporalVariableStepView extends Composite implements DeriveT
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

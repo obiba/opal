@@ -12,11 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
@@ -26,8 +21,10 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
@@ -37,8 +34,8 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   private CategoricalVariableDerivationHelper derivationHelper;
 
   @Inject
-  public DeriveCategoricalVariableStepPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public DeriveCategoricalVariableStepPresenter(final EventBus eventBus, final Display view) {
+    super(eventBus, view);
   }
 
   //
@@ -54,9 +51,9 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
       public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
         derivationHelper = new CategoricalVariableDerivationHelper(variable, statisticsDto);
         derivationHelper.initializeValueMapEntries();
-        getDisplay().enableFrequencyColumn(true);
-        getDisplay().setMaxFrequency(derivationHelper.getMaxFrequency());
-        getDisplay().populateValues(derivationHelper.getValueMapEntries());
+        getView().enableFrequencyColumn(true);
+        getView().setMaxFrequency(derivationHelper.getMaxFrequency());
+        getView().populateValues(derivationHelper.getValueMapEntries());
       }
     }).send();
   }
@@ -70,7 +67,7 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMapStepController().onValidate(new ValidationHandler() {
+    stepCtrls.add(getView().getMapStepController().onValidate(new ValidationHandler() {
 
       @Override
       public boolean validate() {
@@ -83,39 +80,10 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   }
 
   //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  protected void onBind() {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
   // Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     DefaultWizardStepController.Builder getMapStepController();
 

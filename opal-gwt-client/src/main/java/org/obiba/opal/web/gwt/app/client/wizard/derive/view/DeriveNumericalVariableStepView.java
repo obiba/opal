@@ -28,18 +28,18 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class DeriveNumericalVariableStepView extends Composite implements DeriveNumericalVariableStepPresenter.Display {
+public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveNumericalVariableStepPresenter.Display {
 
   @UiTemplate("DeriveNumericalVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveNumericalVariableStepView> {
@@ -48,6 +48,8 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   WizardStep methodStep;
@@ -117,7 +119,8 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
   //
 
   public DeriveNumericalVariableStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    super();
+    this.widget = uiBinder.createAndBindUi(this);
 
     initializeMethodForm();
     initializeValueMapEntryForm();
@@ -219,15 +222,7 @@ public class DeriveNumericalVariableStepView extends Composite implements Derive
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

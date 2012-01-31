@@ -20,13 +20,13 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class DeriveBooleanVariableStepView extends Composite implements DeriveBooleanVariableStepPresenter.Display {
+public class DeriveBooleanVariableStepView extends ViewImpl implements DeriveBooleanVariableStepPresenter.Display {
 
   @UiTemplate("DeriveBooleanVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveBooleanVariableStepView> {
@@ -35,6 +35,8 @@ public class DeriveBooleanVariableStepView extends Composite implements DeriveBo
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
   WizardStep mapStep;
@@ -47,7 +49,8 @@ public class DeriveBooleanVariableStepView extends Composite implements DeriveBo
   //
 
   public DeriveBooleanVariableStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    super();
+    this.widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
@@ -66,15 +69,7 @@ public class DeriveBooleanVariableStepView extends Composite implements DeriveBo
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
 }

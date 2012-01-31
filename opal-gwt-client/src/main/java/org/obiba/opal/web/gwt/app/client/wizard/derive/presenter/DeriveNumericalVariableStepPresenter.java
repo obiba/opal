@@ -12,9 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -36,9 +33,11 @@ import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
@@ -47,7 +46,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
   private static Translations translations = GWT.create(Translations.class);
 
-  @Inject
   private SummaryTabPresenter summaryTabPresenter;
 
   private NumericalVariableDerivationHelper<? extends Number> derivationHelper;
@@ -55,17 +53,15 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   private NumberType numberType;
 
   @Inject
-  public DeriveNumericalVariableStepPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
-
-    super.registerHandler(eventBus.addHandler(SummaryReceivedEvent.getType(), new OriginalVariableSummaryReceivedHandler()));
-    super.registerHandler(getDisplay().addValueMapEntryHandler(new AddValueMapEntryHandler()));
+  public DeriveNumericalVariableStepPresenter(final EventBus eventBus, final Display view, SummaryTabPresenter summaryTabPresenter) {
+    super(eventBus, view);
+    this.summaryTabPresenter = summaryTabPresenter;
   }
 
   @Override
   void initialize(VariableDto variable) {
     super.initialize(variable);
-    getDisplay().setNumberType(variable.getValueType());
+    getView().setNumberType(variable.getValueType());
     summaryTabPresenter.setResourceUri(variable.getLink() + "/summary");
     summaryTabPresenter.forgetSummary();
     summaryTabPresenter.refreshDisplay();
@@ -75,8 +71,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMethodStepController().onValidate(new MethodStepValidationHandler()).build());
-    stepCtrls.add(getDisplay().getMapStepController().onStepIn(new MapStepInHandler()).build());
+    stepCtrls.add(getView().getMethodStepController().onValidate(new MethodStepValidationHandler()).build());
+    stepCtrls.add(getView().getMapStepController().onStepIn(new MapStepInHandler()).build());
 
     return stepCtrls;
   }
@@ -88,7 +84,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
   private boolean addValueMapEntry(String value, String newValue) {
     if(derivationHelper.hasValueMapEntryWithValue(value)) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
       return false;
     }
     numberType.addValueMapEntry(derivationHelper, value, newValue);
@@ -97,7 +93,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
   private boolean addValueMapEntry(Number lower, Number upper, String newValue) {
     if(!numberType.addValueMapEntry(derivationHelper, lower, upper, newValue)) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(translations.rangeOverlap()).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.rangeOverlap()).build());
       return false;
     }
     return true;
@@ -113,31 +109,10 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   //
 
   @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
   protected void onBind() {
-    summaryTabPresenter.bind();
-    getDisplay().setSummaryTabWidget(summaryTabPresenter.getDisplay());
-  }
-
-  @Override
-  protected void onUnbind() {
-    summaryTabPresenter.unbind();
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
+    getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    super.registerHandler(getEventBus().addHandler(SummaryReceivedEvent.getType(), new OriginalVariableSummaryReceivedHandler()));
+    super.registerHandler(getView().addValueMapEntryHandler(new AddValueMapEntryHandler()));
   }
 
   //
@@ -151,11 +126,11 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     @Override
     public boolean validate() {
       List<String> errorMessages = new ArrayList<String>();
-      if(getDisplay().rangeSelected()) {
+      if(getView().rangeSelected()) {
         validateRangeForm(errorMessages);
       }
       if(!errorMessages.isEmpty()) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
       }
       return errorMessages.isEmpty();
     }
@@ -166,37 +141,37 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     }
 
     private void validateRangeLimitsForm(List<String> errorMessages) {
-      getDisplay().setLowerLimitError(false);
-      getDisplay().setUpperLimitError(false);
+      getView().setLowerLimitError(false);
+      getView().setUpperLimitError(false);
 
-      Number lower = getDisplay().getLowerLimit();
-      Number upper = getDisplay().getUpperLimit();
+      Number lower = getView().getLowerLimit();
+      Number upper = getView().getUpperLimit();
 
       if(lower == null) {
         errorMessages.add(translations.lowerValueLimitRequired());
-        getDisplay().setLowerLimitError(true);
+        getView().setLowerLimitError(true);
       }
       if(upper == null) {
         errorMessages.add(translations.upperValueLimitRequired());
-        getDisplay().setUpperLimitError(true);
+        getView().setUpperLimitError(true);
       }
       if(lower != null && upper != null && lower.doubleValue() > upper.doubleValue()) {
         errorMessages.add(translations.lowerLimitGreaterThanUpperLimit());
-        getDisplay().setLowerLimitError(true);
-        getDisplay().setUpperLimitError(true);
+        getView().setLowerLimitError(true);
+        getView().setUpperLimitError(true);
       }
     }
 
     private void validateRangeDefinitionForm(List<String> errorMessages) {
-      getDisplay().setRangeLengthError(false);
-      getDisplay().setRangeCountError(false);
+      getView().setRangeLengthError(false);
+      getView().setRangeCountError(false);
 
-      if(getDisplay().rangeLengthSelected() && getDisplay().getRangeLength() == null) {
+      if(getView().rangeLengthSelected() && getView().getRangeLength() == null) {
         errorMessages.add(translations.rangesLengthRequired());
-        getDisplay().setRangeLengthError(true);
-      } else if(!getDisplay().rangeLengthSelected() && getDisplay().getRangeCount() == null) {
+        getView().setRangeLengthError(true);
+      } else if(!getView().rangeLengthSelected() && getView().getRangeCount() == null) {
         errorMessages.add(translations.rangesCountRequired());
-        getDisplay().setRangeCountError(true);
+        getView().setRangeCountError(true);
       }
     }
   }
@@ -215,32 +190,32 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       if(!newMethodChoice()) return;
 
       newDerivationHelper();
-      if(getDisplay().rangeSelected()) {
+      if(getView().rangeSelected()) {
         // ranges
-        if(getDisplay().rangeLengthSelected()) {
+        if(getView().rangeLengthSelected()) {
           addRangesByLengthMapping();
         } else {
           addRangesByCountMapping();
         }
-        getDisplay().enableFrequency(false);
-        getDisplay().populateValues(derivationHelper.getValueMapEntries());
-      } else if(getDisplay().discreteSelected()) {
+        getView().enableFrequency(false);
+        getView().populateValues(derivationHelper.getValueMapEntries());
+      } else if(getView().discreteSelected()) {
         addDisctinctValuesMapping();
       } else {
-        getDisplay().enableFrequency(false);
-        getDisplay().populateValues(derivationHelper.getValueMapEntries());
+        getView().enableFrequency(false);
+        getView().populateValues(derivationHelper.getValueMapEntries());
 
       }
     }
 
     private boolean newMethodChoice() {
-      if(lastChoice != null && lastChoice.isCurrentChoice(display) && lastChoice.sign(display).equals(lastChoiceSignature)) {
+      if(lastChoice != null && lastChoice.isCurrentChoice(getView()) && lastChoice.sign(getView()).equals(lastChoiceSignature)) {
         return false;
       } else {
         for(MethodChoice method : MethodChoice.values()) {
-          if(method.isCurrentChoice(display)) {
+          if(method.isCurrentChoice(getView())) {
             lastChoice = method;
-            lastChoiceSignature = method.sign(display);
+            lastChoiceSignature = method.sign(getView());
             break;
           }
         }
@@ -254,7 +229,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       .append("?nature=categorical")//
       .append("&distinct=true");
 
-      getDisplay().populateValues(new ArrayList<ValueMapEntry>());
+      getView().populateValues(new ArrayList<ValueMapEntry>());
 
       ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
       .forResource(link.toString()).get()//
@@ -264,28 +239,28 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
           CategoricalSummaryDto categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
           double maxFreq = derivationHelper.addDistinctValues(categoricalSummaryDto);
-          getDisplay().setMaxFrequency(maxFreq);
-          getDisplay().enableFrequency(true);
-          getDisplay().populateValues(derivationHelper.getValueMapEntries());
+          getView().setMaxFrequency(maxFreq);
+          getView().enableFrequency(true);
+          getView().populateValues(derivationHelper.getValueMapEntries());
         }
       }).send();
     }
 
     private void addRangesByCountMapping() {
-      double lowerLimit = getDisplay().getLowerLimit().doubleValue();
-      double upperLimit = getDisplay().getUpperLimit().doubleValue();
-      long count = getDisplay().getRangeCount().longValue();
+      double lowerLimit = getView().getLowerLimit().doubleValue();
+      double upperLimit = getView().getUpperLimit().doubleValue();
+      long count = getView().getRangeCount().longValue();
       double length = (upperLimit - lowerLimit) / count;
       addRangesByLength(length);
     }
 
     private void addRangesByLengthMapping() {
-      addRangesByLength(getDisplay().getRangeLength().doubleValue());
+      addRangesByLength(getView().getRangeLength().doubleValue());
     }
 
     private void addRangesByLength(double length) {
-      double lowerLimit = getDisplay().getLowerLimit().doubleValue();
-      double upperLimit = getDisplay().getUpperLimit().doubleValue();
+      double lowerLimit = getView().getLowerLimit().doubleValue();
+      double upperLimit = getView().getUpperLimit().doubleValue();
 
       int newValue = 1;
 
@@ -424,7 +399,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
           ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
           double from = continuous.getSummary().getMin();
           double to = continuous.getSummary().getMax();
-          getDisplay().setValueLimits(Long.valueOf((long) from), Long.valueOf((long) to + 1));
+          getView().setValueLimits(Long.valueOf((long) from), Long.valueOf((long) to + 1));
 
         }
       }
@@ -438,18 +413,18 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     @Override
     public void onClick(ClickEvent event) {
       boolean added = false;
-      if(getDisplay().addRangeSelected()) {
-        added = addValueMapEntry(getDisplay().getLowerValue(), getDisplay().getUpperValue(), getDisplay().getNewValue());
+      if(getView().addRangeSelected()) {
+        added = addValueMapEntry(getView().getLowerValue(), getView().getUpperValue(), getView().getNewValue());
       } else {
-        added = addValueMapEntry(numberType.formatNumber(getDisplay().getDiscreteValue()), getDisplay().getNewValue());
+        added = addValueMapEntry(numberType.formatNumber(getView().getDiscreteValue()), getView().getNewValue());
       }
       if(added) {
-        getDisplay().refreshValuesMapDisplay();
+        getView().refreshValuesMapDisplay();
       }
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     DefaultWizardStepController.Builder getMethodStepController();
 

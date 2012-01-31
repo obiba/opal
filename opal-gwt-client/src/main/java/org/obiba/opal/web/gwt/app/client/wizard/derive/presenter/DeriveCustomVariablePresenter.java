@@ -12,12 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
-import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
@@ -34,29 +29,36 @@ import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.View;
 
 public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCustomVariablePresenter.Display> {
 
+  private final ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
+
   @Inject
-  public DeriveCustomVariablePresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+  public DeriveCustomVariablePresenter(final EventBus eventBus, final Display view, ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
+    super(eventBus, view);
+    this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
   }
 
   @Override
   void initialize(VariableDto variable) {
     super.initialize(variable);
-    display.getRepeatable().setValue(variable.getIsRepeatable());
-    display.getTestButton().addClickHandler(new TestButtonClickHandler());
-    display.getValueType().setValue(variable.getValueType());
-    display.getScriptBox().setValue("$('" + originalVariable.getName() + "')");
-    display.addSuggestions(variable.getParentLink());
+    getView().getRepeatable().setValue(variable.getIsRepeatable());
+    getView().getTestButton().addClickHandler(new TestButtonClickHandler());
+    getView().getValueType().setValue(variable.getValueType());
+    getView().getScriptBox().setValue("$('" + originalVariable.getName() + "')");
+    getView().addSuggestions(variable.getParentLink());
+  }
+
+  @Override
+  public void onClose() {
+    scriptEvaluationPopupPresenter.getView().hide();
   }
 
   class TestButtonClickHandler implements ClickHandler {
@@ -66,70 +68,38 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
       ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(originalVariable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
         @Override
         public void onResource(Response response, TableDto table) {
-          String selectedScript = display.getScriptBox().getSelectedScript();
+          String selectedScript = getView().getScriptBox().getSelectedScript();
           VariableDto variable = getDerivedVariable();
-          if(!Strings.isNullOrEmpty(selectedScript) && !selectedScript.equals(display.getScriptBox().getValue())) {
+          if(!Strings.isNullOrEmpty(selectedScript) && !selectedScript.equals(getView().getScriptBox().getValue())) {
             variable.setValueType(ValueType.TEXT.getLabel());
             variable.setIsRepeatable(false);
             Variables.setScript(variable, selectedScript);
           }
-          eventBus.fireEvent(new ScriptEvaluationPopupEvent(variable, table, new CloseHandler<PopupPanel>() {
-
-            @Override
-            public void onClose(CloseEvent<PopupPanel> event) {
-              display.getScriptBox().focus();
-            }
-          }));
+          scriptEvaluationPopupPresenter.initialize(table, variable);
+          addToPopupSlot(scriptEvaluationPopupPresenter);
         }
       }).send();
-      display.getScriptBox().focus();
+      getView().getScriptBox().focus();
     }
-  }
-
-  @Override
-  public void refreshDisplay() {
-
-  }
-
-  @Override
-  public void revealDisplay() {
-
   }
 
   @Override
   public VariableDto getDerivedVariable() {
     VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, false);
-    derived.setIsRepeatable(display.getRepeatable().getValue());
-    DerivedVariableGenerator.setScript(derived, display.getScriptBox().getValue());
-    derived.setValueType(display.getValueType().getValue());
+    derived.setIsRepeatable(getView().getRepeatable().getValue());
+    DerivedVariableGenerator.setScript(derived, getView().getScriptBox().getValue());
+    derived.setValueType(getView().getValueType().getValue());
     return derived;
   }
 
   @Override
   List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
-    stepCtrls.add(getDisplay().getDeriveStepController().build());
+    stepCtrls.add(getView().getDeriveStepController().build());
     return stepCtrls;
   }
 
-  @Override
-  protected void onBind() {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     Builder getDeriveStepController();
 

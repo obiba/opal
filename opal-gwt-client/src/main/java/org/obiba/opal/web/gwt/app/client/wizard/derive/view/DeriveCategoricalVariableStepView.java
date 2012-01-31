@@ -26,13 +26,14 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class DeriveCategoricalVariableStepView extends Composite implements DeriveCategoricalVariableStepPresenter.Display {
+public class DeriveCategoricalVariableStepView extends ViewImpl implements DeriveCategoricalVariableStepPresenter.Display {
 
   @UiTemplate("DeriveCategoricalVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveCategoricalVariableStepView> {
@@ -51,6 +52,8 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
 
   private Translations translations = GWT.create(Translations.class);
 
+  private final Widget widget;
+
   @UiField
   WizardStep mapStep;
 
@@ -61,7 +64,13 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
   // Constructors
   //
 
+  @Inject
   public DeriveCategoricalVariableStepView() {
+    initializeValueMapGrid();
+    this.widget = uiBinder.createAndBindUi(this);
+  }
+
+  private void initializeValueMapGrid() {
     valuesMapGrid = new ValueMapGrid() {
       @Override
       protected void initializeValueColumn() {
@@ -101,8 +110,6 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
     };
     valuesMapGrid.setWidth("100%");
     valuesMapGrid.setPageSize(100);
-
-    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
@@ -121,15 +128,7 @@ public class DeriveCategoricalVariableStepView extends Composite implements Deri
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

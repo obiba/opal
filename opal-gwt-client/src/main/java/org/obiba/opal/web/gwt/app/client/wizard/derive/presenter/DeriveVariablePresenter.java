@@ -12,8 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -22,7 +20,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequir
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationHideEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
@@ -106,8 +103,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public DeriveVariablePresenter(final Display display, final EventBus eventBus, Translations translations, DeriveTemporalVariableStepPresenter temporalPresenter, DeriveCategoricalVariableStepPresenter categoricalPresenter, DeriveBooleanVariableStepPresenter booleanPresenter, DeriveNumericalVariableStepPresenter numericalPresenter, DeriveOpenTextualVariableStepPresenter openTextualPresenter, ScriptEvaluationPresenter scriptEvaluationPresenter, DeriveCustomVariablePresenter deriveCustomVariablePresenter) {
-    super(eventBus, display);
+  public DeriveVariablePresenter(final EventBus eventBus, final Display view, Translations translations, DeriveTemporalVariableStepPresenter temporalPresenter, DeriveCategoricalVariableStepPresenter categoricalPresenter, DeriveBooleanVariableStepPresenter booleanPresenter, DeriveNumericalVariableStepPresenter numericalPresenter, DeriveOpenTextualVariableStepPresenter openTextualPresenter, ScriptEvaluationPresenter scriptEvaluationPresenter, DeriveCustomVariablePresenter deriveCustomVariablePresenter) {
+    super(eventBus, view);
     this.translations = translations;
     this.categoricalPresenter = categoricalPresenter;
     this.booleanPresenter = booleanPresenter;
@@ -225,7 +222,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
         getView().setScriptEvaluationSuccess(false);
       }
     });
-    getView().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay());
+    setInSlot(Display.Slots.Summary, scriptEvaluationPresenter);
     getView().setScriptEvaluationStepInHandler(new ScriptEvaluationStepInHandler());
     addEventHandlers();
   }
@@ -246,7 +243,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   @Override
   protected void onCancel() {
     super.onCancel();
-    getEventBus().fireEvent(new ScriptEvaluationHideEvent());
+    derivationPresenter.onClose();
   }
 
   protected void addEventHandlers() {
@@ -417,7 +414,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   private void close(ViewDto view, VariableDto derived) {
     getView().hide();
-    getEventBus().fireEvent(new ScriptEvaluationHideEvent());
+    derivationPresenter.onClose();
     if(getView().isOpenEditorSelected()) {
       getEventBus().fireEvent(new ViewConfigurationRequiredEvent(view, derived));
     }
@@ -520,7 +517,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     public void onStepIn() {
       VariableDto derived = derivationPresenter.getDerivedVariable();
       scriptEvaluationPresenter.setVariable(derived);
-      scriptEvaluationPresenter.refreshDisplay();
     }
   }
 
@@ -539,6 +535,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   }
 
   public interface Display extends WizardView {
+    enum Slots {
+      Summary
+    }
 
     void setScriptEvaluationSuccess(boolean success);
 
@@ -547,8 +546,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     void populateDatasources(JsArray<DatasourceDto> datasources);
 
     void clear();
-
-    void setScriptEvaluationWidget(WidgetDisplay widget);
 
     void setScriptEvaluationStepInHandler(StepInHandler handler);
 

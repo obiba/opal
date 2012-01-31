@@ -15,7 +15,6 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
-import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -102,7 +101,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       } else {
         Variables.setScript(derived, getScript());
       }
-      eventBus.fireEvent(new ScriptEvaluationPopupEvent(derived, table));
+      // eventBus.fireEvent(new ScriptEvaluationPopupEvent(derived, table));
 
     }
   }

@@ -9,56 +9,45 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
-import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationHideEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.ScriptEvaluationPopupEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvaluationPopupPresenter.Display> {
+public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvaluationPopupPresenter.Display> {
 
-  @Inject
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
 
   @Inject
-  public ScriptEvaluationPopupPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+  public ScriptEvaluationPopupPresenter(EventBus eventBus, Display view, ScriptEvaluationPresenter scriptEvaluationPresenter) {
+    super(eventBus, view);
+    this.scriptEvaluationPresenter = scriptEvaluationPresenter;
   }
 
-  @Override
-  public void refreshDisplay() {
-    scriptEvaluationPresenter.refreshDisplay();
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
+  public void initialize(TableDto table, VariableDto variable) {
+    scriptEvaluationPresenter.setTable(table);
+    scriptEvaluationPresenter.setVariable(variable);
   }
 
   @Override
   protected void onBind() {
-    scriptEvaluationPresenter.bind();
+    super.onBind();
+    setInSlot(Display.Slots.Evaluation, scriptEvaluationPresenter);
+
     scriptEvaluationPresenter.setScriptEvaluationCallback(new ScriptEvaluationCallback() {
 
       @Override
       public void onSuccess(VariableDto variable) {
         // make sure it is visible on success
-        revealDisplay();
+        getView().show();
       }
 
       @Override
@@ -66,66 +55,27 @@ public class ScriptEvaluationPopupPresenter extends WidgetPresenter<ScriptEvalua
         // ignore
       }
     });
-    getDisplay().getButton().addClickHandler(new ClickHandler() {
 
-      @Override
-      public void onClick(ClickEvent event) {
-        getDisplay().closeDialog();
-      }
-    });
-    getDisplay().setScriptEvaluationWidget(scriptEvaluationPresenter.getDisplay().asWidget());
     addHandler();
   }
 
-  @Override
-  protected void onUnbind() {
-    scriptEvaluationPresenter.unbind();
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   private void addHandler() {
-    super.registerHandler(eventBus.addHandler(ScriptEvaluationPopupEvent.getType(), new ScriptEvaluationPopupEvent.Handler() {
+    super.registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
 
       @Override
-      public void onScriptEvaluation(final ScriptEvaluationPopupEvent event) {
-        scriptEvaluationPresenter.setTable(event.getTable());
-        scriptEvaluationPresenter.setVariable(event.getVariable());
-        if(event.getCloseHandler() != null) {
-          getDisplay().addCloseHandler(event.getCloseHandler());
-        }
-        refreshDisplay();
-      }
-    }));
-
-    super.registerHandler(eventBus.addHandler(ScriptEvaluationHideEvent.getType(), new ScriptEvaluationHideEvent.Handler() {
-
-      @Override
-      public void onScriptEvaluationHide(ScriptEvaluationHideEvent event) {
-        getDisplay().closeDialog();
+      public void onClick(ClickEvent event) {
+        getView().hide();
       }
     }));
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends PopupView {
 
-    void showDialog();
-
-    void setScriptEvaluationWidget(Widget display);
+    enum Slots {
+      Evaluation
+    }
 
     HasClickHandlers getButton();
-
-    HandlerRegistration addCloseHandler(CloseHandler<PopupPanel> handler);
-
-    void closeDialog();
-
   }
 
 }

@@ -11,19 +11,19 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-public abstract class DerivationPresenter<D extends WidgetDisplay> extends WidgetPresenter<D> {
+import com.google.gwt.event.shared.EventBus;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
+
+public abstract class DerivationPresenter<V extends View> extends PresenterWidget<V> {
 
   protected VariableDto originalVariable;
 
-  public DerivationPresenter(D display, EventBus eventBus) {
-    super(display, eventBus);
+  public DerivationPresenter(EventBus eventBus, V view) {
+    super(eventBus, view);
   }
 
   void initialize(VariableDto variable) {
@@ -32,6 +32,10 @@ public abstract class DerivationPresenter<D extends WidgetDisplay> extends Widge
 
   public VariableDto getOriginalVariable() {
     return originalVariable;
+  }
+
+  public void onClose() {
+
   }
 
   public abstract VariableDto getDerivedVariable();

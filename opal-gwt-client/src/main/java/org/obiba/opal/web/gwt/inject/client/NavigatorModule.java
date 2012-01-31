@@ -92,12 +92,12 @@ public class NavigatorModule extends AbstractOpalModule {
   }
 
   private void configureDeriveVariablePresenters() {
-    bind(DeriveCategoricalVariableStepPresenter.Display.class).to(DeriveCategoricalVariableStepView.class);
-    bind(DeriveNumericalVariableStepPresenter.Display.class).to(DeriveNumericalVariableStepView.class);
-    bind(DeriveBooleanVariableStepPresenter.Display.class).to(DeriveBooleanVariableStepView.class);
-    bind(DeriveTemporalVariableStepPresenter.Display.class).to(DeriveTemporalVariableStepView.class);
-    bind(DeriveOpenTextualVariableStepPresenter.Display.class).to(DeriveOpenTextualVariableStepView.class);
-    bind(DeriveCustomVariablePresenter.Display.class).to(DeriveCustomVariableStepView.class);
+    bindPresenterWidget(DeriveCategoricalVariableStepPresenter.class, DeriveCategoricalVariableStepPresenter.Display.class, DeriveCategoricalVariableStepView.class);
+    bindPresenterWidget(DeriveNumericalVariableStepPresenter.class, DeriveNumericalVariableStepPresenter.Display.class, DeriveNumericalVariableStepView.class);
+    bindPresenterWidget(DeriveBooleanVariableStepPresenter.class, DeriveBooleanVariableStepPresenter.Display.class, DeriveBooleanVariableStepView.class);
+    bindPresenterWidget(DeriveTemporalVariableStepPresenter.class, DeriveTemporalVariableStepPresenter.Display.class, DeriveTemporalVariableStepView.class);
+    bindPresenterWidget(DeriveOpenTextualVariableStepPresenter.class, DeriveOpenTextualVariableStepPresenter.Display.class, DeriveOpenTextualVariableStepView.class);
+    bindPresenterWidget(DeriveCustomVariablePresenter.class, DeriveCustomVariablePresenter.Display.class, DeriveCustomVariableStepView.class);
     bind(CodingViewDialogPresenter.Display.class).to(CodingViewDialogView.class);
   }
 

@@ -26,7 +26,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
@@ -34,11 +33,12 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class DeriveOpenTextualVariableStepView extends Composite implements DeriveOpenTextualVariableStepPresenter.Display {
+public class DeriveOpenTextualVariableStepView extends ViewImpl implements DeriveOpenTextualVariableStepPresenter.Display {
 
   @UiTemplate("DeriveOpenTextualVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveOpenTextualVariableStepView> {
@@ -47,6 +47,8 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   // --- Method fields ---
   @UiField
@@ -83,19 +85,15 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   MultiWordSuggestOracleWithDisplay valueOracle;
 
   public DeriveOpenTextualVariableStepView() {
+    super();
     value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplay());
-
     auto = new RadioButton(Method.group);
     manual = new RadioButton(Method.group);
-
-    initWidget(uiBinder.createAndBindUi(this));
-
+    this.widget = uiBinder.createAndBindUi(this);
     radioGroup = new RadioGroup<Method>();
     radioGroup.addButton(auto, Method.AUTOMATICALLY);
     radioGroup.addButton(manual, Method.MANUAL);
-
     auto.setValue(true);
-
     addButton.setText("Add");
   }
 
@@ -105,11 +103,8 @@ public class DeriveOpenTextualVariableStepView extends Composite implements Deri
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+  public Widget asWidget() {
+    return widget;
   }
 
   @Override

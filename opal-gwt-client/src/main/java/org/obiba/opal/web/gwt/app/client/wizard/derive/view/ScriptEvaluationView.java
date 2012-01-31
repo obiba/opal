@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ValueSetFetcher;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
@@ -35,18 +36,19 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class ScriptEvaluationView extends Composite implements ScriptEvaluationPresenter.Display {
+public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPresenter.Display {
 
   @UiTemplate("ScriptEvaluationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationView> {
@@ -57,6 +59,8 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
   private static Translations translations = GWT.create(Translations.class);
 
   private static final int DEFAULT_PAGE_SIZE = 20;
+
+  private final Widget widget;
 
   @UiField
   Panel summary;
@@ -86,10 +90,20 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
 
   private VariableDto variable;
 
+  @Inject
   public ScriptEvaluationView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    super();
+    this.widget = uiBinder.createAndBindUi(this);
     pager.setDisplay(valuesTable);
     pager.setPageSize(DEFAULT_PAGE_SIZE);
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    if(slot == Display.Slots.Summary) {
+      summary.clear();
+      summary.add(content);
+    }
   }
 
   @Override
@@ -127,8 +141,6 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
       dataProvider.removeDataDisplay(valuesTable);
       dataProvider = null;
     }
-    dataProvider = new ValueSetsDataProvider();
-    dataProvider.addDataDisplay(valuesTable);
 
     ValueColumn col = new ValueColumn(variable);
     col.setValueSelectionHandler(valueSelectionHandler);
@@ -136,6 +148,9 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
       valuesTable.removeColumn(1);
     }
     valuesTable.insertColumn(1, col, translations.valueLabel());
+
+    dataProvider = new ValueSetsDataProvider();
+    dataProvider.addDataDisplay(valuesTable);
   }
 
   @Override
@@ -159,21 +174,9 @@ public class ScriptEvaluationView extends Composite implements ScriptEvaluationP
     this.fetcher = fetcher;
   }
 
-  //
-  // Widget Display methods
-  //
-
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   //

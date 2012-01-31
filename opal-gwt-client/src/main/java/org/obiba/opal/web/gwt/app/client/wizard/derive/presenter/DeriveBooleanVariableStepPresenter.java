@@ -12,18 +12,15 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.BooleanVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
@@ -33,8 +30,8 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
   private BooleanVariableDerivationHelper derivationHelper;
 
   @Inject
-  public DeriveBooleanVariableStepPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public DeriveBooleanVariableStepPresenter(final EventBus eventBus, final Display view) {
+    super(eventBus, view);
   }
 
   //
@@ -45,7 +42,7 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
   void initialize(VariableDto variable) {
     super.initialize(variable);
     derivationHelper = new BooleanVariableDerivationHelper(variable);
-    getDisplay().populateValues(derivationHelper.getValueMapEntries());
+    getView().populateValues(derivationHelper.getValueMapEntries());
   }
 
   @Override
@@ -57,7 +54,7 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
   public List<DefaultWizardStepController> getWizardSteps() {
     List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
 
-    stepCtrls.add(getDisplay().getMapStepController().onValidate(new ValidationHandler() {
+    stepCtrls.add(getView().getMapStepController().onValidate(new ValidationHandler() {
 
       @Override
       public boolean validate() {
@@ -70,39 +67,10 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
   }
 
   //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  protected void onBind() {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  //
   // Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     DefaultWizardStepController.Builder getMapStepController();
 
