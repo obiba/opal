@@ -146,10 +146,8 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
 
   @Override
   public void populate(List<VariableDto> variables, ValueSetDto valueSet) {
-    // remove previously added variable columns
-    while(valuesTable.getColumnCount() > 1) {
-      valuesTable.removeColumn(valuesTable.getColumnCount() - 1);
-    }
+
+    populateVariables(variables, valueSet.getVariablesArray());
 
     // find the max number of occurrences among the group
     // and build the dataset
@@ -165,32 +163,48 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
       occurrences.add(new ValueOccurrence(valueSet, i));
     }
 
-    // add the variables columns
-    JsArrayString variableNames = valueSet.getVariablesArray();
-    for(int i = 0; i < variableNames.length(); i++) {
-      final String varName = variableNames.get(i);
-
-      // find the variable object and create+add the column
-      for(VariableDto var : variables) {
-        if(var.getName().equals(varName)) {
-          valuesTable.addColumn(createValueOccurrenceColumn(var, i), new Header<String>(new TextCell()) {
-
-            @Override
-            public String getValue() {
-              return varName;
-            }
-
-          });
-          break;
-        }
-      }
-
-    }
-
     // refresh data provider
     dataProvider.setList(occurrences);
     dataProvider.refresh();
     valuesTable.setEmptyTableWidget(noValues);
+  }
+
+  //
+  // Private methods
+  //
+
+  private void populateVariables(List<VariableDto> variables, JsArrayString variableNames) {
+    // remove previously added variable columns
+    while(valuesTable.getColumnCount() > 1) {
+      valuesTable.removeColumn(valuesTable.getColumnCount() - 1);
+    }
+
+    // add the variables columns
+    for(int i = 0; i < variableNames.length(); i++) {
+      final String varName = variableNames.get(i);
+
+      // find the variable object and create+add the column
+      VariableDto var = findVariable(variables, varName);
+      if(var != null) {
+        valuesTable.addColumn(createValueOccurrenceColumn(var, i), new Header<String>(new TextCell()) {
+
+          @Override
+          public String getValue() {
+            return varName;
+          }
+
+        });
+      }
+    }
+  }
+
+  private VariableDto findVariable(List<VariableDto> variables, String name) {
+    for(VariableDto var : variables) {
+      if(var.getName().equals(name)) {
+        return var;
+      }
+    }
+    return null;
   }
 
   private ValueOccurrenceColumn createValueOccurrenceColumn(VariableDto variable, int pos) {
