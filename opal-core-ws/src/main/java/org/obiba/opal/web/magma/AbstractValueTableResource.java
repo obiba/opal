@@ -122,11 +122,20 @@ abstract class AbstractValueTableResource {
     JavascriptValueSource jvs = new JavascriptValueSource(valueType, script) {
       @Override
       protected void enterContext(MagmaContext ctx, Scriptable scope) {
+        super.enterContext(ctx, scope);
+
         if(getValueTable() instanceof ValueTableWrapper) {
           ctx.push(ValueTable.class, ((ValueTableWrapper) getValueTable()).getWrappedValueTable());
         } else {
           ctx.push(ValueTable.class, getValueTable());
         }
+      }
+
+      @Override
+      protected void exitContext(MagmaContext ctx) {
+        super.exitContext(ctx);
+
+        ctx.pop(ValueTable.class);
       }
     };
     jvs.initialise();
