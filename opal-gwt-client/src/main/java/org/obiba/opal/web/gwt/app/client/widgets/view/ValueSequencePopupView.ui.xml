@@ -12,7 +12,7 @@
         <g:center>
           <g:ScrollPanel>
             <g:FlowPanel addStyleNames="small-dual-indent top-margin">
-              <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" keyStyleNames="span2 small-indent" valueStyleNames="span8">
+              <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" keyStyleNames="span2 small-indent">
                 <o:PropertyPanel>
                   <g:FlowPanel>
                     <g:InlineLabel><ui:msg description="Occurrence Group label">Occurrence Group</ui:msg></g:InlineLabel>

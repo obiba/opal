@@ -14,35 +14,16 @@
 
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-    <g:HTMLPanel ui:field="propertiesPanel">
-      <table class="item-properties small-indent">
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="select"/>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
-
-    <g:HTMLPanel ui:field="statusPanel">
-      <table class="item-properties small-indent small-top-margin">
-        <tr>
-          <td>
-            <g:Label addStyleNames="key">
-              <ui:msg description="Current Count of Identifiers label">Current Count of Identifiers</ui:msg>:
-            </g:Label>
-          </td>
-          <td>
-            <g:Label ui:field="currentCountOfIdentifiers"/>
-          </td>
-        </tr>
-      </table>
-    </g:HTMLPanel>
+    <o:PropertiesTable  ui:field="propertiesPanel" condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
+      <o:PropertyPanel>
+        <g:Label><ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg></g:Label>
+        <g:Label ui:field="select"/>
+      </o:PropertyPanel>
+      <o:PropertyPanel>
+        <g:Label><ui:msg description="Current Count of Identifiers label">Current Count of Identifiers</ui:msg></g:Label>
+        <g:Label ui:field="currentCountOfIdentifiers"/>
+      </o:PropertyPanel>
+    </o:PropertiesTable>
 
     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
 	  <g:Anchor><ui:msg description="Keystore title">Keystore</ui:msg></g:Anchor>

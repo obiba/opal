@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
@@ -42,7 +43,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -77,6 +77,9 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   FlowPanel functionalUnitDetails;
 
   @UiField
+  PropertiesTable propertiesPanel;
+
+  @UiField
   Label select;
 
   @UiField
@@ -84,12 +87,6 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
 
   @UiField
   FlowPanel toolbarPanel;
-
-  @UiField
-  Panel propertiesPanel;
-
-  @UiField
-  Panel statusPanel;
 
   private MenuBar toolbar;
 
@@ -293,7 +290,6 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
     tabs.setVisible(available);
     toolbarPanel.setVisible(available);
     propertiesPanel.setVisible(available);
-    statusPanel.setVisible(available);
   }
 
   @Override
