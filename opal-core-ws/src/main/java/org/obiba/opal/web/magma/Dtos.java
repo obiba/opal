@@ -46,15 +46,6 @@ import com.google.common.collect.Lists;
  */
 public final class Dtos {
 
-  public static final Function<Value, ValueDto> valueAsDtoFunc = new Function<Value, ValueDto>() {
-
-    @Override
-    public ValueDto apply(Value from) {
-      return asDto(from).build();
-    }
-
-  };
-
   public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc = new Function<VariableEntity, VariableEntityDto>() {
 
     @Override
@@ -224,12 +215,11 @@ public final class Dtos {
     return builder;
   }
 
-  public static ValueDto.Builder asDto(Value value) {
+  public static ValueDto.Builder asDto(String link, Value value) {
     ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(value.getValueType().getName()).setIsSequence(value.isSequence());
     if(value.isNull() == false && value.isSequence() == false) {
       if(value.getValueType().equals(BinaryType.get())) {
-        // TODO link
-        // valueBuilder.setLink();
+        valueBuilder.setLink(link);
         int length = ((byte[]) value.getValue()).length;
         valueBuilder.setValue("byte[" + length + "]");
       } else {
@@ -240,8 +230,7 @@ public final class Dtos {
     if(value.isNull() == false && value.isSequence()) {
       ValueSequence valueSeq = value.asSequence();
       for(int i = 0; i < valueSeq.getSize(); i++) {
-        // TODO link
-        valueBuilder.addValues(Dtos.asDto(/* link + "?pos=" + i, */valueSeq.get(i)).build());
+        valueBuilder.addValues(Dtos.asDto(link.isEmpty() ? link : link + "?pos=" + i, valueSeq.get(i)).build());
       }
     }
 

@@ -12,8 +12,6 @@ package org.obiba.opal.web.magma;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -35,24 +33,20 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
-import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.LinkDto;
-import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -115,30 +109,6 @@ public class VariablesResource extends AbstractValueTableResource {
     return TimestampedResponses.ok(getValueTable()).entity(excelOutput.toByteArray()).type("application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
-  @GET
-  @Path("/query")
-  @AuthorizeResource
-  public Iterable<ValueDto> getVariablesQuery(@QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
-    if(script == null) {
-      throw new InvalidRequestException("RequiredParameter", "script");
-    }
-    if(offset < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
-    }
-    if(limit != null && limit < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
-    }
-
-    Iterable<Value> values = queryVariables(getValueTable(), script, offset, limit);
-    ArrayList<ValueDto> valueDtos = Lists.newArrayList(Iterables.transform(values, new Function<Value, ValueDto>() {
-      public ValueDto apply(Value from) {
-        return Dtos.asDto(from).build();
-      }
-    }));
-
-    return valueDtos;
-  }
-
   @POST
   public Response addOrUpdateVariables(List<VariableDto> variables) {
     VariableWriter vw = null;
@@ -174,37 +144,8 @@ public class VariablesResource extends AbstractValueTableResource {
   // private methods
   //
 
-  private Iterable<Value> queryVariables(ValueTable valueTable, String script, Integer offset, Integer limit) {
-    JavascriptClause jsClause = new JavascriptClause(script);
-    jsClause.initialise();
-
-    List<Variable> variables = Lists.newArrayList(valueTable.getVariables());
-    sortVariableByName(variables);
-
-    int fromIndex = (offset < variables.size()) ? offset : variables.size();
-    int toIndex = (limit != null) ? Math.min(fromIndex + limit, variables.size()) : variables.size();
-
-    List<Value> values = new ArrayList<Value>();
-    for(Variable variable : variables.subList(fromIndex, toIndex)) {
-      values.add(jsClause.query(variable));
-    }
-
-    return values;
-  }
-
   private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
-  }
-
-  private void sortVariableByName(List<Variable> variables) {
-    Collections.sort(variables, new Comparator<Variable>() {
-
-      @Override
-      public int compare(Variable v1, Variable v2) {
-        return v1.getName().compareTo(v2.getName());
-      }
-
-    });
   }
 
   private UriBuilder tableUriBuilder(UriInfo uriInfo) {

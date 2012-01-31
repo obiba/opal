@@ -92,18 +92,19 @@ public class TableResource extends AbstractValueTableResource {
    */
   @GET
   @Path("/valueSet/{identifier}")
-  public ValueSetDto getValueSet(@PathParam("identifier") String identifier, @QueryParam("select") String select) {
+  public ValueSetDto getValueSet(@Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select) {
     VariableEntity entity = new VariableEntityBean(this.getValueTable().getEntityType(), identifier);
     Iterable<Variable> variables = filterVariables(select, 0, null);
-    return getValueSet(entity, variables);
+    return getValueSet(uriInfo, entity, variables);
   }
 
-  private ValueSetDto getValueSet(VariableEntity entity, Iterable<Variable> variables) {
+  private ValueSetDto getValueSet(final UriInfo uriInfo, VariableEntity entity, Iterable<Variable> variables) {
     ValueSet valueSet = this.getValueTable().getValueSet(entity);
     ValueSetDto.Builder builder = ValueSetDto.newBuilder().setEntity(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()));
     for(Variable variable : variables) {
       Value value = this.getValueTable().getValue(variable, valueSet);
-      builder.addVariables(variable.getName()).addValues(Dtos.asDto(value));
+      String link = uriInfo.getPath().replace("valueSet", "variable/" + variable.getName() + "/value");
+      builder.addVariables(variable.getName()).addValues(Dtos.asDto(link, value));
     }
     return builder.build();
   }
@@ -125,6 +126,9 @@ public class TableResource extends AbstractValueTableResource {
     List<String> categories = categoriesQP;
     if(script == null || script.equals("")) {
       script = scriptFP;
+    }
+    if(script == null || script.equals("")) {
+      script = "null";
     }
     if(categories == null || categories.isEmpty()) {
       categories = categoriesFP;

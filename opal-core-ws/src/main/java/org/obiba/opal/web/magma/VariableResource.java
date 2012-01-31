@@ -39,6 +39,7 @@ import org.obiba.opal.web.math.SummaryStatisticsResourceFactory;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
 public class VariableResource {
@@ -102,7 +103,14 @@ public class VariableResource {
     if(limit < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
-    return Iterables.transform(getPagingVectorSource().getValues(offset, limit), Dtos.valueAsDtoFunc);
+    return Iterables.transform(getPagingVectorSource().getValues(offset, limit), new Function<Value, ValueDto>() {
+
+      @Override
+      public ValueDto apply(Value from) {
+        return Dtos.asDto("", from).build();
+      }
+
+    });
   }
 
   @Path("/summary")
