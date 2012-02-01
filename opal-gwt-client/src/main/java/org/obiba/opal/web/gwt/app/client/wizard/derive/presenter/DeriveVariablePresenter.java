@@ -75,19 +75,19 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   private final Translations translations;
 
-  private final DeriveCategoricalVariableStepPresenter categoricalPresenter;
+  private final Provider<DeriveCategoricalVariableStepPresenter> categoricalPresenter;
 
-  private final DeriveBooleanVariableStepPresenter booleanPresenter;
+  private final Provider<DeriveBooleanVariableStepPresenter> booleanPresenter;
 
-  private final DeriveNumericalVariableStepPresenter numericalPresenter;
+  private final Provider<DeriveNumericalVariableStepPresenter> numericalPresenter;
 
-  private final DeriveTemporalVariableStepPresenter temporalPresenter;
+  private final Provider<DeriveTemporalVariableStepPresenter> temporalPresenter;
 
-  private final DeriveOpenTextualVariableStepPresenter openTextualPresenter;
+  private final Provider<DeriveOpenTextualVariableStepPresenter> openTextualPresenter;
+
+  private final Provider<DeriveCustomVariablePresenter> deriveCustomVariablePresenter;
 
   private final ScriptEvaluationPresenter scriptEvaluationPresenter;
-
-  private final DeriveCustomVariablePresenter deriveCustomVariablePresenter;
 
   private VariableDto variable;
 
@@ -103,7 +103,11 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public DeriveVariablePresenter(final EventBus eventBus, final Display view, Translations translations, DeriveTemporalVariableStepPresenter temporalPresenter, DeriveCategoricalVariableStepPresenter categoricalPresenter, DeriveBooleanVariableStepPresenter booleanPresenter, DeriveNumericalVariableStepPresenter numericalPresenter, DeriveOpenTextualVariableStepPresenter openTextualPresenter, ScriptEvaluationPresenter scriptEvaluationPresenter, DeriveCustomVariablePresenter deriveCustomVariablePresenter) {
+  public DeriveVariablePresenter(final EventBus eventBus, final Display view, Translations translations, //
+  Provider<DeriveTemporalVariableStepPresenter> temporalPresenter, Provider<DeriveCategoricalVariableStepPresenter> categoricalPresenter, //
+  Provider<DeriveBooleanVariableStepPresenter> booleanPresenter, Provider<DeriveNumericalVariableStepPresenter> numericalPresenter, //
+  Provider<DeriveOpenTextualVariableStepPresenter> openTextualPresenter, Provider<DeriveCustomVariablePresenter> deriveCustomVariablePresenter, //
+  ScriptEvaluationPresenter scriptEvaluationPresenter) {
     super(eventBus, view);
     this.translations = translations;
     this.categoricalPresenter = categoricalPresenter;
@@ -111,8 +115,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     this.numericalPresenter = numericalPresenter;
     this.temporalPresenter = temporalPresenter;
     this.openTextualPresenter = openTextualPresenter;
-    this.scriptEvaluationPresenter = scriptEvaluationPresenter;
     this.deriveCustomVariablePresenter = deriveCustomVariablePresenter;
+    this.scriptEvaluationPresenter = scriptEvaluationPresenter;
   }
 
   @Override
@@ -150,7 +154,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   }
 
   private void setCustomDerivationPresenter() {
-    derivationPresenter = deriveCustomVariablePresenter;
+    derivationPresenter = deriveCustomVariablePresenter.get();
     derivationPresenter.initialize(variable);
     getView().appendWizardSteps(derivationPresenter.getWizardSteps());
   }
@@ -164,17 +168,17 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       // should not arrive here
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("Cannot categorize binary values.").build());
     } else if(valueType.equals("text") && Variables.allCategoriesMissing(variable)) {
-      derivationPresenter = openTextualPresenter;
+      derivationPresenter = openTextualPresenter.get();
     } else if(valueType.equals("integer") || valueType.equals("decimal")) {
-      derivationPresenter = numericalPresenter;
+      derivationPresenter = numericalPresenter.get();
     } else if(valueType.equals("date") || valueType.equals("datetime")) {
-      derivationPresenter = temporalPresenter;
+      derivationPresenter = temporalPresenter.get();
     } else if(valueType.equals("text") && Variables.hasCategories(variable)) {
-      derivationPresenter = categoricalPresenter;
+      derivationPresenter = categoricalPresenter.get();
     } else if(valueType.equals("boolean")) {
-      derivationPresenter = booleanPresenter;
+      derivationPresenter = booleanPresenter.get();
     } else if(Variables.allCategoriesMissing(variable)) {
-      derivationPresenter = openTextualPresenter;
+      derivationPresenter = openTextualPresenter.get();
     }
 
     if(derivationPresenter != null) {
@@ -202,14 +206,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   @Override
   protected void onBind() {
     super.onBind();
-    categoricalPresenter.bind();
-    booleanPresenter.bind();
-    numericalPresenter.bind();
-    temporalPresenter.bind();
-    openTextualPresenter.bind();
-    deriveCustomVariablePresenter.bind();
 
-    scriptEvaluationPresenter.bind();
     scriptEvaluationPresenter.setScriptEvaluationCallback(new ScriptEvaluationCallback() {
 
       @Override
@@ -225,19 +222,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     setInSlot(Display.Slots.Summary, scriptEvaluationPresenter);
     getView().setScriptEvaluationStepInHandler(new ScriptEvaluationStepInHandler());
     addEventHandlers();
-  }
-
-  @Override
-  protected void onUnbind() {
-    super.onUnbind();
-    categoricalPresenter.unbind();
-    booleanPresenter.unbind();
-    numericalPresenter.unbind();
-    temporalPresenter.unbind();
-    openTextualPresenter.unbind();
-    deriveCustomVariablePresenter.unbind();
-
-    scriptEvaluationPresenter.unbind();
   }
 
   @Override
