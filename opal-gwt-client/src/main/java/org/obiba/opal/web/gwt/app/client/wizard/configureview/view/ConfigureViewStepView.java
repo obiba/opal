@@ -52,9 +52,6 @@ public class ConfigureViewStepView extends PopupViewImpl implements ConfigureVie
   DeckPanel helpPanelDecks;
 
   @UiField
-  SimplePanel entitiesTabPanel;
-
-  @UiField
   SimplePanel dataTabPanel;
 
   @UiField
@@ -120,13 +117,6 @@ public class ConfigureViewStepView extends PopupViewImpl implements ConfigureVie
   public void addDataTabWidget(Widget widget) {
     dataTabPanel.clear();
     dataTabPanel.add(widget);
-  }
-
-  @Override
-  public void addEntitiesTabWidget(Widget widget) {
-    entitiesTabPanel.clear();
-    viewTabs.setTabVisible(2, false);
-    // entitiesTabPanel.add(widget);
   }
 
   @Override

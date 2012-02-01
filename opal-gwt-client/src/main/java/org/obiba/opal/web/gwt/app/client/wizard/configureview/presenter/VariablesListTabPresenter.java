@@ -34,8 +34,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddR
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.VariablesListTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -98,7 +98,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   /**
    * Widget for entering, and testing, the "select" script.
    */
-  private final EvaluateScriptPresenter scriptWidget;
+  private final EvaluateScriptPresenter evaluateScriptPresenter;
 
   private ViewDto viewDto;
 
@@ -122,14 +122,13 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     this.attributesPresenter = attributesPresenter;
     this.summaryPresenter = summaryPresenter;
     this.addDerivedVariableDialogPresenter = addDerivedVariableDialogPresenter;
-    this.scriptWidget = evaluateScriptPresenter;
+    this.evaluateScriptPresenter = evaluateScriptPresenter;
     this.translations = translations;
   }
 
   @Override
   protected void onBind() {
-    scriptWidget.bind();
-    getView().setScriptWidget(scriptWidget.getDisplay());
+    setInSlot(Display.Slots.Test, evaluateScriptPresenter);
 
     categoriesPresenter.bind();
     categoriesPresenter.getDisplay().setAddButtonText(translations.addNewCategory());
@@ -148,7 +147,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   @Override
   protected void onUnbind() {
-    scriptWidget.unbind();
     categoriesPresenter.unbind();
     attributesPresenter.unbind();
     addDerivedVariableDialogPresenter.unbind();
@@ -167,7 +165,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     tableDto.setDatasourceName(viewDto.getDatasourceName());
     tableDto.setName(viewDto.getName());
     tableDto.setViewLink("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName());
-    scriptWidget.setTable(tableDto);
+    evaluateScriptPresenter.setTable(tableDto);
 
     getView().saveChangesEnabled(false);
 
@@ -270,7 +268,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     super.registerHandler(getView().addNameChangedHandler(formChangedHandler));
     super.registerHandler(getView().addValueTypeChangedHandler(formChangedHandler));
-    super.registerHandler(getView().addScriptChangeHandler(formChangedHandler));
+    super.registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(formChangedHandler));
     super.registerHandler(getView().addRepeatableValueChangeHandler(formChangedHandler));
     super.registerHandler(getView().addOccurrenceGroupChangedHandler(formChangedHandler));
     super.registerHandler(getView().addUnitChangedHandler(formChangedHandler));
@@ -325,6 +323,10 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   public interface Display extends View {
 
+    enum Slots {
+      Test
+    }
+
     HasBeforeSelectionHandlers<Integer> getDetailTabs();
 
     void displayDetailTab(int tabNumber);
@@ -377,17 +379,9 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     void setNewVariable(VariableDto variableDto);
 
-    VariableDto getVariableDto();
-
-    void setScriptWidget(EvaluateScriptPresenter.Display scriptWidgetDisplay);
+    VariableDto getVariableDto(String script);
 
     void setScriptWidgetVisible(boolean visible);
-
-    void setScript(String script);
-
-    String getScript();
-
-    HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler);
 
     void saveChangesEnabled(boolean enabled);
 
@@ -433,9 +427,19 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       formEnabled(true);
       getView().saveChangesEnabled(false);
       getView().setNewVariable(event.getVariable());
+      setScript(event.getVariable());
       updateSummaryLink(false);
       if(isTabSelected(Tabs.SUMMARY)) {
         summaryPresenter.refreshDisplay();
+      }
+    }
+
+    private void setScript(VariableDto variableDto) {
+      AttributeDto attr = Variables.getScriptAttribute(variableDto);
+      if(attr != null) {
+        evaluateScriptPresenter.setScript(attr.getValue());
+      } else {
+        evaluateScriptPresenter.setScript("");
       }
     }
   }
@@ -534,7 +538,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
       variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
 
-      currentVariableDto = getView().getVariableDto();
+      currentVariableDto = getView().getVariableDto(evaluateScriptPresenter.getScript());
       if(isEmptyVariable()) {
         // This view has no variables. Clear the variable list and save.
         variableListViewDto.clearVariablesArray();
@@ -568,8 +572,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
 
     private void updateAttributes() {
-      AttributeDto currentVariableScriptAttribute = getAttributeByName(VariablesListTabView.SCRIPT_NAME, currentVariableDto.getAttributesArray());
-      AttributeDto existingVariableScriptAttribute = getAttributeByName(VariablesListTabView.SCRIPT_NAME, attributesPresenter.getVariableDto().getAttributesArray());
+      AttributeDto currentVariableScriptAttribute = Variables.getScriptAttribute(currentVariableDto);
+      AttributeDto existingVariableScriptAttribute = Variables.getScriptAttribute(attributesPresenter.getVariableDto());
       if(existingVariableScriptAttribute != null) {
         // Duplicate 'script' attribute exists. Overwrite the existing 'script' attribute.
         existingVariableScriptAttribute.setValue(currentVariableScriptAttribute.getValue());
@@ -579,14 +583,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         currentVariableDto.setAttributesArray(attributesPresenter.getVariableDto().getAttributesArray());
         currentVariableDto.getAttributesArray().push(currentVariableScriptAttribute);
       }
-    }
-
-    private AttributeDto getAttributeByName(String attributeName, JsArray<AttributeDto> attributes) {
-      if(attributes == null) return null;
-      for(int i = 0; i < attributes.length(); i++) {
-        if(attributes.get(i).getName().equals(attributeName)) return attributes.get(i);
-      }
-      return null;
     }
 
     private boolean isEmptyVariable() {
@@ -744,7 +740,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   private void deleteCurrentVariable() {
     String nextVariableName = variableToDisplayAfterCurrentVariableDeleted();
     VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-    VariableDto variableToDelete = getView().getVariableDto();
+    VariableDto variableToDelete = getView().getVariableDto(evaluateScriptPresenter.getScript());
     @SuppressWarnings("unchecked")
     JsArray<VariableDto> newVariables = (JsArray<VariableDto>) JsArray.createArray();
     for(int i = 0; i < variableListViewDto.getVariablesArray().length(); i++) {
@@ -779,7 +775,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     if(hasChanges) {
 
       // TODO: it would probably be simpler to add a VariableDto to the body instead of putting everything on the URL
-      summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() + "/from/variable/_transient/summary?valueType=" + getView().getVariableDto().getValueType() + "&script=" + URL.encodeQueryString(scriptWidget.getScript()));
+      summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() + "/from/variable/_transient/summary?valueType=" + getView().getVariableDto(evaluateScriptPresenter.getScript()).getValueType() + "&script=" + URL.encodeQueryString(evaluateScriptPresenter.getScript()));
 
       if(categoriesPresenter.getVariableDto().getCategoriesArray() != null) {
         JsArray<CategoryDto> cats = categoriesPresenter.getVariableDto().getCategoriesArray();
@@ -883,6 +879,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
    */
   private void formEnabled(boolean enabled) {
     getView().formEnable(enabled);
+    evaluateScriptPresenter.getView().formEnable(enabled);
     categoriesPresenter.getDisplay().formEnable(enabled);
     attributesPresenter.getDisplay().formEnable(enabled);
   }
@@ -892,6 +889,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
    */
   private void formClear() {
     getView().formClear();
+    evaluateScriptPresenter.getView().formClear();
     categoriesPresenter.formClear();
     attributesPresenter.formClear();
   }

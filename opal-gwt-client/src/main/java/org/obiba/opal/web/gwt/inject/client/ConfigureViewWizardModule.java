@@ -16,7 +16,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.Attribut
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoryDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.DataTabPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.EntitiesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
@@ -25,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AttributeDial
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.CategoryDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureViewStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.DataTabView;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.EntitiesTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.LocalizablesView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.SelectScriptVariablesTabView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.VariablesListTabView;
@@ -48,7 +46,6 @@ public class ConfigureViewWizardModule extends AbstractPresenterModule {
     bind(AttributeDialogPresenter.Display.class).to(AttributeDialogView.class);
     bind(CategoryDialogPresenter.Display.class).to(CategoryDialogView.class);
     bind(DataTabPresenter.Display.class).to(DataTabView.class);
-    bind(EntitiesTabPresenter.Display.class).to(EntitiesTabView.class);
     bind(LocalizablesPresenter.Display.class).to(LocalizablesView.class);
     bind(LabelListPresenter.Display.class).to(LabelListView.class);
   }

@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectScriptVariablesTabPresenter.VariablesToView;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -45,8 +44,6 @@ public class SelectScriptVariablesTabView extends ViewImpl implements SelectScri
   @UiField
   SimplePanel scriptWidgetPanel;
 
-  private EvaluateScriptPresenter.Display scriptWidgetDisplay;
-
   private SelectScriptVariablesTabViewHelp helpWidget;
 
   public SelectScriptVariablesTabView() {
@@ -71,24 +68,15 @@ public class SelectScriptVariablesTabView extends ViewImpl implements SelectScri
   }
 
   @Override
-  public void setScriptWidget(EvaluateScriptPresenter.Display scriptWidgetDisplay) {
-    this.scriptWidgetDisplay = scriptWidgetDisplay;
-    scriptWidgetPanel.add(scriptWidgetDisplay.asWidget());
+  public void setInSlot(Object slot, Widget content) {
+    if(slot == Slots.Test) {
+      scriptWidgetPanel.add(content);
+    }
   }
 
   @Override
   public void setScriptWidgetVisible(boolean visible) {
     scriptWidgetPanel.setVisible(visible);
-  }
-
-  @Override
-  public void setScript(String script) {
-    scriptWidgetDisplay.setScript(script);
-  }
-
-  @Override
-  public String getScript() {
-    return scriptWidgetDisplay.getScript();
   }
 
   @Override
@@ -119,11 +107,6 @@ public class SelectScriptVariablesTabView extends ViewImpl implements SelectScri
   @Override
   public HandlerRegistration addVariablestoViewChangeHandler(ChangeHandler changeHandler) {
     return variablesToView.addChangeHandler(changeHandler);
-  }
-
-  @Override
-  public HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler) {
-    return scriptWidgetDisplay.addScriptChangeHandler(changeHandler);
   }
 
   @Override

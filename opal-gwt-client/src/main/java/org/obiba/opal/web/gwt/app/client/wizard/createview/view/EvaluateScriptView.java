@@ -19,13 +19,15 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class EvaluateScriptView extends Composite implements EvaluateScriptPresenter.Display {
+public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresenter.Display {
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   TextArea scriptArea;
@@ -34,7 +36,7 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
   Button testScript;
 
   public EvaluateScriptView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    this.widget = uiBinder.createAndBindUi(this);
   }
 
   @UiTemplate("EvaluateScriptView.ui.xml")
@@ -43,15 +45,7 @@ public class EvaluateScriptView extends Composite implements EvaluateScriptPrese
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override

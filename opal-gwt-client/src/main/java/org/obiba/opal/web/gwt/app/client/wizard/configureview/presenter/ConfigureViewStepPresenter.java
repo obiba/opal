@@ -47,8 +47,6 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
   private final VariablesListTabPresenter variablesListTabPresenter;
 
-  private final EntitiesTabPresenter entitiesTabPresenter;
-
   /**
    * {@link ViewDto} of view being configured.
    * 
@@ -66,21 +64,19 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   //
 
   @Inject
-  public ConfigureViewStepPresenter(final Display display, final EventBus eventBus, DataTabPresenter dataTabPresenter, SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter, VariablesListTabPresenter variablesListTabPresenter, EntitiesTabPresenter entitiesTabPresenter) {
+  public ConfigureViewStepPresenter(final Display display, final EventBus eventBus, //
+  DataTabPresenter dataTabPresenter, SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter, //
+  VariablesListTabPresenter variablesListTabPresenter) {
     super(eventBus, display);
     this.dataTabPresenter = dataTabPresenter;
     this.selectScriptVariablesTabPresenter = selectScriptVariablesTabPresenter;
     this.variablesListTabPresenter = variablesListTabPresenter;
-    this.entitiesTabPresenter = entitiesTabPresenter;
   }
 
   @Override
   protected void onBind() {
     dataTabPresenter.bind();
     getView().addDataTabWidget(dataTabPresenter.getDisplay().asWidget());
-
-    entitiesTabPresenter.bind();
-    getView().addEntitiesTabWidget(entitiesTabPresenter.getDisplay().asWidget());
 
     getView().getHelpDeck().showWidget(0);
     viewSavePending = false;
@@ -90,7 +86,6 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   @Override
   protected void onUnbind() {
     dataTabPresenter.unbind();
-    entitiesTabPresenter.unbind();
   }
 
   @Override
@@ -107,7 +102,6 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   @Override
   public void onReset() {
     dataTabPresenter.refreshDisplay();
-    entitiesTabPresenter.refreshDisplay();
   }
 
   //
@@ -164,8 +158,6 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
     HandlerRegistration addCloseClickHandler(ClickHandler handler);
 
     void addDataTabWidget(Widget widget);
-
-    void addEntitiesTabWidget(Widget widget);
 
     HorizontalTabLayout getViewTabs();
 

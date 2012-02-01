@@ -9,12 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -47,8 +43,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class VariablesListTabView extends ViewImpl implements VariablesListTabPresenter.Display {
-
-  public static final String SCRIPT_NAME = "script";
 
   private static VariablesListTabViewUiBinder uiBinder = GWT.create(VariablesListTabViewUiBinder.class);
 
@@ -108,8 +102,6 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   MultiWordSuggestOracle suggestions;
 
   private String entityType;
-
-  private EvaluateScriptPresenter.Display scriptWidgetDisplay;
 
   public VariablesListTabView() {
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
@@ -260,26 +252,23 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     setOccurrenceGroup(variableDto);
     setUnit(variableDto);
     setMimeType(variableDto);
-    setScript(variableDto);
   }
 
   @Override
-  public VariableDto getVariableDto() {
+  public VariableDto getVariableDto(String script) {
     VariableDto variableDto = VariableDto.create();
     variableDto.setName(variableName.getValue());
     variableDto.setIsRepeatable(repeatableCheckbox.getValue());
     if(repeatableCheckbox.getValue()) variableDto.setOccurrenceGroup(occurenceGroup.getValue());
     variableDto.setValueType(valueType.getValue(valueType.getSelectedIndex()));
     variableDto.setEntityType(entityType);
-    setScriptAttribute(variableDto);
+    setScriptAttribute(variableDto, script);
     variableDto.setMimeType(mimeType.getValue());
     variableDto.setUnit(unit.getValue());
     return variableDto;
   }
 
-  private void setScriptAttribute(VariableDto variableDto) {
-    String script = scriptWidgetDisplay.getScript();
-
+  private void setScriptAttribute(VariableDto variableDto, String script) {
     AttributeDto attributeDto = AttributeDto.create();
     attributeDto.setName("script");
     attributeDto.setValue(script);
@@ -295,43 +284,15 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   @Override
-  public void setScriptWidget(Display scriptWidgetDisplay) {
-    this.scriptWidgetDisplay = scriptWidgetDisplay;
-    scriptWidgetPanel.add(scriptWidgetDisplay.asWidget());
+  public void setInSlot(Object slot, Widget content) {
+    if(slot == Slots.Test) {
+      scriptWidgetPanel.add(content);
+    }
   }
 
   @Override
   public void setScriptWidgetVisible(boolean visible) {
     scriptWidgetPanel.setVisible(visible);
-  }
-
-  @Override
-  public void setScript(String script) {
-    scriptWidgetDisplay.setScript(script);
-  }
-
-  private void setScript(VariableDto variableDto) {
-    JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variableDto.getAttributesArray());
-    List<AttributeDto> attributeList = JsArrays.toList(attributes);
-    boolean foundScript = false;
-    for(AttributeDto dto : attributeList) {
-      if(dto.getName().equals(SCRIPT_NAME)) {
-        foundScript = true;
-        setScript(dto.getValue());
-        break;
-      }
-    }
-    if(!foundScript) setScript("");
-  }
-
-  @Override
-  public String getScript() {
-    return scriptWidgetDisplay.getScript();
-  }
-
-  @Override
-  public HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler) {
-    return scriptWidgetDisplay.addScriptChangeHandler(changeHandler);
   }
 
   //
@@ -442,7 +403,6 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     addButton.setEnabled(true); // Regardless of form state the add button is enabled.
     valueType.setEnabled(enabled);
     repeatableCheckbox.setEnabled(enabled);
-    scriptWidgetDisplay.formEnable(enabled);
     occurenceGroup.setEnabled(enabled);
     unit.setEnabled(enabled);
     mimeType.setEnabled(enabled);
@@ -452,7 +412,6 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   public void formClear() {
     variableName.setText("");
     repeatableCheckbox.setValue(false);
-    scriptWidgetDisplay.formClear();
     occurenceGroup.setText("");
     occurenceGroup.setEnabled(false); // Occurrence group is only enabled when repeatableCheckbox is true.
     unit.setText("");

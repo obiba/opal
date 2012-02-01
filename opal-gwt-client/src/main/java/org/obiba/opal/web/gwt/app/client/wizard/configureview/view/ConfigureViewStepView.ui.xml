@@ -21,8 +21,6 @@
 			        <g:SimplePanel ui:field="dataTabPanel" />
 			        <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
 			        <g:SimplePanel ui:field="variablesTabPanel" />
-			        <g:Anchor><ui:msg description="Entities label">Entities</ui:msg></g:Anchor>
-			        <g:SimplePanel ui:field="entitiesTabPanel" />
 			    </o:HorizontalTabLayout> 
 			    
 			    <g:DeckPanel ui:field="helpPanelDecks">

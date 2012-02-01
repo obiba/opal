@@ -60,21 +60,20 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
   /**
    * Widget for entering, and testing, the "select" script.
    */
-  private EvaluateScriptPresenter scriptWidget;
+  private EvaluateScriptPresenter evaluateScriptPresenter;
 
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   @Inject
-  public SelectScriptVariablesTabPresenter(final Display display, final EventBus eventBus, EvaluateScriptPresenter scriptWidget) {
+  public SelectScriptVariablesTabPresenter(final Display display, final EventBus eventBus, EvaluateScriptPresenter evaluateScriptPresenter) {
     super(eventBus, display);
-    this.scriptWidget = scriptWidget;
+    this.evaluateScriptPresenter = evaluateScriptPresenter;
   }
 
   @Override
   protected void onBind() {
-    scriptWidget.bind();
-    scriptWidget.showTest(false);
-    getView().setScriptWidget(scriptWidget.getDisplay());
+    evaluateScriptPresenter.showTest(false);
+    setInSlot(Display.Slots.Test, evaluateScriptPresenter);
 
     getView().saveChangesEnabled(false);
 
@@ -84,7 +83,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    scriptWidget.unbind();
+    evaluateScriptPresenter.unbind();
   }
 
   public void setViewDto(ViewDto viewDto) {
@@ -95,15 +94,15 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     TableDto tableDto = TableDto.create();
     tableDto.setDatasourceName(viewDto.getDatasourceName());
     tableDto.setName(viewDto.getName());
-    scriptWidget.setTable(tableDto);
+    evaluateScriptPresenter.setTable(tableDto);
 
     JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
     if(jsViewDto != null && jsViewDto.hasSelect()) {
       getView().setVariablesToView(VariablesToView.SCRIPT);
-      getView().setScript(jsViewDto.getSelect());
+      evaluateScriptPresenter.setScript(jsViewDto.getSelect());
     } else {
       getView().setVariablesToView(VariablesToView.ALL);
-      getView().setScript("");
+      evaluateScriptPresenter.setScript("");
     }
   }
 
@@ -112,7 +111,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     super.registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
     super.registerHandler(getView().addVariablestoViewChangeHandler(new VariablesToViewChangeHandler()));
-    super.registerHandler(getView().addScriptChangeHandler(new ScriptChangeHandler()));
+    super.registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(new ScriptChangeHandler()));
   }
 
   private boolean validate() {
@@ -139,17 +138,15 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
 
   public interface Display extends View {
 
+    enum Slots {
+      Test
+    }
+
     Widget getHelpWidget();
 
     void saveChangesEnabled(boolean enabled);
 
-    void setScriptWidget(EvaluateScriptPresenter.Display scriptWidgetDisplay);
-
     void setScriptWidgetVisible(boolean visible);
-
-    void setScript(String script);
-
-    String getScript();
 
     void setVariablesToView(VariablesToView scriptOrAll);
 
@@ -158,8 +155,6 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
 
     HandlerRegistration addVariablestoViewChangeHandler(ChangeHandler changeHandler);
-
-    HandlerRegistration addScriptChangeHandler(ChangeHandler changeHandler);
 
     ListBox getVariablesToViewListBox();
   }
@@ -193,7 +188,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
       JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
 
       if(getView().getVariablesToView().equals(VariablesToView.SCRIPT)) {
-        String script = getView().getScript().trim();
+        String script = evaluateScriptPresenter.getScript().trim();
         if(script.length() != 0) {
           jsViewDto.setSelect(script);
         } else {
@@ -220,7 +215,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     @Override
     public void onChange(ChangeEvent event) {
       if(getView().getVariablesToView() == VariablesToView.ALL) {
-        getView().setScript("");
+        evaluateScriptPresenter.setScript("");
       }
       getView().setScriptWidgetVisible(getView().getVariablesToView().equals(VariablesToView.SCRIPT));
       getView().saveChangesEnabled(true);

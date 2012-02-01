@@ -9,12 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -24,24 +19,22 @@ import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPresenter.Display> {
+public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPresenter.Display> {
 
   private TableDto table;
 
+  private ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
+
   @Inject
-  public EvaluateScriptPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
+  public EvaluateScriptPresenter(EventBus eventBus, Display view, ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
+    super(eventBus, view);
+    this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
   }
 
   @Override
@@ -49,25 +42,12 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     addEventHandlers();
   }
 
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().addTestScriptClickHandler(new TestButtonClickHandler()));
+    super.registerHandler(getView().addTestScriptClickHandler(new TestButtonClickHandler()));
   }
 
   public void setReadyOnly(boolean readyOnly) {
-    getDisplay().setReadOnly(readyOnly);
+    getView().setReadOnly(readyOnly);
   }
 
   public void setTable(TableDto table) {
@@ -75,16 +55,16 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
   }
 
   public void setScript(String script) {
-    getDisplay().setScript(script);
+    getView().setScript(script);
   }
 
   public String getScript() {
-    String script = getDisplay().getScript();
+    String script = getView().getScript();
     return script.trim().equals("") ? "null" : script;
   }
 
   public void showTest(boolean b) {
-    getDisplay().showTest(b);
+    getView().showTest(b);
   }
 
   class TestButtonClickHandler implements ClickHandler {
@@ -92,7 +72,7 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
     @Override
     public void onClick(ClickEvent event) {
 
-      String selectedScript = getDisplay().getSelectedScript();
+      String selectedScript = getView().getSelectedScript();
       VariableDto derived = VariableDto.create();
       derived.setValueType(ValueType.TEXT.getLabel());
       derived.setIsRepeatable(false);
@@ -101,12 +81,12 @@ public class EvaluateScriptPresenter extends WidgetPresenter<EvaluateScriptPrese
       } else {
         Variables.setScript(derived, getScript());
       }
-      // eventBus.fireEvent(new ScriptEvaluationPopupEvent(derived, table));
-
+      scriptEvaluationPopupPresenter.initialize(table, derived);
+      addToPopupSlot(scriptEvaluationPopupPresenter);
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     String getScript();
 
