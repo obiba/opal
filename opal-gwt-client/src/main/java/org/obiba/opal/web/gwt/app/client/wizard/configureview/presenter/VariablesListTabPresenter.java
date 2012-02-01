@@ -112,7 +112,11 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   private Runnable actionRequiringConfirmation;
 
   @Inject
-  public VariablesListTabPresenter(final Display display, final EventBus eventBus, CategoriesPresenter categoriesPresenter, AttributesPresenter attributesPresenter, SummaryTabPresenter summaryPresenter, AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter, EvaluateScriptPresenter evaluateScriptPresenter, Translations translations) {
+  @SuppressWarnings("PMD.ExcessiveParameterList")
+  public VariablesListTabPresenter(final Display display, final EventBus eventBus, //
+  CategoriesPresenter categoriesPresenter, AttributesPresenter attributesPresenter, //
+  SummaryTabPresenter summaryPresenter, AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter, //
+  EvaluateScriptPresenter evaluateScriptPresenter, Translations translations) {
     super(eventBus, display);
     this.categoriesPresenter = categoriesPresenter;
     this.attributesPresenter = attributesPresenter;
