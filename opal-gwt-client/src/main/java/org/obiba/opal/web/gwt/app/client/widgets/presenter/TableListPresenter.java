@@ -120,7 +120,11 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   }
 
   public void selectTable(final TableDto table) {
-    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName()).get().withCallback(new ResourceCallback<TableDto>() {
+    selectTable(table.getDatasourceName(), table.getName());
+  }
+
+  public void selectTable(String datasourceName, String tableName) {
+    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasourceName + "/table/" + tableName).get().withCallback(new ResourceCallback<TableDto>() {
       @Override
       public void onResource(Response response, TableDto resource) {
         if(resource != null) {
@@ -129,6 +133,10 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
       }
 
     }).send();
+  }
+
+  public void addTable(TableDto table) {
+    updateTables(table);
   }
 
   private boolean updateTables(TableDto selectedTable) {

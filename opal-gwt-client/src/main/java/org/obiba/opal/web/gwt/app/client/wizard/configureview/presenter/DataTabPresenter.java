@@ -9,10 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -33,8 +31,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
@@ -43,7 +39,6 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> {
@@ -89,9 +84,6 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   @Override
   public void refreshDisplay() {
     getDisplay().saveChangesEnabled(false);
-    tableListPresenter.getTables().clear();
-    tableListPresenter.getDisplay().clear();
-    setSelectedTables();
   }
 
   @Override
@@ -183,29 +175,16 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   }
 
   private void setSelectedTables() {
+    tableListPresenter.clear();
     for(int i = 0; i < viewDto.getFromArray().length(); i++) {
       String[] parts = viewDto.getFromArray().get(i).split("\\.");
-      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + parts[0] + "/table/" + parts[1]).get().withCallback(new ResourceCallback<TableDto>() {
-        @Override
-        public void onResource(Response response, TableDto resource) {
-          List<TableDto> tableDtos = new ArrayList<TableDto>(1);
-          tableDtos.add(resource);
-          addTables(tableDtos);
-        }
-      }).send();
-    }
-  }
-
-  private void addTables(List<TableDto> tableDtos) {
-    for(TableDto dto : tableDtos) {
-      tableListPresenter.getDisplay().addTable(dto);
-      tableListPresenter.getTables().add(dto);
+      tableListPresenter.selectTable(parts[0], parts[1]);
     }
   }
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
-
     viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
+    setSelectedTables();
   }
 }
