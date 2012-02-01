@@ -40,7 +40,7 @@
               </g:row>
               <g:row>
                 <g:customCell>
-                  <g:Button ui:field="addButton" styleName="btn info"/>
+                  <g:Button ui:field="addButton" styleName="btn btn-info"/>
                 </g:customCell>
               </g:row>
             </g:Grid>

@@ -40,7 +40,7 @@ public class Grid<T> extends DataGrid<T> {
   public Grid(int pageSize) {
     super(pageSize, resources);
     setStyleName(resources.dataGridStyle().dataGridWidget());
-    addStyleName("grid");
+    addStyleName("opal-Grid");
     Image loading = new Image("image/loading.gif");
     loading.addStyleName("loading");
     setLoadingIndicator(loading);

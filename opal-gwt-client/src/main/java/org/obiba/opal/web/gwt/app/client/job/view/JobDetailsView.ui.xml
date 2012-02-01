@@ -12,7 +12,7 @@
     <g:south size="4">
       <g:HTMLPanel addStyleNames="footer">
         <span class="right-aligned top-margin">
-          <g:Button ui:field="close" styleName="btn info"><ui:msg description="Close label">Close</ui:msg></g:Button>
+          <g:Button ui:field="close" styleName="btn btn-info"><ui:msg description="Close label">Close</ui:msg></g:Button>
         </span>
       </g:HTMLPanel>
     </g:south> 

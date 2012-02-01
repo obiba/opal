@@ -22,7 +22,7 @@
              <g:FlowPanel styleName="input">
                <o2:ScriptSuggestBox ui:field="scriptBox" addStyleNames="x-high full-width"/>
                <g:Label styleName="help-block inline"><ui:msg description="Script Help label">Edit the script and test it. Or select a portion of the script and test it.</ui:msg></g:Label>
-               <g:Button ui:field="testButton" addStyleNames="btn info right-aligned" >
+               <g:Button ui:field="testButton" addStyleNames="btn btn-info right-aligned" >
   		         <ui:msg description="Test label">Test</ui:msg>
   		       </g:Button>
   		     </g:FlowPanel>

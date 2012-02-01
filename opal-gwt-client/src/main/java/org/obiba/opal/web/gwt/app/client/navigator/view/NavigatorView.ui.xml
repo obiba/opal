@@ -10,13 +10,13 @@
     <g:Label><ui:msg description="Datasources label">Datasources</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="createDatasourceButton" styleName="btn icon-before icon-plus">
+      <g:Button ui:field="createDatasourceButton" styleName="btn icon-before i-plus">
         <ui:msg description="Create Datasource label">Create Datasource</ui:msg>
       </g:Button>
-      <g:Button ui:field="importDataButton" styleName="btn icon-before icon-up">
+      <g:Button ui:field="importDataButton" styleName="btn icon-before i-up">
         <ui:msg description="Data Import label">Import Data</ui:msg>
       </g:Button>
-      <g:Button ui:field="exportDataButton" styleName="btn icon-before icon-down">
+      <g:Button ui:field="exportDataButton" styleName="btn icon-before i-down">
         <ui:msg description="Data Export label">Export Data</ui:msg>
       </g:Button>
       <o:HelpImage page="Working+with+Datasources"></o:HelpImage>

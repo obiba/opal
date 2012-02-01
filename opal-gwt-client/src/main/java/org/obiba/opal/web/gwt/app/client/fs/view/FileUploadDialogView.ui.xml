@@ -33,7 +33,7 @@
         <g:south size="4">
           <g:HTMLPanel addStyleNames="footer">
             <span class="right-aligned top-margin">
-              <g:Button ui:field="uploadButton" styleName="btn primary">
+              <g:Button ui:field="uploadButton" styleName="btn btn-primary">
                 <ui:msg description="Upload button label">Upload</ui:msg>
               </g:Button>
               <g:Button ui:field="cancelButton" styleName="btn">

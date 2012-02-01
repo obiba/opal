@@ -10,7 +10,7 @@
     <g:FlowPanel addStyleNames="input">
       <g:InlineLabel ui:field="typeLabel" addStyleNames="key"/>
       <g:SuggestBox ui:field="principal"/>
-      <g:Button ui:field="add" addStyleNames="btn primary xsmall-indent"><ui:msg description="Add button label">Add</ui:msg></g:Button>
+      <g:Button ui:field="add" styleName="btn btn-primary xsmall-indent"><ui:msg description="Add button label">Add</ui:msg></g:Button>
     </g:FlowPanel>
     <g:FlowPanel addStyleNames="top-margin">
       <c:SimplePager ui:field="pager" location="CENTER"/>

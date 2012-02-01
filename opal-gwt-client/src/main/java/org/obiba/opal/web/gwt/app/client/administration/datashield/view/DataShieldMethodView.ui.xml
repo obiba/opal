@@ -38,7 +38,7 @@
           <g:Button ui:field="cancelButton" addStyleNames="btn right-aligned top-margin">
             <ui:msg description="Cancel button label">Cancel</ui:msg>
           </g:Button>
-          <g:Button ui:field="saveButton" addStyleNames="btn primary right-aligned top-margin primary">
+          <g:Button ui:field="saveButton" addStyleNames="btn btn-primary right-aligned top-margin btn-primary">
             <ui:msg description="Save button label">Save</ui:msg>
           </g:Button>
         </g:FlowPanel>

@@ -19,7 +19,7 @@
           <g:Label addStyleNames="key"><ui:msg description="Password field label">Password</ui:msg></g:Label>
           <g:PasswordTextBox ui:field="password"/>
         </g:FlowPanel>
-        <g:Button ui:field="login" styleName="btn info"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
+        <g:Button ui:field="login" styleName="btn btn-info"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
       </g:FlowPanel>
     </g:FlowPanel>
   </g:FlowPanel>

@@ -33,17 +33,17 @@ public class DefaultFlexTable extends FlexTable {
 
   public void setStyled(boolean styled) {
     if(styled) {
-      addStyleName("styled");
+      addStyleName("table");
     } else {
-      removeStyleName("styled");
+      removeStyleName("table");
     }
   }
 
   public void setBordered(boolean bordered) {
     if(bordered) {
-      addStyleName("bordered-table");
+      addStyleName("table-bordered");
     } else {
-      removeStyleName("bordered-table");
+      removeStyleName("table-bordered");
     }
   }
 
@@ -57,17 +57,17 @@ public class DefaultFlexTable extends FlexTable {
 
   public void setCondensed(boolean condensed) {
     if(condensed) {
-      addStyleName("condensed-table");
+      addStyleName("table-condensed");
     } else {
-      removeStyleName("condensed-table");
+      removeStyleName("table-condensed");
     }
   }
 
   public void setZebra(boolean zebra) {
     if(zebra) {
-      addStyleName("zebra-striped");
+      addStyleName("table-striped");
     } else {
-      removeStyleName("zebra-striped");
+      removeStyleName("table-striped");
     }
   }
 

@@ -16,7 +16,7 @@
       <g:south size="4">
         <g:HTMLPanel addStyleNames="footer">
           <span class="right-aligned top-margin">
-            <g:Button ui:field="createFolderButton" styleName="btn primary">
+            <g:Button ui:field="createFolderButton" styleName="btn btn-primary">
                 <ui:msg description="Create folder button label">Create Folder</ui:msg>
             </g:Button>
             <g:Button ui:field="cancelButton" styleName="btn">

@@ -10,16 +10,16 @@
     <g:Label><ui:msg description="Explorer">File Explorer</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="createFolderButton" styleName="btn icon-before icon-plus">
+      <g:Button ui:field="createFolderButton" styleName="btn icon-before i-plus">
         <ui:msg description="Create Folder label">Create Folder</ui:msg>
       </g:Button>          
-      <g:Button ui:field="fileUploadButton" styleName="btn icon-before icon-up">
+      <g:Button ui:field="fileUploadButton" styleName="btn icon-before i-up">
         <ui:msg description="Upload File label">Upload</ui:msg>
       </g:Button>
-      <g:Button ui:field="fileDownloadButton" styleName="btn icon-before icon-down">
+      <g:Button ui:field="fileDownloadButton" styleName="btn icon-before i-down">
         <ui:msg description="Download File label">Download</ui:msg>
       </g:Button>
-      <g:Button ui:field="fileDeleteButton" styleName="btn icon-before icon-disapprove">
+      <g:Button ui:field="fileDeleteButton" styleName="btn icon-before i-disapprove">
         <ui:msg description="Delete File label">Delete</ui:msg>
       </g:Button>
       <o:HelpImage page="Working+with+Files"></o:HelpImage>

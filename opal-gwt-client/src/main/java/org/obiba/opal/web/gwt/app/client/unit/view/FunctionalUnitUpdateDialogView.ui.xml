@@ -23,7 +23,7 @@
       <g:south size="4">
         <g:HTMLPanel addStyleNames="footer">
           <span class="right-aligned top-margin">
-            <g:Button ui:field="updateFunctionalUnitButton" styleName="btn primary">
+            <g:Button ui:field="updateFunctionalUnitButton" styleName="btn btn-primary">
               <ui:msg description="Save button label">Save</ui:msg>
             </g:Button>
             <g:Button ui:field="cancelButton" styleName="btn">

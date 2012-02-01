@@ -13,8 +13,8 @@
     <g:FlowPanel>
       <o:WizardStep ui:field="fileSelectionStep">
         <g:FlowPanel>
-          <g:InlineLabel><ui:msg description="Supported variables file format information">The following file format is supported for describing the variables:</ui:msg></g:InlineLabel>
-          <g:Button ui:field="downloadExcelTemplateButton" styleName="btn info small-indent"><ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template</ui:msg></g:Button>
+          <g:InlineLabel><ui:msg description="Supported variables file format btn-information">The following file format is supported for describing the variables:</ui:msg></g:InlineLabel>
+          <g:Button ui:field="downloadExcelTemplateButton" styleName="btn btn-info small-indent"><ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template</ui:msg></g:Button>
           <g:FlowPanel styleName="input">
             <g:Label ui:field="destinationLabel" addStyleNames="key" visible="false"><ui:msg description="Destination Datasource label">Destination Datasource</ui:msg></g:Label>
             <g:ListBox ui:field="datasources" name="datasources" visible="false"/>
@@ -46,7 +46,7 @@
           <p><ui:msg description="Opal Variables Template help">For complete details, refer to the "Help" sheet in the template.</ui:msg></p>
           
           <g:Label addStyleNames="title"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
-          <p><ui:msg description="Datasource to modify information">Specify the datasource to modify.  Existing tables will be updated and new tables will be created.</ui:msg></p>
+          <p><ui:msg description="Datasource to modify btn-information">Specify the datasource to modify.  Existing tables will be updated and new tables will be created.</ui:msg></p>
         
        </g:HTMLPanel>
      </g:FlowPanel>      
