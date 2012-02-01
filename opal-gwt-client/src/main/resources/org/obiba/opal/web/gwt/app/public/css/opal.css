@@ -815,6 +815,7 @@ margin-left:0.8em;
 
 .dashboard .shortcuts a img {
   margin-right: 0.8em;
+  vertical-align: middle;
 }
 
 .dashboard .shortcuts a {
@@ -824,8 +825,7 @@ margin-left:0.8em;
 }
 
 .dashboard .shortcuts span {
-  margin-left: 60px;
-  margin-top: -20px;
+  margin-left: 61px;
 }
 
 /* Variable browser */
