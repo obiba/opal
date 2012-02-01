@@ -684,6 +684,7 @@ margin-left:0.8em;
 
 .footbar a {
   color: #000000;
+  line-height: normal;
 }
 
 /* Content */
