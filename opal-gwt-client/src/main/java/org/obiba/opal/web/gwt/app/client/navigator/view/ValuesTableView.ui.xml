@@ -40,7 +40,7 @@
 <p>The following table provides a complete list and description of the special characters that can be used in regular expressions.</p>
 
 <h5>Special characters in regular expressions</h5>
-<table class="styled bordered-table zebra-striped">
+<table class="table table-bordered table-striped">
  <thead>
    <tr>
     <th>Character</th>

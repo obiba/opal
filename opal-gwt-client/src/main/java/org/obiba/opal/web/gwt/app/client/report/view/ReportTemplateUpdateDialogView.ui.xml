@@ -62,7 +62,7 @@
                       <p>
                         Full documentation is available as a <g:Anchor ui:field="cronLink">Quartz Scheduler Tutorial</g:Anchor>.
                       </p>
-                      <table cellspacing="1" cellpadding="3">
+                      <table class="table table-bordered table-striped" cellspacing="1" cellpadding="3">
 					    <tbody>
 					        <tr>
 					            <th>Field Name</th>
@@ -117,7 +117,7 @@
 			            <p>
 			              Common schedule expressions examples:
 			            </p>
-			            <table cellspacing="1" cellpadding="3">
+			            <table class="table table-bordered table-striped" cellspacing="1" cellpadding="3">
 						    <tbody>
 						        <tr>
 						            <th>Expression</th>
@@ -159,10 +159,10 @@
       <g:south size="4">
         <g:FlowPanel addStyleNames="footer">
           <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
-          <g:Button ui:field="cancelButton" addStyleNames="btn right-aligned top-margin">
+          <g:Button ui:field="cancelButton" styleName="btn right-aligned top-margin">
             <ui:msg description="Cancel button label">Cancel</ui:msg>
           </g:Button>
-          <g:Button ui:field="updateReportTemplateButton" addStyleNames="btn right-aligned top-margin primary">
+          <g:Button ui:field="updateReportTemplateButton" styleName="btn btn-primary right-aligned top-margin">
             <ui:msg description="Save button label">Save</ui:msg>
           </g:Button>
         </g:FlowPanel>
