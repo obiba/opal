@@ -120,7 +120,13 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   @Override
   public void setTable(TableDto table) {
     this.table = table;
-    valuesTable.setRowCount(table.getValueSetCount());
+
+    if(dataProvider != null) {
+      dataProvider.removeDataDisplay(valuesTable);
+      dataProvider = null;
+    }
+
+    valuesTable.setRowCount(table.getValueSetCount(), table.getValueSetCount() != 0);
 
     while(valuesTable.getColumnCount() > 0) {
       valuesTable.removeColumn(0);
@@ -193,10 +199,10 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
       // query the valuesets
       int start = range.getStart();
 
-      if(start > table.getValueSetCount()) return;
+      if(start > table.getValueSetCount() && table.getValueSetCount() > 0) return;
 
       int length = range.getLength();
-      if(start + length > table.getValueSetCount()) {
+      if(start + length > table.getValueSetCount() && table.getValueSetCount() > 0) {
         length = table.getValueSetCount() - start;
       }
 

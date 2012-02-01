@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequ
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -90,11 +89,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     this.viewDto = viewDto;
 
     viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
-
-    TableDto tableDto = TableDto.create();
-    tableDto.setDatasourceName(viewDto.getDatasourceName());
-    tableDto.setName(viewDto.getName());
-    evaluateScriptPresenter.setTable(tableDto);
+    evaluateScriptPresenter.setTable(viewDto);
 
     JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
     if(jsViewDto != null && jsViewDto.hasSelect()) {

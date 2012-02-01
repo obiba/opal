@@ -161,11 +161,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
     variableListDto.setVariablesArray(JsArrays.toSafeArray(variableListDto.getVariablesArray()));
 
-    TableDto tableDto = TableDto.create();
-    tableDto.setDatasourceName(viewDto.getDatasourceName());
-    tableDto.setName(viewDto.getName());
-    tableDto.setViewLink("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName());
-    evaluateScriptPresenter.setTable(tableDto);
+    evaluateScriptPresenter.setTable(viewDto);
 
     getView().saveChangesEnabled(false);
 

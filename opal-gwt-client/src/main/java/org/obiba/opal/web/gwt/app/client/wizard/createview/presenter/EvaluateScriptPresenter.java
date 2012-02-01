@@ -12,8 +12,11 @@ package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -21,6 +24,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -48,6 +52,16 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
 
   public void setReadyOnly(boolean readyOnly) {
     getView().setReadOnly(readyOnly);
+  }
+
+  public void setTable(ViewDto viewDto) {
+    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName()).get().withCallback(new ResourceCallback<TableDto>() {
+      @Override
+      public void onResource(Response response, TableDto resource) {
+        setTable(resource);
+      }
+
+    }).send();
   }
 
   public void setTable(TableDto table) {
