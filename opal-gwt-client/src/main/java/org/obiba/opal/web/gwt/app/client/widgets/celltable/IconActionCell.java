@@ -65,7 +65,7 @@ public class IconActionCell<C> extends AbstractCell<C> {
   public IconActionCell(String iconClass, SafeHtml message, Delegate<C> delegate) {
     super("click", "mousedown");
     this.delegate = delegate;
-    this.iconClass = iconClass;
+    this.iconClass = iconClass == null ? "" : iconClass;
     this.message = message;
   }
 
@@ -96,9 +96,17 @@ public class IconActionCell<C> extends AbstractCell<C> {
   @Override
   public void render(Context context, C value, SafeHtmlBuilder sb) {
     if(isEnabled()) {
-      sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon " + iconClass + "\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
+      if(iconClass.isEmpty()) {
+        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
+      } else {
+        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon-before " + iconClass + "\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
+      }
     } else {
-      sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon " + iconClass + " disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
+      if(iconClass.isEmpty()) {
+        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
+      } else {
+        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon-before " + iconClass + " disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
+      }
     }
   }
 

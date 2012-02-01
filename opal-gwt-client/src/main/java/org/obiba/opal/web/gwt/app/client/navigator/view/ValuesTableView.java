@@ -302,7 +302,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final class PreviousActionCell extends IconActionCell<String> {
 
     private PreviousActionCell() {
-      super("icon-previous", new PreviousDelegate());
+      super(null, "(", new PreviousDelegate());
     }
 
     @Override
@@ -315,7 +315,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final class NextActionCell extends IconActionCell<String> {
 
     private NextActionCell() {
-      super("icon-next", new NextDelegate());
+      super(null, ")", new NextDelegate());
     }
 
     @Override
