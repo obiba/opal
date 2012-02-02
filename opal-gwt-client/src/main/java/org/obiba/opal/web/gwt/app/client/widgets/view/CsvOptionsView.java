@@ -218,10 +218,7 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   //
 
   private void populateField() {
-    row.setSize("2em", "1em");
     row.setText("1");
-    field.setSize("2em", "1em");
-    quote.setSize("2em", "1em");
   }
 
   //

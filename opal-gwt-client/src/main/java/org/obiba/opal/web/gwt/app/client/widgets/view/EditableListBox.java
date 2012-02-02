@@ -17,7 +17,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -25,7 +30,9 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 
-public class EditableListBox extends TextBox implements HasText, HasValue<String> {
+public class EditableListBox extends Composite implements HasText, HasValue<String> {
+
+  private TextBox textBox = new TextBox();
 
   private PopupPanel panel = new PopupPanel(true);
 
@@ -34,14 +41,26 @@ public class EditableListBox extends TextBox implements HasText, HasValue<String
   private Map<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
 
   public EditableListBox() {
-    panel.add(menuBar);
-    panel.setStyleName("gwt-MenuBarPopup");
+    FlowPanel layout = new FlowPanel();
+    final Button ddBtn = new Button();
+    ddBtn.setStyleName("btn icon-before i-sortasc");
+    ddBtn.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        textBox.setFocus(true);
+        displaySuggestions();
+      }
+    });
 
-    addKeyDownHandler(new KeyDownHandler() {
+    layout.add(textBox);
+    layout.add(ddBtn);
+
+    initWidget(layout);
+
+    textBox.addKeyDownHandler(new KeyDownHandler() {
       public void onKeyDown(KeyDownEvent event) {
         int key = event.getNativeKeyCode();
-        String value = getValue();
-        if(value == null || value.isEmpty() || (value.length() == 1 && key == KeyCodes.KEY_BACKSPACE)) {
+        if(key == KeyCodes.KEY_DOWN || (event.isControlKeyDown() && key == ' ')) {
           displaySuggestions();
         } else {
           panel.hide();
@@ -49,11 +68,14 @@ public class EditableListBox extends TextBox implements HasText, HasValue<String
       }
     });
 
-    addClickHandler(new ClickHandler() {
-      public void onClick(ClickEvent event) {
-        displaySuggestions();
-      }
-    });
+    panel.add(menuBar);
+    panel.setStyleName("gwt-MenuBarPopup");
+
+    setStylePrimaryName("obiba-EditableListBox");
+  }
+
+  public void setTextStyleNames(String style) {
+    textBox.addStyleName(style);
   }
 
   public void addItem(final String value) {
@@ -65,8 +87,8 @@ public class EditableListBox extends TextBox implements HasText, HasValue<String
       @Override
       public void execute() {
         panel.hide();
-        EditableListBox.this.setText(value);
-        EditableListBox.this.setFocus(true);
+        textBox.setText(value);
+        textBox.setFocus(true);
       }
     });
     menuBar.addItem(item);
@@ -82,6 +104,36 @@ public class EditableListBox extends TextBox implements HasText, HasValue<String
   }
 
   private void displaySuggestions() {
-    panel.showRelativeTo(this);
+    panel.showRelativeTo(textBox);
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+    return textBox.addValueChangeHandler(handler);
+  }
+
+  @Override
+  public String getValue() {
+    return textBox.getValue();
+  }
+
+  @Override
+  public void setValue(String value) {
+    textBox.setValue(value);
+  }
+
+  @Override
+  public void setValue(String value, boolean fireEvents) {
+    textBox.setValue(value, fireEvents);
+  }
+
+  @Override
+  public String getText() {
+    return textBox.getText();
+  }
+
+  @Override
+  public void setText(String text) {
+    textBox.setText(text);
   }
 }

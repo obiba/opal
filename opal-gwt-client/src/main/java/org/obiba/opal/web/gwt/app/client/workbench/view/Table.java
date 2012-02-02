@@ -40,7 +40,7 @@ public class Table<T> extends CellTable<T> {
   public Table(int pageSize) {
     super(pageSize, resources);
     setStyleName(resources.cellTableStyle().cellTableWidget());
-    addStyleName("opal-Table");
+    addStyleName("obiba-Table");
     Image loading = new Image("image/loading.gif");
     loading.addStyleName("loading");
     setLoadingIndicator(loading);

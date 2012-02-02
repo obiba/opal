@@ -519,7 +519,7 @@ img.clickable {
 
 /* CellTable */
 
-.opal-Table, .opal-Grid {
+.obiba-Table, .obiba-Grid {
 }
 
 .gwt-CellTable td span,
@@ -529,10 +529,10 @@ td.row-actions span {
   text-decoration: underline;
 }
 
-.opal-Table .empty-label, 
-.opal-Grid .empty-label,
-.opal-Table .loading, 
-.opal-Grid .loading {
+.obiba-Table .empty-label, 
+.obiba-Grid .empty-label,
+.obiba-Table .loading, 
+.obiba-Grid .loading {
   padding: 4px 15px;
   float: left;
   text-decoration: none;
@@ -1429,6 +1429,7 @@ div.variablesListTabContent .form table {
 .tooltip .header a, .tooltip .header a:visited, .tooltip .header a:hover {
   color: #444444;
   text-decoration: none;
+  font-size: 0.8em;
 }
 
 .tooltip .content {
@@ -1678,20 +1679,23 @@ textarea.error:focus {
   width: 100px;
 }
 
-/* Dropdown suggest box */
+/* Dropdown suggest box / Editable list box */
 
-.obiba-DropdownSuggestBox {
+.obiba-DropdownSuggestBox,
+.obiba-EditableListBox {
   
 }
 
-.obiba-DropdownSuggestBox .gwt-SuggestBox {
+.obiba-DropdownSuggestBox .gwt-SuggestBox,
+.obiba-EditableListBox .gwt-TextBox {
   -webkit-border-radius:3px 0 0 3px;
   -moz-border-radius:3px 0 0 3px;
   border-radius: 3px 0 0 3px;
   border-right: none;
 }
 
-.obiba-DropdownSuggestBox .btn {
+.obiba-DropdownSuggestBox .btn,
+.obiba-EditableListBox .btn {
   -webkit-border-radius:0 4px 4px 0;
   -moz-border-radius:0 4px 4px 0;
   border-radius: 0 4px 4px 0;
@@ -1702,7 +1706,8 @@ textarea.error:focus {
   color: #666;
 }
 
-.obiba-DropdownSuggestBox .btn.icon-before:before {
+.obiba-DropdownSuggestBox .btn.icon-before:before,
+.obiba-EditableListBox .btn.icon-before:before {
   margin-right:0;
 }
 

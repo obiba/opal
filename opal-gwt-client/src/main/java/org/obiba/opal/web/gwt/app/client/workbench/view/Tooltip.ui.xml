@@ -12,7 +12,7 @@
         <g:HTMLPanel addStyleNames="header">
           <g:InlineLabel ui:field="caption"><ui:msg description="Information label">Information</ui:msg></g:InlineLabel>
           <span style="float: right;">
-            <g:Anchor ui:field="okay">x</g:Anchor>
+            <g:Anchor ui:field="okay" addStyleNames="icon">'</g:Anchor>
           </span>
         </g:HTMLPanel>
       </g:north>

@@ -11,16 +11,19 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 
 /**
  *
  */
-public class DropdownSuggestBox extends Composite implements HasText {
+public class DropdownSuggestBox extends Composite implements HasText, HasValue<String> {
 
   private DefaultSuggestBox suggestBox;
 
@@ -46,6 +49,10 @@ public class DropdownSuggestBox extends Composite implements HasText {
     setStylePrimaryName("obiba-DropdownSuggestBox");
   }
 
+  public void setTextStyleNames(String style) {
+    suggestBox.addStyleName(style);
+  }
+
   @Override
   public String getText() {
     return suggestBox.getText();
@@ -58,5 +65,25 @@ public class DropdownSuggestBox extends Composite implements HasText {
 
   public MultiWordSuggestOracle getSuggestOracle() {
     return (MultiWordSuggestOracle) suggestBox.getSuggestOracle();
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+    return suggestBox.addValueChangeHandler(handler);
+  }
+
+  @Override
+  public String getValue() {
+    return getText();
+  }
+
+  @Override
+  public void setValue(String value) {
+    setText(value);
+  }
+
+  @Override
+  public void setValue(String value, boolean fireEvents) {
+    suggestBox.setValue(value, fireEvents);
   }
 }
