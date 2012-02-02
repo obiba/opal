@@ -49,9 +49,9 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   private static Cell<String> createCell(final VariableDto variable) {
     if(variable.getIsRepeatable()) {
-      return new ClickableTextCell(new ClickableIconRenderer("icon-list"));
+      return new ClickableTextCell(new ClickableIconRenderer("i-list"));
     } else if(variable.getValueType().equalsIgnoreCase("binary")) {
-      return new ClickableTextCell(new ClickableIconRenderer("icon-down"));
+      return new ClickableTextCell(new ClickableIconRenderer("i-down"));
     } else {
       return new TextCell();
     }

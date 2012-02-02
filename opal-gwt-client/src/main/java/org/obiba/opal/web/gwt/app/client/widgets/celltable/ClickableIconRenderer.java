@@ -24,6 +24,6 @@ public class ClickableIconRenderer extends AbstractSafeHtmlRenderer<String> {
   @Override
   public SafeHtml render(String object) {
     if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
-    return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"icon " + iconClass + "\">").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
+    return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"icon-before " + iconClass + "\">").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
   }
 }
