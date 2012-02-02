@@ -1787,6 +1787,7 @@ ul.closeables li a {
 
 a.icon, a.icon-before {
   text-decoration: none;
+  display: inline;
 }
 
 a.icon:hover {
