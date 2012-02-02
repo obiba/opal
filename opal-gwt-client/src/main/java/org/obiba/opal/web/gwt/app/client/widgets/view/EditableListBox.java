@@ -9,14 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -24,10 +29,13 @@ public class EditableListBox extends TextBox implements HasText, HasValue<String
 
   private PopupPanel panel = new PopupPanel(true);
 
-  private ListBox listBox = new ListBox(true);
+  private MenuBar menuBar = new MenuBar(true);
+
+  private Map<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
 
   public EditableListBox() {
-    panel.add(listBox);
+    panel.add(menuBar);
+    panel.setStyleName("gwt-MenuBarPopup");
 
     addKeyDownHandler(new KeyDownHandler() {
       public void onKeyDown(KeyDownEvent event) {
@@ -46,45 +54,34 @@ public class EditableListBox extends TextBox implements HasText, HasValue<String
         displaySuggestions();
       }
     });
-
-    listBox.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        useSuggestion();
-      }
-    });
   }
 
-  public void addItem(String value) {
-    listBox.addItem(value);
+  public void addItem(final String value) {
+    if(menuItemsMap.containsKey(value)) {
+      removeItem(value);
+    }
+    MenuItem item = new MenuItem(value, new Command() {
+
+      @Override
+      public void execute() {
+        panel.hide();
+        EditableListBox.this.setText(value);
+        EditableListBox.this.setFocus(true);
+      }
+    });
+    menuBar.addItem(item);
+    menuItemsMap.put(value, item);
   }
 
   public void removeItem(String value) {
-    int index = getIndex(value);
-    if(index >= 0) {
-      listBox.removeItem(index);
+    MenuItem item = menuItemsMap.get(value);
+    if(value != null) {
+      menuBar.removeItem(item);
+      menuItemsMap.remove(value);
     }
-  }
-
-  private int getIndex(String value) {
-    for(int i = 0; i < listBox.getItemCount(); i++) {
-      if(value.equals(listBox.getValue(i))) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   private void displaySuggestions() {
-    listBox.setSelectedIndex(getIndex(getValue()));
     panel.showRelativeTo(this);
   }
-
-  private void useSuggestion() {
-    panel.hide();
-    setText(listBox.getValue(listBox.getSelectedIndex()));
-    setFocus(true);
-  }
-
 }
