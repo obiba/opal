@@ -122,11 +122,9 @@ public class GwtApp implements EntryPoint {
         if(credentials != null && credentials.hasCredentials()) {
           // calling this makes the session expired event to be fired in return
           ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().send();
-
           credentials.invalidate();
-          opalGinjector.getPlaceManager().revealDefaultPlace();
         }
-
+        opalGinjector.getPlaceManager().revealDefaultPlace();
       }
     });
 
