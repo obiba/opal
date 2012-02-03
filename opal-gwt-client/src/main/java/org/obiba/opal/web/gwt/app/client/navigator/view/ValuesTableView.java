@@ -336,7 +336,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return (firstVisibleIndex + getMaxVisibleColumns() >= listVariable.size() - 1) == false;
+      return (listVariable.size() - firstVisibleIndex > getMaxVisibleColumns());
     }
 
   }
