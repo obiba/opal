@@ -323,7 +323,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return firstVisibleIndex > 0;
+      return refreshPending.isVisible() == false && firstVisibleIndex > 0;
     }
 
   }
@@ -336,7 +336,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return (listVariable.size() - firstVisibleIndex > getMaxVisibleColumns());
+      return refreshPending.isVisible() == false && (listVariable.size() - firstVisibleIndex > getMaxVisibleColumns());
     }
 
   }
