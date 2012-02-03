@@ -15,7 +15,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -30,6 +32,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BinaryType;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.magma.support.MimetypesFileExtensionsMap;
@@ -61,7 +64,7 @@ public class VariableResource {
   }
 
   @Path("/valueSets")
-  public ValueSetsResource getValueSets() {
+  public ValueSetsResource getValueSets(@Context Request request) {
     return new ValueSetsResource(valueTable, vvs);
   }
 
@@ -94,6 +97,7 @@ public class VariableResource {
     } catch(NoSuchValueSetException ex) {
       return Response.status(Status.NOT_FOUND).build();
     }
+
   }
 
   @GET
@@ -150,7 +154,7 @@ public class VariableResource {
     if(variable.getValueType().equals(BinaryType.get())) {
       return getBinaryValueResponse(identifier, value);
     }
-    return Response.ok(value.toString(), value.isSequence() ? "text/csv" : MediaType.TEXT_PLAIN);
+    return TimestampedResponses.ok(valueTable, value.toString()).type(value.isSequence() ? "text/csv" : MediaType.TEXT_PLAIN);
   }
 
   private ResponseBuilder getBinaryValueResponse(String identifier, Value value) {
@@ -160,7 +164,7 @@ public class VariableResource {
     ResponseBuilder builder;
 
     // download as a file
-    builder = Response.ok(value.getValue(), getVariableMimeType(variable));
+    builder = TimestampedResponses.ok(valueTable, value.getValue()).type(getVariableMimeType(variable));
     builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier) + "\"");
 
     return builder;

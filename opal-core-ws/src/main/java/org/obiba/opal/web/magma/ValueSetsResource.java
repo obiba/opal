@@ -20,6 +20,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Value;
@@ -29,6 +30,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
 
@@ -61,16 +63,19 @@ public class ValueSetsResource extends AbstractValueTableResource {
    */
   @GET
   @POST
-  public ValueSetsDto getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
+  public Response getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
     // filter entities
     final Iterable<VariableEntity> entities = filterEntities(null, offset, limit);
 
+    ValueSetsDto vs;
     if(vvs == null) {
-      return getValueSetsDto(uriInfo, select, entities);
+      vs = getValueSetsDto(uriInfo, select, entities);
     } else {
       // ignore select parameter if value sets are accessed by variable value source
-      return getValueSetsDto(uriInfo, entities);
+      vs = getValueSetsDto(uriInfo, entities);
     }
+
+    return TimestampedResponses.ok(getValueTable(), vs).build();
   }
 
   private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final String select, final Iterable<VariableEntity> entities) {

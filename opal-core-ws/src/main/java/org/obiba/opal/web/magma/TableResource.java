@@ -22,6 +22,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Value;
@@ -92,10 +93,12 @@ public class TableResource extends AbstractValueTableResource {
    */
   @GET
   @Path("/valueSet/{identifier}")
-  public ValueSetDto getValueSet(@Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select) {
+  public Response getValueSet(@Context Request request, @Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select) {
+    TimestampedResponses.evaluate(request, getValueTable());
     VariableEntity entity = new VariableEntityBean(this.getValueTable().getEntityType(), identifier);
     Iterable<Variable> variables = filterVariables(select, 0, null);
-    return getValueSet(uriInfo, entity, variables);
+    ValueSetDto vs = getValueSet(uriInfo, entity, variables);
+    return TimestampedResponses.ok(getValueTable(), vs).build();
   }
 
   private ValueSetDto getValueSet(final UriInfo uriInfo, VariableEntity entity, Iterable<Variable> variables) {
@@ -110,7 +113,8 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @Path("/valueSets")
-  public ValueSetsResource getValueSets() {
+  public ValueSetsResource getValueSets(@Context Request request) {
+    TimestampedResponses.evaluate(request, getValueTable());
     return new ValueSetsResource(getValueTable());
   }
 
