@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
+import java.util.AbstractList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -104,7 +105,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private List<VariableDto> listVariable;
 
-  public List<String> listValueSetVariable;
+  private List<VariableDto> visibleListVariable;
+
+  private List<String> listValueSetVariable;
 
   private TableDto table;
 
@@ -153,6 +156,19 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         // else nothing to refresh
       }
     });
+
+    visibleListVariable = new AbstractList<VariableDto>() {
+
+      @Override
+      public VariableDto get(int i) {
+        return listVariable.get(firstVisibleIndex + i);
+      }
+
+      @Override
+      public int size() {
+        return Math.min(maxVisibleColumns, listVariable.size() - firstVisibleIndex);
+      }
+    };
   }
 
   @Override
@@ -341,6 +357,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       if(navigationPopup.isShowing()) return;
 
       navigate(1);
+      refreshRows();
     }
 
     @Override
@@ -374,9 +391,15 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         @Override
         public void execute() {
           navigate(steps);
+          refreshRows();
           navigationPopup.hide();
         }
       };
+    }
+
+    private void refreshRows() {
+      setRefreshing(true);
+      fetcher.request(visibleListVariable, pager.getPageStart(), pager.getPageSize());
     }
 
     protected abstract MenuBar createMenuBar();
@@ -470,7 +493,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       }
       if(filter.getText().isEmpty()) {
         setRefreshing(true);
-        fetcher.request(listVariable, start, length);
+        fetcher.request(visibleListVariable, start, length);
       } else {
         setRefreshing(true);
         fetcher.request(filter.getText(), start, length);

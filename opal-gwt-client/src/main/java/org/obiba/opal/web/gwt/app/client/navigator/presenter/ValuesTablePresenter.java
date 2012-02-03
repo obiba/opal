@@ -133,14 +133,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       if(table.getVariableCount() > variables.size()) {
         link.append("&select=");
         StringBuilder script = new StringBuilder();
+        script.append("name().matches('");
         for(int i = 0; i < variables.size(); i++) {
-          String eval = "name().eq('" + variables.get(i).getName() + "')";
           if(i > 0) {
-            script.append(".or('").append(eval).append("')");
-          } else {
-            script.append(eval);
+            script.append("|");
           }
+          script.append("^").append(variables.get(i).getName()).append("$");
         }
+        script.append("')");
         link.append(URL.encodePathSegment(script.toString()));
       }
       doRequest(offset, link.toString());
