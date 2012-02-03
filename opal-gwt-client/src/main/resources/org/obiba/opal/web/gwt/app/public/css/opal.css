@@ -94,8 +94,12 @@ input:focus,textarea:focus,select:focus{
 
 label {
   float: none;
-  padding-left: 0.8em;
+  padding-left: 0.4em;
   padding-right: 0.8em;
+}
+
+.gwt-RadioButton label {
+  display: inline;
 }
 
 input[type="checkbox"], input[type="radio"] {
