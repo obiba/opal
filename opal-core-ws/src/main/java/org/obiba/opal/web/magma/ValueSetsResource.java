@@ -23,6 +23,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -62,7 +63,9 @@ public class ValueSetsResource extends AbstractValueTableResource {
    * @return
    */
   @GET
+  // Required to allow passing parameters in the body
   @POST
+  @Cache(isPrivate = true, mustRevalidate = true)
   public Response getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
     // filter entities
     final Iterable<VariableEntity> entities = filterEntities(null, offset, limit);

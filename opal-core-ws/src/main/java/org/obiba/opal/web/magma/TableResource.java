@@ -25,6 +25,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -93,6 +94,7 @@ public class TableResource extends AbstractValueTableResource {
    */
   @GET
   @Path("/valueSet/{identifier}")
+  @Cache(isPrivate = true, mustRevalidate = true)
   public Response getValueSet(@Context Request request, @Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select) {
     TimestampedResponses.evaluate(request, getValueTable());
     VariableEntity entity = new VariableEntityBean(this.getValueTable().getEntityType(), identifier);
