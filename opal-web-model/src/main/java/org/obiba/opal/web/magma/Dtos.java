@@ -226,42 +226,14 @@ public final class Dtos {
     ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(value.getValueType().getName()).setIsSequence(value.isSequence());
 
     if(value.isNull() == false) {
-      final ValueType type = value.getValueType();
-      Function<Object, String> toString = Functions.toStringFunction();
-      if(filterBinary == true) {
-        toString = new Function<Object, String>() {
-
-          @Override
-          public String apply(Object o) {
-            Value input = (Value) o;
-            if(type == BinaryType.get()) {
-              int length = ((byte[]) input.getValue()).length;
-              return "byte[" + length + "]";
-            }
-            return input.toString();
-          }
-        };
-      }
-
       if(link != null) {
         valueBuilder.setLink(link);
       }
-
+      Function<Object, String> toString = filterBinary ? filteredToString() : Functions.toStringFunction();
       if(value.isSequence() == false) {
         valueBuilder.setValue(toString.apply(value));
       } else {
-        Function<String, ValueDto.Optional> toOptional = new Function<String, ValueDto.Optional>() {
-
-          @Override
-          public ValueDto.Optional apply(String input) {
-            ValueDto.Optional.Builder builder = ValueDto.Optional.newBuilder();
-            if(input != null) {
-              builder.setValue(input);
-            }
-            return builder.build();
-          }
-        };
-        valueBuilder.addAllSequence(Iterables.transform(value.asSequence().getValue(), Functions.compose(toOptional, toString)));
+        valueBuilder.addAllSequence(Iterables.transform(value.asSequence().getValue(), Functions.compose(toOptional(), toString)));
       }
     }
 
@@ -300,5 +272,41 @@ public final class Dtos {
     }
 
     return builder.build();
+  }
+
+  private static Function<Object, String> filteredToString() {
+    return FilteredToStringFunction.INSTANCE;
+  }
+
+  private static Function<String, Optional> toOptional() {
+    return ToOptional.INSTANCE;
+  }
+
+  private static final class FilteredToStringFunction implements Function<Object, String> {
+    private static final FilteredToStringFunction INSTANCE = new FilteredToStringFunction();
+
+    @Override
+    public String apply(Object o) {
+      Value input = (Value) o;
+      if(input.getValueType() == BinaryType.get()) {
+        int length = ((byte[]) input.getValue()).length;
+        return "byte[" + length + "]";
+      }
+      return input.toString();
+    }
+
+  }
+
+  private static class ToOptional implements Function<String, Optional> {
+    private static final ToOptional INSTANCE = new ToOptional();
+
+    @Override
+    public ValueDto.Optional apply(String input) {
+      ValueDto.Optional.Builder builder = ValueDto.Optional.newBuilder();
+      if(input != null) {
+        builder.setValue(input);
+      }
+      return builder.build();
+    }
   }
 }
