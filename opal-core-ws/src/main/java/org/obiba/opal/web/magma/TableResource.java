@@ -39,12 +39,10 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.lang.Closeables;
-import org.obiba.magma.support.Values;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.TableDto;
-import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
@@ -123,10 +121,7 @@ public class TableResource extends AbstractValueTableResource {
       try {
         for(int i = 0; i < valueSetDto.getVariablesCount(); i++) {
           Variable variable = getValueTable().getVariable(valueSetDto.getVariables(i));
-          ValueDto valueDto = valueSetDto.getValues(i);
-          final ValueType valueType = ValueType.Factory.forName(valueDto.getValueType());
-          Value value = valueDto.getIsSequence() == false ? valueType.valueOf(valueDto.getValue()) : valueType.sequenceOf(Iterables.transform(valueDto.getSequenceList(), Values.toValueFunction(valueType)));
-          writer.writeValue(variable, value);
+          writer.writeValue(variable, Dtos.fromDto(valueSetDto.getValues(i)));
         }
       } finally {
         Closeables.closeQuietly(writer);
@@ -143,7 +138,7 @@ public class TableResource extends AbstractValueTableResource {
     for(Variable variable : variables) {
       Value value = this.getValueTable().getValue(variable, valueSet);
       String link = uriInfo.getPath().replace("valueSet", "variable/" + variable.getName() + "/value");
-      builder.addVariables(variable.getName()).addValues(Dtos.asDto(link, value));
+      builder.addVariables(variable.getName()).addValues(Dtos.asDto(link, value, true));
     }
     return builder.build();
   }

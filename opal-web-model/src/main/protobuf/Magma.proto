@@ -165,7 +165,13 @@ message ValueDto {
   required bool isSequence = 2;
   optional string value = 3;
   optional string link = 4; // link to the value
-  repeated string sequence = 5; // value sequence
+  repeated Optional sequence = 5; // value sequence
+
+  // Allows creating a message to put in a sequence but without a value.
+  // Used to represent a null value in a sequence
+  message Optional {
+    optional string value = 1;
+  }
 }
 
 message LinkDto {

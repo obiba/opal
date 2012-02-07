@@ -20,7 +20,6 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.opal.web.magma.Dtos;
-import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableDto.Builder;
@@ -87,11 +86,7 @@ class RestValueTableWriter implements ValueTableWriter {
 
       @Override
       public void writeValue(Variable variable, Value value) {
-        ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(value.getValueType().getName()).setIsSequence(value.isSequence());
-        if(value.isNull() == false) {
-          valueBuilder.setValue(value.toString());
-        }
-        valueSetDtoBuilder.addVariables(variable.getName()).addValues(valueBuilder);
+        valueSetDtoBuilder.addVariables(variable.getName()).addValues(Dtos.asDto(value));
       }
     };
   }

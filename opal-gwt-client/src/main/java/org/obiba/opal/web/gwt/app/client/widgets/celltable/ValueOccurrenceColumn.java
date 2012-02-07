@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
+import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -18,7 +19,7 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.cellview.client.Column;
 
 public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
@@ -64,7 +65,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   @Override
   public String getValue(ValueOccurrence value) {
-    return valueRenderer.render(value.getValue(pos));
+    return valueRenderer.render(value.getValue(pos).getValue());
   }
 
   public static final class ValueOccurrence {
@@ -86,7 +87,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
       return valueSet;
     }
 
-    private JsArrayString getValueSequence(int pos) {
+    private JsArray<ValueDto.Optional> getValueSequence(int pos) {
       return JsArrays.toSafeArray(valueSet.getValuesArray().get(pos).getSequenceArray());
     }
 
@@ -94,8 +95,8 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
       return valueSet.getValuesArray().get(pos).getValueType();
     }
 
-    public String getValue(int pos) {
-      JsArrayString valueSequence = getValueSequence(pos);
+    public ValueDto.Optional getValue(int pos) {
+      JsArray<ValueDto.Optional> valueSequence = getValueSequence(pos);
       if(index >= valueSequence.length()) return null;
       return valueSequence.get(index);
     }

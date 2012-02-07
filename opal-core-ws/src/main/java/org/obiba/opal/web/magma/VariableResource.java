@@ -111,7 +111,7 @@ public class VariableResource {
 
       @Override
       public ValueDto apply(Value from) {
-        return Dtos.asDto("", from).build();
+        return Dtos.asDto("", from, true).build();
       }
 
     });
