@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -29,16 +30,21 @@ import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
+import org.obiba.magma.lang.Closeables;
+import org.obiba.magma.support.Values;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.TableDto;
+import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
@@ -59,7 +65,9 @@ public class TableResource extends AbstractValueTableResource {
 
   @GET
   public TableDto get(@Context final UriInfo uriInfo) {
-    return Dtos.asDto(getValueTable(), null).setLink(uriInfo.getPath()).build();
+    TableDto.Builder builder = Dtos.asDto(getValueTable()).setLink(uriInfo.getPath());
+    if(getValueTable().isView()) builder.setViewLink(uriInfo.getPath().replaceFirst("table", "view"));
+    return builder.build();
   }
 
   @Path("/variables")
@@ -95,12 +103,38 @@ public class TableResource extends AbstractValueTableResource {
   @GET
   @Path("/valueSet/{identifier}")
   @Cache(isPrivate = true, mustRevalidate = true)
-  public Response getValueSet(@Context Request request, @Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select) {
+  public
+      Response
+      getValueSet(@Context Request request, @Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select) {
     TimestampedResponses.evaluate(request, getValueTable());
     VariableEntity entity = new VariableEntityBean(this.getValueTable().getEntityType(), identifier);
     Iterable<Variable> variables = filterVariables(select, 0, null);
     ValueSetDto vs = getValueSet(uriInfo, entity, variables);
     return TimestampedResponses.ok(getValueTable(), vs).build();
+  }
+
+  @POST
+  @Path("/valueSet")
+  public Response getValueSet(ValueSetDto valueSetDto) {
+    VariableEntity entity = new VariableEntityBean(valueSetDto.getEntity().getEntityType(), valueSetDto.getEntity().getIdentifier());
+    ValueTableWriter tableWriter = getDatasource().createWriter(getValueTable().getName(), entity.getType());
+    try {
+      ValueSetWriter writer = tableWriter.writeValueSet(entity);
+      try {
+        for(int i = 0; i < valueSetDto.getVariablesCount(); i++) {
+          Variable variable = getValueTable().getVariable(valueSetDto.getVariables(i));
+          ValueDto valueDto = valueSetDto.getValues(i);
+          final ValueType valueType = ValueType.Factory.forName(valueDto.getValueType());
+          Value value = valueDto.getIsSequence() == false ? valueType.valueOf(valueDto.getValue()) : valueType.sequenceOf(Iterables.transform(valueDto.getSequenceList(), Values.toValueFunction(valueType)));
+          writer.writeValue(variable, value);
+        }
+      } finally {
+        Closeables.closeQuietly(writer);
+      }
+    } finally {
+      Closeables.closeQuietly(tableWriter);
+    }
+    return Response.ok().build();
   }
 
   private ValueSetDto getValueSet(final UriInfo uriInfo, VariableEntity entity, Iterable<Variable> variables) {
@@ -127,7 +161,9 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @Path("/variable/_transient")
-  public VariableResource getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
+  public
+      VariableResource
+      getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
     if(script == null || script.equals("")) {
@@ -178,7 +214,8 @@ public class TableResource extends AbstractValueTableResource {
     return new VariableResource(this.getValueTable(), source);
   }
 
-  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
+  private Variable
+      buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
     Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {

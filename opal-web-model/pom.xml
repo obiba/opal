@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -14,6 +15,10 @@
   <url>http://maven.apache.org</url>
 
   <dependencies>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
@@ -130,9 +135,9 @@
                   </fileset>
                 </path>
                 <pathconvert pathsep=" " property="protofilesList" refid="protofiles">
-					<map from="${basedir}/" to="" />
-				</pathconvert>
-				
+                  <map from="${basedir}/" to="" />
+                </pathconvert>
+
                 <!-- Compile our .proto file -->
                 <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
                   <arg value="--java_out=target/generated-sources/protobuf-server" />
@@ -181,13 +186,13 @@
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.magma</value>
                 </property>
-                 <property>
+                <property>
                   <name>use_global_json</name>
                   <value>true</value>
                 </property>
               </options>
             </protoModule>
-             <protoModule>
+            <protoModule>
               <source>src/main/protobuf/Math.proto</source>
               <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
               <outputDir>target/generated-sources/protobuf-gwt</outputDir>
@@ -197,7 +202,7 @@
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.math</value>
                 </property>
-                 <property>
+                <property>
                   <name>use_global_json</name>
                   <value>true</value>
                 </property>
@@ -213,11 +218,11 @@
                   <name>generate_helper_methods</name>
                   <value>true</value>
                 </property>
-                  <property>
+                <property>
                   <name>use_global_json</name>
                   <value>true</value>
                 </property>
-               <property>
+                <property>
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.opal</value>
@@ -234,11 +239,11 @@
                   <name>generate_helper_methods</name>
                   <value>true</value>
                 </property>
-                  <property>
+                <property>
                   <name>use_global_json</name>
                   <value>true</value>
                 </property>
-               <property>
+                <property>
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.opal.r</value>
@@ -255,11 +260,11 @@
                   <name>generate_helper_methods</name>
                   <value>true</value>
                 </property>
-                  <property>
+                <property>
                   <name>use_global_json</name>
                   <value>true</value>
                 </property>
-               <property>
+                <property>
                   <!-- Override the package name -->
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.datashield</value>
@@ -276,7 +281,7 @@
                   <name>org.obiba.opal.web.model</name>
                   <value>org.obiba.opal.web.model.client.opal</value>
                 </property>
-                 <property>
+                <property>
                   <name>use_global_json</name>
                   <value>true</value>
                 </property>

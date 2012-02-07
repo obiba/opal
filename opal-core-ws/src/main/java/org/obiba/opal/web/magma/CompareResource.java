@@ -146,14 +146,16 @@ public class CompareResource {
     return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
   }
 
-  private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables, Set<Variable> missingVariables, Set<Variable> existingVariables) {
+  private
+      TableCompareDto
+      createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables, Set<Variable> missingVariables, Set<Variable> existingVariables) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
-    dtoBuilder.setCompared(Dtos.asDto(compared, null));
+    dtoBuilder.setCompared(Dtos.asDto(compared));
 
     Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
 
     if(with != null) {
-      dtoBuilder.setWithTable(Dtos.asDto(with, null));
+      dtoBuilder.setWithTable(Dtos.asDto(with));
     }
 
     conflicts.addAll(getMissingCsvVariableConficts(compared));
@@ -184,7 +186,8 @@ public class CompareResource {
     return conflicts;
   }
 
-  private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
+  private Set<ConflictDto>
+      getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
     Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
 
     String entityType = null;

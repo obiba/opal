@@ -20,6 +20,7 @@ import org.obiba.magma.support.NullTimestamps;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableEntityProvider;
+import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.ValueSetDto;
@@ -57,12 +58,7 @@ class RestValueTable extends AbstractValueTable {
     for(final VariableDto dto : variables) {
       addVariableValueSource(new VariableValueSource() {
 
-        private final Variable v;
-
-        {
-          // TODO: this is incomplete.
-          v = Variable.Builder.newVariable(dto.getName(), ValueType.Factory.forName(dto.getValueType()), dto.getEntityType()).build();
-        }
+        private final Variable v = Dtos.fromDto(dto);
 
         @Override
         public Variable getVariable() {
@@ -91,6 +87,11 @@ class RestValueTable extends AbstractValueTable {
   @Override
   public ValueSet getValueSet(VariableEntity entity) throws NoSuchValueSetException {
     return new LazyValueSet(this, entity);
+  }
+
+  void refresh() {
+    getSources().clear();
+    initialise();
   }
 
   OpalJavaClient getOpalClient() {

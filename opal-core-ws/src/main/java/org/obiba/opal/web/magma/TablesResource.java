@@ -34,8 +34,8 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
-import org.obiba.opal.web.ws.security.AuthorizeResource;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
+import org.obiba.opal.web.ws.security.AuthorizeResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +57,13 @@ public class TablesResource {
   public List<Magma.TableDto> getTables() {
     final List<Magma.TableDto> tables = Lists.newArrayList();
     UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable");
+    UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView");
     for(ValueTable valueTable : datasource.getValueTables()) {
-      tables.add(Dtos.asDto(valueTable, tableLink).build());
+      TableDto.Builder builder = Dtos.asDto(valueTable).setLink(tableLink.build(datasource.getName(), valueTable.getName()).toString());
+      if(valueTable.isView()) {
+        builder.setViewLink(viewLink.build(datasource.getName(), valueTable.getName()).toString());
+      }
+      tables.add(builder.build());
     }
     sortByName(tables);
 

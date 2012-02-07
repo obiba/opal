@@ -165,7 +165,7 @@ message ValueDto {
   required bool isSequence = 2;
   optional string value = 3;
   optional string link = 4; // link to the value
-  repeated ValueDto values = 5; // value sequence
+  repeated string sequence = 5; // value sequence
 }
 
 message LinkDto {

@@ -22,13 +22,11 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ToggleAnchor;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ToggleAnchor.Delegate;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -154,7 +152,7 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
     List<ValueOccurrence> occurrences = new ArrayList<ValueOccurrence>();
     int max = 0;
     for(int i = 0; i < valueSet.getValuesArray().length(); i++) {
-      JsArray<ValueDto> valueSequence = valueSet.getValuesArray().get(i).getValuesArray();
+      JsArrayString valueSequence = valueSet.getValuesArray().get(i).getSequenceArray();
       if(valueSequence != null && valueSequence.length() > max) {
         max = valueSequence.length();
       }

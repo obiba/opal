@@ -1,10 +1,15 @@
 package org.obiba.opal.rest.client.magma;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.util.EntityUtils;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -30,7 +35,7 @@ public class RestDatasource extends AbstractDatasource {
   public RestDatasource(String name, OpalJavaClient opalClient, String remoteDatasource) {
     super(name, "rest");
     this.opalClient = opalClient;
-    this.datasourceURI = opalClient.newUri().segment("datasource",remoteDatasource).build();
+    this.datasourceURI = opalClient.newUri().segment("datasource", remoteDatasource).build();
   }
 
   @Override
@@ -49,7 +54,7 @@ public class RestDatasource extends AbstractDatasource {
   protected void onDispose() {
     super.onDispose();
     try {
-      //      client.getConnectionManager().shutdown();
+      opalClient.close();
     } catch(Exception ignore) {
       // ignore
     }
@@ -69,6 +74,26 @@ public class RestDatasource extends AbstractDatasource {
   }
 
   @Override
+  public ValueTableWriter createWriter(String tableName, String entityType) {
+    if(super.hasValueTable(tableName) == false) {
+      URI tableUri = newReference("tables");
+      try {
+        HttpResponse response = getOpalClient().post(tableUri, TableDto.newBuilder().setName(tableName).setEntityType(entityType).build());
+        if(response.getStatusLine().getStatusCode() != 201) {
+          throw new RuntimeException("cannot create table " + response.getStatusLine().getReasonPhrase());
+        }
+        EntityUtils.consume(response.getEntity());
+      } catch(ClientProtocolException e) {
+        throw new RuntimeException(e);
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      }
+      refresh();
+    }
+    return new RestValueTableWriter((RestValueTable) super.getValueTable(tableName));
+  }
+
+  @Override
   protected ValueTable initialiseValueTable(final String tableName) {
     return new RestValueTable(this, opalClient.getResource(TableDto.class, newReference("table", tableName), TableDto.newBuilder()));
   }
@@ -80,8 +105,7 @@ public class RestDatasource extends AbstractDatasource {
     SetView<String> tablesToAdd = Sets.difference(currentTables, cachedTableNames);
 
     for(String table : tablesToRemove) {
-      ValueTable v = super.getValueTable(table);
-      // remove table.
+      super.removeValueTable(table);
     }
     for(String table : tablesToAdd) {
       ValueTable vt = initialiseValueTable(table);
@@ -89,7 +113,7 @@ public class RestDatasource extends AbstractDatasource {
       super.addValueTable(vt);
     }
   }
-  
+
   OpalJavaClient getOpalClient() {
     return opalClient;
   }

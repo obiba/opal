@@ -13,8 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
@@ -64,19 +62,19 @@ public final class Dtos {
 
   };
 
-  public static Function<Variable, VariableDto> asDtoFunc(final LinkDto tableLink, final UriBuilder uriBuilder) {
-    return new Function<Variable, VariableDto>() {
+  public static Function<Variable, VariableDto.Builder> asDtoFunc(final LinkDto tableLink) {
+    return new Function<Variable, VariableDto.Builder>() {
 
       private int index = 0;
 
       @Override
-      public VariableDto apply(Variable from) {
-        return asDto(tableLink, uriBuilder, from, index++).build();
+      public VariableDto.Builder apply(Variable from) {
+        return asDto(tableLink, from, index++);
       }
     };
   }
 
-  public static VariableDto.Builder asDto(final LinkDto tableLink, UriBuilder uriBuilder, Variable from, Integer index) {
+  public static VariableDto.Builder asDto(final LinkDto tableLink, Variable from, Integer index) {
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
       var.setOccurrenceGroup(from.getOccurrenceGroup());
@@ -86,9 +84,6 @@ public final class Dtos {
     }
     if(from.getUnit() != null) {
       var.setUnit(from.getUnit());
-    }
-    if(uriBuilder != null) {
-      var.setLink(uriBuilder.build(from.getName()).toString());
     }
     for(Attribute attribute : from.getAttributes()) {
       var.addAttributes(asDto(attribute));
@@ -105,12 +100,12 @@ public final class Dtos {
     return var;
   }
 
-  public static VariableDto.Builder asDto(final LinkDto tableLink, UriBuilder uriBuilder, Variable from) {
-    return asDto(tableLink, uriBuilder, from, null);
+  public static VariableDto.Builder asDto(final LinkDto tableLink, Variable from) {
+    return asDto(tableLink, from, null);
   }
 
   public static VariableDto.Builder asDto(Variable from) {
-    return asDto(null, null, from);
+    return asDto(null, from);
   }
 
   public static CategoryDto.Builder asDto(Category from) {
@@ -177,20 +172,13 @@ public final class Dtos {
     return builder.build();
   }
 
-  public static TableDto.Builder asDto(ValueTable valueTable, UriBuilder uriBuilder) {
+  public static TableDto.Builder asDto(ValueTable valueTable) {
     TableDto.Builder builder = TableDto.newBuilder() //
     .setName(valueTable.getName()) //
     .setEntityType(valueTable.getEntityType()) //
     .setDatasourceName(valueTable.getDatasource().getName()) //
     .setVariableCount(Iterables.size(valueTable.getVariables())) //
     .setValueSetCount(valueTable.getVariableEntities().size());
-    if(uriBuilder != null) {
-      builder.setLink(uriBuilder.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
-    }
-    if(valueTable.isView()) {
-      UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView");
-      builder.setViewLink(viewLink.build(valueTable.getDatasource().getName(), valueTable.getName()).toString());
-    }
     return builder;
   }
 
@@ -217,20 +205,29 @@ public final class Dtos {
 
   public static ValueDto.Builder asDto(String link, Value value) {
     ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(value.getValueType().getName()).setIsSequence(value.isSequence());
-    if(value.isNull() == false && value.isSequence() == false) {
-      if(value.getValueType().equals(BinaryType.get())) {
-        valueBuilder.setLink(link);
-        int length = ((byte[]) value.getValue()).length;
-        valueBuilder.setValue("byte[" + length + "]");
-      } else {
-        valueBuilder.setValue(value.toString());
-      }
-    }
 
-    if(value.isNull() == false && value.isSequence()) {
-      ValueSequence valueSeq = value.asSequence();
-      for(int i = 0; i < valueSeq.getSize(); i++) {
-        valueBuilder.addValues(Dtos.asDto(link.isEmpty() ? link : link + "?pos=" + i, valueSeq.get(i)).build());
+    if(value.isNull() == false) {
+      final ValueType type = value.getValueType();
+      Function<Value, String> toString = new Function<Value, String>() {
+
+        @Override
+        public String apply(Value input) {
+          if(type == BinaryType.get()) {
+            int length = ((byte[]) input.getValue()).length;
+            return "byte[" + length + "]";
+          }
+          return input.toString();
+        }
+      };
+
+      if(link != null) {
+        valueBuilder.setLink(link);
+      }
+
+      if(value.isSequence() == false) {
+        valueBuilder.setValue(toString.apply(value));
+      } else {
+        valueBuilder.addAllSequence(Iterables.transform(value.asSequence().getValue(), toString));
       }
     }
 

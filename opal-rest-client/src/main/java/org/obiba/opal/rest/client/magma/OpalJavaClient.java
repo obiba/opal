@@ -7,15 +7,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.http.HttpMessage;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.auth.params.AuthParams;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -24,7 +28,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -32,6 +39,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
 
 import com.google.protobuf.Message;
 
@@ -57,14 +65,24 @@ public class OpalJavaClient {
 
     DefaultHttpClient httpClient = new DefaultHttpClient();
     httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials = new UsernamePasswordCredentials(username, password));
-    httpClient.getParams().setParameter("http.protocol.handle-authentication", Boolean.TRUE);
-    httpClient.getParams().setParameter("http.auth.target-scheme-pref", Collections.singletonList(OpalAuthScheme.NAME));
+    httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
+    httpClient.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuthScheme.NAME));
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
-    ctx = new BasicHttpContext();
-    ctx.setAttribute(ClientContext.AUTH_SCHEME_PREF, Collections.singletonList(OpalAuthScheme.NAME));
-    ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
+
+    try {
+      SSLSocketFactory factory = new SSLSocketFactory(SSLContext.getDefault(), SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+      httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", 443, factory));
+    } catch(NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    }
     this.client = httpClient;
 
+    this.ctx = new BasicHttpContext();
+    this.ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
+  }
+
+  public void close() {
+    this.client.getConnectionManager().shutdown();
   }
 
   public UriBuilder newUri() {
@@ -77,8 +95,7 @@ public class OpalJavaClient {
       try {
         return new UriBuilder(new URI(root.getScheme(), root.getHost() + ":" + root.getPort(), rootPath + "/", root.getQuery(), root.getFragment()));
       } catch(URISyntaxException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     return new UriBuilder(root);
@@ -93,7 +110,7 @@ public class OpalJavaClient {
     try {
       HttpResponse response = get(uri);
       if(response.getStatusLine().getStatusCode() >= 400) {
-        response.getEntity().consumeContent();
+        EntityUtils.consume(response.getEntity());
         throw new RuntimeException(response.getStatusLine().getReasonPhrase());
       }
       is = response.getEntity().getContent();
@@ -118,7 +135,7 @@ public class OpalJavaClient {
     try {
       HttpResponse response = get(uri);
       if(response.getStatusLine().getStatusCode() >= 400) {
-        response.getEntity().consumeContent();
+        EntityUtils.consume(response.getEntity());
         throw new RuntimeException(response.getStatusLine().getReasonPhrase());
       }
       is = response.getEntity().getContent();
@@ -182,7 +199,9 @@ public class OpalJavaClient {
   }
 
   private void authenticate(HttpMessage msg) {
-    msg.addHeader(OpalAuthScheme.authenticate(credentials, AuthParams.getCredentialCharset(msg.getParams()), false));
+    if(credentials != null) {
+      msg.addHeader(OpalAuthScheme.authenticate(credentials, AuthParams.getCredentialCharset(msg.getParams()), false));
+    }
   }
 
   private void closeQuietly(Closeable closable) {

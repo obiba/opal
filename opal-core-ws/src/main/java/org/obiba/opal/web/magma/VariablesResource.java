@@ -43,10 +43,13 @@ import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Magma.VariableDto.Builder;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -74,17 +77,24 @@ public class VariablesResource extends AbstractValueTableResource {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
 
-    UriBuilder ub = tableUriBuilder(uriInfo);
+    final UriBuilder ub = tableUriBuilder(uriInfo);
     String tableUri = ub.build().toString();
     ub.path(TableResource.class, "getVariable");
 
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
 
     Iterable<Variable> variables = filterVariables(script, offset, limit);
-    Iterable<VariableDto> entity = Iterables.transform(variables, Dtos.asDtoFunc(tableLinkBuilder.build(), ub));
+    Iterable<VariableDto> entity = Iterables.transform(variables, Functions.compose(new Function<VariableDto.Builder, VariableDto>() {
+
+      @Override
+      public VariableDto apply(Builder input) {
+        return input.setLink(ub.build(input.getName()).toString()).build();
+      }
+    }, Dtos.asDtoFunc(tableLinkBuilder.build())));
 
     // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
     return TimestampedResponses.ok(getValueTable(), new GenericEntity<Iterable<VariableDto>>(entity) {
+      // Nothing to implement. Subclassed to keep generic information at runtime.
     }).build();
   }
 
