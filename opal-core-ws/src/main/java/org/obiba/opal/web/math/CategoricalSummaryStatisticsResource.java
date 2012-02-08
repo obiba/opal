@@ -52,7 +52,7 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
 
   @GET
   @POST
-  @Cache(isPrivate = true, mustRevalidate = true)
+  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public Response compute(@QueryParam("distinct") boolean distinct) {
     Frequency freq = computeFrequencyDistribution();
     CategoricalSummaryDto.Builder builder = CategoricalSummaryDto.newBuilder();

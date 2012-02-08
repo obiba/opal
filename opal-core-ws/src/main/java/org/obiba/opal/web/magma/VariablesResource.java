@@ -68,7 +68,7 @@ public class VariablesResource extends AbstractValueTableResource {
    * @return
    */
   @GET
-  @Cache(isPrivate = true, mustRevalidate = true)
+  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public Response getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
@@ -103,7 +103,7 @@ public class VariablesResource extends AbstractValueTableResource {
   @Produces("application/vnd.ms-excel")
   @AuthenticatedByCookie
   @AuthorizeResource
-  @Cache(isPrivate = true, mustRevalidate = true)
+  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
