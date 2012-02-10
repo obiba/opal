@@ -1,6 +1,7 @@
 package org.obiba.opal.rest.client.magma;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
@@ -13,6 +14,8 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.web.model.Magma.TableDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
@@ -22,11 +25,11 @@ import com.google.common.collect.Sets.SetView;
 
 public class RestDatasource extends AbstractDatasource {
 
+  private static final Logger log = LoggerFactory.getLogger(RestDatasource.class);
+
   private final OpalJavaClient opalClient;
 
   private final URI datasourceURI;
-
-  private Set<String> cachedTableNames;
 
   public RestDatasource(String name, String opalUri, String remoteDatasource, String username, String password) throws URISyntaxException {
     this(name, new OpalJavaClient(opalUri, username, password), remoteDatasource);
@@ -40,14 +43,29 @@ public class RestDatasource extends AbstractDatasource {
 
   @Override
   public Set<ValueTable> getValueTables() {
-    refresh();
+    try {
+      refresh();
+    } catch(RuntimeException e) {
+      if(e.getCause() != null && e.getCause() instanceof ConnectException) {
+        log.warn("Failed connecting to Opal: {}", e.getCause().getMessage());
+      } else {
+        log.warn("Unexpected error while communicating with Opal", e);
+      }
+    }
     return super.getValueTables();
   }
 
   @Override
-  protected void onInitialise() {
-    super.onInitialise();
-    cachedTableNames = getValueTableNames();
+  public void initialise() {
+    try {
+      super.initialise();
+    } catch(RuntimeException e) {
+      if(e.getCause() != null && e.getCause() instanceof ConnectException) {
+        log.warn("Failed connecting to Opal: {}", e.getCause().getMessage());
+      } else {
+        log.warn("Unexpected error while communicating with Opal", e);
+      }
+    }
   }
 
   @Override
@@ -99,6 +117,13 @@ public class RestDatasource extends AbstractDatasource {
   }
 
   private void refresh() {
+    Set<String> cachedTableNames = ImmutableSet.copyOf(Iterables.transform(super.getValueTables(), new Function<ValueTable, String>() {
+
+      @Override
+      public String apply(ValueTable input) {
+        return input.getName();
+      }
+    }));
     Set<String> currentTables = getValueTableNames();
 
     SetView<String> tablesToRemove = Sets.difference(cachedTableNames, currentTables);

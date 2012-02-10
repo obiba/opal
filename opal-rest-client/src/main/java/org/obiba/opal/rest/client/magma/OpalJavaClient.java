@@ -122,7 +122,6 @@ public class OpalJavaClient {
       }
       return resources;
     } catch(IOException e) {
-      e.printStackTrace();
       throw new RuntimeException(e);
     } finally {
       closeQuietly(is);
