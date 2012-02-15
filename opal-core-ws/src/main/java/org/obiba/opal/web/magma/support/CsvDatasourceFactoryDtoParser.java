@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import java.io.File;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -54,7 +55,15 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
     for(CsvDatasourceTableBundleDto tableBundleDto : csvDto.getTablesList()) {
       File variables = tableBundleDto.hasVariables() ? resolveLocalFile(tableBundleDto.getVariables()) : null;
       File data = tableBundleDto.hasData() ? resolveLocalFile(tableBundleDto.getData()) : null;
-      ValueTable refTable = tableBundleDto.hasRefTable() ? MagmaEngineTableResolver.valueOf(tableBundleDto.getRefTable()).resolveTable() : null;
+      ValueTable refTable = null;
+      if(tableBundleDto.hasRefTable()) {
+        try {
+          refTable = MagmaEngineTableResolver.valueOf(tableBundleDto.getRefTable()).resolveTable();
+        } catch(NoSuchValueTableException e) {
+          // ref table does not exists, let data dictionary creates it self either from the provided variables
+          // or from the csv data file header
+        }
+      }
       if(refTable != null) {
         factory.addTable(refTable, data);
       } else {
