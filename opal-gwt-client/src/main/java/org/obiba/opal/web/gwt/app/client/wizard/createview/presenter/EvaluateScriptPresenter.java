@@ -95,8 +95,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
       } else {
         Variables.setScript(derived, getScript());
       }
-      scriptEvaluationPopupPresenter.initialize(table, derived);
-      addToPopupSlot(scriptEvaluationPopupPresenter);
+      scriptEvaluationPopupPresenter.initialize(table, derived, EvaluateScriptPresenter.this);
     }
   }
 

@@ -75,8 +75,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
             variable.setIsRepeatable(false);
             Variables.setScript(variable, selectedScript);
           }
-          scriptEvaluationPopupPresenter.initialize(table, variable);
-          addToPopupSlot(scriptEvaluationPopupPresenter);
+          scriptEvaluationPopupPresenter.initialize(table, variable, DeriveCustomVariablePresenter.this);
         }
       }).send();
       getView().getScriptBox().focus();

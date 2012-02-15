@@ -156,7 +156,7 @@ public interface OpalGinjector extends Ginjector {
 
   ConfirmationPresenter getConfirmationPresenter();
 
-  ScriptEvaluationPopupPresenter getScriptEvaluationPopupPresenter();
+  Provider<ScriptEvaluationPopupPresenter> getScriptEvaluationPopupPresenter();
 
   ValueSequencePopupPresenter getValueSequencePopupPresenter();
 

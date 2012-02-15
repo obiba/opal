@@ -21,10 +21,13 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvaluationPopupPresenter.Display> {
 
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
+
+  private PresenterWidget<? extends View> parent;
 
   @Inject
   public ScriptEvaluationPopupPresenter(EventBus eventBus, Display view, ScriptEvaluationPresenter scriptEvaluationPresenter) {
@@ -32,7 +35,8 @@ public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvalua
     this.scriptEvaluationPresenter = scriptEvaluationPresenter;
   }
 
-  public void initialize(TableDto table, VariableDto variable) {
+  public void initialize(TableDto table, VariableDto variable, PresenterWidget<? extends View> parent) {
+    this.parent = parent;
     scriptEvaluationPresenter.setTable(table);
     scriptEvaluationPresenter.setVariable(variable);
   }
@@ -41,21 +45,17 @@ public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvalua
   protected void onBind() {
     super.onBind();
     setInSlot(Display.Slots.Evaluation, scriptEvaluationPresenter);
-
     scriptEvaluationPresenter.setScriptEvaluationCallback(new ScriptEvaluationCallback() {
 
       @Override
       public void onSuccess(VariableDto variable) {
-        // make sure it is visible on success
-        getView().show();
+        parent.addToPopupSlot(ScriptEvaluationPopupPresenter.this);
       }
 
       @Override
       public void onFailure(VariableDto variable) {
-        // ignore
       }
     });
-
     addHandler();
   }
 

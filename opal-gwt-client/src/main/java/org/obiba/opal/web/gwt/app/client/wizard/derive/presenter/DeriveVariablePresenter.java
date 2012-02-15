@@ -104,10 +104,10 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public DeriveVariablePresenter(final EventBus eventBus, final Display view, Translations translations, //
-  Provider<DeriveTemporalVariableStepPresenter> temporalPresenter, Provider<DeriveCategoricalVariableStepPresenter> categoricalPresenter, //
-  Provider<DeriveBooleanVariableStepPresenter> booleanPresenter, Provider<DeriveNumericalVariableStepPresenter> numericalPresenter, //
-  Provider<DeriveOpenTextualVariableStepPresenter> openTextualPresenter, Provider<DeriveCustomVariablePresenter> deriveCustomVariablePresenter, //
-  ScriptEvaluationPresenter scriptEvaluationPresenter) {
+      Provider<DeriveTemporalVariableStepPresenter> temporalPresenter, Provider<DeriveCategoricalVariableStepPresenter> categoricalPresenter, //
+      Provider<DeriveBooleanVariableStepPresenter> booleanPresenter, Provider<DeriveNumericalVariableStepPresenter> numericalPresenter, //
+      Provider<DeriveOpenTextualVariableStepPresenter> openTextualPresenter, Provider<DeriveCustomVariablePresenter> deriveCustomVariablePresenter, //
+      ScriptEvaluationPresenter scriptEvaluationPresenter) {
     super(eventBus, view);
     this.translations = translations;
     this.categoricalPresenter = categoricalPresenter;
@@ -146,17 +146,17 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     if(event.getAssociatedType() == CategorizeWizardType) {
       updateDerivationPresenter();
     } else if(event.getAssociatedType() == CustomWizardType) {
-      setCustomDerivationPresenter();
+      derivationPresenter = deriveCustomVariablePresenter.get();
     } else {
       GWT.log("unknown wizard type");
     }
 
-  }
+    if(derivationPresenter != null) {
+      derivationPresenter.initialize(variable);
+      getView().appendWizardSteps(derivationPresenter.getWizardSteps());
+      setInSlot(Display.Slots.Derivation, derivationPresenter);
+    }
 
-  private void setCustomDerivationPresenter() {
-    derivationPresenter = deriveCustomVariablePresenter.get();
-    derivationPresenter.initialize(variable);
-    getView().appendWizardSteps(derivationPresenter.getWizardSteps());
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
@@ -181,10 +181,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       derivationPresenter = openTextualPresenter.get();
     }
 
-    if(derivationPresenter != null) {
-      derivationPresenter.initialize(variable);
-      getView().appendWizardSteps(derivationPresenter.getWizardSteps());
-    }
   }
 
   private void updateDatasources() {
@@ -520,7 +516,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   public interface Display extends WizardView {
     enum Slots {
-      Summary
+      Summary, Derivation
     }
 
     void setScriptEvaluationSuccess(boolean success);
