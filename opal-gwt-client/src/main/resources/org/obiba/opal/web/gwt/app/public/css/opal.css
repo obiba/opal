@@ -98,7 +98,8 @@ label {
   padding-right: 0.8em;
 }
 
-.gwt-RadioButton label {
+.gwt-RadioButton label,
+.gwt-CheckBox label {
   display: inline;
 }
 
@@ -1087,11 +1088,7 @@ div.variableChangesPager tr > td {
 }
 
 div.ignoreAllModifications {
-  padding:0px 0.8em 0.8em;
-}
-
-div.ignoreAllModifications > span > label {
-  padding-left:0.8em;
+  margin-bottom: 0.8em;
 }
 
 div.variableChangesSummaryPanel > div {
