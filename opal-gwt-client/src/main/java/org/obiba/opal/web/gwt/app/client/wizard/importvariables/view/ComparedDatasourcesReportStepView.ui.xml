@@ -6,6 +6,7 @@
   ui:generateLocales="default">
 
   <g:FlowPanel>
+    <g:Image ui:field="refreshPending" url="image/loading.gif"/>
     <g:HTMLPanel addStyleNames="ignoreAllModifications">
       <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
     </g:HTMLPanel>

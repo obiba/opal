@@ -12,15 +12,15 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
@@ -35,6 +35,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
@@ -64,6 +65,15 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   WizardStep destinationSelectionStep;
 
   @UiField
+  WizardStep comparedDatasourcesReportStep;
+
+  @UiField
+  SimplePanel comparedDatasourcesReportPanel;
+
+  @UiField
+  ValidationReportStepView validationReportPanel;
+
+  @UiField
   WizardStep identityArchiveStep;
 
   @UiField
@@ -78,13 +88,19 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @UiField
   ListBox formatListBox;
 
-  private DataImportPresenter.DataImportStepDisplay formatStepDisplay;
+  private WizardStepDisplay formatStepDisplay;
 
-  private DataImportPresenter.DataImportStepDisplay identityArchiveStepDisplay;
+  private WizardStepDisplay identityArchiveStepDisplay;
 
   private WizardStepChain stepChain;
 
   private ValidationHandler formatStepValidator;
+
+  private StepInHandler comparedDatasourcesReportStepInHandler;
+
+  private ValidationHandler comparedDatasourcesReportValidationHandler;
+
+  private Widget comparedDatasourcesReportHelp;
 
   @Inject
   public DataImportView(EventBus eventBus) {
@@ -115,6 +131,33 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
       }
     }).title(translations.dataImportFileStep())//
 
+    .append(destinationSelectionStep, destinationSelectionHelp)//
+    .title(translations.dataImportDestinationStep())//
+
+    .append(comparedDatasourcesReportStep)//
+    .title(translations.variablesImportCompareStep())//
+    .help(new WidgetProvider() {
+
+      @Override
+      public Widget getWidget() {
+        return comparedDatasourcesReportHelp;
+      }
+    })//
+    .onStepIn(new StepInHandler() {
+
+      @Override
+      public void onStepIn() {
+        comparedDatasourcesReportStepInHandler.onStepIn();
+      }
+    })//
+    .onValidate(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        return comparedDatasourcesReportValidationHandler.validate();
+      }
+    })//
+
     .append(identityArchiveStep)//
     .title(translations.dataImportUnitStep())//
     .help(new WidgetProvider() {
@@ -124,9 +167,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         return identityArchiveStepDisplay.getStepHelp();
       }
     }) //
-
-    .append(destinationSelectionStep, destinationSelectionHelp)//
-    .title(translations.dataImportDestinationStep())//
 
     .append(conclusionStep)//
     .conclusion()//
@@ -178,7 +218,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
-  public void setFormatStepDisplay(DataImportPresenter.DataImportStepDisplay display) {
+  public void setFormatStepDisplay(WizardStepDisplay display) {
     this.formatStepDisplay = display;
     formatStep.removeStepContent();
     formatStep.add(display.asWidget());
@@ -190,16 +230,35 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
-  public void setIdentityArchiveStepDisplay(DataImportPresenter.DataImportStepDisplay display) {
+  public void setIdentityArchiveStepDisplay(WizardStepDisplay display) {
     this.identityArchiveStepDisplay = display;
     identityArchiveStep.removeStepContent();
     identityArchiveStep.add(display.asWidget());
   }
 
   @Override
-  public void setDestinationSelectionDisplay(DataImportPresenter.DataImportStepDisplay display) {
+  public void setDestinationSelectionDisplay(WizardStepDisplay display) {
     destinationSelectionStep.removeStepContent();
     destinationSelectionStep.add(display.asWidget());
+  }
+
+  @Override
+  public void setComparedDatasourcesReportStepInHandler(StepInHandler handler) {
+    this.comparedDatasourcesReportStepInHandler = handler;
+  }
+
+  @Override
+  public void setComparedDatasourcesReportValidationHandler(ValidationHandler handler) {
+    comparedDatasourcesReportValidationHandler = handler;
+  }
+
+  @Override
+  public void setComparedDatasourcesReportDisplay(WizardStepDisplay display) {
+    comparedDatasourcesReportPanel.clear();
+    comparedDatasourcesReportPanel.add(display.asWidget());
+    comparedDatasourcesReportPanel.setVisible(true);
+    validationReportPanel.setVisible(false);
+    comparedDatasourcesReportHelp = display.getStepHelp();
   }
 
   @Override
@@ -216,31 +275,25 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public void renderConclusion(ConclusionStepPresenter presenter) {
-    dialog.setProgress(true);
     conclusionStep.removeStepContent();
     presenter.reset();
     conclusionStep.add(presenter.getDisplay().asWidget());
     conclusionStep.setStepTitle(translations.dataImportPendingValidation());
     stepChain.onNext();
     dialog.setCancelEnabled(false);
-    dialog.setCloseEnabled(false);
-    presenter.setTransientDatasourceCreatedCallback(new DatasourceCreatedCallback() {
+    dialog.setCloseEnabled(true);
+  }
 
-      @Override
-      public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
-        conclusionStep.setStepTitle(translations.dataImportCompletedValidation());
-        dialog.setCloseEnabled(true);
-        dialog.setProgress(false);
-      }
+  @Override
+  public void showDatasourceCreationError(ClientErrorDto errorDto) {
+    comparedDatasourcesReportPanel.setVisible(false);
+    if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+      validationReportPanel.showDatasourceParsingErrors(errorDto);
+      validationReportPanel.setVisible(true);
+    } else {
 
-      @Override
-      public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
-        conclusionStep.setStepTitle(translations.dataImportFailedValidation());
-        dialog.setCancelEnabled(true);
-        dialog.setProgress(false);
-      }
-    });
-
+    }
+    dialog.setNextEnabled(false);
   }
 
 }

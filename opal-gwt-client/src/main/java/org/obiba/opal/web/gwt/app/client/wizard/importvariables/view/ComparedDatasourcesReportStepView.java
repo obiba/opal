@@ -36,6 +36,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -63,6 +64,9 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @UiField
   HTMLPanel help;
 
+  @UiField
+  Image refreshPending;
+
   //
   // Constructors
   //
@@ -77,7 +81,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   @Override
   public void clearDisplay() {
+    refreshPending.setVisible(true);
     tableChangesPanel.clear();
+    tableChangesPanel.setVisible(false);
+    ignoreAllModifications.setVisible(false);
     ignoreAllModifications.setValue(false);
     ignoreAllModifications.setEnabled(false);
   }
@@ -85,6 +92,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
     tableChangesPanel.add(getTableCompareTabContent(tableCompareData), getTableCompareTabHeader(tableCompareData, comparisonResult));
+    tableChangesPanel.setVisible(true);
+    refreshPending.setVisible(false);
   }
 
   @Override
@@ -92,6 +101,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     Anchor tabHeader = getTableCompareTabHeader(tableCompareData, comparisonResult);
     tabHeader.addStyleName("forbidden");
     tableChangesPanel.add(getTableCompareTabContent(tableCompareData), tabHeader);
+    tableChangesPanel.setVisible(true);
+    refreshPending.setVisible(false);
   }
 
   @Override
@@ -102,6 +113,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public void setEnabledIgnoreAllModifications(boolean enabled) {
     ignoreAllModifications.setEnabled(enabled);
+    ignoreAllModifications.setVisible(enabled);
   }
 
   private FlowPanel getTableCompareTabContent(TableCompareDto tableCompareData) {

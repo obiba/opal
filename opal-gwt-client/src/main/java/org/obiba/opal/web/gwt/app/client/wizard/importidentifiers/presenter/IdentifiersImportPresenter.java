@@ -32,7 +32,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceDtos;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -251,7 +251,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   }
 
   private void importIdentifiers() {
-    final DatasourceFactoryDto factory = ConclusionStepPresenter.createDatasourceFactoryDto(importData);
+    final DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importData);
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 

@@ -218,7 +218,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
         public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == 201) {
-            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getView().getSelectedDatasource(), getView(), factory, resource);
+            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getView().getSelectedDatasource(), getView().getDatasourceCreatedCallback(), factory, resource);
           }
         }
       };

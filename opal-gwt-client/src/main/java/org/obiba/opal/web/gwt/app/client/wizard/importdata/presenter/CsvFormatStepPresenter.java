@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -175,7 +176,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
   // Inner classes
   //
 
-  public interface Display extends CsvOptionsDisplay, WidgetDisplay, DataImportPresenter.DataImportStepDisplay {
+  public interface Display extends CsvOptionsDisplay, WidgetDisplay, WizardStepDisplay {
 
   }
 

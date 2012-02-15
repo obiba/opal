@@ -18,6 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 
@@ -83,7 +84,7 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
   // Interfaces
   //
 
-  public interface Display extends WidgetDisplay, DataImportPresenter.DataImportStepDisplay {
+  public interface Display extends WidgetDisplay, WizardStepDisplay {
 
     void setXmlFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 

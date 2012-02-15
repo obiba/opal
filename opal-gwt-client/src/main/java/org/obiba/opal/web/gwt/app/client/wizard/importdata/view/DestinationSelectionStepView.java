@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.widgets.view.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
@@ -40,7 +41,7 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   ListBox datasetListBox;
 
   @UiField
-  ListBox tableListBox;
+  EditableListBox tableListBox;
 
   @UiField
   Label tableListBoxLabel;
@@ -92,12 +93,12 @@ public class DestinationSelectionStepView extends Composite implements Destinati
 
   @Override
   public String getSelectedTable() {
-    return this.tableListBox.getValue(this.tableListBox.getSelectedIndex());
+    return this.tableListBox.getValue();
   }
 
   @Override
   public boolean hasTable() {
-    return this.tableListBox.getItemCount() > 0;
+    return this.tableListBox.getValue().isEmpty() == false;
   }
 
   @Override
@@ -128,7 +129,7 @@ public class DestinationSelectionStepView extends Composite implements Destinati
       tables.removeAll(views);
 
       for(String tableName : tables) {
-        tableListBox.addItem(tableName, tableName);
+        tableListBox.addItem(tableName);
       }
     }
   }

@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -28,7 +29,7 @@ import com.google.inject.Inject;
 
 public class DestinationSelectionStepPresenter extends WidgetPresenter<DestinationSelectionStepPresenter.Display> {
 
-  public interface Display extends WidgetDisplay, DataImportPresenter.DataImportStepDisplay {
+  public interface Display extends WidgetDisplay, WizardStepDisplay {
 
     void setDatasources(JsArray<DatasourceDto> datasources);
 
@@ -84,7 +85,8 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
           d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
         }
 
-        updateSelectableDatasources();
+        getDisplay().setDatasources(datasources);
+        // updateSelectableDatasources();
       }
     }).send();
   }

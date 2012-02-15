@@ -103,6 +103,13 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
     }
   }
 
+  public void clear() {
+    for(String value : menuItemsMap.keySet()) {
+      removeItem(value);
+    }
+    setValue("");
+  }
+
   private void displaySuggestions() {
     panel.showRelativeTo(textBox);
   }

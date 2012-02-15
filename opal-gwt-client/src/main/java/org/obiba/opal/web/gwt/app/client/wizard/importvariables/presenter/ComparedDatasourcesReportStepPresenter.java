@@ -20,6 +20,8 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -36,7 +38,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<ComparedDatasourcesReportStepPresenter.Display> {
@@ -63,7 +64,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   protected void onBind() {
   }
 
-  public void compare(String sourceDatasourceName, String targetDatasourceName, final VariablesImportPresenter.Display display, final DatasourceFactoryDto factory, final DatasourceDto datasourceResource) {
+  public void compare(String sourceDatasourceName, String targetDatasourceName, final DatasourceCreatedCallback datasourceCreatedCallback, final DatasourceFactoryDto factory, final DatasourceDto datasourceResource) {
     this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
     authorizedComparedTables = JsArrays.create();
@@ -84,7 +85,9 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           }
         }
         getDisplay().setEnabledIgnoreAllModifications(conflictsExist || modificationsExist);
-        display.getDatasourceCreatedCallback().onSuccess(factory, datasourceResource);
+        if(datasourceCreatedCallback != null) {
+          datasourceCreatedCallback.onSuccess(factory, datasourceResource);
+        }
       }
 
       private TreeSet<TableCompareDto> sortComparedTables(JsArray<TableCompareDto> comparedTables) {
@@ -219,7 +222,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   //
   // Interfaces
   //
-  public interface Display extends WidgetDisplay {
+  public interface Display extends WidgetDisplay, WizardStepDisplay {
 
     enum ComparisonResult {
       CREATION, MODIFICATION, CONFLICT
@@ -234,8 +237,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     void setEnabledIgnoreAllModifications(boolean enabled);
 
     boolean ignoreAllModifications();
-
-    Widget getStepHelp();
 
   }
 
