@@ -84,7 +84,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     refreshPending.setVisible(true);
     tableChangesPanel.clear();
     tableChangesPanel.setVisible(false);
-    ignoreAllModifications.setVisible(false);
     ignoreAllModifications.setValue(false);
     ignoreAllModifications.setEnabled(false);
   }
@@ -111,9 +110,13 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   @Override
-  public void setEnabledIgnoreAllModifications(boolean enabled) {
+  public void setIgnoreAllModificationsVisible(boolean visible) {
+    ignoreAllModifications.setVisible(visible);
+  }
+
+  @Override
+  public void setIgnoreAllModificationsEnabled(boolean enabled) {
     ignoreAllModifications.setEnabled(enabled);
-    ignoreAllModifications.setVisible(enabled);
   }
 
   private FlowPanel getTableCompareTabContent(TableCompareDto tableCompareData) {

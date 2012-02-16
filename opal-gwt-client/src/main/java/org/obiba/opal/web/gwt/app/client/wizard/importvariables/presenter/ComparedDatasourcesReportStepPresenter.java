@@ -50,6 +50,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   private boolean modificationsExist;
 
+  private boolean canIgnoreAllModifications;
+
   @Inject
   public ComparedDatasourcesReportStepPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
@@ -84,7 +86,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
             modificationsExist = true;
           }
         }
-        getDisplay().setEnabledIgnoreAllModifications(conflictsExist || modificationsExist);
+        getDisplay().setIgnoreAllModificationsEnabled(conflictsExist || modificationsExist);
         if(datasourceCreatedCallback != null) {
           datasourceCreatedCallback.onSuccess(factory, datasourceResource);
         }
@@ -105,6 +107,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
     }).send();
 
+  }
+
+  public void allowIgnoreAllModifications(boolean allow) {
+    getDisplay().setIgnoreAllModificationsVisible(allow);
   }
 
   public boolean canBeSubmitted() {
@@ -234,9 +240,11 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
     void clearDisplay();
 
-    void setEnabledIgnoreAllModifications(boolean enabled);
+    void setIgnoreAllModificationsEnabled(boolean enabled);
 
     boolean ignoreAllModifications();
+
+    void setIgnoreAllModificationsVisible(boolean visible);
 
   }
 

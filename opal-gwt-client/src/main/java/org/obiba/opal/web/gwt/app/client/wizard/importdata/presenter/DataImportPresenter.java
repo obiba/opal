@@ -91,6 +91,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     identityArchiveStepPresenter.bind();
     conclusionStepPresenter.bind();
 
+    comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
+
     setInSlot(Slots.Values, datasourceValuesStepPresenter);
 
     getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
