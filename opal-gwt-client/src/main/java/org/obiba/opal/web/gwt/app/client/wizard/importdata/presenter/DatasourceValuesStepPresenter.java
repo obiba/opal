@@ -32,8 +32,6 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
 
   private final ValuesTablePresenter valuesTablePresenter;
 
-  private TableSelectionHandler tableSelectionHandler;
-
   private JsArray<TableDto> tables;
 
   @Inject
