@@ -70,12 +70,12 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
         public void onResource(Response response, TableDto table) {
           String selectedScript = getView().getScriptBox().getSelectedScript();
           VariableDto variable = getDerivedVariable();
-          if(!Strings.isNullOrEmpty(selectedScript) && !selectedScript.equals(getView().getScriptBox().getValue())) {
+          if(Strings.isNullOrEmpty(selectedScript) == false && selectedScript.equals(getView().getScriptBox().getValue()) == false) {
             variable.setValueType(ValueType.TEXT.getLabel());
             variable.setIsRepeatable(false);
             VariableDtos.setScript(variable, selectedScript);
           }
-          scriptEvaluationPopupPresenter.initialize(table, variable, DeriveCustomVariablePresenter.this);
+          scriptEvaluationPopupPresenter.initialize(table, variable);
         }
       }).send();
       getView().getScriptBox().focus();

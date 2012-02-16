@@ -16,7 +16,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
 
-//TODO move this class out to derive package (or in magma ?)
 public class VariableDtos {
 
   /**
