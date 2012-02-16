@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display.Slots;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -77,7 +76,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   // Inner classes and interfaces
   //
 
-  public interface Display extends View, WizardStepDisplay {
+  public interface Display extends View {
 
     enum Slots {
       Values;

@@ -81,11 +81,6 @@ public class DatasourceValuesStepView extends ViewImpl implements DatasourceValu
   }
 
   @Override
-  public Widget getStepHelp() {
-    return null;
-  }
-
-  @Override
   public Widget asWidget() {
     return widget;
   }
