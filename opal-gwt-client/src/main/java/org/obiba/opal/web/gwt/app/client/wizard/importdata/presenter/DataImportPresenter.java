@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.util.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
@@ -26,7 +25,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsonUtils;
@@ -221,11 +219,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
             importData.setTransientDatasourceName(datasourceDto.getName());
             datasourceDiff(factory, datasourceDto);
           } else {
-            final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-            getView().showDatasourceCreationError(errorDto);
-            if(errorDto.getExtension(ClientErrorDtoExtensions.errors) == null) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
-            }
+            getView().showDatasourceCreationError((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
           }
         }
       };
@@ -236,6 +230,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     private void datasourceDiff(final DatasourceFactoryDto factory, final DatasourceDto datasourceDto) {
       comparedDatasourcesReportPresenter.compare(importData.getTransientDatasourceName(), //
       importData.getDestinationDatasourceName(), null, factory, datasourceDto);
+      getView().showDatasourceCreationSuccess();
     }
   }
 
@@ -246,6 +241,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     ImportFormat getImportFormat();
+
+    void showDatasourceCreationSuccess();
 
     void showDatasourceCreationError(ClientErrorDto errorDto);
 

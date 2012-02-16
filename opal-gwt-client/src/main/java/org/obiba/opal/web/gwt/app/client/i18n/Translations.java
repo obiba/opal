@@ -81,8 +81,8 @@ public interface Translations extends Constants {
   "SUCCEEDED", "Succeeded", //
   "FAILED", "Failed", //
   "CANCEL_PENDING", "Cancel Pending", //
-  "CANCELED", "Cancelled", //
-  "DatasourceCreationFailed", "The datasource creation has failed." })
+  "CANCELED", "Cancelled" //
+  })
   Map<String, String> statusMap();
 
   @Description("Actions label")
@@ -276,7 +276,8 @@ public interface Translations extends Constants {
   "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
   "DatesRangeInvalid", "The range of dates is invalid.",//
   "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
-  "ReportTemplateCannotBeFound", "The Report Template cannot be found."//
+  "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
+  "DatasourceCreationFailed", "The datasource creation has failed: {0}"//
   })
   Map<String, String> userMessageMap();
 

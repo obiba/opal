@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
@@ -91,6 +92,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @UiField
   ListBox formatListBox;
 
+  private final EventBus eventBus;
+
   private WizardStepDisplay formatStepDisplay;
 
   private WizardStepDisplay identityArchiveStepDisplay;
@@ -108,6 +111,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Inject
   public DataImportView(EventBus eventBus) {
     super(eventBus);
+    this.eventBus = eventBus;
     widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
@@ -305,9 +309,16 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
       validationReportPanel.showDatasourceParsingErrors(errorDto);
       validationReportPanel.setVisible(true);
     } else {
-
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
     }
     dialog.setNextEnabled(false);
+  }
+
+  @Override
+  public void showDatasourceCreationSuccess() {
+    comparedDatasourcesReportPanel.setVisible(true);
+    validationReportPanel.setVisible(false);
+    dialog.setNextEnabled(true);
   }
 
 }

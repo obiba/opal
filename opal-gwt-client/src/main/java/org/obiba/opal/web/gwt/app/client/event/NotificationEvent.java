@@ -135,6 +135,9 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   }
 
   public List<String> getMessageArgs() {
+    if(messageArgs == null) {
+      messageArgs = new ArrayList<String>();
+    }
     return Collections.unmodifiableList(messageArgs);
   }
 

@@ -66,7 +66,13 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
     List<String> translatedMessages = new ArrayList<String>();
     for(String message : event.getMessages()) {
       if(translations.userMessageMap().containsKey(message)) {
-        translatedMessages.add(translations.userMessageMap().get(message));
+        String msg = translations.userMessageMap().get(message);
+        int i = 0;
+        for(String arg : event.getMessageArgs()) {
+          msg = msg.replace("{" + i + "}", arg);
+          i++;
+        }
+        translatedMessages.add(msg);
       } else {
         translatedMessages.add(message);
       }

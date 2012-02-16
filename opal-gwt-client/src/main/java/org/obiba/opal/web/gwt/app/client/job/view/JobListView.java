@@ -182,7 +182,14 @@ public class JobListView extends Composite implements Display {
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
-        return translations.statusMap().get(object.getStatus());
+        String status = object.getStatus();
+        if(translations.statusMap().containsKey(status)) {
+          return translations.statusMap().get(status);
+        } else if(translations.userMessageMap().containsKey(status)) {
+          return translations.userMessageMap().get(status);
+        } else {
+          return status;
+        }
       }
     }, translations.statusLabel());
 
