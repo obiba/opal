@@ -119,6 +119,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     this.scriptEvaluationPresenter = scriptEvaluationPresenter;
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
     if(event.getEventParameters().length != 1) {
