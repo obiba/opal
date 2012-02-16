@@ -18,9 +18,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -28,7 +26,6 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -41,12 +38,8 @@ import com.google.inject.Inject;
 
 public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPresenter.Display> {
 
-  private static Translations translations = GWT.create(Translations.class);
-
   @Inject
   private ImportData importData;
-
-  private DatasourceCreatedCallback transientDatasourceCreatedCallback;
 
   @Inject
   public ConclusionStepPresenter(final Display display, final EventBus eventBus) {
@@ -66,10 +59,6 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   protected void addEventHandlers() {
     super.registerHandler(getDisplay().addJobLinkClickHandler(new JobLinkClickHandler()));
-  }
-
-  public void setTransientDatasourceCreatedCallback(DatasourceCreatedCallback callback) {
-    this.transientDatasourceCreatedCallback = callback;
   }
 
   public void reset() {
