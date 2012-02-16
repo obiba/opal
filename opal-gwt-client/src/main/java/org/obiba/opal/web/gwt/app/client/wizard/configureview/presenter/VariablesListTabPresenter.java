@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -35,7 +36,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePend
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -431,7 +431,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
 
     private void setScript(VariableDto variableDto) {
-      AttributeDto attr = Variables.getScriptAttribute(variableDto);
+      AttributeDto attr = VariableDtos.getScriptAttribute(variableDto);
       if(attr != null) {
         evaluateScriptPresenter.setScript(attr.getValue());
       } else {
@@ -568,8 +568,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
 
     private void updateAttributes() {
-      AttributeDto currentVariableScriptAttribute = Variables.getScriptAttribute(currentVariableDto);
-      AttributeDto existingVariableScriptAttribute = Variables.getScriptAttribute(attributesPresenter.getVariableDto());
+      AttributeDto currentVariableScriptAttribute = VariableDtos.getScriptAttribute(currentVariableDto);
+      AttributeDto existingVariableScriptAttribute = VariableDtos.getScriptAttribute(attributesPresenter.getVariableDto());
       if(existingVariableScriptAttribute != null) {
         // Duplicate 'script' attribute exists. Overwrite the existing 'script' attribute.
         existingVariableScriptAttribute.setValue(currentVariableScriptAttribute.getValue());

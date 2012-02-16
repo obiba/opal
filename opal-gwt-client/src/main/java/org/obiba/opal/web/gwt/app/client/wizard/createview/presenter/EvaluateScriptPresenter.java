@@ -9,9 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -91,9 +91,9 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
       derived.setValueType(ValueType.TEXT.getLabel());
       derived.setIsRepeatable(false);
       if(!Strings.isNullOrEmpty(selectedScript)) {
-        Variables.setScript(derived, selectedScript);
+        VariableDtos.setScript(derived, selectedScript);
       } else {
-        Variables.setScript(derived, getScript());
+        VariableDtos.setScript(derived, getScript());
       }
       scriptEvaluationPopupPresenter.initialize(table, derived, EvaluateScriptPresenter.this);
     }

@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
@@ -27,7 +28,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandl
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -167,17 +167,17 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     if(valueType.equals("binary")) {
       // should not arrive here
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("Cannot categorize binary values.").build());
-    } else if(valueType.equals("text") && Variables.allCategoriesMissing(variable)) {
+    } else if(valueType.equals("text") && VariableDtos.allCategoriesMissing(variable)) {
       derivationPresenter = openTextualPresenter.get();
     } else if(valueType.equals("integer") || valueType.equals("decimal")) {
       derivationPresenter = numericalPresenter.get();
     } else if(valueType.equals("date") || valueType.equals("datetime")) {
       derivationPresenter = temporalPresenter.get();
-    } else if(valueType.equals("text") && Variables.hasCategories(variable)) {
+    } else if(valueType.equals("text") && VariableDtos.hasCategories(variable)) {
       derivationPresenter = categoricalPresenter.get();
     } else if(valueType.equals("boolean")) {
       derivationPresenter = booleanPresenter.get();
-    } else if(Variables.allCategoriesMissing(variable)) {
+    } else if(VariableDtos.allCategoriesMissing(variable)) {
       derivationPresenter = openTextualPresenter.get();
     }
 

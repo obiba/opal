@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -226,7 +226,7 @@ public abstract class DerivedVariableGenerator {
     // set attributes
     derived.setAttributesArray(copyAttributes(variable.getAttributesArray()));
     if(!Strings.isNullOrEmpty(variable.getLink())) {
-      Variables.setAttribute(derived, DERIVED_FROM_ATTRIBUTE, variable.getLink());
+      VariableDtos.setAttribute(derived, DERIVED_FROM_ATTRIBUTE, variable.getLink());
     }
 
     // set categories
@@ -238,11 +238,11 @@ public abstract class DerivedVariableGenerator {
   }
 
   public static void setScript(VariableDto derived, String script) {
-    Variables.setScript(derived, script);
+    VariableDtos.setScript(derived, script);
   }
 
   public static AttributeDto getScriptAttribute(VariableDto derived) {
-    return Variables.getScriptAttribute(derived);
+    return VariableDtos.getScriptAttribute(derived);
   }
 
   public static AttributeDto newLabelAttribute(ValueMapEntry entry) {

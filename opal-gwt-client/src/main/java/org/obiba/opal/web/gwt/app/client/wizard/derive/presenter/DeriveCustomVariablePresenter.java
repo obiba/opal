@@ -12,12 +12,12 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -73,7 +73,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
           if(!Strings.isNullOrEmpty(selectedScript) && !selectedScript.equals(getView().getScriptBox().getValue())) {
             variable.setValueType(ValueType.TEXT.getLabel());
             variable.setIsRepeatable(false);
-            Variables.setScript(variable, selectedScript);
+            VariableDtos.setScript(variable, selectedScript);
           }
           scriptEvaluationPopupPresenter.initialize(table, variable, DeriveCustomVariablePresenter.this);
         }

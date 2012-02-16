@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget;
 
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;

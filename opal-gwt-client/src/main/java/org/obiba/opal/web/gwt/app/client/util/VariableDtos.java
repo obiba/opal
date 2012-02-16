@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.derive.util;
+package org.obiba.opal.web.gwt.app.client.util;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -17,7 +17,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.core.client.JsArray;
 
 //TODO move this class out to derive package (or in magma ?)
-public class Variables {
+public class VariableDtos {
 
   /**
    * True if variable has at least one category defined.

@@ -17,10 +17,10 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.util.Variables.ValueType;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -79,7 +79,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
         appendVariableLimitArguments(link);
         // TODO won't work with long script
         // OPAL-1346 encode script
-        link.append("&script=" + URL.encodePathSegment(Variables.getScript(variable)));
+        link.append("&script=" + URL.encodePathSegment(VariableDtos.getScript(variable)));
         getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
       }
 
@@ -115,7 +115,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   }
 
   private void requestSummary() {
-    String script = Variables.getScript(variable);
+    String script = VariableDtos.getScript(variable);
     StringBuilder link = new StringBuilder();
 
     appendTable(link);
@@ -154,7 +154,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   private void appendVariableSummaryArguments(StringBuilder link) {
     appendVariableLimitArguments(link);
 
-    if(ValueType.TEXT.is(variable.getValueType()) && Variables.allCategoriesMissing(variable)) {
+    if(ValueType.TEXT.is(variable.getValueType()) && VariableDtos.allCategoriesMissing(variable)) {
       link.append("&nature=categorical")//
       .append("&distinct=true");
     }
@@ -202,7 +202,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   private final class ValueSetFetcherImpl implements ValueSetFetcher {
     @Override
     public void request(int offset, int limit) {
-      String script = Variables.getScript(variable);
+      String script = VariableDtos.getScript(variable);
 
       StringBuilder link = new StringBuilder();
       appendTable(link);
