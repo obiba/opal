@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.TableSelectionHandler;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
@@ -28,7 +28,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 /**
  *
  */
-public class DatasourceValuesStepView extends ViewImpl implements DatasourceValuesStepPresenter.Display {
+public class DatasourceValuesStepView extends ViewImpl implements Display {
   @UiTemplate("DatasourceValuesStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DatasourceValuesStepView> {
   }

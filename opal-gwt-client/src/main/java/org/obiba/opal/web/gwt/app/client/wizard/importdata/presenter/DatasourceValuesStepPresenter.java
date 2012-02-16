@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display.Slots;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -22,12 +23,11 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceValuesStepPresenter.Display> {
+public class DatasourceValuesStepPresenter extends PresenterWidget<Display> {
 
   private final ValuesTablePresenter valuesTablePresenter;
 
@@ -75,8 +75,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   //
   // Inner classes and interfaces
   //
-
-  public interface Display extends View {
+  public interface Display extends com.gwtplatform.mvp.client.View {
 
     enum Slots {
       Values;
