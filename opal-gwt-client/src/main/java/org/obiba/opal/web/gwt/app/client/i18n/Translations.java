@@ -277,7 +277,9 @@ public interface Translations extends Constants {
   "DatesRangeInvalid", "The range of dates is invalid.",//
   "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
   "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
-  "DatasourceCreationFailed", "The datasource creation has failed: {0}"//
+  "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
+  "DestinationTableRequired", "The destination table is required.",//
+  "DestinationTableCannotBeView", "The destination table cannot be a view."//
   })
   Map<String, String> userMessageMap();
 

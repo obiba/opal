@@ -15,6 +15,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -129,6 +130,37 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
       }
     }
     return result;
+  }
+
+  public boolean validate() {
+    if(ImportFormat.XML.equals(importFormat) == false) {
+      // table cannot be empty and cannot be a view
+      if(getDisplay().hasTable() == false) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
+        return false;
+      }
+      return validateDestinationTableIsNotView();
+    }
+    return true;
+  }
+
+  private boolean validateDestinationTableIsNotView() {
+    String dsName = getDisplay().getSelectedDatasource();
+    String tableName = getDisplay().getSelectedTable();
+    for(int i = 0; i < datasources.length(); i++) {
+      DatasourceDto ds = datasources.get(i);
+      if(ds.getName().equals(dsName) && ds.getViewArray() != null) {
+        for(int j = 0; j < ds.getViewArray().length(); j++) {
+          if(ds.getViewArray().get(j).equals(tableName)) {
+            eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableCannotBeView").build());
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+
+    return true;
   }
 
   private void hideShowTables() {

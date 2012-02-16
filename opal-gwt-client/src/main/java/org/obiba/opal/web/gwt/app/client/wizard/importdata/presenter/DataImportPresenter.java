@@ -96,6 +96,13 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     setInSlot(Slots.Values, datasourceValuesStepPresenter);
 
     getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
+    getView().setDestinationSelectionValidationHandler(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        return destinationSelectionStepPresenter.validate();
+      }
+    });
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
     getView().setIdentityArchiveStepDisplay(identityArchiveStepPresenter.getDisplay());
 
@@ -265,6 +272,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     void setIdentityArchiveStepDisplay(WizardStepDisplay display);
 
     public void renderConclusion(ConclusionStepPresenter presenter);
+
+    void setDestinationSelectionValidationHandler(ValidationHandler handler);
 
   }
 

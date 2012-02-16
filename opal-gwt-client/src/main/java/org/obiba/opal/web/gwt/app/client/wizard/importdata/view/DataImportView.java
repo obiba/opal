@@ -102,6 +102,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   private ValidationHandler formatStepValidator;
 
+  private ValidationHandler destinationSelectionValidationHandler;
+
   private StepInHandler comparedDatasourcesReportStepInHandler;
 
   private ValidationHandler comparedDatasourcesReportValidationHandler;
@@ -140,6 +142,13 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
     .append(destinationSelectionStep, destinationSelectionHelp)//
     .title(translations.dataImportDestinationStep())//
+    .onValidate(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        return destinationSelectionValidationHandler.validate();
+      }
+    })//
 
     .append(comparedDatasourcesReportStep)//
     .title(translations.dataImportComparedDatasourcesReportStep())//
@@ -268,6 +277,11 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Override
   public void setComparedDatasourcesReportValidationHandler(ValidationHandler handler) {
     comparedDatasourcesReportValidationHandler = handler;
+  }
+
+  @Override
+  public void setDestinationSelectionValidationHandler(ValidationHandler handler) {
+    destinationSelectionValidationHandler = handler;
   }
 
   @Override
