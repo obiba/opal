@@ -468,6 +468,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Select the file to be imported and the destination datasource.")
   String dataImportInstructions();
 
+  @Description("Data import Compared Datasources Report instructions")
+  @DefaultStringValue("Review the data dictionary that will be imported.")
+  String dataImportComparedDatasourcesReportStep();
+
+  @Description("Data import Values instructions")
+  @DefaultStringValue("Review the data that will be imported.")
+  String dataImportValuesStep();
+
   @Description("Data import instructions conclusion")
   @DefaultStringValue("Data import job is launched.")
   String dataImportInstructionsConclusion();

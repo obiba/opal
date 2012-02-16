@@ -105,8 +105,9 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
 
   public void clear() {
     for(String value : menuItemsMap.keySet()) {
-      removeItem(value);
+      menuBar.removeItem(menuItemsMap.get(value));
     }
+    menuItemsMap.clear();
     setValue("");
   }
 

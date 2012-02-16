@@ -74,6 +74,9 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   ValidationReportStepView validationReportPanel;
 
   @UiField
+  WizardStep valuesStep;
+
+  @UiField
   WizardStep identityArchiveStep;
 
   @UiField
@@ -135,7 +138,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     .title(translations.dataImportDestinationStep())//
 
     .append(comparedDatasourcesReportStep)//
-    .title(translations.variablesImportCompareStep())//
+    .title(translations.dataImportComparedDatasourcesReportStep())//
     .help(new WidgetProvider() {
 
       @Override
@@ -157,6 +160,9 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         return comparedDatasourcesReportValidationHandler.validate();
       }
     })//
+
+    .append(valuesStep)//
+    .title(translations.dataImportValuesStep())//
 
     .append(identityArchiveStep)//
     .title(translations.dataImportUnitStep())//
@@ -188,6 +194,14 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Override
   protected PopupPanel asPopupPanel() {
     return dialog;
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    if(slot == Slots.Values) {
+      valuesStep.removeStepContent();
+      valuesStep.add(content);
+    }
   }
 
   @Override

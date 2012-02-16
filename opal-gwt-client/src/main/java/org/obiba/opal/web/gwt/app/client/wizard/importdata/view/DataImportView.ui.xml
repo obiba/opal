@@ -28,6 +28,8 @@
         <w:ValidationReportStepView ui:field="validationReportPanel" visible="false"/>
       </o:WizardStep>
       
+      <o:WizardStep ui:field="valuesStep"/>
+      
       <o:WizardStep ui:field="identityArchiveStep"/>
       
       <o:WizardStep ui:field="conclusionStep"/>

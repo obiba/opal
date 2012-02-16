@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter.Display.Slots;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -61,6 +62,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
 
+  private final DatasourceValuesStepPresenter datasourceValuesStepPresenter;
+
   private final IdentityArchiveStepPresenter identityArchiveStepPresenter;
 
   private final ConclusionStepPresenter conclusionStepPresenter;
@@ -69,7 +72,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public DataImportPresenter(final Display display, final EventBus eventBus, CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, DestinationSelectionStepPresenter destinationSelectionStepPresenter, ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, IdentityArchiveStepPresenter identityArchiveStepPresenter, ConclusionStepPresenter conclusionStepPresenter) {
+  public DataImportPresenter(final Display display, final EventBus eventBus, CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, DestinationSelectionStepPresenter destinationSelectionStepPresenter, ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, IdentityArchiveStepPresenter identityArchiveStepPresenter, ConclusionStepPresenter conclusionStepPresenter, DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
@@ -77,6 +80,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.identityArchiveStepPresenter = identityArchiveStepPresenter;
     this.conclusionStepPresenter = conclusionStepPresenter;
+    this.datasourceValuesStepPresenter = datasourceValuesStepPresenter;
   }
 
   @Override
@@ -89,6 +93,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     identityArchiveStepPresenter.bind();
     conclusionStepPresenter.bind();
 
+    setInSlot(Slots.Values, datasourceValuesStepPresenter);
+
     getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
     getView().setIdentityArchiveStepDisplay(identityArchiveStepPresenter.getDisplay());
@@ -98,6 +104,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
       @Override
       public boolean validate() {
+        datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName());
         return comparedDatasourcesReportPresenter.canBeSubmitted();
       }
     });
@@ -189,6 +196,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     private void deleteTransientDatasource() {
+      if(importData.getTransientDatasourceName() == null) return;
 
       ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -232,6 +240,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   public interface Display extends WizardView {
+
+    enum Slots {
+      Values
+    }
 
     ImportFormat getImportFormat();
 
