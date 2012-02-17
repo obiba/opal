@@ -304,13 +304,20 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
+  public void prepareDatasourceCreation() {
+    dialog.setNextEnabled(false);
+  }
+
+  @Override
   public void showDatasourceCreationError(ClientErrorDto errorDto) {
     comparedDatasourcesReportPanel.setVisible(false);
-    if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-      validationReportPanel.showDatasourceParsingErrors(errorDto);
-      validationReportPanel.setVisible(true);
-    } else {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
+    if(errorDto != null) {
+      if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
+        validationReportPanel.showDatasourceParsingErrors(errorDto);
+        validationReportPanel.setVisible(true);
+      } else {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
+      }
     }
     dialog.setNextEnabled(false);
   }

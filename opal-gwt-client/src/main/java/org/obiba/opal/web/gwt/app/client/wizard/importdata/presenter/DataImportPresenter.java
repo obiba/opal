@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandl
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter.Display.Slots;
@@ -230,6 +231,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     private void createTransientDatasource() {
+      getView().prepareDatasourceCreation();
 
       final DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importData);
 
@@ -251,7 +253,19 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     private void datasourceDiff(final DatasourceFactoryDto factory, final DatasourceDto datasourceDto) {
       comparedDatasourcesReportPresenter.compare(importData.getTransientDatasourceName(), //
-      importData.getDestinationDatasourceName(), null, factory, datasourceDto);
+      importData.getDestinationDatasourceName(), new DatasourceCreatedCallback() {
+
+        @Override
+        public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
+          getView().showDatasourceCreationSuccess();
+        }
+
+        @Override
+        public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
+          getView().showDatasourceCreationError(error);
+        }
+      },//
+      factory, datasourceDto);
       getView().showDatasourceCreationSuccess();
     }
   }
@@ -265,6 +279,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     ImportFormat getImportFormat();
 
     void setImportDataInputsHandler(ImportDataInputsHandler handler);
+
+    void prepareDatasourceCreation();
 
     void showDatasourceCreationSuccess();
 
