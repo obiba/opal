@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
 import org.obiba.opal.web.gwt.app.client.util.DatasourceDtos;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
@@ -40,15 +39,6 @@ import com.google.inject.Provider;
 public class DataImportPresenter extends WizardPresenterWidget<DataImportPresenter.Display> {
 
   public static final WizardType WizardType = new WizardType();
-
-  public static class Wizard extends WizardProxy<DataImportPresenter> {
-
-    @Inject
-    protected Wizard(EventBus eventBus, Provider<DataImportPresenter> wizardProvider) {
-      super(eventBus, WizardType, wizardProvider);
-    }
-
-  }
 
   private DataImportFormatStepPresenter formatStepPresenter;
 
@@ -111,38 +101,16 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         updateFormatStepDisplay();
       }
     }));
-    getView().setFormatStepValidator(new ValidationHandler() {
+    getView().setImportDataInputsHandler(new ImportDataInputsHandlerImpl());
 
-      @Override
-      public boolean validate() {
-        if(formatStepPresenter.validate()) {
-          if(getView().getImportFormat().equals(ImportFormat.CSV)) {
-            String name = csvFormatStepPresenter.getSelectedFile();
-            name = name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-            destinationSelectionStepPresenter.getDisplay().setTable(name);
-          } else {
-            destinationSelectionStepPresenter.getDisplay().setTable("");
-          }
-          return true;
-        }
-        return false;
-      }
-    });
-    getView().setDestinationSelectionValidationHandler(new ValidationHandler() {
+  }
 
-      @Override
-      public boolean validate() {
-        return destinationSelectionStepPresenter.validate();
-      }
-    });
-    getView().setComparedDatasourcesReportValidationHandler(new ValidationHandler() {
+  public interface ImportDataInputsHandler {
+    public boolean validateFormat();
 
-      @Override
-      public boolean validate() {
-        datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName());
-        return comparedDatasourcesReportPresenter.canBeSubmitted();
-      }
-    });
+    public boolean validateDestination();
+
+    public boolean validateComparedDatasourcesReport();
   }
 
   @Override
@@ -185,6 +153,43 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   //
   // Inner classes and interfaces
   //
+
+  private final class ImportDataInputsHandlerImpl implements ImportDataInputsHandler {
+    @Override
+    public boolean validateFormat() {
+      if(formatStepPresenter.validate()) {
+        if(getView().getImportFormat().equals(ImportFormat.CSV)) {
+          String name = csvFormatStepPresenter.getSelectedFile();
+          name = name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
+          destinationSelectionStepPresenter.getDisplay().setTable(name);
+        } else {
+          destinationSelectionStepPresenter.getDisplay().setTable("");
+        }
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public boolean validateDestination() {
+      return destinationSelectionStepPresenter.validate();
+    }
+
+    @Override
+    public boolean validateComparedDatasourcesReport() {
+      datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName());
+      return comparedDatasourcesReportPresenter.canBeSubmitted();
+    }
+  }
+
+  public static class Wizard extends WizardProxy<DataImportPresenter> {
+
+    @Inject
+    protected Wizard(EventBus eventBus, Provider<DataImportPresenter> wizardProvider) {
+      super(eventBus, WizardType, wizardProvider);
+    }
+
+  }
 
   private final class TransientDatasourceHandler implements StepInHandler {
 
@@ -259,13 +264,13 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     ImportFormat getImportFormat();
 
+    void setImportDataInputsHandler(ImportDataInputsHandler handler);
+
     void showDatasourceCreationSuccess();
 
     void showDatasourceCreationError(ClientErrorDto errorDto);
 
     public void setComparedDatasourcesReportStepInHandler(StepInHandler handler);
-
-    void setComparedDatasourcesReportValidationHandler(ValidationHandler validationHandler);
 
     void setComparedDatasourcesReportDisplay(WizardStepDisplay display);
 
@@ -273,15 +278,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     void setFormatStepDisplay(WizardStepDisplay display);
 
-    void setFormatStepValidator(ValidationHandler handler);
-
     void setDestinationSelectionDisplay(WizardStepDisplay display);
 
     void setIdentityArchiveStepDisplay(WizardStepDisplay display);
 
     public void renderConclusion(ConclusionStepPresenter presenter);
-
-    void setDestinationSelectionValidationHandler(ValidationHandler handler);
 
   }
 

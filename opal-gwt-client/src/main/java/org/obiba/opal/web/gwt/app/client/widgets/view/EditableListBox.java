@@ -23,6 +23,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -30,9 +31,11 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 
-public class EditableListBox extends Composite implements HasText, HasValue<String> {
+public class EditableListBox extends Composite implements HasText, HasValue<String>, HasEnabled {
 
   private TextBox textBox = new TextBox();
+
+  private Button ddBtn = new Button();
 
   private PopupPanel panel = new PopupPanel(true);
 
@@ -42,7 +45,6 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
 
   public EditableListBox() {
     FlowPanel layout = new FlowPanel();
-    final Button ddBtn = new Button();
     ddBtn.setStyleName("btn icon-before i-sortasc");
     ddBtn.addClickHandler(new ClickHandler() {
       @Override
@@ -91,7 +93,7 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
       @Override
       public void execute() {
         panel.hide();
-        textBox.setText(value);
+        textBox.setValue(value, true);
         textBox.setFocus(true);
       }
     });
@@ -147,5 +149,23 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
   @Override
   public void setText(String text) {
     textBox.setText(text);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    textBox.setEnabled(enabled);
+    ddBtn.setEnabled(enabled);
+    panel.hide();
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return textBox.isEnabled();
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    super.setVisible(visible);
+    panel.hide();
   }
 }

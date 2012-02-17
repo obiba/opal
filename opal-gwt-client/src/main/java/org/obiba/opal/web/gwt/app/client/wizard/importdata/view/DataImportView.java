@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
@@ -100,15 +101,11 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   private WizardStepChain stepChain;
 
-  private ValidationHandler formatStepValidator;
-
-  private ValidationHandler destinationSelectionValidationHandler;
-
   private StepInHandler comparedDatasourcesReportStepInHandler;
 
-  private ValidationHandler comparedDatasourcesReportValidationHandler;
-
   private Widget comparedDatasourcesReportHelp;
+
+  private ImportDataInputsHandler importDataInputsHandler;
 
   @Inject
   public DataImportView(EventBus eventBus) {
@@ -136,7 +133,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
       @Override
       public boolean validate() {
-        return formatStepValidator.validate();
+        return importDataInputsHandler.validateFormat();
       }
     }).title(translations.dataImportFileStep())//
 
@@ -146,7 +143,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
       @Override
       public boolean validate() {
-        return destinationSelectionValidationHandler.validate();
+        return importDataInputsHandler.validateDestination();
       }
     })//
 
@@ -170,7 +167,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
       @Override
       public boolean validate() {
-        return comparedDatasourcesReportValidationHandler.validate();
+        return importDataInputsHandler.validateComparedDatasourcesReport();
       }
     })//
 
@@ -252,8 +249,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
-  public void setFormatStepValidator(ValidationHandler handler) {
-    this.formatStepValidator = handler;
+  public void setImportDataInputsHandler(ImportDataInputsHandler handler) {
+    this.importDataInputsHandler = handler;
   }
 
   @Override
@@ -272,16 +269,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Override
   public void setComparedDatasourcesReportStepInHandler(StepInHandler handler) {
     this.comparedDatasourcesReportStepInHandler = handler;
-  }
-
-  @Override
-  public void setComparedDatasourcesReportValidationHandler(ValidationHandler handler) {
-    comparedDatasourcesReportValidationHandler = handler;
-  }
-
-  @Override
-  public void setDestinationSelectionValidationHandler(ValidationHandler handler) {
-    destinationSelectionValidationHandler = handler;
   }
 
   @Override

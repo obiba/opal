@@ -23,28 +23,13 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class DestinationSelectionStepPresenter extends WidgetPresenter<DestinationSelectionStepPresenter.Display> {
-
-  public interface Display extends WidgetDisplay, WizardStepDisplay {
-
-    void setDatasources(JsArray<DatasourceDto> datasources);
-
-    String getSelectedDatasource();
-
-    boolean hasTable();
-
-    String getSelectedTable();
-
-    void setTable(String name);
-
-    void showTables(boolean visible);
-
-  }
 
   private ImportFormat importFormat;
 
@@ -57,8 +42,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   public void setImportFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
-    hideShowTables();
-    refreshDatasources();
+    refreshDisplay();
   }
 
   @Override
@@ -68,6 +52,23 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   @Override
   protected void onBind() {
+    getDisplay().setTableSelectionHandler(new TableSelectionHandler() {
+
+      @Override
+      public void onTableSelected(String datasource, String table) {
+        // TODO Auto-generated method stub
+        ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasource + "/table/" + table).get()//
+        .withCallback(new ResourceCallback<TableDto>() {
+
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            if(resource != null) {
+              getDisplay().setEntityType(resource.getEntityType());
+            }
+          }
+        }).send();
+      }
+    });
   }
 
   @Override
@@ -95,8 +96,12 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   public boolean validate() {
     if(ImportFormat.XML.equals(importFormat) == false) {
       // table cannot be empty and cannot be a view
-      if(getDisplay().hasTable() == false) {
+      if(getDisplay().getSelectedTable().trim().isEmpty()) {
         eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
+        return false;
+      }
+      if(getDisplay().getSelectedEntityType().trim().isEmpty()) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableEntityTypeRequired").build());
         return false;
       }
       return validateDestinationTableIsNotView();
@@ -123,16 +128,13 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     return true;
   }
 
-  private void hideShowTables() {
-    getDisplay().showTables(ImportFormat.XML.equals(importFormat) == false);
-  }
-
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
   }
 
   @Override
   public void refreshDisplay() {
+    getDisplay().showTables(ImportFormat.XML.equals(importFormat) == false);
     refreshDatasources();
   }
 
@@ -142,9 +144,38 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
   public void updateImportData(ImportData importData) {
     importData.setDestinationDatasourceName(getDisplay().getSelectedDatasource());
-    if(getDisplay().hasTable()) {
+    if(ImportFormat.XML.equals(importFormat) == false) {
       importData.setDestinationTableName(getDisplay().getSelectedTable());
-    } else
+    } else {
       importData.setDestinationTableName(null);
+    }
+  }
+
+  //
+  // Inner classes and interfaces
+  //
+
+  public interface Display extends WidgetDisplay, WizardStepDisplay {
+
+    void setDatasources(JsArray<DatasourceDto> datasources);
+
+    void setTable(String name);
+
+    void setEntityType(String entityType);
+
+    String getSelectedDatasource();
+
+    String getSelectedTable();
+
+    String getSelectedEntityType();
+
+    void showTables(boolean visible);
+
+    void setTableSelectionHandler(TableSelectionHandler handler);
+
+  }
+
+  public interface TableSelectionHandler {
+    public void onTableSelected(String datasource, String table);
   }
 }

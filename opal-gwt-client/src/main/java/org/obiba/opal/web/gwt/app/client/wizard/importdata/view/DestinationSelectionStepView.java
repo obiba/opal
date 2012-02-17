@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.widgets.view.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter.TableSelectionHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;
@@ -56,6 +57,8 @@ public class DestinationSelectionStepView extends Composite implements Destinati
 
   private JsArray<DatasourceDto> datasources;
 
+  private TableSelectionHandler tableSelectionHandler;
+
   public DestinationSelectionStepView() {
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -78,7 +81,11 @@ public class DestinationSelectionStepView extends Composite implements Destinati
 
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
-        entityTypeInput.setVisible(tableListBox.getText().trim().isEmpty() == false && tableListBox.hasItem(tableListBox.getText()) == false);
+        boolean knownTable = tableListBox.hasItem(tableListBox.getText());
+        entityTypeListBox.setEnabled(knownTable == false);
+        if(knownTable) {
+          tableSelectionHandler.onTableSelected(getSelectedDatasource(), getSelectedTable());
+        }
       }
     });
   }
@@ -117,8 +124,8 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   }
 
   @Override
-  public boolean hasTable() {
-    return this.tableListBox.getValue().trim().isEmpty() == false;
+  public String getSelectedEntityType() {
+    return entityTypeListBox.getText();
   }
 
   @Override
@@ -129,7 +136,8 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   @Override
   public void showTables(boolean visible) {
     tableInput.setVisible(visible);
-    entityTypeInput.setVisible(false);
+    entityTypeInput.setVisible(visible);
+    entityTypeListBox.setEnabled(false);
     entityTypeListBox.setText("Participant");
   }
 
@@ -170,5 +178,15 @@ public class DestinationSelectionStepView extends Composite implements Destinati
       list.add(jsArrayString.get(i));
     }
     return list;
+  }
+
+  @Override
+  public void setEntityType(String entityType) {
+    entityTypeListBox.setText(entityType);
+  }
+
+  @Override
+  public void setTableSelectionHandler(TableSelectionHandler handler) {
+    this.tableSelectionHandler = handler;
   }
 }
