@@ -40,8 +40,6 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
   private List<String> availableCharsets = new ArrayList<String>();
 
-  private String defaultCharset;
-
   @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
 
@@ -110,7 +108,6 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
       public void onResource(Response response, JsArrayString resource) {
         String charset = resource.get(0);
         getDisplay().setDefaultCharset(charset);
-        CsvFormatStepPresenter.this.defaultCharset = charset;
       }
     }).send();
 
