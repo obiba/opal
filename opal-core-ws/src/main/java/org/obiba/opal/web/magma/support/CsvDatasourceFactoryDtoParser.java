@@ -66,8 +66,10 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
       }
       if(refTable != null) {
         factory.addTable(refTable, data);
-      } else {
+      } else if(variables != null && variables.exists()) {
         factory.addTable(tableBundleDto.getName(), variables, data);
+      } else {
+        factory.addTable(tableBundleDto.getName(), data, tableBundleDto.getEntityType());
       }
     }
   }

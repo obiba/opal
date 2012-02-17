@@ -45,6 +45,8 @@ public class ImportData {
 
   private String transientDatasourceName;
 
+  private String entityType;
+
   public void clear() {
     importFormat = null;
     xmlFile = null;
@@ -205,4 +207,11 @@ public class ImportData {
     this.transientDatasourceName = transientDatasourceName;
   }
 
+  public void setDestinationEntityType(String entityType) {
+    this.entityType = entityType;
+  }
+
+  public String getEntityType() {
+    return entityType;
+  }
 }

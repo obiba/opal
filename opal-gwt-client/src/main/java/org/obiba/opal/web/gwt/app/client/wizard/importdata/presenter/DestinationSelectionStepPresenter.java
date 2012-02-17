@@ -146,6 +146,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     importData.setDestinationDatasourceName(getDisplay().getSelectedDatasource());
     if(ImportFormat.XML.equals(importFormat) == false) {
       importData.setDestinationTableName(getDisplay().getSelectedTable());
+      importData.setDestinationEntityType(getDisplay().getSelectedEntityType());
     } else {
       importData.setDestinationTableName(null);
     }

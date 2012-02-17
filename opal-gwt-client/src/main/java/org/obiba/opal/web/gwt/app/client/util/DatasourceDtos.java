@@ -37,6 +37,7 @@ public class DatasourceDtos {
     CsvDatasourceTableBundleDto bundleDto = CsvDatasourceTableBundleDto.create();
     bundleDto.setName(importData.getDestinationTableName());
     bundleDto.setData(importData.getCsvFile());
+    bundleDto.setEntityType(importData.getEntityType());
     if(importData.getDestinationDatasourceName() != null) {
       bundleDto.setRefTable(importData.getDestinationDatasourceName() + "." + importData.getDestinationTableName());
     }
