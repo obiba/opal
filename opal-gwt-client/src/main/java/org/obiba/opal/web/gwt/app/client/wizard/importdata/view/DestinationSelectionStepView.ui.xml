@@ -14,10 +14,12 @@
     <g:FlowPanel ui:field="tableInput" styleName="input">
       <g:Label addStyleNames="key"><ui:msg description="Destination table label">Destination Table</ui:msg></g:Label>
       <w:EditableListBox ui:field="tableListBox"/>
+      <g:Label styleName="help-block"><ui:msg description="Destination Table Name help label">Select an existing table or provide a name for a new table</ui:msg></g:Label>
     </g:FlowPanel>
     <g:FlowPanel ui:field="entityTypeInput" styleName="input" visible="false">
       <g:Label addStyleNames="key"><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
       <w:EditableListBox ui:field="entityTypeListBox"/>
+      <g:Label styleName="help-block"><ui:msg description="Destination Entity Type help label">Specify what these data relate to (Participant, Instrument, Area etc.)</ui:msg></g:Label>
     </g:FlowPanel>
   </g:FlowPanel>
   

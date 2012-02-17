@@ -100,6 +100,10 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
         eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
         return false;
       }
+      if(getDisplay().getSelectedTable().contains(".") || getDisplay().getSelectedTable().contains(":")) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableNameInvalid").build());
+        return false;
+      }
       if(getDisplay().getSelectedEntityType().trim().isEmpty()) {
         eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableEntityTypeRequired").build());
         return false;

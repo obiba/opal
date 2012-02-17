@@ -71,7 +71,7 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
     });
 
     panel.add(menuBar);
-    panel.setStyleName("gwt-MenuBarPopup");
+    panel.setStyleName("obiba-EditableListBox gwt-MenuBarPopup");
 
     setStylePrimaryName("obiba-EditableListBox");
   }

@@ -279,6 +279,7 @@ public interface Translations extends Constants {
   "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
   "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
   "DestinationTableRequired", "The destination table is required.",//
+  "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",//
   "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
   "DestinationTableCannotBeView", "The destination table cannot be a view."//
   })
