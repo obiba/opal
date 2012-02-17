@@ -82,15 +82,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
   }
 
   private String getSelectedCharacterSet() {
-    String charset = null;
-    if(getDisplay().isDefaultCharacterSet().getValue()) {
-      charset = defaultCharset;
-    } else if(getDisplay().isCharsetCommonList().getValue()) {
-      charset = getDisplay().getCharsetCommonList();
-    } else if(getDisplay().isCharsetSpecify().getValue()) {
-      charset = getDisplay().getCharsetSpecifyText().getText();
-    }
-    return charset;
+    return getDisplay().getCharsetText().getText();
   }
 
   private List<String> validateCharacterSet(String charset) {

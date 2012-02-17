@@ -14,18 +14,12 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.SpanElement;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -55,22 +49,7 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   EditableListBox quote;
 
   @UiField
-  RadioButton charsetDefault;
-
-  @UiField
-  RadioButton charsetCommonList;
-
-  @UiField
-  ListBox charsetCommonListBox;
-
-  @UiField
-  RadioButton charsetSpecify;
-
-  @UiField
-  SpanElement defaultCharset;
-
-  @UiField
-  TextBox charsetSpecifyTextBox;
+  EditableListBox charsetListBox;
 
   @UiField
   DisclosurePanel advancedOptions;
@@ -83,16 +62,14 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     initWidget(uiBinder.createAndBindUi(this));
     populateField();
 
-    final ValueChangeHandler<Boolean> valueChangeHandler = new CharsetValueChangeHandler();
-    charsetDefault.addValueChangeHandler(valueChangeHandler);
-    charsetCommonList.addValueChangeHandler(valueChangeHandler);
-    charsetSpecify.addValueChangeHandler(valueChangeHandler);
-
     for(String s : new String[] { ",", ";", ":", "tab", "|" }) {
       field.addItem(s);
     }
     for(String s : new String[] { "\"", "'" }) {
       quote.addItem(s);
+    }
+    for(String s : new String[] { "ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9", "ISO-8859-13", "ISO-8859-15", "UTF-8", "UTF-16", "UTF-32" }) {
+      charsetListBox.addItem(s);
     }
   }
 
@@ -118,59 +95,36 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   // CsvOptionsDisplay Methods
   //
 
+  @Override
   public void setCsvFileSelectorWidgetDisplay(Display display) {
     selectCsvFilePanel.setWidget(display.asWidget());
     fileSelection = display;
     fileSelection.setFieldWidth("20em");
   }
 
+  @Override
   public HasText getRowText() {
     return row;
   }
 
+  @Override
+  public HasText getCharsetText() {
+    return charsetListBox;
+  }
+
+  @Override
   public String getFieldSeparator() {
     return field.getValue();
   }
 
+  @Override
   public String getQuote() {
     return quote.getValue();
   }
 
-  public HasValue<Boolean> isDefaultCharacterSet() {
-    return charsetDefault;
-  }
-
-  public void setDefaultCharset(String defaultCharset) {
-    this.defaultCharset.setInnerText(defaultCharset);
-  }
-
-  public HasValue<Boolean> isCharsetCommonList() {
-    return charsetCommonList;
-  }
-
-  public String getCharsetCommonList() {
-    return charsetCommonListBox.getValue(charsetCommonListBox.getSelectedIndex());
-  }
-
-  public HasValue<Boolean> isCharsetSpecify() {
-    return charsetSpecify;
-  }
-
-  public HasText getCharsetSpecifyText() {
-    return charsetSpecifyTextBox;
-  }
-
   @Override
-  public String getSelectedCharacterSet() {
-    String charset = null;
-    if(isDefaultCharacterSet().getValue()) {
-      charset = this.defaultCharset.getInnerText();
-    } else if(isCharsetCommonList().getValue()) {
-      charset = getCharsetCommonList();
-    } else if(isCharsetSpecify().getValue()) {
-      charset = getCharsetSpecifyText().getText();
-    }
-    return charset;
+  public void setDefaultCharset(String defaultCharset) {
+    charsetListBox.setText(defaultCharset);
   }
 
   public Widget asWidget() {
@@ -189,7 +143,6 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
 
   @Override
   public void resetCommonCharset() {
-    charsetCommonListBox.setSelectedIndex(0);
   }
 
   @Override
@@ -201,16 +154,6 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     row.setText("1");
     resetFieldSeparator();
     resetQuote();
-
-    charsetDefault.setValue(true);
-
-    charsetCommonList.setValue(false);
-    charsetCommonListBox.setEnabled(false);
-    charsetCommonListBox.setSelectedIndex(0);
-
-    charsetSpecify.setValue(false);
-    charsetSpecifyTextBox.setEnabled(false);
-    charsetSpecifyTextBox.setText("");
   }
 
   //
@@ -227,26 +170,5 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
 
   @UiTemplate("CsvOptionsView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, CsvOptionsView> {
-  }
-
-  class CharsetValueChangeHandler implements ValueChangeHandler<Boolean> {
-
-    @Override
-    public void onValueChange(ValueChangeEvent<Boolean> event) {
-      if(event.getValue() == true) {
-        if(event.getSource().equals(charsetDefault)) {
-          charsetCommonListBox.setEnabled(false);
-          charsetSpecifyTextBox.setEnabled(false);
-          charsetSpecifyTextBox.setText("");
-        } else if(event.getSource().equals(charsetCommonList)) {
-          charsetCommonListBox.setEnabled(true);
-          charsetSpecifyTextBox.setEnabled(false);
-          charsetSpecifyTextBox.setText("");
-        } else if(event.getSource().equals(charsetSpecify)) {
-          charsetSpecifyTextBox.setEnabled(true);
-          charsetCommonListBox.setEnabled(false);
-        }
-      }
-    }
   }
 }

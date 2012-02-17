@@ -12,8 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
@@ -27,10 +25,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
@@ -73,8 +68,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
 
     addValidator(new RequiredTextValidator(getSelectedFile(), "NoDataFileSelected"));
     addValidator(new RegExValidator(getView().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
-    addValidator(new ConditionalValidator(getView().isCharsetSpecify(), new RequiredTextValidator(getView().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
-    addValidator(new ConditionalValidator(getView().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
+    addValidator(new RequiredTextValidator(getView().getCharsetText(), "CharsetNotAvailable"));
   }
 
   @Override
@@ -145,17 +139,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
   }
 
   private String getCharset() {
-    String charset = null;
-
-    if(!getView().isDefaultCharacterSet().getValue()) {
-      if(getView().isCharsetCommonList().getValue()) {
-        charset = getView().getCharsetCommonList();
-      } else if(getView().isCharsetSpecify().getValue()) {
-        charset = getView().getCharsetSpecifyText().getText();
-      }
-    }
-
-    return charset;
+    return getView().getCharsetText().getText();
   }
 
   private void getDefaultCharset() {
@@ -197,31 +181,6 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
     return selectedFile;
   }
 
-  private HasValue<Boolean> isSpecificCharsetAvailable() {
-    if(isSpecificCharsetAvailable == null) {
-      isSpecificCharsetAvailable = new HasValue<Boolean>() {
-
-        public Boolean getValue() {
-          return availableCharsets.contains(getView().getCharsetSpecifyText().getText());
-        }
-
-        public void setValue(Boolean arg0) {
-        }
-
-        public void setValue(Boolean arg0, boolean arg1) {
-        }
-
-        public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> arg0) {
-          return null;
-        }
-
-        public void fireEvent(GwtEvent<?> arg0) {
-        }
-      };
-    }
-    return isSpecificCharsetAvailable;
-  }
-
   //
   // Interfaces and Inner Classes
   //
@@ -232,21 +191,13 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
 
     HasText getRowText();
 
+    HasText getCharsetText();
+
     void setDefaultCharset(String charset);
 
     String getQuote();
 
     String getFieldSeparator();
-
-    HasValue<Boolean> isDefaultCharacterSet();
-
-    HasValue<Boolean> isCharsetCommonList();
-
-    String getCharsetCommonList();
-
-    HasValue<Boolean> isCharsetSpecify();
-
-    HasText getCharsetSpecifyText();
 
     void resetQuote();
 

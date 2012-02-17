@@ -18,8 +18,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.util.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -46,14 +44,11 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -226,8 +221,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
       if(getView().getImportFormat().equals(ImportFormat.CSV)) {
         validators.add(new RequiredTextValidator(getSelectedCsvFile(), "NoFileSelected"));
         validators.add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
-        validators.add(new ConditionalValidator(getView().getCsvOptions().isCharsetSpecify(), new RequiredTextValidator(getView().getCsvOptions().getCharsetSpecifyText(), "SpecificCharsetNotIndicated")));
-        validators.add(new ConditionalValidator(getView().getCsvOptions().isCharsetSpecify(), new ConditionValidator(isSpecificCharsetAvailable(), "CharsetNotAvailable")));
+        validators.add(new RequiredTextValidator(getView().getCsvOptions().getCharsetText(), "CharsetNotAvailable"));
       } else {
         validators.add(new RequiredTextValidator(getView().getSelectedFile(), "NoFileSelected"));
       }
@@ -244,7 +238,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
     importData.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
     importData.setXmlFile(fileSelectionPresenter.getSelectedFile());
     importData.setUnit(functionalUnit.getName());
-    importData.setCharacterSet(getView().getCsvOptions().getSelectedCharacterSet());
+    importData.setCharacterSet(getView().getCsvOptions().getCharsetText().getText());
     importData.setRow(Integer.parseInt(getView().getCsvOptions().getRowText().getText()));
     importData.setQuote(getView().getCsvOptions().getQuote());
     importData.setField(getView().getCsvOptions().getFieldSeparator());
@@ -311,29 +305,6 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
       public void setText(String text) {
         // do nothing
-      }
-    };
-    return result;
-  }
-
-  private HasValue<Boolean> isSpecificCharsetAvailable() {
-    HasValue<Boolean> result = new HasValue<Boolean>() {
-
-      public Boolean getValue() {
-        return availableCharsets.contains(getView().getCsvOptions().getCharsetSpecifyText().getText());
-      }
-
-      public void setValue(Boolean arg0) {
-      }
-
-      public void setValue(Boolean arg0, boolean arg1) {
-      }
-
-      public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> arg0) {
-        return null;
-      }
-
-      public void fireEvent(GwtEvent<?> arg0) {
       }
     };
     return result;

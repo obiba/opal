@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.gwtplatform.mvp.client.View;
 
 public interface CsvOptionsDisplay extends View {
@@ -19,24 +18,13 @@ public interface CsvOptionsDisplay extends View {
 
   HasText getRowText();
 
+  HasText getCharsetText();
+
   String getFieldSeparator();
 
   String getQuote();
 
   void setDefaultCharset(String defaultCharset);
-
-  HasValue<Boolean> isDefaultCharacterSet();
-
-  HasValue<Boolean> isCharsetCommonList();
-
-  String getCharsetCommonList();
-
-  HasValue<Boolean> isCharsetSpecify();
-
-  HasText getCharsetSpecifyText();
-
-  /** Returns the character set selected by the user. */
-  String getSelectedCharacterSet();
 
   void resetFieldSeparator();
 

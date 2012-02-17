@@ -15,7 +15,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public abstract class AbstractCsvOptionsView extends ViewImpl implements CsvOptionsDisplay, WidgetDisplay {
@@ -31,6 +30,11 @@ public abstract class AbstractCsvOptionsView extends ViewImpl implements CsvOpti
   }
 
   @Override
+  public HasText getCharsetText() {
+    return getCsvOptions().getCharsetText();
+  }
+
+  @Override
   public String getFieldSeparator() {
     return getCsvOptions().getFieldSeparator();
   }
@@ -41,33 +45,8 @@ public abstract class AbstractCsvOptionsView extends ViewImpl implements CsvOpti
   }
 
   @Override
-  public HasValue<Boolean> isDefaultCharacterSet() {
-    return getCsvOptions().isDefaultCharacterSet();
-  }
-
-  @Override
   public void setDefaultCharset(String defaultCharset) {
     getCsvOptions().setDefaultCharset(defaultCharset);
-  }
-
-  @Override
-  public HasValue<Boolean> isCharsetCommonList() {
-    return getCsvOptions().isCharsetCommonList();
-  }
-
-  @Override
-  public String getCharsetCommonList() {
-    return getCsvOptions().getCharsetCommonList();
-  }
-
-  @Override
-  public HasValue<Boolean> isCharsetSpecify() {
-    return getCsvOptions().isCharsetSpecify();
-  }
-
-  @Override
-  public HasText getCharsetSpecifyText() {
-    return getCsvOptions().getCharsetSpecifyText();
   }
 
   @Override
@@ -83,11 +62,6 @@ public abstract class AbstractCsvOptionsView extends ViewImpl implements CsvOpti
   @Override
   public void resetCommonCharset() {
     getCsvOptions().resetCommonCharset();
-  }
-
-  @Override
-  public String getSelectedCharacterSet() {
-    return getCsvOptions().getSelectedCharacterSet();
   }
 
   @Override
