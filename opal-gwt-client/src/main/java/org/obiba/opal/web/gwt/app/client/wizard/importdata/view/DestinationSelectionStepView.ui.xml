@@ -2,18 +2,22 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui" 
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
   xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key"><ui:msg description="Destination datasource label">Destination Datasource</ui:msg></g:Label>
-      <g:ListBox ui:field='datasetListBox' visibleItemCount='1'/>
+      <g:ListBox ui:field="datasetListBox" visibleItemCount="1"/>
     </g:FlowPanel>
-    <g:FlowPanel styleName="input">
-      <g:Label ui:field='tableListBoxLabel' addStyleNames="key"><ui:msg description="Destination table label">Destination Table</ui:msg></g:Label>
-      <w:EditableListBox ui:field='tableListBox'/>
+    <g:FlowPanel ui:field="tableInput" styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="Destination table label">Destination Table</ui:msg></g:Label>
+      <w:EditableListBox ui:field="tableListBox"/>
+    </g:FlowPanel>
+    <g:FlowPanel ui:field="entityTypeInput" styleName="input" visible="false">
+      <g:Label addStyleNames="key"><ui:msg description="Entity type label">Entity Type</ui:msg></g:Label>
+      <w:EditableListBox ui:field="entityTypeListBox"/>
     </g:FlowPanel>
   </g:FlowPanel>
   

@@ -40,9 +40,9 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
 
     String getSelectedTable();
 
-    void hideTables();
+    void setTable(String name);
 
-    void showTables();
+    void showTables(boolean visible);
 
   }
 
@@ -92,46 +92,6 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     }).send();
   }
 
-  private void updateSelectableDatasources() {
-    JsArray<DatasourceDto> selectableDatasources;
-    if(ImportFormat.CSV.equals(importFormat)) {
-      selectableDatasources = removeDatasourcesWithoutTables(datasources);
-
-      // OPAL-902
-      selectableDatasources = removeDatasourcesWithOnlyViews(selectableDatasources);
-    } else {
-      selectableDatasources = datasources;
-    }
-
-    getDisplay().setDatasources(selectableDatasources);
-  }
-
-  private JsArray<DatasourceDto> removeDatasourcesWithoutTables(JsArray<DatasourceDto> datasources) {
-    @SuppressWarnings("unchecked")
-    JsArray<DatasourceDto> result = (JsArray<DatasourceDto>) JsArray.createArray();
-    for(int i = 0; i < datasources.length(); i++) {
-      DatasourceDto d = datasources.get(i);
-
-      if(d.getTableArray().length() > 0) {
-        result.push(d);
-      }
-    }
-    return result;
-  }
-
-  private JsArray<DatasourceDto> removeDatasourcesWithOnlyViews(JsArray<DatasourceDto> datasources) {
-    @SuppressWarnings("unchecked")
-    JsArray<DatasourceDto> result = (JsArray<DatasourceDto>) JsArray.createArray();
-    for(int i = 0; i < datasources.length(); i++) {
-      DatasourceDto d = datasources.get(i);
-
-      if(d.getTableArray().length() > d.getViewArray().length()) {
-        result.push(d);
-      }
-    }
-    return result;
-  }
-
   public boolean validate() {
     if(ImportFormat.XML.equals(importFormat) == false) {
       // table cannot be empty and cannot be a view
@@ -164,11 +124,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   }
 
   private void hideShowTables() {
-    if(ImportFormat.XML.equals(importFormat)) {
-      getDisplay().hideTables();
-    } else {
-      getDisplay().showTables();
-    }
+    getDisplay().showTables(ImportFormat.XML.equals(importFormat) == false);
   }
 
   @Override

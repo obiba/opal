@@ -131,6 +131,10 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     getDisplay().clear();
   }
 
+  public String getSelectedFile() {
+    return csvFileSelectionPresenter.getSelectedFile();
+  }
+
   //
   // Display methods
   //
@@ -139,7 +143,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
   public ImportData getImportData() {
     ImportData importData = new ImportData();
     importData.setFormat(ImportFormat.CSV);
-    importData.setCsvFile(csvFileSelectionPresenter.getSelectedFile());
+    importData.setCsvFile(getSelectedFile());
     importData.setRow(Integer.parseInt(getDisplay().getRowText().getText()));
     importData.setField(getDisplay().getFieldSeparator());
     importData.setQuote(getDisplay().getQuote());

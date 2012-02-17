@@ -96,25 +96,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     setInSlot(Slots.Values, datasourceValuesStepPresenter);
 
     getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
-    getView().setDestinationSelectionValidationHandler(new ValidationHandler() {
-
-      @Override
-      public boolean validate() {
-        return destinationSelectionStepPresenter.validate();
-      }
-    });
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
     getView().setIdentityArchiveStepDisplay(identityArchiveStepPresenter.getDisplay());
-
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
-    getView().setComparedDatasourcesReportValidationHandler(new ValidationHandler() {
-
-      @Override
-      public boolean validate() {
-        datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName());
-        return comparedDatasourcesReportPresenter.canBeSubmitted();
-      }
-    });
 
     addEventHandlers();
   }
@@ -131,10 +115,34 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
       @Override
       public boolean validate() {
-        return formatStepPresenter.validate();
+        if(formatStepPresenter.validate()) {
+          if(getView().getImportFormat().equals(ImportFormat.CSV)) {
+            String name = csvFormatStepPresenter.getSelectedFile();
+            name = name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
+            destinationSelectionStepPresenter.getDisplay().setTable(name);
+          } else {
+            destinationSelectionStepPresenter.getDisplay().setTable("");
+          }
+          return true;
+        }
+        return false;
       }
     });
+    getView().setDestinationSelectionValidationHandler(new ValidationHandler() {
 
+      @Override
+      public boolean validate() {
+        return destinationSelectionStepPresenter.validate();
+      }
+    });
+    getView().setComparedDatasourcesReportValidationHandler(new ValidationHandler() {
+
+      @Override
+      public boolean validate() {
+        datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName());
+        return comparedDatasourcesReportPresenter.canBeSubmitted();
+      }
+    });
   }
 
   @Override

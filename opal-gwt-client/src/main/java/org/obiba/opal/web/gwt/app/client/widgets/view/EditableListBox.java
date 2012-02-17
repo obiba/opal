@@ -78,6 +78,10 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
     textBox.addStyleName(style);
   }
 
+  public boolean hasItem(final String value) {
+    return menuItemsMap.containsKey(value);
+  }
+
   public void addItem(final String value) {
     if(menuItemsMap.containsKey(value)) {
       removeItem(value);

@@ -21,12 +21,14 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DestinationSelectionStepView extends Composite implements DestinationSelectionStepPresenter.Display {
@@ -44,12 +46,22 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   EditableListBox tableListBox;
 
   @UiField
-  Label tableListBoxLabel;
+  Panel tableInput;
+
+  @UiField
+  EditableListBox entityTypeListBox;
+
+  @UiField
+  Panel entityTypeInput;
 
   private JsArray<DatasourceDto> datasources;
 
   public DestinationSelectionStepView() {
     initWidget(uiBinder.createAndBindUi(this));
+
+    entityTypeListBox.addItem("Participant");
+    entityTypeListBox.setText("Participant");
+
     addHandlers();
   }
 
@@ -59,6 +71,14 @@ public class DestinationSelectionStepView extends Composite implements Destinati
       @Override
       public void onChange(ChangeEvent event) {
         displayTablesFor(datasetListBox.getValue(datasetListBox.getSelectedIndex()));
+      }
+    });
+
+    tableListBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        entityTypeInput.setVisible(tableListBox.getText().trim().isEmpty() == false && tableListBox.hasItem(tableListBox.getText()) == false);
       }
     });
   }
@@ -98,19 +118,19 @@ public class DestinationSelectionStepView extends Composite implements Destinati
 
   @Override
   public boolean hasTable() {
-    return this.tableListBox.getValue().isEmpty() == false;
+    return this.tableListBox.getValue().trim().isEmpty() == false;
   }
 
   @Override
-  public void hideTables() {
-    tableListBoxLabel.setVisible(false);
-    tableListBox.setVisible(false);
+  public void setTable(String name) {
+    tableListBox.setValue(name, true);
   }
 
   @Override
-  public void showTables() {
-    tableListBoxLabel.setVisible(true);
-    tableListBox.setVisible(true);
+  public void showTables(boolean visible) {
+    tableInput.setVisible(visible);
+    entityTypeInput.setVisible(false);
+    entityTypeListBox.setText("Participant");
   }
 
   @Override
