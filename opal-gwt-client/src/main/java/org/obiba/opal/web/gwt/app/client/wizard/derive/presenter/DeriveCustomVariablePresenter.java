@@ -25,7 +25,6 @@ import org.obiba.opal.web.model.client.magma.LinkDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -68,12 +67,11 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
       ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(originalVariable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
         @Override
         public void onResource(Response response, TableDto table) {
-          String selectedScript = getView().getScriptBox().getSelectedScript();
           VariableDto variable = getDerivedVariable();
-          if(Strings.isNullOrEmpty(selectedScript) == false && selectedScript.equals(getView().getScriptBox().getValue()) == false) {
+          if(getView().getScriptBox().isTextSelected()) {
             variable.setValueType(ValueType.TEXT.getLabel());
             variable.setIsRepeatable(false);
-            VariableDtos.setScript(variable, selectedScript);
+            VariableDtos.setScript(variable, getView().getScriptBox().getSelectedScript());
           }
           scriptEvaluationPopupPresenter.initialize(table, variable);
         }

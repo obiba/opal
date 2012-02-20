@@ -15,6 +15,8 @@ import org.obiba.opal.web.model.client.magma.LinkDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
@@ -60,9 +62,14 @@ public class ScriptSuggestBox extends Composite {
     return inner.getSelectedText();
   }
 
+  public boolean isTextSelected() {
+    return inner.isTextSelected();
+  }
+
   public void setValue(String value) {
+
     variable.setValue(value);
-    inner.setRealText(value);
+    inner.initializeText(value);
   }
 
   public String getValue() {
@@ -89,6 +96,18 @@ public class ScriptSuggestBox extends Composite {
     public int getOffsetWidth() {
       return 1;
     }
+  }
+
+  public void setEnabled(boolean enabled) {
+    inner.setEnabled(enabled);
+  }
+
+  public void setReadOnly(boolean readOnly) {
+    inner.setReadOnly(readOnly);
+  }
+
+  public HandlerRegistration addChangeHandler(ChangeHandler handler) {
+    return inner.addChangeHandler(handler);
   }
 
 }

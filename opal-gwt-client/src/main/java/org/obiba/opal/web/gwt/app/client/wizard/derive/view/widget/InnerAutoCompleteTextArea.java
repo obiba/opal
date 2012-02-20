@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,28 +8,30 @@ import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.text.shared.testing.PassthroughParser;
 import com.google.gwt.user.client.ui.TextArea;
 
 public class InnerAutoCompleteTextArea extends TextArea {
 
-  private List<String> suggestions = new ArrayList<String>();
+  private List<String> suggestions;
 
-  private String previousText = "";
+  private String previousText;
 
-  private int currentSuggestionPosition = 0;
+  private int currentSuggestionPosition;
 
-  private String currentSuggestion = "";
+  private String currentSuggestion;
 
-  private boolean backspacePressed = false;
+  private boolean backspacePressed;
 
   private String text;
 
   public InnerAutoCompleteTextArea() {
+    initializeText("");
     addKeyDownHandler(new KeyDownHandler() {
 
       @Override
       public void onKeyDown(KeyDownEvent event) {
-        if(!Strings.isNullOrEmpty(currentSuggestion)) {
+        if(Strings.isNullOrEmpty(currentSuggestion) == false) {
           switch(event.getNativeKeyCode()) {
           case KeyCodes.KEY_ENTER:
           case KeyCodes.KEY_UP:
@@ -57,20 +60,36 @@ public class InnerAutoCompleteTextArea extends TextArea {
     }
     if(Strings.isNullOrEmpty(text)) {
       currentSuggestion = "";
+      previousText = text;
       return text;
     }
     previousText = text;
     if(backspacePressed) {
-      if(!Strings.isNullOrEmpty(currentSuggestion)) {
+      if(Strings.isNullOrEmpty(currentSuggestion) == false) {
         currentSuggestion = currentSuggestion.substring(0, currentSuggestion.length() - 1);
       }
     } else {
+      if(cursorPosition == 0) return "";
       char charAt = text.charAt(cursorPosition - 1);
       currentSuggestion += Character.toString(charAt);
     }
     currentSuggestionPosition = cursorPosition;
-    if(!isSuggestionMatch()) currentSuggestion = "";
+    if(isSuggestionMatch() == false) currentSuggestion = "";
     return currentSuggestion;
+  }
+
+  @Override
+  public String getValueOrThrow() throws ParseException {
+    String text = getRealText();
+    String parseResult = PassthroughParser.instance().parse(text);
+    if("".equals(text)) {
+      return null;
+    }
+    return parseResult;
+  }
+
+  public boolean isTextSelected() {
+    return getSelectionLength() > 0;
   }
 
   @Override
@@ -84,11 +103,18 @@ public class InnerAutoCompleteTextArea extends TextArea {
   }
 
   public String getRealText() {
-    return text;
+    return text == null ? "" : text;
   }
 
-  public void setRealText(String value) {
+  public void initializeText(String value) {
     text = value;
+    super.setText(value);
+    suggestions = new ArrayList<String>();
+    previousText = "";
+    currentSuggestionPosition = 0;
+    currentSuggestion = "";
+    backspacePressed = false;
+    setCursorPos(text.length());
   }
 
   @Override
@@ -118,7 +144,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
    * Intern for InnerAutoCompleteTextArea. Not part of API...
    */
   public void setSelectionRange(int pos, int length) {
-    if(!isAttached()) {
+    if(isAttached() == false) {
       return;
     }
     getImpl().setSelectionRange(getElement(), pos, length);
