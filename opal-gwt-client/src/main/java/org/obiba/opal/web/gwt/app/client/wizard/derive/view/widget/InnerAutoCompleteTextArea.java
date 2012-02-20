@@ -51,6 +51,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
     });
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   @Override
   public String getText() {
     int cursorPosition = getCursorPos();
