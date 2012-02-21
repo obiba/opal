@@ -293,7 +293,7 @@ public class CompareResource {
     if(compared == null && with == null) return false;
     if((compared == null || compared.size() == 0) && (with == null || with.size() == 0)) return false;
     if((compared == null && with != null) || (compared != null && with == null)) return true;
-    if(compared.size() != with.size()) return true;
+    if(compared != null && with != null && compared.size() != with.size()) return true;
 
     for(Category comparedCat : compared) {
       boolean found = false;
@@ -332,10 +332,10 @@ public class CompareResource {
 
   private boolean isModified(Value compared, Value with) {
     if(compared == null && with == null) return false;
-    if(compared != null && with == null) return true;
-    if(compared == null && with != null) return true;
+    String comparedStr = compared == null ? null : compared.toString();
+    String withStr = with == null ? null : with.toString();
 
-    return isModified(compared.toString(), with.toString());
+    return isModified(comparedStr, withStr);
   }
 
   private boolean isSameAttribute(Attribute compared, Attribute with) {
