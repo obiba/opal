@@ -54,7 +54,7 @@
        
        <o:PropertyPanel span="2">
          <g:Label><ui:msg description="Label label">Label</ui:msg></g:Label>
-         <g:Label ui:field="label"/>
+         <g:FlowPanel ui:field="label"/>
        </o:PropertyPanel>
      </o:PropertiesTable>
 

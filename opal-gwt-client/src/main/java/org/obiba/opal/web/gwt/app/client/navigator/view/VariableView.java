@@ -13,6 +13,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CategoryAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
@@ -91,7 +92,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   Label occurrenceGroup;
 
   @UiField
-  Label label;
+  FlowPanel label;
 
   @UiField
   HorizontalTabLayout tabs;
@@ -191,9 +192,33 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     int size = attributeProvider.getList().size();
     attributeTableTitle.setText(translations.attributesLabel() + " (" + size + ")");
     attributeTablePager.firstPage();
-    label.setText(VariableViewHelper.getLabelValue(rows));
     attributeTablePager.setVisible(size > NavigatorView.PAGE_SIZE);
     attributeProvider.refresh();
+    renderVariableLabels(rows);
+  }
+
+  private void renderVariableLabels(final JsArray<AttributeDto> rows) {
+    label.clear();
+    for(AttributeDto attr : JsArrays.toIterable(rows)) {
+      if(attr.getName().equals("label")) {
+        renderVariableLabel(attr);
+      }
+    }
+  }
+
+  private void renderVariableLabel(AttributeDto attr) {
+    if(attr.hasValue() && attr.getValue().trim().length() > 0) {
+      FlowPanel item = new FlowPanel();
+      if(attr.hasLocale() && attr.getLocale().trim().length() > 0) {
+        InlineLabel lang = new InlineLabel(attr.getLocale());
+        lang.setStyleName("label");
+        item.add(lang);
+      }
+      InlineLabel value = new InlineLabel(attr.getValue());
+      value.addStyleName("xsmall-indent");
+      item.add(value);
+      label.add(item);
+    }
   }
 
   @Override
