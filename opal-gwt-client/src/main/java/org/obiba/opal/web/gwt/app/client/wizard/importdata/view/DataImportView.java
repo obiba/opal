@@ -305,7 +305,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public void prepareDatasourceCreation() {
-    dialog.setNextEnabled(false);
+    dialog.setProgress(true);
   }
 
   @Override
@@ -319,6 +319,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
       }
     }
+    dialog.setProgress(false);
     dialog.setNextEnabled(false);
   }
 
@@ -326,7 +327,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   public void showDatasourceCreationSuccess() {
     comparedDatasourcesReportPanel.setVisible(true);
     validationReportPanel.setVisible(false);
-    dialog.setNextEnabled(true);
+    dialog.setProgress(false);
   }
 
 }
