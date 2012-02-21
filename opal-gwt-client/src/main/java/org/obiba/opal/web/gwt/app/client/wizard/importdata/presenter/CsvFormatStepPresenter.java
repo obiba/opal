@@ -152,7 +152,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
   public boolean validate() {
     List<String> errors = new ArrayList<String>();
 
-    if(csvFileSelectionPresenter.getSelectedFile().isEmpty()) {
+    if(csvFileSelectionPresenter.getSelectedFile().isEmpty() || !csvFileSelectionPresenter.getSelectedFile().toLowerCase().endsWith(".csv")) {
       errors.add("CSVFileRequired");
     }
 

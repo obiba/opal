@@ -73,7 +73,7 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
 
   @Override
   public boolean validate() {
-    if(getDisplay().getSelectedFile().isEmpty() || !getDisplay().getSelectedFile().endsWith(".zip")) {
+    if(getDisplay().getSelectedFile().isEmpty() || !getDisplay().getSelectedFile().toLowerCase().endsWith(".zip")) {
       eventBus.fireEvent(NotificationEvent.newBuilder().error("ZipFileRequired").build());
       return false;
     }
