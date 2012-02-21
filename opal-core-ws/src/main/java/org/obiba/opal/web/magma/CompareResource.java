@@ -293,6 +293,7 @@ public class CompareResource {
     return true;
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private boolean isModified(Set<Category> compared, Set<Category> with) {
     if(compared == null && with == null) return false;
     if((compared == null || compared.size() == 0) && (with == null || with.size() == 0)) return false;
