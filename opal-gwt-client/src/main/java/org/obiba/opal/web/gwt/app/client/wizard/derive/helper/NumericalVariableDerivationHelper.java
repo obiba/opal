@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveOpenTextualVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -72,7 +71,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
           entry = ValueMapEntry.fromDistinct(frequencyDto.getValue()).newValue(Integer.toString(i + 1)).build();
           addValueMapEntry(entry);
         }
-        entry.setCount(Double.parseDouble(DeriveOpenTextualVariableStepPresenter.FREQ_FORMAT.format(freq)));
+        entry.setCount(freq);
       } else {
         setEmptiesFrequency(freq);
       }
