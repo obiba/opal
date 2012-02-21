@@ -99,7 +99,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public void addForbiddenTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
     Anchor tabHeader = getTableCompareTabHeader(tableCompareData, comparisonResult);
-    tabHeader.addStyleName("forbidden");
+    tabHeader.addStyleName("icon-before i-disapprove");
     tableChangesPanel.add(getTableCompareTabContent(tableCompareData), tabHeader);
     tableChangesPanel.setVisible(true);
     refreshPending.setVisible(false);

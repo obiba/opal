@@ -1033,42 +1033,6 @@ margin-left:0.8em;
 
 /* Import variables */ 
 
-.tableChangesPanel .tabz li {
-  padding-left:0.8em;
-}
-
-.tableChangesPanel .tabz.horizontal li {
-  padding-left:0;
-}
-
-a.table {
-  margin-bottom:0;
-}
-
-a.table.conflict, a.table.conflict:visited, a.table.conflict:hover {
-  background:transparent url(../image/16/error.png) no-repeat scroll left center;
-  height:18px;
-  padding-left:20px;
-}
-
-a.table.creation, a.table.creation:visited, a.table.creation:hover {
-  background:transparent url(../image/more.png) no-repeat scroll left center;
-  height:18px;
-  padding-left:20px;
-}
-
-a.table.modification, a.table.modification:visited, a.table.modification:hover {
-  background:transparent url(../image/16/edit.png) no-repeat scroll left center;
-  height:18px;
-  padding-left:20px;
-}
-
-a.table.forbidden, a.table.forbidden:visited, a.table.forbidden:hover {
-  background:transparent url(../image/16/forbidden.png) no-repeat scroll left center !important;
-  height:18px;
-  padding-left:20px;
-}
-
 div.variableChanges {
   height:100%;
 }
