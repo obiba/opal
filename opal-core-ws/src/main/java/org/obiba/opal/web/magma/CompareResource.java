@@ -158,12 +158,11 @@ public class CompareResource {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared));
 
-    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
-
     if(with != null) {
       dtoBuilder.setWithTable(Dtos.asDto(with));
     }
 
+    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
     conflicts.addAll(getMissingCsvVariableConficts(compared));
 
     conflicts.addAll(getConflicts(compared, with, existingVariables, false));
@@ -177,6 +176,10 @@ public class CompareResource {
       dtoBuilder.addMissingVariables(Dtos.asDto(v));
     }
 
+    return addTableCompareDtoModifications(dtoBuilder, compared, with, existingVariables, conflicts).build();
+  }
+
+  private TableCompareDto.Builder addTableCompareDtoModifications(TableCompareDto.Builder dtoBuilder, ValueTable compared, ValueTable with, Set<Variable> existingVariables, Set<ConflictDto> conflicts) {
     Set<Variable> unconflictingExistingVariables = getUnconflicting(existingVariables, conflicts);
     Set<Variable> unmodifiedVariables = unconflictingExistingVariables;
     if(with != null) {
@@ -189,7 +192,8 @@ public class CompareResource {
     for(Variable v : unmodifiedVariables) {
       dtoBuilder.addUnmodifiedVariables(Dtos.asDto(v));
     }
-    return dtoBuilder.build();
+
+    return dtoBuilder;
   }
 
   private Set<ConflictDto> getMissingCsvVariableConficts(ValueTable compared) {
@@ -299,14 +303,19 @@ public class CompareResource {
       boolean found = false;
       for(Category withCat : with) {
         if(comparedCat.getName().equals(withCat.getName())) {
-          if(comparedCat.isMissing() != withCat.isMissing()) return true;
-          if(isModified(comparedCat.getAttributes(), withCat.getAttributes())) return true;
+          if(isModified(comparedCat, withCat)) return true;
           found = true;
         }
       }
       if(found == false) return true;
     }
 
+    return false;
+  }
+
+  private boolean isModified(Category compared, Category with) {
+    if(compared.isMissing() != with.isMissing()) return true;
+    if(isModified(compared.getAttributes(), with.getAttributes())) return true;
     return false;
   }
 
