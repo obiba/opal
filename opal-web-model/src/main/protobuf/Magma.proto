@@ -240,9 +240,10 @@ message TableCompareDto {
   required TableDto compared = 1;
   optional TableDto withTable = 2; // optional because this is absent when the destination table does not exist
   repeated VariableDto newVariables = 3; // list of all variables present in "compared" but not in "with"
-  repeated VariableDto existingVariables = 4; // list of all variables present in both and whose definitions are compatible
+  repeated VariableDto unmodifiedVariables = 4; // list of all variables present in both and whose definitions are compatible and are not modified
   repeated VariableDto missingVariables = 5; // list of all variables present in "with" but not in "compared"
   repeated ConflictDto conflicts = 6;  // list of all variables present in both and whose definitions are incompatible
+  repeated VariableDto modifiedVariables = 7; // list of all variables present in both and whose definitions are compatible but are modified
 }
 
 message ConflictDto {

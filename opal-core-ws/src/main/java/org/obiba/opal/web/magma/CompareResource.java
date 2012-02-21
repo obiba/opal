@@ -10,6 +10,7 @@
 package org.obiba.opal.web.magma;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -18,9 +19,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.magma.Attribute;
+import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchVariableException;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.csv.CsvDatasource;
@@ -31,6 +35,8 @@ import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.Magma.TableCompareDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -39,6 +45,8 @@ public class CompareResource {
   //
   // Constants
   //
+  @SuppressWarnings("unused")
+  private static final Logger log = LoggerFactory.getLogger(CompareResource.class);
 
   private static final String INCOMPATIBLE_ENTITY_TYPE = "IncompatibleEntityType";
 
@@ -146,9 +154,7 @@ public class CompareResource {
     return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
   }
 
-  private
-      TableCompareDto
-      createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables, Set<Variable> missingVariables, Set<Variable> existingVariables) {
+  private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables, Set<Variable> missingVariables, Set<Variable> existingVariables) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared));
 
@@ -170,8 +176,18 @@ public class CompareResource {
     for(Variable v : missingVariables) {
       dtoBuilder.addMissingVariables(Dtos.asDto(v));
     }
-    for(Variable v : getUnconflicting(existingVariables, conflicts)) {
-      dtoBuilder.addExistingVariables(Dtos.asDto(v));
+
+    Set<Variable> unconflictingExistingVariables = getUnconflicting(existingVariables, conflicts);
+    Set<Variable> unmodifiedVariables = unconflictingExistingVariables;
+    if(with != null) {
+      Set<Variable> modifiedVariables = getUnconflictingModified(compared, with, unconflictingExistingVariables);
+      for(Variable v : modifiedVariables) {
+        dtoBuilder.addModifiedVariables(Dtos.asDto(v));
+      }
+      unmodifiedVariables.removeAll(modifiedVariables);
+    }
+    for(Variable v : unmodifiedVariables) {
+      dtoBuilder.addUnmodifiedVariables(Dtos.asDto(v));
     }
     return dtoBuilder.build();
   }
@@ -186,8 +202,7 @@ public class CompareResource {
     return conflicts;
   }
 
-  private Set<ConflictDto>
-      getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
+  private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
     Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
 
     String entityType = null;
@@ -241,6 +256,98 @@ public class CompareResource {
     }
 
     return unconflicting;
+  }
+
+  private Set<Variable> getUnconflictingModified(ValueTable compared, ValueTable with, Set<Variable> variables) {
+    Set<Variable> modified = new LinkedHashSet<Variable>(5000);
+
+    for(Variable v : variables) {
+      Variable withVar = with.getVariable(v.getName());
+      if(isModified(v, withVar)) {
+        modified.add(v);
+      }
+    }
+
+    return modified;
+  }
+
+  private boolean isModified(Variable compared, Variable with) {
+    if(isModified(compared.getMimeType(), with.getMimeType())) return true;
+    if(isModified(compared.getOccurrenceGroup(), with.getOccurrenceGroup())) return true;
+    if(isModified(compared.getReferencedEntityType(), with.getReferencedEntityType())) return true;
+    if(isModified(compared.getUnit(), with.getUnit())) return true;
+    if(isModified(compared.getCategories(), with.getCategories())) return true;
+    if(isModified(compared.getAttributes(), with.getAttributes())) return true;
+
+    return false;
+  }
+
+  private boolean isModified(String compared, String with) {
+    if(compared == null && with == null) return false;
+    if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
+    if(compared != null && compared.equals(with)) return false;
+    return true;
+  }
+
+  private boolean isModified(Set<Category> compared, Set<Category> with) {
+    if(compared == null && with == null) return false;
+    if((compared == null || compared.size() == 0) && (with == null || with.size() == 0)) return false;
+    if((compared == null && with != null) || (compared != null && with == null)) return true;
+    if(compared.size() != with.size()) return true;
+
+    for(Category comparedCat : compared) {
+      boolean found = false;
+      for(Category withCat : with) {
+        if(comparedCat.getName().equals(withCat.getName())) {
+          if(comparedCat.isMissing() != withCat.isMissing()) return true;
+          if(isModified(comparedCat.getAttributes(), withCat.getAttributes())) return true;
+          found = true;
+        }
+      }
+      if(found == false) return true;
+    }
+
+    return false;
+  }
+
+  private boolean isModified(List<Attribute> compared, List<Attribute> with) {
+    if(compared == null && with == null) return false;
+    if((compared == null || compared.size() == 0) && (with == null || with.size() == 0)) return false;
+    if(compared == null || with == null) return true;
+    if(compared.size() != with.size()) return true;
+
+    for(Attribute comparedAttr : compared) {
+      boolean found = false;
+      for(Attribute withAttr : with) {
+        if(isSameAttribute(comparedAttr, withAttr)) {
+          if(isModified(comparedAttr.getValue(), withAttr.getValue())) return true;
+          found = true;
+        }
+      }
+      if(found == false) return true;
+    }
+
+    return false;
+  }
+
+  private boolean isModified(Value compared, Value with) {
+    if(compared == null && with == null) return false;
+    if(compared != null && with == null) return true;
+    if(compared == null && with != null) return true;
+
+    return isModified(compared.toString(), with.toString());
+  }
+
+  private boolean isSameAttribute(Attribute compared, Attribute with) {
+    if(compared.getName().equals(with.getName()) == false) return false;
+    if((compared.getLocale() == null || compared.getLocale().toString().isEmpty()) && (with.getLocale() == null || with.getLocale().toString().isEmpty())) return true;
+    if(compared.getLocale() != null) {
+      return compared.getLocale().equals(with.getLocale());
+    } else if(with.getLocale() != null) {
+      return with.getLocale().equals(compared.getLocale());
+    }
+
+    return false;
   }
 
   private ConflictDto createConflictDto(VariableDto variableDto, String code, String... args) {

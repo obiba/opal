@@ -1845,6 +1845,13 @@ a.icon:hover {
 .icon-before.i-greater:before { content: ">"; }
 .icon-before.i-rotate:before { content: "*"; }
 .icon-before.i-close:before { content: "'"; }
+.icon-before.i-cross:before { 
+  content: "'"; 
+  -moz-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=0.5);
+}
 
 /* Social networks icons */
 .icon-before.i-rss:before { content: "r"; }
@@ -1880,7 +1887,7 @@ a.icon:hover {
 .icon-before.i-forward:before { content: "j"; }
 .icon-before.i-fullscreen:before { content: "%"; }
 .icon-before.i-done:before { content: "."; }
-.icon-before.i-approved:before { content: "/"; }
+.icon-before.i-approve:before { content: "/"; }
 .icon-before.i-loading:before { content: "0—7"; }
 .icon-before.i-alert:before { content: "W"; }
 .icon-before.i-sync:before { content: "V"; }

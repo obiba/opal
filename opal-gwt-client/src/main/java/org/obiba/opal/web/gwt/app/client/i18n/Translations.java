@@ -612,6 +612,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("New Variables")
   String newVariablesLabel();
 
+  @Description("Unmodified variables label")
+  @DefaultStringValue("Unmodified Variables")
+  String unmodifiedVariablesLabel();
+
   @Description("Modified variables label")
   @DefaultStringValue("Modified Variables")
   String modifiedVariablesLabel();

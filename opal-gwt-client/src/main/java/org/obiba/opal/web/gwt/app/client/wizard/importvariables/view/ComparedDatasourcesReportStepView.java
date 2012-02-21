@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
@@ -136,11 +137,13 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   private Anchor getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
     Anchor tabHeader = new Anchor(tableCompareData.getCompared().getName());
     if(comparisonResult == ComparisonResult.CONFLICT) {
-      tabHeader.addStyleName("table conflict");
+      tabHeader.addStyleName("icon-before i-alert");
     } else if(comparisonResult == ComparisonResult.CREATION) {
-      tabHeader.addStyleName("table creation");
+      tabHeader.addStyleName("icon-before i-plus");
+    } else if(comparisonResult == ComparisonResult.MODIFICATION) {
+      tabHeader.addStyleName("icon-before i-reblog");
     } else {
-      tabHeader.addStyleName("table modification");
+      tabHeader.addStyleName("icon-before i-done");
     }
     return tabHeader;
   }
@@ -150,10 +153,15 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     HorizontalTabLayout variableChangesPanel = new HorizontalTabLayout();
     variableChangesPanel.addStyleName("variableChanges");
 
-    JsArray<VariableDto> newVariables = getNullAsEmptyArray(tableCompareData.getNewVariablesArray());
-    JsArray<VariableDto> modifiedVariables = getNullAsEmptyArray(tableCompareData.getExistingVariablesArray());
-    JsArray<ConflictDto> conflicts = getNullAsEmptyArray(tableCompareData.getConflictsArray());
+    JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareData.getNewVariablesArray());
+    JsArray<VariableDto> unmodifiedVariables = JsArrays.toSafeArray(tableCompareData.getUnmodifiedVariablesArray());
+    JsArray<VariableDto> modifiedVariables = JsArrays.toSafeArray(tableCompareData.getModifiedVariablesArray());
+    JsArray<ConflictDto> conflicts = JsArrays.toSafeArray(tableCompareData.getConflictsArray());
     addVariableChangesSummary(tableComparePanel, newVariables, modifiedVariables, conflicts);
+
+    if(unmodifiedVariables.length() > 0) {
+      addVariablesTab(unmodifiedVariables, variableChangesPanel, translations.unmodifiedVariablesLabel());
+    }
 
     if(newVariables.length() > 0) {
       addVariablesTab(newVariables, variableChangesPanel, translations.newVariablesLabel());
@@ -167,11 +175,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       addConflictsTab(conflicts, variableChangesPanel);
     }
     return variableChangesPanel;
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T extends JavaScriptObject> JsArray<T> getNullAsEmptyArray(JsArray<T> array) {
-    return (JsArray<T>) (array != null ? array : JsArray.createArray());
   }
 
   private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables, JsArray<ConflictDto> conflicts) {
@@ -309,7 +312,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       }
 
       private String getVariableLabels(VariableDto variable) {
-        JsArray<AttributeDto> attributes = getNullAsEmptyArray(variable.getAttributesArray());
+        JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variable.getAttributesArray());
         AttributeDto attribute = null;
         StringBuilder labels = new StringBuilder();
 

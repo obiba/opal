@@ -82,7 +82,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
           addTableCompareTab(tableComparison, comparisonResult);
           if(comparisonResult == ComparisonResult.CONFLICT) {
             conflictsExist = true;
-          } else if(tableComparison.getExistingVariablesArray() != null) {
+          } else if(tableComparison.getModifiedVariablesArray() != null) {
             modificationsExist = true;
           }
         }
@@ -134,12 +134,14 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   }
 
   private ComparisonResult getTableComparisonResult(TableCompareDto tableComparison) {
-    if(tableComparison.getConflictsArray() != null && tableComparison.getConflictsArray().length() > 0) {
+    if(JsArrays.toSafeArray(tableComparison.getConflictsArray()).length() > 0) {
       return ComparisonResult.CONFLICT;
     } else if(!tableComparison.hasWithTable()) {
       return ComparisonResult.CREATION;
-    } else {
+    } else if(JsArrays.toSafeArray(tableComparison.getModifiedVariablesArray()).length() > 0 || JsArrays.toSafeArray(tableComparison.getNewVariablesArray()).length() > 0) {
       return ComparisonResult.MODIFICATION;
+    } else {
+      return ComparisonResult.SAME;
     }
   }
 
@@ -147,12 +149,12 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   public void addUpdateVariablesResourceRequests(ConclusionStepPresenter conclusionStepPresenter) {
     for(TableCompareDto tableCompareDto : JsArrays.toIterable(authorizedComparedTables)) {
       JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareDto.getNewVariablesArray());
-      JsArray<VariableDto> existingVariables = JsArrays.toSafeArray(tableCompareDto.getExistingVariablesArray());
+      JsArray<VariableDto> modifiedVariables = JsArrays.toSafeArray(tableCompareDto.getModifiedVariablesArray());
 
       JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
       JsArrays.pushAll(variablesToStringify, newVariables);
       if(!getDisplay().ignoreAllModifications()) {
-        JsArrays.pushAll(variablesToStringify, existingVariables);
+        JsArrays.pushAll(variablesToStringify, modifiedVariables);
       }
 
       if(variablesToStringify.length() > 0) {
@@ -231,7 +233,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   public interface Display extends WidgetDisplay, WizardStepDisplay {
 
     enum ComparisonResult {
-      CREATION, MODIFICATION, CONFLICT
+      CREATION, MODIFICATION, CONFLICT, SAME
     }
 
     void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
