@@ -42,6 +42,10 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
 
   protected abstract JsArray<AttributeDto> getAttributes(T object);
 
+  protected String getAttributeName(T object) {
+    return attributeName;
+  }
+
   @Override
   public String getValue(T object) {
     return getLabels(object);
@@ -54,7 +58,7 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
 
     for(int i = 0; i < attributes.length(); i++) {
       attribute = attributes.get(i);
-      if(attribute.getName().equals(attributeName)) {
+      if(attribute.getName().equals(getAttributeName(object))) {
         appendLabel(attribute, labels);
       }
     }

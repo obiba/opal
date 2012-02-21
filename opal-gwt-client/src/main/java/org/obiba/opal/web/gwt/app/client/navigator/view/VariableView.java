@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.AttributeValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CategoryAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
@@ -374,10 +375,6 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     }, translations.missingLabel());
   }
 
-  private String getCategoryLabel(CategoryDto categoryDto) {
-    return VariableViewHelper.getLabelValue(categoryDto.getAttributesArray());
-  }
-
   private void initAttributeTable() {
     attributeTableTitle.setText(translations.attributesLabel());
 
@@ -397,19 +394,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
       }
     }, translations.nameLabel());
 
-    attributeTable.addColumn(new TextColumn<AttributeDto>() {
-      @Override
-      public String getValue(AttributeDto object) {
-        return object.hasLocale() ? object.getLocale() : "";
-      }
-    }, translations.languageLabel());
-
-    attributeTable.addColumn(new TextColumn<AttributeDto>() {
-      @Override
-      public String getValue(AttributeDto object) {
-        return object.getValue();
-      }
-    }, translations.valueLabel());
+    attributeTable.addColumn(new AttributeValueColumn(), translations.valueLabel());
   }
 
   @Override
