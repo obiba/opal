@@ -263,6 +263,10 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   }
 
+  public int getTabCount() {
+    return items.size();
+  }
+
   public int getSelectedIndex() {
     return selectedIndex;
   }

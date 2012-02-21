@@ -134,7 +134,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   }
 
   private ComparisonResult getTableComparisonResult(TableCompareDto tableComparison) {
-    if(JsArrays.toSafeArray(tableComparison.getConflictsArray()).length() > 0) {
+    if(JsArrays.toSafeArray(tableComparison.getConflictsArray()).length() > 0 //
+        || (JsArrays.toSafeArray(tableComparison.getModifiedVariablesArray()).length() + JsArrays.toSafeArray(tableComparison.getUnmodifiedVariablesArray()).length() + JsArrays.toSafeArray(tableComparison.getNewVariablesArray()).length() == 0)) {
       return ComparisonResult.CONFLICT;
     } else if(!tableComparison.hasWithTable()) {
       return ComparisonResult.CREATION;

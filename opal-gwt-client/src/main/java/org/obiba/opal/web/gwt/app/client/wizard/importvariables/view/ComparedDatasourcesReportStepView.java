@@ -151,7 +151,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @SuppressWarnings("unchecked")
   private HorizontalTabLayout initVariableChangesPanel(TableCompareDto tableCompareData, FlowPanel tableComparePanel) {
     HorizontalTabLayout variableChangesPanel = new HorizontalTabLayout();
-    variableChangesPanel.addStyleName("variableChanges");
 
     JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareData.getNewVariablesArray());
     JsArray<VariableDto> unmodifiedVariables = JsArrays.toSafeArray(tableCompareData.getUnmodifiedVariablesArray());
@@ -174,6 +173,9 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     if(conflicts.length() > 0) {
       addConflictsTab(conflicts, variableChangesPanel);
     }
+
+    variableChangesPanel.setVisible(variableChangesPanel.getTabCount() > 0);
+
     return variableChangesPanel;
   }
 
