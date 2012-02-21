@@ -12,11 +12,11 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.app.client.workbench.view.VerticalTabLayout;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -306,40 +306,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       }
     }, translations.unitLabel());
 
-    table.addColumn(new TextColumn<VariableDto>() {
-
-      @Override
-      public String getValue(VariableDto variable) {
-        return getVariableLabels(variable);
-      }
-
-      private String getVariableLabels(VariableDto variable) {
-        JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variable.getAttributesArray());
-        AttributeDto attribute = null;
-        StringBuilder labels = new StringBuilder();
-
-        for(int i = 0; i < attributes.length(); i++) {
-          attribute = attributes.get(i);
-          if(attribute.getName().equals("label")) {
-            appendLabel(attribute, labels);
-          }
-        }
-
-        return labels.toString();
-      }
-
-      private void appendLabel(AttributeDto attr, StringBuilder labels) {
-        if(attr.hasValue() && attr.getValue().trim().length() > 0) {
-          if(labels.length() > 0) {
-            labels.append(", ");
-          }
-          if(attr.hasLocale() && attr.getLocale().trim().length() > 0) {
-            labels.append("(").append(attr.getLocale()).append(") ");
-          }
-          labels.append(attr.getValue());
-        }
-      }
-    }, translations.labelLabel());
+    table.addColumn(new VariableAttributeColumn("label"), translations.labelLabel());
 
     return table;
   }

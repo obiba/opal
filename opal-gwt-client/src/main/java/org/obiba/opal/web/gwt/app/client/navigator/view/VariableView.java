@@ -14,6 +14,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.CategoryAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -338,12 +339,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
       }
     }, translations.nameLabel());
 
-    categoryTable.addColumn(new TextColumn<CategoryDto>() {
-      @Override
-      public String getValue(CategoryDto object) {
-        return getCategoryLabel(object);
-      }
-    }, translations.labelLabel());
+    categoryTable.addColumn(new CategoryAttributeColumn("label"), translations.labelLabel());
 
     categoryTable.addColumn(new TextColumn<CategoryDto>() {
       @Override

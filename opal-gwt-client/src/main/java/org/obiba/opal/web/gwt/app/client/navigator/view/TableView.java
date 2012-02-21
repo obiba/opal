@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -161,12 +162,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     }, translations.nameLabel());
     variableNameColumn.setSortable(true);
 
-    table.addColumn(new TextColumn<VariableDto>() {
-      @Override
-      public String getValue(VariableDto object) {
-        return VariableViewHelper.getLabelValue(object.getAttributesArray());
-      }
-    }, translations.labelLabel());
+    table.addColumn(new VariableAttributeColumn("label"), translations.labelLabel());
 
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
