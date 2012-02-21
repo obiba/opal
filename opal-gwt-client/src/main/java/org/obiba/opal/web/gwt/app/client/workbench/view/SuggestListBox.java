@@ -72,7 +72,9 @@ public class SuggestListBox extends FocusPanel {
 
       @Override
       public void onSelection(SelectionEvent<Suggestion> event) {
-        addItem(suggestBox.getText());
+        if(addItem(suggestBox.getText())) {
+          suggestBox.setText("");
+        }
       }
     });
 
@@ -118,6 +120,11 @@ public class SuggestListBox extends FocusPanel {
         suggestBox.setText("");
       }
     });
+  }
+
+  public void clear() {
+    closeables.clear();
+    suggestBox.setValue("");
   }
 
   public boolean addItem(String text) {
