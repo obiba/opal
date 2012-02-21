@@ -299,15 +299,17 @@ public class CompareResource {
     if((compared == null && with != null) || (compared != null && with == null)) return true;
     if(compared != null && with != null && compared.size() != with.size()) return true;
 
-    for(Category comparedCat : compared) {
-      boolean found = false;
-      for(Category withCat : with) {
-        if(comparedCat.getName().equals(withCat.getName())) {
-          if(isModified(comparedCat, withCat)) return true;
-          found = true;
+    if(compared != null && with != null) {
+      for(Category comparedCat : compared) {
+        boolean found = false;
+        for(Category withCat : with) {
+          if(comparedCat.getName().equals(withCat.getName())) {
+            if(isModified(comparedCat, withCat)) return true;
+            found = true;
+          }
         }
+        if(found == false) return true;
       }
-      if(found == false) return true;
     }
 
     return false;
