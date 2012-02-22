@@ -32,7 +32,7 @@ public class DropdownSuggestBox extends Composite implements HasText, HasValue<S
     this.suggestBox = new DefaultSuggestBox();
     FlowPanel layout = new FlowPanel();
     final Button ddBtn = new Button();
-    ddBtn.setStyleName("btn icon-before i-sortasc");
+    ddBtn.setStyleName("btn iconb i-sortasc");
     ddBtn.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {

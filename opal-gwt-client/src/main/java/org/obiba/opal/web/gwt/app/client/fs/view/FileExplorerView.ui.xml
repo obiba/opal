@@ -11,17 +11,17 @@
     <g:Label></g:Label>
     <g:FlowPanel>
       <g:FlowPanel styleName="btn-group">
-        <g:Button ui:field="createFolderButton" styleName="btn icon-before i-plus">
+        <g:Button ui:field="createFolderButton" styleName="btn iconb i-plus">
           <ui:msg description="Create Folder label">Create Folder</ui:msg>
         </g:Button>          
-        <g:Button ui:field="fileUploadButton" styleName="btn icon-before i-up">
+        <g:Button ui:field="fileUploadButton" styleName="btn iconb i-up">
           <ui:msg description="Upload File label">Upload</ui:msg>
         </g:Button>
-        <g:Button ui:field="fileDownloadButton" styleName="btn icon-before i-down">
+        <g:Button ui:field="fileDownloadButton" styleName="btn iconb i-down">
           <ui:msg description="Download File label">Download</ui:msg>
         </g:Button>
       </g:FlowPanel>
-      <g:Button ui:field="fileDeleteButton" styleName="btn icon-before i-disapprove left-aligned">
+      <g:Button ui:field="fileDeleteButton" styleName="btn iconb i-disapprove left-aligned">
         <ui:msg description="Delete File label">Delete</ui:msg>
       </g:Button>
       <o:HelpImage page="Working+with+Files"></o:HelpImage>

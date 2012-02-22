@@ -99,7 +99,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public void addForbiddenTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
     Anchor tabHeader = getTableCompareTabHeader(tableCompareData, comparisonResult);
-    tabHeader.addStyleName("icon-before i-disapprove");
+    tabHeader.addStyleName("iconb i-disapprove");
     tableChangesPanel.add(getTableCompareTabContent(tableCompareData), tabHeader);
     tableChangesPanel.setVisible(true);
     refreshPending.setVisible(false);
@@ -137,13 +137,13 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   private Anchor getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
     Anchor tabHeader = new Anchor(tableCompareData.getCompared().getName());
     if(comparisonResult == ComparisonResult.CONFLICT) {
-      tabHeader.addStyleName("icon-before i-alert");
+      tabHeader.addStyleName("iconb i-alert");
     } else if(comparisonResult == ComparisonResult.CREATION) {
-      tabHeader.addStyleName("icon-before i-plus");
+      tabHeader.addStyleName("iconb i-plus");
     } else if(comparisonResult == ComparisonResult.MODIFICATION) {
-      tabHeader.addStyleName("icon-before i-reblog");
+      tabHeader.addStyleName("iconb i-reblog");
     } else {
-      tabHeader.addStyleName("icon-before i-done");
+      tabHeader.addStyleName("iconb i-done");
     }
     return tabHeader;
   }

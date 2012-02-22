@@ -11,13 +11,13 @@
     <g:Label></g:Label>
     <g:FlowPanel>
       <g:FlowPanel styleName="btn-group">
-        <g:Button ui:field="functionalUnitButton" styleName="btn icon-before i-plus">
+        <g:Button ui:field="functionalUnitButton" styleName="btn iconb i-plus">
           <ui:msg description="Add Functional Unit label">Add Unit</ui:msg>
         </g:Button>
-        <g:Button ui:field="exportButton" styleName="btn icon-before i-down">
+        <g:Button ui:field="exportButton" styleName="btn iconb i-down">
           <ui:msg description="Export All Identifiers label">Export All Identifiers</ui:msg>
         </g:Button>
-        <g:Button ui:field="importButton" styleName="btn icon-before i-scale">
+        <g:Button ui:field="importButton" styleName="btn iconb i-scale">
           <ui:msg description="Map Identifiers label">Map Identifiers</ui:msg>
         </g:Button>
       </g:FlowPanel>

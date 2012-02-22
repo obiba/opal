@@ -10,8 +10,8 @@
     <g:Label><ui:msg description="Jobs label">Jobs</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="refreshButton" styleName="btn icon-before i-sync"><ui:msg description="Refresh jobs list">Refresh</ui:msg></g:Button>
-      <g:Button ui:field="clearButton" styleName="btn icon-before i-disapprove"><ui:msg description="Clear jobs list">Clear</ui:msg></g:Button>
+      <g:Button ui:field="refreshButton" styleName="btn iconb i-sync"><ui:msg description="Refresh jobs list">Refresh</ui:msg></g:Button>
+      <g:Button ui:field="clearButton" styleName="btn iconb i-disapprove"><ui:msg description="Clear jobs list">Clear</ui:msg></g:Button>
       <o:HelpImage page="Working+with+Jobs"></o:HelpImage>
     </g:FlowPanel>
     

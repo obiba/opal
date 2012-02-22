@@ -99,13 +99,13 @@ public class IconActionCell<C> extends AbstractCell<C> {
       if(iconClass.isEmpty()) {
         sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
       } else {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon-before " + iconClass + "\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
+        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"iconb " + iconClass + "\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
       }
     } else {
       if(iconClass.isEmpty()) {
         sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
       } else {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon-before " + iconClass + " disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
+        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"iconb " + iconClass + " disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
       }
     }
   }

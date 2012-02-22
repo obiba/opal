@@ -10,10 +10,10 @@
     <g:Label><ui:msg description="Reports title">Reports</ui:msg></g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="reportTemplateButton" styleName="btn icon-before i-plus">
+      <g:Button ui:field="reportTemplateButton" styleName="btn iconb i-plus">
         <ui:msg description="Add Report Template label">Add Report Template</ui:msg>
       </g:Button>
-      <g:Button ui:field="refreshButton" styleName="btn icon-before i-sync"><ui:msg description="Refresh jobs list">Refresh</ui:msg></g:Button>
+      <g:Button ui:field="refreshButton" styleName="btn iconb i-sync"><ui:msg description="Refresh jobs list">Refresh</ui:msg></g:Button>
       <o:HelpImage page="Generating+Reports"></o:HelpImage>
     </g:FlowPanel>
     <g:SplitLayoutPanel>

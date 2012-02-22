@@ -45,7 +45,7 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
 
   public EditableListBox() {
     FlowPanel layout = new FlowPanel();
-    ddBtn.setStyleName("btn icon-before i-sortasc");
+    ddBtn.setStyleName("btn iconb i-sortasc");
     ddBtn.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {

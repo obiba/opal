@@ -222,7 +222,7 @@
          </g:row>
          <g:row>
            <g:customCell>
-             <g:Button styleName="btn small-bottom-margin btn-info icon-before i-sync" ui:field="refreshButton"><ui:msg description="Refresh label">Refresh</ui:msg></g:Button> 
+             <g:Button styleName="btn small-bottom-margin btn-info iconb i-sync" ui:field="refreshButton"><ui:msg description="Refresh label">Refresh</ui:msg></g:Button> 
            </g:customCell>
          </g:row>
        </g:Grid>

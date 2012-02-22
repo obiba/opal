@@ -77,7 +77,7 @@ textarea.x-high {
 }
 
 h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, cite, code, del, dfn, em, img, q, s, samp, small, strike, strong, sub, sup, tt, var, dd, dl, dt, li, ol, ul, fieldset, form, label, legend, button, table, caption, tbody, tfoot, thead, tr, th, td {
-  line-height: 16px;
+  line-height: 18px;
 }
 
 input, textarea, select {
@@ -1675,8 +1675,8 @@ textarea.error:focus {
   color: #666;
 }
 
-.obiba-DropdownSuggestBox .btn.icon-before:before,
-.obiba-EditableListBox .btn.icon-before:before {
+.obiba-DropdownSuggestBox .btn.iconb:before,
+.obiba-EditableListBox .btn.iconb:before {
   margin-right:0;
 }
 
@@ -1748,18 +1748,18 @@ ul.closeables li a {
   cursor: default;
 }
 
-.icon-before:before { 
+.iconb:before { 
   font-family: 'WebSymbolsRegular';
   margin-right: 5px;
   color: #888;
 }
 
-.btn-info.icon-before:before,
-.btn-primary.icon-before:before {
+.btn-info.iconb:before,
+.btn-primary.iconb:before {
   color: #fff;
 }
 
-a.icon, a.icon-before {
+a.icon, a.iconb {
   text-decoration: none;
   display: inline;
 }
@@ -1768,48 +1768,48 @@ a.icon:hover {
   color: #888;
 }
 
-.disabled.icon, .disabled.icon-before:before {
+.disabled.icon, .disabled.iconb:before {
   color: #bbb;
 }
 
 /* Icons for content management systems */
-.icon-before.i-image:before { content: "I"; }
-.icon-before.i-settings:before { content: "S"; }
-.icon-before.i-cloud:before { content: "C"; }
-.icon-before.i-folder:before { content: "F"; }
-.icon-before.i-archive:before { content: "Z"; }
-.icon-before.i-movie:before { content: "M"; }
-.icon-before.i-xml:before { content: "H"; }
-.icon-before.i-text:before { content: "T"; }
-.icon-before.i-terminal:before { content: "_"; }
-.icon-before.i-attachment:before { content: "A"; }
-.icon-before.i-logout:before { content: "X"; }
-.icon-before.i-indent:before { content: "n"; }
-.icon-before.i-outdent:before { content: "o"; }
-.icon-before.i-bulletlist:before { content: "p"; }
-.icon-before.i-numberlist:before { content: "q"; }
-.icon-before.i-move:before { content: "~"; }
-.icon-before.i-user:before {  content: "U"; }
-.icon-before.i-openedlock:before { content: "w"; }
-.icon-before.i-closedlock:before { content: "x"; }
-.icon-before.i-portraitview:before { content: "a"; }
-.icon-before.i-albumview:before { content: "b"; }
-.icon-before.i-center:before { content: "`"; }
+.iconb.i-image:before { content: "I"; }
+.iconb.i-settings:before { content: "S"; }
+.iconb.i-cloud:before { content: "C"; }
+.iconb.i-folder:before { content: "F"; }
+.iconb.i-archive:before { content: "Z"; }
+.iconb.i-movie:before { content: "M"; }
+.iconb.i-xml:before { content: "H"; }
+.iconb.i-text:before { content: "T"; }
+.iconb.i-terminal:before { content: "_"; }
+.iconb.i-attachment:before { content: "A"; }
+.iconb.i-logout:before { content: "X"; }
+.iconb.i-indent:before { content: "n"; }
+.iconb.i-outdent:before { content: "o"; }
+.iconb.i-bulletlist:before { content: "p"; }
+.iconb.i-numberlist:before { content: "q"; }
+.iconb.i-move:before { content: "~"; }
+.iconb.i-user:before {  content: "U"; }
+.iconb.i-openedlock:before { content: "w"; }
+.iconb.i-closedlock:before { content: "x"; }
+.iconb.i-portraitview:before { content: "a"; }
+.iconb.i-albumview:before { content: "b"; }
+.iconb.i-center:before { content: "`"; }
 
 /* Gallery navigation icons */
-.icon-before.i-plus:before { content: "+"; }
-.icon-before.i-minus:before { content: "-"; }
-.icon-before.i-up:before { content: ":"; }
-.icon-before.i-down:before { content: ";"; }
-.icon-before.i-disapprove:before { content: "×"; }
-.icon-before.i-scale:before { content: "&"; }
-.icon-before.i-previous:before { content: "("; }
-.icon-before.i-next:before { content: ")"; }
-.icon-before.i-lower:before { content: "<"; }
-.icon-before.i-greater:before { content: ">"; }
-.icon-before.i-rotate:before { content: "*"; }
-.icon-before.i-close:before { content: "'"; }
-.icon-before.i-cross:before { 
+.iconb.i-plus:before { content: "+"; }
+.iconb.i-minus:before { content: "-"; }
+.iconb.i-up:before { content: ":"; }
+.iconb.i-down:before { content: ";"; }
+.iconb.i-disapprove:before { content: "×"; }
+.iconb.i-scale:before { content: "&"; }
+.iconb.i-previous:before { content: "("; }
+.iconb.i-next:before { content: ")"; }
+.iconb.i-lower:before { content: "<"; }
+.iconb.i-greater:before { content: ">"; }
+.iconb.i-rotate:before { content: "*"; }
+.iconb.i-close:before { content: "'"; }
+.iconb.i-cross:before { 
   content: "'"; 
   -moz-transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
@@ -1818,41 +1818,41 @@ a.icon:hover {
 }
 
 /* Social networks icons */
-.icon-before.i-rss:before { content: "r"; }
-.icon-before.i-rsslarge:before { content: "R"; }
+.iconb.i-rss:before { content: "r"; }
+.iconb.i-rsslarge:before { content: "R"; }
 
 /* Icons for service sites */
-.icon-before.i-favorite:before { content: "R"; }
-.icon-before.i-tag:before { content: ","; }
-.icon-before.i-comment:before { content: "c"; }
-.icon-before.i-chat:before { content: "d"; }
-.icon-before.i-openedChat:before { content: "e"; }
-.icon-before.i-rating:before { content: "u"; }
-.icon-before.i-mappin:before { content: "?"; }
-.icon-before.i-like:before { content: "N"; }
-.icon-before.i-unlike:before { content: "O"; }
-.icon-before.i-search:before { content: "L"; }
-.icon-before.i-reblog:before { content: "J"; }
-.icon-before.i-openwindow:before { content: "D"; }
-.icon-before.i-clock:before { content: "P"; }
-.icon-before.i-link:before { content: "K"; }
+.iconb.i-favorite:before { content: "R"; }
+.iconb.i-tag:before { content: ","; }
+.iconb.i-comment:before { content: "c"; }
+.iconb.i-chat:before { content: "d"; }
+.iconb.i-openedChat:before { content: "e"; }
+.iconb.i-rating:before { content: "u"; }
+.iconb.i-mappin:before { content: "?"; }
+.iconb.i-like:before { content: "N"; }
+.iconb.i-unlike:before { content: "O"; }
+.iconb.i-search:before { content: "L"; }
+.iconb.i-reblog:before { content: "J"; }
+.iconb.i-openwindow:before { content: "D"; }
+.iconb.i-clock:before { content: "P"; }
+.iconb.i-link:before { content: "K"; }
 
 /* Other icons */
-.icon-before.i-mail:before { content: "@"; }
-.icon-before.i-sortasc:before { content: "{"; }
-.icon-before.i-sortdesc:before { content: "}"; }
-.icon-before.i-unfold:before { content: "["; }
-.icon-before.i-fold:before { content: "]"; }
-.icon-before.i-icon:before { content: "¹"; }
-.icon-before.i-list:before { content: "²"; }
-.icon-before.i-listwithicons:before { content: "³"; }
-.icon-before.i-reply:before { content: "h"; }
-.icon-before.i-replyall:before { content: "i"; }
-.icon-before.i-forward:before { content: "j"; }
-.icon-before.i-fullscreen:before { content: "%"; }
-.icon-before.i-done:before { content: "."; }
-.icon-before.i-approve:before { content: "/"; }
-.icon-before.i-loading:before { content: "0—7"; }
-.icon-before.i-alert:before { content: "W"; }
-.icon-before.i-sync:before { content: "V"; }
+.iconb.i-mail:before { content: "@"; }
+.iconb.i-sortasc:before { content: "{"; }
+.iconb.i-sortdesc:before { content: "}"; }
+.iconb.i-unfold:before { content: "["; }
+.iconb.i-fold:before { content: "]"; }
+.iconb.i-icon:before { content: "¹"; }
+.iconb.i-list:before { content: "²"; }
+.iconb.i-listwithicons:before { content: "³"; }
+.iconb.i-reply:before { content: "h"; }
+.iconb.i-replyall:before { content: "i"; }
+.iconb.i-forward:before { content: "j"; }
+.iconb.i-fullscreen:before { content: "%"; }
+.iconb.i-done:before { content: "."; }
+.iconb.i-approve:before { content: "/"; }
+.iconb.i-loading:before { content: "0—7"; }
+.iconb.i-alert:before { content: "W"; }
+.iconb.i-sync:before { content: "V"; }
 
