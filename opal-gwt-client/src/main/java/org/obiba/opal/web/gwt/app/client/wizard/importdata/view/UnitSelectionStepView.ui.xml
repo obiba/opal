@@ -17,16 +17,6 @@
         <g:ListBox ui:field="units" enabled="false"/>
       </g:FlowPanel>
     </g:FlowPanel>
-  
-    <g:HTMLPanel ui:field="help">
-      <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
-      <p><ui:msg description="Unique identifier information">The unique identifiers in the imported file(s) can</ui:msg></p>
-      <ul>
-        <li><ui:msg description="CSV format information">be used exactly as they appear in the files and directly written to the destination.</ui:msg></li>
-        <li><ui:msg description="Opal XML information">be stored in a different place than the data found in the file(s). These identifiers are then substituted with identifiers that are known only by your organisation.<p/>This is usually done so that two organisations (units) may share data about participants without disclosing internal identifiers to one-another. Opal can effectively maintain any number of identifier per participant.</ui:msg></li>
-      </ul>
-   </g:HTMLPanel>
-      
   </g:FlowPanel>    
   
 </ui:UiBinder>

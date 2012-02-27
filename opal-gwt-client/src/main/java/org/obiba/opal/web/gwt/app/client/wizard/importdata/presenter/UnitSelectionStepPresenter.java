@@ -9,13 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -24,13 +17,64 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class UnitSelectionStepPresenter extends WidgetPresenter<UnitSelectionStepPresenter.Display> {
+public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionStepPresenter.Display> {
 
-  public interface Display extends WidgetDisplay, WizardStepDisplay {
+  @Inject
+  public UnitSelectionStepPresenter(final Display display, final EventBus eventBus) {
+    super(eventBus, display);
+  }
+
+  @Override
+  protected void onBind() {
+    super.onBind();
+    addEventHandlers();
+    initUnits();
+  }
+
+  protected void addEventHandlers() {
+    super.registerHandler(getView().addIdentifierAsIsClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        getView().setUnitEnabled(false);
+      }
+    }));
+    super.registerHandler(getView().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        getView().setUnitEnabled(true);
+      }
+    }));
+  }
+
+  public void updateImportData(ImportData importData) {
+    importData.setIdentifierAsIs(getView().isIdentifierAsIs());
+    importData.setIdentifierSharedWithUnit(getView().isIdentifierSharedWithUnit());
+    if(getView().isIdentifierSharedWithUnit()) {
+      importData.setUnit(getView().getSelectedUnit());
+    } else {
+      importData.setUnit(null);
+    }
+  }
+
+  public void initUnits() {
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
+        getView().setUnits(units);
+      }
+    }).send();
+  }
+
+  public interface Display extends View {
 
     boolean isIdentifierAsIs();
 
@@ -55,74 +99,6 @@ public class UnitSelectionStepPresenter extends WidgetPresenter<UnitSelectionSte
     /** Allows the identity (unit) section of the form to be enabled and disabled. */
     void setIdentityEnabled(boolean enabled);
 
-  }
-
-  @Inject
-  public UnitSelectionStepPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onBind() {
-    addEventHandlers();
-    initUnits();
-  }
-
-  protected void addEventHandlers() {
-    super.registerHandler(getDisplay().addIdentifierAsIsClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getDisplay().setUnitEnabled(false);
-      }
-    }));
-    super.registerHandler(getDisplay().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getDisplay().setUnitEnabled(true);
-      }
-    }));
-  }
-
-  public void updateImportData(ImportData importData) {
-    importData.setIdentifierAsIs(getDisplay().isIdentifierAsIs());
-    importData.setIdentifierSharedWithUnit(getDisplay().isIdentifierSharedWithUnit());
-    if(getDisplay().isIdentifierSharedWithUnit()) {
-      importData.setUnit(getDisplay().getSelectedUnit());
-    } else {
-      importData.setUnit(null);
-    }
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  public void initUnits() {
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getDisplay().setUnits(units);
-      }
-    }).send();
   }
 
 }

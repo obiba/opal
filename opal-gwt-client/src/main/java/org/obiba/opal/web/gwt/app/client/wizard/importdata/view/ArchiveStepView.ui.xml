@@ -16,12 +16,6 @@
         <g:SimplePanel ui:field="archivePanel" addStyleNames="small-top-margin indent"/>
       </g:FlowPanel>
     </g:FlowPanel>
-  
-    <g:HTMLPanel ui:field="help">
-      <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
-      <p><ui:msg description="Select archive directory information">If you wish, you can select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
-   </g:HTMLPanel>
-      
   </g:FlowPanel>    
   
 </ui:UiBinder>

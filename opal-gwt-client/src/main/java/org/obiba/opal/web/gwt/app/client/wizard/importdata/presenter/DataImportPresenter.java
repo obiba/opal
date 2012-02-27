@@ -85,19 +85,17 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
     destinationSelectionStepPresenter.bind();
-    unitSelectionStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
-    archiveStepPresenter.bind();
     conclusionStepPresenter.bind();
 
     comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
 
+    setInSlot(Slots.Unit, unitSelectionStepPresenter);
     setInSlot(Slots.Values, datasourceValuesStepPresenter);
+    setInSlot(Slots.Archive, archiveStepPresenter);
 
     getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
-    getView().setUnitSelectionDisplay(unitSelectionStepPresenter.getDisplay());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
-    getView().setArchiveStepDisplay(archiveStepPresenter.getDisplay());
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
 
     addEventHandlers();
@@ -283,7 +281,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public interface Display extends WizardView {
 
     enum Slots {
-      Values
+      Unit, Values, Archive
     }
 
     ImportFormat getImportFormat();
@@ -305,10 +303,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     void setFormatStepDisplay(WizardStepDisplay display);
 
     void setDestinationSelectionDisplay(WizardStepDisplay display);
-
-    void setUnitSelectionDisplay(WizardStepDisplay display);
-
-    void setArchiveStepDisplay(WizardStepDisplay display);
 
     public void renderConclusion(ConclusionStepPresenter presenter);
 

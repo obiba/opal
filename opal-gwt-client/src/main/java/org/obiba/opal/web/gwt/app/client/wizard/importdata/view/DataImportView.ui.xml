@@ -32,7 +32,7 @@
       
       <o:WizardStep ui:field="valuesStep"/>
       
-      <o:WizardStep ui:field="identityArchiveStep"/>
+      <o:WizardStep ui:field="archiveStep"/>
       
       <o:WizardStep ui:field="conclusionStep"/>
       
@@ -47,6 +47,20 @@
       <g:HTMLPanel ui:field="destinationSelectionHelp">
         <g:Label addStyleNames="title"><ui:msg description="Destination label">Destination</ui:msg></g:Label>
         <p><ui:msg description="Destination information">Select the destination. This is where the data from your file will be written to.<p/>Opal will validate that the variables in the source are compatible with the ones in the destination before starting the process.</ui:msg></p>    
+      </g:HTMLPanel>
+      
+      <g:HTMLPanel ui:field="unitSelectionHelp">
+        <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
+        <p><ui:msg description="Unique identifier information">The unique identifiers in the imported file(s) can</ui:msg></p>
+        <ul>
+          <li><ui:msg description="CSV format information">be used exactly as they appear in the files and directly written to the destination.</ui:msg></li>
+          <li><ui:msg description="Opal XML information">be stored in a different place than the data found in the file(s). These identifiers are then substituted with identifiers that are known only by your organisation.<p/>This is usually done so that two organisations (units) may share data about participants without disclosing internal identifiers to one-another. Opal can effectively maintain any number of identifier per participant.</ui:msg></li>
+        </ul>
+      </g:HTMLPanel>
+      
+      <g:HTMLPanel ui:field="archiveHelp">
+        <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
+        <p><ui:msg description="Select archive directory information">If you wish, you can select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
       </g:HTMLPanel>
         
     </g:FlowPanel> 

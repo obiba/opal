@@ -82,7 +82,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   WizardStep valuesStep;
 
   @UiField
-  WizardStep identityArchiveStep;
+  WizardStep archiveStep;
 
   @UiField
   WizardStep conclusionStep;
@@ -94,15 +94,17 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   HTMLPanel destinationSelectionHelp;
 
   @UiField
+  HTMLPanel unitSelectionHelp;
+
+  @UiField
+  HTMLPanel archiveHelp;
+
+  @UiField
   ListBox formatListBox;
 
   private final EventBus eventBus;
 
   private WizardStepDisplay formatStepDisplay;
-
-  private WizardStepDisplay unitSelectionStepDisplay;
-
-  private WizardStepDisplay identityArchiveStepDisplay;
 
   private WizardStepChain stepChain;
 
@@ -152,15 +154,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
       }
     })//
 
-    .append(unitSelectionStep)//
+    .append(unitSelectionStep, unitSelectionHelp)//
     .title(translations.dataImportUnitStep())//
-    .help(new WidgetProvider() {
-
-      @Override
-      public Widget getWidget() {
-        return unitSelectionStepDisplay.getStepHelp();
-      }
-    }) //
 
     .append(comparedDatasourcesReportStep)//
     .title(translations.dataImportComparedDatasourcesReportStep())//
@@ -189,15 +184,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     .append(valuesStep)//
     .title(translations.dataImportValuesStep())//
 
-    .append(identityArchiveStep)//
+    .append(archiveStep, archiveHelp)//
     .title(translations.dataImportArchiveStep())//
-    .help(new WidgetProvider() {
-
-      @Override
-      public Widget getWidget() {
-        return identityArchiveStepDisplay.getStepHelp();
-      }
-    }) //
 
     .append(conclusionStep)//
     .conclusion()//
@@ -223,9 +211,15 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    if(slot == Slots.Values) {
+    if(slot == Slots.Unit) {
+      unitSelectionStep.removeStepContent();
+      unitSelectionStep.add(content);
+    } else if(slot == Slots.Values) {
       valuesStep.removeStepContent();
       valuesStep.add(content);
+    } else if(slot == Slots.Archive) {
+      archiveStep.removeStepContent();
+      archiveStep.add(content);
     }
   }
 
@@ -269,23 +263,9 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
-  public void setArchiveStepDisplay(WizardStepDisplay display) {
-    this.identityArchiveStepDisplay = display;
-    identityArchiveStep.removeStepContent();
-    identityArchiveStep.add(display.asWidget());
-  }
-
-  @Override
   public void setDestinationSelectionDisplay(WizardStepDisplay display) {
     destinationSelectionStep.removeStepContent();
     destinationSelectionStep.add(display.asWidget());
-  }
-
-  @Override
-  public void setUnitSelectionDisplay(WizardStepDisplay display) {
-    this.unitSelectionStepDisplay = display;
-    unitSelectionStep.removeStepContent();
-    unitSelectionStep.add(display.asWidget());
   }
 
   @Override

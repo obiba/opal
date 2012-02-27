@@ -19,19 +19,20 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class ArchiveStepView extends Composite implements ArchiveStepPresenter.Display {
+public class ArchiveStepView extends ViewImpl implements ArchiveStepPresenter.Display {
 
   @UiTemplate("ArchiveStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ArchiveStepView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   RadioButton archiveLeave;
@@ -42,26 +43,15 @@ public class ArchiveStepView extends Composite implements ArchiveStepPresenter.D
   @UiField
   SimplePanel archivePanel;
 
-  @UiField
-  HTMLPanel help;
-
   private FileSelectionPresenter.Display archiveSelection;
 
   public ArchiveStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override
@@ -96,10 +86,4 @@ public class ArchiveStepView extends Composite implements ArchiveStepPresenter.D
   public HandlerRegistration addArchiveMoveClickHandler(ClickHandler handler) {
     return archiveMove.addClickHandler(handler);
   }
-
-  @Override
-  public Widget getStepHelp() {
-    return help;
-  }
-
 }
