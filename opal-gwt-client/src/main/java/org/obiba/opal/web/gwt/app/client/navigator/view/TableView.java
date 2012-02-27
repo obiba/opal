@@ -29,6 +29,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -63,6 +64,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   private static TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
+
+  private static final Integer VALUES_TAB_INDEX = 1;
+
+  private static final Integer PERMISSIONS_TAB_INDEX = 2;
 
   private final Widget widget;
 
@@ -404,8 +409,13 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
+  public HasAuthorization getValuesAuthorizer() {
+    return new TabAuthorizer(tabs, VALUES_TAB_INDEX);
+  }
+
+  @Override
   public HasAuthorization getPermissionsAuthorizer() {
-    return new TabAuthorizer(tabs, 1);
+    return new TabAuthorizer(tabs, PERMISSIONS_TAB_INDEX);
   }
 
   @Override
@@ -414,6 +424,24 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       return ((VariableClickableColumn) column).getName();
     }
     return null;
+  }
+
+  @Override
+  public void setValuesTabCommand(final Command cmd) {
+    tabs.addSelectionHandler(new SelectionHandler<Integer>() {
+
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
+        if(event.getSelectedItem() == VALUES_TAB_INDEX) {
+          cmd.execute();
+        }
+      }
+    });
+  }
+
+  @Override
+  public boolean isValuesTabSelected() {
+    return tabs.getSelectedIndex() == VALUES_TAB_INDEX;
   }
 
 }

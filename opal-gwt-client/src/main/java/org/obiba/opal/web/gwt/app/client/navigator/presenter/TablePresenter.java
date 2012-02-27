@@ -127,6 +127,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().setParentCommand(new ParentCommand());
     getView().setPreviousCommand(new PreviousCommand());
     getView().setNextCommand(new NextCommand());
+    getView().setValuesTabCommand(new ValuesCommand());
 
     VariableNameFieldUpdater updater = new VariableNameFieldUpdater();
     super.getView().setVariableNameFieldUpdater(updater);
@@ -146,7 +147,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private void authorize() {
     // export variables in excel
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/variables/excel").get().authorize(getView().getExcelDownloadAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get().authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
     .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
@@ -158,13 +159,16 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getView().getCopyDataAuthorizer()).send();
     if(table.hasViewLink()) {
       // remove view
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).delete().authorize(getView().getRemoveAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete().authorize(getView().getRemoveAuthorizer()).send();
       // edit view
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/view/" + table.getName()).put().authorize(getView().getEditAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put().authorize(getView().getEditAuthorizer()).send();
     } else {
       // Drop table
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName()).delete().authorize(getView().getRemoveAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete().authorize(getView().getRemoveAuthorizer()).send();
     }
+
+    // values
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer()).send();
 
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
@@ -175,13 +179,16 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     this.previous = previous;
     this.next = next;
 
-    valuesTablePresenter.setTable(table);
     getView().clear();
     getView().setTable(tableDto);
     getView().setParentName(tableDto.getDatasourceName());
     getView().setPreviousName(previous);
     getView().setNextName(next);
     getView().setRemoveCommand(new RemoveCommand());
+
+    if(getView().isValuesTabSelected()) {
+      valuesTablePresenter.setTable(tableDto);
+    }
 
     if(tableIsView()) {
       getView().setDownloadViewCommand(new DownloadViewCommand());
@@ -260,6 +267,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private boolean tableIsView() {
     return table.hasViewLink();
+  }
+
+  final class ValuesCommand implements Command {
+
+    @Override
+    public void execute() {
+      valuesTablePresenter.setTable(table);
+    }
+
   }
 
   /**
@@ -575,9 +591,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     HasAuthorization getEditAuthorizer();
 
+    HasAuthorization getValuesAuthorizer();
+
     HasAuthorization getPermissionsAuthorizer();
 
     String getClickableColumnName(Column<?, ?> column);
+
+    void setValuesTabCommand(Command cmd);
+
+    boolean isValuesTabSelected();
 
   }
 

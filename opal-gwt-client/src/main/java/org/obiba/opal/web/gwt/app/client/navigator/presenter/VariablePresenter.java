@@ -56,6 +56,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
   private VariableDto variable;
 
+  private TableDto table;
+
   @Inject
   public VariablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
@@ -87,6 +89,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     getView().setParentCommand(new ParentCommand());
     getView().setNextCommand(new NextCommand());
     getView().setPreviousCommand(new PreviousCommand());
+    getView().setValuesTabCommand(new ValuesCommand());
     getView().setSummaryTabCommand(new SummaryCommand());
     getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
     // TODO
@@ -100,8 +103,9 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     summaryTabPresenter.unbind();
   }
 
-  private void updateDisplay(TableDto table, VariableDto variableDto, VariableDto previous, VariableDto next) {
+  private void updateDisplay(TableDto tableDto, VariableDto variableDto, VariableDto previous, VariableDto next) {
     if(variable == null || !isCurrentVariable(variableDto)) {
+      table = tableDto;
       variable = variableDto;
       getView().setVariableName(variable.getName());
       getView().setEntityType(variable.getEntityType());
@@ -119,14 +123,13 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
       getView().renderAttributeRows(variable.getAttributesArray());
       getView().setCategorizeMenuAvailable(!variable.getValueType().equals("binary"));
 
-      updateDerivedVariableDisplay(table);
-      valuesTablePresenter.setTable(table, variable);
+      updateDerivedVariableDisplay();
 
-      authorize(table);
+      authorize();
     }
   }
 
-  private void updateDerivedVariableDisplay(TableDto table) {
+  private void updateDerivedVariableDisplay() {
     // if table is a view, check for a script attribute
     getView().setDerivedVariable(false, "");
     if(table == null || !table.hasViewLink()) return;
@@ -140,9 +143,12 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     }
   }
 
-  private void authorize(TableDto table) {
+  private void authorize() {
     // summary
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getView().getSummaryAuthorizer(), new SummaryUpdate())).send();
+
+    // values
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer()).send();
 
     // edit variable
     if(table.hasViewLink()) {
@@ -154,7 +160,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   }
 
   private boolean isCurrentVariable(VariableDto variableDto) {
-    return variableDto.getName().equals(variable.getName()) && variableDto.getParentLink().getRel().equals(variable.getParentLink().getRel());
+    return variableDto.getName().equals(variable.getName()) && variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
   }
 
   /**
@@ -203,7 +209,9 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
-      authz.setAclRequest("variable", AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
+      authz.setAclRequest("variable", AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), //
+      AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"), //
+      AclRequest.newBuilder("Values", variable.getParentLink().getLink() + "/valueSets", "GET:GET"));
       setInSlot(Display.Slots.Permissions, authz);
     }
   }
@@ -267,9 +275,15 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     }
   }
 
-  /**
-   *
-   */
+  final class ValuesCommand implements Command {
+
+    @Override
+    public void execute() {
+      valuesTablePresenter.setTable(table, variable);
+    }
+
+  }
+
   final class SummaryCommand implements Command {
     @Override
     public void execute() {
@@ -351,6 +365,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
     HasAuthorization getSummaryAuthorizer();
 
+    HasAuthorization getValuesAuthorizer();
+
     HasAuthorization getEditAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
@@ -360,5 +376,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     void setDeriveCategorizeCommand(Command cmd);
 
     void setDeriveCustomCommand(Command cmd);
+
+    void setValuesTabCommand(Command cmd);
   }
 }

@@ -60,6 +60,10 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   private static final Integer SUMMARY_TAB_INDEX = 3;
 
+  private static final Integer VALUES_TAB_INDEX = 4;
+
+  private static final Integer PERMISSIONS_TAB_INDEX = 5;
+
   private static VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
 
   private static Translations translations = GWT.create(Translations.class);
@@ -220,6 +224,19 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
       item.add(value);
       label.add(item);
     }
+  }
+
+  @Override
+  public void setValuesTabCommand(final Command cmd) {
+    tabs.addSelectionHandler(new SelectionHandler<Integer>() {
+
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
+        if(event.getSelectedItem() == VALUES_TAB_INDEX) {
+          cmd.execute();
+        }
+      }
+    });
   }
 
   @Override
@@ -415,8 +432,13 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   }
 
   @Override
+  public HasAuthorization getValuesAuthorizer() {
+    return new TabAuthorizer(tabs, VALUES_TAB_INDEX);
+  }
+
+  @Override
   public HasAuthorization getPermissionsAuthorizer() {
-    return new TabAuthorizer(tabs, SUMMARY_TAB_INDEX + 1);
+    return new TabAuthorizer(tabs, PERMISSIONS_TAB_INDEX);
   }
 
   @Override

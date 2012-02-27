@@ -21,6 +21,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
@@ -127,6 +128,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   private class DataFetcherImpl implements DataFetcher {
+
+    private Request variablesRequest = null;
+
+    private Request valuesRequest = null;
+
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
       StringBuilder link = getLinkBuilder(offset, limit);
@@ -157,7 +163,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     private void doRequest(int offset, String link) {
-      ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get().withCallback(new ValueSetsResourceCallback(offset, table)).send();
+      if(valuesRequest != null) {
+        valuesRequest.cancel();
+        valuesRequest = null;
+      }
+      valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get()//
+      .withCallback(new ValueSetsResourceCallback(offset, table)).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
@@ -183,7 +194,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       if(select != null && select.isEmpty() == false) {
         link += "?script=" + URL.encodePathSegment(select);
       }
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get().withCallback(new VariablesResourceCallback(table)).send();
+      if(variablesRequest != null) {
+        variablesRequest.cancel();
+        variablesRequest = null;
+      }
+      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get()//
+      .withCallback(new VariablesResourceCallback(table)).send();
     }
 
   }
