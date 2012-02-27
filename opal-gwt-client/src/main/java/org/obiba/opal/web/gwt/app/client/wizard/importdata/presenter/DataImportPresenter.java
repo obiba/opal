@@ -133,7 +133,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     super.onUnbind();
     csvFormatStepPresenter.unbind();
     xmlFormatStepPresenter.unbind();
-    destinationSelectionStepPresenter.unbind();
   }
 
   @Override
