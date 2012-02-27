@@ -55,7 +55,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final DatasourceValuesStepPresenter datasourceValuesStepPresenter;
 
-  private final IdentityArchiveStepPresenter identityArchiveStepPresenter;
+  private final ArchiveStepPresenter archiveStepPresenter;
 
   private final ConclusionStepPresenter conclusionStepPresenter;
 
@@ -66,7 +66,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public DataImportPresenter(final Display display, final EventBus eventBus, //
   CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
   DestinationSelectionStepPresenter destinationSelectionStepPresenter, UnitSelectionStepPresenter unitSelectionStepPresenter, //
-  ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, IdentityArchiveStepPresenter identityArchiveStepPresenter, //
+  ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, ArchiveStepPresenter archiveStepPresenter, //
   ConclusionStepPresenter conclusionStepPresenter, DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
@@ -74,7 +74,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.destinationSelectionStepPresenter = destinationSelectionStepPresenter;
     this.unitSelectionStepPresenter = unitSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
-    this.identityArchiveStepPresenter = identityArchiveStepPresenter;
+    this.archiveStepPresenter = archiveStepPresenter;
     this.conclusionStepPresenter = conclusionStepPresenter;
     this.datasourceValuesStepPresenter = datasourceValuesStepPresenter;
   }
@@ -87,7 +87,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     destinationSelectionStepPresenter.bind();
     unitSelectionStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
-    identityArchiveStepPresenter.bind();
+    archiveStepPresenter.bind();
     conclusionStepPresenter.bind();
 
     comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
@@ -97,7 +97,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
     getView().setUnitSelectionDisplay(unitSelectionStepPresenter.getDisplay());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
-    getView().setIdentityArchiveStepDisplay(identityArchiveStepPresenter.getDisplay());
+    getView().setArchiveStepDisplay(archiveStepPresenter.getDisplay());
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
 
     addEventHandlers();
@@ -126,7 +126,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @Override
   protected void onFinish() {
     ImportData importData = transientDatasourceHandler.getImportData();
-    identityArchiveStepPresenter.updateImportData(importData);
+    archiveStepPresenter.updateImportData(importData);
     conclusionStepPresenter.launchImport(importData);
     getView().renderConclusion(conclusionStepPresenter);
   }
@@ -308,7 +308,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     void setUnitSelectionDisplay(WizardStepDisplay display);
 
-    void setIdentityArchiveStepDisplay(WizardStepDisplay display);
+    void setArchiveStepDisplay(WizardStepDisplay display);
 
     public void renderConclusion(ConclusionStepPresenter presenter);
 

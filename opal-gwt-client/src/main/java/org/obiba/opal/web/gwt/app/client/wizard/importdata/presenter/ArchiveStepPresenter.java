@@ -25,7 +25,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
 
-public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiveStepPresenter.Display> {
+public class ArchiveStepPresenter extends WidgetPresenter<ArchiveStepPresenter.Display> {
 
   public interface Display extends WidgetDisplay, WizardStepDisplay {
 
@@ -46,7 +46,7 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   private FileSelectionPresenter archiveFolderSelectionPresenter;
 
   @Inject
-  public IdentityArchiveStepPresenter(final Display display, final EventBus eventBus) {
+  public ArchiveStepPresenter(final Display display, final EventBus eventBus) {
     super(display, eventBus);
   }
 

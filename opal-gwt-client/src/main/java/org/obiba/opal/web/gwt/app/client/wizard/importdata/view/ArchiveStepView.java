@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.IdentityArchiveStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ArchiveStepPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,10 +25,10 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class IdentityArchiveStepView extends Composite implements IdentityArchiveStepPresenter.Display {
+public class ArchiveStepView extends Composite implements ArchiveStepPresenter.Display {
 
-  @UiTemplate("IdentityArchiveStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, IdentityArchiveStepView> {
+  @UiTemplate("ArchiveStepView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, ArchiveStepView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -47,7 +47,7 @@ public class IdentityArchiveStepView extends Composite implements IdentityArchiv
 
   private FileSelectionPresenter.Display archiveSelection;
 
-  public IdentityArchiveStepView() {
+  public ArchiveStepView() {
     initWidget(uiBinder.createAndBindUi(this));
   }
 

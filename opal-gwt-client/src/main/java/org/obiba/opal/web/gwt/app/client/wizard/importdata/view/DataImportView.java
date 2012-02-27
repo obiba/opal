@@ -269,7 +269,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
-  public void setIdentityArchiveStepDisplay(WizardStepDisplay display) {
+  public void setArchiveStepDisplay(WizardStepDisplay display) {
     this.identityArchiveStepDisplay = display;
     identityArchiveStep.removeStepContent();
     identityArchiveStep.add(display.asWidget());
