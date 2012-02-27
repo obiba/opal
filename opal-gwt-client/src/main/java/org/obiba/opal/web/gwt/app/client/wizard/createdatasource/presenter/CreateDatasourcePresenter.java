@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -25,14 +26,19 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
@@ -40,11 +46,11 @@ import com.google.inject.Provider;
 
 public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatasourcePresenter.Display> implements HasDatasourceForms {
 
-  private final CreateDatasourceConclusionStepPresenter createDatasourceConclusionStepPresenter;
-
   private final Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
 
   public static final WizardType WizardType = new WizardType();
+
+  private static Translations translations = GWT.create(Translations.class);
 
   public static class Wizard extends WizardProxy<CreateDatasourcePresenter> {
 
@@ -58,9 +64,8 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
   private DatasourceFormPresenter datasourceFormPresenter;
 
   @Inject
-  public CreateDatasourcePresenter(final Display display, final EventBus eventBus, CreateDatasourceConclusionStepPresenter createDatasourceConclusionStepPresenter) {
+  public CreateDatasourcePresenter(final Display display, final EventBus eventBus) {
     super(eventBus, display);
-    this.createDatasourceConclusionStepPresenter = createDatasourceConclusionStepPresenter;
   }
 
   @Override
@@ -71,7 +76,6 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
   @Override
   protected void onBind() {
     super.onBind();
-    createDatasourceConclusionStepPresenter.bind();
     addEventHandlers();
     getEventBus().fireEvent(new RequestDatasourceFormsEvent(this));
   }
@@ -79,7 +83,6 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    createDatasourceConclusionStepPresenter.unbind();
     datasourceFormPresenters.clear();
   }
 
@@ -136,13 +139,20 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
   private void createDatasource() {
     DatasourceFactoryDto dto = getDatasourceForm().getDatasourceFactory();
     dto.setName(getDatasourceName());
-    createDatasourceConclusionStepPresenter.setDatasourceFactory(dto);
-    getView().setConclusion(createDatasourceConclusionStepPresenter);
+    launchDatasourceCreation(dto);
   }
 
   @Override
-  protected void onClose() {
-    getEventBus().fireEvent(new DatasourceSelectionChangeEvent(createDatasourceConclusionStepPresenter.getDatasource()));
+  protected boolean hideOnFinish() {
+    return true;
+  }
+
+  private void launchDatasourceCreation(final DatasourceFactoryDto dto) {
+    ResponseCodeCallback callback = new CreateDatasourceResponseCallback();
+
+    ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post()//
+    .withResourceBody(DatasourceFactoryDto.stringify(dto))//
+    .withCallback(201, callback).withCallback(400, callback).withCallback(405, callback).withCallback(500, callback).send();
   }
 
   private void updateDatasourceFormDisplay() {
@@ -172,6 +182,25 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
     }
   }
 
+  private final class CreateDatasourceResponseCallback implements ResponseCodeCallback {
+
+    private CreateDatasourceResponseCallback() {
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      if(response.getStatusCode() == 201) {
+        DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
+        getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasourceDto));
+      } else if(response.getText() != null && response.getText().length() != 0) {
+        ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatasourceCreationFailed").args(errorDto.getArgumentsArray()).build());
+      } else {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.datasourceCreationFailed()).build());
+      }
+    }
+  }
+
   public interface Display extends WizardView {
 
     HasText getDatasourceName();
@@ -182,7 +211,6 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
 
     HandlerRegistration addDatasourceTypeChangeHandler(ChangeHandler handler);
 
-    void setConclusion(CreateDatasourceConclusionStepPresenter presenter);
   }
 
   class DatasourceSelectionTypeValidationHandler extends AbstractValidationHandler {

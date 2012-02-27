@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.TableView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableView;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenterSubscriber;
@@ -31,7 +30,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Excel
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.FsDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.HibernateDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcDatasourceFormPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceConclusionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CsvDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.ExcelDatasourceFormView;
@@ -81,7 +79,6 @@ public class NavigatorModule extends AbstractOpalModule {
     bindDatasourceFormPresenter(FsDatasourceFormPresenter.class, FsDatasourceFormPresenter.Display.class, FsDatasourceFormView.class, FsDatasourceFormPresenter.Subscriber.class);
     bindDatasourceFormPresenter(JdbcDatasourceFormPresenter.class, JdbcDatasourceFormPresenter.Display.class, JdbcDatasourceFormView.class, JdbcDatasourceFormPresenter.Subscriber.class);
     bindDatasourceFormPresenter(CsvDatasourceFormPresenter.class, CsvDatasourceFormPresenter.Display.class, CsvDatasourceFormView.class, CsvDatasourceFormPresenter.Subscriber.class);
-    bind(CreateDatasourceConclusionStepPresenter.Display.class).to(CreateDatasourceConclusionStepView.class);
 
     configureDeriveVariablePresenters();
   }

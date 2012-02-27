@@ -13,14 +13,9 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourceConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -186,35 +181,6 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   @Override
   public String getDatasourceType() {
     return datasourceType.getValue(datasourceType.getSelectedIndex());
-  }
-
-  @Override
-  public void setConclusion(CreateDatasourceConclusionStepPresenter presenter) {
-    dialog.setProgress(true);
-    conclusionStep.removeStepContent();
-    conclusionStep.setTitle(translations.createDatasourceProcessSummary());
-    presenter.reset();
-    conclusionStep.add(presenter.getDisplay().asWidget());
-    stepChain.onNext();
-    dialog.setCancelEnabled(false);
-    dialog.setCloseEnabled(false);
-    presenter.setDatasourceCreatedCallback(new DatasourceCreatedCallback() {
-
-      @Override
-      public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
-        conclusionStep.setStepTitle(translations.datasourceCreationCompleted());
-        dialog.setCloseEnabled(true);
-        dialog.setProgress(false);
-      }
-
-      @Override
-      public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
-        conclusionStep.setStepTitle(translations.datasourceCreationFailed());
-        dialog.setCancelEnabled(true);
-        dialog.setProgress(false);
-      }
-    });
-
   }
 
   @Override
