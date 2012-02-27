@@ -34,12 +34,12 @@ public class ImportModule extends AbstractOpalModule {
   @Override
   protected void configure() {
     bindWizardPresenterWidget(DataImportPresenter.class, DataImportPresenter.Display.class, DataImportView.class, DataImportPresenter.Wizard.class);
+    bindPresenterWidget(DestinationSelectionStepPresenter.class, DestinationSelectionStepPresenter.Display.class, DestinationSelectionStepView.class);
     bindPresenterWidget(UnitSelectionStepPresenter.class, UnitSelectionStepPresenter.Display.class, UnitSelectionStepView.class);
     bindPresenterWidget(DatasourceValuesStepPresenter.class, DatasourceValuesStepPresenter.Display.class, DatasourceValuesStepView.class);
     bindPresenterWidget(ArchiveStepPresenter.class, ArchiveStepPresenter.Display.class, ArchiveStepView.class);
 
     bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class);
-    bind(DestinationSelectionStepPresenter.Display.class).to(DestinationSelectionStepView.class);
     bind(XmlFormatStepPresenter.Display.class).to(XmlFormatStepView.class);
     bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class);
   }

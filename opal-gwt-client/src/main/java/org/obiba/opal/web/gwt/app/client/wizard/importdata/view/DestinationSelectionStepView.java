@@ -27,18 +27,20 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class DestinationSelectionStepView extends Composite implements DestinationSelectionStepPresenter.Display {
+public class DestinationSelectionStepView extends ViewImpl implements DestinationSelectionStepPresenter.Display {
 
   @UiTemplate("DestinationSelectionStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DestinationSelectionStepView> {
   }
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget widget;
 
   @UiField
   ListBox datasetListBox;
@@ -60,7 +62,7 @@ public class DestinationSelectionStepView extends Composite implements Destinati
   private TableSelectionHandler tableSelectionHandler;
 
   public DestinationSelectionStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
 
     entityTypeListBox.addItem("Participant");
     entityTypeListBox.setText("Participant");
@@ -92,15 +94,7 @@ public class DestinationSelectionStepView extends Composite implements Destinati
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return widget;
   }
 
   @Override
@@ -139,12 +133,6 @@ public class DestinationSelectionStepView extends Composite implements Destinati
     entityTypeInput.setVisible(visible);
     entityTypeListBox.setEnabled(false);
     entityTypeListBox.setText("Participant");
-  }
-
-  @Override
-  public Widget getStepHelp() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   private void displayTablesFor(String datasourceName) {

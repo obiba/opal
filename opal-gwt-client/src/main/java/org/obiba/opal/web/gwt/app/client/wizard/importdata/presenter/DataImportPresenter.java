@@ -84,17 +84,16 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     super.onBind();
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
-    destinationSelectionStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
     conclusionStepPresenter.bind();
 
     comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
 
+    setInSlot(Slots.Destination, destinationSelectionStepPresenter);
     setInSlot(Slots.Unit, unitSelectionStepPresenter);
     setInSlot(Slots.Values, datasourceValuesStepPresenter);
     setInSlot(Slots.Archive, archiveStepPresenter);
 
-    getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
 
@@ -169,9 +168,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         if(getView().getImportFormat().equals(ImportFormat.CSV)) {
           String name = csvFormatStepPresenter.getSelectedFile();
           name = name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-          destinationSelectionStepPresenter.getDisplay().setTable(name);
+          destinationSelectionStepPresenter.getView().setTable(name);
         } else {
-          destinationSelectionStepPresenter.getDisplay().setTable("");
+          destinationSelectionStepPresenter.getView().setTable("");
         }
         return true;
       }
@@ -281,7 +280,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public interface Display extends WizardView {
 
     enum Slots {
-      Unit, Values, Archive
+      Destination, Unit, Values, Archive
     }
 
     ImportFormat getImportFormat();
@@ -301,8 +300,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     HandlerRegistration addFormatChangeHandler(ChangeHandler handler);
 
     void setFormatStepDisplay(WizardStepDisplay display);
-
-    void setDestinationSelectionDisplay(WizardStepDisplay display);
 
     public void renderConclusion(ConclusionStepPresenter presenter);
 

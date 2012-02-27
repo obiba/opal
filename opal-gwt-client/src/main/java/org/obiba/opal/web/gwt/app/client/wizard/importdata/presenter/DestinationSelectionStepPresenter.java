@@ -9,15 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -26,18 +19,21 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class DestinationSelectionStepPresenter extends WidgetPresenter<DestinationSelectionStepPresenter.Display> {
+public class DestinationSelectionStepPresenter extends PresenterWidget<DestinationSelectionStepPresenter.Display> {
 
   private ImportFormat importFormat;
 
   JsArray<DatasourceDto> datasources;
 
   @Inject
-  public DestinationSelectionStepPresenter(final Display display, final EventBus eventBus) {
-    super(display, eventBus);
+  public DestinationSelectionStepPresenter(final EventBus eventBus, final Display display) {
+    super(eventBus, display);
   }
 
   public void setImportFormat(ImportFormat importFormat) {
@@ -46,13 +42,9 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   }
 
   @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
   protected void onBind() {
-    getDisplay().setTableSelectionHandler(new TableSelectionHandler() {
+    super.onBind();
+    getView().setTableSelectionHandler(new TableSelectionHandler() {
 
       @Override
       public void onTableSelected(String datasource, String table) {
@@ -63,16 +55,12 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
           @Override
           public void onResource(Response response, TableDto resource) {
             if(resource != null) {
-              getDisplay().setEntityType(resource.getEntityType());
+              getView().setEntityType(resource.getEntityType());
             }
           }
         }).send();
       }
     });
-  }
-
-  @Override
-  protected void onUnbind() {
   }
 
   private void refreshDatasources() {
@@ -87,8 +75,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
           d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
         }
 
-        getDisplay().setDatasources(datasources);
-        // updateSelectableDatasources();
+        getView().setDatasources(datasources);
       }
     }).send();
   }
@@ -96,16 +83,16 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   public boolean validate() {
     if(ImportFormat.XML.equals(importFormat) == false) {
       // table cannot be empty and cannot be a view
-      if(getDisplay().getSelectedTable().trim().isEmpty()) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
+      if(getView().getSelectedTable().trim().isEmpty()) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
         return false;
       }
-      if(getDisplay().getSelectedTable().contains(".") || getDisplay().getSelectedTable().contains(":")) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableNameInvalid").build());
+      if(getView().getSelectedTable().contains(".") || getView().getSelectedTable().contains(":")) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableNameInvalid").build());
         return false;
       }
-      if(getDisplay().getSelectedEntityType().trim().isEmpty()) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableEntityTypeRequired").build());
+      if(getView().getSelectedEntityType().trim().isEmpty()) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableEntityTypeRequired").build());
         return false;
       }
       return validateDestinationTableIsNotView();
@@ -114,14 +101,14 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   }
 
   private boolean validateDestinationTableIsNotView() {
-    String dsName = getDisplay().getSelectedDatasource();
-    String tableName = getDisplay().getSelectedTable();
+    String dsName = getView().getSelectedDatasource();
+    String tableName = getView().getSelectedTable();
     for(int i = 0; i < datasources.length(); i++) {
       DatasourceDto ds = datasources.get(i);
       if(ds.getName().equals(dsName) && ds.getViewArray() != null) {
         for(int j = 0; j < ds.getViewArray().length(); j++) {
           if(ds.getViewArray().get(j).equals(tableName)) {
-            eventBus.fireEvent(NotificationEvent.newBuilder().error("DestinationTableCannotBeView").build());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableCannotBeView").build());
             return false;
           }
         }
@@ -132,25 +119,16 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
     return true;
   }
 
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
   public void refreshDisplay() {
-    getDisplay().showTables(ImportFormat.XML.equals(importFormat) == false);
+    getView().showTables(ImportFormat.XML.equals(importFormat) == false);
     refreshDatasources();
   }
 
-  @Override
-  public void revealDisplay() {
-  }
-
   public void updateImportData(ImportData importData) {
-    importData.setDestinationDatasourceName(getDisplay().getSelectedDatasource());
+    importData.setDestinationDatasourceName(getView().getSelectedDatasource());
     if(ImportFormat.XML.equals(importFormat) == false) {
-      importData.setDestinationTableName(getDisplay().getSelectedTable());
-      importData.setDestinationEntityType(getDisplay().getSelectedEntityType());
+      importData.setDestinationTableName(getView().getSelectedTable());
+      importData.setDestinationEntityType(getView().getSelectedEntityType());
     } else {
       importData.setDestinationTableName(null);
     }
@@ -160,7 +138,7 @@ public class DestinationSelectionStepPresenter extends WidgetPresenter<Destinati
   // Inner classes and interfaces
   //
 
-  public interface Display extends WidgetDisplay, WizardStepDisplay {
+  public interface Display extends View {
 
     void setDatasources(JsArray<DatasourceDto> datasources);
 

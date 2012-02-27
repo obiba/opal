@@ -211,7 +211,10 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    if(slot == Slots.Unit) {
+    if(slot == Slots.Destination) {
+      destinationSelectionStep.removeStepContent();
+      destinationSelectionStep.add(content);
+    } else if(slot == Slots.Unit) {
       unitSelectionStep.removeStepContent();
       unitSelectionStep.add(content);
     } else if(slot == Slots.Values) {
@@ -260,12 +263,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Override
   public void setImportDataInputsHandler(ImportDataInputsHandler handler) {
     this.importDataInputsHandler = handler;
-  }
-
-  @Override
-  public void setDestinationSelectionDisplay(WizardStepDisplay display) {
-    destinationSelectionStep.removeStepContent();
-    destinationSelectionStep.add(display.asWidget());
   }
 
   @Override
