@@ -1404,6 +1404,12 @@ div.variablesListTabContent .form table {
 .tooltip .content {
   background-color: #FFFFFF;
   padding: 0.8em 0.8em 0 0.8em;
+  font-size: 1em;
+}
+
+.tooltip p {
+  margin: 10px 0;
+  font-size: 1em;
 }
 
 .tooltip .footer {

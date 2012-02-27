@@ -23,6 +23,8 @@
       
       <o:WizardStep ui:field="destinationSelectionStep"/>
       
+      <o:WizardStep ui:field="unitSelectionStep"/>
+      
       <o:WizardStep ui:field="comparedDatasourcesReportStep">
       	<g:SimplePanel ui:field="comparedDatasourcesReportPanel"></g:SimplePanel>
         <w:ValidationReportStepView ui:field="validationReportPanel" visible="false"/>

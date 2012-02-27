@@ -67,6 +67,9 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   WizardStep destinationSelectionStep;
 
   @UiField
+  WizardStep unitSelectionStep;
+
+  @UiField
   WizardStep comparedDatasourcesReportStep;
 
   @UiField
@@ -96,6 +99,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   private final EventBus eventBus;
 
   private WizardStepDisplay formatStepDisplay;
+
+  private WizardStepDisplay unitSelectionStepDisplay;
 
   private WizardStepDisplay identityArchiveStepDisplay;
 
@@ -147,6 +152,16 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
       }
     })//
 
+    .append(unitSelectionStep)//
+    .title(translations.dataImportUnitStep())//
+    .help(new WidgetProvider() {
+
+      @Override
+      public Widget getWidget() {
+        return unitSelectionStepDisplay.getStepHelp();
+      }
+    }) //
+
     .append(comparedDatasourcesReportStep)//
     .title(translations.dataImportComparedDatasourcesReportStep())//
     .help(new WidgetProvider() {
@@ -175,7 +190,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     .title(translations.dataImportValuesStep())//
 
     .append(identityArchiveStep)//
-    .title(translations.dataImportUnitStep())//
+    .title(translations.dataImportArchiveStep())//
     .help(new WidgetProvider() {
 
       @Override
@@ -264,6 +279,13 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   public void setDestinationSelectionDisplay(WizardStepDisplay display) {
     destinationSelectionStep.removeStepContent();
     destinationSelectionStep.add(display.asWidget());
+  }
+
+  @Override
+  public void setUnitSelectionDisplay(WizardStepDisplay display) {
+    this.unitSelectionStepDisplay = display;
+    unitSelectionStep.removeStepContent();
+    unitSelectionStep.add(display.asWidget());
   }
 
   @Override

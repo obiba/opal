@@ -892,6 +892,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Specify how the participant are identified.")
   String dataImportUnitStep();
 
+  @Description("Data Import Archive Step")
+  @DefaultStringValue("Specify whether the data file is to be archived.")
+  String dataImportArchiveStep();
+
   @Description("Data Import Destination Step")
   @DefaultStringValue("Select the destination of the import.")
   String dataImportDestinationStep();

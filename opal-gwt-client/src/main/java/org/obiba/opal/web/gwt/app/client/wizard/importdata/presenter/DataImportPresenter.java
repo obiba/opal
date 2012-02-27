@@ -49,6 +49,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final DestinationSelectionStepPresenter destinationSelectionStepPresenter;
 
+  private final UnitSelectionStepPresenter unitSelectionStepPresenter;
+
   private final ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
 
   private final DatasourceValuesStepPresenter datasourceValuesStepPresenter;
@@ -61,11 +63,16 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public DataImportPresenter(final Display display, final EventBus eventBus, CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, DestinationSelectionStepPresenter destinationSelectionStepPresenter, ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, IdentityArchiveStepPresenter identityArchiveStepPresenter, ConclusionStepPresenter conclusionStepPresenter, DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
+  public DataImportPresenter(final Display display, final EventBus eventBus, //
+  CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
+  DestinationSelectionStepPresenter destinationSelectionStepPresenter, UnitSelectionStepPresenter unitSelectionStepPresenter, //
+  ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, IdentityArchiveStepPresenter identityArchiveStepPresenter, //
+  ConclusionStepPresenter conclusionStepPresenter, DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
     this.destinationSelectionStepPresenter = destinationSelectionStepPresenter;
+    this.unitSelectionStepPresenter = unitSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.identityArchiveStepPresenter = identityArchiveStepPresenter;
     this.conclusionStepPresenter = conclusionStepPresenter;
@@ -78,6 +85,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
     destinationSelectionStepPresenter.bind();
+    unitSelectionStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
     identityArchiveStepPresenter.bind();
     conclusionStepPresenter.bind();
@@ -87,6 +95,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     setInSlot(Slots.Values, datasourceValuesStepPresenter);
 
     getView().setDestinationSelectionDisplay(destinationSelectionStepPresenter.getDisplay());
+    getView().setUnitSelectionDisplay(unitSelectionStepPresenter.getDisplay());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
     getView().setIdentityArchiveStepDisplay(identityArchiveStepPresenter.getDisplay());
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
@@ -206,6 +215,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       removeTransientDatasource();
       importData = formatStepPresenter.getImportData();
       destinationSelectionStepPresenter.updateImportData(importData);
+      unitSelectionStepPresenter.updateImportData(importData);
       createTransientDatasource();
     }
 
@@ -295,6 +305,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     void setFormatStepDisplay(WizardStepDisplay display);
 
     void setDestinationSelectionDisplay(WizardStepDisplay display);
+
+    void setUnitSelectionDisplay(WizardStepDisplay display);
 
     void setIdentityArchiveStepDisplay(WizardStepDisplay display);
 

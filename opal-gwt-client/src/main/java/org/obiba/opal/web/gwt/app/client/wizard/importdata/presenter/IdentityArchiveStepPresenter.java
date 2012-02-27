@@ -19,38 +19,15 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiveStepPresenter.Display> {
 
   public interface Display extends WidgetDisplay, WizardStepDisplay {
-
-    boolean isIdentifierAsIs();
-
-    void setIdentifierAsIs(boolean checked);
-
-    boolean isIdentifierSharedWithUnit();
-
-    void setIdentifierSharedWithUnit(boolean checked);
-
-    void setUnits(JsArray<FunctionalUnitDto> units);
-
-    String getSelectedUnit();
-
-    void setSelectedUnit(String unit);
-
-    HandlerRegistration addIdentifierAsIsClickHandler(ClickHandler handler);
-
-    HandlerRegistration addIdentifierSharedWithUnitClickHandler(ClickHandler handler);
 
     boolean isArchiveLeave();
 
@@ -63,22 +40,10 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
     HandlerRegistration addArchiveLeaveClickHandler(ClickHandler handler);
 
     HandlerRegistration addArchiveMoveClickHandler(ClickHandler handler);
-
-    void setUnitEnabled(boolean enabled);
-
-    /** Allows the identity (unit) section of the form to be enabled and disabled. */
-    void setIdentityEnabled(boolean enabled);
-
   }
 
   @Inject
-  private ImportData importData;
-
-  @Inject
   private FileSelectionPresenter archiveFolderSelectionPresenter;
-
-  @Inject
-  private ConclusionStepPresenter conclusionStepPresenter;
 
   @Inject
   public IdentityArchiveStepPresenter(final Display display, final EventBus eventBus) {
@@ -93,7 +58,6 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   @Override
   protected void onBind() {
     addEventHandlers();
-    initUnits();
 
     archiveFolderSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
     archiveFolderSelectionPresenter.bind();
@@ -101,46 +65,6 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
   }
 
   protected void addEventHandlers() {
-    addIdentifierEventHandlers();
-    addArchiveEventHandlers();
-  }
-
-  public void updateImportData(ImportData importData) {
-    importData.setIdentifierAsIs(getDisplay().isIdentifierAsIs());
-    importData.setIdentifierSharedWithUnit(getDisplay().isIdentifierSharedWithUnit());
-    if(getDisplay().isIdentifierSharedWithUnit()) {
-      importData.setUnit(getDisplay().getSelectedUnit());
-    } else {
-      importData.setUnit(null);
-    }
-
-    importData.setArchiveLeave(getDisplay().isArchiveLeave());
-    importData.setArchiveMove(getDisplay().isArchiveMove());
-    importData.setArchiveDirectory(getDisplay().getArchiveDirectory());
-  }
-
-  private void addIdentifierEventHandlers() {
-    super.registerHandler(getDisplay().addIdentifierAsIsClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getDisplay().setUnitEnabled(false);
-      }
-    }));
-    super.registerHandler(getDisplay().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        getDisplay().setUnitEnabled(true);
-      }
-    }));
-  }
-
-  private boolean isIdentifierAlreadyProvided() {
-    return importData.isIdentifierAsIs() || importData.isIdentifierSharedWithUnit();
-  }
-
-  private void addArchiveEventHandlers() {
     super.registerHandler(getDisplay().addArchiveLeaveClickHandler(new ClickHandler() {
 
       @Override
@@ -157,6 +81,12 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
     }));
   }
 
+  public void updateImportData(ImportData importData) {
+    importData.setArchiveLeave(getDisplay().isArchiveLeave());
+    importData.setArchiveMove(getDisplay().isArchiveMove());
+    importData.setArchiveDirectory(getDisplay().getArchiveDirectory());
+  }
+
   @Override
   protected void onPlaceRequest(PlaceRequest request) {
   }
@@ -171,15 +101,6 @@ public class IdentityArchiveStepPresenter extends WidgetPresenter<IdentityArchiv
 
   @Override
   public void revealDisplay() {
-  }
-
-  public void initUnits() {
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getDisplay().setUnits(units);
-      }
-    }).send();
   }
 
 }
