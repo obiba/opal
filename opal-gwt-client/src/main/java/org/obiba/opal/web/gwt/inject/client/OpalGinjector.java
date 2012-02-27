@@ -62,7 +62,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptVi
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ArchiveStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
@@ -176,8 +175,6 @@ public interface OpalGinjector extends Ginjector {
   ArchiveStepPresenter getArchiveStepPresenter();
 
   UnitSelectionStepPresenter getUnitSelectionStepPresenter();
-
-  ConclusionStepPresenter getConclusionStepPresenter();
 
   EvaluateScriptView getEvaluateScriptView();
 

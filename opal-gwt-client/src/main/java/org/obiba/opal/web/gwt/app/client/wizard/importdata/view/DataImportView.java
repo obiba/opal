@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandl
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
@@ -83,9 +82,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @UiField
   WizardStep archiveStep;
-
-  @UiField
-  WizardStep conclusionStep;
 
   @UiField
   HTMLPanel formatSelectionHelp;
@@ -187,9 +183,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     .append(archiveStep, archiveHelp)//
     .title(translations.dataImportArchiveStep())//
 
-    .append(conclusionStep)//
-    .conclusion()//
-
     .onNext().onPrevious().build();
 
   }
@@ -289,17 +282,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         handler.onClick(evt);
       }
     });
-  }
-
-  @Override
-  public void renderConclusion(ConclusionStepPresenter presenter) {
-    conclusionStep.removeStepContent();
-    presenter.reset();
-    conclusionStep.add(presenter.getDisplay().asWidget());
-    conclusionStep.setStepTitle(translations.dataImportPendingValidation());
-    stepChain.onNext();
-    dialog.setCancelEnabled(false);
-    dialog.setCloseEnabled(true);
   }
 
   @Override

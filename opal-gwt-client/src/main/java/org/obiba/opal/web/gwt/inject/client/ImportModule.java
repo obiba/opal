@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.inject.client;
 
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ArchiveStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter;
@@ -18,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.Destination
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.UnitSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.ArchiveStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.ConclusionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.CsvFormatStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DatasourceValuesStepView;
@@ -41,6 +39,5 @@ public class ImportModule extends AbstractOpalModule {
 
     bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class);
     bind(XmlFormatStepPresenter.Display.class).to(XmlFormatStepView.class);
-    bind(ConclusionStepPresenter.Display.class).to(ConclusionStepView.class);
   }
 }

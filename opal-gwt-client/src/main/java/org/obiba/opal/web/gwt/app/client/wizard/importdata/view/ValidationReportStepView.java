@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ConclusionStepPresenter.TableCompareError;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorTable;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -113,5 +112,27 @@ public class ValidationReportStepView extends Composite {
 
   @UiTemplate("ValidationReportStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ValidationReportStepView> {
+  }
+
+  public static class TableCompareError {
+
+    private final String column;
+
+    private final String errorMessageKey;
+
+    public TableCompareError(String column, String errorMessageKey) {
+      super();
+      this.column = column;
+      this.errorMessageKey = errorMessageKey;
+    }
+
+    public String getColumn() {
+      return column;
+    }
+
+    public String getErrorMessageKey() {
+      return errorMessageKey;
+    }
+
   }
 }

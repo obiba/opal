@@ -33,8 +33,6 @@ public class ImportData {
 
   private String archiveDirectory;
 
-  private String jobId;
-
   private int row;
 
   private String quote;
@@ -59,7 +57,6 @@ public class ImportData {
     archiveLeave = false;
     archiveMove = false;
     archiveDirectory = null;
-    jobId = null;
     row = 0;
     quote = null;
     field = null;
@@ -157,14 +154,6 @@ public class ImportData {
 
   public void setImportFormat(ImportFormat importFormat) {
     this.importFormat = importFormat;
-  }
-
-  public String getJobId() {
-    return jobId;
-  }
-
-  public void setJobId(String jobId) {
-    this.jobId = jobId;
   }
 
   public int getRow() {

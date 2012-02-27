@@ -33,9 +33,7 @@
       <o:WizardStep ui:field="valuesStep"/>
       
       <o:WizardStep ui:field="archiveStep"/>
-      
-      <o:WizardStep ui:field="conclusionStep"/>
-      
+            
       <g:HTMLPanel ui:field="formatSelectionHelp">
         <p><ui:msg description="Number of formats information">There are two data file formats currently supported:</ui:msg></p>    
         <ul>

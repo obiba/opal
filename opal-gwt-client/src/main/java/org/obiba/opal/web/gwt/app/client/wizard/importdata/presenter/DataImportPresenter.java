@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.util.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
@@ -25,8 +26,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -57,9 +61,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final ArchiveStepPresenter archiveStepPresenter;
 
-  private final ConclusionStepPresenter conclusionStepPresenter;
-
   private TransientDatasourceHandler transientDatasourceHandler;
+
+  private ImportData importData;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -67,7 +71,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
   DestinationSelectionStepPresenter destinationSelectionStepPresenter, UnitSelectionStepPresenter unitSelectionStepPresenter, //
   ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, ArchiveStepPresenter archiveStepPresenter, //
-  ConclusionStepPresenter conclusionStepPresenter, DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
+  DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
@@ -75,7 +79,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.unitSelectionStepPresenter = unitSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.archiveStepPresenter = archiveStepPresenter;
-    this.conclusionStepPresenter = conclusionStepPresenter;
     this.datasourceValuesStepPresenter = datasourceValuesStepPresenter;
   }
 
@@ -85,7 +88,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
-    conclusionStepPresenter.bind();
 
     comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
 
@@ -124,8 +126,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   protected void onFinish() {
     ImportData importData = transientDatasourceHandler.getImportData();
     archiveStepPresenter.updateImportData(importData);
-    conclusionStepPresenter.launchImport(importData);
-    getView().renderConclusion(conclusionStepPresenter);
+    launchImport(importData);
   }
 
   @Override
@@ -139,6 +140,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public void onReveal() {
     destinationSelectionStepPresenter.refreshDisplay(); // to refresh the datasources
     updateFormatStepDisplay();
+  }
+
+  @Override
+  protected boolean hideOnFinish() {
+    return true;
   }
 
   private void updateFormatStepDisplay() {
@@ -156,9 +162,57 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
   }
 
+  private void launchImport(ImportData importData) {
+    this.importData = importData;
+
+    if(importData.getImportFormat().equals(ImportFormat.XML)) {
+      submitJob(createImportCommandOptionsDto(importData.getXmlFile()));
+    } else if(importData.getImportFormat().equals(ImportFormat.CSV)) {
+      submitJob(createImportCommandOptionsDto(importData.getCsvFile()));
+    }
+  }
+
+  private void submitJob(ImportCommandOptionsDto dto) {
+
+    ResponseCodeCallback callback = new SubmitJobResponseCodeCallBack();
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post() //
+    .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
+    .withCallback(201, callback).withCallback(400, callback).withCallback(500, callback).send();
+  }
+
+  private ImportCommandOptionsDto createImportCommandOptionsDto(String selectedFile) {
+    ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
+    dto.setDestination(importData.getDestinationDatasourceName());
+    if(importData.isArchiveMove()) {
+      dto.setArchive(importData.getArchiveDirectory());
+      JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
+      selectedFiles.push(selectedFile);
+      dto.setFilesArray(selectedFiles);
+    }
+    if(importData.isIdentifierSharedWithUnit()) {
+      dto.setUnit(importData.getUnit());
+    }
+    dto.setSource(importData.getTransientDatasourceName());
+    return dto;
+  }
+
   //
   // Inner classes and interfaces
   //
+
+  private final class SubmitJobResponseCodeCallBack implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      if(response.getStatusCode() == 201) {
+        String location = response.getHeader("Location");
+        String jobId = location.substring(location.lastIndexOf('/') + 1);
+        getEventBus().fireEvent(NotificationEvent.newBuilder().info("DataImportationProcessLaunched").args(jobId).build());
+      } else {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      }
+    }
+  }
 
   private final class ImportDataInputsHandlerImpl implements ImportDataInputsHandler {
     @Override
@@ -299,8 +353,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     HandlerRegistration addFormatChangeHandler(ChangeHandler handler);
 
     void setFormatStepDisplay(WizardStepDisplay display);
-
-    public void renderConclusion(ConclusionStepPresenter presenter);
 
   }
 
