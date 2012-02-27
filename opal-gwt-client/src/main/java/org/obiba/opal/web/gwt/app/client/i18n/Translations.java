@@ -282,7 +282,8 @@ public interface Translations extends Constants {
   "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",//
   "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
   "DestinationTableCannotBeView", "The destination table cannot be a view.",//
-  "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}"//
+  "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
+  "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}"//
   })
   Map<String, String> userMessageMap();
 

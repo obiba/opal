@@ -51,12 +51,7 @@
           </g:FlowPanel>
 	    </g:FlowPanel>
       </o:WizardStep>
-      
-	  <o:WizardStep ui:field="conclusionStep">
-	    <g:Label addStyleNames="p"><ui:msg description="Data export job">The data exportation process can be followed using the Job ID:</ui:msg></g:Label>
-		<g:Anchor ui:field="jobLink" addStyleNames="large-indent">Job ID</g:Anchor>
-	  </o:WizardStep>
-	  
+      	  
 	  <g:HTMLPanel ui:field="destinationHelpPanel">
        <g:Label addStyleNames="title"><ui:msg description="File destination label">File Destination</ui:msg></g:Label>
         

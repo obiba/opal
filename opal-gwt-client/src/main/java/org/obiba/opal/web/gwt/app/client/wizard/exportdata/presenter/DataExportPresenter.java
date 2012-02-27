@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
@@ -36,13 +35,10 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -89,7 +85,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
     initFileSelectionType();
     fileSelectionPresenter.bind();
-    super.registerHandler(getView().addJobLinkClickHandler(new JobLinkClickHandler()));
     super.registerHandler(getView().addFileFormatChangeHandler(new FileFormatChangeHandler()));
     super.registerHandler(getEventBus().addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
     getView().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
@@ -153,9 +148,13 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   }
 
   @Override
+  protected boolean hideOnFinish() {
+    return true;
+  }
+
+  @Override
   protected void onFinish() {
     super.onFinish();
-    getView().renderPendingConclusion();
     ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
     .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
     .withCallback(400, new ClientFailureResponseCodeCallBack()) //
@@ -247,7 +246,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     @Override
     public void onResponseCode(Request request, Response response) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-      getView().renderFailedConclusion();
     }
   }
 
@@ -256,19 +254,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     public void onResponseCode(Request request, Response response) {
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
-      getView().renderCompletedConclusion(jobId);
-    }
-  }
-
-  class JobLinkClickHandler implements ClickHandler {
-
-    public JobLinkClickHandler() {
-      super();
-    }
-
-    @Override
-    public void onClick(ClickEvent arg0) {
-      getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
+      getEventBus().fireEvent(NotificationEvent.newBuilder().info("DataExportationProcessLaunched").args(jobId).build());
     }
   }
 
@@ -293,16 +279,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
     /** Get the Opal unit selected by the user. */
     String getSelectedUnit();
-
-    /** Display the conclusion step */
-    void renderCompletedConclusion(String jobId);
-
-    void renderFailedConclusion();
-
-    void renderPendingConclusion();
-
-    /** Add a handler to the job list */
-    HandlerRegistration addJobLinkClickHandler(ClickHandler handler);
 
     String getOutFile();
 

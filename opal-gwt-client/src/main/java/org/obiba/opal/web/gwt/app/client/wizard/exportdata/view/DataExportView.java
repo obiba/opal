@@ -30,7 +30,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -72,13 +71,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   WizardStep unitStep;
 
   @UiField
-  WizardStep conclusionStep;
-
-  @UiField
   ListBox units;
-
-  @UiField
-  Anchor jobLink;
 
   @UiField
   SimplePanel tablesPanel;
@@ -174,9 +167,6 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
         clearUnitStep();
       }
     })//
-    .append(conclusionStep)//
-    .title(translations.dataExportPendingConclusion())//
-    .conclusion()//
 
     .onNext().onPrevious().build();
   }
@@ -235,11 +225,6 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   }
 
   @Override
-  public HandlerRegistration addJobLinkClickHandler(ClickHandler handler) {
-    return jobLink.addClickHandler(handler);
-  }
-
-  @Override
   public boolean isIncremental() {
     return false;
   }
@@ -287,33 +272,6 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   public HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler) {
     return fileFormat.addChangeHandler(handler);
-  }
-
-  @Override
-  public void renderPendingConclusion() {
-    conclusionStep.setStepTitle(translations.dataExportPendingConclusion());
-    jobLink.setText("");
-    dialog.setProgress(true);
-    stepChain.onNext();
-    dialog.setCancelEnabled(false);
-    dialog.setPreviousEnabled(false);
-    dialog.setFinishEnabled(false);
-  }
-
-  @Override
-  public void renderCompletedConclusion(String jobId) {
-    dialog.setProgress(false);
-    conclusionStep.setStepTitle(translations.dataExportCompletedConclusion());
-    jobLink.setText(translations.jobLabel() + " #" + jobId);
-    dialog.setFinishEnabled(true);
-  }
-
-  @Override
-  public void renderFailedConclusion() {
-    dialog.setProgress(false);
-    conclusionStep.setStepTitle(translations.dataExportFailedConclusion());
-    dialog.setCancelEnabled(true);
-    dialog.setPreviousEnabled(true);
   }
 
   @Override
