@@ -147,6 +147,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     return true;
   }
 
+  @Override
+  protected void onCancel() {
+    super.onCancel();
+    if(transientDatasourceHandler != null) {
+      transientDatasourceHandler.removeTransientDatasource();
+    }
+  }
+
   private void updateFormatStepDisplay() {
     destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
     if(getView().getImportFormat().equals(ImportFormat.CSV)) {
@@ -255,6 +263,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     private ImportData importData;
 
+    private Request transientRequest;
+
+    private Request diffRequest;
+
     public ImportData getImportData() {
       return importData;
     }
@@ -271,6 +283,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     private void removeTransientDatasource() {
       if(importData == null) return;
+      if(transientRequest != null) {
+        transientRequest.cancel();
+        transientRequest = null;
+      }
+      if(diffRequest != null) {
+        diffRequest.cancel();
+        diffRequest = null;
+      }
 
       deleteTransientDatasource();
       importData = null;
@@ -298,6 +318,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
         public void onResponseCode(Request request, Response response) {
+          transientRequest = null;
           if(response.getStatusCode() == 201) {
             DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
             importData.setTransientDatasourceName(datasourceDto.getName());
@@ -308,11 +329,13 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         }
       };
 
-      ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory)).withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
+      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/transient-datasources").post()//
+      .withResourceBody(DatasourceFactoryDto.stringify(factory))//
+      .withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
     }
 
     private void datasourceDiff(final DatasourceFactoryDto factory, final DatasourceDto datasourceDto) {
-      comparedDatasourcesReportPresenter.compare(importData.getTransientDatasourceName(), //
+      diffRequest = comparedDatasourcesReportPresenter.compare(importData.getTransientDatasourceName(), //
       importData.getDestinationDatasourceName(), new DatasourceCreatedCallback() {
 
         @Override

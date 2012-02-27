@@ -37,6 +37,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
@@ -66,12 +67,12 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   protected void onBind() {
   }
 
-  public void compare(String sourceDatasourceName, String targetDatasourceName, final DatasourceCreatedCallback datasourceCreatedCallback, final DatasourceFactoryDto factory, final DatasourceDto datasourceResource) {
+  public Request compare(String sourceDatasourceName, String targetDatasourceName, final DatasourceCreatedCallback datasourceCreatedCallback, final DatasourceFactoryDto factory, final DatasourceDto datasourceResource) {
     this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
     authorizedComparedTables = JsArrays.create();
 
-    ResourceRequestBuilderFactory.<DatasourceCompareDto> newBuilder().forResource("/datasource/" + sourceDatasourceName + "/compare/" + targetDatasourceName).get().withCallback(new ResourceCallback<DatasourceCompareDto>() {
+    return ResourceRequestBuilderFactory.<DatasourceCompareDto> newBuilder().forResource("/datasource/" + sourceDatasourceName + "/compare/" + targetDatasourceName).get().withCallback(new ResourceCallback<DatasourceCompareDto>() {
 
       @Override
       public void onResource(Response response, DatasourceCompareDto resource) {
