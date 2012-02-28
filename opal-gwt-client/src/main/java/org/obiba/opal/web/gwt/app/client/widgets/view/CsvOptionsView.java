@@ -113,9 +113,17 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     return charsetListBox;
   }
 
+  public HasText getFieldSeparatorText() {
+    return field;
+  }
+
   @Override
   public String getFieldSeparator() {
     return field.getValue();
+  }
+
+  public HasText getQuoteText() {
+    return quote;
   }
 
   @Override

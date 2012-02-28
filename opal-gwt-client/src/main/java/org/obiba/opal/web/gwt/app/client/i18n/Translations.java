@@ -242,6 +242,8 @@ public interface Translations extends Constants {
   "NoDataToCopy", "No data to copy to the current destination.",//
   "NoFileSelected", "You must select a file.",//
   "CharsetNotAvailable", "The character set you have specified is not available.",//
+  "FieldSeparatorRequired", "The field separator is required.",//
+  "QuoteSeparatorRequired", "The quote separator is required.",//
   "NotIgnoredConlicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
   "NoVariablesToBeImported", "No variables are to be imported.",//
   "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//

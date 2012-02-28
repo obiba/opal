@@ -223,9 +223,13 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
       if(getView().getImportFormat().equals(ImportFormat.CSV)) {
-        validators.add(new RequiredTextValidator(getSelectedCsvFile(), "NoFileSelected"));
+        validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "i", "CSVFileRequired"));
         validators.add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
         validators.add(new RequiredTextValidator(getView().getCsvOptions().getCharsetText(), "CharsetNotAvailable"));
+        validators.add(new RequiredTextValidator(getView().getCsvOptions().getFieldSeparatorText(), "FieldSeparatorRequired"));
+        validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuoteText(), "QuoteSeparatorRequired"));
+      } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
+        validators.add(new RegExValidator(getSelectedCsvFile(), ".zip$", "i", "ZipFileRequired"));
       } else {
         validators.add(new RequiredTextValidator(getView().getSelectedFile(), "NoFileSelected"));
       }

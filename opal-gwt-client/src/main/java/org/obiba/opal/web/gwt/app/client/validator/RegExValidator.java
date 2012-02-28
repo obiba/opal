@@ -23,15 +23,22 @@ public class RegExValidator extends AbstractFieldValidator {
 
   private String regex;
 
+  private String modifiers;
+
   //
   // Constructors
   //
 
   public RegExValidator(HasText textField, String regex, String errorMessageKey) {
+    this(textField, regex, "", errorMessageKey);
+  }
+
+  public RegExValidator(HasText textField, String regex, String modifiers, String errorMessageKey) {
     super(errorMessageKey);
 
     this.textField = textField;
     this.regex = regex;
+    this.modifiers = modifiers;
   }
 
   //
@@ -40,11 +47,16 @@ public class RegExValidator extends AbstractFieldValidator {
 
   @Override
   protected boolean hasError() {
-    return !matchesRegEx(textField.getText(), regex);
+    return !matchesRegEx(textField.getText(), regex, modifiers);
   }
 
   public static native boolean matchesRegEx(String input, String regex)
   /*-{
   return input.match(new RegExp(regex)) != null;
+  }-*/;
+
+  public static native boolean matchesRegEx(String input, String regex, String modifiers)
+  /*-{
+  return input.match(new RegExp(regex,modifiers)) != null;
   }-*/;
 }
