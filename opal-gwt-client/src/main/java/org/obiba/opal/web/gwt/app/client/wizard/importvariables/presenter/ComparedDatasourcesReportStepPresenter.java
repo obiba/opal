@@ -72,42 +72,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     getDisplay().clearDisplay();
     authorizedComparedTables = JsArrays.create();
 
-    return ResourceRequestBuilderFactory.<DatasourceCompareDto> newBuilder().forResource("/datasource/" + sourceDatasourceName + "/compare/" + targetDatasourceName).get().withCallback(new ResourceCallback<DatasourceCompareDto>() {
-
-      @Override
-      public void onResource(Response response, DatasourceCompareDto resource) {
-        Set<TableCompareDto> comparedTables = sortComparedTables(JsArrays.toSafeArray(resource.getTableComparisonsArray()));
-        conflictsExist = false;
-        for(TableCompareDto tableComparison : comparedTables) {
-          ComparisonResult comparisonResult = getTableComparisonResult(tableComparison);
-          addTableCompareTab(tableComparison, comparisonResult);
-          if(comparisonResult == ComparisonResult.CONFLICT) {
-            conflictsExist = true;
-          } else if(tableComparison.getModifiedVariablesArray() != null) {
-            modificationsExist = true;
-          }
-        }
-        getDisplay().setIgnoreAllModificationsEnabled(conflictsExist || modificationsExist);
-        if(datasourceCreatedCallback != null) {
-          datasourceCreatedCallback.onSuccess(factory, datasourceResource);
-        }
-      }
-
-      private TreeSet<TableCompareDto> sortComparedTables(JsArray<TableCompareDto> comparedTables) {
-        TreeSet<TableCompareDto> tree = new TreeSet<TableCompareDto>(new Comparator<TableCompareDto>() {
-          @Override
-          public int compare(TableCompareDto table1, TableCompareDto table2) {
-            return table1.getCompared().getName().compareTo(table2.getCompared().getName());
-          }
-        });
-        for(int i = 0; i < comparedTables.length(); i++) {
-          tree.add(comparedTables.get(i));
-        }
-        return tree;
-      }
-
-    }).send();
-
+    return ResourceRequestBuilderFactory.<DatasourceCompareDto> newBuilder().forResource("/datasource/" + sourceDatasourceName + "/compare/" + targetDatasourceName).get()//
+    .withCallback(new DatasourceCompareResourceCallack(datasourceCreatedCallback, factory, datasourceResource)).send();
   }
 
   public void allowIgnoreAllModifications(boolean allow) {
@@ -200,6 +166,53 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   //
   // Inner classes
   //
+
+  private final class DatasourceCompareResourceCallack implements ResourceCallback<DatasourceCompareDto> {
+
+    private final DatasourceCreatedCallback datasourceCreatedCallback;
+
+    private final DatasourceFactoryDto factory;
+
+    private final DatasourceDto datasourceResource;
+
+    private DatasourceCompareResourceCallack(DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory, DatasourceDto datasourceResource) {
+      this.datasourceCreatedCallback = datasourceCreatedCallback;
+      this.factory = factory;
+      this.datasourceResource = datasourceResource;
+    }
+
+    @Override
+    public void onResource(Response response, DatasourceCompareDto resource) {
+      Set<TableCompareDto> comparedTables = sortComparedTables(JsArrays.toSafeArray(resource.getTableComparisonsArray()));
+      conflictsExist = false;
+      for(TableCompareDto tableComparison : comparedTables) {
+        ComparisonResult comparisonResult = getTableComparisonResult(tableComparison);
+        addTableCompareTab(tableComparison, comparisonResult);
+        if(comparisonResult == ComparisonResult.CONFLICT) {
+          conflictsExist = true;
+        } else if(tableComparison.getModifiedVariablesArray() != null) {
+          modificationsExist = true;
+        }
+      }
+      getDisplay().setIgnoreAllModificationsEnabled(conflictsExist || modificationsExist);
+      if(datasourceCreatedCallback != null) {
+        datasourceCreatedCallback.onSuccess(factory, datasourceResource);
+      }
+    }
+
+    private TreeSet<TableCompareDto> sortComparedTables(JsArray<TableCompareDto> comparedTables) {
+      TreeSet<TableCompareDto> tree = new TreeSet<TableCompareDto>(new Comparator<TableCompareDto>() {
+        @Override
+        public int compare(TableCompareDto table1, TableCompareDto table2) {
+          return table1.getCompared().getName().compareTo(table2.getCompared().getName());
+        }
+      });
+      for(int i = 0; i < comparedTables.length(); i++) {
+        tree.add(comparedTables.get(i));
+      }
+      return tree;
+    }
+  }
 
   private final class TableEditionAuthorizer implements HasAuthorization {
 
