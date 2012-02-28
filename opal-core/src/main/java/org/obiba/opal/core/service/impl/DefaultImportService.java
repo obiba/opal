@@ -110,22 +110,22 @@ public class DefaultImportService implements ImportService {
   //
 
   @Override
-  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
+  public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
     // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
-    importData(unitName, datasourceName, file, STAGE_ATTRIBUTE_NAME);
+    importData(unitName, destinationDatasourceName, sourceFile, allowIdentifierGeneration, STAGE_ATTRIBUTE_NAME);
   }
 
-  private void importData(String unitName, String datasourceName, FileObject file, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
+  private void importData(String unitName, String destinationDatasourceName, FileObject sourceFile, boolean allowIdentifierGeneration, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
     // If unitName is the empty string, coerce it to null.
     String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
 
     if(nonEmptyUnitName != null) Assert.isTrue(!nonEmptyUnitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
-    Assert.hasText(datasourceName, "datasourceName is null or empty");
-    Assert.notNull(file, "file is null");
-    Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
+    Assert.hasText(destinationDatasourceName, "datasourceName is null or empty");
+    Assert.notNull(sourceFile, "file is null");
+    Assert.isTrue(sourceFile.getType() == FileType.FILE, "No such file (" + sourceFile.getName().getPath() + ")");
 
     // Validate the datasource name.
-    Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
+    Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
 
     FunctionalUnit unit = null;
     if(nonEmptyUnitName != null) {
@@ -135,11 +135,11 @@ public class DefaultImportService implements ImportService {
       }
     }
 
-    copyToDestinationDatasource(file, dispatchAttribute, destinationDatasource, unit);
+    copyToDestinationDatasource(sourceFile, dispatchAttribute, destinationDatasource, unit, allowIdentifierGeneration);
   }
 
   @Override
-  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName) throws NoSuchFunctionalUnitException, IOException, InterruptedException {
+  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, IOException, InterruptedException {
     // If unitName is the empty string, coerce it to null.
     String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
 
@@ -160,7 +160,7 @@ public class DefaultImportService implements ImportService {
 
     try {
       // OPAL-903: do not multiplex when not importing Onyx data
-      copyValueTables(sourceDatasource, destinationDatasource, unit, null);
+      copyValueTables(sourceDatasource, destinationDatasource, unit, allowIdentifierGeneration, null);
     } finally {
       safelyDisposeTransientDatasource(sourceDatasource);
     }
@@ -265,20 +265,20 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit) throws IOException, InterruptedException {
+  private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit, boolean allowIdentifierGeneration) throws IOException, InterruptedException {
     DatasourceEncryptionStrategy datasourceEncryptionStrategy = null;
     if(unit != null) datasourceEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
     FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), datasourceEncryptionStrategy);
 
     try {
       sourceDatasource.initialise();
-      copyValueTables(sourceDatasource, destinationDatasource, unit, dispatchAttribute);
+      copyValueTables(sourceDatasource, destinationDatasource, unit, allowIdentifierGeneration, dispatchAttribute);
     } finally {
       sourceDatasource.dispose();
     }
   }
 
-  private void copyValueTables(final Datasource source, final Datasource destination, final FunctionalUnit unit, final String dispatchAttribute) throws IOException, InterruptedException {
+  private void copyValueTables(final Datasource source, final Datasource destination, final FunctionalUnit unit, final boolean allowIdentifierGeneration, final String dispatchAttribute) throws IOException, InterruptedException {
     try {
       new LockingActionTemplate() {
 
@@ -303,7 +303,7 @@ public class DefaultImportService implements ImportService {
 
                 if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
                   if(unit != null) {
-                    copyParticipants(valueTable, source, destination, unit, dispatchAttribute);
+                    copyParticipants(valueTable, source, destination, unit, allowIdentifierGeneration, dispatchAttribute);
                   } else {
                     addMissingEntitiesToKeysTable(valueTable);
                     MultithreadedDatasourceCopier.Builder.newCopier().withThreads(new ThreadFactory() {
@@ -376,12 +376,12 @@ public class DefaultImportService implements ImportService {
     return tablesToLock;
   }
 
-  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, final String dispatchAttribute) throws IOException {
+  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, boolean allowIdentifierGeneration, final String dispatchAttribute) throws IOException {
     final String keyVariableName = unit.getKeyVariableName();
     final View privateView = createPrivateView(participantTable, unit, null);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
 
-    final FunctionalUnitView publicView = createPublicView(participantTable, unit);
+    final FunctionalUnitView publicView = createPublicView(participantTable, unit, allowIdentifierGeneration);
     final PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
 
     // prepare for copying participant data
@@ -466,11 +466,12 @@ public class DefaultImportService implements ImportService {
    * Wraps the participant table in a {@link View} that exposes public entities and non-identifier variables.
    * 
    * @param participantTable
-   * @param entityMap
+   * @param unit
+   * @param allowIdentifierGeneration
    * @return
    */
-  private FunctionalUnitView createPublicView(ValueTable participantTable, final FunctionalUnit unit) {
-    FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable, getIdentifiersValueTable(), participantIdentifier);
+  private FunctionalUnitView createPublicView(ValueTable participantTable, final FunctionalUnit unit, final boolean allowIdentifierGeneration) {
+    FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable, getIdentifiersValueTable(), allowIdentifierGeneration ? participantIdentifier : null);
     publicTable.setSelectClause(new SelectClause() {
 
       public boolean select(Variable variable) {

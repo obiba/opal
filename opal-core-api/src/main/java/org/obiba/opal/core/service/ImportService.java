@@ -25,14 +25,15 @@ public interface ImportService {
    * Imports data into an Opal datasource .
    * 
    * @param unitName functional unit name
-   * @param datasource name of the destination datasource
-   * @param file data file to be imported
+   * @param sourceFile data file to be imported
+   * @param destinationDatasourceName name of the destination datasource
+   * @param allowIdentifierGeneration unknown participant will be created at importation time
    * @throws NoSuchDatasourceException if the specified datasource does not exist
    * @throws IllegalArgumentException if the specified file does not exist or is not a normal file
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void importData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException, InterruptedException;
+  public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException, InterruptedException;
 
   /**
    * Imports data from a source Opal datasource into a destination Opal datasource. Usually the source datasource will
@@ -41,13 +42,14 @@ public interface ImportService {
    * @param unitName functional unit name
    * @param sourceDatasourceName name of the source datasource
    * @param destinationDatasourceName name of the destination datasource
+   * @param allowIdentifierGeneration unknown participant will be created at imprtation time
    * @throws NoSuchFunctionalUnitException
    * @throws NonExistentVariableEntitiesException if unitName is null and the source entities do not exist as public
    * keys in the opal keys database
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
+  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
   /**
    * Import identifiers using the given participant identifiers provider.

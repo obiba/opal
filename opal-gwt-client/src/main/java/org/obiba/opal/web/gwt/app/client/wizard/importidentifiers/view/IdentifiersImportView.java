@@ -26,9 +26,9 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -63,16 +63,10 @@ public class IdentifiersImportView extends PopupViewImpl implements IdentifiersI
   WizardStep formatStep;
 
   @UiField
-  HTMLPanel xmlOptions;
+  Panel xmlOptions;
 
   @UiField
   CsvOptionsView csvOptions;
-
-  @UiField
-  WizardStep conclusionStep;
-
-  @UiField
-  SimplePanel conclusionPanel;
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -98,9 +92,6 @@ public class IdentifiersImportView extends PopupViewImpl implements IdentifiersI
 
     .append(formatStep)//
     .title(translations.dataImportFileStep())//
-
-    .append(conclusionStep)//
-    .conclusion()//
 
     .onNext().onPrevious().build();
 
@@ -193,28 +184,22 @@ public class IdentifiersImportView extends PopupViewImpl implements IdentifiersI
 
   @Override
   public void renderPendingConclusion() {
-    conclusionStep.setStepTitle(translations.identifierImportPendingConclusion());
     dialog.setProgress(true);
-    stepChain.onNext();
-    dialog.setProgress(true);
-    dialog.setCloseEnabled(false);
+    dialog.setFinishEnabled(false);
     dialog.setCancelEnabled(false);
   }
 
   @Override
   public void renderCompletedConclusion() {
     dialog.setProgress(false);
-    conclusionStep.setStepTitle(translations.identifierImportCompletedConclusion());
-    dialog.setCloseEnabled(true);
-    dialog.setProgress(false);
+    dialog.hide();
   }
 
   @Override
   public void renderFailedConclusion() {
     dialog.setProgress(false);
-    conclusionStep.setStepTitle(translations.identifierImportFailedConclusion());
+    dialog.setFinishEnabled(true);
     dialog.setCancelEnabled(true);
-    dialog.setProgress(false);
   }
 
   @Override

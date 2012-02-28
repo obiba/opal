@@ -148,8 +148,12 @@ public class FunctionalUnitView extends View {
   private class UnitIdentifiersArePrivate implements BijectiveFunction<VariableEntity, VariableEntity> {
     public VariableEntity apply(VariableEntity from) {
       VariableEntity publicEntity = entityMap.publicEntity(from);
-      if(publicEntity == null && allowIdentifierGeneration) {
-        publicEntity = entityMap.createPublicEntity(from);
+      if(publicEntity == null) {
+        if(allowIdentifierGeneration) {
+          publicEntity = entityMap.createPublicEntity(from);
+        } else {
+          throw new RuntimeException("Functional unit '" + unit.getName() + "' has an unknown entity with identifier '" + from.getIdentifier() + "'");
+        }
       }
       return publicEntity;
     }

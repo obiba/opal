@@ -200,6 +200,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
     if(importData.isIdentifierSharedWithUnit()) {
       dto.setUnit(importData.getUnit());
+      dto.setForce(false);
+    } else {
+      dto.setForce(true);
     }
     dto.setSource(importData.getTransientDatasourceName());
     return dto;

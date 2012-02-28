@@ -84,7 +84,7 @@ public class ImportCommandTest {
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     OpalShell mockShell = createMockShellForRelativePathImport("my-unit", "test.zip");
     ImportService mockImportService = createMock(ImportService.class);
-    mockImportService.importData("my-unit", "opal-data", mockFile);
+    mockImportService.importData("my-unit", mockFile, "opal-data", true);
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
 
     test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir, mockFile);
@@ -104,7 +104,7 @@ public class ImportCommandTest {
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
     ImportService mockImportService = createMock(ImportService.class);
     for(FileObject mockFile : mockFilesInUnitDir) {
-      mockImportService.importData("my-unit", "opal-data", mockFile);
+      mockImportService.importData("my-unit", mockFile, "opal-data", true);
     }
 
     test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir);
@@ -175,6 +175,7 @@ public class ImportCommandTest {
     expect(mockOptions.getDestination()).andReturn(destination).atLeastOnce();
     expect(mockOptions.isFiles()).andReturn(true).atLeastOnce();
     expect(mockOptions.getFiles()).andReturn(Arrays.asList(relativeFilePath)).atLeastOnce();
+    expect(mockOptions.isForce()).andReturn(true).atLeastOnce();
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
 
@@ -229,6 +230,7 @@ public class ImportCommandTest {
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
     expect(mockOptions.getDestination()).andReturn(destination).atLeastOnce();
     expect(mockOptions.isFiles()).andReturn(false).atLeastOnce();
+    expect(mockOptions.isForce()).andReturn(true).atLeastOnce();
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
 

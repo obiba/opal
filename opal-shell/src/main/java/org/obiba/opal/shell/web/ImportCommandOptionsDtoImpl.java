@@ -78,4 +78,9 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
   public boolean isSource() {
     return dto.hasSource();
   }
+
+  @Override
+  public boolean isForce() {
+    return dto.getForce();
+  }
 }

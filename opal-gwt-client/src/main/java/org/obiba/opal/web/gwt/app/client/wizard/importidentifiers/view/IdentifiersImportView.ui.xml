@@ -14,48 +14,24 @@
     <g:FlowPanel>
     
       <o:WizardStep ui:field="formatSelectionStep">
-        <g:HTMLPanel>
-          <table cellspacing="10">
-            <tbody>    
-              <tr>
-                <td>
-                  <ui:msg description="Format label">Format</ui:msg>:          
-                </td>
-                <td>
-                  <g:ListBox ui:field="formatListBox" visibleItemCount="1"/>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </g:HTMLPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key"><ui:msg description="Data format label">Data Format</ui:msg></g:Label>
+          <g:ListBox ui:field='formatListBox' visibleItemCount='1'/>
+        </g:FlowPanel>
       </o:WizardStep>
       
       <o:WizardStep ui:field="formatStep">
         <g:FlowPanel>
-          <g:HTMLPanel ui:field="xmlOptions">
-            <table cellspacing="10" class="full-width">
-              <tbody>           
-                <tr>
-                  <td>
-                    <ui:msg description="File label">File</ui:msg>:
-                  </td>
-                  <td>
-                    <g:SimplePanel ui:field="selectFilePanel" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </g:HTMLPanel>
+          <g:FlowPanel ui:field="xmlOptions" styleName="input">
+            <g:Label addStyleNames="key"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
+            <g:SimplePanel ui:field="selectFilePanel" />
+            <g:Label styleName="help-block"><ui:msg description="Opal XML File Description label">Data in Opal XML format are packaged in an archive file (.zip)</ui:msg></g:Label>
+          </g:FlowPanel>
           <w:CsvOptionsView ui:field="csvOptions" />
         </g:FlowPanel>
       </o:WizardStep>
       
-      <o:WizardStep ui:field="conclusionStep">
-        <g:SimplePanel ui:field="conclusionPanel" />
-      </o:WizardStep>
-      
     </g:FlowPanel>
-    
     
   </o:WizardDialogBox>
   

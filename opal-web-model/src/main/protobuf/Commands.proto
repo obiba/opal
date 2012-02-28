@@ -34,6 +34,7 @@ message ImportCommandOptionsDto {
   optional string archive = 3;
   repeated string files = 4;
   optional string source = 5;
+  optional bool force = 6 [default = false];
 }
 
 message CopyCommandOptionsDto {

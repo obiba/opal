@@ -43,4 +43,7 @@ public interface ImportCommandOptions extends HelpOption {
   public List<String> getFiles();
 
   public boolean isFiles();
+
+  @Option(shortName = "f", description = "Forces participant creation when an unknown participant's identifier is encountered in a functional unit. Ignored when no functional unit is specified.")
+  boolean isForce();
 }

@@ -153,7 +153,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     getShell().printf("  %s\n", file.getName().getPath());
     try {
-      importService.importData(options.getUnit(), options.getDestination(), file);
+      importService.importData(options.getUnit(), file, options.getDestination(), options.isForce());
       archive(file);
       errorCode = 0; // success!
     } catch(NoSuchFunctionalUnitException ex) {
@@ -169,6 +169,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     } catch(InterruptedException ex) {
       // Report the interrupted and continue; the test for interruption will detect this condition.
       getShell().printf("Thread interrupted");
+    } catch(RuntimeException ex) {
+      runtimeExceptionHandler(ex);
     }
 
     return errorCode;
@@ -178,7 +180,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
     try {
-      importService.importData(unitName, options.getSource(), options.getDestination());
+      importService.importData(unitName, options.getSource(), options.getDestination(), options.isForce());
       if(file != null) archive(file);
       errorCode = 0; // success!
     } catch(NoSuchDatasourceException ex) {

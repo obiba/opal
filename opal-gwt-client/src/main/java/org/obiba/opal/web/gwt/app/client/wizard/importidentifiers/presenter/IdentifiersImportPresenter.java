@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.util.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -40,6 +41,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,6 +55,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class IdentifiersImportPresenter extends WizardPresenterWidget<IdentifiersImportPresenter.Display> {
+
+  private static Translations translations = GWT.create(Translations.class);
 
   public static final WizardType WizardType = new WizardType();
 
@@ -235,6 +239,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
     importData.setFormat(getView().getImportFormat());
     importData.setDestinationDatasourceName(null); // no ref table
     importData.setDestinationTableName(identifiersTable.getName());
+    importData.setDestinationEntityType("Participant");
     importData.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
     importData.setXmlFile(fileSelectionPresenter.getSelectedFile());
     importData.setUnit(functionalUnit.getName());
@@ -252,10 +257,12 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
           getView().renderCompletedConclusion();
+          getEventBus().fireEvent(NotificationEvent.newBuilder().info(translations.identifierImportCompletedConclusion()).build());
         } else {
           final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
             getView().renderFailedConclusion();
+            getEventBus().fireEvent(NotificationEvent.newBuilder().info(translations.identifierImportFailedConclusion()).build());
           } else {
             getEventBus().fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
           }
