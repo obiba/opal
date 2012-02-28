@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.util.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -36,14 +37,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -229,7 +227,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
         validators.add(new RequiredTextValidator(getView().getCsvOptions().getFieldSeparatorText(), "FieldSeparatorRequired"));
         validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuoteText(), "QuoteSeparatorRequired"));
       } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
-        validators.add(new RegExValidator(getSelectedCsvFile(), ".zip$", "i", "ZipFileRequired"));
+        validators.add(new RegExValidator(getSelectedFile(), ".zip$", "i", "ZipFileRequired"));
       } else {
         validators.add(new RequiredTextValidator(getView().getSelectedFile(), "NoFileSelected"));
       }
@@ -261,15 +259,11 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
           getView().renderCompletedConclusion();
+          getEventBus().fireEvent(new FunctionalUnitSelectedEvent(functionalUnit));
           getEventBus().fireEvent(NotificationEvent.newBuilder().info(translations.identifierImportCompletedConclusion()).build());
         } else {
-          final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-            getView().renderFailedConclusion();
-            getEventBus().fireEvent(NotificationEvent.newBuilder().info(translations.identifierImportFailedConclusion()).build());
-          } else {
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
-          }
+          getView().renderFailedConclusion();
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.identifierImportFailedConclusion()).build());
         }
       }
     };
@@ -312,6 +306,20 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
       public String getText() {
         return csvOptionsFileSelectionPresenter.getSelectedFile();
+      }
+
+      public void setText(String text) {
+        // do nothing
+      }
+    };
+    return result;
+  }
+
+  private HasText getSelectedFile() {
+    HasText result = new HasText() {
+
+      public String getText() {
+        return fileSelectionPresenter.getSelectedFile();
       }
 
       public void setText(String text) {
