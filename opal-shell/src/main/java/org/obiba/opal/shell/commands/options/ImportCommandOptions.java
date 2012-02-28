@@ -21,7 +21,7 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 @CommandLineInterface(application = "import")
 public interface ImportCommandOptions extends HelpOption {
 
-  @Option(shortName = "u", description = "The functional unit. If not supplied, imported identifiers must exist in opal and are imported as is.")
+  @Option(shortName = "u", description = "The functional unit. If supplied, imported identifiers must exist in opal, otherwise use 'force' option. If no unit is supplied, identifiers are imported as is.")
   public String getUnit();
 
   public boolean isUnit();
