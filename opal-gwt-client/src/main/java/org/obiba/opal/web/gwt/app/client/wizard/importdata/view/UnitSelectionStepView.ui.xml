@@ -15,6 +15,7 @@
       <g:FlowPanel styleName="input">
         <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
         <g:ListBox ui:field="units" enabled="false"/>
+        <g:Label styleName="help-block large-indent"><ui:msg description="Share identifier with unit help label">Participant's identifiers must have been imported first through the selected unit, otherwise data import will fail</ui:msg></g:Label>
       </g:FlowPanel>
     </g:FlowPanel>
   </g:FlowPanel>    
