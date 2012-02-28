@@ -43,7 +43,7 @@ public class ImportCommandTest {
   @Test
   public void testImportIntoOpalInstanceNotAllowed() {
     ImportCommandOptions mockOptions = createMock(ImportCommandOptions.class);
-    expect(mockOptions.isUnit()).andReturn(true).once();
+    expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(FunctionalUnit.OPAL_INSTANCE).atLeastOnce();
 
     OpalShell mockShell = createMockShellForOpalInstanceNotAllowed();
@@ -59,7 +59,7 @@ public class ImportCommandTest {
   @Test
   public void testImportIntoBogusUnitNotAllowed() {
     ImportCommandOptions mockOptions = createMock(ImportCommandOptions.class);
-    expect(mockOptions.isUnit()).andReturn(true).once();
+    expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn("bogus").atLeastOnce();
 
     OpalShell mockShell = createMockShellForBogusUnitNotAllowed("bogus");
@@ -170,7 +170,7 @@ public class ImportCommandTest {
   private ImportCommandOptions createMockOptionsForRelativePathImport(String unitName, String destination, String relativeFilePath) {
     ImportCommandOptions mockOptions = createMock(ImportCommandOptions.class);
 
-    expect(mockOptions.isUnit()).andReturn(true).times(2);
+    expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
     expect(mockOptions.getDestination()).andReturn(destination).atLeastOnce();
     expect(mockOptions.isFiles()).andReturn(true).atLeastOnce();
@@ -226,7 +226,7 @@ public class ImportCommandTest {
   private ImportCommandOptions createMockOptionsForImportWithNoFile(String unitName, String destination) {
     ImportCommandOptions mockOptions = createMock(ImportCommandOptions.class);
 
-    expect(mockOptions.isUnit()).andReturn(true).times(2);
+    expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
     expect(mockOptions.getDestination()).andReturn(destination).atLeastOnce();
     expect(mockOptions.isFiles()).andReturn(false).atLeastOnce();

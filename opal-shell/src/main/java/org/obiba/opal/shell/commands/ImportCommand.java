@@ -150,11 +150,12 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
    */
   @SuppressWarnings("PMD.NcssMethodCount")
   private int importFile(FileObject file) {
+    String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
 
     getShell().printf("  %s\n", file.getName().getPath());
     try {
-      importService.importData(options.getUnit(), file, options.getDestination(), options.isForce());
+      importService.importData(unitName, file, options.getDestination(), options.isForce());
       archive(file);
       errorCode = 0; // success!
     } catch(NoSuchFunctionalUnitException ex) {
