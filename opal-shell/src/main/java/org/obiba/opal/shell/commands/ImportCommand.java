@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 
-@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import [--unit NAME] [--source NAME] --destination NAME [--archive FILE] [_FILE_...]")
+@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import [--unit NAME] [--force] [--source NAME] --destination NAME [--archive FILE] [_FILE_...]")
 public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
   //
