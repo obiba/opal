@@ -148,6 +148,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
    * @return error code (<code>0</code> on success, <code>1</code> on critical errors, <code>2</code> on errors handled
    * by continuing with the next file)
    */
+  @SuppressWarnings("PMD.NcssMethodCount")
   private int importFile(FileObject file) {
     int errorCode = 1; // critical error (or interruption)!
 
@@ -176,6 +177,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     return errorCode;
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private int importFromDatasource(FileObject file) {
     String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
