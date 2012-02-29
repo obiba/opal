@@ -64,6 +64,7 @@ public class DatasourceDtos {
     FsDatasourceFactoryDto factoryDto = FsDatasourceFactoryDto.create();
     factoryDto.setFile(importData.getXmlFile());
     factoryDto.setUnit(importData.getUnit());
+    factoryDto.setOldOnyx(importData.isOldOnyxFormat());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     dto.setExtension(FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);

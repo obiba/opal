@@ -45,6 +45,8 @@ public class ImportData {
 
   private String entityType;
 
+  private boolean oldOnyxFormat;
+
   public void clear() {
     importFormat = null;
     xmlFile = null;
@@ -62,6 +64,7 @@ public class ImportData {
     field = null;
     csvFile = null;
     transientDatasourceName = null;
+    oldOnyxFormat = false;
   }
 
   public void setFormat(ImportFormat importFormat) {
@@ -202,5 +205,13 @@ public class ImportData {
 
   public String getEntityType() {
     return entityType;
+  }
+
+  public void setOldOnyxFormat(boolean oldOnyxFormat) {
+    this.oldOnyxFormat = oldOnyxFormat;
+  }
+
+  public boolean isOldOnyxFormat() {
+    return oldOnyxFormat;
   }
 }
