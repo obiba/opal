@@ -39,6 +39,7 @@ message CsvDatasourceTableBundleDto {
 message FsDatasourceFactoryDto {
   required string file = 1;
   optional string unit = 2;
+  optional bool oldOnyx = 3 [default = false]; // old onyx versions are until 1.6 included 
   extend DatasourceFactoryDto { 
     optional FsDatasourceFactoryDto params = 1002; 
   }
