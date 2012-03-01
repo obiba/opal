@@ -39,7 +39,7 @@ message CsvDatasourceTableBundleDto {
 message FsDatasourceFactoryDto {
   required string file = 1;
   optional string unit = 2;
-  required bool onyxWrapper = 3 [default = false]; // required to read correctly old onyx versions are until 1.6 included 
+  optional bool onyxWrapper = 3 [default = true]; // required to read correctly old onyx versions are until 1.6 included 
   extend DatasourceFactoryDto { 
     optional FsDatasourceFactoryDto params = 1002; 
   }
