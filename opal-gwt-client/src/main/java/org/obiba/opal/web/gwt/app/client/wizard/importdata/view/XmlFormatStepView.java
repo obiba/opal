@@ -17,7 +17,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -35,9 +34,6 @@ public class XmlFormatStepView extends Composite implements XmlFormatStepPresent
 
   @UiField
   SimplePanel selectXmlFilePanel;
-
-  @UiField
-  CheckBox oldOnyx;
 
   @UiField
   HTMLPanel help;
@@ -75,11 +71,6 @@ public class XmlFormatStepView extends Composite implements XmlFormatStepPresent
   public Widget getStepHelp() {
     help.removeFromParent();
     return help;
-  }
-
-  @Override
-  public boolean isOldOnyxFormat() {
-    return oldOnyx.getValue();
   }
 
 }

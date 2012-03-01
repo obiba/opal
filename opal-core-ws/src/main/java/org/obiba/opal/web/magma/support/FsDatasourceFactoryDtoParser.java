@@ -10,12 +10,9 @@
 package org.obiba.opal.web.magma.support;
 
 import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.fs.support.FsDatasourceFactory;
-import org.obiba.magma.support.MultiplexingDatasource.VariableAttributeMultiplexer;
-import org.obiba.magma.support.MultiplexingDatasource.VariableNameTransformer;
-import org.obiba.magma.support.MultiplexingDatasourceFactory;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.support.OnyxDatasourceFactory;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.FsDatasourceFactoryDto;
@@ -41,22 +38,7 @@ public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoPa
       fsFactory.setEncryptionStrategy(unit.getDatasourceEncryptionStrategy());
     }
 
-    DatasourceFactory factory = fsFactory;
-    if(fsDto.hasOldOnyx() && fsDto.getOldOnyx()) {
-
-      factory = new MultiplexingDatasourceFactory(fsFactory, new VariableAttributeMultiplexer("stage"), new VariableNameTransformer() {
-
-        @Override
-        protected String transformName(Variable variable) {
-          if(variable.hasAttribute("stage")) {
-            return variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue("stage") + "\\.", "");
-          }
-          return variable.getName();
-        }
-
-      });
-    }
-
+    DatasourceFactory factory = fsDto.getOnyxWrapper() ? new OnyxDatasourceFactory(fsFactory) : fsFactory;
     factory.setName(dto.getName());
 
     return factory;

@@ -67,7 +67,6 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
     ImportData importData = new ImportData();
     importData.setFormat(ImportFormat.XML);
     importData.setXmlFile(getDisplay().getSelectedFile());
-    importData.setOldOnyxFormat(getDisplay().isOldOnyxFormat());
 
     return importData;
   }
@@ -90,8 +89,6 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
     void setXmlFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
     String getSelectedFile();
-
-    boolean isOldOnyxFormat();
 
   }
 

@@ -11,15 +11,6 @@
       <g:SimplePanel ui:field="selectXmlFilePanel" />
       <g:Label styleName="help-block"><ui:msg description="Opal XML File Description label">Data in Opal XML format are packaged in an archive file (.zip)</ui:msg></g:Label>
     </g:FlowPanel>
-    
-    <g:DisclosurePanel ui:field="advancedOptions" addStyleNames="full-width">
-      <g:customHeader>
-        <g:Label><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:Label>
-      </g:customHeader>
-      <g:FlowPanel>
-        <g:CheckBox ui:field="oldOnyx"><ui:msg description="Old Onyx Data Format label">Data from Onyx 1.0 to 1.6</ui:msg></g:CheckBox>
-      </g:FlowPanel>
-    </g:DisclosurePanel>
       
     <g:HTMLPanel ui:field="help">
       <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
