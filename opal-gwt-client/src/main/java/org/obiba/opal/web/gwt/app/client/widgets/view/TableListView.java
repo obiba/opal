@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.SuggestListBox;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.GWT;
@@ -47,6 +48,9 @@ public class TableListView extends Composite implements TableListPresenter.Displ
   private static TableListViewUiBinder uiBinder = GWT.create(TableListViewUiBinder.class);
 
   @UiField
+  SuggestListBox suggestList;
+
+  @UiField
   ListBox tableList;
 
   @UiField
@@ -57,7 +61,7 @@ public class TableListView extends Composite implements TableListPresenter.Displ
 
   //
   // Constructors
-  // 
+  //
 
   /**
    * 
@@ -98,6 +102,7 @@ public class TableListView extends Composite implements TableListPresenter.Displ
   @Override
   public void addTable(TableDto table) {
     tableList.addItem(getDisplayName(table), getFullyQualifiedName(table));
+    suggestList.addItem(getFullyQualifiedName(table));
   }
 
   @Override
@@ -116,6 +121,7 @@ public class TableListView extends Composite implements TableListPresenter.Displ
   @Override
   public void clear() {
     tableList.clear();
+    suggestList.clear();
   }
 
   @Override
@@ -129,6 +135,16 @@ public class TableListView extends Composite implements TableListPresenter.Displ
       tableList.setItemSelected(i, i == first ? true : false);
     }
 
+  }
+
+  @Override
+  public void clearSuggestions() {
+    suggestList.getSuggestOracle().clear();
+  }
+
+  @Override
+  public void suggestTable(TableDto tableDto) {
+    suggestList.getSuggestOracle().add(tableDto.getDatasourceName() + "." + tableDto.getName());
   }
 
   //

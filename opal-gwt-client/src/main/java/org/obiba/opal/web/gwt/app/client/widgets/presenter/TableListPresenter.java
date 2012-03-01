@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -67,6 +68,7 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   @Override
   protected void onBind() {
     addEventHandlers();
+    initializeSuggestions();
   }
 
   @Override
@@ -76,10 +78,12 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
 
   @Override
   public void revealDisplay() {
+    initializeSuggestions();
   }
 
   @Override
   public void refreshDisplay() {
+    initializeSuggestions();
   }
 
   @Override
@@ -214,6 +218,34 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
     }
   }
 
+  private void initializeSuggestions() {
+    getDisplay().clearSuggestions();
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<DatasourceDto> resource) {
+        if(resource != null) {
+          for(int i = 0; i < resource.length(); i++) {
+            initializeSuggestions(resource.get(i));
+          }
+        }
+      }
+
+    }).send();
+  }
+
+  private void initializeSuggestions(DatasourceDto datasource) {
+    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource(datasource.getLink() + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<TableDto> resource) {
+        if(resource != null) {
+          for(int i = 0; i < resource.length(); i++) {
+            getDisplay().suggestTable(resource.get(i));
+          }
+        }
+      }
+    }).send();
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -252,6 +284,10 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   public interface Display extends WidgetDisplay {
 
     HandlerRegistration addAddClickHandler(ClickHandler handler);
+
+    void suggestTable(TableDto tableDto);
+
+    void clearSuggestions();
 
     HandlerRegistration addRemoveClickHandler(ClickHandler handler);
 

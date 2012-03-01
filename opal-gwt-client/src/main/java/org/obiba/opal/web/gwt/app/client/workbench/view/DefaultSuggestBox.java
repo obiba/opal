@@ -24,7 +24,11 @@ import com.google.gwt.user.client.ui.SuggestBox;
 public class DefaultSuggestBox extends SuggestBox {
 
   public DefaultSuggestBox() {
-    super(new DefaultMultiWordSuggestOracle());
+    this(" .,-_");
+  }
+
+  public DefaultSuggestBox(String whitespaceChars) {
+    super(new DefaultMultiWordSuggestOracle(whitespaceChars));
 
     addKeyUpHandler(new KeyUpHandler() {
 
@@ -47,6 +51,14 @@ public class DefaultSuggestBox extends SuggestBox {
   private static final class DefaultMultiWordSuggestOracle extends MultiWordSuggestOracle {
 
     private List<String> defaults = new ArrayList<String>();
+
+    public DefaultMultiWordSuggestOracle() {
+      super();
+    }
+
+    public DefaultMultiWordSuggestOracle(String whitespaceChars) {
+      super(whitespaceChars);
+    }
 
     @Override
     public void add(String suggestion) {

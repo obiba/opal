@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui" 
   xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"  
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
@@ -14,7 +15,8 @@
     }
   </ui:style>
 
-  <g:HTMLPanel>
+  <g:FlowPanel>
+    <o:SuggestListBox ui:field="suggestList" visible="false"/>
     <g:HorizontalPanel>
    	  <g:ListBox ui:field="tableList" multipleSelect="true"></g:ListBox>
    	  <g:VerticalPanel addStyleNames="{style.toolbar},{style.toolbar-right}">
@@ -22,6 +24,5 @@
         <g:Image ui:field="removeImage" url="image/20/list-remove.png"></g:Image>
    	  </g:VerticalPanel>	
     </g:HorizontalPanel>
-    
-  </g:HTMLPanel>
+  </g:FlowPanel>
 </ui:UiBinder>
