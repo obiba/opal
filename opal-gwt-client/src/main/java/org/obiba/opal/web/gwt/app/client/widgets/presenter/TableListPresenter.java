@@ -25,7 +25,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -234,18 +233,19 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
     // }).send();
   }
 
-  private void initializeSuggestions(DatasourceDto datasource) {
-    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource(datasource.getLink() + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<TableDto> resource) {
-        if(resource != null) {
-          for(int i = 0; i < resource.length(); i++) {
-            getDisplay().suggestTable(resource.get(i));
-          }
-        }
-      }
-    }).send();
-  }
+  // private void initializeSuggestions(DatasourceDto datasource) {
+  // ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource(datasource.getLink() +
+  // "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+  // @Override
+  // public void onResource(Response response, JsArray<TableDto> resource) {
+  // if(resource != null) {
+  // for(int i = 0; i < resource.length(); i++) {
+  // getDisplay().suggestTable(resource.get(i));
+  // }
+  // }
+  // }
+  // }).send();
+  // }
 
   //
   // Inner Classes / Interfaces
