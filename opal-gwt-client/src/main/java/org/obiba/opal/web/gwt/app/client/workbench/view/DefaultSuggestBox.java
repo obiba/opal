@@ -37,33 +37,52 @@ public class DefaultSuggestBox extends SuggestBox {
         if(event.isControlKeyDown() && event.getNativeEvent().getCharCode() == 0) {
           DefaultSuggestBox.this.showSuggestionList();
         } else if(event.getNativeKeyCode() == KeyCodes.KEY_ESCAPE) {
-          ((DefaultSuggestionDisplay) DefaultSuggestBox.this.getSuggestionDisplay()).hideSuggestions();
+          hideSuggestions();
         }
 
       }
     });
   }
 
+  public void clear() {
+    setText("");
+    hideSuggestions();
+  }
+
+  public void hideSuggestions() {
+    ((DefaultSuggestionDisplay) getSuggestionDisplay()).hideSuggestions();
+  }
+
   public MultiWordSuggestOracle getSuggestOracle() {
     return (MultiWordSuggestOracle) super.getSuggestOracle();
+  }
+
+  public void setDefaultSuggestionsEnabled(boolean enable) {
+    DefaultMultiWordSuggestOracle oracle = (DefaultMultiWordSuggestOracle) super.getSuggestOracle();
+    oracle.setWithDefaults(enable);
   }
 
   private static final class DefaultMultiWordSuggestOracle extends MultiWordSuggestOracle {
 
     private List<String> defaults = new ArrayList<String>();
 
-    public DefaultMultiWordSuggestOracle() {
-      super();
-    }
+    private boolean withDefaults = true;
 
     public DefaultMultiWordSuggestOracle(String whitespaceChars) {
       super(whitespaceChars);
     }
 
+    public void setWithDefaults(boolean withDefaults) {
+      this.withDefaults = withDefaults;
+      if(!withDefaults) {
+        setDefaultSuggestionsFromText(new ArrayList<String>());
+      }
+    }
+
     @Override
     public void add(String suggestion) {
       super.add(suggestion);
-      if(!defaults.contains(suggestion)) {
+      if(withDefaults && !defaults.contains(suggestion)) {
         defaults.add(suggestion);
         setDefaultSuggestionsFromText(defaults);
       }

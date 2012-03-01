@@ -102,7 +102,7 @@ public class TableListView extends Composite implements TableListPresenter.Displ
   @Override
   public void addTable(TableDto table) {
     tableList.addItem(getDisplayName(table), getFullyQualifiedName(table));
-    suggestList.addItem(getFullyQualifiedName(table));
+    // suggestList.addItem(getFullyQualifiedName(table));
   }
 
   @Override
@@ -134,17 +134,17 @@ public class TableListView extends Composite implements TableListPresenter.Displ
     for(int i = 0; i < tableList.getItemCount(); i++) {
       tableList.setItemSelected(i, i == first ? true : false);
     }
-
   }
 
   @Override
   public void clearSuggestions() {
-    suggestList.getSuggestOracle().clear();
+    suggestList.clear();
   }
 
   @Override
   public void suggestTable(TableDto tableDto) {
-    suggestList.getSuggestOracle().add(tableDto.getDatasourceName() + "." + tableDto.getName());
+    String suggestion = tableDto.getDatasourceName() + "." + tableDto.getName();
+    suggestList.addSuggestion(suggestion);
   }
 
   //

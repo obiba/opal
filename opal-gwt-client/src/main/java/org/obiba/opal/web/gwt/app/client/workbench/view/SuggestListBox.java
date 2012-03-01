@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemRemovedHandler;
@@ -37,23 +38,35 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
  */
 public class SuggestListBox extends FocusPanel {
 
+  private FlowPanel content;
+
   private CloseableList closeables;
 
   private DefaultSuggestBox suggestBox;
+
+  private List<String> suggestions = new ArrayList<String>();
+
+  private boolean strict = true;
 
   public SuggestListBox() {
     super();
     addStyleName("obiba-SuggestListBox");
 
-    FlowPanel content = new FlowPanel();
+    content = new FlowPanel();
     add(content);
 
     closeables = new CloseableList();
     content.add(closeables);
+    closeables.addItemRemovedHandler(new ItemRemovedHandler() {
 
-    content.add(suggestBox = new DefaultSuggestBox());
-    suggestBox.setWidth("25px");
-    addSuggestBoxHandlers();
+      @Override
+      public void onItemRemoved(String text) {
+        rebuildSuggestBox();
+        suggestBox.setFocus(true);
+      }
+    });
+
+    rebuildSuggestBox();
 
     addFocusHandler(new FocusHandler() {
 
@@ -66,15 +79,41 @@ public class SuggestListBox extends FocusPanel {
     setItemValidator(new DefaultItemValidator());
   }
 
+  /**
+   * Strict if only what is suggested can be added (default is true).
+   * @param strict
+   */
+  public void setStrict(boolean strict) {
+    this.strict = strict;
+  }
+
+  private void rebuildSuggestBox() {
+    if(suggestBox != null) {
+      // do this because not able to clear suggest box text
+      content.remove(suggestBox);
+      suggestBox.hideSuggestions();
+    }
+
+    content.add(suggestBox = new DefaultSuggestBox());
+    suggestBox.setWidth("25px");
+    suggestBox.setDefaultSuggestionsEnabled(false);
+    addSuggestBoxHandlers();
+    for(String suggestion : suggestions) {
+      if(getItems().contains(suggestion) == false) {
+        getSuggestOracle().add(suggestion);
+      }
+    }
+  }
+
   private void addSuggestBoxHandlers() {
 
     suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 
       @Override
       public void onSelection(SelectionEvent<Suggestion> event) {
-        if(addItem(suggestBox.getText())) {
-          suggestBox.setText("");
-        }
+        closeables.addItem(suggestBox.getText());
+        rebuildSuggestBox();
+        suggestBox.setFocus(true);
       }
     });
 
@@ -84,9 +123,9 @@ public class SuggestListBox extends FocusPanel {
       public void onKeyDown(KeyDownEvent event) {
         if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
           if(!Strings.isNullOrEmpty(suggestBox.getText())) {
-            if(addItem(suggestBox.getText())) {
-              suggestBox.setText("");
-            }
+            closeables.addItem(suggestBox.getText());
+            rebuildSuggestBox();
+            suggestBox.setFocus(true);
           }
         } else if(event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE) {
           if(Strings.isNullOrEmpty(suggestBox.getText())) {
@@ -109,7 +148,7 @@ public class SuggestListBox extends FocusPanel {
 
       @Override
       public void onFocus(FocusEvent event) {
-        suggestBox.setText("");
+        suggestBox.clear();
       }
     });
 
@@ -117,18 +156,28 @@ public class SuggestListBox extends FocusPanel {
 
       @Override
       public void onBlur(BlurEvent event) {
-        suggestBox.setText("");
+        suggestBox.clear();
       }
     });
   }
 
   public void clear() {
     closeables.clear();
-    suggestBox.setValue("");
+    suggestions.clear();
+    rebuildSuggestBox();
+  }
+
+  public void addSuggestion(String suggestion) {
+    if(suggestions.contains(suggestion)) return;
+
+    suggestions.add(suggestion);
+    if(getItems().contains(suggestion) == false) {
+      getSuggestOracle().add(suggestion);
+    }
   }
 
   public boolean addItem(String text) {
-    return closeables.addItem(text);
+    return closeables.addItem(text, false);
   }
 
   public void removeItem(String text) {
@@ -162,7 +211,11 @@ public class SuggestListBox extends FocusPanel {
 
     @Override
     public boolean validate(String text) {
-      return text != null && !Strings.isNullOrEmpty(text.trim()) && !getItems().contains(text);
+      if(text == null || Strings.isNullOrEmpty(text.trim()) || getItems().contains(text)) return false;
+      if(strict) {
+        return suggestions.contains(text);
+      }
+      return true;
     }
 
   }

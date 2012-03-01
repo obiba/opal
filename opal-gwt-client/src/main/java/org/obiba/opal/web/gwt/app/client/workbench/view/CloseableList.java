@@ -36,9 +36,13 @@ public class CloseableList extends UList {
   }
 
   public boolean addItem(final String text) {
+    return addItem(text, true);
+  }
+
+  public boolean addItem(final String text, boolean validate) {
     if(Strings.isNullOrEmpty(text)) return false;
 
-    if(itemValidator != null && !itemValidator.validate(text)) return false;
+    if(validate && itemValidator != null && !itemValidator.validate(text)) return false;
 
     addItemInternal(text);
 

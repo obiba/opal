@@ -219,18 +219,19 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   }
 
   private void initializeSuggestions() {
-    getDisplay().clearSuggestions();
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        if(resource != null) {
-          for(int i = 0; i < resource.length(); i++) {
-            initializeSuggestions(resource.get(i));
-          }
-        }
-      }
-
-    }).send();
+    // getDisplay().clearSuggestions();
+    // ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>
+    // newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    // @Override
+    // public void onResource(Response response, JsArray<DatasourceDto> resource) {
+    // if(resource != null) {
+    // for(int i = 0; i < resource.length(); i++) {
+    // initializeSuggestions(resource.get(i));
+    // }
+    // }
+    // }
+    //
+    // }).send();
   }
 
   private void initializeSuggestions(DatasourceDto datasource) {
