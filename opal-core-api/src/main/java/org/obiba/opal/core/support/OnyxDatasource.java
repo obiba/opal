@@ -73,6 +73,11 @@ public class OnyxDatasource implements Datasource {
     }
   }
 
+  /**
+   * Fs datasource has to have one participants table with name Participants and have a variable that provides onyx
+   * version: this identifies old onyx data dictionary.
+   * @return
+   */
   private boolean isToBeMultiplexed() {
     boolean isOnyx = false;
     int participantTablesCount = 0;
