@@ -63,19 +63,7 @@ public class OnyxDatasource implements Datasource {
     try {
       // this will initialise the fs datasource
       Initialisables.initialise(mxDatasource);
-      boolean isOnyx = false;
-      int participantTablesCount = 0;
-      for(ValueTable table : fsDatasource.getValueTables()) {
-        if(table.getEntityType().equals("Participant")) {
-          participantTablesCount++;
-          if(table.getName().equals("Participants")) {
-            if(table.hasVariable("Admin.onyxVersion")) {
-              isOnyx = true;
-            }
-          }
-        }
-      }
-      if(isOnyx && participantTablesCount == 1) {
+      if(isToBeMultiplexed()) {
         wrapped = mxDatasource;
       } else {
         wrapped = fsDatasource;
@@ -83,6 +71,20 @@ public class OnyxDatasource implements Datasource {
     } catch(UnsupportedOperationException ex) {
       wrapped = fsDatasource;
     }
+  }
+
+  private boolean isToBeMultiplexed() {
+    boolean isOnyx = false;
+    int participantTablesCount = 0;
+    for(ValueTable table : fsDatasource.getValueTables()) {
+      if(table.getEntityType().equals("Participant")) {
+        participantTablesCount++;
+        if(table.getName().equals("Participants")) {
+          isOnyx = table.hasVariable("Admin.onyxVersion");
+        }
+      }
+    }
+    return (isOnyx && participantTablesCount == 1);
   }
 
   @Override
