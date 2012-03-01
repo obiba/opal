@@ -34,8 +34,6 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
-import org.obiba.magma.support.DatasourceCopier.MultiplexingStrategy;
-import org.obiba.magma.support.DatasourceCopier.VariableTransformer;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.type.BooleanType;
@@ -51,6 +49,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.support.OnyxDatasource;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
@@ -111,11 +110,6 @@ public class DefaultImportService implements ImportService {
 
   @Override
   public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
-    // OPAL-170 Dispatch the variables in tables corresponding to Onyx stage attribute value.
-    importData(unitName, destinationDatasourceName, sourceFile, allowIdentifierGeneration, STAGE_ATTRIBUTE_NAME);
-  }
-
-  private void importData(String unitName, String destinationDatasourceName, FileObject sourceFile, boolean allowIdentifierGeneration, String dispatchAttribute) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
     // If unitName is the empty string, coerce it to null.
     String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
 
@@ -135,7 +129,7 @@ public class DefaultImportService implements ImportService {
       }
     }
 
-    copyToDestinationDatasource(sourceFile, dispatchAttribute, destinationDatasource, unit, allowIdentifierGeneration);
+    copyToDestinationDatasource(sourceFile, destinationDatasource, unit, allowIdentifierGeneration);
   }
 
   @Override
@@ -159,8 +153,7 @@ public class DefaultImportService implements ImportService {
     }
 
     try {
-      // OPAL-903: do not multiplex when not importing Onyx data
-      copyValueTables(sourceDatasource, destinationDatasource, unit, allowIdentifierGeneration, null);
+      copyValueTables(sourceDatasource, destinationDatasource, unit, allowIdentifierGeneration);
     } finally {
       safelyDisposeTransientDatasource(sourceDatasource);
     }
@@ -265,20 +258,21 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyToDestinationDatasource(FileObject file, String dispatchAttribute, Datasource destinationDatasource, FunctionalUnit unit, boolean allowIdentifierGeneration) throws IOException, InterruptedException {
+  private void copyToDestinationDatasource(FileObject file, Datasource destinationDatasource, FunctionalUnit unit, boolean allowIdentifierGeneration) throws IOException, InterruptedException {
     DatasourceEncryptionStrategy datasourceEncryptionStrategy = null;
     if(unit != null) datasourceEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
-    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), datasourceEncryptionStrategy);
+    // always wrap fs datasources in onyx datasource to support old onyx data dictionary (from 1.0 to 1.6 version)
+    Datasource sourceDatasource = new OnyxDatasource(new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), datasourceEncryptionStrategy));
 
     try {
       sourceDatasource.initialise();
-      copyValueTables(sourceDatasource, destinationDatasource, unit, allowIdentifierGeneration, dispatchAttribute);
+      copyValueTables(sourceDatasource, destinationDatasource, unit, allowIdentifierGeneration);
     } finally {
       sourceDatasource.dispose();
     }
   }
 
-  private void copyValueTables(final Datasource source, final Datasource destination, final FunctionalUnit unit, final boolean allowIdentifierGeneration, final String dispatchAttribute) throws IOException, InterruptedException {
+  private void copyValueTables(final Datasource source, final Datasource destination, final FunctionalUnit unit, final boolean allowIdentifierGeneration) throws IOException, InterruptedException {
     try {
       new LockingActionTemplate() {
 
@@ -303,7 +297,7 @@ public class DefaultImportService implements ImportService {
 
                 if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
                   if(unit != null) {
-                    copyParticipants(valueTable, source, destination, unit, allowIdentifierGeneration, dispatchAttribute);
+                    copyParticipants(valueTable, source, destination, unit, allowIdentifierGeneration);
                   } else {
                     addMissingEntitiesToKeysTable(valueTable);
                     MultithreadedDatasourceCopier.Builder.newCopier().withThreads(new ThreadFactory() {
@@ -311,7 +305,7 @@ public class DefaultImportService implements ImportService {
                       public Thread newThread(Runnable r) {
                         return new TransactionalThread(r);
                       }
-                    }).withCopier(newCopierForParticipants(dispatchAttribute, valueTable)).from(valueTable).to(destination).build().copy();
+                    }).withCopier(newCopierForParticipants(valueTable)).from(valueTable).to(destination).build().copy();
                   }
                 } else {
                   DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(valueTable, destination);
@@ -376,7 +370,7 @@ public class DefaultImportService implements ImportService {
     return tablesToLock;
   }
 
-  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, boolean allowIdentifierGeneration, final String dispatchAttribute) throws IOException {
+  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, boolean allowIdentifierGeneration) throws IOException {
     final String keyVariableName = unit.getKeyVariableName();
     final View privateView = createPrivateView(participantTable, unit, null);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
@@ -388,7 +382,7 @@ public class DefaultImportService implements ImportService {
     final ValueTableWriter keysTableWriter = writeToKeysTable();
 
     try {
-      copyPublicViewToDestinationDatasource(destination, dispatchAttribute, publicView, createKeysListener(privateView, keyVariable, entityMap, keysTableWriter));
+      copyPublicViewToDestinationDatasource(destination, publicView, createKeysListener(privateView, keyVariable, entityMap, keysTableWriter));
     } finally {
       keysTableWriter.close();
     }
@@ -413,20 +407,13 @@ public class DefaultImportService implements ImportService {
     return createKeysListener;
   }
 
-  private DatasourceCopier.Builder newCopierForParticipants(final String dispatchAttribute, final ValueTable sourceTable) {
+  private DatasourceCopier.Builder newCopierForParticipants(final ValueTable sourceTable) {
     return DatasourceCopier.Builder.newCopier() //
-    .withLoggingListener().withThroughtputListener() //
-    .withMultiplexingStrategy(dispatchAttribute != null ? new VariableAttributeMutiplexingStrategy(dispatchAttribute, sourceTable.getName()) : null)//
-    .withVariableTransformer(new VariableTransformer() {
-      /** Remove the dispatch attribute from the variable name. This is onyx-specific. See OPAL-170 */
-      public Variable transform(Variable variable) {
-        return Variable.Builder.sameAs(variable).name(variable.hasAttribute(dispatchAttribute) ? variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue(dispatchAttribute) + "\\.", "") : variable.getName()).build();
-      }
-    });
+    .withLoggingListener().withThroughtputListener();
   }
 
-  private void copyPublicViewToDestinationDatasource(Datasource destination, final String dispatchAttribute, FunctionalUnitView publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
-    newCopierForParticipants(dispatchAttribute, publicView) //
+  private void copyPublicViewToDestinationDatasource(Datasource destination, FunctionalUnitView publicView, DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
+    newCopierForParticipants(publicView) //
     .withListener(createKeysListener).build()
     // Copy participant's non-identifiable variables and data
     .copy(publicView, destination);
@@ -546,29 +533,6 @@ public class DefaultImportService implements ImportService {
 
   private boolean isIdentifierVariableForUnit(Variable variable, FunctionalUnit unit) {
     return (unit.getSelect() != null && unit.getSelect().select(variable));
-  }
-
-  /**
-   * A MultiplexingStrategy that uses a variable attribute as the destination table name
-   */
-  static private class VariableAttributeMutiplexingStrategy implements MultiplexingStrategy {
-
-    private final String attributeName;
-
-    private final String defaultName;
-
-    public VariableAttributeMutiplexingStrategy(String attributeName, String defaultName) {
-      this.attributeName = attributeName;
-      this.defaultName = defaultName;
-    }
-
-    public String multiplexVariable(Variable variable) {
-      return variable.hasAttribute(attributeName) ? variable.getAttributeStringValue(attributeName) : defaultName;
-    }
-
-    public String multiplexValueSet(VariableEntity entity, Variable variable) {
-      return multiplexVariable(variable);
-    }
   }
 
   class TransactionalThread extends Thread {
