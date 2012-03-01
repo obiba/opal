@@ -104,11 +104,13 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   @Override
   public void onReset() {
+    super.onReset();
     refresh();
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     initUiComponents();
     addHandlers();
     setCommands();

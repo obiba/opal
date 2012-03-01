@@ -122,6 +122,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
   @Override
   protected void onBind() {
+    super.onBind();
     initUiComponents();
     addHandlers();
     setCommands();

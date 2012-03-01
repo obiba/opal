@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
@@ -30,6 +31,7 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
 
@@ -65,6 +67,17 @@ public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<Functio
     this.functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
     this.functionalUnitListPresenter = FunctionalUnitListPresenter;
     this.functionalUnitUpdateDialogPresenter = FunctionalUnitUpdateDialogPresenter;
+  }
+
+  @Override
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+  }
+
+  @Override
+  public void onReveal() {
+    super.onReveal();
+    authorize();
   }
 
   @Override

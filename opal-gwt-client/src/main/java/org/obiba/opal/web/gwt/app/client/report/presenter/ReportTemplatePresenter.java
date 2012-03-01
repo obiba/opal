@@ -66,6 +66,7 @@ public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportT
 
   @Override
   public void onReveal() {
+    super.onReveal();
     authorize();
   }
 
