@@ -21,6 +21,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -39,7 +40,7 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   InlineLabel noUnitLabel;
 
   @UiField
-  InlineLabel unitLabel;
+  Panel unitPanel;
 
   @UiField
   RadioButton identifierAsIs;
@@ -77,7 +78,7 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
     }
     this.units.setEnabled(isIdentifierSharedWithUnit());
     noUnitLabel.setVisible(units.length() == 0);
-    unitLabel.setVisible(units.length() > 0);
+    unitPanel.setVisible(units.length() > 0);
     this.units.setVisible(units.length() > 0);
     identifierAsIs.setVisible(units.length() > 0);
     identifierSharedWithUnit.setVisible(units.length() > 0);
