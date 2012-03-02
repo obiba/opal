@@ -277,7 +277,6 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     @Override
     public void execute() {
       ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenterProvider.get();
-      presenter.bind();
       presenter.setDialogMode(Mode.UPDATE);
       presenter.setReportTemplate(getView().getReportTemplateDetails());
       addToPopupSlot(presenter);

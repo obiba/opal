@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -27,7 +26,6 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportTemplatePresenter.Display, ReportTemplatePresenter.Proxy> {
 
@@ -60,17 +58,6 @@ public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportT
   }
 
   @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
-  }
-
-  @Override
-  public void onReveal() {
-    super.onReveal();
-    authorize();
-  }
-
-  @Override
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
     switch(slot) {
     case LEFT:
@@ -81,6 +68,7 @@ public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportT
     return null;
   }
 
+  @Override
   protected void addHandlers() {
     super.registerHandler(getView().addReportTemplateClickHandler(new AddReportTemplateClickHandler()));
     super.registerHandler(getView().refreshClickHandler(new ClickHandler() {
@@ -92,6 +80,7 @@ public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportT
     }));
   }
 
+  @Override
   protected void authorize() {
     // create report templates
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").post().authorize(getView().getAddReportTemplateAuthorizer()).send();

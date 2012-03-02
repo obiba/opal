@@ -122,6 +122,7 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
 
   @Override
   protected void onBind() {
+    super.onBind();
     addEventHandlers();
     addValidators();
   }

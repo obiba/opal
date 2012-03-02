@@ -24,10 +24,9 @@ public class ReportsModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-
     bindPresenter(ReportTemplatePresenter.class, ReportTemplatePresenter.Display.class, ReportTemplateView.class, ReportTemplatePresenter.Proxy.class);
     bindPresenterWidget(ReportTemplateListPresenter.class, ReportTemplateListPresenter.Display.class, ReportTemplateListView.class);
     bindPresenterWidget(ReportTemplateDetailsPresenter.class, ReportTemplateDetailsPresenter.Display.class, ReportTemplateDetailsView.class);
-    bind(ReportTemplateUpdateDialogPresenter.Display.class).to(ReportTemplateUpdateDialogView.class);
+    bindPresenterWidget(ReportTemplateUpdateDialogPresenter.class, ReportTemplateUpdateDialogPresenter.Display.class, ReportTemplateUpdateDialogView.class);
   }
 }

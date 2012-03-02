@@ -44,11 +44,13 @@ public class FunctionalUnitListPresenter extends PresenterWidget<FunctionalUnitL
 
   @Override
   public void onReveal() {
+    super.onReveal();
     refreshFunctionalUnits();
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     refreshFunctionalUnits();
     addHandlers();
   }

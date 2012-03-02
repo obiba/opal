@@ -41,6 +41,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -56,7 +57,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
   private FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
 
-  private AddKeyPairDialogPresenter addKeyPairDialogPresenter;
+  private Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter;
 
   private FunctionalUnitDto functionalUnit;
 
@@ -108,7 +109,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   }
 
   @Inject
-  public FunctionalUnitDetailsPresenter(final Display display, final EventBus eventBus, FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter, AddKeyPairDialogPresenter addKeyPairDialogPresenter) {
+  public FunctionalUnitDetailsPresenter(final Display display, final EventBus eventBus, FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter, Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter) {
     super(eventBus, display);
     this.functionalUnitUpdateDialogPresenter = functionalUnitUpdateDialogPresenter;
     this.addKeyPairDialogPresenter = addKeyPairDialogPresenter;
@@ -169,6 +170,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   }
 
   private void updateCurrentCountOfIdentifiers() {
+    if(functionalUnit == null) return;
+
     if(countIdentifiersRequest != null && countIdentifiersRequest.isPending()) {
       countIdentifiersRequest.cancel();
       countIdentifiersRequest = null;
@@ -298,8 +301,9 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     @Override
     public void execute() {
-      addKeyPairDialogPresenter.setFunctionalUnit(functionalUnit);
-      addToPopupSlot(addKeyPairDialogPresenter);
+      AddKeyPairDialogPresenter popup = addKeyPairDialogPresenter.get();
+      popup.setFunctionalUnit(functionalUnit);
+      addToPopupSlot(popup);
     }
 
   }
