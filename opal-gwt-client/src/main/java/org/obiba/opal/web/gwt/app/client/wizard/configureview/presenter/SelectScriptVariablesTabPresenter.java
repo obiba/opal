@@ -79,12 +79,6 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     addEventHandlers();
   }
 
-  @Override
-  protected void onUnbind() {
-    super.onUnbind();
-    evaluateScriptPresenter.unbind();
-  }
-
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
 

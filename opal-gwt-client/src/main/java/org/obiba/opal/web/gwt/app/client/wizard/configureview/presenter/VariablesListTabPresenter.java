@@ -130,6 +130,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   @Override
   protected void onBind() {
+    super.onBind();
     setInSlot(Display.Slots.Test, evaluateScriptPresenter);
 
     setScriptEvaluationOnSaveCallback();
@@ -151,6 +152,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   @Override
   protected void onUnbind() {
+    super.onUnbind();
     categoriesPresenter.unbind();
     attributesPresenter.unbind();
     addDerivedVariableDialogPresenter.unbind();
@@ -440,6 +442,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       } else {
         evaluateScriptPresenter.setScript("");
       }
+      evaluateScriptPresenter.setRepeatable(variableDto.getIsRepeatable());
     }
   }
 
@@ -493,6 +496,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       if(!enabled) {
         getView().clearOccurrenceGroup();
       }
+      evaluateScriptPresenter.setRepeatable(enabled);
     }
 
   }

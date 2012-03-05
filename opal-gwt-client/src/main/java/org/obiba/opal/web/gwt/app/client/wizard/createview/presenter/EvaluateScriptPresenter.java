@@ -35,6 +35,8 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
 
   private ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
 
+  private boolean repeatable;
+
   @Inject
   public EvaluateScriptPresenter(EventBus eventBus, Display view, ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
     super(eventBus, view);
@@ -68,6 +70,10 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
     this.table = table;
   }
 
+  public void setRepeatable(boolean repeatable) {
+    this.repeatable = repeatable;
+  }
+
   public void setScript(String script) {
     getView().setScript(script);
   }
@@ -89,7 +95,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
       String selectedScript = getView().getSelectedScript();
       VariableDto derived = VariableDto.create();
       derived.setValueType(ValueType.TEXT.getLabel());
-      derived.setIsRepeatable(false);
+      derived.setIsRepeatable(repeatable);
       if(!Strings.isNullOrEmpty(selectedScript)) {
         VariableDtos.setScript(derived, selectedScript);
       } else {
