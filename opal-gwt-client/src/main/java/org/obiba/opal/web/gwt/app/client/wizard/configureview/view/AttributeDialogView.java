@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 
@@ -41,8 +40,6 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  private static Translations translations = GWT.create(Translations.class);
 
   @UiField
   DialogBox dialog;
@@ -184,7 +181,6 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
     simplePanel.clear();
     simplePanel.add(inputField.asWidget());
     this.inputField = inputField;
-    this.inputField.setAttributeValueLabel("");
   }
 
   @Override

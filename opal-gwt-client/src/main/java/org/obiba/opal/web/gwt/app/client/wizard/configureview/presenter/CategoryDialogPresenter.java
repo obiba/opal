@@ -123,7 +123,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
     validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
     validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("CategoryLabelRequired"));
 
     getDisplay().showDialog();
   }

@@ -183,7 +183,8 @@ public interface Translations extends Constants {
   "CategoryNameAlreadyExists", "The specified category name already exists.", //
   "AttributeNameRequired", "An attribute name is required.", //
   "AttributeNameAlreadyExists", "The specified attribute name already exists.", //
-  "BaseLanguageLabelRequired", "The base language field (marked with *) requires a value.", //
+  "AttributeValueRequired", "Provide a value for the attribute (either localised, or not localised).", //
+  "CategoryLabelRequired", "Provide a label for the this category.", //
   "jobCancelled", "Job cancelled.", //
   "jobDeleted", "Job deleted.", //
   "completedJobsDeleted", "All completed jobs deleted.", //

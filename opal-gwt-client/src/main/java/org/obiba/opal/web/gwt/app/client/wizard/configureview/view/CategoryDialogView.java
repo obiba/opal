@@ -146,7 +146,6 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
     simplePanel.clear();
     simplePanel.add(inputField.asWidget());
     this.inputField = inputField;
-    this.inputField.setAttributeValueLabel("");
   }
 
   @Override

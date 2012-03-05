@@ -23,6 +23,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,8 +37,6 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
   private LocaleDto baseLanguage;
 
   private Map<String, TextBox> languageLabelMap = new HashMap<String, TextBox>();
-
-  private String attributeValueLabel;
 
   private Translations translations = GWT.create(Translations.class);
 
@@ -67,7 +66,7 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
     grid.addStyleName("full-width");
     for(int i = 0; i < languages.length(); i++) {
       if(i == 0) baseLanguage = languages.get(0);
-      grid.setWidget(i, 0, new Label(getLabelText(languages.get(i).getName(), i)));
+      grid.setWidget(i, 0, makeLabel(languages.get(i).getName(), i));
       TextBox box;
       languageLabelMap.put(languages.get(i).getName(), box = new TextBox());
       box.addStyleName("not-so-full-width");
@@ -76,20 +75,15 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
     panel.add(grid);
   }
 
-  private String getLabelText(String language, int index) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(attributeValueLabel);
-    sb.append(" (");
+  private Label makeLabel(String language, int index) {
+    Label label;
     if(language.equals("")) {
-      sb.append(translations.noLocale());
+      label = new Label(translations.noLocale());
     } else {
-      sb.append(language);
+      label = new InlineLabel(language);
+      label.addStyleName("label");
     }
-    sb.append(")");
-    if(index == 0) sb.append("*");
-
-    sb.append(":");
-    return sb.toString();
+    return label;
   }
 
   @Override
@@ -124,8 +118,4 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
     }
   }
 
-  @Override
-  public void setAttributeValueLabel(String attributeValueLabel) {
-    this.attributeValueLabel = attributeValueLabel;
-  }
 }

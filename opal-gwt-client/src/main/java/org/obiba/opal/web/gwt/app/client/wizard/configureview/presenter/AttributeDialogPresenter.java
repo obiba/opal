@@ -119,7 +119,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     validators.add(new RequiredTextValidator(getDisplay().getAttributeName(), "AttributeNameRequired"));
     validators.add(new UniqueAttributeNameValidator("AttributeNameAlreadyExists"));
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("BaseLanguageLabelRequired"));
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("AttributeValueRequired"));
 
     getDisplay().showDialog();
   }

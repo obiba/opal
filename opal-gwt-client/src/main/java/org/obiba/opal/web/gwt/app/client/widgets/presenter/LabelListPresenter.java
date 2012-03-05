@@ -42,7 +42,6 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
     public void clearAttributes(); // i.e., clear the attribute values
 
-    public void setAttributeValueLabel(String attributeValueLabel);
   }
 
   private String attributeToDisplay;
