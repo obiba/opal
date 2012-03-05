@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -223,6 +224,7 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       validators.add(new RequiredTextValidator(getView().getDatasourceName(), "DatasourceNameRequired"));
+      validators.add(new DisallowedCharactersValidator(getView().getDatasourceName(), new char[] { '.', ':' }, "DatasourceNameDisallowedChars"));
       return validators;
     }
   }
