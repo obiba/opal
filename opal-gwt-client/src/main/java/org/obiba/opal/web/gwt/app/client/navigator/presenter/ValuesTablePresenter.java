@@ -83,6 +83,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
+  private String cleanFilter(String filter) {
+    return filter.replaceAll("/", "\\\\/");
+  }
+
   //
   // Inner classes and interfaces
   //
@@ -156,7 +160,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     public void request(String filter, int offset, int limit) {
       StringBuilder link = getLinkBuilder(offset, limit);
       if(filter != null && filter.isEmpty() == false) {
-        link.append("&select=").append(URL.encodePathSegment("name().matches(/" + filter + "/)"));
+        link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
       }
 
       doRequest(offset, link.toString());
@@ -192,7 +196,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     public void updateVariables(String select) {
       String link = table.getLink() + "/variables";
       if(select != null && select.isEmpty() == false) {
-        link += "?script=" + URL.encodePathSegment(select);
+        link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(select) + "/)");
       }
       if(variablesRequest != null) {
         variablesRequest.cancel();
@@ -201,7 +205,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get()//
       .withCallback(new VariablesResourceCallback(table)).send();
     }
-
   }
 
   public interface Display extends View {

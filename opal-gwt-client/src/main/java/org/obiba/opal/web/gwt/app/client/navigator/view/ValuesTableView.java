@@ -142,12 +142,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
           // variables list has changed so update all
           lastFilter = filter.getText();
           maxVisibleColumns = visibleColumns.getNumberValue().intValue();
-          String select = "";
-          if(filter.getText().isEmpty() == false) {
-            select = "name().matches(/" + filter.getText() + "/)";
-          }
           setRefreshing(true);
-          fetcher.updateVariables(select);
+          fetcher.updateVariables(filter.getText());
         } else if(valuesTable.getPageSize() != pageSize.getNumberValue().intValue()) {
           // page size only has changed
           setRefreshing(true);
