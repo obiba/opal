@@ -147,7 +147,7 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   }
 
   private void addPager() {
-    localizablesTable.setPageSize(5);
+    localizablesTable.setPageSize(10);
     pager.setDisplay(localizablesTable);
   }
 
