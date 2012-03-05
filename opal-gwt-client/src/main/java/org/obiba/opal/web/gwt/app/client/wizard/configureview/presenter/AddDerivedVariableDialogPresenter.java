@@ -20,7 +20,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -85,7 +84,6 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     // Add the variables to the suggestions.
     String[] tableNameParts;
     for(int i = 0; i < viewDto.getFromArray().length(); i++) {
-      GWT.log(viewDto.getFromArray().get(i));
       tableNameParts = viewDto.getFromArray().get(i).split("\\.");
       ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + tableNameParts[0] + "/table/" + tableNameParts[1] + "/variables").get().withCallback(new VariablesDtoCallBack()).send();
     }

@@ -48,14 +48,11 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
@@ -118,9 +115,9 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public VariablesListTabPresenter(final Display display, final EventBus eventBus, //
-      CategoriesPresenter categoriesPresenter, AttributesPresenter attributesPresenter, //
-      SummaryTabPresenter summaryPresenter, AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter, //
-      EvaluateScriptPresenter evaluateScriptPresenter, ScriptEvaluationPresenter scriptEvaluationPresenter, Translations translations) {
+  CategoriesPresenter categoriesPresenter, AttributesPresenter attributesPresenter, //
+  SummaryTabPresenter summaryPresenter, AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter, //
+  EvaluateScriptPresenter evaluateScriptPresenter, ScriptEvaluationPresenter scriptEvaluationPresenter, Translations translations) {
     super(eventBus, display);
     this.categoriesPresenter = categoriesPresenter;
     this.attributesPresenter = attributesPresenter;
@@ -253,7 +250,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     super.registerHandler(getView().addPreviousVariableNameClickHandler(new PreviousVariableClickHandler()));
     super.registerHandler(getView().addNextVariableNameClickHandler(new NextVariableClickHandler()));
     super.registerHandler(getView().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
-    super.registerHandler(getView().addVariableNameEnterKeyPressed(new VariableNameEnterKeyPressedHandler()));
     super.registerHandler(getView().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
     super.registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
@@ -486,17 +482,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       addDerivedVariableDialogPresenter.getView().getVariableName().setText("");
       addToPopupSlot(addDerivedVariableDialogPresenter);
     }
-  }
-
-  class VariableNameEnterKeyPressedHandler implements KeyDownHandler {
-
-    @Override
-    public void onKeyDown(KeyDownEvent event) {
-      if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-        GWT.log("Selection changed to (enter) " + getView().getSelectedVariableName() + ", handler: " + this);
-      }
-    }
-
   }
 
   class RepeatableClickHandler implements ValueChangeHandler<Boolean> {

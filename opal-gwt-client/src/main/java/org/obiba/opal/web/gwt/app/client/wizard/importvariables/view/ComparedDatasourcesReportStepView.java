@@ -179,7 +179,9 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return variableChangesPanel;
   }
 
-  private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables, JsArray<ConflictDto> conflicts) {
+  private
+      void
+      addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables, JsArray<ConflictDto> conflicts) {
     FlowPanel variableChangesSummaryPanel = new FlowPanel();
     variableChangesSummaryPanel.addStyleName("variableChangesSummaryPanel");
     int conflictsCount[] = getConflictsCounts(conflicts);
@@ -199,8 +201,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   private int[] getConflictsCounts(JsArray<ConflictDto> conflicts) {
     int conflictsCount[] = { 0, 0 };
     for(int i = 0; i < conflicts.length(); i++) {
-
-      GWT.log("conflict " + conflicts.get(i).getVariable().getIsNewVariable());
       if(conflicts.get(i).getVariable().getIsNewVariable()) {
         conflictsCount[0]++;
       } else {
@@ -219,7 +219,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     populateVariableChangesTable(conflicts, dataProvider, variableConflictsPager);
   }
 
-  private void addVariablesTab(JsArray<VariableDto> variables, HorizontalTabLayout variableChangesPanel, String tabTitle) {
+  private void
+      addVariablesTab(JsArray<VariableDto> variables, HorizontalTabLayout variableChangesPanel, String tabTitle) {
     CellTable<VariableDto> variablesDetails = setupColumnsForVariables();
     SimplePager variableDetailsPager = prepareVariableChangesTab(variableChangesPanel, tabTitle, variablesDetails);
 
@@ -228,7 +229,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     populateVariableChangesTable(variables, dataProvider, variableDetailsPager);
   }
 
-  private <T extends JavaScriptObject> SimplePager prepareVariableChangesTab(HorizontalTabLayout variableChangesTabPanel, String tabTitle, CellTable<T> variableChangesTable) {
+  private
+      <T extends JavaScriptObject>
+      SimplePager
+      prepareVariableChangesTab(HorizontalTabLayout variableChangesTabPanel, String tabTitle, CellTable<T> variableChangesTable) {
     variableChangesTable.addStyleName("variableChangesDetails");
     ScrollPanel variableChangesDetails = new ScrollPanel();
     VerticalPanel variableChangesDetailsVert = new VerticalPanel();
@@ -251,7 +255,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return pagerPanel;
   }
 
-  private <T extends JavaScriptObject> void populateVariableChangesTable(final JsArray<T> conflicts, JsArrayDataProvider<T> dataProvider, SimplePager pager) {
+  private <T extends JavaScriptObject> void
+      populateVariableChangesTable(final JsArray<T> conflicts, JsArrayDataProvider<T> dataProvider, SimplePager pager) {
     dataProvider.setArray(conflicts);
     pager.firstPage();
     dataProvider.refresh();

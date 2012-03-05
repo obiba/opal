@@ -70,7 +70,6 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
     }
     int length = scriptArea.getSelectionLength();
     String selected = scriptArea.getText().substring(start, start + length);
-    GWT.log("selected=" + selected);
     return selected;
   }
 
