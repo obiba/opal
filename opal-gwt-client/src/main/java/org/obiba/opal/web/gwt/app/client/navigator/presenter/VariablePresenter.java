@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChange
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -85,6 +86,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     setInSlot(Display.Slots.Values, valuesTablePresenter);
 
     super.registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+
     summaryTabPresenter.bind();
     getView().setParentCommand(new ParentCommand());
     getView().setNextCommand(new NextCommand());
@@ -104,43 +107,44 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   }
 
   private void updateDisplay(TableDto tableDto, VariableDto variableDto, VariableDto previous, VariableDto next) {
-    if(variable == null || !isCurrentVariable(variableDto)) {
-      table = tableDto;
-      variable = variableDto;
-      getView().setVariableName(variable.getName());
-      getView().setEntityType(variable.getEntityType());
-      getView().setValueType(variable.getValueType());
-      getView().setMimeType(variable.hasMimeType() ? variable.getMimeType() : "");
-      getView().setUnit(variable.hasUnit() ? variable.getUnit() : "");
-      getView().setRepeatable(variable.getIsRepeatable());
-      getView().setOccurrenceGroup(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
+    table = tableDto;
+    variable = variableDto;
+    getView().setVariableName(variable.getName());
+    getView().setEntityType(variable.getEntityType());
+    getView().setValueType(variable.getValueType());
+    getView().setMimeType(variable.hasMimeType() ? variable.getMimeType() : "");
+    getView().setUnit(variable.hasUnit() ? variable.getUnit() : "");
+    getView().setRepeatable(variable.getIsRepeatable());
+    getView().setOccurrenceGroup(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
 
-      getView().setParentName(variable.getParentLink().getRel());
-      getView().setPreviousName(previous != null ? previous.getName() : "");
-      getView().setNextName(next != null ? next.getName() : "");
+    getView().setParentName(variable.getParentLink().getRel());
+    getView().setPreviousName(previous != null ? previous.getName() : "");
+    getView().setNextName(next != null ? next.getName() : "");
 
-      getView().renderCategoryRows(variable.getCategoriesArray());
-      getView().renderAttributeRows(variable.getAttributesArray());
-      getView().setCategorizeMenuAvailable(!variable.getValueType().equals("binary"));
+    getView().renderCategoryRows(variable.getCategoriesArray());
+    getView().renderAttributeRows(variable.getAttributesArray());
+    getView().setCategorizeMenuAvailable(!variable.getValueType().equals("binary"));
 
-      updateDerivedVariableDisplay();
+    updateDerivedVariableDisplay();
 
-      authorize();
-    }
+    authorize();
   }
 
   private void updateDerivedVariableDisplay() {
     // if table is a view, check for a script attribute
-    getView().setDerivedVariable(false, "");
-    if(table == null || !table.hasViewLink()) return;
+    if(table == null || !table.hasViewLink()) {
+      getView().setDerivedVariable(false, "");
+      return;
+    }
 
     for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
       if(attr.getName().equals("script")) {
         getView().setDerivedVariable(true, attr.getValue());
         getView().setEditCommand(new EditCommand());
-        break;
+        return;
       }
     }
+    getView().setDerivedVariable(false, "");
   }
 
   private void authorize() {
@@ -163,6 +167,10 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     return variableDto.getName().equals(variable.getName()) && variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
   }
 
+  private boolean isCurrentTable(ViewDto viewDto) {
+    return this.table != null && table.getDatasourceName().equals(viewDto.getDatasourceName()) && table.getName().equals(viewDto.getName());
+  }
+
   /**
    * @param selection
    */
@@ -177,6 +185,29 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   //
   // Interfaces and classes
   //
+
+  class ViewSavedEventHandler implements ViewSavedEvent.Handler {
+
+    @Override
+    public void onViewSaved(ViewSavedEvent event) {
+      if(isVisible() && isCurrentTable(event.getView())) {
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<VariableDto> resource) {
+            JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
+            for(int i = 0; i < variables.length(); i++) {
+              if(isCurrentVariable(variables.get(i))) {
+                variable = null;
+                updateDisplay(table, variables.get(i), i > 0 ? variables.get(i - 1) : null, i < (variables.length() + 1) ? variables.get(i + 1) : null);
+                break;
+              }
+            }
+          }
+        }).send();
+      }
+    }
+  }
 
   final class DeriveCategorizeCommand implements Command {
     @Override
@@ -309,7 +340,6 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
-
     }
   }
 

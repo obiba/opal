@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
@@ -457,7 +458,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
       if(this.table.getLink().equals(TablePresenter.this.table.getLink())) {
-        variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
+        variables = JsArrays.toSafeArray(resource);
         getView().renderRows(variables);
         for(int i = 0; i < variables.length(); i++) {
           getView().addVariableSuggestion(variables.get(i).getName());
