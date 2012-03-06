@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.event;
 
+import org.obiba.opal.web.model.client.magma.ViewDto;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -20,7 +22,10 @@ public class ViewSavedEvent extends GwtEvent<ViewSavedEvent.Handler> {
 
   private static Type<Handler> TYPE;
 
-  public ViewSavedEvent() {
+  private final ViewDto view;
+
+  public ViewSavedEvent(ViewDto view) {
+    this.view = view;
   }
 
   @Override
@@ -35,6 +40,10 @@ public class ViewSavedEvent extends GwtEvent<ViewSavedEvent.Handler> {
 
   public static Type<Handler> getType() {
     return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+  }
+
+  public ViewDto getView() {
+    return view;
   }
 
   public interface Handler extends EventHandler {

@@ -246,7 +246,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
           } else {
             // Send event so save button and asterisk can be cleared.
             viewSavePending = false;
-            getEventBus().fireEvent(new ViewSavedEvent());
+            getEventBus().fireEvent(new ViewSavedEvent(viewDto));
           }
         }
       };
