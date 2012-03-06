@@ -483,16 +483,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
       if(start > table.getValueSetCount()) return;
 
-      int length = range.getLength();
-      if(start + length > table.getValueSetCount()) {
-        length = table.getValueSetCount() - start;
-      }
       if(filter.getText().isEmpty()) {
         setRefreshing(true);
-        fetcher.request(visibleListVariable, start, length);
+        fetcher.request(visibleListVariable, start, pager.getPageSize());
       } else {
         setRefreshing(true);
-        fetcher.request(filter.getText(), start, length);
+        fetcher.request(filter.getText(), start, pager.getPageSize());
       }
     }
 
