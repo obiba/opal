@@ -23,8 +23,6 @@ public class InnerAutoCompleteTextArea extends TextArea {
 
   private boolean backspacePressed;
 
-  private String text;
-
   public InnerAutoCompleteTextArea() {
     initializeText("");
     addKeyDownHandler(new KeyDownHandler() {
@@ -55,7 +53,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
   @Override
   public String getText() {
     int cursorPosition = getCursorPos();
-    text = super.getText();
+    String text = super.getText();
     if(text.equals(previousText)) {
       return currentSuggestion;
     }
@@ -104,18 +102,17 @@ public class InnerAutoCompleteTextArea extends TextArea {
   }
 
   public String getRealText() {
-    return text == null ? "" : text;
+    return super.getText();
   }
 
   public void initializeText(String value) {
-    text = value;
     super.setText(value);
     suggestions = new ArrayList<String>();
     previousText = "";
     currentSuggestionPosition = 0;
     currentSuggestion = "";
     backspacePressed = false;
-    setCursorPos(text.length());
+    setCursorPos(value.length());
   }
 
   @Override
