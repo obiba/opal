@@ -15,7 +15,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCustomVar
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ValueTypeBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
-import org.obiba.opal.web.model.client.magma.LinkDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -85,8 +85,8 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
   }
 
   @Override
-  public void addSuggestions(LinkDto parentLink) {
-    scriptBox.addAsyncSuggestions(parentLink);
+  public void addSuggestions(TableDto table) {
+    scriptBox.addAsyncSuggestions(table);
   }
 
   @Override

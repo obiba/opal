@@ -21,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGen
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.LinkDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -51,8 +50,6 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     getView().getRepeatable().setValue(variable.getIsRepeatable());
     getView().getTestButton().addClickHandler(new TestButtonClickHandler());
     getView().getValueType().setValue(variable.getValueType());
-    getView().getScriptBox().setValue("$('" + originalVariable.getName() + "')");
-    getView().addSuggestions(variable.getParentLink());
   }
 
   @Override
@@ -96,13 +93,27 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     return stepCtrls;
   }
 
+  @Override
+  void setTable(TableDto table) {
+    super.setTable(table);
+    String name = originalVariable.getName();
+    if(table.hasViewLink()) {
+      String datasourceName = table.getDatasourceName();
+      String tableName = table.getName();
+      getView().getScriptBox().setValue("$('" + datasourceName + "." + tableName + ":" + name + "')");
+    } else {
+      getView().getScriptBox().setValue("$('" + name + "')");
+    }
+    getView().addSuggestions(table);
+  }
+
   public interface Display extends View {
 
     Builder getDeriveStepController();
 
     HasClickHandlers getTestButton();
 
-    void addSuggestions(LinkDto parentLink);
+    void addSuggestions(TableDto table);
 
     void add(Widget widget);
 

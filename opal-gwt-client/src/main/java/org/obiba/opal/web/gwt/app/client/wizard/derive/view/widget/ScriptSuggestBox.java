@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.LinkDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -43,27 +42,21 @@ public class ScriptSuggestBox extends Composite {
     initWidget(variable);
   }
 
-  public void addAsyncSuggestions(final LinkDto link) {
-    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(link.getLink()).get().withCallback(new ResourceCallback<TableDto>() {
+  public void addAsyncSuggestions(final TableDto table) {
+    if(table.hasViewLink() == false) {
+      requestVariables(table.getLink());
+    } else {
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(table.getViewLink()).get().withCallback(new ResourceCallback<ViewDto>() {
 
-      @Override
-      public void onResource(Response response, TableDto table) {
-        if(table.hasViewLink() == false) {
-          requestVariables(link.getLink());
-        } else {
-          ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(table.getViewLink()).get().withCallback(new ResourceCallback<ViewDto>() {
-
-            @Override
-            public void onResource(Response response, ViewDto view) {
-              for(String table : JsArrays.toIterable(view.getFromArray())) {
-                String[] tableNameParts = table.split("\\.");
-                requestVariables("/datasource/" + tableNameParts[0] + "/table/" + tableNameParts[1]);
-              }
-            }
-          }).send();
+        @Override
+        public void onResource(Response response, ViewDto view) {
+          for(String table : JsArrays.toIterable(view.getFromArray())) {
+            String[] tableNameParts = table.split("\\.");
+            requestVariables("/datasource/" + tableNameParts[0] + "/table/" + tableNameParts[1]);
+          }
         }
-      }
-    }).send();
+      }).send();
+    }
   }
 
   private void requestVariables(final String link) {

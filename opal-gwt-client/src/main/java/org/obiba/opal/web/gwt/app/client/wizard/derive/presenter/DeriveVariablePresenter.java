@@ -138,10 +138,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       public void onResource(Response response, TableDto resource) {
         table = resource;
         scriptEvaluationPresenter.setTable(table);
+        derivationPresenter.setTable(table);
       }
-
     }).send();
-
     updateDatasources();
 
     if(event.getAssociatedType() == CategorizeWizardType) {

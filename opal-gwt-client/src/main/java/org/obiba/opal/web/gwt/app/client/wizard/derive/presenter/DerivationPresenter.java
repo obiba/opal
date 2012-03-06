@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.shared.EventBus;
@@ -28,6 +29,10 @@ public abstract class DerivationPresenter<V extends View> extends PresenterWidge
 
   void initialize(VariableDto variable) {
     this.originalVariable = variable;
+  }
+
+  void setTable(TableDto table) {
+
   }
 
   public VariableDto getOriginalVariable() {
