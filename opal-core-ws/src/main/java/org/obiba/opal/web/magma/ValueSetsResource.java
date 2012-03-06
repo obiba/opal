@@ -65,7 +65,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
   @GET
   // Required to allow passing parameters in the body
   @POST
-  @Cache(isPrivate = true, mustRevalidate = true)
+  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public Response getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
     // filter entities
     final Iterable<VariableEntity> entities = filterEntities(null, offset, limit);
