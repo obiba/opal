@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
@@ -84,6 +85,15 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
       @Override
       public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
         updateTree(event.getDatasourceName(), true);
+      }
+
+    }));
+
+    super.registerHandler(getEventBus().addHandler(DatasourceRemovedEvent.getType(), new DatasourceRemovedEvent.Handler() {
+
+      @Override
+      public void onDatasourceRemoved(DatasourceRemovedEvent event) {
+        updateTree(null, false);
       }
 
     }));

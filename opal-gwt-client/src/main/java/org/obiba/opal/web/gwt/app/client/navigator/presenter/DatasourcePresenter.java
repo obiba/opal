@@ -13,11 +13,12 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -44,7 +45,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -231,7 +231,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     getEventBus().fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasource));
   }
 
-  private void removeDatasource(String datasource) {
+  private void removeDatasource(final String datasource) {
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -240,9 +240,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
         if(response.getStatusCode() != Response.SC_OK) {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
-          // TODO: this is not sufficient to update the UI. We need to send an evet to get presenters to update
-          // themselves
-          getEventBus().fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
+          initDatasources();
+          getEventBus().fireEvent(new DatasourceRemovedEvent(datasource));
         }
       }
     };
@@ -270,7 +269,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
       @Override
       public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        datasources = (resource != null) ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
+        datasources = JsArrays.toSafeArray(resource);
       }
 
     }).send();
@@ -403,7 +402,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     @Override
     public void onResource(Response response, JsArray<TableDto> resource) {
       if(this.datasourceName.equals(DatasourcePresenter.this.datasourceName)) {
-        tables = (resource != null) ? resource : (JsArray<TableDto>) JsArray.createArray();
+        tables = JsArrays.toSafeArray(resource);
         getView().renderRows(resource);
         selectTable(selectTableName);
         getView().afterRenderRows();
