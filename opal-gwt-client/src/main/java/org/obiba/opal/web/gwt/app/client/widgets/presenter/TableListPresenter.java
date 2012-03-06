@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -67,7 +68,6 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   @Override
   protected void onBind() {
     addEventHandlers();
-    initializeSuggestions();
   }
 
   @Override
@@ -77,12 +77,10 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
 
   @Override
   public void revealDisplay() {
-    initializeSuggestions();
   }
 
   @Override
   public void refreshDisplay() {
-    initializeSuggestions();
   }
 
   @Override
@@ -123,7 +121,7 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   }
 
   public void selectTable(final TableDto table) {
-    selectTable(table.getDatasourceName(), table.getName());
+    updateTables(table);
   }
 
   public void selectTable(String datasourceName, String tableName) {
@@ -134,8 +132,7 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
           updateTables(resource);
         }
       }
-
-    }).send();
+    }).withCallback(404, ResponseCodeCallbacks.noOp()).send();
   }
 
   public void addTable(TableDto table) {
@@ -216,40 +213,6 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
       eventBus.fireEvent(new TableListUpdateEvent(TableListPresenter.this));
     }
   }
-
-  private void initializeSuggestions() {
-    // getDisplay().clearSuggestions();
-    // ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>
-    // newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-    // @Override
-    // public void onResource(Response response, JsArray<DatasourceDto> resource) {
-    // if(resource != null) {
-    // for(int i = 0; i < resource.length(); i++) {
-    // initializeSuggestions(resource.get(i));
-    // }
-    // }
-    // }
-    //
-    // }).send();
-  }
-
-  // private void initializeSuggestions(DatasourceDto datasource) {
-  // ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource(datasource.getLink() +
-  // "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
-  // @Override
-  // public void onResource(Response response, JsArray<TableDto> resource) {
-  // if(resource != null) {
-  // for(int i = 0; i < resource.length(); i++) {
-  // getDisplay().suggestTable(resource.get(i));
-  // }
-  // }
-  // }
-  // }).send();
-  // }
-
-  //
-  // Inner Classes / Interfaces
-  //
 
   class RemoveClickHandler implements ClickHandler {
 

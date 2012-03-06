@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -81,11 +82,16 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
       getView().addVariableSuggestion(variable.getName());
     }
 
+    VariablesDtoCallBack variablesDtoCallBack = new VariablesDtoCallBack();
     // Add the variables to the suggestions.
     String[] tableNameParts;
     for(int i = 0; i < viewDto.getFromArray().length(); i++) {
       tableNameParts = viewDto.getFromArray().get(i).split("\\.");
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource("/datasource/" + tableNameParts[0] + "/table/" + tableNameParts[1] + "/variables").get().withCallback(new VariablesDtoCallBack()).send();
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder()//
+      .forResource("/datasource/" + tableNameParts[0] + "/table/" + tableNameParts[1] + "/variables")//
+      .get()//
+      .withCallback(404, ResponseCodeCallbacks.noOp())//
+      .withCallback(variablesDtoCallBack).send();
     }
   }
 

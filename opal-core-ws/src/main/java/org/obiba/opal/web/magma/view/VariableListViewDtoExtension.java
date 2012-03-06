@@ -17,10 +17,11 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.js.views.VariablesClause;
+import org.obiba.magma.support.ValueTableReference;
 import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.View;
-import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.View.Builder;
+import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -91,6 +92,9 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
   }
 
   String toStringReference(ValueTable vt) {
+    if(vt instanceof ValueTableReference) {
+      return ((ValueTableReference) vt).getReference();
+    }
     return vt.getDatasource().getName() + "." + vt.getName();
   }
 }
