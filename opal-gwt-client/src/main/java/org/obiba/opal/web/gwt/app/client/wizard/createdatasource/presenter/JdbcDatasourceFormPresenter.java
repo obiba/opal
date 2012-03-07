@@ -35,7 +35,7 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
   public static class Subscriber extends DatasourceFormPresenterSubscriber {
 
     @Inject
-    public Subscriber(com.google.gwt.event.shared.EventBus eventBus, JdbcDatasourceFormPresenter presenter) {
+    public Subscriber(EventBus eventBus, JdbcDatasourceFormPresenter presenter) {
       super(eventBus, presenter);
     }
 
@@ -53,16 +53,12 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
   }
 
   @Override
-  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
+  public PresenterWidget<? extends DatasourceFormPresenter.Display> getPresenter() {
     return this;
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
-  protected void onBind() {
+  protected void onReveal() {
     ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>> newBuilder().forResource("/system/jdbcDrivers").get().withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
 
       @Override
@@ -76,6 +72,12 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
     }).send();
   }
 
+  @Override
+  public boolean validateFormData() {
+    return validate();
+  }
+
+  @Override
   public DatasourceFactoryDto getDatasourceFactory() {
     JdbcDatasourceFactoryDto extensionDto = JdbcDatasourceFactoryDto.create();
     extensionDto.setDriver(getView().getDriver().getText());
@@ -90,13 +92,10 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
     return dto;
   }
 
+  @Override
   public boolean isForType(String type) {
     return type.equalsIgnoreCase("jdbc");
   }
-
-  //
-  // Methods
-  //
 
   private JdbcDatasourceSettingsDto getSettings() {
     JdbcDatasourceSettingsDto settingsDto = JdbcDatasourceSettingsDto.create();
@@ -137,11 +136,6 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
     HasText getDefaultUpdatedTimestampColumnName();
 
     void setJdbcDrivers(List<JdbcDriverDto> drivers);
-  }
-
-  @Override
-  public boolean validateFormData() {
-    return validate();
   }
 
   @Override

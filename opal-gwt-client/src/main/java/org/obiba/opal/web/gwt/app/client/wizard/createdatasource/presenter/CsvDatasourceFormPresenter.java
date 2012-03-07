@@ -72,7 +72,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
   }
 
   @Override
-  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
+  public PresenterWidget<? extends DatasourceFormPresenter.Display> getPresenter() {
     return this;
   }
 
@@ -82,7 +82,11 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
     csvFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
 
     getView().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getDisplay());
+  }
 
+  @Override
+  protected void onReveal() {
+    super.onReveal();
     getDefaultCharset();
     getAvailableCharsets();
   }
