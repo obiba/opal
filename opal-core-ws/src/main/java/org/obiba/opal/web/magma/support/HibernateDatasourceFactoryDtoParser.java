@@ -14,8 +14,8 @@ import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.HibernateDatasourceFactoryDto;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,11 +24,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  private final BeanFactory beanFactory;
+  private final ApplicationContext applicationContext;
 
   @Autowired
-  public HibernateDatasourceFactoryDtoParser(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
+  public HibernateDatasourceFactoryDtoParser(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
   }
 
   @Override
@@ -36,9 +36,13 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
     HibernateDatasourceFactory factory = new HibernateDatasourceFactory();
     HibernateDatasourceFactoryDto hDto = dto.getExtension(HibernateDatasourceFactoryDto.params);
     if(hDto.getKey()) {
-      factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(beanFactory, "keySessionFactory"));
+      factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "keySessionFactory"));
     } else {
-      factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(beanFactory, "opalSessionFactory"));
+      if(hDto.hasDatabase()) {
+        factory.setSessionFactoryProvider(new DatabaseSessionFactoryProvider(applicationContext, hDto.getDatabase()));
+      } else {
+        factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "opalSessionFactory"));
+      }
     }
     factory.setName(dto.getName());
     return factory;

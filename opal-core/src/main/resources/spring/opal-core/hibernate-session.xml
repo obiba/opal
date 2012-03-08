@@ -101,4 +101,27 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </property>
   </bean>
 
+  <bean id="hibernate-properties" class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
+    <qualifier value="hibernate" />
+    <property name="properties">
+      <props>
+        <prop key="hibernate.generate_statistics">true</prop>
+        <prop key="hibernate.cache.use_structured_entries">true</prop>
+        <prop key="hibernate.cache.use_query_cache">true</prop>
+        <prop key="hibernate.cache.use_second_level_cache">true</prop>
+        <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
+        <prop key="net.sf.ehcache.configurationResourceName">/opal-ehcache.xml</prop>
+
+        <!-- Set the CurrentSessionContext to JTASessionContext: a Hibernate Session will be available when a transaction 
+          is active -->
+        <prop key="hibernate.current_session_context_class">jta</prop>
+
+        <!-- Overridden to lookup the JOTM UserTransaction directly instead of a JNDI lookup -->
+        <prop key="hibernate.transaction.factory_class">org.obiba.opal.core.tx.JOTMTransactionFactory</prop>
+        <prop key="hibernate.transaction.auto_close_session">true</prop>
+        <prop key="hibernate.transaction.flush_before_completion">true</prop>
+      </props>
+    </property>
+  </bean>
+
 </beans>

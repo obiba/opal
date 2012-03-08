@@ -76,6 +76,7 @@ message JdbcValueTableSettingsDto {
 
 message HibernateDatasourceFactoryDto {
   optional bool key = 1;
+  optional string database = 2;
   extend DatasourceFactoryDto { 
     optional HibernateDatasourceFactoryDto params = 1004; 
   } 
