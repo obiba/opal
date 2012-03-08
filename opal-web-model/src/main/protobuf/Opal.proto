@@ -67,7 +67,18 @@ message LocaleDto {
 
 message JdbcDriverDto {
   required string driverName = 1;  // e.g., "MySQL 5.1"
-  required string driverClass = 2; // e.g., "com.mysql.jdbc.Driver" 
+  required string driverClass = 2; // e.g., "com.mysql.jdbc.Driver"
+  required string jdbcUrlTemplate = 3; // e.g., "jdbc:mysql://{hostname}:{port}/{databaseName}"
+  optional string version = 4;
+}
+
+message JdbcDataSourceDto {
+  required string name = 1;
+  required string url = 2;
+  required string driverClass = 3;
+  required string username = 4;
+  required string password = 5;
+  optional string properties = 6;
 }
 
 message ReportTemplateDto {

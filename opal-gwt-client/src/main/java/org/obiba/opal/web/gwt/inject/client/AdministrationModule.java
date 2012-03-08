@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.inject.client;
 
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.view.DatabaseAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.database.view.DatabaseView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
@@ -32,6 +36,10 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenter(AdministrationPresenter.class, AdministrationPresenter.Display.class, AdministrationView.class, AdministrationPresenter.Proxy.class);
     bindPresenter(DataShieldConfigPresenter.class, DataShieldConfigPresenter.Display.class, DataShieldConfigView.class, DataShieldConfigPresenter.Proxy.class);
     bindPresenter(RAdministrationPresenter.class, RAdministrationPresenter.Display.class, RAdministrationView.class, RAdministrationPresenter.Proxy.class);
+
+    bindPresenter(DatabaseAdministrationPresenter.class, DatabaseAdministrationPresenter.Display.class, DatabaseAdministrationView.class, DatabaseAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(DatabasePresenter.class, DatabasePresenter.Display.class, DatabaseView.class);
+
     bindPresenterWidget(DataShieldAdministrationPresenter.class, DataShieldAdministrationPresenter.Display.class, DataShieldAdministrationView.class);
     bindPresenterWidget(DataShieldMethodPresenter.class, DataShieldMethodPresenter.Display.class, DataShieldMethodView.class);
   }

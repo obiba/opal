@@ -129,7 +129,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
   @ProxyStandard
   @NameToken("!admin.r")
-  @TabInfo(container = AdministrationPresenter.class, label = "R", priority = 1)
+  @TabInfo(container = AdministrationPresenter.class, label = "R", priority = 2)
   public interface Proxy extends TabContentProxyPlace<RAdministrationPresenter> {
   }
 

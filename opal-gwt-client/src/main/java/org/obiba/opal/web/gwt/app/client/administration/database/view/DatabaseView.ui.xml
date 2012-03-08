@@ -1,0 +1,59 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <ui:style>
+    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
+  </ui:style>
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="32em" width="40em">
+      <g:center>
+        <g:ScrollPanel>
+          <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+              <g:TextBox name="name" ui:field="name"/>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Url label">Url</ui:msg></g:Label>
+              <g:TextBox name="url" ui:field="url"/>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Driver label">Driver</ui:msg></g:Label>
+              <g:TextBox name="driver" ui:field="driver"/>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Username label">Username</ui:msg></g:Label>
+              <g:TextBox name="username" ui:field="username"/>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key"><ui:msg description="Password label">Password</ui:msg></g:Label>
+              <g:PasswordTextBox name="password" ui:field="password"/>
+            </g:FlowPanel>
+
+          </g:FlowPanel>
+        </g:ScrollPanel>
+      </g:center>
+      <g:south size="4">
+        <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
+          <g:Button ui:field="cancelButton" styleName="btn right-aligned top-margin">
+            <ui:msg description="Cancel button label">Cancel</ui:msg>
+          </g:Button>
+          <g:Button ui:field="saveButton" styleName="btn btn-primary right-aligned top-margin">
+            <ui:msg description="Save button label">Save</ui:msg>
+          </g:Button>
+        </g:FlowPanel>
+      </g:south>
+    </g:DockLayoutPanel>
+
+  </g:DialogBox>
+
+</ui:UiBinder>

@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.mozilla.javascript.RhinoException;
@@ -24,6 +27,10 @@ public class ClientErrorDtos {
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus != null ? errorStatus : "");
+  }
+  
+  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, String ... args) {
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus != null ? errorStatus : "").addAllArguments(args != null ? Arrays.asList(args) : Collections.<String>emptyList());
   }
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, Exception e) {

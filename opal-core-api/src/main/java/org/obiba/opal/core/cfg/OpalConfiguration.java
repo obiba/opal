@@ -65,6 +65,12 @@ public class OpalConfiguration {
     this.magmaEngineFactory = magmaEngineFactory;
   }
 
+  public void addExtension(OpalConfigurationExtension extension) {
+    if(hasExtension(extension.getClass()) == false) {
+      extensions.add(extension);
+    }
+  }
+
   public <T extends OpalConfigurationExtension> T getExtension(Class<T> type) {
     try {
       return Iterables.getOnlyElement(Iterables.filter(extensions, type));

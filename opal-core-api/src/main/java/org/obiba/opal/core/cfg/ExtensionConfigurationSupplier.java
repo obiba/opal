@@ -30,6 +30,20 @@ public abstract class ExtensionConfigurationSupplier<T extends OpalConfiguration
     this.extensionType = extensionType;
   }
 
+  public boolean hasExtension() {
+    return opalConfigurationService.getOpalConfiguration().hasExtension(extensionType);
+  }
+
+  public void addExtension(final T extensionConfig) {
+    opalConfigurationService.modifyConfiguration(new ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        config.addExtension(extensionConfig);
+      }
+    });
+  }
+
   /**
    * Returns the {@code OpalConfigurationExtension} implementation from the {@code OpalConfiguration}
    */
