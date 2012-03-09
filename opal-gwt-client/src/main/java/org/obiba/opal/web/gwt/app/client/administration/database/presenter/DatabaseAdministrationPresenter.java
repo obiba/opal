@@ -80,11 +80,15 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
   }
 
+  private static final String DATABASES_RESOURCE = "/jdbc/databases";
+
+  private static final String DATABASE_RESOURCE = "/jdbc/database/";
+
   private final Provider<DatabasePresenter> jdbcDataSourcePresenter;
 
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider = new ResourceDataProvider<JdbcDataSourceDto>("/jdbc/databases");
+  private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider = new ResourceDataProvider<JdbcDataSourceDto>(DATABASES_RESOURCE);
 
   private Command confirmedCommand;
 
@@ -98,7 +102,7 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/jdbc/databases").post().authorize(event.getHasAuthorization()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(DATABASES_RESOURCE).post().authorize(event.getHasAuthorization()).send();
   }
 
   @Override
@@ -119,7 +123,7 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/jdbc/databases").post().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(DATABASES_RESOURCE).post().authorize(authorizer).send();
   }
 
   @Override
@@ -179,7 +183,7 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
           };
           ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>> newBuilder()//
-          .forResource("/jdbc/database/" + object.getName() + "/connections").accept("application/json")//
+          .forResource(databaseResource(object.getName(), "connections")).accept("application/json")//
           .withCallback(200, callback).withCallback(503, callback).post().send();
         }
       }
@@ -198,11 +202,11 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
     }));
 
     resourceDataProvider.addDataDisplay(getView().getDatabaseTable());
-    authorizationPresenter.setAclRequest("databases", AclRequest.newBuilder("Administrate", "/jdbc/databases", "*:POST/*"));
+    authorizationPresenter.setAclRequest("databases", AclRequest.newBuilder("Administrate", DATABASES_RESOURCE, "*:POST/*"));
   }
 
   private void deleteDatabase(JdbcDataSourceDto database) {
-    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>> newBuilder().forResource("/jdbc/database/" + database.getName()).withCallback(200, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>> newBuilder().forResource(databaseResource(database.getName())).withCallback(200, new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
@@ -214,6 +218,16 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
   private void refresh() {
     getView().getDatabaseTable().setVisibleRangeAndClearData(new Range(0, 10), true);
+  }
+
+  private String databaseResource(String databaseName, String... subResources) {
+    String resource = DATABASE_RESOURCE + databaseName;
+    if(subResources != null) {
+      for(String s : subResources) {
+        resource += "/" + s;
+      }
+    }
+    return resource;
   }
 
   private final class PermissionsUpdate implements HasAuthorization {

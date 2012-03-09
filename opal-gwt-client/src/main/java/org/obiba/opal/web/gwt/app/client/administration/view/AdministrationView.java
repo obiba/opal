@@ -9,9 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import java.util.Collections;
+import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.AbstractTabLayout;
+
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -21,28 +25,32 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.Tab;
 import com.gwtplatform.mvp.client.TabData;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class AdministrationView implements AdministrationPresenter.Display {
+public class AdministrationView extends ViewImpl implements AdministrationPresenter.Display {
 
-  private class AdminTab implements Tab {
+  private class AdminTab implements Tab, Comparable<AdminTab> {
 
     private final TabData tabData;
 
     private final SimplePanel tabContent;
 
-    private final int tabIndex;
+    private final Hyperlink tab;
 
     private AdminTab(TabData tabData, String token) {
       this.tabData = tabData;
       this.tabContent = new SimplePanel();
-      Hyperlink hl = new Hyperlink();
-      hl.setTargetHistoryToken(token);
-      hl.setText(tabData.getLabel());
-      this.tabIndex = administrationDisplays.add(tabContent, hl);
+      tab = new Hyperlink();
+      tab.setTargetHistoryToken(token);
+      // TODO: localise
+      tab.setText(tabData.getLabel());
+      orderedTabs.add(this);
+      Collections.sort(orderedTabs);
+      administrationDisplays.insert(tabContent, tab, getTabIndex());
     }
 
     public int getTabIndex() {
-      return tabIndex;
+      return orderedTabs.indexOf(this);
     }
 
     @Override
@@ -79,6 +87,12 @@ public class AdministrationView implements AdministrationPresenter.Display {
 
     }
 
+    @Override
+    public int compareTo(AdminTab o) {
+      if(getPriority() == o.getPriority()) return 0;
+      return getPriority() < o.getPriority() ? -1 : 1;
+    }
+
   }
 
   @UiTemplate("AdministrationView.ui.xml")
@@ -89,8 +103,10 @@ public class AdministrationView implements AdministrationPresenter.Display {
 
   private final Widget widget;
 
+  private final List<AdminTab> orderedTabs = Lists.newLinkedList();
+
   @UiField
-  HorizontalTabLayout administrationDisplays;
+  AbstractTabLayout administrationDisplays;
 
   private Widget currentTabContent;
 
@@ -107,6 +123,7 @@ public class AdministrationView implements AdministrationPresenter.Display {
   @Override
   public void removeTab(Tab tab) {
     administrationDisplays.remove(((AdminTab) tab).getTabIndex());
+    orderedTabs.remove(tab);
   }
 
   @Override
@@ -117,23 +134,19 @@ public class AdministrationView implements AdministrationPresenter.Display {
   @Override
   public void setActiveTab(Tab tab) {
     AdminTab adminTab = (AdminTab) tab;
-    adminTab.tabContent.clear();
-    adminTab.tabContent.add(currentTabContent);
+    if(currentTabContent != null) {
+      adminTab.tabContent.setWidget(currentTabContent);
+      currentTabContent = null;
+    }
     administrationDisplays.selectTab(adminTab.getTabIndex());
-    currentTabContent = null;
-  }
-
-  @Override
-  public void addToSlot(Object slot, Widget content) {
-  }
-
-  @Override
-  public void removeFromSlot(Object slot, Widget content) {
   }
 
   @Override
   public void setInSlot(Object slot, Widget content) {
     if(slot == AdministrationPresenter.TabSlot) {
+      // The gwt-platform pattern is that the tab container has only one Panel with the active content being shown.
+      // The AbstractTabLayout does not. At least, it doesn't expose it.
+      // So we keep this around and in "setActiveTab" we associate this widget to its tab
       currentTabContent = content;
     }
   }

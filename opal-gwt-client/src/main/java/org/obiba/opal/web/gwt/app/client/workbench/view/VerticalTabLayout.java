@@ -15,9 +15,8 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 public class VerticalTabLayout extends AbstractTabLayout {
 
   public VerticalTabLayout() {
-    super();
+    super("vertical");
     addStyleName("vertical-tabs");
-    menu.addStyleName("vertical");
   }
 
 }

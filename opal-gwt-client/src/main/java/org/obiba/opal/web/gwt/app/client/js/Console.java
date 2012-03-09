@@ -17,4 +17,9 @@ public class Console {
   /*-{
      console.log(jso);
    }-*/;
+
+  public static native void log(String str)
+  /*-{
+     console.log(str);
+   }-*/;
 }
