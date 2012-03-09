@@ -288,8 +288,13 @@ public interface Translations extends Constants {
       "DestinationTableCannotBeView", "The destination table cannot be a view.",//
       "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
       "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}",//
+      "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "Connection successful.",//
-      "DatabaseConnectionFailed", "Failed to connect: {0}."//
+      "DatabaseConnectionFailed", "Failed to connect: {0}.",//
+      "NameIsRequired", "A name is required.",//
+      "DriverIsRequired", "A driver is required.",//
+      "UrlIsRequired", "A url is required.",//
+      "UsernameIsRequired", "A username is required."//
       })
       Map<String, String> userMessageMap();
 

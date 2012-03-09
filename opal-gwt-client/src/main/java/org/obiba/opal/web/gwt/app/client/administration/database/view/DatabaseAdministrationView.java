@@ -16,7 +16,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Datab
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -65,7 +65,22 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   @UiField
   Panel permissions;
 
-  ActionsColumn<JdbcDataSourceDto> actionsColumn = new ActionsColumn<JdbcDataSourceDto>(new ConstantActionsProvider<JdbcDataSourceDto>(TEST_ACTION, EDIT_ACTION, DELETE_ACTION));
+  ActionsColumn<JdbcDataSourceDto> actionsColumn = new ActionsColumn<JdbcDataSourceDto>(new ActionsProvider<JdbcDataSourceDto>() {
+
+    private final String[] all = new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
+
+    private final String[] immutable = new String[] { TEST_ACTION };
+
+    @Override
+    public String[] allActions() {
+      return all;
+    }
+
+    @Override
+    public String[] getActions(JdbcDataSourceDto value) {
+      return value.getEditable() ? allActions() : immutable;
+    }
+  });
 
   public DatabaseAdministrationView() {
     super();

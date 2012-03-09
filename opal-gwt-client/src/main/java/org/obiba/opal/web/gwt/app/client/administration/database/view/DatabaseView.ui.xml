@@ -19,13 +19,13 @@
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Url label">Url</ui:msg></g:Label>
-              <g:TextBox name="url" ui:field="url"/>
+              <g:Label addStyleNames="key"><ui:msg description="Driver label">Driver</ui:msg></g:Label>
+              <g:TextBox name="driver" ui:field="driver"/>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Driver label">Driver</ui:msg></g:Label>
-              <g:TextBox name="driver" ui:field="driver"/>
+              <g:Label addStyleNames="key"><ui:msg description="Url label">Url</ui:msg></g:Label>
+              <g:TextBox name="url" ui:field="url"/>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">

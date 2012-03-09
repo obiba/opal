@@ -77,8 +77,9 @@ message JdbcDataSourceDto {
   required string url = 2;
   required string driverClass = 3;
   required string username = 4;
-  required string password = 5;
-  optional string properties = 6;
+  optional string password = 5;
+  optional bool editable = 6 [default = true];
+  optional string properties = 7;
 }
 
 message ReportTemplateDto {

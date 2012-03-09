@@ -47,12 +47,18 @@ public class JdbcDataSourceResource {
 
   @DELETE
   public Response delete() {
+    if(jdbcDataSource.isEditable() == false) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
     jdbcDataSourceRegistry.remove(jdbcDataSource);
     return Response.ok().build();
   }
 
   @PUT
   public Response update(JdbcDataSourceDto dto) {
+    if(jdbcDataSource.isEditable() == false) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
     if(dto.getName().equals(jdbcDataSource.getName()) == false) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode()).setStatus("InvalidName").build()).build();
     }

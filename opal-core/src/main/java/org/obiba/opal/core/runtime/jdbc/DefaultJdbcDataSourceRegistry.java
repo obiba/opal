@@ -24,6 +24,7 @@ import org.obiba.opal.core.runtime.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Predicate;
@@ -43,6 +44,10 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   }
 
+  private static final String DEFAULT_NAME = "<default>";
+
+  private final JdbcDataSource defaultDatasource;
+
   private final DataSourceFactory dataSourceFactory;
 
   private final ExtensionConfigurationSupplier<JdbcDataSourcesConfig> configSupplier;
@@ -50,10 +55,11 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   private final ConcurrentMap<String, BasicDataSource> dataSourceCache = Maps.newConcurrentMap();
 
   @Autowired
-  public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, OpalConfigurationService opalConfigService) {
+  public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
     this.dataSourceFactory = dataSourceFactory;
     configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService, JdbcDataSourcesConfig.class) {
     };
+    defaultDatasource = buildDefaultDataSource(opalDataSource);
   }
 
   @Override
@@ -90,7 +96,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public Iterable<JdbcDataSource> listDataSources() {
-    return ImmutableList.copyOf(get().datasources);
+    return Iterables.concat(ImmutableList.of(defaultDatasource), get().datasources);
   }
 
   @Override
@@ -105,6 +111,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public void update(final JdbcDataSource jdbcDataSource) {
+    if(getJdbcDataSource(jdbcDataSource.getName()).isEditable() == false) return;
     configSupplier.modify(new ExtensionConfigModificationTask<DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig>() {
 
       @Override
@@ -119,6 +126,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public void remove(final JdbcDataSource jdbcDataSource) {
+    if(getJdbcDataSource(jdbcDataSource.getName()).isEditable() == false) return;
     configSupplier.modify(new ExtensionConfigModificationTask<DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig>() {
 
       @Override
@@ -130,6 +138,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public void registerDataSource(final JdbcDataSource jdbcDataSource) {
+    if(jdbcDataSource.getName().equals(DEFAULT_NAME)) return;
     configSupplier.modify(new ExtensionConfigModificationTask<DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig>() {
 
       @Override
@@ -145,4 +154,10 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
     }
     return configSupplier.get();
   }
+
+  private JdbcDataSource buildDefaultDataSource(DataSource opalDataSource) {
+    BasicDataSource bds = (BasicDataSource) opalDataSource;
+    return new JdbcDataSource(DEFAULT_NAME, bds.getUrl(), bds.getDriverClassName(), bds.getUsername(), bds.getPassword(), null).immutable();
+  }
+
 }

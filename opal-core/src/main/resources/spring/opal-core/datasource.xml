@@ -19,6 +19,7 @@
   </bean>
 
   <bean id="opalDataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource" destroy-method="close">
+    <qualifier value="opal-datasource"/>
     <property name="transactionManager" ref="jotm" />
     <property name="url" value="${org.obiba.opal.datasource.opal.url}" />
     <property name="driverClassName" value="${org.obiba.opal.datasource.opal.driver}" />

@@ -13,6 +13,7 @@ import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
 import org.obiba.opal.web.model.Opal.JdbcDataSourceDto;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 
 final class Dtos {
 
@@ -26,8 +27,9 @@ final class Dtos {
         .setDriverClass(input.getDriverClass())//
         .setUrl(input.getUrl())//
         .setUsername(input.getUsername())//
-        .setPassword(input.getPassword())//
-        .setProperties(input.getProperties()).build();
+        .setPassword(Strings.nullToEmpty(input.getPassword()))//
+        .setEditable(input.isEditable()) //
+        .setProperties(Strings.nullToEmpty(input.getProperties())).build();
       }
 
     };

@@ -76,8 +76,7 @@ public class JdbcResource {
   @Produces("text/html")
   @AuthenticatedByCookie
   @Path("/drivers")
-  public Response
-      addDriver(@Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileUploadException, IOException {
+  public Response addDriver(@Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileUploadException, IOException {
     ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
     for(FileItem fileItem : (List<FileItem>) upload.parseRequest(request)) {
       if(!fileItem.isFormField()) {
@@ -101,7 +100,7 @@ public class JdbcResource {
   }
 
   @Path("/database/{name}")
-  public Object getJdbcDatasource(@PathParam("name") String name) {
+  public JdbcDataSourceResource getJdbcDatasource(@PathParam("name") String name) {
     return new JdbcDataSourceResource(jdbcDataSourceRegistry, jdbcDataSourceRegistry.getJdbcDataSource(name));
   }
 }

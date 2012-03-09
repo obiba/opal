@@ -29,6 +29,8 @@ public class JdbcDataSource {
 
   private String properties;
 
+  private boolean editable = true;
+
   public JdbcDataSource() {
   }
 
@@ -99,6 +101,15 @@ public class JdbcDataSource {
 
   public void setProperties(String properties) {
     this.properties = properties;
+  }
+
+  public boolean isEditable() {
+    return editable;
+  }
+
+  public JdbcDataSource immutable() {
+    this.editable = false;
+    return this;
   }
 
   @Override

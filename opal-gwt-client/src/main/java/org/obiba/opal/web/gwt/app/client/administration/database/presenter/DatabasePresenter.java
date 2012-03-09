@@ -113,7 +113,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     if(methodValidationHandler.validate()) {
       CreateMethodCallBack createCallback = new CreateMethodCallBack();
       AlreadyExistMethodCallBack alreadyExistCallback = new AlreadyExistMethodCallBack();
-      ResourceRequestBuilderFactory.<JdbcDataSourceDto> newBuilder().forResource("/jdbc/database/" + (getView().getName().getText())).get()//
+      ResourceRequestBuilderFactory.<JdbcDataSourceDto> newBuilder().forResource(Resources.database(getView().getName().getText())).get()//
       .withCallback(alreadyExistCallback)//
       .withCallback(Response.SC_NOT_FOUND, createCallback).send();
     }
@@ -121,7 +121,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
 
   private void postDatabase(JdbcDataSourceDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/jdbc/databases").post()//
+    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()//
     .withResourceBody(JdbcDataSourceDto.stringify(dto))//
     .withCallback(Response.SC_OK, callbackHandler)//
     .withCallback(Response.SC_CREATED, callbackHandler)//
@@ -130,7 +130,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
 
   private void putDatabase(JdbcDataSourceDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/jdbc/database/" + (getView().getName().getText())).put()//
+    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.database(getView().getName().getText())).put()//
     .withResourceBody(JdbcDataSourceDto.stringify(dto))//
     .withCallback(Response.SC_OK, callbackHandler)//
     .withCallback(Response.SC_CREATED, callbackHandler)//
@@ -163,11 +163,10 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
-        validators.add(new RequiredTextValidator(getView().getName(), "DataShieldMethodNameIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getUrl(), "DataShieldMethodNameIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getDriver(), "DataShieldMethodNameIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getUsername(), "DataShieldMethodNameIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getPassword(), "DataShieldMethodNameIsRequired"));
+        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired"));
+        validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired"));
+        validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired"));
+        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired"));
       }
       return validators;
     }
@@ -178,7 +177,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
 
     @Override
     public void onResource(Response response, JdbcDataSourceDto resource) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("DataShieldMethodAlreadyExistWithTheSpecifiedName").build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatabaseAlreadyExists").build());
     }
 
   }

@@ -34,7 +34,6 @@ public interface DatasourceFormPresenter {
   public void clearForm();
 
   public interface Display extends View {
-
   }
 
 }
