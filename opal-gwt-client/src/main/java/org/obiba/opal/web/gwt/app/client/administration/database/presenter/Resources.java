@@ -28,4 +28,8 @@ final class Resources {
     }
     return r;
   }
+
+  public static String drivers() {
+    return "/jdbc/drivers";
+  }
 }

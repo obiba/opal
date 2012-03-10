@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+ * Copyright 2012(c) OBiBa. All rights reserved.
  * 
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -22,7 +22,9 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -61,6 +63,14 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
       }
     }));
 
+    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>> newBuilder().forResource(Resources.drivers()).withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
+
+      @Override
+      public void onResource(Response response, JsArray<JdbcDriverDto> resource) {
+        getView().setAvailableDrivers(resource);
+      }
+    }).get().send();
+
     this.methodValidationHandler = new MethodValidationHandler(getEventBus());
   }
 
@@ -84,15 +94,6 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
   public void updateDatabase(JdbcDataSourceDto dto) {
     setDialogMode(Mode.UPDATE);
     displayDatabase(dto.getName(), dto);
-  }
-
-  /**
-   * Setup the dialog for copying an existing method
-   * @param dto method to copy
-   */
-  public void copyDatabase(JdbcDataSourceDto dto) {
-    setDialogMode(Mode.CREATE);
-    displayDatabase("copy_of_" + dto.getName(), dto);
   }
 
   private void displayDatabase(String name, JdbcDataSourceDto dto) {
@@ -227,6 +228,8 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
   public interface Display extends PopupView {
 
     void hideDialog();
+
+    void setAvailableDrivers(JsArray<JdbcDriverDto> resource);
 
     void setDialogMode(Mode dialogMode);
 

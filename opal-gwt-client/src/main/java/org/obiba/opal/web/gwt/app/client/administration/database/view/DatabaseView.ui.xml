@@ -20,7 +20,7 @@
 
             <g:FlowPanel styleName="input">
               <g:Label addStyleNames="key"><ui:msg description="Driver label">Driver</ui:msg></g:Label>
-              <g:TextBox name="driver" ui:field="driver"/>
+              <g:ListBox name="driver" ui:field="driver"/>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
