@@ -6,20 +6,8 @@
   
   <g:FlowPanel>
     <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="Driver label">Driver</ui:msg></g:Label>
-      <g:ListBox ui:field="driver" visibleItemCount="1"/>
-    </g:FlowPanel>
-    <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="URL label">URL</ui:msg></g:Label>
-      <g:TextBox ui:field="url"/>
-    </g:FlowPanel>
-    <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="User Name label">User Name</ui:msg></g:Label>
-      <g:TextBox ui:field="username"/>
-    </g:FlowPanel>
-    <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="Password label">Password</ui:msg></g:Label>
-      <g:PasswordTextBox ui:field="password"/>
+      <g:Label addStyleNames="key"><ui:msg description="Database label">Database</ui:msg></g:Label>
+      <g:ListBox ui:field="database" visibleItemCount="1"/>
     </g:FlowPanel>
     
     <g:DisclosurePanel>

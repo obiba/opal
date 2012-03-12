@@ -9,18 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
-import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
+import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
@@ -46,9 +42,6 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
   public JdbcDatasourceFormPresenter(final Display display, final EventBus eventBus) {
     super(eventBus, display);
 
-    addValidator(new RequiredTextValidator(getView().getUrl(), "UrlRequired"));
-    addValidator(new RequiredTextValidator(getView().getUsername(), "UsernameRequired"));
-    addValidator(new RequiredTextValidator(getView().getPassword(), "PasswordRequired"));
     addValidator(new RequiredOptionValidator(RequiredOptionValidator.asSet(getView().getUseMetadataTablesOption(), getView().getDoNotUseMetadataTablesOption()), "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables"));
   }
 
@@ -59,17 +52,13 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
   @Override
   protected void onReveal() {
-    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>> newBuilder().forResource("/system/jdbcDrivers").get().withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>> newBuilder().forResource("/jdbc/databases").withCallback(new ResourceCallback<JsArray<JdbcDataSourceDto>>() {
 
       @Override
-      public void onResource(Response response, JsArray<JdbcDriverDto> drivers) {
-        List<JdbcDriverDto> driverList = new ArrayList<JdbcDriverDto>();
-        for(int i = 0; i < drivers.length(); i++) {
-          driverList.add(drivers.get(i));
-        }
-        getView().setJdbcDrivers(driverList);
+      public void onResource(Response response, JsArray<JdbcDataSourceDto> resource) {
+        getView().setDatabases(resource);
       }
-    }).send();
+    }).get().send();
   }
 
   @Override
@@ -80,10 +69,7 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
   @Override
   public DatasourceFactoryDto getDatasourceFactory() {
     JdbcDatasourceFactoryDto extensionDto = JdbcDatasourceFactoryDto.create();
-    extensionDto.setDriver(getView().getDriver().getText());
-    extensionDto.setUrl(getView().getUrl().getText());
-    extensionDto.setUsername(getView().getUsername().getText());
-    extensionDto.setPassword(getView().getPassword().getText());
+    extensionDto.setDatabase(getView().getSelectedDatabase());
     extensionDto.setSettings(getSettings());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
@@ -119,13 +105,9 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
   public interface Display extends DatasourceFormPresenter.Display {
 
-    HasText getDriver();
+    void setDatabases(JsArray<JdbcDataSourceDto> resource);
 
-    HasText getUrl();
-
-    HasText getUsername();
-
-    HasText getPassword();
+    String getSelectedDatabase();
 
     HasValue<Boolean> getUseMetadataTablesOption();
 
@@ -135,18 +117,13 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
     HasText getDefaultUpdatedTimestampColumnName();
 
-    void setJdbcDrivers(List<JdbcDriverDto> drivers);
   }
 
   @Override
   public void clearForm() {
-    getView().getUrl().setText("");
-    getView().getUsername().setText("");
-    getView().getPassword().setText("");
     getView().getDefaultCreatedTimestampColumnName().setText("");
     getView().getDefaultUpdatedTimestampColumnName().setText("");
     getView().getDoNotUseMetadataTablesOption().setValue(true);
     getView().getUseMetadataTablesOption().setValue(false);
-    getView().getDriver().setText("");
   }
 }

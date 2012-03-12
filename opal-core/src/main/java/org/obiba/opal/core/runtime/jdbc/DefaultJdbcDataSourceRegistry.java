@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.hibernate.SessionFactory;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
@@ -48,18 +49,26 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   private final JdbcDataSource defaultDatasource;
 
+  private final DataSource opalDataSource;
+
   private final DataSourceFactory dataSourceFactory;
+
+  private final SessionFactoryFactory sessionFactoryFactory;
 
   private final ExtensionConfigurationSupplier<JdbcDataSourcesConfig> configSupplier;
 
   private final ConcurrentMap<String, BasicDataSource> dataSourceCache = Maps.newConcurrentMap();
 
+  private final ConcurrentMap<String, SessionFactory> sessionFactoryCache = Maps.newConcurrentMap();
+
   @Autowired
-  public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
+  public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, SessionFactoryFactory sessionFactoryFactory, OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
     this.dataSourceFactory = dataSourceFactory;
-    configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService, JdbcDataSourcesConfig.class) {
+    this.sessionFactoryFactory = sessionFactoryFactory;
+    this.configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService, JdbcDataSourcesConfig.class) {
     };
-    defaultDatasource = buildDefaultDataSource(opalDataSource);
+    this.opalDataSource = opalDataSource;
+    this.defaultDatasource = buildDefaultDataSource(opalDataSource);
   }
 
   @Override
@@ -86,12 +95,25 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public DataSource getDataSource(String name) {
+    if(name.equals(defaultDatasource.getName())) {
+      return opalDataSource;
+    }
     synchronized(dataSourceCache) {
       if(dataSourceCache.containsKey(name) == false) {
         dataSourceCache.put(name, dataSourceFactory.createDataSource(getJdbcDataSource(name)));
       }
     }
     return dataSourceCache.get(name);
+  }
+
+  @Override
+  public SessionFactory getSessionFactory(String name) {
+    synchronized(sessionFactoryCache) {
+      if(sessionFactoryCache.containsKey(name) == false) {
+        sessionFactoryCache.put(name, sessionFactoryFactory.getSessionFactory(getDataSource(name)));
+      }
+    }
+    return sessionFactoryCache.get(name);
   }
 
   @Override

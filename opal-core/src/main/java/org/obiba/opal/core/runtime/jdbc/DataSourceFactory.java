@@ -42,6 +42,11 @@ public class DataSourceFactory {
     bmds.setUsername(datasource.getUsername());
     bmds.setPassword(datasource.getPassword());
 
+    if(bmds.getMaxWait() < 0) {
+      // Wait for 10 seconds maximum
+      bmds.setMaxWait(10 * 1000);
+    }
+
     return bmds;
   }
 

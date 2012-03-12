@@ -9,14 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import java.util.Properties;
-
-import javax.transaction.TransactionManager;
-
 import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.magma.datasource.jdbc.JdbcValueTableSettings;
+import org.obiba.opal.core.runtime.jdbc.JdbcDataSourceRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.JdbcDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.JdbcDatasourceSettingsDto;
@@ -26,17 +22,14 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableSet;
 
-/**
- *
- */
 @Component
 public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  private final TransactionManager transactionManager;
+  private final JdbcDataSourceRegistry jdbcDataSourceRegistry;
 
-  @Autowired(required = false)
-  public JdbcDatasourceFactoryDtoParser(TransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
+  @Autowired
+  public JdbcDatasourceFactoryDtoParser(JdbcDataSourceRegistry jdbcDataSourceRegistry) {
+    this.jdbcDataSourceRegistry = jdbcDataSourceRegistry;
   }
 
   @Override
@@ -46,22 +39,8 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
 
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    JdbcDatasourceFactory factory = new JdbcDatasourceFactory();
     JdbcDatasourceFactoryDto jdbcDto = dto.getExtension(JdbcDatasourceFactoryDto.params);
-    factory.setTransactionManager(transactionManager);
-    factory.setJdbcProperties(parseProperties(jdbcDto));
-    factory.setDatasourceSettings(parseSettings(jdbcDto.getSettings()));
-    factory.setName(dto.getName());
-    return factory;
-  }
-
-  private Properties parseProperties(JdbcDatasourceFactoryDto dto) {
-    Properties properties = new Properties();
-    properties.put(JdbcDatasourceFactory.DRIVER_CLASS_NAME, dto.getDriver());
-    properties.put(JdbcDatasourceFactory.URL, dto.getUrl());
-    properties.put(JdbcDatasourceFactory.USERNAME, dto.getUsername());
-    properties.put(JdbcDatasourceFactory.PASSWORD, dto.getPassword());
-    return properties;
+    return new DatabaseJdbcDatasourceFactory(dto.getName(), jdbcDto.getDatabase(), parseSettings(jdbcDto.getSettings()), jdbcDataSourceRegistry);
   }
 
   private JdbcDatasourceSettings parseSettings(JdbcDatasourceSettingsDto dto) {

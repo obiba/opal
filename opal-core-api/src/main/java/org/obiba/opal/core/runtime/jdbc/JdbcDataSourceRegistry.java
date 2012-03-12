@@ -11,6 +11,8 @@ package org.obiba.opal.core.runtime.jdbc;
 
 import javax.sql.DataSource;
 
+import org.hibernate.SessionFactory;
+
 public interface JdbcDataSourceRegistry {
 
   public Iterable<JdbcDataSource> listDataSources();
@@ -18,6 +20,8 @@ public interface JdbcDataSourceRegistry {
   public JdbcDataSource getJdbcDataSource(String name);
 
   public DataSource getDataSource(String name);
+
+  public SessionFactory getSessionFactory(String name);
 
   public void update(JdbcDataSource jdbcDataSource);
 

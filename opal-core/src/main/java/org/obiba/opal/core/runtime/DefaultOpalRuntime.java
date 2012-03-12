@@ -14,8 +14,11 @@ import java.util.Set;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.MagmaEngineExtension;
 import org.obiba.magma.js.MagmaJsExtension;
+import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -127,8 +130,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
         public void run() {
           // This needs to be added BEFORE otherwise bad things happen. That really sucks.
           MagmaEngine.get().addDecorator(viewManager);
-
-          opalConfigurationService.getOpalConfiguration().getMagmaEngineFactory().initialize(MagmaEngine.get());
+          initialise(MagmaEngine.get(), opalConfigurationService.getOpalConfiguration().getMagmaEngineFactory());
         }
       };
       new TransactionalThread(txManager, magmaEngineInit).start();
@@ -163,6 +165,22 @@ public class DefaultOpalRuntime implements OpalRuntime {
       }
       syncFs.notifyAll();
     }
+  }
+
+  private void initialise(MagmaEngine engine, MagmaEngineFactory magmaEngineFactory) {
+    for(MagmaEngineExtension extension : magmaEngineFactory.extensions()) {
+      engine.extend(extension);
+    }
+
+    for(DatasourceFactory factory : magmaEngineFactory.factories()) {
+      try {
+        engine.addDatasource(factory);
+      } catch(RuntimeException e) {
+        log.warn("Cannot initialise datasource '{}' : {}", factory.getName(), e.getMessage());
+        log.debug("Datasource exception:", e);
+      }
+    }
+
   }
 
   //
