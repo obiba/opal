@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
@@ -65,8 +66,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, SessionFactoryFactory sessionFactoryFactory, OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
     this.dataSourceFactory = dataSourceFactory;
     this.sessionFactoryFactory = sessionFactoryFactory;
-    this.configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService, JdbcDataSourcesConfig.class) {
-    };
+    this.configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService, JdbcDataSourcesConfig.class);
     this.opalDataSource = opalDataSource;
     this.defaultDatasource = buildDefaultDataSource(opalDataSource);
   }
@@ -83,6 +83,15 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public void stop() {
+    for(SessionFactory sf : sessionFactoryCache.values()) {
+      try {
+        sf.close();
+      } catch(HibernateException e) {
+        log.warn("Ignoring exception during shutdown: ", e);
+      }
+    }
+    sessionFactoryCache.clear();
+
     for(BasicDataSource ds : dataSourceCache.values()) {
       try {
         ds.close();
@@ -95,7 +104,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public DataSource getDataSource(String name) {
-    if(name.equals(defaultDatasource.getName())) {
+    if(defaultDatasource.getName().equals(name)) {
       return opalDataSource;
     }
     synchronized(dataSourceCache) {

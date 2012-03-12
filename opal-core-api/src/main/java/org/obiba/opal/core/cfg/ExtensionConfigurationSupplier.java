@@ -19,13 +19,13 @@ import com.google.common.base.Supplier;
  * 
  * @param <T> the concrete implementation of {@code OpalConfigurationExtension} that is managed by this instance.
  */
-public abstract class ExtensionConfigurationSupplier<T extends OpalConfigurationExtension> implements Supplier<T> {
+public class ExtensionConfigurationSupplier<T extends OpalConfigurationExtension> implements Supplier<T> {
 
   private final OpalConfigurationService opalConfigurationService;
 
   private final Class<T> extensionType;
 
-  protected ExtensionConfigurationSupplier(OpalConfigurationService opalConfigurationService, Class<T> extensionType) {
+  public ExtensionConfigurationSupplier(OpalConfigurationService opalConfigurationService, Class<T> extensionType) {
     this.opalConfigurationService = opalConfigurationService;
     this.extensionType = extensionType;
   }
