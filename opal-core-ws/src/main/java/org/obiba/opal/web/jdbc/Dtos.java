@@ -27,7 +27,8 @@ final class Dtos {
         .setDriverClass(input.getDriverClass())//
         .setUrl(input.getUrl())//
         .setUsername(input.getUsername())//
-        .setPassword(Strings.nullToEmpty(input.getPassword()))//
+        // Do not send password.
+        // .setPassword(Strings.nullToEmpty(input.getPassword()))//
         .setEditable(input.isEditable()) //
         .setProperties(Strings.nullToEmpty(input.getProperties())).build();
       }
