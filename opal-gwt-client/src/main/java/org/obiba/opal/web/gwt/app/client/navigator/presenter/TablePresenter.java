@@ -472,6 +472,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void onTableSelectionChanged(TableSelectionChangeEvent event) {
       updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
+      authorize();
     }
   }
 
