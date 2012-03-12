@@ -23,6 +23,7 @@ public class DatabaseSessionFactoryProvider implements SessionFactoryProvider {
     Preconditions.checkArgument(jdbcDataSourceRegistry != null);
     Preconditions.checkArgument(databaseName != null);
     this.databaseName = databaseName;
+    this.jdbcDataSourceRegistry = jdbcDataSourceRegistry;
   }
 
   @Override
