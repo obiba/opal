@@ -165,6 +165,10 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
     }
 
+    public static Builder newNotification() {
+      return new Builder();
+    }
+
     public Builder error(List<String> messages) {
       this.event = new NotificationEvent(NotificationType.ERROR, messages, null);
       return this;

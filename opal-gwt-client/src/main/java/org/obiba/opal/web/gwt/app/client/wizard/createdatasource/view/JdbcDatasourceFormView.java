@@ -9,19 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view;
 
-import java.util.List;
-
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcDatasourceFormPresenter;
-import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
+import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,16 +40,7 @@ public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFo
   private final Widget widget;
 
   @UiField
-  ListBox driver;
-
-  @UiField
-  TextBox url;
-
-  @UiField
-  TextBox username;
-
-  @UiField
-  PasswordTextBox password;
+  ListBox database;
 
   @UiField
   TextBox defaultCreatedTimestampColumnName;
@@ -68,37 +58,17 @@ public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFo
     widget = uiBinder.createAndBindUi(this);
   }
 
-  public HasText getDriver() {
-    return new HasText() {
-
-      public String getText() {
-        return (driver.getSelectedIndex() != -1) ? driver.getValue(driver.getSelectedIndex()) : null;
-      }
-
-      public void setText(String text) {
-        if(text != null && driver.getItemCount() > 0) {
-          for(int i = 0; i < driver.getItemCount(); i++) {
-            if(driver.getValue(i).equals(text)) {
-              driver.setSelectedIndex(i);
-              break;
-            }
-          }
-          driver.setSelectedIndex(0);
-        }
-      }
-    };
+  @Override
+  public String getSelectedDatabase() {
+    return database.getItemText(database.getSelectedIndex());
   }
 
-  public HasText getUrl() {
-    return url;
-  }
-
-  public HasText getUsername() {
-    return username;
-  }
-
-  public HasText getPassword() {
-    return password;
+  @Override
+  public void setDatabases(JsArray<JdbcDataSourceDto> resource) {
+    database.clear();
+    for(JdbcDataSourceDto dto : JsArrays.toIterable(resource)) {
+      database.addItem(dto.getName());
+    }
   }
 
   public HasValue<Boolean> getUseMetadataTablesOption() {
@@ -115,13 +85,6 @@ public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFo
 
   public HasText getDefaultUpdatedTimestampColumnName() {
     return defaultUpdatedTimestampColumnName;
-  }
-
-  public void setJdbcDrivers(List<JdbcDriverDto> drivers) {
-    driver.clear();
-    for(JdbcDriverDto driverDto : drivers) {
-      driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
-    }
   }
 
   @Override

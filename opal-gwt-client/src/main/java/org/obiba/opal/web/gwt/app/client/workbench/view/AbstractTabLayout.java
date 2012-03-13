@@ -9,9 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -22,6 +22,7 @@ import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.uibinder.client.UiChild;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IndexedPanel;
@@ -33,95 +34,104 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSelectionHandlers<Integer>, HasBeforeSelectionHandlers<Integer> {
 
-  protected UList menu;
+  private final UList menu;
 
-  private SimplePanel content;
+  private final SimplePanel contentContainer;
 
-  private List<ListItem> items;
+  private final List<Widget> tabContents = Lists.newLinkedList();
 
-  private List<Widget> contents;
+  private int selectedIndex = -1;
 
-  private int selectedIndex = 0;
-
-  protected AbstractTabLayout() {
+  protected AbstractTabLayout(String menuStyleName) {
     super();
     menu = new UList();
-    super.add(getMenu());
+    menu.addStyleName(menuStyleName);
     menu.addStyleName("tabz");
-    super.add(content = new SimplePanel());
-    content.addStyleName("content");
-
-    items = new ArrayList<ListItem>();
-    contents = new ArrayList<Widget>();
+    super.add(menu);
+    super.add(contentContainer = new SimplePanel());
+    contentContainer.addStyleName("content");
   }
 
-  protected Widget getMenu() {
-    return menu;
+  @UiChild(tagname = "tab")
+  public void addTabHeader(Widget tab) {
+    insertItem((HasClickHandlers) tab, menu.getWidgetCount());
+  }
+
+  @UiChild(tagname = "content")
+  public void addTabContent(Widget content) {
+    addContent(content);
+    if(getTabCount() == 1) {
+      selectTab(0);
+    }
   }
 
   @Override
   public void add(Widget w) {
-    if(items.size() == contents.size()) {
-      if(w instanceof HasClickHandlers) {
-        addItem((HasClickHandlers) w);
-      } else {
-        throw new IllegalArgumentException("HasClickHandlers expected at index " + items.size());
-      }
-    } else if(contents.size() == items.size() - 1) {
-      contents.add(w);
-      if(contents.size() == 1) {
-        content.setWidget(w);
-        selectedIndex = 0;
-      } else {
-        w.removeFromParent();
-      }
+    if(menu.getWidgetCount() == tabContents.size()) {
+      addTabHeader(w);
     } else {
-      throw new IllegalArgumentException("Alternate list of HasClickHandlers and Widget is expected.");
+      addTabContent(w);
     }
   }
 
-  private void addItem(HasClickHandlers item) {
+  private void addContent(Widget content) {
+    insertContent(content, tabContents.size());
+  }
 
-    ListItem li;
-    menu.add(li = new ListItem((Widget) item));
-    items.add(li);
+  private void insertItem(HasClickHandlers item, int beforeIndex) {
+    if(beforeIndex < 0 || beforeIndex > getTabCount()) {
+      throw new IndexOutOfBoundsException("cannot insert before " + beforeIndex);
+    }
+    final ListItem li;
+    menu.insert(li = new ListItem((Widget) item), beforeIndex);
 
-    final int index = items.size() - 1;
     item.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent evt) {
-        selectTab(index);
+        selectTab(menu.getWidgetIndex(li));
       }
     });
-    if(items.size() == 1) {
-      li.addStyleName("first active");
+  }
+
+  private void insertContent(Widget content, int beforeIndex) {
+    tabContents.add(beforeIndex, content);
+  }
+
+  public void add(Widget w, String text) {
+    add(w, new Anchor(text));
+  }
+
+  public void add(Widget w, HasClickHandlers item) {
+    insert(w, item, menu.getWidgetCount());
+  }
+
+  public void insert(Widget content, HasClickHandlers tab, int beforeIndex) {
+    insertItem((HasClickHandlers) tab, beforeIndex);
+    insertContent(content, beforeIndex);
+
+    if(selectedIndex < 0 || beforeIndex <= selectedIndex) {
+      setSelectedIndex(beforeIndex);
     }
   }
 
-  public int add(Widget w, String text) {
-    return add(w, new Anchor(text));
-  }
-
-  public int add(Widget w, HasClickHandlers item) {
-    add((Widget) item);
-    add(w);
-    return contents.size() - 1;
-  }
-
   private void setSelectedIndex(int index) {
-    if(selectedIndex != -1) items.get(selectedIndex).removeStyleName("active");
-    items.get(index).addStyleName("active");
-    content.setWidget(contents.get(index));
+    int i = 0;
+    for(Widget child : menu) {
+      child.removeStyleName("active");
+      if(i++ == index) {
+        child.addStyleName("active");
+      }
+    }
+    contentContainer.setWidget(tabContents.get(index));
     selectedIndex = index;
   }
 
   @Override
   public void clear() {
     menu.clear();
-    content.clear();
-    items.clear();
-    contents.clear();
+    contentContainer.clear();
+    tabContents.clear();
     selectedIndex = -1;
   }
 
@@ -149,7 +159,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
       }
     }
 
-    items.get(index).setVisible(visible);
+    menu.getWidget(index).setVisible(visible);
   }
 
   /**
@@ -179,7 +189,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
   private boolean selectClosestHigherVisibleTab(int index) {
     boolean selectionChanged = false;
     int idx = index + 1;
-    while(!selectionChanged || idx >= items.size()) {
+    while(!selectionChanged || idx >= menu.getWidgetCount()) {
       if(isTabVisible(idx)) {
         setSelectedIndex(idx);
         selectionChanged = true;
@@ -197,11 +207,11 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
    */
   public boolean isTabVisible(int index) {
     checkIndex(index);
-    return items.get(index).isVisible();
+    return menu.getWidget(index).isVisible();
   }
 
   private void checkIndex(int index) {
-    assert (index >= 0) && (index < contents.size()) : "Index out of bounds";
+    assert (index >= 0) && (index < menu.getWidgetCount()) : "Index out of bounds";
   }
 
   /**
@@ -264,7 +274,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
   }
 
   public int getTabCount() {
-    return items.size();
+    return menu.getWidgetCount();
   }
 
   public int getSelectedIndex() {
@@ -277,34 +287,36 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   @Override
   public Widget getWidget(int index) {
-    return contents.get(index);
+    return tabContents.get(index);
   }
 
   @Override
   public int getWidgetCount() {
-    return contents.size();
+    return tabContents.size();
   }
 
   @Override
   public int getWidgetIndex(Widget child) {
-    return contents.indexOf(child);
+    return tabContents.indexOf(child);
   }
 
   @Override
   public boolean remove(int index) {
-    if(index < 0 || index >= contents.size()) return false;
+    if(index < 0 || index >= menu.getWidgetCount()) return false;
 
-    items.remove(index);
     menu.remove(index);
-    contents.remove(index);
+    tabContents.remove(index);
 
-    if(contents.size() == 0) {
-      content.clear();
+    int newSize = menu.getWidgetCount();
+
+    if(newSize == 0) {
+      menu.clear();
+      tabContents.clear();
       selectedIndex = -1;
     } else if(selectedIndex > index) {
       selectedIndex--;
-    } else if(selectedIndex > contents.size() - 1) {
-      setSelectedIndex(contents.size() - 1);
+    } else if(selectedIndex > newSize - 1) {
+      setSelectedIndex(newSize - 1);
     } else if(selectedIndex == index) {
       setSelectedIndex(index);
     }

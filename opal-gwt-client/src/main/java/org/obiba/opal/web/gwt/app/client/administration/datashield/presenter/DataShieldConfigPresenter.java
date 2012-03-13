@@ -41,7 +41,7 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
   @ProxyStandard
   @NameToken("!admin.datashield")
-  @TabInfo(container = AdministrationPresenter.class, label = "DataSHIELD", priority = 1)
+  @TabInfo(container = AdministrationPresenter.class, label = "DataSHIELD", priority = 3)
   public interface Proxy extends TabContentProxyPlace<DataShieldConfigPresenter> {
   }
 

@@ -3,7 +3,12 @@
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
-  
-  <g:Label><ui:msg description="Hibernate Datasource form">No options for this type of datasource.</ui:msg></g:Label>
+
+  <g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="Database label">Database</ui:msg></g:Label>
+      <g:ListBox ui:field="database" visibleItemCount="1"/>
+    </g:FlowPanel>
+  </g:FlowPanel>
 
 </ui:UiBinder>

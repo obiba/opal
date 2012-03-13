@@ -46,14 +46,11 @@ message FsDatasourceFactoryDto {
 }
 
 message JdbcDatasourceFactoryDto {
-  required string driver = 1;
-  required string url = 2;
-  required string username = 3;
-  required string password = 4;
-  required JdbcDatasourceSettingsDto settings = 5;
+  required string database = 1;
+  required JdbcDatasourceSettingsDto settings = 2;
   extend DatasourceFactoryDto { 
     optional JdbcDatasourceFactoryDto params = 1003; 
-  } 
+  }
 }
 
 message JdbcDatasourceSettingsDto {
@@ -76,6 +73,7 @@ message JdbcValueTableSettingsDto {
 
 message HibernateDatasourceFactoryDto {
   optional bool key = 1;
+  optional string database = 2;
   extend DatasourceFactoryDto { 
     optional HibernateDatasourceFactoryDto params = 1004; 
   } 
@@ -224,7 +222,6 @@ message FileViewDto {
     optional FileViewDto view = 1003;
   }
 }
-
 
 message JavaScriptErrorDto {
   required string message = 1;      // RhinoException.details()

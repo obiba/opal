@@ -42,7 +42,7 @@ public class AdministrationPresenter extends TabContainerPresenter<Administratio
 
   @Override
   public Tab addTab(TabContentProxy<?> tabProxy) {
-    if(defaultTab == null || tabProxy.getTabData().getPriority() > defaultTab.getTabData().getPriority()) {
+    if(defaultTab == null || tabProxy.getTabData().getPriority() < defaultTab.getTabData().getPriority()) {
       this.defaultTab = tabProxy;
     }
     return super.addTab(tabProxy);
@@ -61,7 +61,6 @@ public class AdministrationPresenter extends TabContainerPresenter<Administratio
   }
 
   public interface Display extends View, TabPanel {
-
   }
 
   @ProxyStandard

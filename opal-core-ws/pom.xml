@@ -77,6 +77,10 @@
       <artifactId>ow2-jta-1.1-spec</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-null</artifactId>
       <scope>test</scope>

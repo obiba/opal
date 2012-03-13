@@ -9,18 +9,23 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view;
 
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.HibernateDatasourceFormPresenter;
+import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class HibernateDatasourceFormView extends ViewImpl implements DatasourceFormPresenter.Display {
+public class HibernateDatasourceFormView extends ViewImpl implements HibernateDatasourceFormPresenter.Display {
 
   @UiTemplate("HibernateDatasourceFormView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, HibernateDatasourceFormView> {
@@ -29,6 +34,9 @@ public class HibernateDatasourceFormView extends ViewImpl implements DatasourceF
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
+
+  @UiField
+  ListBox database;
 
   public HibernateDatasourceFormView() {
     widget = uiBinder.createAndBindUi(this);
@@ -39,4 +47,17 @@ public class HibernateDatasourceFormView extends ViewImpl implements DatasourceF
     return widget;
   }
 
+  @Override
+  public void setDatabases(JsArray<JdbcDataSourceDto> databases) {
+    database.clear();
+    for(JdbcDataSourceDto d : JsArrays.toIterable(databases)) {
+      database.addItem(d.getName());
+    }
+  }
+
+  @Override
+  public String getSelectedDatabase() {
+    int selectedIndex = database.getSelectedIndex();
+    return selectedIndex == 0 ? null : database.getItemText(selectedIndex);
+  }
 }

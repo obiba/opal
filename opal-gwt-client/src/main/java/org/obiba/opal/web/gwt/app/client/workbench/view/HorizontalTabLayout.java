@@ -9,16 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-
 /**
  *
  */
 public class HorizontalTabLayout extends AbstractTabLayout {
 
   public HorizontalTabLayout() {
-    super();
+    super("horizontal");
     addStyleName("horizontal-tabs");
-    menu.addStyleName("horizontal");
   }
 
 }
