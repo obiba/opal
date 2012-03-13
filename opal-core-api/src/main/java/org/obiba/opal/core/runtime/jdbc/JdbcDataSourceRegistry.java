@@ -19,14 +19,16 @@ public interface JdbcDataSourceRegistry {
 
   public JdbcDataSource getJdbcDataSource(String name);
 
-  public DataSource getDataSource(String name);
+  public DataSource getDataSource(String name, String usedBy);
 
-  public SessionFactory getSessionFactory(String name);
+  public SessionFactory getSessionFactory(String name, String usedBy);
 
   public void update(JdbcDataSource jdbcDataSource);
 
   public void remove(JdbcDataSource jdbcDataSource);
 
   public void registerDataSource(JdbcDataSource jdbcDatasource);
+
+  public void unregister(String databaseName, String usedBy);
 
 }

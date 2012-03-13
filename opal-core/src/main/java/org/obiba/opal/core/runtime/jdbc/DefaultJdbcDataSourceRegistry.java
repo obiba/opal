@@ -29,11 +29,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
 
 @Component
 public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Service {
@@ -61,6 +65,8 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   private final ConcurrentMap<String, BasicDataSource> dataSourceCache = Maps.newConcurrentMap();
 
   private final ConcurrentMap<String, SessionFactory> sessionFactoryCache = Maps.newConcurrentMap();
+
+  private final SetMultimap<String, String> registrations = Multimaps.synchronizedSetMultimap(HashMultimap.<String, String> create());
 
   @Autowired
   public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, SessionFactoryFactory sessionFactoryFactory, OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
@@ -103,7 +109,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   }
 
   @Override
-  public DataSource getDataSource(String name) {
+  public DataSource getDataSource(String name, String usedBy) {
     if(defaultDatasource.getName().equals(name)) {
       return opalDataSource;
     }
@@ -112,22 +118,42 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
         dataSourceCache.put(name, dataSourceFactory.createDataSource(getJdbcDataSource(name)));
       }
     }
+    if(usedBy != null) {
+      registrations.put(name, usedBy);
+    }
     return dataSourceCache.get(name);
   }
 
   @Override
-  public SessionFactory getSessionFactory(String name) {
+  public SessionFactory getSessionFactory(String name, String usedBy) {
     synchronized(sessionFactoryCache) {
       if(sessionFactoryCache.containsKey(name) == false) {
-        sessionFactoryCache.put(name, sessionFactoryFactory.getSessionFactory(getDataSource(name)));
+        sessionFactoryCache.put(name, sessionFactoryFactory.getSessionFactory(getDataSource(name, usedBy)));
       }
+    }
+    if(usedBy != null) {
+      registrations.put(name, usedBy);
     }
     return sessionFactoryCache.get(name);
   }
 
   @Override
+  public void unregister(String databaseName, String usedBy) {
+    registrations.remove(databaseName, usedBy);
+  }
+
+  @Override
   public Iterable<JdbcDataSource> listDataSources() {
-    return Iterables.concat(ImmutableList.of(defaultDatasource), get().datasources);
+    return Iterables.transform(Iterables.concat(ImmutableList.of(defaultDatasource), get().datasources), new Function<JdbcDataSource, JdbcDataSource>() {
+
+      @Override
+      public JdbcDataSource apply(JdbcDataSource input) {
+        if(input.getName().equals(DEFAULT_NAME) || registrations.containsKey(input.getName())) {
+          return input.immutable();
+        }
+        return input.mutable();
+      }
+    });
   }
 
   @Override
@@ -151,6 +177,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
         if(index > -1) {
           config.datasources.set(index, jdbcDataSource);
         }
+        destroyDataSource(jdbcDataSource.getName());
       }
     });
   }
@@ -163,6 +190,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
       @Override
       public void doWithConfig(JdbcDataSourcesConfig config) {
         config.datasources.remove(jdbcDataSource);
+        destroyDataSource(jdbcDataSource.getName());
       }
     });
   }
@@ -189,6 +217,27 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   private JdbcDataSource buildDefaultDataSource(DataSource opalDataSource) {
     BasicDataSource bds = (BasicDataSource) opalDataSource;
     return new JdbcDataSource(DEFAULT_NAME, bds.getUrl(), bds.getDriverClassName(), bds.getUsername(), bds.getPassword(), null).immutable();
+  }
+
+  private void destroyDataSource(String name) {
+    synchronized(sessionFactoryCache) {
+      if(sessionFactoryCache.containsKey(name)) {
+        try {
+          sessionFactoryCache.remove(name).close();
+        } catch(HibernateException e) {
+          log.warn("Ignoring exception during shutdown: ", e);
+        }
+      }
+    }
+    synchronized(dataSourceCache) {
+      if(dataSourceCache.containsKey(name)) {
+        try {
+          dataSourceCache.remove(name).close();
+        } catch(SQLException e) {
+          log.warn("Ignoring exception during shutdown: ", e);
+        }
+      }
+    }
   }
 
 }

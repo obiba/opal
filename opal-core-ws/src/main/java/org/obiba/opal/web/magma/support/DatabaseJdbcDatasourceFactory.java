@@ -11,12 +11,13 @@ package org.obiba.opal.web.magma.support;
 
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.jdbc.JdbcDatasource;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.core.runtime.jdbc.JdbcDataSourceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory {
+public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory implements Disposable {
 
   private String databaseName;
 
@@ -42,7 +43,12 @@ public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory {
 
   @Override
   protected Datasource internalCreate() {
-    return new JdbcDatasource(getName(), dataSourceRegistry.getDataSource(databaseName), settings);
+    return new JdbcDatasource(getName(), dataSourceRegistry.getDataSource(databaseName, getName()), settings);
+  }
+
+  @Override
+  public void dispose() {
+    dataSourceRegistry.unregister(databaseName, getName());
   }
 
 }

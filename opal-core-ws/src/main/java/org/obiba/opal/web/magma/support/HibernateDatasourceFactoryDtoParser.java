@@ -43,7 +43,7 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
       factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "keySessionFactory"));
     } else {
       if(hDto.hasDatabase()) {
-        factory.setSessionFactoryProvider(new DatabaseSessionFactoryProvider(jdbcDataSourceRegistry, hDto.getDatabase()));
+        factory.setSessionFactoryProvider(new DatabaseSessionFactoryProvider(dto.getName(), jdbcDataSourceRegistry, hDto.getDatabase()));
       } else {
         factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "opalSessionFactory"));
       }

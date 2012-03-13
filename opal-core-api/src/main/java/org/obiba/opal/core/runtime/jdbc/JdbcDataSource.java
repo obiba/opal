@@ -112,6 +112,11 @@ public class JdbcDataSource {
     return this;
   }
 
+  public JdbcDataSource mutable() {
+    this.editable = true;
+    return this;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if(obj == null) return false;

@@ -31,6 +31,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.Disposables;
@@ -127,7 +128,8 @@ public class DatasourceResource {
 
         @Override
         public void doWithConfig(OpalConfiguration config) {
-          config.getMagmaEngineFactory().removeFactory(name);
+          DatasourceFactory factory = config.getMagmaEngineFactory().removeFactory(name);
+          Disposables.dispose(factory);
         }
       });
 

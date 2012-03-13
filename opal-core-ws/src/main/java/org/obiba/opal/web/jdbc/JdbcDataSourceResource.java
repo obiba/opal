@@ -71,7 +71,7 @@ public class JdbcDataSourceResource {
   public Response testConnection() {
     ClientErrorDto error = ClientErrorDtos.getErrorMessage(Status.SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", "").build();
     try {
-      JdbcTemplate t = new JdbcTemplate(jdbcDataSourceRegistry.getDataSource(jdbcDataSource.getName()));
+      JdbcTemplate t = new JdbcTemplate(jdbcDataSourceRegistry.getDataSource(jdbcDataSource.getName(), null));
       Boolean result = t.execute(new ConnectionCallback<Boolean>() {
 
         @Override
