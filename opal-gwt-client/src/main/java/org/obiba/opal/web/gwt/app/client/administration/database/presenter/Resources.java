@@ -22,9 +22,11 @@ final class Resources {
   static String database(String name, String... more) {
     String r = database(name);
     if(more != null) {
+      StringBuilder sb = new StringBuilder(r);
       for(String s : more) {
-        r += "/" + s;
+        sb.append("/").append(s);
       }
+      r = sb.toString();
     }
     return r;
   }
