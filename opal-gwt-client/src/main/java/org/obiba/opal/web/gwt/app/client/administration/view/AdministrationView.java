@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.view;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
@@ -29,7 +30,18 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class AdministrationView extends ViewImpl implements AdministrationPresenter.Display {
 
-  private class AdminTab implements Tab, Comparable<AdminTab> {
+  private final static class AdminTabComparator implements Comparator<AdminTab> {
+
+    private static final AdminTabComparator instance = new AdminTabComparator();
+
+    @Override
+    public int compare(AdminTab o1, AdminTab o2) {
+      if(o1.getPriority() == o2.getPriority()) return 0;
+      return o1.getPriority() < o2.getPriority() ? -1 : 1;
+    }
+  }
+
+  private class AdminTab implements Tab {
 
     private final TabData tabData;
 
@@ -45,7 +57,7 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
       // TODO: localise
       tab.setText(tabData.getLabel());
       orderedTabs.add(this);
-      Collections.sort(orderedTabs);
+      Collections.sort(orderedTabs, AdminTabComparator.instance);
       administrationDisplays.insert(tabContent, tab, getTabIndex());
     }
 
@@ -86,13 +98,6 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
     public void setText(String text) {
 
     }
-
-    @Override
-    public int compareTo(AdminTab o) {
-      if(getPriority() == o.getPriority()) return 0;
-      return getPriority() < o.getPriority() ? -1 : 1;
-    }
-
   }
 
   @UiTemplate("AdministrationView.ui.xml")

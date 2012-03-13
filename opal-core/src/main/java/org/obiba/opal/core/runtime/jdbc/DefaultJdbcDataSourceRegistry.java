@@ -11,7 +11,7 @@ package org.obiba.opal.core.runtime.jdbc;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -62,9 +62,9 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   private final ExtensionConfigurationSupplier<JdbcDataSourcesConfig> configSupplier;
 
-  private final ConcurrentMap<String, BasicDataSource> dataSourceCache = Maps.newConcurrentMap();
+  private final Map<String, BasicDataSource> dataSourceCache = Maps.newConcurrentMap();
 
-  private final ConcurrentMap<String, SessionFactory> sessionFactoryCache = Maps.newConcurrentMap();
+  private final Map<String, SessionFactory> sessionFactoryCache = Maps.newConcurrentMap();
 
   private final SetMultimap<String, String> registrations = Multimaps.synchronizedSetMultimap(HashMultimap.<String, String> create());
 
