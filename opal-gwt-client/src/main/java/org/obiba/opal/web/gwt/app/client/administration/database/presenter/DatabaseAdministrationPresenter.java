@@ -113,6 +113,7 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
   @Override
   protected void onReveal() {
+    refresh();
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
