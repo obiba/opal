@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -31,6 +32,7 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -81,6 +83,9 @@ public class DatabaseView extends PopupViewImpl implements Display {
   @UiField
   TextBox password;
 
+  @UiField
+  TextArea properties;
+
   String driverClass;
 
   HasText hasTextListBox;
@@ -108,13 +113,14 @@ public class DatabaseView extends PopupViewImpl implements Display {
 
   private void initWidgets() {
     dialog.hide();
+    properties.getElement().setAttribute("placeholder", translations.keyValueLabel());
     resizeHandle.makeResizable(contentLayout);
     driver.addChangeHandler(new ChangeHandler() {
 
       @Override
       public void onChange(ChangeEvent event) {
         int index = driver.getSelectedIndex();
-        JdbcDriverDto jdbcDriver = getDriver(driver.getItemText(index));
+        JdbcDriverDto jdbcDriver = getDriver(driver.getValue(index));
         if(jdbcDriver != null) {
           url.setText(jdbcDriver.getJdbcUrlTemplate());
         }
@@ -189,21 +195,22 @@ public class DatabaseView extends PopupViewImpl implements Display {
   }
 
   @Override
+  public HasText getProperties() {
+    return properties;
+  }
+
+  @Override
   public void setAvailableDrivers(JsArray<JdbcDriverDto> resource) {
+    availableDrivers = resource;
     for(JdbcDriverDto driver : JsArrays.toIterable(resource)) {
       this.driver.addItem(driver.getDriverName(), driver.getDriverClass());
     }
     updateDriverSelection();
-    availableDrivers = resource;
   }
 
-  @Override
-  public void clear() {
-  }
-
-  private JdbcDriverDto getDriver(String name) {
+  private JdbcDriverDto getDriver(String driverClass) {
     for(JdbcDriverDto driver : JsArrays.toIterable(availableDrivers)) {
-      if(driver.getDriverName().equals(name)) {
+      if(driver.getDriverClass().equals(driverClass)) {
         return driver;
       }
     }
@@ -217,5 +224,12 @@ public class DatabaseView extends PopupViewImpl implements Display {
         break;
       }
     }
+    if(Strings.isNullOrEmpty(getUrl().getText())) {
+      JdbcDriverDto dto = getDriver(hasTextListBox.getText());
+      if(dto != null) {
+        getUrl().setText(dto.getJdbcUrlTemplate());
+      }
+    }
   }
+
 }

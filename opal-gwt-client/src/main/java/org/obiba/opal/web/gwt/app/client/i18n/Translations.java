@@ -1203,4 +1203,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("URL")
   String urlLabel();
 
+  @Description("Key/Value label")
+  @DefaultStringValue("key=value")
+  String keyValueLabel();
+
 }

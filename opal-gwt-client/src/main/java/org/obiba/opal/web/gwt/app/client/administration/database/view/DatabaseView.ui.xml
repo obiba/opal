@@ -9,7 +9,7 @@
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
-    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="32em" width="40em">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="35em" width="40em">
       <g:center>
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
@@ -25,7 +25,7 @@
 
             <g:FlowPanel styleName="input">
               <g:Label addStyleNames="key"><ui:msg description="Url label">Url</ui:msg></g:Label>
-              <g:TextBox name="url" ui:field="url"/>
+              <g:TextBox name="url" ui:field="url" addStyleNames="span4"/>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
@@ -38,6 +38,17 @@
               <g:PasswordTextBox name="password" ui:field="password"/>
             </g:FlowPanel>
 
+            <g:DisclosurePanel>
+              <g:customHeader>
+                <g:Label><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:Label>
+              </g:customHeader>
+              <g:FlowPanel>
+                <g:FlowPanel styleName="input">
+                  <g:Label addStyleNames="key"><ui:msg description="Properties">Properties</ui:msg></g:Label>
+                  <g:TextArea ui:field="properties"/>
+                </g:FlowPanel>
+              </g:FlowPanel>
+            </g:DisclosurePanel>    
           </g:FlowPanel>
         </g:ScrollPanel>
       </g:center>

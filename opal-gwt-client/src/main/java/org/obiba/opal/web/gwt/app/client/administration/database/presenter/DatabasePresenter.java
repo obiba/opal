@@ -84,7 +84,6 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
    */
   public void createNewDatabase() {
     setDialogMode(Mode.CREATE);
-    getView().clear();
   }
 
   /**
@@ -102,6 +101,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     getView().getUrl().setText(dto.getUrl());
     getView().getUsername().setText(dto.getUsername());
     getView().getPassword().setText(dto.getPassword());
+    getView().getProperties().setText(dto.getProperties());
   }
 
   private void updateDatabase() {
@@ -145,6 +145,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     dto.setDriverClass(getView().getDriver().getText());
     dto.setUsername(getView().getUsername().getText());
     dto.setPassword(getView().getPassword().getText());
+    dto.setProperties(getView().getProperties().getText());
     return dto;
   }
 
@@ -247,7 +248,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
 
     HasText getPassword();
 
-    void clear();
+    HasText getProperties();
 
   }
 
