@@ -11,7 +11,6 @@ package org.obiba.opal.core.runtime.jdbc;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -31,11 +30,15 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
@@ -62,9 +65,44 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   private final ExtensionConfigurationSupplier<JdbcDataSourcesConfig> configSupplier;
 
-  private final Map<String, BasicDataSource> dataSourceCache = Maps.newConcurrentMap();
+  private final Cache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder().removalListener(new RemovalListener<String, BasicDataSource>() {
 
-  private final Map<String, SessionFactory> sessionFactoryCache = Maps.newConcurrentMap();
+    @Override
+    public void onRemoval(RemovalNotification<String, BasicDataSource> notification) {
+      try {
+        log.info("Destroying DataSource {}", notification.getKey());
+        notification.getValue().close();
+      } catch(SQLException e) {
+        log.warn("Ignoring exception during shutdown: ", e);
+      }
+    }
+  }).build(new CacheLoader<String, BasicDataSource>() {
+
+    @Override
+    public BasicDataSource load(String key) throws Exception {
+      log.info("Building DataSource {}", key);
+      return dataSourceFactory.createDataSource(getJdbcDataSource(key));
+    }
+  });
+
+  private final Cache<String, SessionFactory> sessionFactoryCache = CacheBuilder.newBuilder().removalListener(new RemovalListener<String, SessionFactory>() {
+    @Override
+    public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
+      try {
+        log.info("Destroying session factory {}", notification.getKey());
+        notification.getValue().close();
+      } catch(HibernateException e) {
+        log.warn("Ignoring exception during shutdown: ", e);
+      }
+    }
+  }).build(new CacheLoader<String, SessionFactory>() {
+
+    @Override
+    public SessionFactory load(String key) throws Exception {
+      log.info("Building SessionFactory {}", key);
+      return sessionFactoryFactory.getSessionFactory(getDataSource(key, null));
+    }
+  });
 
   private final SetMultimap<String, String> registrations = Multimaps.synchronizedSetMultimap(HashMultimap.<String, String> create());
 
@@ -75,6 +113,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
     this.configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService, JdbcDataSourcesConfig.class);
     this.opalDataSource = opalDataSource;
     this.defaultDatasource = buildDefaultDataSource(opalDataSource);
+
   }
 
   @Override
@@ -89,23 +128,8 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public void stop() {
-    for(SessionFactory sf : sessionFactoryCache.values()) {
-      try {
-        sf.close();
-      } catch(HibernateException e) {
-        log.warn("Ignoring exception during shutdown: ", e);
-      }
-    }
-    sessionFactoryCache.clear();
-
-    for(BasicDataSource ds : dataSourceCache.values()) {
-      try {
-        ds.close();
-      } catch(SQLException e) {
-        log.warn("Ignoring exception during shutdown: ", e);
-      }
-    }
-    dataSourceCache.clear();
+    sessionFactoryCache.invalidateAll();
+    dataSourceCache.invalidateAll();
   }
 
   @Override
@@ -113,28 +137,18 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
     if(defaultDatasource.getName().equals(name)) {
       return opalDataSource;
     }
-    synchronized(dataSourceCache) {
-      if(dataSourceCache.containsKey(name) == false) {
-        dataSourceCache.put(name, dataSourceFactory.createDataSource(getJdbcDataSource(name)));
-      }
-    }
     if(usedBy != null) {
       registrations.put(name, usedBy);
     }
-    return dataSourceCache.get(name);
+    return dataSourceCache.getUnchecked(name);
   }
 
   @Override
   public SessionFactory getSessionFactory(String name, String usedBy) {
-    synchronized(sessionFactoryCache) {
-      if(sessionFactoryCache.containsKey(name) == false) {
-        sessionFactoryCache.put(name, sessionFactoryFactory.getSessionFactory(getDataSource(name, usedBy)));
-      }
-    }
     if(usedBy != null) {
       registrations.put(name, usedBy);
     }
-    return sessionFactoryCache.get(name);
+    return sessionFactoryCache.getUnchecked(name);
   }
 
   @Override
@@ -220,24 +234,8 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   }
 
   private void destroyDataSource(String name) {
-    synchronized(sessionFactoryCache) {
-      if(sessionFactoryCache.containsKey(name)) {
-        try {
-          sessionFactoryCache.remove(name).close();
-        } catch(HibernateException e) {
-          log.warn("Ignoring exception during shutdown: ", e);
-        }
-      }
-    }
-    synchronized(dataSourceCache) {
-      if(dataSourceCache.containsKey(name)) {
-        try {
-          dataSourceCache.remove(name).close();
-        } catch(SQLException e) {
-          log.warn("Ignoring exception during shutdown: ", e);
-        }
-      }
-    }
+    sessionFactoryCache.invalidate(name);
+    dataSourceCache.invalidate(name);
   }
 
 }
