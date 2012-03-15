@@ -9,9 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -34,16 +32,11 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
-import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.magma.support.MimetypesFileExtensionsMap;
 import org.obiba.opal.web.magma.support.PagingVectorSource;
 import org.obiba.opal.web.math.AbstractSummaryStatisticsResource;
 import org.obiba.opal.web.math.SummaryStatisticsResourceFactory;
-import org.obiba.opal.web.model.Magma.ValueDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 
 public class VariableResource {
 
@@ -98,23 +91,6 @@ public class VariableResource {
       return Response.status(Status.NOT_FOUND).build();
     }
 
-  }
-
-  @GET
-  @POST
-  @Path("/values")
-  public Iterable<ValueDto> getValues(@QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") @DefaultValue("10") Integer limit) {
-    if(limit < 0) {
-      throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
-    }
-    return Iterables.transform(getPagingVectorSource().getValues(offset, limit), new Function<Value, ValueDto>() {
-
-      @Override
-      public ValueDto apply(Value from) {
-        return Dtos.asDto("", from, true).build();
-      }
-
-    });
   }
 
   @Path("/summary")

@@ -22,8 +22,9 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ToggleAnchor;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ToggleAnchor.Delegate;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueDto;
-import org.obiba.opal.web.model.client.magma.ValueSetDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.TextCell;
@@ -145,16 +146,17 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   }
 
   @Override
-  public void populate(List<VariableDto> variables, ValueSetDto valueSet) {
+  public void populate(List<VariableDto> variables, ValueSetsDto valueSets) {
 
-    populateVariables(variables, valueSet.getVariablesArray());
+    populateVariables(variables, valueSets.getVariablesArray());
 
     // find the max number of occurrences among the group
     // and build the dataset
     List<ValueOccurrence> occurrences = new ArrayList<ValueOccurrence>();
+    ValueSetDto valueSet = valueSets.getValueSetsArray().get(0);
     int max = 0;
     for(int i = 0; i < valueSet.getValuesArray().length(); i++) {
-      JsArray<ValueDto.Optional> valueSequence = valueSet.getValuesArray().get(i).getSequenceArray();
+      JsArray<ValueDto> valueSequence = valueSet.getValuesArray().get(i).getValuesArray();
       if(valueSequence != null && valueSequence.length() > max) {
         max = valueSequence.length();
       }
@@ -214,7 +216,7 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
 
         @Override
         public void onBinaryValueSelection(VariableDto variable, int index, ValueSetDto valueSet) {
-          fetcher.requestBinaryValue(variable, valueSet.getEntity().getIdentifier(), index);
+          fetcher.requestBinaryValue(variable, valueSet.getIdentifier(), index);
         }
       };
     }

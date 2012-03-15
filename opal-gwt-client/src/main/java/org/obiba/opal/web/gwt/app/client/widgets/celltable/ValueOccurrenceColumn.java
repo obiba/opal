@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
-import org.obiba.opal.web.model.client.magma.ValueDto;
-import org.obiba.opal.web.model.client.magma.ValueSetDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.Cell;
@@ -53,7 +53,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   private static Cell<String> createCell(final VariableDto variable) {
     if(variable.getValueType().equalsIgnoreCase("binary")) {
-      return new ClickableTextCell(new ClickableIconRenderer("icon-down"));
+      return new ClickableTextCell(new ClickableIconRenderer("i-down"));
     } else {
       return new TextCell();
     }
@@ -65,7 +65,8 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   @Override
   public String getValue(ValueOccurrence value) {
-    return valueRenderer.render(value.getValue(pos).getValue());
+    ValueDto v = value.getValue(pos);
+    return valueRenderer.render(v == null ? "" : v.getValue());
   }
 
   public static final class ValueOccurrence {
@@ -87,16 +88,12 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
       return valueSet;
     }
 
-    private JsArray<ValueDto.Optional> getValueSequence(int pos) {
-      return JsArrays.toSafeArray(valueSet.getValuesArray().get(pos).getSequenceArray());
+    private JsArray<ValueDto> getValueSequence(int pos) {
+      return JsArrays.toSafeArray(valueSet.getValuesArray().get(pos).getValuesArray());
     }
 
-    public String getValueType(int pos) {
-      return valueSet.getValuesArray().get(pos).getValueType();
-    }
-
-    public ValueDto.Optional getValue(int pos) {
-      JsArray<ValueDto.Optional> valueSequence = getValueSequence(pos);
+    public ValueDto getValue(int pos) {
+      JsArray<ValueDto> valueSequence = getValueSequence(pos);
       if(index >= valueSequence.length()) return null;
       return valueSequence.get(index);
     }

@@ -17,7 +17,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueSetDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -115,10 +115,10 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
       } else {
         link.append(URL.encodePathSegment(filter));
       }
-      ResourceRequestBuilderFactory.<ValueSetDto> newBuilder().forResource(link.toString()).get().withCallback(new ResourceCallback<ValueSetDto>() {
+      ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link.toString()).get().withCallback(new ResourceCallback<ValueSetsDto>() {
 
         @Override
-        public void onResource(Response response, ValueSetDto resource) {
+        public void onResource(Response response, ValueSetsDto resource) {
           getView().populate(variables, resource);
         }
       }).send();
@@ -138,7 +138,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
 
     HasClickHandlers getButton();
 
-    void populate(List<VariableDto> variables, ValueSetDto valueSet);
+    void populate(List<VariableDto> variables, ValueSetsDto valueSet);
 
     void setValueSetFetcher(ValueSetFetcher fetcher);
 
