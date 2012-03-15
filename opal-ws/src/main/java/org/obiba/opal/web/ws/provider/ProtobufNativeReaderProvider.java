@@ -22,8 +22,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.ExtensionRegistry;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
@@ -32,6 +35,13 @@ import com.google.protobuf.Message.Builder;
 @Provider
 @Consumes({ "application/x-protobuf" })
 public class ProtobufNativeReaderProvider extends AbstractProtobufProvider implements MessageBodyReader<Object> {
+  
+  private final int messageSizeLimit; 
+  
+  @Autowired
+  public ProtobufNativeReaderProvider(@Value("${org.obiba.opal.ws.messageSizeLimit}") int messageSizeLimit) {
+    this.messageSizeLimit = messageSizeLimit;
+  }
 
   @Override
   public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -52,7 +62,9 @@ public class ProtobufNativeReaderProvider extends AbstractProtobufProvider imple
       }
       return msgs;
     } else {
-      return builder.mergeFrom(entityStream, extensionRegistry).build();
+      CodedInputStream cis = CodedInputStream.newInstance(entityStream);
+      cis.setSizeLimit(messageSizeLimit);
+      return builder.mergeFrom(cis, extensionRegistry).build();
     }
   }
 }
