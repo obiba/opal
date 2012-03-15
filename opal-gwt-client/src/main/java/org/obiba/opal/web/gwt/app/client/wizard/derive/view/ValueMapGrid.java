@@ -78,6 +78,7 @@ public class ValueMapGrid extends FlowPanel {
     } else {
       dataProvider.setList(valueMapEntries);
     }
+    pager.setVisible((valueMapEntries.size() > pager.getPageSize()));
     dataProvider.refresh();
 
     addStyleName("value-map");
@@ -102,7 +103,6 @@ public class ValueMapGrid extends FlowPanel {
     add(table);
     pager.setPageSize(pageSize);
     pager.setDisplay(table);
-    pager.setVisible((valueMapEntries.size() > pager.getPageSize()));
 
     initializeColumns();
   }
