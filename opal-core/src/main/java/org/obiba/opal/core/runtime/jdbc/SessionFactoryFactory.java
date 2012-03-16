@@ -46,6 +46,7 @@ public class SessionFactoryFactory {
   @Qualifier("hibernate")
   private Properties hibernateProperties;
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   public SessionFactory getSessionFactory(DataSource dataSource) {
     AnnotationSessionFactoryBean asfb = new AnnotationSessionFactoryBean() {
       @Override
