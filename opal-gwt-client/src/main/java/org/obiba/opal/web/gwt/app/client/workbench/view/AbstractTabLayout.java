@@ -301,6 +301,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   public boolean remove(int index) {
     if(index < 0 || index >= menu.getWidgetCount()) return false;
 
