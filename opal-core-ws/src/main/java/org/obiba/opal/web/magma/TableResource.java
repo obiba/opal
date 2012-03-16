@@ -43,7 +43,7 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.TableDto;
-import org.obiba.opal.web.model.Magma.ValueSetDto;
+import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
 import com.google.common.base.Function;
@@ -98,49 +98,35 @@ public class TableResource extends AbstractValueTableResource {
    * @param select script for filtering the variables
    * @return
    */
-  @GET
   @Path("/valueSet/{identifier}")
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public
-      Response
-      getValueSet(@Context Request request, @Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select) {
+  public ValueSetsResource getValueSet(@Context Request request, @Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     TimestampedResponses.evaluate(request, getValueTable());
-    VariableEntity entity = new VariableEntityBean(this.getValueTable().getEntityType(), identifier);
-    Iterable<Variable> variables = filterVariables(select, 0, null);
-    ValueSetDto vs = getValueSet(uriInfo, entity, variables);
-    return TimestampedResponses.ok(getValueTable(), vs).build();
+    return new ValueSetsResource(getValueTable(), ImmutableList.<VariableEntity>of(new VariableEntityBean(this.getValueTable().getEntityType(), identifier)));
   }
 
+  // This should be /valueSets, but its POST is already implemented in ValueSetsResource due to GET not allowing a body
   @POST
   @Path("/valueSet")
-  public Response getValueSet(ValueSetDto valueSetDto) {
-    VariableEntity entity = new VariableEntityBean(valueSetDto.getEntity().getEntityType(), valueSetDto.getEntity().getIdentifier());
-    ValueTableWriter tableWriter = getDatasource().createWriter(getValueTable().getName(), entity.getType());
+  public Response updateValueSet(ValueSetsDto valueSetsDto) {
+    ValueTableWriter tableWriter = getDatasource().createWriter(getValueTable().getName(), valueSetsDto.getEntityType());
     try {
-      ValueSetWriter writer = tableWriter.writeValueSet(entity);
-      try {
-        for(int i = 0; i < valueSetDto.getVariablesCount(); i++) {
-          Variable variable = getValueTable().getVariable(valueSetDto.getVariables(i));
-          writer.writeValue(variable, Dtos.fromDto(valueSetDto.getValues(i)));
+      for(ValueSetsDto.ValueSetDto valueSetDto : valueSetsDto.getValueSetsList()) {
+        VariableEntity entity = new VariableEntityBean(valueSetsDto.getEntityType(), valueSetDto.getIdentifier());
+        ValueSetWriter writer = tableWriter.writeValueSet(entity);
+        try {
+          for(int i = 0; i < valueSetsDto.getVariablesCount(); i++) {
+            Variable variable = getValueTable().getVariable(valueSetsDto.getVariables(i));
+            writer.writeValue(variable, Dtos.fromDto(valueSetDto.getValues(i), variable.getValueType(), variable.isRepeatable()));
+          }
+        } finally {
+          Closeables.closeQuietly(writer);
         }
-      } finally {
-        Closeables.closeQuietly(writer);
       }
     } finally {
       Closeables.closeQuietly(tableWriter);
     }
     return Response.ok().build();
-  }
-
-  private ValueSetDto getValueSet(final UriInfo uriInfo, VariableEntity entity, Iterable<Variable> variables) {
-    ValueSet valueSet = this.getValueTable().getValueSet(entity);
-    ValueSetDto.Builder builder = ValueSetDto.newBuilder().setEntity(VariableEntityDto.newBuilder().setIdentifier(entity.getIdentifier()));
-    for(Variable variable : variables) {
-      Value value = this.getValueTable().getValue(variable, valueSet);
-      String link = uriInfo.getPath().replace("valueSet", "variable/" + variable.getName() + "/value");
-      builder.addVariables(variable.getName()).addValues(Dtos.asDto(link, value, true));
-    }
-    return builder.build();
   }
 
   @Path("/valueSets")
@@ -156,9 +142,7 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @Path("/variable/_transient")
-  public
-      VariableResource
-      getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
+  public VariableResource getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
     if(script == null || script.equals("")) {
@@ -186,15 +170,6 @@ public class TableResource extends AbstractValueTableResource {
     return super.getLocalesResource();
   }
 
-  // @Path("/dictionary")
-  // public TableResource getDictionary() {
-  // return new TableResource(new VariableValueTable(getValueTable()), getLocales());
-  // }
-
-  //
-  // private methods
-  //
-
   private ValueType resolveValueType(String valueTypeName) {
     ValueType valueType = null;
     try {
@@ -209,8 +184,7 @@ public class TableResource extends AbstractValueTableResource {
     return new VariableResource(this.getValueTable(), source);
   }
 
-  private Variable
-      buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
+  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
     Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {

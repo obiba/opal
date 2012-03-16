@@ -144,11 +144,19 @@ public class RestDatasource extends AbstractDatasource {
   }
 
   URI newReference(String... segments) {
-    return buildURI(this.datasourceURI, segments);
+    return uriBuilder().segment(segments).build();
   }
 
   URI buildURI(final URI root, String... segments) {
-    return opalClient.newUri(root).segment(segments).build();
+    return uriBuilder(root).segment(segments).build();
+  }
+
+  UriBuilder uriBuilder() {
+    return uriBuilder(this.datasourceURI);
+  }
+
+  UriBuilder uriBuilder(final URI root) {
+    return opalClient.newUri(root);
   }
 
 }

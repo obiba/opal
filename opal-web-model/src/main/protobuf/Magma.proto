@@ -146,32 +146,13 @@ message ValueSetsDto {
     repeated ValueDto values = 3; // value sequence
   }
   repeated string variables = 1;
-  repeated ValueSetDto valueSets = 2;  
+  repeated ValueSetDto valueSets = 2;
+  required string entityType = 3;
 }
 
 message VariableEntityDto {
   required string identifier = 1;
   optional string entityType = 2;
-}
-
-message ValueSetDto {
-  required VariableEntityDto  entity = 1;
-  repeated string variables = 2;
-  repeated ValueDto values = 3;
-}
-
-message ValueDto {
-  required string valueType = 1;
-  required bool isSequence = 2;
-  optional string value = 3;
-  optional string link = 4; // link to the value
-  repeated Optional sequence = 5; // value sequence
-
-  // Allows creating a message to put in a sequence but without a value.
-  // Used to represent a null value in a sequence
-  message Optional {
-    optional string value = 1;
-  }
 }
 
 message LinkDto {

@@ -20,7 +20,7 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.opal.web.magma.Dtos;
-import org.obiba.opal.web.model.Magma.ValueSetDto;
+import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableDto.Builder;
 
@@ -76,17 +76,21 @@ class RestValueTableWriter implements ValueTableWriter {
 
     return new ValueSetWriter() {
 
-      private ValueSetDto.Builder valueSetDtoBuilder = ValueSetDto.newBuilder().setEntity(Dtos.asDto(entity));
+      private ValueSetsDto.Builder valueSetsDtoBuilder = ValueSetsDto.newBuilder().setEntityType(entity.getType());
+
+      private ValueSetsDto.ValueSetDto.Builder valueSetDtoBuilder = ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(entity.getIdentifier());
 
       @Override
       public void close() throws IOException {
+        valueSetsDtoBuilder.addValueSets(valueSetDtoBuilder);
         URI valueSetUri = restValueTable.newReference("valueSet");
-        checkResponse(restValueTable.getOpalClient().post(valueSetUri, valueSetDtoBuilder.build()));
+        checkResponse(restValueTable.getOpalClient().post(valueSetUri, valueSetsDtoBuilder.build()));
       }
 
       @Override
       public void writeValue(Variable variable, Value value) {
-        valueSetDtoBuilder.addVariables(variable.getName()).addValues(Dtos.asDto(value));
+        valueSetsDtoBuilder.addVariables(variable.getName());
+        valueSetDtoBuilder.addValues(Dtos.asDto(value));
       }
     };
   }

@@ -17,12 +17,10 @@ import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Value;
-import org.obiba.magma.ValueSequence;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.support.Values;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
@@ -30,8 +28,6 @@ import org.obiba.opal.web.model.Magma.CategoryDto;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.TableDto;
-import org.obiba.opal.web.model.Magma.ValueDto;
-import org.obiba.opal.web.model.Magma.ValueDto.Optional;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
@@ -206,54 +202,51 @@ public final class Dtos {
     return builder;
   }
 
-  public static Value fromDto(ValueDto valueDto) {
-    final ValueType valueType = ValueType.Factory.forName(valueDto.getValueType());
-    Value value = valueDto.getIsSequence() == false ? valueType.valueOf(valueDto.getValue()) : valueType.sequenceOf(Iterables.transform(valueDto.getSequenceList(), Functions.compose(Values.toValueFunction(valueType), new Function<ValueDto.Optional, String>() {
-
-      @Override
-      public String apply(Optional input) {
-        return input.hasValue() ? input.getValue() : null;
+  public static Value fromDto(ValueSetsDto.ValueDto valueDto, final ValueType type, boolean isSequence) {
+    if(isSequence) {
+      if(valueDto.getValuesCount() == 0) {
+        return type.nullSequence();
       }
-    })));
-    return value;
-  }
+      return type.sequenceOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
 
-  public static ValueDto.Builder asDto(Value value) {
-    return asDto(null, value, false);
-  }
-
-  public static ValueDto.Builder asDto(String link, Value value, boolean filterBinary) {
-    ValueDto.Builder valueBuilder = ValueDto.newBuilder().setValueType(value.getValueType().getName()).setIsSequence(value.isSequence());
-
-    if(value.isNull() == false) {
-      if(link != null) {
-        valueBuilder.setLink(link);
+        @Override
+        public Value apply(ValueSetsDto.ValueDto input) {
+          return fromDto(input, type, false);
+        }
+      }));
+    } else {
+      if(valueDto.hasValue()) {
+        return type.valueOf(valueDto.getValue());
       }
-      Function<Object, String> toString = filterBinary ? filteredToString() : Functions.toStringFunction();
-      if(value.isSequence() == false) {
-        valueBuilder.setValue(toString.apply(value));
-      } else {
-        valueBuilder.addAllSequence(Iterables.transform(value.asSequence().getValue(), Functions.compose(toOptional(), toString)));
-      }
+      return type.nullValue();
     }
 
-    return valueBuilder;
   }
 
-  public static ValueSetsDto.ValueDto.Builder asValueSetsValueDto(String link, Value value) {
+  public static ValueSetsDto.ValueDto.Builder asDto(Value value) {
+    return asDto(null, value);
+  }
+
+  public static ValueSetsDto.ValueDto.Builder asDto(String link, Value value) {
+    return asDto(link, value, false);
+  }
+
+  public static ValueSetsDto.ValueDto.Builder asDto(String link, Value value, boolean filterBinary) {
+    Function<Object, String> toString = filterBinary ? filteredToString() : Functions.toStringFunction();
+
     ValueSetsDto.ValueDto.Builder valueDto = ValueSetsDto.ValueDto.newBuilder();
     if(value.isNull() == false && value.isSequence() == false) {
-      if(value.getValueType().equals(BinaryType.get())) {
+      if(filterBinary && value.getValueType() == BinaryType.get()) {
         valueDto.setLink(link);
-      } else {
-        valueDto.setValue(value.toString());
       }
+      valueDto.setValue(toString.apply(value));
     }
 
     if(value.isNull() == false && value.isSequence()) {
-      ValueSequence valueSeq = value.asSequence();
-      for(int i = 0; i < valueSeq.getSize(); i++) {
-        valueDto.addValues(Dtos.asValueSetsValueDto(link + "?pos=" + i, valueSeq.get(i)).build());
+      int i = 0;
+      for(Value v : value.asSequence().getValue()) {
+        valueDto.addValues(Dtos.asDto(link + "?pos=" + i, v, filterBinary));
+        i++;
       }
     }
 
@@ -278,10 +271,6 @@ public final class Dtos {
     return FilteredToStringFunction.INSTANCE;
   }
 
-  private static Function<String, Optional> toOptional() {
-    return ToOptional.INSTANCE;
-  }
-
   private static final class FilteredToStringFunction implements Function<Object, String> {
     private static final FilteredToStringFunction INSTANCE = new FilteredToStringFunction();
 
@@ -297,16 +286,4 @@ public final class Dtos {
 
   }
 
-  private static class ToOptional implements Function<String, Optional> {
-    private static final ToOptional INSTANCE = new ToOptional();
-
-    @Override
-    public ValueDto.Optional apply(String input) {
-      ValueDto.Optional.Builder builder = ValueDto.Optional.newBuilder();
-      if(input != null) {
-        builder.setValue(input);
-      }
-      return builder.build();
-    }
-  }
 }

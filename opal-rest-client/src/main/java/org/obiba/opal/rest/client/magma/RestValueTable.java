@@ -22,8 +22,8 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableEntityProvider;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma.TableDto;
-import org.obiba.opal.web.model.Magma.ValueDto;
-import org.obiba.opal.web.model.Magma.ValueSetDto;
+import org.obiba.opal.web.model.Magma.ValueSetsDto;
+import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
@@ -67,7 +67,7 @@ class RestValueTable extends AbstractValueTable {
 
         @Override
         public Value getValue(ValueSet valueSet) {
-          return ((LazyValueSet) valueSet).get(v.getName());
+          return ((LazyValueSet) valueSet).get(v);
         }
 
         @Override
@@ -100,6 +100,10 @@ class RestValueTable extends AbstractValueTable {
 
   URI newReference(String... segments) {
     return getDatasource().buildURI(this.tableReference, segments);
+  }
+
+  UriBuilder newUri(String... segments) {
+    return getDatasource().uriBuilder(this.tableReference).segment(segments);
   }
 
   private class FederatedVariableEntityProvider implements VariableEntityProvider, Initialisable {
@@ -136,28 +140,27 @@ class RestValueTable extends AbstractValueTable {
 
   private class LazyValueSet extends ValueSetBean {
 
-    private ValueSetDto valueSet;
+    private ValueSetsDto valueSet;
 
     private LazyValueSet(ValueTable table, VariableEntity entity) {
       super(table, entity);
     }
 
-    public Value get(String name) {
-      ValueSetDto valueSet = loadValueSet();
+    public Value get(Variable variable) {
+      ValueSetsDto valueSet = loadValueSet();
+      ValueSetsDto.ValueSetDto values = valueSet.getValueSets(0);
+
       for(int i = 0; i < valueSet.getVariablesCount(); i++) {
-        if(name.equals(valueSet.getVariables(i))) {
-          ValueDto value = valueSet.getValues(i);
-          ValueType type = ValueType.Factory.forName(value.getValueType());
-          String stringValue = value.hasValue() ? value.getValue() : null;
-          return value.getIsSequence() ? type.sequenceOf(stringValue) : type.valueOf(stringValue);
+        if(variable.getName().equals(valueSet.getVariables(i))) {
+          return Dtos.fromDto(values.getValues(i), variable.getValueType(), variable.isRepeatable());
         }
       }
-      throw new NoSuchVariableException(name);
+      throw new NoSuchVariableException(variable.getName());
     }
 
-    synchronized ValueSetDto loadValueSet() {
+    synchronized ValueSetsDto loadValueSet() {
       if(valueSet == null) {
-        valueSet = getOpalClient().getResource(ValueSetDto.class, newReference("valueSet", getVariableEntity().getIdentifier()), ValueSetDto.newBuilder());
+        valueSet = getOpalClient().getResource(ValueSetsDto.class, newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "false").build(), ValueSetDto.newBuilder());
       }
       return valueSet;
     }

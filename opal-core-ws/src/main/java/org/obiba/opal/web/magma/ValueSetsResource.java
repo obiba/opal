@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -44,15 +45,28 @@ import com.google.common.collect.Iterables;
  */
 public class ValueSetsResource extends AbstractValueTableResource {
 
+  @Nullable
   private VariableValueSource vvs;
+  
+  @Nullable
+  private Iterable<VariableEntity> entities;
 
   public ValueSetsResource(ValueTable valueTable) {
-    this(valueTable, null);
+    this(valueTable, null, null);
+  }
+
+  public ValueSetsResource(ValueTable valueTable, Iterable<VariableEntity> entities) {
+    this(valueTable, null, entities);
   }
 
   public ValueSetsResource(ValueTable valueTable, VariableValueSource vvs) {
+    this(valueTable, vvs, null);
+  }
+
+  public ValueSetsResource(ValueTable valueTable, VariableValueSource vvs, Iterable<VariableEntity> entities) {
     super(valueTable, new HashSet<Locale>());
     this.vvs = vvs;
+    this.entities = entities;
   }
 
   /**
@@ -66,13 +80,13 @@ public class ValueSetsResource extends AbstractValueTableResource {
   // Required to allow passing parameters in the body
   @POST
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public Response getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
+  public Response getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     // filter entities
-    final Iterable<VariableEntity> entities = filterEntities(null, offset, limit);
+    final Iterable<VariableEntity> entities = this.entities == null ? filterEntities(null, offset, limit) : this.entities;
 
     ValueSetsDto vs;
     if(vvs == null) {
-      vs = getValueSetsDto(uriInfo, select, entities);
+      vs = getValueSetsDto(uriInfo, select, entities, filterBinary);
     } else {
       // ignore select parameter if value sets are accessed by variable value source
       vs = getValueSetsDto(uriInfo, entities);
@@ -81,10 +95,10 @@ public class ValueSetsResource extends AbstractValueTableResource {
     return TimestampedResponses.ok(getValueTable(), vs).build();
   }
 
-  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final String select, final Iterable<VariableEntity> entities) {
+  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final String select, final Iterable<VariableEntity> entities, final boolean filterBinary) {
     final Iterable<Variable> variables = filterVariables(select, 0, null);
 
-    return ValueSetsDto.newBuilder().addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
+    return ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType()).addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
 
       @Override
       public String apply(Variable from) {
@@ -102,7 +116,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
           public ValueSetsDto.ValueDto apply(Variable fromVariable) {
             String link = uriInfo.getPath().replace("valueSets", "variable/" + fromVariable.getName() + "/value/" + fromEntity.getIdentifier());
             Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
-            return Dtos.asValueSetsValueDto(link, value).build();
+            return Dtos.asDto(link, value, filterBinary).build();
           }
         })).build();
       }
@@ -110,7 +124,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
   }
 
   private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final Iterable<VariableEntity> entities) {
-    ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().addVariables(vvs.getVariable().getName());
+    ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(vvs.getVariable().getEntityType()).addVariables(vvs.getVariable().getName());
 
     VectorSource vector = vvs.asVectorSource();
     if(vector != null) {
@@ -148,7 +162,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
 
   private ValueSetDto getValueSetDto(final UriInfo uriInfo, VariableEntity fromEntity, Value value) {
     String link = uriInfo.getPath().replace("valueSets", "value/" + fromEntity.getIdentifier());
-    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addValues(Dtos.asValueSetsValueDto(link, value)).build();
+    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addValues(Dtos.asDto(link, value)).build();
   }
 
 }
