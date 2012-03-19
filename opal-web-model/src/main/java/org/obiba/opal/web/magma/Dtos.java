@@ -84,6 +84,9 @@ public final class Dtos {
     if(from.getUnit() != null) {
       var.setUnit(from.getUnit());
     }
+    if(from.getReferencedEntityType() != null) {
+      var.setReferencedEntityType(from.getReferencedEntityType());
+    }
     for(Attribute attribute : from.getAttributes()) {
       var.addAttributes(asDto(attribute));
     }
@@ -139,6 +142,10 @@ public final class Dtos {
 
     if(variableDto.getMimeType() != null) {
       builder.mimeType(variableDto.getMimeType());
+    }
+
+    if(variableDto.getReferencedEntityType() != null) {
+      builder.referencedEntityType(variableDto.getReferencedEntityType());
     }
 
     if(variableDto.getUnit() != null) {

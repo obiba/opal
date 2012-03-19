@@ -111,6 +111,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     variable = variableDto;
     getView().setVariableName(variable.getName());
     getView().setEntityType(variable.getEntityType());
+    getView().setReferencedEntityType(variable.getReferencedEntityType());
     getView().setValueType(variable.getValueType());
     getView().setMimeType(variable.hasMimeType() ? variable.getMimeType() : "");
     getView().setUnit(variable.hasUnit() ? variable.getUnit() : "");
@@ -360,6 +361,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     void setDerivedVariable(boolean derived, String script);
 
     void setEntityType(String text);
+
+    void setReferencedEntityType(String text);
 
     void setValueType(String text);
 

@@ -28,8 +28,8 @@
        </o:PropertyPanel>
        
        <o:PropertyPanel column="1">
-         <g:Label><ui:msg description="Mime Type label">Mime Type</ui:msg></g:Label>
-         <g:Label ui:field="mimeType"/>
+         <g:Label><ui:msg description="Referenced Entity Type label">Referenced Entity Type</ui:msg></g:Label>
+         <g:Label ui:field="refEntityType"/>
        </o:PropertyPanel>
        
        <o:PropertyPanel>
@@ -38,18 +38,23 @@
        </o:PropertyPanel>
        
        <o:PropertyPanel column="1">
-         <g:Label><ui:msg description="Repeatable label">Repeatable</ui:msg></g:Label>
-         <g:Label ui:field="repeatable"/>
+         <g:Label><ui:msg description="Mime Type label">Mime Type</ui:msg></g:Label>
+         <g:Label ui:field="mimeType"/>
        </o:PropertyPanel>
        
        <o:PropertyPanel>
-         <g:Label><ui:msg description="Unit label">Unit</ui:msg></g:Label>
-         <g:Label ui:field="unit"/>
+         <g:Label><ui:msg description="Repeatable label">Repeatable</ui:msg></g:Label>
+         <g:Label ui:field="repeatable"/>
        </o:PropertyPanel>
        
        <o:PropertyPanel column="1">
          <g:Label><ui:msg description="Occurrence Group label">Occurrence Group</ui:msg></g:Label>
          <g:Label ui:field="occurrenceGroup"/>
+       </o:PropertyPanel>
+       
+       <o:PropertyPanel span="2">
+         <g:Label><ui:msg description="Unit label">Unit</ui:msg></g:Label>
+         <g:Label ui:field="unit"/>
        </o:PropertyPanel>
        
        <o:PropertyPanel span="2">

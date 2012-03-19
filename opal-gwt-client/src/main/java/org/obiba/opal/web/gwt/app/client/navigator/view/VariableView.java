@@ -82,6 +82,9 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   Label entityType;
 
   @UiField
+  Label refEntityType;
+
+  @UiField
   Label valueType;
 
   @UiField
@@ -278,6 +281,11 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   @Override
   public void setEntityType(String text) {
     entityType.setText(text);
+  }
+
+  @Override
+  public void setReferencedEntityType(String text) {
+    refEntityType.setText(text);
   }
 
   @Override
