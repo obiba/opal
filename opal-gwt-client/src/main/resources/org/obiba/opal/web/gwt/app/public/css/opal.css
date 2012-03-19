@@ -68,6 +68,10 @@ textarea {
   -ms-box-sizing: border-box;
 }
 
+textarea.code {
+  font-family:Menlo,Monaco,"Courier New",monospace;
+}
+
 textarea.high {
   height: 20em;
 }

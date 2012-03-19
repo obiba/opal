@@ -40,6 +40,7 @@ public class ScriptSuggestBox extends Composite {
     display.setPositionRelativeTo(new CustomPositionnedUIObject());
     variable = new SuggestBox(suggest, inner, display);
     initWidget(variable);
+    addStyleName("code");
   }
 
   public void addAsyncSuggestions(final TableDto table) {
