@@ -121,7 +121,7 @@ message VariableDto {
   optional LinkDto parentLink = 11;
   optional bool isNewVariable = 12;
   optional int32 index = 13;
-  required string referencedEntityType = 14;
+  optional string referencedEntityType = 14;
 }
 
 message CategoryDto {
