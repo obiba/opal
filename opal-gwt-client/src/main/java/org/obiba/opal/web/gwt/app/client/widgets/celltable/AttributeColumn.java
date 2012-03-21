@@ -17,6 +17,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.Column;
 
@@ -72,7 +73,17 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
       if(attr.hasLocale() && attr.getLocale().trim().length() > 0) {
         labels.append("<span class=\"label\">").append(attr.getLocale()).append("</span> ");
       }
-      labels.append(SafeHtmlUtils.fromString(attr.getValue()).asString()).append("</div>");
+      String value = attr.getValue();
+      try {
+        if(UriUtils.extractScheme(value) != null && UriUtils.isSafeUri(value)) {
+          labels.append("<a href=" + value + " target=\"_blank\">").append(SafeHtmlUtils.fromString(value).asString()).append("</a>");
+        } else {
+          labels.append(SafeHtmlUtils.fromString(value).asString());
+        }
+      } catch(Exception e) {
+        labels.append(SafeHtmlUtils.fromString(value).asString());
+      }
+      labels.append("</div>");
     }
   }
 }
