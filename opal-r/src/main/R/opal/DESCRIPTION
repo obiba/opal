@@ -4,7 +4,7 @@ Date: 2011-03-18
 Title: Opal R API
 Author: OBiBa <info@obiba.org>
 Maintainer: OBiBa <info@obiba.org>
-Depends: R (>= 2.9.0), RCurl (>= 1.6-6, < 1.7-0), rjson
+Depends: R (>= 2.9.0), RCurl (>= 1.6-6), rjson
 Description: Data integration Web application for biobanks by OBiBa.
 	Opal is OBiBa's core database application for biobanks. Participant data, once collected from any data source, must be integrated and stored in a central data repository under a uniform model. Opal is such a central repository. It can import, process, validate, query, analyze, report, and export data. Opal is typically used in a research center to analyze the data acquired at assessment centres. Its ultimate purpose is to achieve seamless data-sharing among biobanks.
 License: GPL (= 3)
