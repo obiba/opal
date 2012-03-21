@@ -29,10 +29,15 @@ public interface ImportCommandOptions extends HelpOption {
   @Option(shortName = "d", description = "The destination datasource into which the variable catalogue and the participants data will be imported.")
   public String getDestination();
 
-  @Option(shortName = "s", description = "Copy all tables from this datasource. If supplied, FILE is only used for archiving.")
+  @Option(shortName = "s", description = "Copy all tables from this datasource.")
   public String getSource();
 
   public boolean isSource();
+
+  @Option(shortName = "t", description = "Copy specified tables.")
+  public List<String> getTables();
+
+  public boolean isTables();
 
   @Option(shortName = "a", description = "Archive directory. If a relative path is given, it is relative to the functional unit's directory.")
   public String getArchive();

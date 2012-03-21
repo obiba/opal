@@ -11,6 +11,7 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
@@ -21,6 +22,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -35,6 +37,7 @@ import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.Disposables;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
@@ -49,6 +52,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
 import org.obiba.opal.core.support.OnyxDatasource;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
@@ -62,6 +66,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 /**
@@ -133,15 +138,46 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, IOException, InterruptedException {
+  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException, InterruptedException {
+    Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
+    Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
+
+    try {
+      importData(unitName, sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration);
+    } finally {
+      silentlyDisposeTransientDatasource(sourceDatasource);
+    }
+  }
+
+  @Override
+  public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException {
+    Assert.isNull(sourceTableNames, "sourceTableNames is null");
+    Assert.isTrue(sourceTableNames.size() > 0, "sourceTableNames is empty");
+
+    ImmutableSet.Builder<ValueTable> builder = ImmutableSet.<ValueTable> builder();
+    for(String tableName : sourceTableNames) {
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+      builder.add(resolver.resolveTable());
+    }
+    Set<ValueTable> sourceTables = builder.build();
+
+    try {
+      importData(unitName, sourceTables, destinationDatasourceName, allowIdentifierGeneration);
+    } finally {
+      for(ValueTable table : sourceTables) {
+        silentlyDisposeTransientDatasource(table.getDatasource());
+      }
+    }
+  }
+
+  private void importData(String unitName, Set<ValueTable> sourceTables, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
     // If unitName is the empty string, coerce it to null.
     String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
 
-    if(nonEmptyUnitName != null) Assert.isTrue(!nonEmptyUnitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
-    Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
+    if(nonEmptyUnitName != null) {
+      Assert.isTrue(!nonEmptyUnitName.equals(FunctionalUnit.OPAL_INSTANCE), "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
+    }
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
-
-    Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
 
     FunctionalUnit unit = null;
@@ -152,11 +188,7 @@ public class DefaultImportService implements ImportService {
       }
     }
 
-    try {
-      copyValueTables(sourceDatasource, destinationDatasource, unit, allowIdentifierGeneration);
-    } finally {
-      safelyDisposeTransientDatasource(sourceDatasource);
-    }
+    copyValueTables(sourceTables, destinationDatasource, unit, allowIdentifierGeneration);
   }
 
   public int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier) {
@@ -218,12 +250,12 @@ public class DefaultImportService implements ImportService {
         }
       }
     } finally {
-      safelyDisposeTransientDatasource(sourceDatasource);
+      silentlyDisposeTransientDatasource(sourceDatasource);
     }
   }
 
   @Override
-  public void importIdentifiers(String sourceDatasourceName) throws IOException {
+  public void importIdentifiers(String sourceDatasourceName) throws IOException, NoSuchDatasourceException {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
@@ -240,11 +272,11 @@ public class DefaultImportService implements ImportService {
       // Don't copy null values otherwise, we'll delete existing mappings
       DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, getIdentifiersValueTable().getDatasource());
     } finally {
-      safelyDisposeTransientDatasource(sourceDatasource);
+      silentlyDisposeTransientDatasource(sourceDatasource);
     }
   }
 
-  private Datasource getDatasourceOrTransientDatasource(String datasourceName) {
+  private Datasource getDatasourceOrTransientDatasource(String datasourceName) throws NoSuchDatasourceException {
     if(MagmaEngine.get().hasDatasource(datasourceName)) {
       return MagmaEngine.get().getDatasource(datasourceName);
     } else {
@@ -252,9 +284,9 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void safelyDisposeTransientDatasource(Datasource datasource) {
+  private void silentlyDisposeTransientDatasource(Datasource datasource) {
     if(MagmaEngine.get().hasTransientDatasource(datasource.getName())) {
-      Disposables.dispose(datasource);
+      Disposables.silentlyDispose(datasource);
     }
   }
 
@@ -266,19 +298,28 @@ public class DefaultImportService implements ImportService {
 
     try {
       sourceDatasource.initialise();
-      copyValueTables(sourceDatasource, destinationDatasource, unit, allowIdentifierGeneration);
+      copyValueTables(sourceDatasource.getValueTables(), destinationDatasource, unit, allowIdentifierGeneration);
     } finally {
       sourceDatasource.dispose();
     }
   }
 
-  private void copyValueTables(final Datasource source, final Datasource destination, final FunctionalUnit unit, final boolean allowIdentifierGeneration) throws IOException, InterruptedException {
+  /**
+   * Copy the specified set a tables.
+   * @param sourceTables
+   * @param destination
+   * @param unit
+   * @param allowIdentifierGeneration
+   * @throws IOException
+   * @throws InterruptedException
+   */
+  private void copyValueTables(final Set<ValueTable> sourceTables, final Datasource destination, final FunctionalUnit unit, final boolean allowIdentifierGeneration) throws IOException, InterruptedException {
     try {
       new LockingActionTemplate() {
 
         @Override
         protected Set<String> getLockNames() {
-          return getTablesToLock(source);
+          return getTablesToLock(sourceTables);
         }
 
         @Override
@@ -290,14 +331,14 @@ public class DefaultImportService implements ImportService {
         protected Action getAction() {
           return new Action() {
             public void execute() throws Exception {
-              for(ValueTable valueTable : source.getValueTables()) {
+              for(ValueTable valueTable : sourceTables) {
                 if(Thread.interrupted()) {
                   throw new InterruptedException("Thread interrupted");
                 }
 
                 if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
                   if(unit != null) {
-                    copyParticipants(valueTable, source, destination, unit, allowIdentifierGeneration);
+                    copyParticipants(valueTable, destination, unit, allowIdentifierGeneration);
                   } else {
                     addMissingEntitiesToKeysTable(valueTable);
                     MultithreadedDatasourceCopier.Builder.newCopier().withThreads(new ThreadFactory() {
@@ -351,12 +392,12 @@ public class DefaultImportService implements ImportService {
     return nonExistentVariableEntities;
   }
 
-  private Set<String> getTablesToLock(Datasource source) {
+  private Set<String> getTablesToLock(Set<ValueTable> sourceTables) {
     Set<String> tablesToLock = new TreeSet<String>();
 
     boolean needToLockKeysTable = false;
 
-    for(ValueTable valueTable : source.getValueTables()) {
+    for(ValueTable valueTable : sourceTables) {
       tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
       if(valueTable.getEntityType().equals(identifiersTableService.getEntityType())) {
         needToLockKeysTable = true;
@@ -370,7 +411,7 @@ public class DefaultImportService implements ImportService {
     return tablesToLock;
   }
 
-  private void copyParticipants(ValueTable participantTable, Datasource source, Datasource destination, FunctionalUnit unit, boolean allowIdentifierGeneration) throws IOException {
+  private void copyParticipants(ValueTable participantTable, Datasource destination, FunctionalUnit unit, boolean allowIdentifierGeneration) throws IOException {
     final String keyVariableName = unit.getKeyVariableName();
     final View privateView = createPrivateView(participantTable, unit, null);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);

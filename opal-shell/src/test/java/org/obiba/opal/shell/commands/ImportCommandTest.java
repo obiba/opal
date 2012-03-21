@@ -178,6 +178,7 @@ public class ImportCommandTest {
     expect(mockOptions.isForce()).andReturn(true).atLeastOnce();
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
+    expect(mockOptions.isTables()).andReturn(false).atLeastOnce();
 
     return mockOptions;
   }
@@ -194,7 +195,8 @@ public class ImportCommandTest {
   private OpalShell createMockShellForRelativePathImport(String unitName, String relativeFilePath) {
     OpalShell mockShell = createMock(OpalShell.class);
     mockShell.printf("Importing %d file%s :\n", 1, "");
-    mockShell.printf("  %s\n", "units" + "/" + unitName + "/" + relativeFilePath);
+    mockShell.printf("  Importing file: %s ...\n", "units" + "/" + unitName + "/" + relativeFilePath);
+    mockShell.printf("Import done.\n");
 
     return mockShell;
   }
@@ -233,6 +235,7 @@ public class ImportCommandTest {
     expect(mockOptions.isForce()).andReturn(true).atLeastOnce();
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
+    expect(mockOptions.isTables()).andReturn(false).atLeastOnce();
 
     return mockOptions;
   }
@@ -242,8 +245,9 @@ public class ImportCommandTest {
     mockShell.printf("Importing %d file%s :\n", 2, "s");
 
     for(String fileName : fileNames) {
-      mockShell.printf("  %s\n", "units" + "/" + unitName + "/" + fileName);
+      mockShell.printf("  Importing file: %s ...\n", "units" + "/" + unitName + "/" + fileName);
     }
+    mockShell.printf("Import done.\n");
 
     return mockShell;
   }

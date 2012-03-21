@@ -20,6 +20,7 @@ import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
@@ -29,9 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import [--unit NAME] [--force] [--source NAME] --destination NAME [--archive FILE] [_FILE_...]")
+@CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import [--unit NAME] [--force] [--source NAME] [--tables NAMES] --destination NAME [--archive FILE] [FILES]")
 public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
   //
@@ -54,28 +56,27 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     List<FileObject> filesToImport = getFilesToImport();
 
     if(options.isSource()) {
-      errorCode = importDatasource(filesToImport);
-    } else if(!filesToImport.isEmpty()) {
+      errorCode = importFromDatasource();
+    }
+
+    if(errorCode == 0 && options.isTables()) {
+      errorCode = importFromTables();
+    }
+
+    if(errorCode == 0 && !filesToImport.isEmpty()) {
       errorCode = importFiles(filesToImport);
-    } else {
+    }
+
+    if(options.isSource() == false & options.isTables() == false & filesToImport.isEmpty()) {
       // TODO: Should this be considered success or an error? Will treat as an error for now.
-      getShell().printf("No file found. Import canceled.\n");
+      getShell().printf("No file, source or tables provided. Import canceled.\n");
       errorCode = 1;
-    }
-
-    return errorCode;
-  }
-
-  private int importDatasource(List<FileObject> filesToImport) {
-    int errorCode = 0;
-    if(filesToImport.isEmpty()) {
-      errorCode = importFromDatasource(null);
-    } else if(filesToImport.size() == 1) {
-      errorCode = importFromDatasource(filesToImport.get(0));
+    } else if(errorCode != 0) {
+      getShell().printf("Import failed.\n");
     } else {
-      getShell().printf("Expect only one file to archive when importing from a datasource.\n");
-      errorCode = 1;
+      getShell().printf("Import done.\n");
     }
+
     return errorCode;
   }
 
@@ -153,7 +154,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
 
-    getShell().printf("  %s\n", file.getName().getPath());
+    getShell().printf("  Importing file: %s ...\n", file.getName().getPath());
     try {
       importService.importData(unitName, file, options.getDestination(), options.isForce());
       archive(file);
@@ -179,15 +180,44 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
-  private int importFromDatasource(FileObject file) {
+  private int importFromDatasource() {
     String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
+
+    getShell().printf("  Importing datasource: %s ...\n", options.getSource());
     try {
       importService.importData(unitName, options.getSource(), options.getDestination(), options.isForce());
-      if(file != null) archive(file);
       errorCode = 0; // success!
     } catch(NoSuchDatasourceException ex) {
       getShell().printf("Datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
+    } catch(KeyProviderException ex) {
+      getShell().printf("Decryption exception: %s\n", ex.getMessage());
+    } catch(IOException ex) {
+      // Report an error and continue with the next file.
+      getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
+      errorCode = 2; // non-critical error!
+    } catch(InterruptedException ex) {
+      // Report the interrupted and continue; the test for interruption will detect this condition.
+      getShell().printf("Thread interrupted");
+    } catch(RuntimeException ex) {
+      runtimeExceptionHandler(ex);
+    }
+    return errorCode;
+  }
+
+  @SuppressWarnings("PMD.NcssMethodCount")
+  private int importFromTables() {
+    String unitName = options.isUnit() ? options.getUnit() : null;
+    int errorCode = 1; // critical error (or interruption)!
+
+    getShell().printf("  Importing tables: %s ...\n", Joiner.on(", ").join(options.getTables()));
+    try {
+      importService.importData(unitName, options.getTables(), options.getDestination(), options.isForce());
+      errorCode = 0; // success!
+    } catch(NoSuchDatasourceException ex) {
+      getShell().printf("'%s'. Cannot import.\n", ex.getMessage());
+    } catch(NoSuchValueTableException ex) {
+      getShell().printf("'%s'. Cannot import.\n", ex.getMessage());
     } catch(KeyProviderException ex) {
       getShell().printf("Decryption exception: %s\n", ex.getMessage());
     } catch(IOException ex) {

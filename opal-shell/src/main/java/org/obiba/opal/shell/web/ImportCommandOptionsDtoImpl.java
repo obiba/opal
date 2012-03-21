@@ -80,6 +80,16 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
   }
 
   @Override
+  public List<String> getTables() {
+    return dto.getTablesList();
+  }
+
+  @Override
+  public boolean isTables() {
+    return dto.getTablesCount() != 0;
+  }
+
+  @Override
   public boolean isForce() {
     return dto.getForce();
   }
