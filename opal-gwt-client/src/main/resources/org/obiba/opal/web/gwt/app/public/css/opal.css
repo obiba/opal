@@ -1441,6 +1441,10 @@ ul.tabz {
   z-index:5;
 }
 
+ul.tabz.vertical {
+  margin-top: 1em;
+}
+
 ul.vertical li {
   margin:-0.083em 0 0;
 }
