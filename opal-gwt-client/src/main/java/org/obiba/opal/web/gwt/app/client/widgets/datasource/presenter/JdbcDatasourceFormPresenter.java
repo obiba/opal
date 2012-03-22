@@ -7,10 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
+package org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter;
 
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenter.Display;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;

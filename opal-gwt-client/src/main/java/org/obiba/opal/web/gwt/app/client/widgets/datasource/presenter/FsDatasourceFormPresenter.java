@@ -7,39 +7,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
+package org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+/**
+ *
+ */
+public class FsDatasourceFormPresenter extends PresenterWidget<FsDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
 
   public static class Subscriber extends DatasourceFormPresenterSubscriber {
 
     @Inject
-    public Subscriber(EventBus eventBus, ExcelDatasourceFormPresenter presenter) {
+    public Subscriber(com.google.gwt.event.shared.EventBus eventBus, FsDatasourceFormPresenter presenter) {
       super(eventBus, presenter);
     }
 
   }
 
-  private FileSelectionPresenter fileSelectionPresenter;
+  private final FileSelectionPresenter fileSelectionPresenter;
 
   @Inject
-  public ExcelDatasourceFormPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
+  public FsDatasourceFormPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
   }
 
   @Override
-  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
+  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
     return this;
   }
 
@@ -52,19 +56,18 @@ public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourc
 
   @Override
   public DatasourceFactoryDto getDatasourceFactory() {
-    ExcelDatasourceFactoryDto extensionDto = ExcelDatasourceFactoryDto.create();
+    FsDatasourceFactoryDto extensionDto = FsDatasourceFactoryDto.create();
     extensionDto.setFile(fileSelectionPresenter.getSelectedFile());
-    extensionDto.setReadOnly(false);
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
+    dto.setExtension(FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
 
     return dto;
   }
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("excel");
+    return type.equalsIgnoreCase("fs");
   }
 
   public interface Display extends DatasourceFormPresenter.Display {
@@ -84,10 +87,10 @@ public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourc
 
     if(file.length() == 0) {
       isValid = false;
-      fireErrorEvent("ExcelFileRequired");
-    } else if(!file.endsWith(".xls") && !file.endsWith(".xlsx")) {
+      fireErrorEvent("ZipFileRequired");
+    } else if(!file.endsWith(".zip")) {
       isValid = false;
-      fireErrorEvent("ExcelFileSuffixInvalid");
+      fireErrorEvent("ZipFileSuffixInvalid");
     }
 
     return isValid;

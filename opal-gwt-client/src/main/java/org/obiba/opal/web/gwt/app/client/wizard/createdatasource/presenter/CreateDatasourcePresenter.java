@@ -21,6 +21,9 @@ import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.HasDatasourceForms;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.RequestDatasourceFormsEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;

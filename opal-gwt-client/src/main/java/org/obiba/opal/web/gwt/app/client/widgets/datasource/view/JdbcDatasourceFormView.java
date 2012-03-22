@@ -7,10 +7,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view;
+package org.obiba.opal.web.gwt.app.client.widgets.datasource.view;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.JdbcDatasourceFormPresenter;
 import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 
 import com.google.gwt.core.client.GWT;

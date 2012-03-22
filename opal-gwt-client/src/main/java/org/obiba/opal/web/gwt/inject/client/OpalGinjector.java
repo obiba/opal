@@ -45,6 +45,10 @@ import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPre
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitListPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.ExcelDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.FsDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.HibernateDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.JdbcDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
@@ -55,10 +59,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPre
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.ExcelDatasourceFormPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.FsDatasourceFormPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.HibernateDatasourceFormPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.JdbcDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;

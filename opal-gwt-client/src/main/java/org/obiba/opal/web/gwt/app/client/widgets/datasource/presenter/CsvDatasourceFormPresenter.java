@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
+package org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
