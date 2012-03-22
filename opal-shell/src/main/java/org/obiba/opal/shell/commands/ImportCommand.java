@@ -55,6 +55,24 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     List<FileObject> filesToImport = getFilesToImport();
 
+    errorCode = executeImports(filesToImport);
+
+    if(options.isSource() == false & options.isTables() == false & filesToImport.isEmpty()) {
+      // TODO: Should this be considered success or an error? Will treat as an error for now.
+      getShell().printf("No file, source or tables provided. Import canceled.\n");
+      errorCode = 1;
+    } else if(errorCode != 0) {
+      getShell().printf("Import failed.\n");
+    } else {
+      getShell().printf("Import done.\n");
+    }
+
+    return errorCode;
+  }
+
+  private int executeImports(List<FileObject> filesToImport) {
+    int errorCode = 0;
+
     if(options.isSource()) {
       errorCode = importFromDatasource();
     }
@@ -65,16 +83,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     if(errorCode == 0 && !filesToImport.isEmpty()) {
       errorCode = importFiles(filesToImport);
-    }
-
-    if(options.isSource() == false & options.isTables() == false & filesToImport.isEmpty()) {
-      // TODO: Should this be considered success or an error? Will treat as an error for now.
-      getShell().printf("No file, source or tables provided. Import canceled.\n");
-      errorCode = 1;
-    } else if(errorCode != 0) {
-      getShell().printf("Import failed.\n");
-    } else {
-      getShell().printf("Import done.\n");
     }
 
     return errorCode;
