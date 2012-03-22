@@ -35,7 +35,6 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -54,8 +53,6 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
 
   public static final WizardType WizardType = new WizardType();
 
-  private static Translations translations = GWT.create(Translations.class);
-
   public static class Wizard extends WizardProxy<CreateDatasourcePresenter> {
 
     @Inject
@@ -65,11 +62,14 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
 
   }
 
+  private final Translations translations;
+
   private DatasourceFormPresenter datasourceFormPresenter;
 
   @Inject
-  public CreateDatasourcePresenter(final Display display, final EventBus eventBus) {
+  public CreateDatasourcePresenter(final Display display, final EventBus eventBus, Translations translations) {
     super(eventBus, display);
+    this.translations = translations;
   }
 
   @Override
