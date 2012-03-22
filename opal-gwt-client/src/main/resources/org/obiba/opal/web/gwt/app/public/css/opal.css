@@ -526,6 +526,56 @@ img.clickable {
   margin-left:0.8em;
 }
 
+/* DatePicker */
+
+.dateBoxPopup {
+  z-index: 1000;
+  -webkit-box-shadow:0 2px 4px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow:0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow:0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.gwt-DatePicker {
+  border-color: #CCCCCC;
+}
+
+.gwt-DatePicker table, 
+.gwt-DatePicker caption, 
+.gwt-DatePicker tbody, 
+.gwt-DatePicker tfoot, 
+.gwt-DatePicker thead, 
+.gwt-DatePicker tr, 
+.gwt-DatePicker th, 
+.gwt-DatePicker td {
+  line-height:14px;
+}
+
+.datePickerMonthSelector, .datePickerWeekdayLabel, .datePickerWeekendLabel {
+  background-color: #F3F4EB;
+}
+
+.datePickerMonthSelector {
+}
+
+.datePickerWeekdayLabel, .datePickerWeekendLabel {
+  border-bottom: 1px solid #B4A291;
+}
+
+.datePickerPreviousButton, .datePickerNextButton, td.datePickerMonth {
+  color: #111111;
+}
+
+.datePickerDay, .datePickerWeekdayLabel, .datePickerWeekendLabel {
+  font-size: 85%;
+}
+
+.datePickerDayIsHighlighted {
+  background-color: #F3F4EB;
+}
+
+.datePickerDayIsValue {
+  background-color: #B4A291;
+}
+
 /* CellTable */
 
 .obiba-Table, .obiba-Grid {
