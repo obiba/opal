@@ -1434,13 +1434,13 @@ div.variablesListTabContent .form table {
 
 .tooltip.gwt-PopupPanel {
   border:0.2em solid #402817;
-  -moz-border-radius: 0.5em 0.5em 0.5em 0.5em; -webkit-border-radius: 0.5em 0.5em 0.5em 0.5em;
+  -moz-border-radius: 0.5em 0.5em 0.5em 0.5em; -webkit-border-radius: 0.5em 0.5em 0.5em 0.5em; border-radius: 0.5em 0.5em 0.5em 0.5em;
   -moz-box-shadow: 0.4em 0.4em 0.8em #CCCCCC; -webkit-box-shadow: 0.4em 0.4em 0.8em #CCCCCC; box-shadow: 0.4em 0.4em 0.8em #CCCCCC;
   padding: 0;
 }
 
 .tooltip .header {
-  -moz-border-radius: 0.5em 0.5em 0 0; -webkit-border-radius: 0.5em 0.5em 0 0;
+  -moz-border-radius: 0.5em 0.5em 0 0; -webkit-border-radius: 0.5em 0.5em 0 0; border-radius: 0.5em 0.5em 0 0;
   background-color: #F3F4EB;
   border-bottom: 1px solid #BBBBBB;
   font-weight: bold;
@@ -1468,14 +1468,14 @@ div.variablesListTabContent .form table {
 
 .tooltip .footer {
   background-color: #FFFFFF;
-  -moz-border-radius: 0 0 0.5em 0.5em; -webkit-border-radius: 0 0 0.5em 0.5em;
+  -moz-border-radius: 0 0 0.5em 0.5em; -webkit-border-radius: 0 0 0.5em 0.5em; border-radius: 0 0 0.5em 0.5em;
 }
 
 .tooltip .resizable-handle.resizable-se {
   top:0em;
 }
 
-/* Vertical/Horizontal tabs */
+/* Vertical/Horizontal/BreadCrumb tabs */
 
 ul.vertical {
   float:left;
@@ -1484,7 +1484,7 @@ ul.vertical {
   min-width:8em;
 }
 
-ul.tabz {
+ul.tabz.vertical, ul.tabz.horizontal {
   list-style-type:none;
   margin:0;
   padding:0;
@@ -1499,7 +1499,7 @@ ul.vertical li {
   margin:-0.083em 0 0;
 }
 
-ul.tabz li {
+ul.tabz.vertical li, ul.tabz.horizontal li {
   background-color:#F0F0F0;
   border:0.083em solid #BBBBBB;
   display:block;
@@ -1519,7 +1519,12 @@ ul.tabz.horizontal li {
   position: relative;
   top: 1px;
 }
- 
+
+ul.tabz.breadcrumb {
+  padding: 7px 10px;
+  margin: 0 0 10px;
+}
+
 ul.tabz.horizontal li.active {
   z-index: 1;
   border-bottom-color: #FFFFFF;
@@ -1529,7 +1534,7 @@ ul.tabz li a {
   color:#535353;
 }
 
-ul.tabz li.active {
+ul.tabz.horizontal li.active, ul.tabz.vertical li.active {
   background-color:#FFFFFF;
 }
 
@@ -1547,8 +1552,11 @@ ul.vertical li.active {
   margin-left:-0.5em;
 }
 
-ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
+ul.tabz.vertical li a, ul.tabz.horizontal li a {
   display:block;
+}
+
+ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
   font-weight:700;
   text-decoration:none;
   overflow:hidden;
@@ -1556,12 +1564,15 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
   white-space:nowrap;
 }
 
-.vertical-tabs > .content, .horizontal-tabs > .content {
-  -moz-border-radius: 0.4em; -webkit-border-radius: 0.4em;
+.vertical-tabs > .content, .horizontal-tabs > .content, .breadcrumb-tabs > .content {
   background-color:#FFFFFF;
-  border:1px solid #BBBBBB;
   position:relative;
   overflow-x:auto;
+}
+
+.vertical-tabs > .content, .horizontal-tabs > .content {
+  -moz-border-radius: 0.4em; -webkit-border-radius: 0.4em; border-radius: 0.4em;
+  border:1px solid #BBBBBB;
   padding: 0.8em;
 }
 
@@ -1760,6 +1771,8 @@ ul.closeables li {
   background-image: -moz-linear-gradient(center bottom , #E4E4E4 0%, #EEEEEE 70%);
   border: 1px solid #B4B4B4;
   border-radius: 3px 3px 3px 3px;
+  -moz-border-radius: 3px 3px 3px 3px;
+  -webkit-border-radius: 3px 3px 3px 3px;
   color: #333333;
   margin: 3px 0 3px 5px;
   padding: 3px 6px 3px 6px;
@@ -1784,6 +1797,8 @@ ul.closeables li a {
 .obiba-SuggestListBox {
   border: 1px solid #CCCCCC;
   border-radius: 3px 3px 3px 3px;
+  -moz-border-radius: 3px 3px 3px 3px;
+  -webkit-border-radius: 3px 3px 3px 3px;
   -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
 }

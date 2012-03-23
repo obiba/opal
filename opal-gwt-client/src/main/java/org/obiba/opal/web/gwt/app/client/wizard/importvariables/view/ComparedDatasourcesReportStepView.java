@@ -15,9 +15,9 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.BreadCrumbTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
@@ -25,14 +25,12 @@ import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.CheckboxCell;
+import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -43,13 +41,10 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -78,7 +73,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   HTMLPanel help;
 
   @UiField
-  HorizontalTabLayout tableTabs;
+  BreadCrumbTabLayout tableTabs;
 
   @UiField
   CellTable<TableComparision> tableList;
@@ -94,28 +89,16 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   public ComparedDatasourcesReportStepView() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    tableTabs.addSelectionHandler(new SelectionHandler<Integer>() {
-
-      @Override
-      public void onSelection(SelectionEvent<Integer> event) {
-        if(event.getSelectedItem().intValue() == 0) {
-          while(tableTabs.getWidgetCount() > 1) {
-            tableTabs.remove(tableTabs.getWidgetCount() - 1);
-          }
-        }
-      }
-    });
-
-    initTablesColumns();
+    initTableList();
   }
 
-  private void initTablesColumns() {
+  private void initTableList() {
     tableList.setPageSize(100);
     tableComparisionsProvider = new ListDataProvider<TableComparision>(tableComparisions);
     tableComparisionsProvider.addDataDisplay(tableList);
     tableList.setEmptyTableWidget(tableList.getLoadingIndicator());
 
-    final SelectionModel<TableComparision> selectionModel = new MultiSelectionModel<TableComparision>(new ProvidesKey<TableComparision>() {
+    SelectionModel<TableComparision> selectionModel = new MultiSelectionModel<TableComparision>(new ProvidesKey<TableComparision>() {
 
       @Override
       public Object getKey(TableComparision item) {
@@ -124,12 +107,16 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     });
     tableList.setSelectionModel(selectionModel);
 
+    initTableListColumns();
+  }
+
+  private void initTableListColumns() {
     tableList.addColumn(new Column<TableComparision, Boolean>(new CheckboxCell(true, true)) {
 
       @Override
       public Boolean getValue(TableComparision object) {
         // Get the value from the selection model.
-        return selectionModel.isSelected(object);
+        return tableList.getSelectionModel().isSelected(object);
       }
     }, new Header<Boolean>(new CheckboxCell(true, true)) {
 
@@ -138,7 +125,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
         if(tableComparisions.size() == 0) return false;
         boolean allSelected = true;
         for(TableComparision tc : tableComparisions) {
-          if(selectionModel.isSelected(tc) == false) {
+          if(tableList.getSelectionModel().isSelected(tc) == false) {
             return false;
           }
         }
@@ -146,42 +133,29 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       }
     });
 
-    ClickableColumn<TableComparision> tableNameColumn;
-    tableList.addColumn(tableNameColumn = new ClickableColumn<TableComparision>() {
-
-      @Override
-      public String getValue(TableComparision object) {
-        return object.getTableName();
-      }
-    }, "Table");
-    tableNameColumn.setFieldUpdater(new FieldUpdater<ComparedDatasourcesReportStepView.TableComparision, String>() {
-
-      @Override
-      public void update(int index, TableComparision object, String value) {
-        while(tableTabs.getWidgetCount() > 1) {
-          tableTabs.remove(tableTabs.getWidgetCount() - 1);
-        }
-        tableTabs.add(getTableCompareTabContent(object.getTableCompareDto()), object.getTableName());
-        tableTabs.selectTab(1);
-      }
-    });
-
-    tableList.addColumn(new Column<TableComparision, String>(new TextCell() {
+    Column<TableComparision, String> tableNameColumn;
+    tableList.addColumn(tableNameColumn = new Column<TableComparision, String>(new ClickableTextCell() {
       @Override
       public void render(Context context, SafeHtml value, SafeHtmlBuilder sb) {
-
         if(value != null) {
           TableComparision tc = (TableComparision) context.getKey();
-          sb.appendHtmlConstant("<span class=\"" + tc.getStatusStyle() + "\" title=\"" + value.asString() + "\">").appendHtmlConstant("</span>");
+          sb.appendHtmlConstant("<a class=\"" + tc.getStatusStyle() + "\" title=\"" + tc.getStatus() + "\">").append(value).appendHtmlConstant("</a>");
         }
       }
     }) {
 
       @Override
       public String getValue(TableComparision object) {
-        return object.getStatus();
+        return object.getTableName();
       }
-    }, "Status");
+    }, translations.tableLabel());
+    tableNameColumn.setFieldUpdater(new FieldUpdater<ComparedDatasourcesReportStepView.TableComparision, String>() {
+
+      @Override
+      public void update(int index, TableComparision object, String value) {
+        tableTabs.addAndSelect(getTableCompareTabContent(object.getTableCompareDto()), object.getTableName());
+      }
+    });
 
     tableList.addColumn(new TextColumn<TableComparision>() {
 
@@ -189,23 +163,33 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       public String getValue(TableComparision object) {
         return Integer.toString(object.getUnmodifiedVariablesCount());
       }
-    }, "Unmodified Variables");
+    }, translations.unmodifiedVariablesLabel());
 
     tableList.addColumn(new TextColumn<TableComparision>() {
 
       @Override
       public String getValue(TableComparision object) {
-        return Integer.toString(object.getNewVariablesCount());
+        int conflicts = object.getNewVariablesConflictsCount();
+        if(conflicts > 0) {
+          return Integer.toString(object.getNewVariablesCount()) + " (" + conflicts + ")";
+        } else {
+          return Integer.toString(object.getNewVariablesCount());
+        }
       }
-    }, "New Variables");
+    }, translations.newVariablesLabel());
 
     tableList.addColumn(new TextColumn<TableComparision>() {
 
       @Override
       public String getValue(TableComparision object) {
-        return Integer.toString(object.getModifiedVariablesCount());
+        int conflicts = object.getModifiedVariablesConflictsCount();
+        if(conflicts > 0) {
+          return Integer.toString(object.getModifiedVariablesCount()) + " (" + conflicts + ")";
+        } else {
+          return Integer.toString(object.getModifiedVariablesCount());
+        }
       }
-    }, "Modified Variables");
+    }, translations.modifiedVariablesLabel());
 
     tableList.addColumn(new TextColumn<TableComparision>() {
 
@@ -213,7 +197,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       public String getValue(TableComparision object) {
         return Integer.toString(object.getConflictsCount());
       }
-    }, "Conflicts");
+    }, translations.conflictedVariablesLabel());
   }
 
   //
@@ -263,31 +247,9 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   private FlowPanel getTableCompareTabContent(TableCompareDto tableCompareData) {
     FlowPanel tableComparePanel = new FlowPanel();
-
-    Label tableName = new Label(tableCompareData.getCompared().getName());
-    tableName.addStyleName("title");
-    tableComparePanel.add(tableName);
-
     HorizontalTabLayout variableChangesPanel = initVariableChangesPanel(tableCompareData, tableComparePanel);
-
     tableComparePanel.add(variableChangesPanel);
-
     return tableComparePanel;
-  }
-
-  private Anchor getTableCompareTabHeader(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
-    String tableName = tableCompareData.getCompared().getName();
-    Anchor tabHeader = new Anchor(tableName);
-    if(comparisonResult == ComparisonResult.CONFLICT) {
-      tabHeader.addStyleName("iconb i-alert");
-    } else if(comparisonResult == ComparisonResult.CREATION) {
-      tabHeader.addStyleName("iconb i-plus");
-    } else if(comparisonResult == ComparisonResult.MODIFICATION) {
-      tabHeader.addStyleName("iconb i-reblog");
-    } else {
-      tabHeader.addStyleName("iconb i-done");
-    }
-    return tabHeader;
   }
 
   @SuppressWarnings("unchecked")
@@ -298,7 +260,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     JsArray<VariableDto> unmodifiedVariables = JsArrays.toSafeArray(tableCompareData.getUnmodifiedVariablesArray());
     JsArray<VariableDto> modifiedVariables = JsArrays.toSafeArray(tableCompareData.getModifiedVariablesArray());
     JsArray<ConflictDto> conflicts = JsArrays.toSafeArray(tableCompareData.getConflictsArray());
-    addVariableChangesSummary(tableComparePanel, newVariables, modifiedVariables, conflicts);
 
     if(unmodifiedVariables.length() > 0) {
       addVariablesTab(unmodifiedVariables, variableChangesPanel, translations.unmodifiedVariablesLabel());
@@ -319,35 +280,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     variableChangesPanel.setVisible(variableChangesPanel.getTabCount() > 0);
 
     return variableChangesPanel;
-  }
-
-  private void addVariableChangesSummary(FlowPanel tableComparePanel, JsArray<VariableDto> newVariables, JsArray<VariableDto> modifiedVariables, JsArray<ConflictDto> conflicts) {
-    FlowPanel variableChangesSummaryPanel = new FlowPanel();
-    variableChangesSummaryPanel.addStyleName("variableChangesSummaryPanel");
-    int conflictsCount[] = getConflictsCounts(conflicts);
-    variableChangesSummaryPanel.add(new HTML(getNewVariablesCountLabel(newVariables, conflictsCount)));
-    variableChangesSummaryPanel.add(new HTML(getModifiedVariablesCountLabel(modifiedVariables, conflictsCount)));
-    tableComparePanel.add(variableChangesSummaryPanel);
-  }
-
-  private String getModifiedVariablesCountLabel(JsArray<VariableDto> modifiedVariables, int[] conflictsCount) {
-    return translations.modifiedVariablesLabel() + ": " + String.valueOf(modifiedVariables.length() + conflictsCount[1]) + (conflictsCount[1] > 0 ? " <em>(" + conflictsCount[1] + " " + translations.conflictedVariablesLabel() + ")</em>" : "");
-  }
-
-  private String getNewVariablesCountLabel(JsArray<VariableDto> newVariables, int[] conflictsCount) {
-    return translations.newVariablesLabel() + ": " + String.valueOf(newVariables.length() + conflictsCount[0]) + (conflictsCount[0] > 0 ? " <em>(" + conflictsCount[0] + " " + translations.conflictedVariablesLabel() + ")</em>" : "");
-  }
-
-  private int[] getConflictsCounts(JsArray<ConflictDto> conflicts) {
-    int conflictsCount[] = { 0, 0 };
-    for(int i = 0; i < conflicts.length(); i++) {
-      if(conflicts.get(i).getVariable().getIsNewVariable()) {
-        conflictsCount[0]++;
-      } else {
-        conflictsCount[1]++;
-      }
-    }
-    return conflictsCount;
   }
 
   private void addConflictsTab(JsArray<ConflictDto> conflicts, HorizontalTabLayout variableChangesPanel) {
@@ -384,7 +316,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   FlowPanel initVariableChangesPager(CellTable<? extends JavaScriptObject> table, SimplePager pager) {
-    table.setPageSize(18);
+    table.setPageSize(20);
     FlowPanel pagerPanel = new FlowPanel();
     pagerPanel.addStyleName("variableChangesPager");
     pagerPanel.add(pager);
@@ -532,6 +464,26 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
     public int getConflictsCount() {
       return JsArrays.toSafeArray(dto.getConflictsArray()).length();
+    }
+
+    public int getNewVariablesConflictsCount() {
+      return getConflictsCounts(JsArrays.toSafeArray(dto.getConflictsArray()))[0];
+    }
+
+    public int getModifiedVariablesConflictsCount() {
+      return getConflictsCounts(JsArrays.toSafeArray(dto.getConflictsArray()))[1];
+    }
+
+    private int[] getConflictsCounts(JsArray<ConflictDto> conflicts) {
+      int conflictsCount[] = { 0, 0 };
+      for(int i = 0; i < conflicts.length(); i++) {
+        if(conflicts.get(i).getVariable().getIsNewVariable()) {
+          conflictsCount[0]++;
+        } else {
+          conflictsCount[1]++;
+        }
+      }
+      return conflictsCount;
     }
   }
 

@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -24,9 +21,9 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiChild;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IndexedPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -36,9 +33,9 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   private final UList menu;
 
-  private final SimplePanel contentContainer;
+  private final DeckPanel contentContainer;
 
-  private final List<Widget> tabContents = Lists.newLinkedList();
+  // private final List<Widget> tabContents = Lists.newLinkedList();
 
   private int selectedIndex = -1;
 
@@ -48,7 +45,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     menu.addStyleName(menuStyleName);
     menu.addStyleName("tabz");
     super.add(menu);
-    super.add(contentContainer = new SimplePanel());
+    super.add(contentContainer = new DeckPanel());
     contentContainer.addStyleName("content");
   }
 
@@ -65,9 +62,17 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     }
   }
 
+  public void setAnimationEnabled(boolean enable) {
+    contentContainer.setAnimationEnabled(enable);
+  }
+
+  public boolean isAnimationEnabled() {
+    return contentContainer.isAnimationEnabled();
+  }
+
   @Override
   public void add(Widget w) {
-    if(menu.getWidgetCount() == tabContents.size()) {
+    if(menu.getWidgetCount() == contentContainer.getWidgetCount()) {
       addTabHeader(w);
     } else {
       addTabContent(w);
@@ -75,7 +80,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
   }
 
   private void addContent(Widget content) {
-    insertContent(content, tabContents.size());
+    insertContent(content, contentContainer.getWidgetCount());
   }
 
   private void insertItem(HasClickHandlers item, int beforeIndex) {
@@ -83,7 +88,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
       throw new IndexOutOfBoundsException("cannot insert before " + beforeIndex);
     }
     final ListItem li;
-    menu.insert(li = new ListItem((Widget) item), beforeIndex);
+    menu.insert(li = newListItem((Widget) item, beforeIndex), beforeIndex);
 
     item.addClickHandler(new ClickHandler() {
 
@@ -94,8 +99,12 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     });
   }
 
+  protected ListItem newListItem(Widget item, int beforeIndex) {
+    return new ListItem(item);
+  }
+
   private void insertContent(Widget content, int beforeIndex) {
-    tabContents.add(beforeIndex, content);
+    contentContainer.insert(content, beforeIndex);
   }
 
   public void add(Widget w, String text) {
@@ -123,7 +132,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
         child.addStyleName("active");
       }
     }
-    contentContainer.setWidget(tabContents.get(index));
+    contentContainer.showWidget(index);
     selectedIndex = index;
   }
 
@@ -131,7 +140,6 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
   public void clear() {
     menu.clear();
     contentContainer.clear();
-    tabContents.clear();
     selectedIndex = -1;
   }
 
@@ -287,17 +295,17 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   @Override
   public Widget getWidget(int index) {
-    return tabContents.get(index);
+    return contentContainer.getWidget(index);
   }
 
   @Override
   public int getWidgetCount() {
-    return tabContents.size();
+    return contentContainer.getWidgetCount();
   }
 
   @Override
   public int getWidgetIndex(Widget child) {
-    return tabContents.indexOf(child);
+    return contentContainer.getWidgetIndex(child);
   }
 
   @Override
@@ -306,13 +314,13 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     if(index < 0 || index >= menu.getWidgetCount()) return false;
 
     menu.remove(index);
-    tabContents.remove(index);
+    contentContainer.remove(index);
 
     int newSize = menu.getWidgetCount();
 
     if(newSize == 0) {
       menu.clear();
-      tabContents.clear();
+      contentContainer.clear();
       selectedIndex = -1;
     } else if(selectedIndex > index) {
       selectedIndex--;
