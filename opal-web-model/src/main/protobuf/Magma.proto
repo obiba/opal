@@ -79,6 +79,15 @@ message HibernateDatasourceFactoryDto {
   } 
 }
 
+message LimesurveyDatasourceFactoryDto {
+  optional bool key = 1;
+  required string database = 2;
+  optional string tablePrefix = 3;
+  extend DatasourceFactoryDto { 
+    optional LimesurveyDatasourceFactoryDto params = 1005; 
+  } 
+}
+
 message DatasourceParsingErrorDto {
   required string defaultMessage = 1;
   required string key = 2;
