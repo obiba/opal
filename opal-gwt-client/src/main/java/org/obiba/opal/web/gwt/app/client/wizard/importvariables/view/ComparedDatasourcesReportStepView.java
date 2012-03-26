@@ -114,6 +114,56 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   private void initTableListColumns() {
+    initTableListCheckColumn();
+    initTableListTableNameColumn();
+    initTableListCountColumns();
+  }
+
+  private void initTableListCountColumns() {
+    tableList.addColumn(new TextColumn<TableComparision>() {
+
+      @Override
+      public String getValue(TableComparision object) {
+        return Integer.toString(object.getUnmodifiedVariablesCount());
+      }
+    }, translations.unmodifiedVariablesLabel());
+
+    tableList.addColumn(new TextColumn<TableComparision>() {
+
+      @Override
+      public String getValue(TableComparision object) {
+        int conflicts = object.getNewVariablesConflictsCount();
+        if(conflicts > 0) {
+          return Integer.toString(object.getNewVariablesCount()) + " (" + conflicts + ")";
+        } else {
+          return Integer.toString(object.getNewVariablesCount());
+        }
+      }
+    }, translations.newVariablesLabel());
+
+    tableList.addColumn(new TextColumn<TableComparision>() {
+
+      @Override
+      public String getValue(TableComparision object) {
+        int conflicts = object.getModifiedVariablesConflictsCount();
+        if(conflicts > 0) {
+          return Integer.toString(object.getModifiedVariablesCount()) + " (" + conflicts + ")";
+        } else {
+          return Integer.toString(object.getModifiedVariablesCount());
+        }
+      }
+    }, translations.modifiedVariablesLabel());
+
+    tableList.addColumn(new TextColumn<TableComparision>() {
+
+      @Override
+      public String getValue(TableComparision object) {
+        return Integer.toString(object.getConflictsCount());
+      }
+    }, translations.conflictedVariablesLabel());
+  }
+
+  private void initTableListCheckColumn() {
     Column<TableComparision, Boolean> checkColumn = new Column<TableComparision, Boolean>(new CheckboxCell(true, true) {
       @Override
       public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
@@ -167,7 +217,9 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       }
     });
     tableList.addColumn(checkColumn, checkHeader);
+  }
 
+  private void initTableListTableNameColumn() {
     Column<TableComparision, String> tableNameColumn;
     tableList.addColumn(tableNameColumn = new Column<TableComparision, String>(new ClickableTextCell() {
       @Override
@@ -191,48 +243,6 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
         tableTabs.addAndSelect(getTableCompareTabContent(object.getTableCompareDto()), object.getTableName());
       }
     });
-
-    tableList.addColumn(new TextColumn<TableComparision>() {
-
-      @Override
-      public String getValue(TableComparision object) {
-        return Integer.toString(object.getUnmodifiedVariablesCount());
-      }
-    }, translations.unmodifiedVariablesLabel());
-
-    tableList.addColumn(new TextColumn<TableComparision>() {
-
-      @Override
-      public String getValue(TableComparision object) {
-        int conflicts = object.getNewVariablesConflictsCount();
-        if(conflicts > 0) {
-          return Integer.toString(object.getNewVariablesCount()) + " (" + conflicts + ")";
-        } else {
-          return Integer.toString(object.getNewVariablesCount());
-        }
-      }
-    }, translations.newVariablesLabel());
-
-    tableList.addColumn(new TextColumn<TableComparision>() {
-
-      @Override
-      public String getValue(TableComparision object) {
-        int conflicts = object.getModifiedVariablesConflictsCount();
-        if(conflicts > 0) {
-          return Integer.toString(object.getModifiedVariablesCount()) + " (" + conflicts + ")";
-        } else {
-          return Integer.toString(object.getModifiedVariablesCount());
-        }
-      }
-    }, translations.modifiedVariablesLabel());
-
-    tableList.addColumn(new TextColumn<TableComparision>() {
-
-      @Override
-      public String getValue(TableComparision object) {
-        return Integer.toString(object.getConflictsCount());
-      }
-    }, translations.conflictedVariablesLabel());
   }
 
   //
