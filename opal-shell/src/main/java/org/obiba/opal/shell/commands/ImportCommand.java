@@ -74,14 +74,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = 0;
 
     if(options.isSource()) {
-      errorCode = importFromDatasource();
-    }
-
-    if(errorCode == 0 && options.isTables()) {
-      errorCode = importFromTables();
-    }
-
-    if(errorCode == 0 && !filesToImport.isEmpty()) {
+      errorCode = importFromDatasource(filesToImport.isEmpty() ? null : filesToImport.get(0));
+    } else if(options.isTables()) {
+      errorCode = importFromTables(filesToImport.isEmpty() ? null : filesToImport.get(0));
+    } else if(!filesToImport.isEmpty()) {
       errorCode = importFiles(filesToImport);
     }
 
@@ -188,13 +184,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
-  private int importFromDatasource() {
+  private int importFromDatasource(FileObject file) {
     String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
 
     getShell().printf("  Importing datasource: %s ...\n", options.getSource());
     try {
       importService.importData(unitName, options.getSource(), options.getDestination(), options.isForce());
+      if(file != null) archive(file);
       errorCode = 0; // success!
     } catch(NoSuchDatasourceException ex) {
       getShell().printf("Datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
@@ -214,13 +211,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
-  private int importFromTables() {
+  private int importFromTables(FileObject file) {
     String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
 
     getShell().printf("  Importing tables: %s ...\n", Joiner.on(", ").join(options.getTables()));
     try {
       importService.importData(unitName, options.getTables(), options.getDestination(), options.isForce());
+      if(file != null) archive(file);
       errorCode = 0; // success!
     } catch(NoSuchDatasourceException ex) {
       getShell().printf("'%s'. Cannot import.\n", ex.getMessage());
