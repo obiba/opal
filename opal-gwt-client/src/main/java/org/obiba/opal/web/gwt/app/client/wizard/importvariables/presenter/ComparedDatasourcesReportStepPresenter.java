@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -82,6 +83,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
   public boolean canBeSubmitted() {
     return !conflictsExist || getDisplay().ignoreAllModifications();
+  }
+
+  public List<String> getSelectedTables() {
+    return getDisplay().getSelectedTables();
   }
 
   @Override
@@ -228,7 +233,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
     @Override
     public void unauthorized() {
-      getDisplay().addForbiddenTableCompareTab(tableCompareDto, comparisonResult);
+      getDisplay().addTableComparision(tableCompareDto, ComparisonResult.FORBIDDEN);
     }
 
     @Override
@@ -238,7 +243,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     @Override
     public void authorized() {
       authorizedComparedTables.push(tableCompareDto);
-      getDisplay().addTableCompareTab(tableCompareDto, comparisonResult);
+      getDisplay().addTableComparision(tableCompareDto, comparisonResult);
     }
   }
 
@@ -248,12 +253,10 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   public interface Display extends WidgetDisplay, WizardStepDisplay {
 
     enum ComparisonResult {
-      CREATION, MODIFICATION, CONFLICT, SAME
+      CREATION, MODIFICATION, CONFLICT, SAME, FORBIDDEN
     }
 
-    void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
-
-    void addForbiddenTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
+    void addTableComparision(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
 
     void clearDisplay();
 
@@ -262,6 +265,8 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     boolean ignoreAllModifications();
 
     void setIgnoreAllModificationsVisible(boolean visible);
+
+    List<String> getSelectedTables();
 
   }
 

@@ -24,15 +24,18 @@ import org.obiba.opal.web.model.client.magma.ConflictDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -111,27 +114,59 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   private void initTableListColumns() {
-    tableList.addColumn(new Column<TableComparision, Boolean>(new CheckboxCell(true, true)) {
+    Column<TableComparision, Boolean> checkColumn = new Column<TableComparision, Boolean>(new CheckboxCell(true, true) {
+      @Override
+      public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
+        // check if forbidden
+        TableComparision tc = (TableComparision) context.getKey();
+        if(tc.isForbidden()) {
+          sb.append(SafeHtmlUtils.fromSafeConstant("<input type=\"checkbox\" disabled=\"true\" tabindex=\"-1\"/>"));
+        } else {
+          super.render(context, value, sb);
+        }
+      }
+    }) {
 
       @Override
       public Boolean getValue(TableComparision object) {
         // Get the value from the selection model.
         return tableList.getSelectionModel().isSelected(object);
       }
-    }, new Header<Boolean>(new CheckboxCell(true, true)) {
+
+    };
+    checkColumn.setFieldUpdater(new FieldUpdater<ComparedDatasourcesReportStepView.TableComparision, Boolean>() {
+
+      @Override
+      public void update(int index, TableComparision object, Boolean value) {
+        tableList.getSelectionModel().setSelected(object, value);
+      }
+    });
+    Header<Boolean> checkHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
 
       @Override
       public Boolean getValue() {
         if(tableComparisions.size() == 0) return false;
         boolean allSelected = true;
         for(TableComparision tc : tableComparisions) {
-          if(tableList.getSelectionModel().isSelected(tc) == false) {
+          if(tc.isForbidden() == false && tableList.getSelectionModel().isSelected(tc) == false) {
             return false;
           }
         }
         return allSelected;
       }
+    };
+    checkHeader.setUpdater(new ValueUpdater<Boolean>() {
+
+      @Override
+      public void update(Boolean value) {
+        for(TableComparision tc : tableComparisions) {
+          if(tc.isForbidden() == false) {
+            tableList.getSelectionModel().setSelected(tc, value);
+          }
+        }
+      }
     });
+    tableList.addColumn(checkColumn, checkHeader);
 
     Column<TableComparision, String> tableNameColumn;
     tableList.addColumn(tableNameColumn = new Column<TableComparision, String>(new ClickableTextCell() {
@@ -205,6 +240,17 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   //
 
   @Override
+  public List<String> getSelectedTables() {
+    ImmutableList.Builder<String> builder = ImmutableList.<String> builder();
+    for(TableComparision tc : tableComparisions) {
+      if(tableList.getSelectionModel().isSelected(tc)) {
+        builder.add(tc.getTableName());
+      }
+    }
+    return builder.build();
+  }
+
+  @Override
   public void clearDisplay() {
     ignoreAllModifications.setValue(false);
     ignoreAllModifications.setEnabled(false);
@@ -213,21 +259,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   @Override
-  public void addTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
-    TableComparision tc;
-    tableComparisions.add(tc = new TableComparision(tableCompareData, comparisonResult));
+  public void addTableComparision(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
+    tableComparisions.add(new TableComparision(tableCompareData, comparisonResult));
     tableComparisionsProvider.refresh();
     tableList.setVisible(true);
-    // tableList.getSelectionModel().setSelected(tc, true);
-  }
-
-  @Override
-  public void addForbiddenTableCompareTab(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
-    TableComparision tc;
-    tableComparisions.add(tc = new TableComparision(tableCompareData, comparisonResult, true));
-    tableComparisionsProvider.refresh();
-    tableList.setVisible(true);
-    // tableList.getSelectionModel().setSelected(tc, false);
   }
 
   @Override
@@ -411,17 +446,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
     private final ComparisonResult result;
 
-    private final boolean forbidden;
-
     public TableComparision(TableCompareDto dto, ComparisonResult result) {
-      this(dto, result, false);
-    }
-
-    public TableComparision(TableCompareDto dto, ComparisonResult result, boolean forbidden) {
       super();
       this.dto = dto;
       this.result = result;
-      this.forbidden = forbidden;
     }
 
     public String getTableName() {
@@ -429,21 +457,26 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     }
 
     public String getStatus() {
-      return forbidden ? "FORBIDDEN" : result.toString();
+      return result.toString();
     }
 
     public String getStatusStyle() {
-      if(forbidden) {
+      switch(result) {
+      case FORBIDDEN:
         return "iconb i-disapprove";
-      } else if(result == ComparisonResult.CONFLICT) {
+      case CONFLICT:
         return "iconb i-alert";
-      } else if(result == ComparisonResult.CREATION) {
+      case CREATION:
         return "iconb i-plus";
-      } else if(result == ComparisonResult.MODIFICATION) {
+      case MODIFICATION:
         return "iconb i-reblog";
-      } else {
+      default:
         return "iconb i-done";
       }
+    }
+
+    public boolean isForbidden() {
+      return result == ComparisonResult.FORBIDDEN;
     }
 
     public TableCompareDto getTableCompareDto() {
