@@ -33,6 +33,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -93,6 +95,14 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     initWidget(uiBinder.createAndBindUi(this));
 
     initTableList();
+
+    ignoreAllModifications.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        tableList.redraw();
+      }
+    });
   }
 
   private void initTableList() {
@@ -456,7 +466,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return help;
   }
 
-  private static class TableComparison {
+  private class TableComparison {
     private final TableCompareDto dto;
 
     private final ComparisonResult result;
@@ -491,7 +501,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     }
 
     public boolean isSelectable() {
-      return result != ComparisonResult.FORBIDDEN && result != ComparisonResult.CONFLICT;
+      return result != ComparisonResult.FORBIDDEN && (ignoreAllModifications.getValue() || result != ComparisonResult.CONFLICT);
     }
 
     public TableCompareDto getTableCompareDto() {
