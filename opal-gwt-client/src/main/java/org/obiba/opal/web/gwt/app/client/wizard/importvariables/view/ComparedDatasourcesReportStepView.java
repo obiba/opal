@@ -191,6 +191,11 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
         tableList.getSelectionModel().setSelected(object, value);
       }
     });
+
+    tableList.addColumn(checkColumn, createTableListCheckColumnHeader());
+  }
+
+  private Header<Boolean> createTableListCheckColumnHeader() {
     Header<Boolean> checkHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
 
       @Override
@@ -216,7 +221,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
         }
       }
     });
-    tableList.addColumn(checkColumn, checkHeader);
+    return checkHeader;
   }
 
   private void initTableListTableNameColumn() {
