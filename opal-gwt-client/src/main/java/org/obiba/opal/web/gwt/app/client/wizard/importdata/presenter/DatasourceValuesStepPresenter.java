@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display;
@@ -44,12 +46,26 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<Display> {
   }
 
   public void setDatasource(String datasource) {
+    setDatasource(datasource, null);
+  }
+
+  public void setDatasource(String datasource, final List<String> tableNames) {
     ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasource + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
 
       @Override
       public void onResource(Response response, JsArray<TableDto> resource) {
         tables = JsArrays.toSafeArray(resource);
-        getView().setTables(tables);
+        if(tableNames == null) {
+          getView().setTables(tables);
+        } else {
+          JsArray<TableDto> filteredTables = JsArrays.create();
+          for(TableDto table : JsArrays.toIterable(tables)) {
+            if(tableNames.contains(table.getName())) {
+              filteredTables.push(table);
+            }
+          }
+          getView().setTables(filteredTables);
+        }
       }
 
     }).send();

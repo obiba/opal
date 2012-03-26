@@ -204,7 +204,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     } else {
       dto.setForce(true);
     }
-    dto.setSource(importData.getTransientDatasourceName());
+    JsArrayString selectedTables = JavaScriptObject.createArray().cast();
+    for(String tableName : comparedDatasourcesReportPresenter.getSelectedTables()) {
+      selectedTables.push(importData.getTransientDatasourceName() + "." + tableName);
+    }
+    dto.setTablesArray(selectedTables);
     return dto;
   }
 
@@ -248,7 +252,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     @Override
     public boolean validateComparedDatasourcesReport() {
-      datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName());
+      if(comparedDatasourcesReportPresenter.getSelectedTables().size() == 0) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
+        return false;
+      }
+      datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName(), comparedDatasourcesReportPresenter.getSelectedTables());
       return comparedDatasourcesReportPresenter.canBeSubmitted();
     }
   }

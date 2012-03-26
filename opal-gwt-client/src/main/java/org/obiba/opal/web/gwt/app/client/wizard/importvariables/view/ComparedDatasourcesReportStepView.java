@@ -79,11 +79,11 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   BreadCrumbTabLayout tableTabs;
 
   @UiField
-  CellTable<TableComparision> tableList;
+  CellTable<TableComparison> tableList;
 
-  private List<TableComparision> tableComparisions = new ArrayList<TableComparision>();
+  private List<TableComparison> tableComparisons = new ArrayList<TableComparison>();
 
-  private ListDataProvider<TableComparision> tableComparisionsProvider;
+  private ListDataProvider<TableComparison> tableComparisonsProvider;
 
   //
   // Constructors
@@ -97,14 +97,14 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   private void initTableList() {
     tableList.setPageSize(100);
-    tableComparisionsProvider = new ListDataProvider<TableComparision>(tableComparisions);
-    tableComparisionsProvider.addDataDisplay(tableList);
+    tableComparisonsProvider = new ListDataProvider<TableComparison>(tableComparisons);
+    tableComparisonsProvider.addDataDisplay(tableList);
     tableList.setEmptyTableWidget(tableList.getLoadingIndicator());
 
-    SelectionModel<TableComparision> selectionModel = new MultiSelectionModel<TableComparision>(new ProvidesKey<TableComparision>() {
+    SelectionModel<TableComparison> selectionModel = new MultiSelectionModel<TableComparison>(new ProvidesKey<TableComparison>() {
 
       @Override
-      public Object getKey(TableComparision item) {
+      public Object getKey(TableComparison item) {
         return item.getTableName();
       }
     });
@@ -120,18 +120,18 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   private void initTableListCountColumns() {
-    tableList.addColumn(new TextColumn<TableComparision>() {
+    tableList.addColumn(new TextColumn<TableComparison>() {
 
       @Override
-      public String getValue(TableComparision object) {
+      public String getValue(TableComparison object) {
         return Integer.toString(object.getUnmodifiedVariablesCount());
       }
     }, translations.unmodifiedVariablesLabel());
 
-    tableList.addColumn(new TextColumn<TableComparision>() {
+    tableList.addColumn(new TextColumn<TableComparison>() {
 
       @Override
-      public String getValue(TableComparision object) {
+      public String getValue(TableComparison object) {
         int conflicts = object.getNewVariablesConflictsCount();
         if(conflicts > 0) {
           return Integer.toString(object.getNewVariablesCount()) + " (" + conflicts + ")";
@@ -141,10 +141,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       }
     }, translations.newVariablesLabel());
 
-    tableList.addColumn(new TextColumn<TableComparision>() {
+    tableList.addColumn(new TextColumn<TableComparison>() {
 
       @Override
-      public String getValue(TableComparision object) {
+      public String getValue(TableComparison object) {
         int conflicts = object.getModifiedVariablesConflictsCount();
         if(conflicts > 0) {
           return Integer.toString(object.getModifiedVariablesCount()) + " (" + conflicts + ")";
@@ -154,40 +154,40 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       }
     }, translations.modifiedVariablesLabel());
 
-    tableList.addColumn(new TextColumn<TableComparision>() {
+    tableList.addColumn(new TextColumn<TableComparison>() {
 
       @Override
-      public String getValue(TableComparision object) {
+      public String getValue(TableComparison object) {
         return Integer.toString(object.getConflictsCount());
       }
     }, translations.conflictedVariablesLabel());
   }
 
   private void initTableListCheckColumn() {
-    Column<TableComparision, Boolean> checkColumn = new Column<TableComparision, Boolean>(new CheckboxCell(true, true) {
+    Column<TableComparison, Boolean> checkColumn = new Column<TableComparison, Boolean>(new CheckboxCell(true, true) {
       @Override
       public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
-        // check if forbidden
-        TableComparision tc = (TableComparision) context.getKey();
-        if(tc.isForbidden()) {
-          sb.append(SafeHtmlUtils.fromSafeConstant("<input type=\"checkbox\" disabled=\"true\" tabindex=\"-1\"/>"));
-        } else {
+        // check if forbidden or has conflict
+        TableComparison tc = (TableComparison) context.getKey();
+        if(tc.isSelectable()) {
           super.render(context, value, sb);
+        } else {
+          sb.append(SafeHtmlUtils.fromSafeConstant("<input type=\"checkbox\" disabled=\"true\" tabindex=\"-1\"/>"));
         }
       }
     }) {
 
       @Override
-      public Boolean getValue(TableComparision object) {
+      public Boolean getValue(TableComparison object) {
         // Get the value from the selection model.
         return tableList.getSelectionModel().isSelected(object);
       }
 
     };
-    checkColumn.setFieldUpdater(new FieldUpdater<ComparedDatasourcesReportStepView.TableComparision, Boolean>() {
+    checkColumn.setFieldUpdater(new FieldUpdater<ComparedDatasourcesReportStepView.TableComparison, Boolean>() {
 
       @Override
-      public void update(int index, TableComparision object, Boolean value) {
+      public void update(int index, TableComparison object, Boolean value) {
         tableList.getSelectionModel().setSelected(object, value);
       }
     });
@@ -200,10 +200,10 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
       @Override
       public Boolean getValue() {
-        if(tableComparisions.size() == 0) return false;
+        if(tableComparisons.size() == 0) return false;
         boolean allSelected = true;
-        for(TableComparision tc : tableComparisions) {
-          if(tc.isForbidden() == false && tableList.getSelectionModel().isSelected(tc) == false) {
+        for(TableComparison tc : tableComparisons) {
+          if(tc.isSelectable() && tableList.getSelectionModel().isSelected(tc) == false) {
             return false;
           }
         }
@@ -214,8 +214,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
       @Override
       public void update(Boolean value) {
-        for(TableComparision tc : tableComparisions) {
-          if(tc.isForbidden() == false) {
+        for(TableComparison tc : tableComparisons) {
+          if(tc.isSelectable()) {
             tableList.getSelectionModel().setSelected(tc, value);
           }
         }
@@ -225,26 +225,26 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   }
 
   private void initTableListTableNameColumn() {
-    Column<TableComparision, String> tableNameColumn;
-    tableList.addColumn(tableNameColumn = new Column<TableComparision, String>(new ClickableTextCell() {
+    Column<TableComparison, String> tableNameColumn;
+    tableList.addColumn(tableNameColumn = new Column<TableComparison, String>(new ClickableTextCell() {
       @Override
       public void render(Context context, SafeHtml value, SafeHtmlBuilder sb) {
         if(value != null) {
-          TableComparision tc = (TableComparision) context.getKey();
-          sb.appendHtmlConstant("<a class=\"" + tc.getStatusStyle() + "\" title=\"" + tc.getStatus() + "\">").append(value).appendHtmlConstant("</a>");
+          TableComparison tc = (TableComparison) context.getKey();
+          sb.appendHtmlConstant("<a class=\"" + tc.getStatusStyle() + "\" title=\"" + translations.comparisonResultMap().get(tc.getStatus()) + "\">").append(value).appendHtmlConstant("</a>");
         }
       }
     }) {
 
       @Override
-      public String getValue(TableComparision object) {
+      public String getValue(TableComparison object) {
         return object.getTableName();
       }
     }, translations.tableLabel());
-    tableNameColumn.setFieldUpdater(new FieldUpdater<ComparedDatasourcesReportStepView.TableComparision, String>() {
+    tableNameColumn.setFieldUpdater(new FieldUpdater<ComparedDatasourcesReportStepView.TableComparison, String>() {
 
       @Override
-      public void update(int index, TableComparision object, String value) {
+      public void update(int index, TableComparison object, String value) {
         tableTabs.addAndSelect(getTableCompareTabContent(object.getTableCompareDto()), object.getTableName());
       }
     });
@@ -257,7 +257,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   @Override
   public List<String> getSelectedTables() {
     ImmutableList.Builder<String> builder = ImmutableList.<String> builder();
-    for(TableComparision tc : tableComparisions) {
+    for(TableComparison tc : tableComparisons) {
       if(tableList.getSelectionModel().isSelected(tc)) {
         builder.add(tc.getTableName());
       }
@@ -269,14 +269,14 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   public void clearDisplay() {
     ignoreAllModifications.setValue(false);
     ignoreAllModifications.setEnabled(false);
-    tableComparisions.clear();
-    tableComparisionsProvider.refresh();
+    tableComparisons.clear();
+    tableComparisonsProvider.refresh();
   }
 
   @Override
-  public void addTableComparision(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
-    tableComparisions.add(new TableComparision(tableCompareData, comparisonResult));
-    tableComparisionsProvider.refresh();
+  public void addTableComparison(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
+    tableComparisons.add(new TableComparison(tableCompareData, comparisonResult));
+    tableComparisonsProvider.refresh();
     tableList.setVisible(true);
   }
 
@@ -456,12 +456,12 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     return help;
   }
 
-  private static class TableComparision {
+  private static class TableComparison {
     private final TableCompareDto dto;
 
     private final ComparisonResult result;
 
-    public TableComparision(TableCompareDto dto, ComparisonResult result) {
+    public TableComparison(TableCompareDto dto, ComparisonResult result) {
       super();
       this.dto = dto;
       this.result = result;
@@ -490,8 +490,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
       }
     }
 
-    public boolean isForbidden() {
-      return result == ComparisonResult.FORBIDDEN;
+    public boolean isSelectable() {
+      return result != ComparisonResult.FORBIDDEN && result != ComparisonResult.CONFLICT;
     }
 
     public TableCompareDto getTableCompareDto() {

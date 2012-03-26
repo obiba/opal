@@ -142,7 +142,10 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private final class ImportableValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
+      if(comparedDatasourcesReportPresenter.getSelectedTables().size() == 0) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
+        return false;
+      } else if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("NotIgnoredConlicts").build());
         return false;
       }

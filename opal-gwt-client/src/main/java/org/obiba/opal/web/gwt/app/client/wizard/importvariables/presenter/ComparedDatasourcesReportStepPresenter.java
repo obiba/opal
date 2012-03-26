@@ -233,7 +233,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
 
     @Override
     public void unauthorized() {
-      getDisplay().addTableComparision(tableCompareDto, ComparisonResult.FORBIDDEN);
+      getDisplay().addTableComparison(tableCompareDto, ComparisonResult.FORBIDDEN);
     }
 
     @Override
@@ -243,7 +243,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     @Override
     public void authorized() {
       authorizedComparedTables.push(tableCompareDto);
-      getDisplay().addTableComparision(tableCompareDto, comparisonResult);
+      getDisplay().addTableComparison(tableCompareDto, comparisonResult);
     }
   }
 
@@ -256,7 +256,7 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
       CREATION, MODIFICATION, CONFLICT, SAME, FORBIDDEN
     }
 
-    void addTableComparision(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
+    void addTableComparison(TableCompareDto tableCompareData, ComparisonResult comparisonResult);
 
     void clearDisplay();
 
