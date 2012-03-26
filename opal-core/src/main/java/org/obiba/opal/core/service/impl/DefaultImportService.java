@@ -151,13 +151,14 @@ public class DefaultImportService implements ImportService {
 
   @Override
   public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException {
-    Assert.isNull(sourceTableNames, "sourceTableNames is null");
+    Assert.isTrue(sourceTableNames != null, "sourceTableNames is null");
     Assert.isTrue(sourceTableNames.size() > 0, "sourceTableNames is empty");
 
     ImmutableSet.Builder<ValueTable> builder = ImmutableSet.<ValueTable> builder();
     for(String tableName : sourceTableNames) {
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
-      builder.add(resolver.resolveTable());
+      Datasource ds = getDatasourceOrTransientDatasource(resolver.getDatasourceName());
+      builder.add(ds.getValueTable(resolver.getTableName()));
     }
     Set<ValueTable> sourceTables = builder.build();
 
