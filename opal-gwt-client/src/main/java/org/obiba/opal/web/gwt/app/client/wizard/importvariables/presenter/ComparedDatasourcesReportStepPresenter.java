@@ -36,6 +36,8 @@ import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -51,8 +53,6 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
   private boolean conflictsExist;
 
   private boolean modificationsExist;
-
-  private boolean canIgnoreAllModifications;
 
   @Inject
   public ComparedDatasourcesReportStepPresenter(Display display, EventBus eventBus) {
@@ -118,22 +118,34 @@ public class ComparedDatasourcesReportStepPresenter extends WidgetPresenter<Comp
     }
   }
 
-  @SuppressWarnings("unchecked")
   public void addUpdateVariablesResourceRequests(ConclusionStepPresenter conclusionStepPresenter) {
-    for(TableCompareDto tableCompareDto : JsArrays.toIterable(authorizedComparedTables)) {
-      JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareDto.getNewVariablesArray());
-      JsArray<VariableDto> modifiedVariables = JsArrays.toSafeArray(tableCompareDto.getModifiedVariablesArray());
+    final List<String> selectedTableNames = getDisplay().getSelectedTables();
+    Iterable<TableCompareDto> filteredTables = Iterables.filter(JsArrays.toIterable(authorizedComparedTables), new Predicate<TableCompareDto>() {
 
-      JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
-      JsArrays.pushAll(variablesToStringify, newVariables);
-      if(!getDisplay().ignoreAllModifications()) {
-        JsArrays.pushAll(variablesToStringify, modifiedVariables);
+      @Override
+      public boolean apply(TableCompareDto input) {
+        return selectedTableNames.contains(input.getCompared().getName());
       }
+    });
+    for(TableCompareDto tableCompareDto : filteredTables) {
+      addUpdateVariablesResourceRequest(conclusionStepPresenter, tableCompareDto);
+    }
+  }
 
-      if(variablesToStringify.length() > 0) {
-        conclusionStepPresenter.setTargetDatasourceName(targetDatasourceName);
-        conclusionStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
-      }
+  @SuppressWarnings("unchecked")
+  private void addUpdateVariablesResourceRequest(ConclusionStepPresenter conclusionStepPresenter, TableCompareDto tableCompareDto) {
+    JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareDto.getNewVariablesArray());
+    JsArray<VariableDto> modifiedVariables = JsArrays.toSafeArray(tableCompareDto.getModifiedVariablesArray());
+
+    JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
+    JsArrays.pushAll(variablesToStringify, newVariables);
+    if(!getDisplay().ignoreAllModifications()) {
+      JsArrays.pushAll(variablesToStringify, modifiedVariables);
+    }
+
+    if(variablesToStringify.length() > 0) {
+      conclusionStepPresenter.setTargetDatasourceName(targetDatasourceName);
+      conclusionStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(), "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(), createResourceRequestBuilder(tableCompareDto.getCompared(), !tableCompareDto.hasWithTable(), variablesToStringify));
     }
   }
 
