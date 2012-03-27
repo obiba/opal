@@ -1,0 +1,20 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+  <g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key">
+        <ui:msg description="Database label">Database</ui:msg>
+      </g:Label>
+      <g:ListBox ui:field="database" visibleItemCount="1"/>
+    </g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key">
+        <ui:msg description="Table prefix label">Table prefix</ui:msg>
+      </g:Label>
+      <g:TextBox ui:field="tablePrefix"></g:TextBox>
+    </g:FlowPanel>
+  </g:FlowPanel>
+</ui:UiBinder>

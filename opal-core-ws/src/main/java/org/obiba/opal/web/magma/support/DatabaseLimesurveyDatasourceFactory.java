@@ -32,8 +32,9 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
 
   /**
    * @param name
-   * @param jdbcDataSourceRegistry
-   * @param parseSettings
+   * @param databaseName
+   * @param tablePrefix
+   * @param dataSourceRegistry
    */
   public DatabaseLimesurveyDatasourceFactory(String name, String databaseName, String tablePrefix, JdbcDataSourceRegistry dataSourceRegistry) {
     super.setName(name);

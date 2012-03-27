@@ -570,6 +570,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Opal XML")
   String opalXmlLabel();
 
+  @Description("Limesurvey label")
+  @DefaultStringValue("LimeSurvey")
+  String limesurveyLabel();
+
   @Description("Select file and data format label")
   @DefaultStringValue("Select a file and data format")
   String selectFileAndDataFormatLabel();

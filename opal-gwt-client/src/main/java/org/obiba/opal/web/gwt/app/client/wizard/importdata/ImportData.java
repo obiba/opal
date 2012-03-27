@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -45,6 +45,10 @@ public class ImportData {
 
   private String entityType;
 
+  private String database;
+
+  private String tablePrefix;
+
   public void clear() {
     importFormat = null;
     xmlFile = null;
@@ -62,6 +66,8 @@ public class ImportData {
     field = null;
     csvFile = null;
     transientDatasourceName = null;
+    database = null;
+    tablePrefix = null;
   }
 
   public void setFormat(ImportFormat importFormat) {
@@ -204,4 +210,19 @@ public class ImportData {
     return entityType;
   }
 
+  public String getDatabase() {
+    return database;
+  }
+
+  public void setDatabase(String database) {
+    this.database = database;
+  }
+
+  public String getTablePrefix() {
+    return tablePrefix;
+  }
+
+  public void setTablePrefix(String tablePrefix) {
+    this.tablePrefix = tablePrefix;
+  }
 }
