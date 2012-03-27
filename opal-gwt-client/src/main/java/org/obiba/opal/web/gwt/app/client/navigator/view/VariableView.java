@@ -15,9 +15,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.AttributeValueColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.CategoryAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
@@ -32,9 +31,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -108,8 +105,8 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   @UiField
   Anchor categoryTableTitle;
 
-  @UiField
-  CellTable<CategoryDto> categoryTable;
+  @UiField(provided = true)
+  Table<CategoryDto> categoryTable;
 
   @UiField
   SimplePager categoryTablePager;
@@ -119,8 +116,8 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   @UiField
   Anchor attributeTableTitle;
 
-  @UiField
-  CellTable<AttributeDto> attributeTable;
+  @UiField(provided = true)
+  Table<AttributeDto> attributeTable;
 
   @UiField
   SimplePager attributeTablePager;
@@ -135,12 +132,6 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   @UiField
   Panel values;
-
-  @UiField
-  InlineLabel noCategories;
-
-  @UiField
-  InlineLabel noAttributes;
 
   @UiField
   PrettyPrintLabel script;
@@ -160,6 +151,8 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   //
 
   public VariableView() {
+    categoryTable = new CategoriesTable();
+    attributeTable = new AttributesTable();
     this.widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     initCategoryTable();
@@ -371,55 +364,17 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   }
 
   private void initCategoryTable() {
-
     categoryTableTitle.setText(translations.categoriesLabel());
-
-    addCategoryTableColumns();
-
     categoryTable.setPageSize(NavigatorView.PAGE_SIZE);
-    categoryTable.setEmptyTableWidget(noCategories);
     categoryTablePager.setDisplay(categoryTable);
     categoryProvider.addDataDisplay(categoryTable);
   }
 
-  private void addCategoryTableColumns() {
-    categoryTable.addColumn(new TextColumn<CategoryDto>() {
-      @Override
-      public String getValue(CategoryDto object) {
-        return object.getName();
-      }
-    }, translations.nameLabel());
-
-    categoryTable.addColumn(new CategoryAttributeColumn("label"), translations.labelLabel());
-
-    categoryTable.addColumn(new TextColumn<CategoryDto>() {
-      @Override
-      public String getValue(CategoryDto object) {
-        return object.getIsMissing() ? translations.yesLabel() : translations.noLabel();
-      }
-    }, translations.missingLabel());
-  }
-
   private void initAttributeTable() {
     attributeTableTitle.setText(translations.attributesLabel());
-
-    addAttributeTableColumns();
-
     attributeTable.setPageSize(NavigatorView.PAGE_SIZE);
-    attributeTable.setEmptyTableWidget(noAttributes);
     attributeTablePager.setDisplay(attributeTable);
     attributeProvider.addDataDisplay(attributeTable);
-  }
-
-  private void addAttributeTableColumns() {
-    attributeTable.addColumn(new TextColumn<AttributeDto>() {
-      @Override
-      public String getValue(AttributeDto object) {
-        return object.getName();
-      }
-    }, translations.nameLabel());
-
-    attributeTable.addColumn(new AttributeValueColumn(), translations.valueLabel());
   }
 
   @Override

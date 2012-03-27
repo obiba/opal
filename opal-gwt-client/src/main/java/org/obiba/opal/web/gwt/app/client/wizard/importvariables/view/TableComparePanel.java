@@ -13,18 +13,18 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  *
@@ -33,86 +33,99 @@ public class TableComparePanel extends FlowPanel {
 
   private static Translations translations = GWT.create(Translations.class);
 
-  public TableComparePanel(TableCompareDto tableCompareData) {
+  private final TableCompareDto tableCompareDto;
+
+  private final FieldUpdater<VariableDto, String> variableFieldUpdater;
+
+  private final FieldUpdater<ConflictDto, String> conflictFieldUpdater;
+
+  public TableComparePanel(TableCompareDto tableCompareDto, FieldUpdater<VariableDto, String> variableFieldUpdater, FieldUpdater<ConflictDto, String> conflictFieldUpdater) {
     super();
-    HorizontalTabLayout variableChangesPanel = initVariableChangesPanel(tableCompareData);
-    add(variableChangesPanel);
+    this.tableCompareDto = tableCompareDto;
+    this.variableFieldUpdater = variableFieldUpdater;
+    this.conflictFieldUpdater = conflictFieldUpdater;
+
+    add(initProperties());
+    add(initVariableChangesPanel());
   }
 
-  @SuppressWarnings("unchecked")
-  private HorizontalTabLayout initVariableChangesPanel(TableCompareDto tableCompareData) {
-    HorizontalTabLayout variableChangesPanel = new HorizontalTabLayout();
+  private PropertiesTable initProperties() {
+    PropertiesTable properties = new PropertiesTable();
+    properties.setZebra(true);
+    properties.setCondensed(true);
+    properties.setBorderedCell(false);
+    properties.setKeyStyleNames("span2");
 
-    JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareData.getNewVariablesArray());
-    JsArray<VariableDto> unmodifiedVariables = JsArrays.toSafeArray(tableCompareData.getUnmodifiedVariablesArray());
-    JsArray<VariableDto> modifiedVariables = JsArrays.toSafeArray(tableCompareData.getModifiedVariablesArray());
-    JsArray<ConflictDto> conflicts = JsArrays.toSafeArray(tableCompareData.getConflictsArray());
+    properties.addProperty(translations.entityTypeLabel(), tableCompareDto.getCompared().getEntityType());
+
+    return properties;
+  }
+
+  private HorizontalTabLayout initVariableChangesPanel() {
+    HorizontalTabLayout tabs = new HorizontalTabLayout();
+    tabs.addStyleName("top-margin");
+
+    JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareDto.getNewVariablesArray());
+    JsArray<VariableDto> unmodifiedVariables = JsArrays.toSafeArray(tableCompareDto.getUnmodifiedVariablesArray());
+    JsArray<VariableDto> modifiedVariables = JsArrays.toSafeArray(tableCompareDto.getModifiedVariablesArray());
+    JsArray<ConflictDto> conflicts = JsArrays.toSafeArray(tableCompareDto.getConflictsArray());
 
     if(unmodifiedVariables.length() > 0) {
-      addVariablesTab(unmodifiedVariables, variableChangesPanel, translations.unmodifiedVariablesLabel());
+      addVariablesTab(unmodifiedVariables, tabs, translations.unmodifiedVariablesLabel());
     }
 
     if(newVariables.length() > 0) {
-      addVariablesTab(newVariables, variableChangesPanel, translations.newVariablesLabel());
+      addVariablesTab(newVariables, tabs, translations.newVariablesLabel());
     }
 
     if(modifiedVariables.length() > 0) {
-      addVariablesTab(modifiedVariables, variableChangesPanel, translations.modifiedVariablesLabel());
+      addVariablesTab(modifiedVariables, tabs, translations.modifiedVariablesLabel());
     }
 
     if(conflicts.length() > 0) {
-      addConflictsTab(conflicts, variableChangesPanel);
+      addConflictsTab(conflicts, tabs);
     }
 
-    variableChangesPanel.setVisible(variableChangesPanel.getTabCount() > 0);
+    tabs.setVisible(tabs.getTabCount() > 0);
 
-    return variableChangesPanel;
+    return tabs;
   }
 
   private void addConflictsTab(JsArray<ConflictDto> conflicts, HorizontalTabLayout variableChangesPanel) {
-    CellTable<ConflictDto> variableConflictsDetails = new TableCompareConflictsTable();
-    SimplePager variableConflictsPager = prepareVariableChangesTab(variableChangesPanel, translations.conflictedVariablesLabel(), variableConflictsDetails);
+    TableCompareConflictsTable variableConflictsDetails = new TableCompareConflictsTable();
+    variableConflictsDetails.getVariableNameColumn().setFieldUpdater(conflictFieldUpdater);
+
+    addTab(variableChangesPanel, translations.conflictedVariablesLabel(), variableConflictsDetails);
 
     JsArrayDataProvider<ConflictDto> dataProvider = new JsArrayDataProvider<ConflictDto>();
     dataProvider.addDataDisplay(variableConflictsDetails);
-    populateVariableChangesTable(conflicts, dataProvider, variableConflictsPager);
+    dataProvider.setArray(conflicts);
   }
 
   private void addVariablesTab(JsArray<VariableDto> variables, HorizontalTabLayout variableChangesPanel, String tabTitle) {
-    CellTable<VariableDto> variablesDetails = new TableCompareVariablesTable();
-    SimplePager variableDetailsPager = prepareVariableChangesTab(variableChangesPanel, tabTitle, variablesDetails);
+    TableCompareVariablesTable variablesDetails = new TableCompareVariablesTable();
+    variablesDetails.getVariableNameColumn().setFieldUpdater(variableFieldUpdater);
+
+    addTab(variableChangesPanel, tabTitle, variablesDetails);
 
     JsArrayDataProvider<VariableDto> dataProvider = new JsArrayDataProvider<VariableDto>();
     dataProvider.addDataDisplay(variablesDetails);
-    populateVariableChangesTable(variables, dataProvider, variableDetailsPager);
+    dataProvider.setArray(variables);
   }
 
-  private <T extends JavaScriptObject> SimplePager prepareVariableChangesTab(HorizontalTabLayout variableChangesTabPanel, String tabTitle, CellTable<T> variableChangesTable) {
-    variableChangesTable.addStyleName("variableChangesDetails");
-    ScrollPanel variableChangesDetails = new ScrollPanel();
-    VerticalPanel variableChangesDetailsVert = new VerticalPanel();
-    variableChangesDetailsVert.setWidth("100%");
+  private <T extends JavaScriptObject> SimplePager addTab(HorizontalTabLayout tabs, String tabTitle, CellTable<T> table) {
+    FlowPanel panel = new FlowPanel();
     SimplePager pager = new SimplePager();
-    pager.setDisplay(variableChangesTable);
-    variableChangesDetailsVert.add(initVariableChangesPager(variableChangesTable, pager));
-    variableChangesDetailsVert.add(variableChangesTable);
-    variableChangesDetailsVert.addStyleName("variableChangesDetailsVert");
-    variableChangesDetails.add(variableChangesDetailsVert);
-    variableChangesTabPanel.add(variableChangesDetails, tabTitle);
+    pager.addStyleName("right-aligned");
+    pager.setDisplay(table);
+    panel.add(pager);
+
+    table.addStyleName("left-aligned");
+    table.setWidth("100%");
+    panel.add(table);
+    tabs.add(panel, tabTitle);
+
     return pager;
   }
 
-  FlowPanel initVariableChangesPager(CellTable<? extends JavaScriptObject> table, SimplePager pager) {
-    table.setPageSize(20);
-    FlowPanel pagerPanel = new FlowPanel();
-    pagerPanel.addStyleName("variableChangesPager");
-    pagerPanel.add(pager);
-    return pagerPanel;
-  }
-
-  private <T extends JavaScriptObject> void populateVariableChangesTable(final JsArray<T> conflicts, JsArrayDataProvider<T> dataProvider, SimplePager pager) {
-    dataProvider.setArray(conflicts);
-    pager.firstPage();
-    dataProvider.refresh();
-  }
 }

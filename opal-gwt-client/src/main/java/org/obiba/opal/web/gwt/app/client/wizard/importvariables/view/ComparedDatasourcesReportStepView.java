@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.BreadCrumbTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -103,14 +104,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     });
     table.setSelectionModel(selectionModel);
 
-    table.getTableNameColumn().setFieldUpdater(new FieldUpdater<ComparedDatasourcesReportStepView.TableComparison, String>() {
-
-      @Override
-      public void update(int index, TableComparison object, String value) {
-        tableTabs.addAndSelect(new TableComparePanel(object.getTableCompareDto()), object.getTableName());
-      }
-
-    });
+    table.getTableNameColumn().setFieldUpdater(new TableComparisonFieldUpdater());
 
     this.tableList = table;
   }
@@ -135,7 +129,9 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     ignoreAllModifications.setValue(false);
     ignoreAllModifications.setEnabled(false);
     tableComparisons.clear();
+    tableComparisonsProvider.setList(tableComparisons);
     tableComparisonsProvider.refresh();
+    tableTabs.selectTab(0);
   }
 
   @Override
@@ -173,6 +169,32 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   //
   // Inner Classes / Interfaces
   //
+
+  private final class TableComparisonFieldUpdater implements FieldUpdater<TableComparison, String> {
+    @Override
+    public void update(int index, TableComparison object, String value) {
+      TableComparePanel panel = new TableComparePanel(object.getTableCompareDto(), new TableCompareVariableFieldUpdater(), new TableCompareConflictFieldUpdater());
+      tableTabs.addAndSelect(panel, object.getTableName());
+    }
+  }
+
+  private final class TableCompareVariableFieldUpdater implements FieldUpdater<VariableDto, String> {
+
+    @Override
+    public void update(int index, VariableDto object, String value) {
+      tableTabs.addAndSelect(new TableCompareVariablePanel(object), object.getName());
+    }
+
+  }
+
+  private final class TableCompareConflictFieldUpdater implements FieldUpdater<ConflictDto, String> {
+
+    @Override
+    public void update(int index, ConflictDto object, String value) {
+      tableTabs.addAndSelect(new TableCompareVariablePanel(object.getVariable()), object.getVariable().getName());
+    }
+
+  }
 
   @UiTemplate("ComparedDatasourcesReportStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ComparedDatasourcesReportStepView> {

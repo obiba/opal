@@ -15,6 +15,7 @@ import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IndexedPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -53,6 +54,18 @@ public class PropertiesTable extends FlowPanel {
     } else {
       throw new IllegalArgumentException("PropertiesGrid expects child widgets being IndexedPanels");
     }
+  }
+
+  public void addProperty(String key, String value) {
+    addProperty(new Label(key), new Label(value));
+  }
+
+  public void addProperty(String key, String value, int column) {
+    addProperty(new Label(key), new Label(value), column);
+  }
+
+  public void addProperty(String key, String value, int column, int span) {
+    addProperty(new Label(key), new Label(value), column, span);
   }
 
   public void addProperty(Widget key, Widget value) {

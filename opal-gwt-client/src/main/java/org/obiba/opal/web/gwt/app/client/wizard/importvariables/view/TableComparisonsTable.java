@@ -134,12 +134,16 @@ public abstract class TableComparisonsTable extends Table<TableComparison> {
       public Boolean getValue() {
         if(getTableComparisons().size() == 0) return false;
         boolean allSelected = true;
+        boolean hasSelectable = false;
         for(TableComparison tc : getTableComparisons()) {
-          if(tc.isSelectable() && getSelectionModel().isSelected(tc) == false) {
-            return false;
+          if(tc.isSelectable()) {
+            hasSelectable = true;
+            if(getSelectionModel().isSelected(tc) == false) {
+              return false;
+            }
           }
         }
-        return allSelected;
+        return hasSelectable == false ? false : allSelected;
       }
     };
     checkHeader.setUpdater(new ValueUpdater<Boolean>() {

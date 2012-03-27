@@ -158,6 +158,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Entity Type")
   String entityTypeLabel();
 
+  @Description("Referenced Entity type label")
+  @DefaultStringValue("Referenced Entity Type")
+  String referencedEntityTypeLabel();
+
   @Description("Entity type column label")
   @DefaultStringValue("Entity Type column")
   String entityTypeColumnLabel();
@@ -328,9 +332,17 @@ public interface Translations extends Constants {
   @DefaultStringValue("Categories")
   String categoriesLabel();
 
+  @Description("No Categories label")
+  @DefaultStringValue("No Categories")
+  String noCategoriesLabel();
+
   @Description("Attributes label")
   @DefaultStringValue("Attributes")
   String attributesLabel();
+
+  @Description("No Attributes label")
+  @DefaultStringValue("No Attributes")
+  String noAttributesLabel();
 
   @Description("Language label")
   @DefaultStringValue("Language")
