@@ -665,10 +665,10 @@ td.row-actions span {
 
 .topbar > .gwt-Label {
   color:#FFFFFF;
-display:inline;
-font-size:1.5em;
-font-weight:bold;
-margin-left:0.8em;
+  display:inline;
+  font-size:1.5em;
+  font-weight:bold;
+  margin-left:0.8em;
 }
 
 .topbar a:hover {
@@ -688,6 +688,7 @@ margin-left:0.8em;
 .topbar span {
   padding-right: 0.8em;
   border-right: dotted 1px;
+  line-height: 18px;
 }
 
 
