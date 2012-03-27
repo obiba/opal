@@ -1,23 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.List;
-
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
@@ -27,6 +19,13 @@ import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display> {
 
@@ -37,7 +36,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private ValueSequencePopupPresenter valueSequencePopupPresenter;
 
   @Inject
-  public ValuesTablePresenter(Display display, final EventBus eventBus, ValueSequencePopupPresenter valueSequencePopupPresenter) {
+  public ValuesTablePresenter(Display display, final EventBus eventBus,
+      ValueSequencePopupPresenter valueSequencePopupPresenter) {
     super(eventBus, display);
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
   }
@@ -51,7 +51,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     this.table = table;
 
     getView().setTable(table);
-    JsArray<VariableDto> variables = JsArray.createArray().<JsArray<VariableDto>> cast();
+    JsArray<VariableDto> variables = JsArray.createArray().<JsArray<VariableDto>>cast();
     variables.push(variable);
     getView().setVariables(variables);
   }
@@ -103,7 +103,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
       if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        JsArray<VariableDto> variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
+        JsArray<VariableDto> variables = (resource != null) ? resource : JsArray.createArray()
+            .<JsArray<VariableDto>>cast();
         getView().setVariables(variables);
       }
     }
@@ -143,14 +144,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       if(table.getVariableCount() > variables.size()) {
         link.append("&select=");
         StringBuilder script = new StringBuilder();
-        script.append("name().matches('");
+        script.append("name().matches(/");
         for(int i = 0; i < variables.size(); i++) {
           if(i > 0) {
             script.append("|");
           }
-          script.append("^").append(variables.get(i).getName()).append("$");
+          script.append("^").append(escape(variables.get(i).getName())).append("$");
         }
-        script.append("')");
+        script.append("/)");
         link.append(URL.encodePathSegment(script.toString()));
       }
       doRequest(offset, link.toString());
@@ -166,17 +167,22 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       doRequest(offset, link.toString());
     }
 
+    private String escape(String filter) {
+      return filter.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
+    }
+
     private void doRequest(int offset, String link) {
       if(valuesRequest != null) {
         valuesRequest.cancel();
         valuesRequest = null;
       }
-      valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get()//
-      .withCallback(new ValueSetsResourceCallback(offset, table)).send();
+      valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link).get()//
+          .withCallback(new ValueSetsResourceCallback(offset, table)).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
-      return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=").append(limit);
+      return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=")
+          .append(limit);
     }
 
     @Override
@@ -202,8 +208,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         variablesRequest.cancel();
         variablesRequest = null;
       }
-      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get()//
-      .withCallback(new VariablesResourceCallback(table)).send();
+      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
+          .withCallback(new VariablesResourceCallback(table)).send();
     }
   }
 

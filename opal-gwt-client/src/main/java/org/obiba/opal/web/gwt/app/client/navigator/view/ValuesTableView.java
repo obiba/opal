@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -11,21 +11,6 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.AbstractList;
 import java.util.List;
-
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
@@ -56,6 +41,20 @@ import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.gwtplatform.mvp.client.ViewImpl;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Display {
 
@@ -138,7 +137,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
       @Override
       public void onClick(ClickEvent event) {
-        if(lastFilter.equals(filter.getText()) == false || maxVisibleColumns != visibleColumns.getNumberValue().intValue()) {
+        if(lastFilter.equals(filter.getText()) == false || maxVisibleColumns != visibleColumns.getNumberValue()
+            .intValue()) {
           // variables list has changed so update all
           lastFilter = filter.getText();
           maxVisibleColumns = visibleColumns.getNumberValue().intValue();
@@ -204,7 +204,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getText().isEmpty()) {
-      lastFilter = "^" + listVariable.get(0).getName() + "$";
+      lastFilter = "^" + escape(listVariable.get(0).getName()) + "$";
       filter.setValue(lastFilter, false);
     }
 
@@ -215,6 +215,10 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     valuesTable.setPageSize(pageSize.getNumberValue().intValue());
     dataProvider = new ValueSetsDataProvider();
     dataProvider.addDataDisplay(valuesTable);
+  }
+
+  private String escape(String filter) {
+    return filter.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
   }
 
   @Override
@@ -427,7 +431,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(2);
         int idx = firstVisibleIndex++ + getMaxVisibleColumns();
-        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
+        valuesTable
+            .insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
       }
       valuesTable.redrawHeaders();
     }
