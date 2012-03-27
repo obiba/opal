@@ -174,7 +174,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
       this.formatStepPresenter = xmlFormatStepPresenter;
       getView().setFormatStepDisplay(xmlFormatStepPresenter.getDisplay());
-    } else if(getView().getImportFormat().equals(ImportFormat.LIMESURVEY)) {
+    } else if(getView().getImportFormat() == ImportFormat.LIMESURVEY) {
       this.formatStepPresenter = limesurveyStepPresenter;
       getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
     } else {
@@ -204,9 +204,21 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         .withCallback(201, callback).withCallback(400, callback).withCallback(500, callback).send();
   }
 
-  //TODO implements
+  //TODO refactor with createImportCommandOptionsDto(String selectedFile)
   private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
     ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
+    dto.setDestination(importData.getDestinationDatasourceName());
+    if(importData.isIdentifierSharedWithUnit()) {
+      dto.setUnit(importData.getUnit());
+      dto.setForce(false);
+    } else {
+      dto.setForce(true);
+    }
+    JsArrayString selectedTables = JavaScriptObject.createArray().cast();
+    for(String tableName : comparedDatasourcesReportPresenter.getSelectedTables()) {
+      selectedTables.push(importData.getTransientDatasourceName() + "." + tableName);
+    }
+    dto.setTablesArray(selectedTables);
     return dto;
   }
 
