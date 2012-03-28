@@ -80,6 +80,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
      * @param newWidget the {@link Widget} to show
      * @param animate true to animate, false to switch instantly
      */
+    @SuppressWarnings("PMD.NcssMethodCount")
     public void showWidget(Widget oldWidget, Widget newWidget, boolean animate) {
       isAnimationRunning = true;
       // Immediately complete previous animation
