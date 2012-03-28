@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -35,12 +36,40 @@ public class BreadCrumbTabLayout extends AbstractTabLayout {
 
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
-        int idx = event.getSelectedItem().intValue();
+        final int idx = event.getSelectedItem().intValue();
+        if(isAnimationEnabled()) {
+          // wait for the end of the animation before removing descendants
+          Timer t = new Timer() {
+            @Override
+            public void run() {
+              if(isAnimationRunning() == false) {
+                removeDescendants(idx);
+                cancel();
+              }
+            }
+          };
+          t.scheduleRepeating(10);
+        } else {
+          removeDescendants(idx);
+        }
+      }
+
+      private void removeDescendants(int idx) {
         while(getWidgetCount() > idx + 1) {
           remove(getWidgetCount() - 1);
         }
       }
     });
+
+    setAnimationEnabled(true);
+  }
+
+  public void setAnimationEnabled(boolean enable) {
+    super.setAnimationEnabled(enable);
+  }
+
+  public boolean isAnimationEnabled() {
+    return super.isAnimationEnabled();
   }
 
   @Override

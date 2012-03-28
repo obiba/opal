@@ -21,7 +21,6 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiChild;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IndexedPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,7 +32,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   private final UList menu;
 
-  private final DeckPanel contentContainer;
+  private final TabDeckPanel contentContainer;
 
   // private final List<Widget> tabContents = Lists.newLinkedList();
 
@@ -45,7 +44,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     menu.addStyleName(menuStyleName);
     menu.addStyleName("tabz");
     super.add(menu);
-    super.add(contentContainer = new DeckPanel());
+    super.add(contentContainer = new TabDeckPanel());
     contentContainer.addStyleName("content");
   }
 
@@ -62,12 +61,16 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
     }
   }
 
-  public void setAnimationEnabled(boolean enable) {
+  protected void setAnimationEnabled(boolean enable) {
     contentContainer.setAnimationEnabled(enable);
   }
 
-  public boolean isAnimationEnabled() {
+  protected boolean isAnimationEnabled() {
     return contentContainer.isAnimationEnabled();
+  }
+
+  protected boolean isAnimationRunning() {
+    return contentContainer.isAnimationRunning();
   }
 
   @Override
