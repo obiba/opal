@@ -14,6 +14,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,6 +33,9 @@ public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresen
 
   @UiField
   TextBox tablePrefix;
+
+  @UiField
+  HTMLPanel help;
 
   @UiTemplate("LimesurveyStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, LimesurveyStepView> {
@@ -69,6 +73,7 @@ public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresen
 
   @Override
   public Widget getStepHelp() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    help.removeFromParent();
+    return help;
   }
 }

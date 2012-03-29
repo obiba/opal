@@ -1,68 +1,122 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.wizard.importdata.view"  
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.wizard.importdata.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
   <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="45em">
     <g:caption>
       <ui:msg description="Data import title">Import Data</ui:msg>
     </g:caption>
-       
+
     <g:FlowPanel>
       <o:WizardStep ui:field="formatSelectionStep">
         <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Data format label">Data Format</ui:msg></g:Label>
+          <g:Label addStyleNames="key">
+            <ui:msg description="Data format label">Data Format</ui:msg>
+          </g:Label>
           <g:ListBox ui:field='formatListBox' visibleItemCount='1'/>
         </g:FlowPanel>
       </o:WizardStep>
-    
+
       <o:WizardStep ui:field="formatStep"/>
-      
+
       <o:WizardStep ui:field="destinationSelectionStep"/>
-      
+
       <o:WizardStep ui:field="unitSelectionStep"/>
-      
+
       <o:WizardStep ui:field="comparedDatasourcesReportStep">
-      	<g:SimplePanel ui:field="comparedDatasourcesReportPanel"></g:SimplePanel>
+        <g:SimplePanel ui:field="comparedDatasourcesReportPanel"></g:SimplePanel>
         <w:ValidationReportStepView ui:field="validationReportPanel" visible="false"/>
       </o:WizardStep>
-      
+
       <o:WizardStep ui:field="valuesStep"/>
-      
+
       <o:WizardStep ui:field="archiveStep"/>
-            
+
       <g:HTMLPanel ui:field="formatSelectionHelp">
-        <p><ui:msg description="Number of formats information">There are two data file formats currently supported:</ui:msg></p>    
+        <p>
+          <ui:msg description="Number of formats information">There are three formats currently supported:
+          </ui:msg>
+        </p>
         <ul>
-          <li><ui:msg description="CSV format information">CSV: first column contain the participant identifiers and variables are identified by subsequent column names. The variable dictionary can be specified in a later step.</ui:msg></li>
-          <li><ui:msg description="Opal XML information">Opal XML: usually this format is used by Onyx when exporting data. Comes with its own variable dictionary.</ui:msg></li>
+          <li>
+            <p>
+              <ui:msg description="CSV format information">CSV: first column contain the participant identifiers and
+                variables are identified by subsequent column names. The variable dictionary can be specified in a later
+                step.
+              </ui:msg>
+            </p>
+          </li>
+          <li>
+            <p>
+              <ui:msg description="Opal XML information">Opal XML: usually this format is used by Onyx when exporting
+                data. Comes with its own variable dictionary.
+              </ui:msg>
+            </p>
+          </li>
+          <li>
+            <p>
+              <ui:msg description="LimeSurvey Information">LimeSurvey: import variable dictionaries and data from a
+                LimeSurvey database.
+              </ui:msg>
+            </p>
+          </li>
         </ul>
       </g:HTMLPanel>
-      
+
       <g:HTMLPanel ui:field="destinationSelectionHelp">
-        <g:Label addStyleNames="title"><ui:msg description="Destination label">Destination</ui:msg></g:Label>
-        <p><ui:msg description="Destination information">Select the destination. This is where the data from your file will be written to.<p/>Opal will validate that the variables in the source are compatible with the ones in the destination before starting the process.</ui:msg></p>    
+        <g:Label addStyleNames="title">
+          <ui:msg description="Destination label">Destination</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Destination information">Select the destination. This is where the data from your file
+            will be written to.<p/>Opal will validate that the variables in the source are compatible with the ones in
+            the destination before starting the process.
+          </ui:msg>
+        </p>
       </g:HTMLPanel>
-      
+
       <g:HTMLPanel ui:field="unitSelectionHelp">
-        <g:Label addStyleNames="title"><ui:msg description="Participant Identifier label">Participant Identifier</ui:msg></g:Label>
-        <p><ui:msg description="Unique identifier information">The unique identifiers in the imported file(s) can</ui:msg></p>
+        <g:Label addStyleNames="title">
+          <ui:msg description="Participant Identifier label">Participant Identifier</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Unique identifier information">The unique identifiers in the imported file(s) can
+          </ui:msg>
+        </p>
         <ul>
-          <li><ui:msg description="CSV format information">be used exactly as they appear in the files and directly written to the destination.</ui:msg></li>
-          <li><ui:msg description="Opal XML information">be stored in a different place than the data found in the file(s). These identifiers are then substituted with identifiers that are known only by your organisation.<p/>This is usually done so that two organisations (units) may share data about participants without disclosing internal identifiers to one-another. Opal can effectively maintain any number of identifier per participant.</ui:msg></li>
+          <li>
+            <ui:msg description="CSV format information">be used exactly as they appear in the files and directly
+              written to the destination.
+            </ui:msg>
+          </li>
+          <li>
+            <ui:msg description="Opal XML information">be stored in a different place than the data found in the
+              file(s). These identifiers are then substituted with identifiers that are known only by your organisation.
+              <p/>This is usually done so that two organisations (units) may share data about participants without
+              disclosing internal identifiers to one-another. Opal can effectively maintain any number of identifier per
+              participant.
+            </ui:msg>
+          </li>
         </ul>
       </g:HTMLPanel>
-      
+
       <g:HTMLPanel ui:field="archiveHelp">
-        <g:Label addStyleNames="title"><ui:msg description="Archive label">Archive</ui:msg></g:Label>
-        <p><ui:msg description="Select archive directory information">If you wish, you can select a directory on the server side where the data file will be stored once successfully imported.</ui:msg></p>
+        <g:Label addStyleNames="title">
+          <ui:msg description="Archive label">Archive</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Select archive directory information">If you wish, you can select a directory on the
+            server side where the data file will be stored once successfully imported.
+          </ui:msg>
+        </p>
       </g:HTMLPanel>
-        
-    </g:FlowPanel> 
-    
+
+    </g:FlowPanel>
+
   </o:WizardDialogBox>
-  
+
 </ui:UiBinder>

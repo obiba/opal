@@ -4,6 +4,24 @@
              ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
              ui:generateLocales="default">
   <g:FlowPanel>
+
+    <g:HTMLPanel ui:field="help">
+      <g:Label addStyleNames="title">
+        <ui:msg description="Database label">Database</ui:msg>
+      </g:Label>
+      <p>
+        <ui:msg description="Database information">Select the database you want to import from
+        </ui:msg>
+      </p>
+      <g:Label addStyleNames="title">
+        <ui:msg description="Table prefix label">Table prefix</ui:msg>
+      </g:Label>
+      <p>
+        <ui:msg description="Table prefix information">Table prefix used in LimeSurvey (optional)
+        </ui:msg>
+      </p>
+    </g:HTMLPanel>
+
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
         <ui:msg description="Database label">Database</ui:msg>

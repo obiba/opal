@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -20,7 +20,7 @@ import com.google.gwt.i18n.client.LocalizableResource.GenerateKeys;
  * in the {@code com.google.gwt.i18n.client} package.
  */
 @GenerateKeys
-@Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = { "default" })
+@Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = {"default"})
 public interface Translations extends Constants {
 
   @Description("Error dialog title")
@@ -76,12 +76,12 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
-  "IN_PROGRESS", "In Progress", //
-  "SUCCEEDED", "Succeeded", //
-  "FAILED", "Failed", //
-  "CANCEL_PENDING", "Cancel Pending", //
-  "CANCELED", "Cancelled" //
+  @DefaultStringMapValue({"NOT_STARTED", "Not Started", //
+      "IN_PROGRESS", "In Progress", //
+      "SUCCEEDED", "Succeeded", //
+      "FAILED", "Failed", //
+      "CANCEL_PENDING", "Cancel Pending", //
+      "CANCELED", "Cancelled" //
   })
   Map<String, String> statusMap();
 
@@ -90,39 +90,39 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue({ "Log", "Log", //
-  "Cancel", "Cancel", //
-  "Delete", "Delete", //
-  "Edit", "Edit", //
-  "Copy", "Copy", //
-  "Test", "Test", //
-  "Download", "Download", //
-  "DownloadCertificate", "Download Certificate" })
+  @DefaultStringMapValue({"Log", "Log", //
+      "Cancel", "Cancel", //
+      "Delete", "Delete", //
+      "Edit", "Edit", //
+      "Copy", "Copy", //
+      "Test", "Test", //
+      "Download", "Download", //
+      "DownloadCertificate", "Download Certificate"})
   Map<String, String> actionMap();
 
   @Description("Permission map")
-  @DefaultStringMapValue({ "Use", "Use", //
-  "Administrate", "Administrate", //
-  "View", "View", //
-  "Summary", "Summary" })
+  @DefaultStringMapValue({"Use", "Use", //
+      "Administrate", "Administrate", //
+      "View", "View", //
+      "Summary", "Summary"})
   Map<String, String> permissionMap();
 
   @Description("Permission explanation map")
   @DefaultStringMapValue({ //
-  "datasource", "Specify the access rights to the datasource and its content.", //
-  "table", "Specify the access rights to the table and its content. Induces the visibility of the parent datasource.", //
-  "variable", "Specify the access rights to the variable. Induces the visibility of the parent table and datasource.", //
-  "datashield", "Specify the access rights to the DataShield services.",//
-  "r", "Specify the access rights to the R services."//
+      "datasource", "Specify the access rights to the datasource and its content.", //
+      "table", "Specify the access rights to the table and its content. Induces the visibility of the parent datasource.", //
+      "variable", "Specify the access rights to the variable. Induces the visibility of the parent table and datasource.", //
+      "datashield", "Specify the access rights to the DataShield services.",//
+      "r", "Specify the access rights to the R services."//
   })
   Map<String, String> permissionExplanationMap();
 
   @Description("Table Comparison Result map")
-  @DefaultStringMapValue({ "CREATION", "Table to be created", //
-  "MODIFICATION", "Table to be modified", //
-  "CONFLICT", "Conflicting table modifications", //
-  "SAME", "No table modifications", //
-  "FORBIDDEN", "Table modifications not permitted" //
+  @DefaultStringMapValue({"CREATION", "Table to be created", //
+      "MODIFICATION", "Table to be modified", //
+      "CONFLICT", "Conflicting table modifications", //
+      "SAME", "No table modifications", //
+      "FORBIDDEN", "Table modifications not permitted" //
   })
   Map<String, String> comparisonResultMap();
 
@@ -192,123 +192,123 @@ public interface Translations extends Constants {
 
   @Description("User message map")
   @DefaultStringMapValue({ //
-  "VariableNameNotUnique", "The specified variable name already exists.", //
-  "CategoryDialogNameRequired", "A category name is required.", //
-  "CategoryNameAlreadyExists", "The specified category name already exists.", //
-  "AttributeNameRequired", "An attribute name is required.", //
-  "AttributeNameAlreadyExists", "The specified attribute name already exists.", //
-  "AttributeValueRequired", "Provide a value for the attribute (either localised, or not localised).", //
-  "CategoryLabelRequired", "Provide a label for the this category.", //
-  "jobCancelled", "Job cancelled.", //
-  "jobDeleted", "Job deleted.", //
-  "completedJobsDeleted", "All completed jobs deleted.", //
-  "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", //
-  "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", //
-  "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", //
-  "DeleteCommand_NotFound", "Job could not be deleted (not found).", //
-  "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.", //
-  "cannotCreateFolderPathAlreadyExist", "Could not create the folder, a folder or a file exist with that name at the specified path.", //
-  "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.", //
-  "cannotCreatefolderUnexpectedError", "There was an unexpected error while creating the folder.", //
-  "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", //
-  "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", //
-  "couldNotDeleteFileError", "There was an error while deleting the file or folder.", //
-  "datasourceMustBeSelected", "You must select a datasource.", //
-  "fileReadError", "The file could not be read.", //
-  "ViewNameRequired", "You must provide a name for the view.", //
-  "ViewAlreadyExists", "A view with the same name already exists.", //
-  "TableSelectionRequired", "You must select at least one table.", //
-  "TableEntityTypesDoNotMatch", "The selected tables must all have the same entity type.", //
-  "VariableDefinitionMethodRequired", "You must indicate how the view's variables are to be defined.", //
-  "DatasourceNameRequired", "You must provide a name for the datasource.", //
-  "DatasourceAlreadyExistsWithThisName", "A datasource already exists with this name.", //
-  "ExcelFileRequired", "An Excel file is required.", "ExcelFileSuffixInvalid", //
-  "Invalid Excel file suffix: .xls or .xlsx are expected.", //
-  "ViewMustBeAttachedToExistingOrNewDatasource", "The view must be attached to either an existing datasource or a new one.", //
-  "DuplicateDatasourceName", "The datasource name is already in use. Please choose another.", //
-  "UnknownError", "An unknown error has occurred.", //
-  "InternalError", "An internal error has occurred. Please contact technical support.", //
-  "DatasourceNameDisallowedChars", "Datasource names cannot contain colon or period characters.", //
-  "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
-  "CSVFileRequired", "A CSV file is required.", //
-  "XMLFileRequired", "An XML file is required.", //
-  "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
-  "ZipFileRequired", "A Zip file is required.", //
-  "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
-  "ReportTemplateWasNotFound", "The specified report template could not be found.",//
-  "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list.",//
-  "ReportTemplateAlreadyExistForTheSpecifiedName", "A report template already exist with the specified name.",//
-  "BirtReportDesignFileIsRequired", "A BIRT Design File must be selected.",//
-  "CronExpressionIsRequired", "A schedule expression must be specified.",//
-  "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",//
-  "ReportTemplateNameIsRequired", "A name is required for the report template.",//
-  "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables.",//
-  "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
-  "ScriptIsRequired", "A script is required.",//
-  "CopyFromVariableNameIsRequired", "You must enter the name of a variable from which the new variable will be created from.",//
-  "cannotSwitchTabBecauseOfUnsavedChanges", "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
-  "UrlRequired", "You must provide the database's URL.",//
-  "UsernameRequired", "You must indicate the user name to be used for the database connection.",//
-  "PasswordRequired", "You must indicate the password to be used for the database connection.", //
-  "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables", "You must indicate whether meta-data tables are to be used or not.",//
-  "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",//
-  "SpecificCharsetNotIndicated", "You have selected to use a specific character set but have not indicated which one.",//
-  "NoDataFileSelected", "You must select a data file.",//
-  "NoDataToCopy", "No data to copy to the current destination.",//
-  "NoFileSelected", "You must select a file.",//
-  "CharsetNotAvailable", "The character set you have specified is not available.",//
-  "FieldSeparatorRequired", "The field separator is required.",//
-  "QuoteSeparatorRequired", "The quote separator is required.",//
-  "NotIgnoredConlicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
-  "NoVariablesToBeImported", "No variables are to be imported.",//
-  "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//
-  "FunctionalUnitNameIsRequired", "Unit name is required.",//
-  "DuplicateFunctionalUnitNames", "Duplicate Unit names.",//
-  "KeyPairAliasIsRequired", "Alias is required",//
-  "KeyPairAlgorithmIsRequired", "Algorithm is required.",//
-  "KeyPairKeySizeIsRequired", "Size is required.",//
-  "KeyPairPrivateKeyPEMIsRequired", "Private Key in PEM format is required.", //
-  "KeyPairFirstAndLastNameIsRequired", "First and Last Name is required.",//
-  "KeyPairOrganizationalUnitIsRequired", "Organizational Unit is required.",//
-  "KeyPairOrganizationNameIsRequired", "Organization Name is required.",//
-  "KeyPairCityNameIsRequired", "City or Locality Name is required.",//
-  "KeyPairStateNameIsRequired", "State or Province Name is required.",//
-  "KeyPairCountryCodeIsRequired", "Country Code is required.",//
-  "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
-  "DestinationFileIsMissing", "Destination File is required.", //
-  "ExportDataMissingTables", "At least one table is required.",//
-  "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
-  "NoIdentifiersGenerated", "No Identifiers generated.",//
-  "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
-  "IdentifiersGenerationPending", "An Identifiers generation task is currently running.",//
-  "MappedUnitsCannotBeIdentified", "Units to be mapped cannot be identified.",//
-  "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",//
-  "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
-  "DataShieldMethodNameIsRequired", "A name is required.",//
-  "DataShieldRScriptIsRequired", "A R script is required.",//
-  "DataShieldRFunctionIsRequired", "A R function is required.",//
-  "RIsAlive", "R server is alive.",//
-  "RConnectionFailed", "Connection with R server failed.", //
-  "UnauthorizedOperation", "You are not allowed to perform this operation.",//
-  "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
-  "DatesRangeInvalid", "The range of dates is invalid.",//
-  "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
-  "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
-  "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
-  "DestinationTableRequired", "The destination table is required.",//
-  "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",//
-  "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
-  "DestinationTableCannotBeView", "The destination table cannot be a view.",//
-  "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
-  "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}",//
-  "DatabaseAlreadyExists", "A database with this name already exists.",//
-  "DatabaseConnectionOk", "Connection successful.",//
-  "DatabaseConnectionFailed", "Failed to connect: {0}.",//
-  "NameIsRequired", "A name is required.",//
-  "DriverIsRequired", "A driver is required.",//
-  "UrlIsRequired", "A url is required.",//
-  "UsernameIsRequired", "A username is required.",//
-  "TableSelectionIsRequired", "At least one table must be selected."//
+      "VariableNameNotUnique", "The specified variable name already exists.", //
+      "CategoryDialogNameRequired", "A category name is required.", //
+      "CategoryNameAlreadyExists", "The specified category name already exists.", //
+      "AttributeNameRequired", "An attribute name is required.", //
+      "AttributeNameAlreadyExists", "The specified attribute name already exists.", //
+      "AttributeValueRequired", "Provide a value for the attribute (either localised, or not localised).", //
+      "CategoryLabelRequired", "Provide a label for the this category.", //
+      "jobCancelled", "Job cancelled.", //
+      "jobDeleted", "Job deleted.", //
+      "completedJobsDeleted", "All completed jobs deleted.", //
+      "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", //
+      "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", //
+      "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", //
+      "DeleteCommand_NotFound", "Job could not be deleted (not found).", //
+      "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.", //
+      "cannotCreateFolderPathAlreadyExist", "Could not create the folder, a folder or a file exist with that name at the specified path.", //
+      "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.", //
+      "cannotCreatefolderUnexpectedError", "There was an unexpected error while creating the folder.", //
+      "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", //
+      "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", //
+      "couldNotDeleteFileError", "There was an error while deleting the file or folder.", //
+      "datasourceMustBeSelected", "You must select a datasource.", //
+      "fileReadError", "The file could not be read.", //
+      "ViewNameRequired", "You must provide a name for the view.", //
+      "ViewAlreadyExists", "A view with the same name already exists.", //
+      "TableSelectionRequired", "You must select at least one table.", //
+      "TableEntityTypesDoNotMatch", "The selected tables must all have the same entity type.", //
+      "VariableDefinitionMethodRequired", "You must indicate how the view's variables are to be defined.", //
+      "DatasourceNameRequired", "You must provide a name for the datasource.", //
+      "DatasourceAlreadyExistsWithThisName", "A datasource already exists with this name.", //
+      "ExcelFileRequired", "An Excel file is required.", "ExcelFileSuffixInvalid", //
+      "Invalid Excel file suffix: .xls or .xlsx are expected.", //
+      "ViewMustBeAttachedToExistingOrNewDatasource", "The view must be attached to either an existing datasource or a new one.", //
+      "DuplicateDatasourceName", "The datasource name is already in use. Please choose another.", //
+      "UnknownError", "An unknown error has occurred.", //
+      "InternalError", "An internal error has occurred. Please contact technical support.", //
+      "DatasourceNameDisallowedChars", "Datasource names cannot contain colon or period characters.", //
+      "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
+      "CSVFileRequired", "A CSV file is required.", //
+      "XMLFileRequired", "An XML file is required.", //
+      "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
+      "ZipFileRequired", "A Zip file is required.", //
+      "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
+      "ReportTemplateWasNotFound", "The specified report template could not be found.",//
+      "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list.",//
+      "ReportTemplateAlreadyExistForTheSpecifiedName", "A report template already exist with the specified name.",//
+      "BirtReportDesignFileIsRequired", "A BIRT Design File must be selected.",//
+      "CronExpressionIsRequired", "A schedule expression must be specified.",//
+      "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",//
+      "ReportTemplateNameIsRequired", "A name is required for the report template.",//
+      "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables.",//
+      "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
+      "ScriptIsRequired", "A script is required.",//
+      "CopyFromVariableNameIsRequired", "You must enter the name of a variable from which the new variable will be created from.",//
+      "cannotSwitchTabBecauseOfUnsavedChanges", "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
+      "UrlRequired", "You must provide the database's URL.",//
+      "UsernameRequired", "You must indicate the user name to be used for the database connection.",//
+      "PasswordRequired", "You must indicate the password to be used for the database connection.", //
+      "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables", "You must indicate whether meta-data tables are to be used or not.",//
+      "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",//
+      "SpecificCharsetNotIndicated", "You have selected to use a specific character set but have not indicated which one.",//
+      "NoDataFileSelected", "You must select a data file.",//
+      "NoDataToCopy", "No data to copy to the current destination.",//
+      "NoFileSelected", "You must select a file.",//
+      "CharsetNotAvailable", "The character set you have specified is not available.",//
+      "FieldSeparatorRequired", "The field separator is required.",//
+      "QuoteSeparatorRequired", "The quote separator is required.",//
+      "NotIgnoredConlicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
+      "NoVariablesToBeImported", "No variables are to be imported.",//
+      "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//
+      "FunctionalUnitNameIsRequired", "Unit name is required.",//
+      "DuplicateFunctionalUnitNames", "Duplicate Unit names.",//
+      "KeyPairAliasIsRequired", "Alias is required",//
+      "KeyPairAlgorithmIsRequired", "Algorithm is required.",//
+      "KeyPairKeySizeIsRequired", "Size is required.",//
+      "KeyPairPrivateKeyPEMIsRequired", "Private Key in PEM format is required.", //
+      "KeyPairFirstAndLastNameIsRequired", "First and Last Name is required.",//
+      "KeyPairOrganizationalUnitIsRequired", "Organizational Unit is required.",//
+      "KeyPairOrganizationNameIsRequired", "Organization Name is required.",//
+      "KeyPairCityNameIsRequired", "City or Locality Name is required.",//
+      "KeyPairStateNameIsRequired", "State or Province Name is required.",//
+      "KeyPairCountryCodeIsRequired", "Country Code is required.",//
+      "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
+      "DestinationFileIsMissing", "Destination File is required.", //
+      "ExportDataMissingTables", "At least one table is required.",//
+      "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
+      "NoIdentifiersGenerated", "No Identifiers generated.",//
+      "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
+      "IdentifiersGenerationPending", "An Identifiers generation task is currently running.",//
+      "MappedUnitsCannotBeIdentified", "Units to be mapped cannot be identified.",//
+      "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",//
+      "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
+      "DataShieldMethodNameIsRequired", "A name is required.",//
+      "DataShieldRScriptIsRequired", "A R script is required.",//
+      "DataShieldRFunctionIsRequired", "A R function is required.",//
+      "RIsAlive", "R server is alive.",//
+      "RConnectionFailed", "Connection with R server failed.", //
+      "UnauthorizedOperation", "You are not allowed to perform this operation.",//
+      "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
+      "DatesRangeInvalid", "The range of dates is invalid.",//
+      "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
+      "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
+      "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
+      "DestinationTableRequired", "The destination table is required.",//
+      "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",//
+      "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
+      "DestinationTableCannotBeView", "The destination table cannot be a view.",//
+      "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
+      "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}",//
+      "DatabaseAlreadyExists", "A database with this name already exists.",//
+      "DatabaseConnectionOk", "Connection successful.",//
+      "DatabaseConnectionFailed", "Failed to connect: {0}.",//
+      "NameIsRequired", "A name is required.",//
+      "DriverIsRequired", "A driver is required.",//
+      "UrlIsRequired", "A url is required.",//
+      "UsernameIsRequired", "A username is required.",//
+      "TableSelectionIsRequired", "At least one table must be selected."//
   })
   Map<String, String> userMessageMap();
 
@@ -406,48 +406,48 @@ public interface Translations extends Constants {
 
   @Description("Confirmation title map")
   @DefaultStringMapValue({ //
-  "deleteVariableTitle", "Delete Variable", //
-  "deleteTable", "Delete Table", //
-  "clearJobsList", "Clear Jobs List", //
-  "cancelJob", "Cancel Job", //
-  "replaceExistingFile", "Replace File", //
-  "deleteFile", "Delete File", //
-  "deleteKeyPair", "Delete Key Pair", //
-  "removeDatasource", "Remove Datasource",//
-  "removeReportTemplate", "Remove Report Template",//
-  "removeFunctionalUnit", "Remove Unit",//
-  "generateFunctionalUnitIdentifiers", "Generate Unit Identifiers",//
-  "deleteCategory", "Delete Category",//
-  "deleteAttribute", "Delete Attribute",//
-  "overwriteVariable", "Overwrite Variable",//
-  "createView", "Create View",//
-  "removeView", "Remove View",//
-  "removeTable", "Remove Table",//
-  "deleteDataShieldMethod", "Delete Aggregating Method",//
-  "deleteDatabase", "Delete Database" })
+      "deleteVariableTitle", "Delete Variable", //
+      "deleteTable", "Delete Table", //
+      "clearJobsList", "Clear Jobs List", //
+      "cancelJob", "Cancel Job", //
+      "replaceExistingFile", "Replace File", //
+      "deleteFile", "Delete File", //
+      "deleteKeyPair", "Delete Key Pair", //
+      "removeDatasource", "Remove Datasource",//
+      "removeReportTemplate", "Remove Report Template",//
+      "removeFunctionalUnit", "Remove Unit",//
+      "generateFunctionalUnitIdentifiers", "Generate Unit Identifiers",//
+      "deleteCategory", "Delete Category",//
+      "deleteAttribute", "Delete Attribute",//
+      "overwriteVariable", "Overwrite Variable",//
+      "createView", "Create View",//
+      "removeView", "Remove View",//
+      "removeTable", "Remove Table",//
+      "deleteDataShieldMethod", "Delete Aggregating Method",//
+      "deleteDatabase", "Delete Database"})
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
   @DefaultStringMapValue({ //
-  "confirmVariableDelete", "Delete the currently displayed variable?", //
-  "removingTablesFromViewMayAffectVariables", "Removing tables from the view will have an impact on which Variables can be defined.", //
-  "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
-  "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", //
-  "confirmReplaceExistingFile", "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.", //
-  "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //
-  "confirmDeleteKeyPair", "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore",//
-  "confirmRemoveDatasource", "Please confirm that you want to remove the current datasource from Opal configuration (datasource content will not be affected).",//
-  "confirmDeleteReportTemplate", "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",//
-  "confirmDeleteFunctionalUnit", "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",//
-  "confirmDeleteCategory", "Please confirm that you want to remove this category.",//
-  "confirmDeleteAttribute", "Please confirm that you want to remove this attribute.",//
-  "confirmOverwriteVariable", "A variable with the same name already exists. Please confirm that you want to overwrite this variable.",//
-  "confirmCreateView", "Please confirm that you want to create a new view.",//
-  "confirmRemoveView", "Please confirm that you want to remove the current view.",//
-  "confirmRemoveTable", "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",//
-  "confirmGenerateFunctionalUnitIdentifiers", "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.",//
-  "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method.",//
-  "confirmDeleteDatabase", "Please confirm that you want to remove this database." })
+      "confirmVariableDelete", "Delete the currently displayed variable?", //
+      "removingTablesFromViewMayAffectVariables", "Removing tables from the view will have an impact on which Variables can be defined.", //
+      "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
+      "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", //
+      "confirmReplaceExistingFile", "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.", //
+      "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //
+      "confirmDeleteKeyPair", "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore",//
+      "confirmRemoveDatasource", "Please confirm that you want to remove the current datasource from Opal configuration (datasource content will not be affected).",//
+      "confirmDeleteReportTemplate", "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",//
+      "confirmDeleteFunctionalUnit", "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",//
+      "confirmDeleteCategory", "Please confirm that you want to remove this category.",//
+      "confirmDeleteAttribute", "Please confirm that you want to remove this attribute.",//
+      "confirmOverwriteVariable", "A variable with the same name already exists. Please confirm that you want to overwrite this variable.",//
+      "confirmCreateView", "Please confirm that you want to create a new view.",//
+      "confirmRemoveView", "Please confirm that you want to remove the current view.",//
+      "confirmRemoveTable", "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",//
+      "confirmGenerateFunctionalUnitIdentifiers", "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.",//
+      "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method.",//
+      "confirmDeleteDatabase", "Please confirm that you want to remove this database."})
   Map<String, String> confirmationMessageMap();
 
   @Description("A name is required when creating a new folder")
@@ -619,34 +619,34 @@ public interface Translations extends Constants {
   String errorLabel();
 
   @Description("Datasource parsing error map")
-  @DefaultStringMapValue({ "CategoryNameRequired", "Category name required", //
-  "CategoryVariableNameRequired", "Category variable name required", //
-  "DuplicateCategoryName", "Duplicate category name", //
-  "DuplicateColumns", "Duplicate columns", //
-  "DuplicateVariableName", "Duplicate variable name", //
-  "TableDefinitionErrors", "Table definition errors", //
-  "UnexpectedErrorInCategory", "Unexpected error in category", //
-  "UnexpectedErrorInVariable", "Unexpected error in variable", //
-  "UnidentifiedVariableName", "Unidentified variable name", //
-  "UnknownValueType", "Unknown value type", //
-  "VariableCategoriesDefinitionErrors", "Variable categories definition errors", //
-  "VariableNameCannotContainColon", "Variable name cannot contain colon", //
-  "VariableNameRequired", "Variable name required", //
-  "CsvInitialisationError", "Error occurred initialising csv datasource", //
-  "CsvVariablesHeaderMustContainName", "The variables.csv header must contain 'name'", //
-  "CsvVariablesHeaderMustContainValueType", "The variables.csv header must contain 'valueType'.", //
-  "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.", //
-  "CsvCannotCreateWriter", "Cannot create writer", //
-  "CsvCannotSetVariableHeader", "Cannot set variables header", //
-  "CsvCannotObtainWriter", "Can not get csv writer", //
-  "CsvCannotObtainReader", "Can not get csv reader" })
+  @DefaultStringMapValue({"CategoryNameRequired", "Category name required", //
+      "CategoryVariableNameRequired", "Category variable name required", //
+      "DuplicateCategoryName", "Duplicate category name", //
+      "DuplicateColumns", "Duplicate columns", //
+      "DuplicateVariableName", "Duplicate variable name", //
+      "TableDefinitionErrors", "Table definition errors", //
+      "UnexpectedErrorInCategory", "Unexpected error in category", //
+      "UnexpectedErrorInVariable", "Unexpected error in variable", //
+      "UnidentifiedVariableName", "Unidentified variable name", //
+      "UnknownValueType", "Unknown value type", //
+      "VariableCategoriesDefinitionErrors", "Variable categories definition errors", //
+      "VariableNameCannotContainColon", "Variable name cannot contain colon", //
+      "VariableNameRequired", "Variable name required", //
+      "CsvInitialisationError", "Error occurred initialising csv datasource", //
+      "CsvVariablesHeaderMustContainName", "The variables.csv header must contain 'name'", //
+      "CsvVariablesHeaderMustContainValueType", "The variables.csv header must contain 'valueType'.", //
+      "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.", //
+      "CsvCannotCreateWriter", "Cannot create writer", //
+      "CsvCannotSetVariableHeader", "Cannot set variables header", //
+      "CsvCannotObtainWriter", "Can not get csv writer", //
+      "CsvCannotObtainReader", "Can not get csv reader"})
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value type", //
-  "IncompatibleEntityType", "Incompatible entity type", //
-  "CsvVariableMissing", "Variable name exists in csv data file, but no Variable associated with this name exists in the destination table", //
-  "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination" })
+  @DefaultStringMapValue({"IncompatibleValueType", "Incompatible value type", //
+      "IncompatibleEntityType", "Incompatible entity type", //
+      "CsvVariableMissing", "Variable name exists in csv data file, but no Variable associated with this name exists in the destination table", //
+      "VariablePresentInSourceButNotDestination", "Variable exists in source but not in destination"})
   Map<String, String> datasourceComparisonErrorMap();
 
   @Description("New variables label")
@@ -754,7 +754,8 @@ public interface Translations extends Constants {
   String copyOf();
 
   @Description("Script contains errors and was not saved")
-  @DefaultStringValue("The script contains errors and was not saved. Click 'Test' to execute the script and see a detailed report of the errors.")
+  @DefaultStringValue(
+      "The script contains errors and was not saved. Click 'Test' to execute the script and see a detailed report of the errors.")
   String scriptContainsErrorsAndWasNotSaved();
 
   @Description("Create Datasource Step summary")
@@ -862,7 +863,7 @@ public interface Translations extends Constants {
   String helpLabel();
 
   @Description("KeyType map")
-  @DefaultStringMapValue({ "KEY_PAIR", "Key Pair", "CERTIFICATE", "Certificate" })
+  @DefaultStringMapValue({"KEY_PAIR", "Key Pair", "CERTIFICATE", "Certificate"})
   Map<String, String> keyTypeMap();
 
   @Description("Paste Private Key PEM label")
@@ -914,11 +915,11 @@ public interface Translations extends Constants {
   String csvFormatOptionsStep();
 
   @Description("Datasource Type map")
-  @DefaultStringMapValue({ "hibernate", "Opal SQL", //
-  "jdbc", "Custom SQL", //
-  "fs", "XML", //
-  "csv", "CSV", //
-  "excel", "Excel" })
+  @DefaultStringMapValue({"hibernate", "Opal SQL", //
+      "jdbc", "Custom SQL", //
+      "fs", "XML", //
+      "csv", "CSV", //
+      "excel", "Excel"})
   Map<String, String> datasourceTypeMap();
 
   @Description("Data Import Format Step")
@@ -926,7 +927,7 @@ public interface Translations extends Constants {
   String dataImportFormatStep();
 
   @Description("Data Import File Step")
-  @DefaultStringValue("Select the file to be imported.")
+  @DefaultStringValue("Select the source to be imported.")
   String dataImportFileStep();
 
   @Description("Data Import Unit Step")
@@ -982,8 +983,8 @@ public interface Translations extends Constants {
   String whoLabel();
 
   @Description("Subject Type map")
-  @DefaultStringMapValue({ "USER", "User Name", //
-  "GROUP", "Group Name" })
+  @DefaultStringMapValue({"USER", "User Name", //
+      "GROUP", "Group Name"})
   Map<String, String> subjectTypeMap();
 
   @Description("Derive label")
@@ -1076,68 +1077,68 @@ public interface Translations extends Constants {
 
   @Description("Time map")
   @DefaultStringMapValue({ //
-  "Hour", "Hour", //
-  "Monday", "Monday", //
-  "Tuesday", "Tuesday", //
-  "Wednesday", "Wednesday", //
-  "Thursday", "Thursday", //
-  "Friday", "Friday", //
-  "Saturday", "Saturday", //
-  "Sunday", "Sunday", //
-  "January", "January", //
-  "February", "February", //
-  "March", "March", //
-  "April", "April", //
-  "May", "May", //
-  "June", "June", //
-  "July", "July", //
-  "August", "August", //
-  "September", "September", //
-  "October", "October", //
-  "November", "November", //
-  "December", "December", //
-  "Second", "Second", //
-  "Minute", "Minute", //
-  "Hour", "Hour", //
-  "Day", "Day", //
-  "Week", "Week", //
-  "Month", "Month", //
-  "Quarter", "Quarter", //
-  "Semester", "Semester", //
-  "Year", "Year", //
-  "Lustrum", "Lustrum", //
-  "Decade", "Decade", //
-  "Century", "Century", //
-  "Millenium", "Millenium", //
-  "Era", "Era" //
+      "Hour", "Hour", //
+      "Monday", "Monday", //
+      "Tuesday", "Tuesday", //
+      "Wednesday", "Wednesday", //
+      "Thursday", "Thursday", //
+      "Friday", "Friday", //
+      "Saturday", "Saturday", //
+      "Sunday", "Sunday", //
+      "January", "January", //
+      "February", "February", //
+      "March", "March", //
+      "April", "April", //
+      "May", "May", //
+      "June", "June", //
+      "July", "July", //
+      "August", "August", //
+      "September", "September", //
+      "October", "October", //
+      "November", "November", //
+      "December", "December", //
+      "Second", "Second", //
+      "Minute", "Minute", //
+      "Hour", "Hour", //
+      "Day", "Day", //
+      "Week", "Week", //
+      "Month", "Month", //
+      "Quarter", "Quarter", //
+      "Semester", "Semester", //
+      "Year", "Year", //
+      "Lustrum", "Lustrum", //
+      "Decade", "Decade", //
+      "Century", "Century", //
+      "Millenium", "Millenium", //
+      "Era", "Era" //
   })
   Map<String, String> timeMap();
 
   @Description("Time Group map")
   @DefaultStringMapValue({ //
-  "HOUR_OF_DAY", "Hour of Day", //
-  "DAY_OF_WEEK", "Day of Week", //
-  "DAY_OF_MONTH", "Day of Month", //
-  "DAY_OF_YEAR", "Day of Year", //
-  "WEEK_OF_MONTH", "Week of Month", //
-  "WEEK_OF_YEAR", "Week of Year", //
-  "MONTH", "Month", //
-  "MONTH_OF_YEAR", "Month of Year", //
-  "QUARTER_OF_YEAR", "Quarter of Year", //
-  "QUARTER", "Quarter", //
-  "SEMESTER_OF_YEAR", "Semester of Year", //
-  "SEMESTER", "Semester", //
-  "YEAR", "Year", //
-  "LUSTRUM", "Lustrum (5 years period)", //
-  "DECADE", "Decade (10 years period)", //
-  "CENTURY", "Century" //
+      "HOUR_OF_DAY", "Hour of Day", //
+      "DAY_OF_WEEK", "Day of Week", //
+      "DAY_OF_MONTH", "Day of Month", //
+      "DAY_OF_YEAR", "Day of Year", //
+      "WEEK_OF_MONTH", "Week of Month", //
+      "WEEK_OF_YEAR", "Week of Year", //
+      "MONTH", "Month", //
+      "MONTH_OF_YEAR", "Month of Year", //
+      "QUARTER_OF_YEAR", "Quarter of Year", //
+      "QUARTER", "Quarter", //
+      "SEMESTER_OF_YEAR", "Semester of Year", //
+      "SEMESTER", "Semester", //
+      "YEAR", "Year", //
+      "LUSTRUM", "Lustrum (5 years period)", //
+      "DECADE", "Decade (10 years period)", //
+      "CENTURY", "Century" //
   })
   Map<String, String> timeGroupMap();
 
   @Description("DataSHIELD Labels")
   @DefaultStringMapValue({ //
-  "Aggregate", "Aggregate",//
-  "Assign", "Assign" //
+      "Aggregate", "Aggregate",//
+      "Assign", "Assign" //
   })
   Map<String, String> dataShieldLabelsMap();
 
