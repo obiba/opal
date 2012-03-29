@@ -1,18 +1,18 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
-
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
@@ -27,6 +27,10 @@ public class DefaultWizardStepController implements WizardStepController {
       this.currentStepCtrl = ctrl;
     }
 
+    public static Builder create(WizardStep step, Widget help, Skippable skippable) {
+      return new Builder(new DefaultWizardStepController(step, help, skippable));
+    }
+
     public static Builder create(WizardStep step, Widget help) {
       return new Builder(new DefaultWizardStepController(step, help));
     }
@@ -37,6 +41,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Set the title of the last appended step.
+     *
      * @param text
      * @return
      */
@@ -47,6 +52,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Set a provider of help for the last appended step.
+     *
      * @param provider
      * @return
      */
@@ -58,6 +64,7 @@ public class DefaultWizardStepController implements WizardStepController {
     /**
      * Set if the last appended step is a conclusion: when entering this step the navigation buttons
      * (next/previous/finish) will be hidden and close/cancel will be available.
+     *
      * @return
      */
     public Builder conclusion() {
@@ -67,6 +74,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback that validates the current step before switching to the next step.
+     *
      * @param validator
      * @return
      */
@@ -77,6 +85,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback to ask for the step to reset its display.
+     *
      * @param handler
      * @return
      */
@@ -87,6 +96,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback to execute some code before steping into this step
+     *
      * @param handler
      * @return
      */
@@ -103,7 +113,7 @@ public class DefaultWizardStepController implements WizardStepController {
     }
 
     /**
-     * @param build
+     * @param next
      * @return
      */
     public Builder next(DefaultWizardStepController next) {
@@ -128,9 +138,14 @@ public class DefaultWizardStepController implements WizardStepController {
 
   private ResetHandler reset;
 
-  private boolean finish = false;
+  private Skippable skippable;
 
   private boolean conclusion = false;
+
+  DefaultWizardStepController(WizardStep step, final Widget help, Skippable skippable) {
+    this(step, help);
+    setSkippable(skippable);
+  }
 
   DefaultWizardStepController(WizardStep step, final Widget help) {
     super();
@@ -164,8 +179,8 @@ public class DefaultWizardStepController implements WizardStepController {
     this.help = provider;
   }
 
-  public void setFinish(boolean finish) {
-    this.finish = finish;
+  public void setSkippable(Skippable skippable) {
+    this.skippable = skippable;
   }
 
   public void setConclusion(boolean conclusion) {
@@ -199,28 +214,43 @@ public class DefaultWizardStepController implements WizardStepController {
       next.getStep().setVisible(true);
       return next;
     }
+    GWT.log("strange to be here ?");
     return next.onNext();
   }
 
   @Override
   public WizardStepController onPrevious() {
+    WizardStepController previous = getPrevious();
     if(previous == null) throw new IllegalStateException("No previous step");
     if(getStep().isVisible()) {
       getStep().setVisible(false);
       previous.getStep().setVisible(true);
       return previous;
     }
+    GWT.log("strange to be here ?");
     return previous.onPrevious();
   }
 
   @Override
   public boolean hasNext() {
-    return next != null;
+    if(next != null) {
+      if(next.shouldSkip()) {
+        return next.hasNext();
+      }
+      return true;
+    }
+    return false;
   }
 
   @Override
   public boolean hasPrevious() {
-    return previous != null;
+    if(previous != null) {
+      if(previous.shouldSkip()) {
+        return previous.hasPrevious();
+      }
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -241,7 +271,12 @@ public class DefaultWizardStepController implements WizardStepController {
 
   @Override
   public boolean isFinish() {
-    return finish || (next != null && next.isConclusion()) || (hasNext() == false);
+    return (next != null && next.isConclusion()) || (hasNext() == false);
+  }
+
+  @Override
+  public boolean shouldSkip() {
+    return skippable != null ? skippable.skip() : false;
   }
 
   @Override
@@ -250,7 +285,11 @@ public class DefaultWizardStepController implements WizardStepController {
   }
 
   protected WizardStepController getNext() {
-    return next;
+    return next.shouldSkip() ? next.onNext() : next;
+  }
+
+  protected WizardStepController getPrevious() {
+    return previous.shouldSkip() ? previous.onPrevious() : previous;
   }
 
   private static class WidgetProviderImpl implements WidgetProvider {

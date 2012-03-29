@@ -204,22 +204,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         .withCallback(201, callback).withCallback(400, callback).withCallback(500, callback).send();
   }
 
-  //TODO refactor with createImportCommandOptionsDto(String selectedFile)
   private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
-    ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
-    dto.setDestination(importData.getDestinationDatasourceName());
-    if(importData.isIdentifierSharedWithUnit()) {
-      dto.setUnit(importData.getUnit());
-      dto.setForce(false);
-    } else {
-      dto.setForce(true);
-    }
-    JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-    for(String tableName : comparedDatasourcesReportPresenter.getSelectedTables()) {
-      selectedTables.push(importData.getTransientDatasourceName() + "." + tableName);
-    }
-    dto.setTablesArray(selectedTables);
-    return dto;
+    return createImportCommandOptionsDto(null);
   }
 
   private ImportCommandOptionsDto createImportCommandOptionsDto(String selectedFile) {

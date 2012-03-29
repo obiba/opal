@@ -1,14 +1,20 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -17,13 +23,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 
 public class DestinationSelectionStepPresenter extends PresenterWidget<DestinationSelectionStepPresenter.Display> {
 
@@ -49,39 +48,41 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
       @Override
       public void onTableSelected(String datasource, String table) {
         // TODO Auto-generated method stub
-        ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasource + "/table/" + table).get()//
-        .withCallback(new ResourceCallback<TableDto>() {
+        ResourceRequestBuilderFactory.<TableDto>newBuilder()
+            .forResource("/datasource/" + datasource + "/table/" + table).get()//
+            .withCallback(new ResourceCallback<TableDto>() {
 
-          @Override
-          public void onResource(Response response, TableDto resource) {
-            if(resource != null) {
-              getView().setEntityType(resource.getEntityType());
-            }
-          }
-        }).send();
+              @Override
+              public void onResource(Response response, TableDto resource) {
+                if(resource != null) {
+                  getView().setEntityType(resource.getEntityType());
+                }
+              }
+            }).send();
       }
     });
   }
 
   private void refreshDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        datasources = JsArrays.toSafeArray(resource);
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            datasources = JsArrays.toSafeArray(resource);
 
-        for(int i = 0; i < datasources.length(); i++) {
-          DatasourceDto d = datasources.get(i);
-          d.setTableArray(JsArrays.toSafeArray(d.getTableArray()));
-          d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
-        }
+            for(int i = 0; i < datasources.length(); i++) {
+              DatasourceDto d = datasources.get(i);
+              d.setTableArray(JsArrays.toSafeArray(d.getTableArray()));
+              d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
+            }
 
-        getView().setDatasources(datasources);
-      }
-    }).send();
+            getView().setDatasources(datasources);
+          }
+        }).send();
   }
 
   public boolean validate() {
-    if(ImportFormat.XML.equals(importFormat) == false) {
+    if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
       // table cannot be empty and cannot be a view
       if(getView().getSelectedTable().trim().isEmpty()) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
@@ -120,13 +121,13 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   }
 
   public void refreshDisplay() {
-    getView().showTables(ImportFormat.XML.equals(importFormat) == false);
+    getView().showTables(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat);
     refreshDatasources();
   }
 
   public void updateImportData(ImportData importData) {
     importData.setDestinationDatasourceName(getView().getSelectedDatasource());
-    if(ImportFormat.XML.equals(importFormat) == false) {
+    if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
       importData.setDestinationTableName(getView().getSelectedTable());
       importData.setDestinationEntityType(getView().getSelectedEntityType());
     } else {

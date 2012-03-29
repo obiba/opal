@@ -1,25 +1,24 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
@@ -118,6 +117,7 @@ public class WizardStepChain {
 
     /**
      * Create a step chain for the wizard.
+     *
      * @param wizard
      * @return
      */
@@ -127,6 +127,7 @@ public class WizardStepChain {
 
     /**
      * Create a step chain for the wizard, with optional glass rendering.
+     *
      * @param wizard
      * @param glass
      * @return
@@ -138,6 +139,7 @@ public class WizardStepChain {
 
     /**
      * Append a step, without a help widget.
+     *
      * @param step
      * @return
      */
@@ -147,12 +149,17 @@ public class WizardStepChain {
 
     /**
      * Append a step with its help widget.
+     *
      * @param step
      * @param help
      * @return
      */
     public Builder append(WizardStep step, Widget help) {
       return append(new DefaultWizardStepController(step, help));
+    }
+
+    public Builder append(WizardStep step, Widget help, Skippable skippable) {
+      return append(new DefaultWizardStepController(step, help, skippable));
     }
 
     public Builder append(DefaultWizardStepController stepCtrl) {
@@ -169,6 +176,7 @@ public class WizardStepChain {
 
     /**
      * Set the title of the last appended step.
+     *
      * @param text
      * @return
      */
@@ -179,6 +187,7 @@ public class WizardStepChain {
 
     /**
      * Set a provider of help for the last appended step.
+     *
      * @param provider
      * @return
      */
@@ -190,6 +199,7 @@ public class WizardStepChain {
     /**
      * Set if the last appended step is a conclusion: when entering this step the navigation buttons
      * (next/previous/finish) will be hidden and close/cancel will be available.
+     *
      * @return
      */
     public Builder conclusion() {
@@ -199,6 +209,7 @@ public class WizardStepChain {
 
     /**
      * Callback that validates the current step before switching to the next step.
+     *
      * @param validator
      * @return
      */
@@ -214,6 +225,7 @@ public class WizardStepChain {
 
     /**
      * Callback to ask for the step to reset its display.
+     *
      * @param handler
      * @return
      */
@@ -224,6 +236,7 @@ public class WizardStepChain {
 
     /**
      * Set a specific handler to be called when next is clicked.
+     *
      * @param handler
      * @return
      */
@@ -235,6 +248,7 @@ public class WizardStepChain {
 
     /**
      * Set a default handler to be called when next is clicked: current step is validated and next step is requested.
+     *
      * @return
      */
     public Builder onNext() {
@@ -251,6 +265,7 @@ public class WizardStepChain {
 
     /**
      * Set a specific handler to be called when previous is clicked.
+     *
      * @param handler
      * @return
      */
@@ -262,6 +277,7 @@ public class WizardStepChain {
 
     /**
      * Set a default handler to be called when previous is clicked: previous step is requested.
+     *
      * @return
      */
     public Builder onPrevious() {
@@ -278,6 +294,7 @@ public class WizardStepChain {
 
     /**
      * Set a specific handler to be called when finish is clicked.
+     *
      * @param handler
      * @return
      */
@@ -289,6 +306,7 @@ public class WizardStepChain {
 
     /**
      * Set a default handler to be called when finish is clicked: validate the current step and hide.
+     *
      * @return
      */
     public Builder onFinish() {
@@ -303,6 +321,7 @@ public class WizardStepChain {
 
     /**
      * Set a default handler to be called when close is clicked: validate the current step and hide.
+     *
      * @return
      */
     public Builder onClose() {
@@ -317,6 +336,7 @@ public class WizardStepChain {
 
     /**
      * Set a specific handler to be called when close is clicked.
+     *
      * @param handler
      * @return
      */
@@ -328,6 +348,7 @@ public class WizardStepChain {
 
     /**
      * Set a specific handler to be called when cancel is clicked.
+     *
      * @param handler
      * @return
      */
@@ -339,6 +360,7 @@ public class WizardStepChain {
 
     /**
      * Set a default handler to be called when cancel is clicked: just hide.
+     *
      * @return
      */
     public Builder onCancel() {
@@ -353,6 +375,7 @@ public class WizardStepChain {
 
     /**
      * Get the last registration handler after a click handler was added.
+     *
      * @return
      */
     public HandlerRegistration getRegistrationHandler() {
@@ -361,6 +384,7 @@ public class WizardStepChain {
 
     /**
      * Build the chain of steps.
+     *
      * @return
      */
     public WizardStepChain build() {

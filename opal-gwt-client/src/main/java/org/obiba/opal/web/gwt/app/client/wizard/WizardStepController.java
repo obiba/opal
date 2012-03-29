@@ -40,6 +40,8 @@ public interface WizardStepController {
 
   public boolean isFinish();
 
+  public boolean shouldSkip();
+
   public interface WidgetProvider {
 
     public Widget getWidget();
