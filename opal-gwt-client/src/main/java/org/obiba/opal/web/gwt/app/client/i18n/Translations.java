@@ -639,7 +639,9 @@ public interface Translations extends Constants {
       "CsvCannotCreateWriter", "Cannot create writer", //
       "CsvCannotSetVariableHeader", "Cannot set variables header", //
       "CsvCannotObtainWriter", "Can not get csv writer", //
-      "CsvCannotObtainReader", "Can not get csv reader"})
+      "CsvCannotObtainReader", "Can not get csv reader",
+      "LimeDuplicateVariableName", "'{0}' contains duplicated variable names: {1}"
+  })
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
