@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 import java.util.List;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -19,13 +20,17 @@ import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display> {
 
@@ -209,7 +214,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         variablesRequest = null;
       }
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
-          .withCallback(new VariablesResourceCallback(table)).send();
+          .withCallback(new VariablesResourceCallback(table)).withCallback(400, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+              JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error
+                  .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+              String firstError = errors.get(0).getMessage();
+              NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error(firstError)
+                  .build();
+              getEventBus().fireEvent(notificationEvent);
+              setTable(table);
+            }
+          }).send();
     }
   }
 
