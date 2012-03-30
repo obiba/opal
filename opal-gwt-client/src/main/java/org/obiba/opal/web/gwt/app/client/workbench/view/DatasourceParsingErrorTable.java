@@ -21,6 +21,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.view.client.ListDataProvider;
 
@@ -88,51 +89,24 @@ public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto
   }
 
   private void addTableColumns() {
-    addColumn(new TextColumn<DatasourceParsingErrorDto>() {
-      @Override
-      public String getValue(DatasourceParsingErrorDto dto) {
-        return dto.getArgumentsArray().get(0);
-      }
-    }, translations.sheetLabel());
 
     addColumn(new TextColumn<DatasourceParsingErrorDto>() {
       @Override
       public String getValue(DatasourceParsingErrorDto dto) {
-        return dto.getArgumentsArray().get(1);
-      }
-    }, translations.rowNumberLabel());
-
-    addColumn(new TextColumn<DatasourceParsingErrorDto>() {
-      @Override
-      public String getValue(DatasourceParsingErrorDto dto) {
-        // TODO: arguments in error message
-        if(dto.getArgumentsArray().length() > 2) {
-
+        if(translations.datasourceParsingErrorMap().containsKey(dto.getKey()) == false) {
+          return dto.getDefaultMessage();
         }
-        return translations.datasourceParsingErrorMap().get(dto.getKey());
+        String msg = translations.datasourceParsingErrorMap().get(dto.getKey());
+        JsArrayString args = dto.getArgumentsArray();
+        if(args != null) {
+          for(int i = 0; i < args.length(); i++) {
+            msg = msg.replace("{" + i + "}", args.get(i));
+          }
+        }
+        return msg;
       }
     }, translations.errorLabel());
 
-    addColumn(new TextColumn<DatasourceParsingErrorDto>() {
-      @Override
-      public String getValue(DatasourceParsingErrorDto dto) {
-        return dto.getArgumentsArray().length() > 2 ? dto.getArgumentsArray().get(2) : "";
-      }
-    }, translations.tableLabel());
-
-    addColumn(new TextColumn<DatasourceParsingErrorDto>() {
-      @Override
-      public String getValue(DatasourceParsingErrorDto dto) {
-        return dto.getArgumentsArray().length() > 3 ? dto.getArgumentsArray().get(3) : "";
-      }
-    }, translations.variableLabel());
-
-    addColumn(new TextColumn<DatasourceParsingErrorDto>() {
-      @Override
-      public String getValue(DatasourceParsingErrorDto dto) {
-        return dto.getArgumentsArray().length() > 4 ? dto.getArgumentsArray().get(4) : "";
-      }
-    }, translations.itemLabel());
   }
 
 }
