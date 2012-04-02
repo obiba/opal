@@ -25,7 +25,7 @@
           </g:FlowPanel>
           <g:FlowPanel>
             <g:Label ui:field="failed" addStyleNames="p"><ui:msg description="Variables file validation failed">Some errors have been detected. You should fix them before importing this variables file.</ui:msg></g:Label>
-            <o:DatasourceParsingErrorTable ui:field="datasourceParsingErrorTable" addStyleNames="p full-width"/>
+            <o:DatasourceParsingErrorPanel ui:field="datasourceParsingErrors" addStyleNames="p full-width"/>
           </g:FlowPanel>
         </g:FlowPanel>
        </o:WizardStep>

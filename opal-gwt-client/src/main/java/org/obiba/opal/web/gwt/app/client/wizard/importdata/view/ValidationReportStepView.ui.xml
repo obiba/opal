@@ -9,7 +9,7 @@
    <g:FlowPanel>
      <g:Label ui:field="validationLabel" visible="false"><ui:msg description="Validation Report Step summary">Some formatting errors have been detected. You should fix them before importing variables.</ui:msg></g:Label>
      <o:Table width="100%" ui:field="validationTable" visible="false"/>
-     <o:DatasourceParsingErrorTable width="100%" ui:field="parsingErrorTable" visible="false"/>
+     <o:DatasourceParsingErrorPanel width="100%" ui:field="parsingErrors" visible="false"/>
    </g:FlowPanel> 
 
 </ui:UiBinder>

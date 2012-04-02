@@ -20,7 +20,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Datas
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorTable;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -80,7 +80,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   Label failed;
 
   @UiField
-  DatasourceParsingErrorTable datasourceParsingErrorTable;
+  DatasourceParsingErrorPanel datasourceParsingErrors;
 
   @UiField
   ListBox datasources;
@@ -141,8 +141,8 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   private void showErrors(ClientErrorDto errorDto) {
     if(errorDto != null && errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
       failed.setVisible(true);
-      datasourceParsingErrorTable.setErrors(errorDto);
-      datasourceParsingErrorTable.setVisible(true);
+      datasourceParsingErrors.setErrors(errorDto);
+      datasourceParsingErrors.setVisible(true);
     }
   }
 
@@ -240,7 +240,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   @Override
   public void hideErrors() {
     failed.setVisible(false);
-    datasourceParsingErrorTable.setVisible(false);
+    datasourceParsingErrors.setVisible(false);
   }
 
   @Override

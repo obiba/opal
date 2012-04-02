@@ -20,25 +20,20 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
  *
  */
-public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto> {
+public class DatasourceParsingErrorPanel extends FlowPanel {
   //
   // Static Variables
   //
 
   private static Translations translations = GWT.create(Translations.class);
 
-  private ListDataProvider<DatasourceParsingErrorDto> dataProvider = new ListDataProvider<DatasourceParsingErrorDto>();
-
-  public DatasourceParsingErrorTable() {
+  public DatasourceParsingErrorPanel() {
     super();
-    initTable();
-    dataProvider.addDataDisplay(this);
   }
 
   public void setErrors(final ClientErrorDto errorDto) {
@@ -46,8 +41,12 @@ public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto
   }
 
   private void setErrors(final List<DatasourceParsingErrorDto> errors) {
-    dataProvider.setList(errors);
-    dataProvider.refresh();
+    clear();
+    AlertPanel.Builder builder = AlertPanel.newBuilder().error();
+    for(DatasourceParsingErrorDto dto : errors) {
+      builder.error(getErrorMessage(dto));
+    }
+    this.add(builder.build());
   }
 
   @SuppressWarnings("unchecked")
@@ -64,22 +63,11 @@ public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto
     return datasourceParsingErrors;
   }
 
-  private void initTable() {
-    addTableColumns();
-  }
-
-  private void addTableColumns() {
-
-    addColumn(new TextColumn<DatasourceParsingErrorDto>() {
-      @Override
-      public String getValue(DatasourceParsingErrorDto dto) {
-        if(translations.datasourceParsingErrorMap().containsKey(dto.getKey()) == false) {
-          return dto.getDefaultMessage();
-        }
-        return TranslationsUtils.replaceArguments(translations.datasourceParsingErrorMap().get(dto.getKey()), dto.getArgumentsArray());
-      }
-    }, translations.errorLabel());
-
+  private String getErrorMessage(DatasourceParsingErrorDto dto) {
+    if(translations.datasourceParsingErrorMap().containsKey(dto.getKey()) == false) {
+      return dto.getDefaultMessage();
+    }
+    return TranslationsUtils.replaceArguments(translations.datasourceParsingErrorMap().get(dto.getKey()), dto.getArgumentsArray());
   }
 
 }

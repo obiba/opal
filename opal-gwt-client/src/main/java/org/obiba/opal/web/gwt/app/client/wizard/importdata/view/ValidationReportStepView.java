@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorTable;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
@@ -43,7 +43,7 @@ public class ValidationReportStepView extends Composite {
   CellTable<TableCompareError> validationTable;
 
   @UiField
-  DatasourceParsingErrorTable parsingErrorTable;
+  DatasourceParsingErrorPanel parsingErrors;
 
   @UiField
   Label validationLabel;
@@ -72,14 +72,14 @@ public class ValidationReportStepView extends Composite {
   }
 
   public void showDatasourceParsingErrors(ClientErrorDto errorDto) {
-    parsingErrorTable.setVisible(true);
-    parsingErrorTable.setErrors(errorDto);
+    parsingErrors.setVisible(true);
+    parsingErrors.setErrors(errorDto);
   }
 
   public void hideErrors() {
     validationLabel.setVisible(false);
     validationTable.setVisible(false);
-    parsingErrorTable.setVisible(false);
+    parsingErrors.setVisible(false);
   }
 
   private void initTable() {
