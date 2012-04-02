@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.shared.EventBus;
@@ -66,12 +67,7 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
     List<String> translatedMessages = new ArrayList<String>();
     for(String message : event.getMessages()) {
       if(translations.userMessageMap().containsKey(message)) {
-        String msg = translations.userMessageMap().get(message);
-        int i = 0;
-        for(String arg : event.getMessageArgs()) {
-          msg = msg.replace("{" + i + "}", arg);
-          i++;
-        }
+        String msg = TranslationsUtils.replaceArguments(translations.userMessageMap().get(message), event.getMessageArgs());
         translatedMessages.add(msg);
       } else {
         translatedMessages.add(message);

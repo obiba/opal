@@ -14,15 +14,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.view.client.ListDataProvider;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.view.client.ListDataProvider;
 
 /**
  *
@@ -55,8 +56,7 @@ public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto
   private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
     List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
 
-    JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto
-        .getExtension(ClientErrorDtoExtensions.errors);
+    JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto.getExtension(ClientErrorDtoExtensions.errors);
     if(errors != null) {
       for(int i = 0; i < errors.length(); i++) {
         datasourceParsingErrors.add(errors.get(i));
@@ -96,14 +96,7 @@ public class DatasourceParsingErrorTable extends Table<DatasourceParsingErrorDto
         if(translations.datasourceParsingErrorMap().containsKey(dto.getKey()) == false) {
           return dto.getDefaultMessage();
         }
-        String msg = translations.datasourceParsingErrorMap().get(dto.getKey());
-        JsArrayString args = dto.getArgumentsArray();
-        if(args != null) {
-          for(int i = 0; i < args.length(); i++) {
-            msg = msg.replace("{" + i + "}", args.get(i));
-          }
-        }
-        return msg;
+        return TranslationsUtils.replaceArguments(translations.datasourceParsingErrorMap().get(dto.getKey()), dto.getArgumentsArray());
       }
     }, translations.errorLabel());
 
