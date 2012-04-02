@@ -63,8 +63,6 @@
 .cellTableFirstColumn{}
 .cellTableLastColumn{}
 
-.cellTableWidget{}
-
 .cellTableSelectedRowCell{}
 
 .cellTableHoveredRowCell{}
@@ -78,6 +76,11 @@
  .cellTableKeyboardSelectedCell{}
  
  .cellTableKeyboardSelectedRow{}
+
+.cellTableOddRowCell div.progress, .cellTableEvenRowCell div.progress {
+  margin-bottom: 0;
+  cursor: default;
+}
 
 /* Specific tables */
 
