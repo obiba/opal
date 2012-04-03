@@ -29,7 +29,10 @@
 
       <o:WizardStep ui:field="comparedDatasourcesReportStep">
         <g:SimplePanel ui:field="comparedDatasourcesReportPanel"></g:SimplePanel>
-        <w:ValidationReportStepView ui:field="validationReportPanel" visible="false"/>
+        <g:FlowPanel ui:field="datasourceErrors" visible="false">
+          <g:Label addStyleNames="p"><ui:msg description="Import datasource creation failed">Some errors have been detected in the datasource definition. You should fix them before importing these data.</ui:msg></g:Label>
+          <o:DatasourceParsingErrorPanel ui:field="parsingErrors" addStyleNames="p full-width" visible="false"/>
+        </g:FlowPanel>
       </o:WizardStep>
 
       <o:WizardStep ui:field="valuesStep"/>

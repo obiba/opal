@@ -31,6 +31,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -53,7 +54,7 @@ public class NotificationView extends PopupViewImpl implements NotificationPrese
   PopupPanel dialog;
 
   @UiField
-  Label caption;
+  InlineLabel caption;
 
   @UiField
   VerticalPanel messagePanel;
@@ -150,10 +151,10 @@ public class NotificationView extends PopupViewImpl implements NotificationPrese
       nonStickyTimer = null;
     }
 
-    dialog.removeStyleName(NotificationType.ERROR.toString().toLowerCase());
-    dialog.removeStyleName(NotificationType.WARNING.toString().toLowerCase());
-    dialog.removeStyleName(NotificationType.INFO.toString().toLowerCase());
-    dialog.addStyleName(type.toString().toLowerCase());
+    dialog.removeStyleName("alert-" + NotificationType.ERROR.toString().toLowerCase());
+    dialog.removeStyleName("alert-" + NotificationType.WARNING.toString().toLowerCase());
+    dialog.removeStyleName("alert-" + NotificationType.INFO.toString().toLowerCase());
+    dialog.addStyleName("alert-" + type.toString().toLowerCase());
   }
 
   @Override

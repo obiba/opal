@@ -163,6 +163,10 @@ td.link {
   cursor: pointer;
 }
 
+.bold {
+  font-weight:bold;
+}
+
 .clear {
   clear: both;
 }
@@ -398,36 +402,56 @@ img.clickable {
 /* Popup */ 
 
 .gwt-PopupPanel {
-  border:0.4em solid #DDDDDD;
   border-radius: 0.5em;-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
   z-index: 10000;
 }
 
 .notification {
-  border:0.4em solid #222222;
-  background-color: #222222;
   opacity: 0.9;
-  color:#ffffff;
-  border-radius: 0.5em;-moz-border-radius: 0.5em; -webkit-border-radius: 0.5em;
   float:right;
+  padding: 8px 14px;
 }
 
-.notification.error {
-  border-color:#8d0000;
-  background-color: #8d0000;
+.notification.alert-error {
+}
+
+.notification.alert-warning {
+}
+
+.notification.alert-info {
+  background-color: #222222;
+  border-color: #222222;
+  color: #FFFFFF;
+  text-shadow: none;
+}
+
+.notification.alert-info a {
+  color: #FFFFFF;
+}
+
+.notification.alert-info .close {
+  opacity: 0.4;
+}
+
+.notification.alert-info .main {
+  opacity: 0.8;
 }
 
 .notification .header {
   font-weight:bold;
+  margin: 0.5em 0;
+}
+
+.notification .close {
+  right: 0;
 }
 
 .notification .main {
-  padding:0.5em;
+  padding:0.5em 0;
 }
 
-.notification a, .notification a:visited, .notification a:hover {
-  color:#ffffff;
-  text-decoration: none;
+.notification .resizable-handle {
+  opacity: 0.4;
 }
 
 /* Tree */
@@ -1940,3 +1964,8 @@ a.icon:hover {
 .iconb.i-alert:before { content: "W"; }
 .iconb.i-sync:before { content: "V"; }
 
+/* Alerts */
+
+.alert .close {
+  font-size: 1em;
+}

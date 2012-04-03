@@ -9,22 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -36,10 +20,29 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 public class DataImportView extends PopupViewImpl implements DataImportPresenter.Display {
 
@@ -75,7 +78,10 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   SimplePanel comparedDatasourcesReportPanel;
 
   @UiField
-  ValidationReportStepView validationReportPanel;
+  Panel datasourceErrors;
+
+  @UiField
+  DatasourceParsingErrorPanel parsingErrors;
 
   @UiField
   WizardStep valuesStep;
@@ -121,73 +127,73 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-        .append(formatSelectionStep, formatSelectionHelp)//
-        .title(translations.dataImportFormatStep())//
+    .append(formatSelectionStep, formatSelectionHelp)//
+    .title(translations.dataImportFormatStep())//
 
-        .append(formatStep)//
-        .help(new WidgetProvider() {
+    .append(formatStep)//
+    .help(new WidgetProvider() {
 
-          @Override
-          public Widget getWidget() {
-            return formatStepDisplay.getStepHelp();
-          }
-        }) //
-        .onValidate(new ValidationHandler() {
+      @Override
+      public Widget getWidget() {
+        return formatStepDisplay.getStepHelp();
+      }
+    }) //
+    .onValidate(new ValidationHandler() {
 
-          @Override
-          public boolean validate() {
-            return importDataInputsHandler.validateFormat();
-          }
-        }).title(translations.dataImportFileStep())//
+      @Override
+      public boolean validate() {
+        return importDataInputsHandler.validateFormat();
+      }
+    }).title(translations.dataImportFileStep())//
 
-        .append(destinationSelectionStep, destinationSelectionHelp)//
-        .title(translations.dataImportDestinationStep())//
-        .onValidate(new ValidationHandler() {
+    .append(destinationSelectionStep, destinationSelectionHelp)//
+    .title(translations.dataImportDestinationStep())//
+    .onValidate(new ValidationHandler() {
 
-          @Override
-          public boolean validate() {
-            return importDataInputsHandler.validateDestination();
-          }
-        })//
+      @Override
+      public boolean validate() {
+        return importDataInputsHandler.validateDestination();
+      }
+    })//
 
-        .append(unitSelectionStep, unitSelectionHelp)//
-        .title(translations.dataImportUnitStep())//
+    .append(unitSelectionStep, unitSelectionHelp)//
+    .title(translations.dataImportUnitStep())//
 
-        .append(comparedDatasourcesReportStep)//
-        .title(translations.dataImportComparedDatasourcesReportStep())//
-        .help(new WidgetProvider() {
+    .append(comparedDatasourcesReportStep)//
+    .title(translations.dataImportComparedDatasourcesReportStep())//
+    .help(new WidgetProvider() {
 
-          @Override
-          public Widget getWidget() {
-            return comparedDatasourcesReportHelp;
-          }
-        })//
-        .onStepIn(new StepInHandler() {
+      @Override
+      public Widget getWidget() {
+        return comparedDatasourcesReportHelp;
+      }
+    })//
+    .onStepIn(new StepInHandler() {
 
-          @Override
-          public void onStepIn() {
-            comparedDatasourcesReportStepInHandler.onStepIn();
-          }
-        })//
-        .onValidate(new ValidationHandler() {
+      @Override
+      public void onStepIn() {
+        comparedDatasourcesReportStepInHandler.onStepIn();
+      }
+    })//
+    .onValidate(new ValidationHandler() {
 
-          @Override
-          public boolean validate() {
-            return importDataInputsHandler.validateComparedDatasourcesReport();
-          }
-        })//
+      @Override
+      public boolean validate() {
+        return importDataInputsHandler.validateComparedDatasourcesReport();
+      }
+    })//
 
-        .append(valuesStep)//
-        .title(translations.dataImportValuesStep())//
+    .append(valuesStep)//
+    .title(translations.dataImportValuesStep())//
 
-        .append(archiveStep, archiveHelp, new Skippable() {
-          @Override
-          public boolean skip() {
-            return ImportFormat.LIMESURVEY.name().equals(formatListBox.getValue(formatListBox.getSelectedIndex()));
-          }
-        })//
-        .title(translations.dataImportArchiveStep())//
-        .onNext().onPrevious().build();
+    .append(archiveStep, archiveHelp, new Skippable() {
+      @Override
+      public boolean skip() {
+        return ImportFormat.LIMESURVEY.name().equals(formatListBox.getValue(formatListBox.getSelectedIndex()));
+      }
+    })//
+    .title(translations.dataImportArchiveStep())//
+    .onNext().onPrevious().build();
   }
 
   private void initWidgets() {
@@ -272,7 +278,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     comparedDatasourcesReportPanel.clear();
     comparedDatasourcesReportPanel.add(display.asWidget());
     comparedDatasourcesReportPanel.setVisible(true);
-    validationReportPanel.setVisible(false);
+    datasourceErrors.setVisible(false);
+    parsingErrors.setVisible(false);
     comparedDatasourcesReportHelp = display.getStepHelp();
   }
 
@@ -291,6 +298,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Override
   public void prepareDatasourceCreation() {
     dialog.setProgress(true);
+    datasourceErrors.setVisible(false);
+    parsingErrors.setVisible(false);
   }
 
   @Override
@@ -298,13 +307,13 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     comparedDatasourcesReportPanel.setVisible(false);
     if(errorDto != null) {
       if(errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-        validationReportPanel.showDatasourceParsingErrors(errorDto);
-        validationReportPanel.setVisible(true);
+        parsingErrors.setErrors(errorDto);
+        parsingErrors.setVisible(true);
       } else {
-        eventBus.fireEvent(
-            NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
       }
     }
+    datasourceErrors.setVisible(true);
     dialog.setProgress(false);
     dialog.setNextEnabled(false);
   }
@@ -312,7 +321,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Override
   public void showDatasourceCreationSuccess() {
     comparedDatasourcesReportPanel.setVisible(true);
-    validationReportPanel.setVisible(false);
+    datasourceErrors.setVisible(false);
+    parsingErrors.setVisible(false);
     dialog.setProgress(false);
   }
 
