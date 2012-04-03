@@ -21,12 +21,13 @@ import com.google.gwt.core.client.JsArrayString;
 public class TranslationsUtils {
 
   public static String replaceArguments(String msg, List<String> args) {
+    String message = msg;
     if(args != null) {
       for(int i = 0; i < args.size(); i++) {
-        msg = msg.replace("{" + i + "}", args.get(i));
+        message = message.replace("{" + i + "}", args.get(i));
       }
     }
-    return msg;
+    return message;
   }
 
   public static String replaceArguments(String msg, JsArrayString args) {
