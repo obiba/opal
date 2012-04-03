@@ -19,18 +19,22 @@ import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.web.model.Magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.Magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for handling ClientError Dtos.
  */
 public class ClientErrorDtos {
 
+  private static final Logger log = LoggerFactory.getLogger(ClientErrorDtos.class);
+
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus != null ? errorStatus : "");
   }
-  
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, String ... args) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus != null ? errorStatus : "").addAllArguments(args != null ? Arrays.asList(args) : Collections.<String>emptyList());
+
+  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, String... args) {
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus != null ? errorStatus : "").addAllArguments(args != null ? Arrays.asList(args) : Collections.<String> emptyList());
   }
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, Exception e) {
@@ -44,8 +48,13 @@ public class ClientErrorDtos {
   }
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, RuntimeException e) {
+    log.warn(errorStatus, e);
+    Throwable cause = e;
+    while(cause.getCause() != null) {
+      cause = cause.getCause();
+    }
     ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
-    clientError.addArguments(e.getMessage());
+    clientError.addArguments(cause.getMessage());
     return clientError;
   }
 
