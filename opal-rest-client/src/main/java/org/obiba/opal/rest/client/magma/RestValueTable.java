@@ -86,6 +86,9 @@ class RestValueTable extends AbstractValueTable {
 
   @Override
   public ValueSet getValueSet(VariableEntity entity) throws NoSuchValueSetException {
+    if(hasValueSet(entity) == false) {
+      throw new NoSuchValueSetException(this, entity);
+    }
     return new LazyValueSet(this, entity);
   }
 
