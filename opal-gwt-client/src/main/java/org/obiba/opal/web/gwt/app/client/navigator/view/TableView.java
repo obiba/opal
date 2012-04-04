@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultSuggestBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -48,9 +49,7 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
-import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -103,10 +102,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   SimplePager pager;
 
-  @UiField(provided = true)
-  SuggestBox variableNameSuggestBox;
-
-  MultiWordSuggestOracle suggestions;
+  @UiField
+  DefaultSuggestBox variableNameSuggestBox;
 
   @UiField
   Panel permissions;
@@ -126,7 +123,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private MenuItemSeparator removeItemSeparator;
 
   public TableView() {
-    variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
     this.widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
@@ -195,7 +191,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
-    suggestions.clear();
+    variableNameSuggestBox.getSuggestOracle().clear();
     variableNameSuggestBox.setText("");
     table.setEmptyTableWidget(table.getLoadingIndicator());
   }
@@ -360,7 +356,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void addVariableSuggestion(String suggestion) {
-    suggestions.add(suggestion);
+    variableNameSuggestBox.getSuggestOracle().add(suggestion);
   }
 
   @Override
