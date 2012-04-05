@@ -79,8 +79,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   public DefaultResourceRequestBuilder<T> forResource(String resource) {
     if(resource == null) throw new IllegalArgumentException("path cannot be null");
-    this.resource = resource;
-    this.uri = resource.startsWith("http") ? resource : OPAL_WS_ROOT + resource;
+    this.resource = resource.replaceAll("//", "/");
+    this.uri = resource.startsWith("http") ? this.resource : OPAL_WS_ROOT + this.resource;
     return this;
   }
 

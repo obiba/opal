@@ -177,7 +177,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
     }
 
     private void fireDatasourceSelectionChangeEvent(final TreeItem item) {
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + item.getText()).get().withCallback(new ResourceCallback<DatasourceDto>() {
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + item.getText() + "/").get().withCallback(new ResourceCallback<DatasourceDto>() {
         @Override
         public void onResource(Response response, DatasourceDto resource) {
           getEventBus().fireEvent(new DatasourceSelectionChangeEvent(resource));
@@ -186,7 +186,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
     }
 
     private void fireTableSelectionChangeEvent(final TreeItem item) {
-      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + item.getParentItem().getText() + "/table/" + item.getText()).get().withCallback(new ResourceCallback<TableDto>() {
+      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + item.getParentItem().getText() + "/table/" + item.getText() + "/").get().withCallback(new ResourceCallback<TableDto>() {
         @Override
         public void onResource(Response response, TableDto resource) {
           TreeItem parentItem = item.getParentItem();

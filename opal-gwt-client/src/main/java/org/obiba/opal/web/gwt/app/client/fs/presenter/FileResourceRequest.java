@@ -39,7 +39,7 @@ public class FileResourceRequest {
   }
 
   public void send() {
-    final String resource = "/files/meta" + path;
+    final String resource = "/files/meta" + path + "/";
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(resource).get().authorize(new Authorizer(eventBus) {
 
