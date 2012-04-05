@@ -38,6 +38,7 @@ public class UnhandledResponseNotificationView extends PopupViewImpl implements 
     super(eventBus);
     popup.add(uiBinder.createAndBindUi(this));
     popup.setGlassEnabled(true);
+    popup.addStyleName("alert alert-error");
   }
 
   @Override
