@@ -1,22 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
-
-import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -28,6 +19,15 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPresenter.Display> {
 
@@ -38,7 +38,8 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
   private boolean repeatable;
 
   @Inject
-  public EvaluateScriptPresenter(EventBus eventBus, Display view, ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
+  public EvaluateScriptPresenter(EventBus eventBus, Display view,
+      ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
     super(eventBus, view);
     this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
   }
@@ -57,7 +58,10 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
   }
 
   public void setTable(ViewDto viewDto) {
-    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName()).get().withCallback(new ResourceCallback<TableDto>() {
+    UriBuilder ub = UriBuilder.create()
+        .segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
+    ResourceRequestBuilderFactory.<TableDto>newBuilder()
+        .forResource(ub.build()).get().withCallback(new ResourceCallback<TableDto>() {
       @Override
       public void onResource(Response response, TableDto resource) {
         setTable(resource);

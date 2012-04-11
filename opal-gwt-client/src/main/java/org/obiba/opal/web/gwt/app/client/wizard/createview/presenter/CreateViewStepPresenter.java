@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -13,6 +13,18 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
@@ -40,25 +52,13 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewStepPresenter.Display> {
 
@@ -86,7 +86,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   //
 
   @Inject
-  public CreateViewStepPresenter(final Display display, final EventBus eventBus, TableListPresenter tableListPresenter, FileSelectionPresenter fileSelectionPresenter) {
+  public CreateViewStepPresenter(final Display display, final EventBus eventBus, TableListPresenter tableListPresenter,
+      FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
     this.tableListPresenter = tableListPresenter;
     this.fileSelectionPresenter = fileSelectionPresenter;
@@ -147,13 +148,15 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     if(event.getEventParameters().length != 0) {
       if(event.getEventParameters()[0] instanceof String) {
         datasourceName = (String) event.getEventParameters()[0];
-        ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + datasourceName).get().withCallback(new ResourceCallback<DatasourceDto>() {
+        UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
+        ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
+            .withCallback(new ResourceCallback<DatasourceDto>() {
 
-          @Override
-          public void onResource(Response response, DatasourceDto resource) {
-            datasourceDto = resource;
-          }
-        }).send();
+              @Override
+              public void onResource(Response response, DatasourceDto resource) {
+                datasourceDto = resource;
+              }
+            }).send();
       } else {
         throw new IllegalArgumentException("unexpected event parameter type (expected String)");
       }
@@ -171,14 +174,13 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
     // Create the resource request (the builder).
     getViewRequest(datasourceName, viewName).withCallback(Response.SC_OK, doNotCreate)//
-    .withCallback(Response.SC_NOT_FOUND, create).send();
+        .withCallback(Response.SC_NOT_FOUND, create).send();
   }
 
   private ResourceRequestBuilder<ViewDto> getViewRequest(String datasourceName, String viewName) {
-    return ResourceRequestBuilderFactory.<ViewDto> newBuilder()//
-    .get()//
-    .forResource("/datasource/" + datasourceName + "/view/" + viewName)//
-    .accept("application/x-protobuf+json");
+    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "view", viewName);
+    return ResourceRequestBuilderFactory.<ViewDto>newBuilder()
+        .get().forResource(ub.build()).accept("application/x-protobuf+json");
   }
 
   private void createView() {
@@ -190,19 +192,21 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     String viewName = getView().getViewName().getText();
 
     // Build the ViewDto for the request.
-    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
+    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName)
+        .fromTables(tableListPresenter.getTables());
 
     // Create the resource request (the builder).
+    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "views");
     ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
-    .post()//
-    .forResource("/datasource/" + datasourceName + "/views")//
-    .withResourceBody(ViewDto.stringify(createViewDto(viewDtoBuilder)))//
-    .withCallback(Response.SC_CREATED, completed)//
-    .withCallback(Response.SC_OK, completed)//
-    .withCallback(Response.SC_BAD_REQUEST, failed)//
-    .withCallback(Response.SC_NOT_FOUND, failed)//
-    .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
-    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
+        .post()//
+        .forResource(ub.build())//
+        .withResourceBody(ViewDto.stringify(createViewDto(viewDtoBuilder)))//
+        .withCallback(Response.SC_CREATED, completed)//
+        .withCallback(Response.SC_OK, completed)//
+        .withCallback(Response.SC_BAD_REQUEST, failed)//
+        .withCallback(Response.SC_NOT_FOUND, failed)//
+        .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
 
     resourceRequestBuilder.send();
   }
@@ -265,14 +269,14 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
       // Get the new view dto
       getViewRequest(datasourceName, getView().getViewName().getText())//
-      .withCallback(new ResourceCallback<ViewDto>() {
+          .withCallback(new ResourceCallback<ViewDto>() {
 
-        @Override
-        public void onResource(Response response, ViewDto resource) {
-          getView().hide();
-          getEventBus().fireEvent(new ViewConfigurationRequiredEvent(resource));
-        }
-      }).send();
+            @Override
+            public void onResource(Response response, ViewDto resource) {
+              getView().hide();
+              getEventBus().fireEvent(new ViewConfigurationRequiredEvent(resource));
+            }
+          }).send();
 
     }
   }
@@ -312,10 +316,15 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
       validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired"));
-      validators.add(new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars"));
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getView().getAddVariablesOneByOneOption(), getView().getFileViewOption(), getView().getExcelFileOption()), "VariableDefinitionMethodRequired"));
-      validators.add(new ConditionalValidator(getView().getFileViewOption(), new RequiredFileSelectionValidator("XMLFileRequired")));
-      validators.add(new ConditionalValidator(getView().getExcelFileOption(), new RequiredFileSelectionValidator("ExcelFileRequired")));
+      validators.add(
+          new DisallowedCharactersValidator(getView().getViewName(), new char[] {'.', ':'}, "ViewNameDisallowedChars"));
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator
+          .asSet(getView().getAddVariablesOneByOneOption(), getView().getFileViewOption(),
+              getView().getExcelFileOption()), "VariableDefinitionMethodRequired"));
+      validators.add(new ConditionalValidator(getView().getFileViewOption(),
+          new RequiredFileSelectionValidator("XMLFileRequired")));
+      validators.add(new ConditionalValidator(getView().getExcelFileOption(),
+          new RequiredFileSelectionValidator("ExcelFileRequired")));
       return validators;
     }
   }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -11,23 +11,6 @@ package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.IsNotEqualValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
-import org.obiba.opal.web.model.client.opal.KeyForm;
-import org.obiba.opal.web.model.client.opal.KeyType;
-import org.obiba.opal.web.model.client.opal.PrivateKeyForm;
-import org.obiba.opal.web.model.client.opal.PublicKeyForm;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -43,6 +26,23 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.IsNotEqualValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.opal.KeyForm;
+import org.obiba.opal.web.model.client.opal.KeyType;
+import org.obiba.opal.web.model.client.opal.PrivateKeyForm;
+import org.obiba.opal.web.model.client.opal.PublicKeyForm;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogPresenter.Display> {
 
@@ -149,7 +149,11 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
         }
 
         CreateKeyPairCallBack callbackHandler = new CreateKeyPairCallBack(form);
-        ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().withResourceBody(KeyForm.stringify(form)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+        UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "keys");
+        ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).post()
+            .withResourceBody(KeyForm.stringify(form))
+            .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+            .send();
       }
 
     }));
@@ -253,7 +257,8 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       validators.add(new RequiredTextValidator(getView().getCertificatePem(), "KeyPairPublicKeyPEMIsRequired"));
-      validators.add(new IsNotEqualValidator<String>(getView().getCertificatePem(), getView().getDefaultPublicKeyText(), "KeyPairPublicKeyPEMIsRequired"));
+      validators.add(new IsNotEqualValidator<String>(getView().getCertificatePem(), getView().getDefaultPublicKeyText(),
+          "KeyPairPublicKeyPEMIsRequired"));
       return validators;
     }
   }
@@ -267,10 +272,15 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new ConditionalValidator(getView().isPrivateKeyCreate(), new RequiredTextValidator(getView().getAlgorithm(), "KeyPairAlgorithmIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPrivateKeyCreate(), new RequiredTextValidator(getView().getKeySize(), "KeyPairKeySizeIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPrivateKeyImport(), new RequiredTextValidator(getView().getPrivateKeyImport(), "KeyPairPrivateKeyPEMIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPrivateKeyImport(), new IsNotEqualValidator<String>(getView().getPrivateKeyImport(), getView().getDefaultPrivateKeyText(), "KeyPairPrivateKeyPEMIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPrivateKeyCreate(),
+          new RequiredTextValidator(getView().getAlgorithm(), "KeyPairAlgorithmIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPrivateKeyCreate(),
+          new RequiredTextValidator(getView().getKeySize(), "KeyPairKeySizeIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPrivateKeyImport(),
+          new RequiredTextValidator(getView().getPrivateKeyImport(), "KeyPairPrivateKeyPEMIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPrivateKeyImport(),
+          new IsNotEqualValidator<String>(getView().getPrivateKeyImport(), getView().getDefaultPrivateKeyText(),
+              "KeyPairPrivateKeyPEMIsRequired")));
       return validators;
     }
   }
@@ -284,14 +294,23 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getFirstAndLastName(), "KeyPairFirstAndLastNameIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getOrganizationalUnit(), "KeyPairOrganizationalUnitIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getOrganizationName(), "KeyPairOrganizationNameIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getCity(), "KeyPairCityNameIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getState(), "KeyPairStateNameIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(), new RequiredTextValidator(getView().getCountry(), "KeyPairCountryCodeIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPublicKeyImport(), new RequiredTextValidator(getView().getPublicKeyImport(), "KeyPairPublicKeyPEMIsRequired")));
-      validators.add(new ConditionalValidator(getView().isPublicKeyImport(), new IsNotEqualValidator<String>(getView().getPublicKeyImport(), getView().getDefaultPublicKeyText(), "KeyPairPrivateKeyPEMIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(),
+          new RequiredTextValidator(getView().getFirstAndLastName(), "KeyPairFirstAndLastNameIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(),
+          new RequiredTextValidator(getView().getOrganizationalUnit(), "KeyPairOrganizationalUnitIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(),
+          new RequiredTextValidator(getView().getOrganizationName(), "KeyPairOrganizationNameIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(),
+          new RequiredTextValidator(getView().getCity(), "KeyPairCityNameIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(),
+          new RequiredTextValidator(getView().getState(), "KeyPairStateNameIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyCreate(),
+          new RequiredTextValidator(getView().getCountry(), "KeyPairCountryCodeIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyImport(),
+          new RequiredTextValidator(getView().getPublicKeyImport(), "KeyPairPublicKeyPEMIsRequired")));
+      validators.add(new ConditionalValidator(getView().isPublicKeyImport(),
+          new IsNotEqualValidator<String>(getView().getPublicKeyImport(), getView().getDefaultPublicKeyText(),
+              "KeyPairPrivateKeyPEMIsRequired")));
       return validators;
     }
 

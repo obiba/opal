@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -12,12 +12,16 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
@@ -26,14 +30,9 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
 
 public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPresenter.Display> {
   //
@@ -103,8 +102,10 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
     getDisplay().clearResourceRequests();
   }
 
-  public <T extends JavaScriptObject> void addResourceRequest(String resourceName, String resourceLink, ResourceRequestBuilder<T> requestBuilder) {
-    ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(), eventBus, requestBuilder, new ImportVariablesResponseCodeCallback());
+  public <T extends JavaScriptObject> void addResourceRequest(String resourceName, String resourceLink,
+      ResourceRequestBuilder<T> requestBuilder) {
+    ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(),
+        eventBus, requestBuilder, new ImportVariablesResponseCodeCallback());
     resourceRequestPresenter.getDisplay().setResourceName(resourceName);
     resourceRequestPresenter.getDisplay().setResourceClickHandler(new TableResourceClickHandler(resourceLink));
     resourceRequestPresenter.setSuccessCodes(200, 201);
@@ -161,8 +162,10 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
           eventBus.fireEvent(new DatasourceUpdatedEvent(resource));
         }
       };
-
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().get().forResource("/datasource/" + targetDatasourceName).withCallback(resourceCallback).send();
+      UriBuilder ub = UriBuilder.create().segment("datasource", targetDatasourceName);
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().get().forResource(ub.build())
+          .withCallback(resourceCallback)
+          .send();
     }
   }
 
@@ -183,13 +186,14 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
     }
 
     private void fireTableSelectionChangeEvent(final String tableName) {
-      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(getResourceLink()).get().withCallback(new ResourceCallback<TableDto>() {
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(getResourceLink()).get()
+          .withCallback(new ResourceCallback<TableDto>() {
 
-        @Override
-        public void onResource(Response response, TableDto resource) {
-          // TODO: Fire an event to trigger display of the selected table.
-        }
-      }).send();
+            @Override
+            public void onResource(Response response, TableDto resource) {
+              // TODO: Fire an event to trigger display of the selected table.
+            }
+          }).send();
     }
   }
 }

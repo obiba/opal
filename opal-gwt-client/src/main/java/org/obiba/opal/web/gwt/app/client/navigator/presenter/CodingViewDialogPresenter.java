@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -14,12 +14,22 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.inject.Inject;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
@@ -33,23 +43,12 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicatio
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.inject.Inject;
 
 public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogPresenter.Display> {
 
@@ -83,7 +82,8 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private void updateDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new DatasourcesCallback()).send();
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new DatasourcesCallback()).send();
   }
 
   public void setTableVariables(TableDto table, JsArray<VariableDto> variables) {
@@ -123,8 +123,10 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private ViewDto getViewDto() {
-    ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table).defaultVariableListView().build();
-    VariableListViewDto derivedVariables = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table)
+        .defaultVariableListView().build();
+    VariableListViewDto derivedVariables = (VariableListViewDto) view
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
     for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
       DerivationHelper derivator = null;
@@ -175,7 +177,14 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
         getDisplay().showProgress(true);
         CreateCodingViewCallBack createCodingViewCallback = new CreateCodingViewCallBack();
         AlreadyExistViewCallBack alreadyExistCodingViewCallback = new AlreadyExistViewCallBack();
-        ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource("/datasource/" + getDisplay().getDatasourceName() + "/view/" + getDisplay().getViewName().getText()).get().withCallback(alreadyExistCodingViewCallback).withCallback(Response.SC_NOT_FOUND, createCodingViewCallback).send();
+        UriBuilder uriBuilder = UriBuilder.create();
+        uriBuilder.segment("datasource", getDisplay().getDatasourceName(), "view",
+            getDisplay().getViewName().getText());
+
+        ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(uriBuilder.build()).get()
+            .withCallback(alreadyExistCodingViewCallback)
+            .withCallback(Response.SC_NOT_FOUND, createCodingViewCallback)
+            .send();
       }
     }
 
@@ -205,7 +214,13 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
       ViewDto codingView = getViewDto();
       CreatedCodingViewCallBack callbackHandler = new CreatedCodingViewCallBack(codingView);
-      ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + getDisplay().getDatasourceName() + "/views/").post().withResourceBody(ViewDto.stringify(codingView)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      UriBuilder uriBuilder = UriBuilder.create();
+      uriBuilder.segment("datasource", getDisplay().getDatasourceName(), "views");
+      ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post()
+          .withResourceBody(ViewDto.stringify(codingView))
+          .withCallback(Response.SC_CREATED, callbackHandler)
+          .withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+          .send();
     }
   }
 

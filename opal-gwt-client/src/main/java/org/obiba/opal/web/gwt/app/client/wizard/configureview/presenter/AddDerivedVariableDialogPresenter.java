@@ -1,25 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
-
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.VariableListViewDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -30,6 +18,18 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresenter<AddDerivedVariableDialogPresenter.Display> {
 
@@ -66,7 +66,8 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
   private void addHandlers() {
     super.registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
     super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
   }
 
   private String getVariableName() {
@@ -77,7 +78,8 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     getView().clearVariableSuggestions();
 
     // Add the derived variables to the suggestions.
-    VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    VariableListViewDto variableListDto = (VariableListViewDto) viewDto
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
       getView().addVariableSuggestion(variable.getName());
     }
@@ -87,11 +89,13 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     String[] tableNameParts;
     for(int i = 0; i < viewDto.getFromArray().length(); i++) {
       tableNameParts = viewDto.getFromArray().get(i).split("\\.");
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder()//
-      .forResource("/datasource/" + tableNameParts[0] + "/table/" + tableNameParts[1] + "/variables")//
-      .get()//
-      .withCallback(404, ResponseCodeCallbacks.noOp())//
-      .withCallback(variablesDtoCallBack).send();
+      UriBuilder ub = UriBuilder.create()
+          .segment("datasource", tableNameParts[0], "table", tableNameParts[1], "variables");
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()//
+          .forResource(ub.build())//
+          .get()//
+          .withCallback(404, ResponseCodeCallbacks.noOp())//
+          .withCallback(variablesDtoCallBack).send();
     }
   }
 
@@ -111,7 +115,8 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
       ViewDto viewDto = event.getView();
       viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
-      VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      VariableListViewDto variableListDto = (VariableListViewDto) viewDto
+          .getExtension(VariableListViewDto.ViewDtoExtensions.view);
       variableListDto.setVariablesArray(JsArrays.toSafeArray(variableListDto.getVariablesArray()));
 
       refreshVariableNameSuggestions(event.getView());

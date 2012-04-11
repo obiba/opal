@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -14,6 +14,18 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -32,23 +44,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMapPresenter.Display> {
 
@@ -96,7 +96,8 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
   protected TableDto identifiersTable;
 
   @Inject
-  public IdentifiersMapPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter csvOptionsFileSelectionPresenter) {
+  public IdentifiersMapPresenter(final Display display, final EventBus eventBus,
+      FileSelectionPresenter csvOptionsFileSelectionPresenter) {
     super(eventBus, display);
     this.csvOptionsFileSelectionPresenter = csvOptionsFileSelectionPresenter;
   }
@@ -119,7 +120,10 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
 
   @Override
   protected void onFinish() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getView().getSelectedUnitName() + "/entities/identifiers/map").put().authorize(new Authorizer(getEventBus()) {
+    UriBuilder ub = UriBuilder.create()
+        .segment("functional-unit", getView().getSelectedUnitName(), "entities", "identifiers", "map");
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).put().authorize(new Authorizer(getEventBus()) {
 
       @Override
       public void authorized() {
@@ -130,15 +134,16 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
   }
 
   private void getIdentifiersTable() {
-    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/functional-units/entities/table").get().withCallback(new ResourceCallback<TableDto>() {
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource("/functional-units/entities/table").get()
+        .withCallback(new ResourceCallback<TableDto>() {
 
-      @Override
-      public void onResource(Response response, TableDto resource) {
-        if(resource != null) {
-          identifiersTable = resource;
-        }
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            if(resource != null) {
+              identifiersTable = resource;
+            }
+          }
+        }).send();
   }
 
   class FileValidator extends AbstractValidationHandler {
@@ -152,7 +157,8 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
       validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "CSVFileRequired"));
-      validators.add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
+      validators
+          .add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
       validators.add(new RequiredTextValidator(getView().getCsvOptions().getCharsetText(), "CharsetNotAvailable"));
 
       return validators;
@@ -166,11 +172,11 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
       // get the units from the map file
       String path = "/functional-units/entities/identifiers/map/units?path=" + getSelectedCsvFile().getText();
 
-      ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource(path).get()//
-      .withCallback(new GetMappedUnitsCompletedCallback())//
-      .withCallback(Response.SC_NOT_FOUND, new GetMappedUnitsFailedCallback())//
-      .withCallback(Response.SC_BAD_REQUEST, new GetMappedUnitsFailedCallback())//
-      .send();
+      ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource(path).get()//
+          .withCallback(new GetMappedUnitsCompletedCallback())//
+          .withCallback(Response.SC_NOT_FOUND, new GetMappedUnitsFailedCallback())//
+          .withCallback(Response.SC_BAD_REQUEST, new GetMappedUnitsFailedCallback())//
+          .send();
     }
   }
 
@@ -223,36 +229,39 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
         }
       }
     };
-
-    String path = "/functional-unit/" + getView().getSelectedUnitName() + "/entities/identifiers/map?path=" + getSelectedCsvFile().getText();
+    String build = UriBuilder.create()
+        .segment("functional-unit", getView().getSelectedUnitName(), "entities", "identifiers", "map").build();
+    String path = build + "?path=" + getSelectedCsvFile().getText();
 
     ResourceRequestBuilderFactory.newBuilder().forResource(path).put()//
-    .accept("application/x-protobuf+json").accept("text/plain").withCallback(200, callbackHandler)//
-    .withCallback(400, callbackHandler)//
-    .withCallback(500, callbackHandler).send();
+        .accept("application/x-protobuf+json").accept("text/plain").withCallback(200, callbackHandler)//
+        .withCallback(400, callbackHandler)//
+        .withCallback(500, callbackHandler).send();
   }
 
   public void getDefaultCharset() {
-    ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
+    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
+        .withCallback(new ResourceCallback<JsArrayString>() {
 
-      @Override
-      public void onResource(Response response, JsArrayString resource) {
-        String charset = resource.get(0);
-        getView().setDefaultCharset(charset);
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArrayString resource) {
+            String charset = resource.get(0);
+            getView().setDefaultCharset(charset);
+          }
+        }).send();
 
   }
 
   public void getAvailableCharsets() {
-    ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/available").get().withCallback(new ResourceCallback<JsArrayString>() {
-      @Override
-      public void onResource(Response response, JsArrayString datasources) {
-        for(int i = 0; i < datasources.length(); i++) {
-          availableCharsets.add(datasources.get(i));
-        }
-      }
-    }).send();
+    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/available").get()
+        .withCallback(new ResourceCallback<JsArrayString>() {
+          @Override
+          public void onResource(Response response, JsArrayString datasources) {
+            for(int i = 0; i < datasources.length(); i++) {
+              availableCharsets.add(datasources.get(i));
+            }
+          }
+        }).send();
   }
 
   private HasText getSelectedCsvFile() {

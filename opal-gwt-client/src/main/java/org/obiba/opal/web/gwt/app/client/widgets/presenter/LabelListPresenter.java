@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -11,22 +11,21 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
 import java.util.Map;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.inject.Inject;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.inject.Inject;
 
 public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Display> {
 
@@ -68,21 +67,23 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
   }
 
   private void getLanguages() {
-    ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/" + datasourceName + "/locales").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<LocaleDto> resource) {
-        @SuppressWarnings("unchecked")
-        JsArray<LocaleDto> languages = (resource != null) ? resource : (JsArray<LocaleDto>) JsArray.createArray();
+    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "locales");
+    ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<LocaleDto> resource) {
+            @SuppressWarnings("unchecked")
+            JsArray<LocaleDto> languages = (resource != null) ? resource : (JsArray<LocaleDto>) JsArray.createArray();
 
-        // Add the 'no locale' locale to the list of locales.
-        LocaleDto noLocaleDto = LocaleDto.create();
-        noLocaleDto.setName("");
-        languages.push(noLocaleDto);
+            // Add the 'no locale' locale to the list of locales.
+            LocaleDto noLocaleDto = LocaleDto.create();
+            noLocaleDto.setName("");
+            languages.push(noLocaleDto);
 
-        getDisplay().setLanguages(languages);
-        updateFields();
-      }
-    }).send();
+            getDisplay().setLanguages(languages);
+            updateFields();
+          }
+        }).send();
   }
 
   @Override
@@ -123,7 +124,8 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
     @Override
     protected boolean hasError() {
       LocaleDto baseLanguageLocaleDto = getDisplay().getBaseLanguage();
-      String baseLanguageLabelValue = getDisplay().getLanguageLabelMap().get(baseLanguageLocaleDto.getName()).getValue();
+      String baseLanguageLabelValue = getDisplay().getLanguageLabelMap().get(baseLanguageLocaleDto.getName())
+          .getValue();
 
       // Base language not required when no locale value is provided.
       String noLocaleValue = getDisplay().getLanguageLabelMap().get("").getValue();

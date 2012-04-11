@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -12,12 +12,17 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
@@ -26,14 +31,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEve
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
 
 /**
  *
@@ -107,7 +106,8 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   }
 
   public void selectDatasourceTables(String datasourceName) {
-    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + datasourceName + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(
+        "/datasource/" + datasourceName + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
       @Override
       public void onResource(Response response, JsArray<TableDto> resource) {
         if(resource != null) {
@@ -125,14 +125,16 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
   }
 
   public void selectTable(String datasourceName, String tableName) {
-    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/datasource/" + datasourceName + "/table/" + tableName).get().withCallback(new ResourceCallback<TableDto>() {
-      @Override
-      public void onResource(Response response, TableDto resource) {
-        if(resource != null) {
-          updateTables(resource);
-        }
-      }
-    }).withCallback(404, ResponseCodeCallbacks.noOp()).send();
+    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "table", tableName);
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get().withCallback(
+        new ResourceCallback<TableDto>() {
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            if(resource != null) {
+              updateTables(resource);
+            }
+          }
+        }).withCallback(404, ResponseCodeCallbacks.noOp()).send();
   }
 
   public void addTable(TableDto table) {
@@ -145,7 +147,8 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
     boolean updated = false;
     boolean found = false;
     for(TableDto table : getTables()) {
-      if(table.getName().equals(selectedTable.getName()) && table.getDatasourceName().equals(selectedTable.getDatasourceName())) {
+      if(table.getName().equals(selectedTable.getName()) && table.getDatasourceName().equals(
+          selectedTable.getDatasourceName())) {
         found = true;
         break;
       }
@@ -231,14 +234,16 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
           removeButtonAction();
         }
       };
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, confirmationTitleKey, confirmationMessageKey));
+      eventBus.fireEvent(
+          new ConfirmationRequiredEvent(actionRequiringConfirmation, confirmationTitleKey, confirmationMessageKey));
     }
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event
+          .isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }

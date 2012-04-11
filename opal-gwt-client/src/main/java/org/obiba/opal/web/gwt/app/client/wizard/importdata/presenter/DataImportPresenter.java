@@ -339,7 +339,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           // ignore
         }
       };
-
+      //TODO use uribuilder
       ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + importData.getTransientDatasourceName())
           .delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
           .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)

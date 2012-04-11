@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -11,20 +11,6 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
-import org.obiba.opal.web.gwt.app.client.widgets.event.SelectionType;
-import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -35,6 +21,19 @@ import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import net.customware.gwt.presenter.client.EventBus;
+import net.customware.gwt.presenter.client.place.Place;
+import net.customware.gwt.presenter.client.place.PlaceRequest;
+import net.customware.gwt.presenter.client.widget.WidgetDisplay;
+import net.customware.gwt.presenter.client.widget.WidgetPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.event.SelectionType;
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 /**
  *
@@ -75,31 +74,33 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
 
   @Override
   public void revealDisplay() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        initDatasource(resource);
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            initDatasource(resource);
 
-        getDisplay().setSelectionType(selectionType);
-        getDisplay().renderDatasources(datasources);
-        getDisplay().showDialog();
-      }
+            getDisplay().setSelectionType(selectionType);
+            getDisplay().renderDatasources(datasources);
+            getDisplay().showDialog();
+          }
 
-    }).send();
+        }).send();
   }
 
   @Override
   public void refreshDisplay() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        initDatasource(resource);
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            initDatasource(resource);
 
-        getDisplay().setSelectionType(selectionType);
-        getDisplay().renderDatasources(datasources);
-      }
+            getDisplay().setSelectionType(selectionType);
+            getDisplay().renderDatasources(datasources);
+          }
 
-    }).send();
+        }).send();
   }
 
   @Override
@@ -132,14 +133,15 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
   }
 
   private void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(TableSelectionRequiredEvent.getType(), new TableSelectionRequiredEvent.Handler() {
+    super.registerHandler(
+        eventBus.addHandler(TableSelectionRequiredEvent.getType(), new TableSelectionRequiredEvent.Handler() {
 
-      public void onTableSelectionRequired(TableSelectionRequiredEvent event) {
-        callSource = event.getSource();
-        setSelectionType(event.getSelectionType());
-        revealDisplay();
-      }
-    }));
+          public void onTableSelectionRequired(TableSelectionRequiredEvent event) {
+            callSource = event.getSource();
+            setSelectionType(event.getSelectionType());
+            revealDisplay();
+          }
+        }));
 
     super.registerHandler(getDisplay().getDatasourceList().addChangeHandler(new ChangeHandler() {
 
@@ -157,18 +159,20 @@ public class TableSelectorPresenter extends WidgetPresenter<TableSelectorPresent
       public void onClick(ClickEvent event) {
         DatasourceDto selectedDatasource = datasources.get(getDisplay().getSelectedDatasourceIndex());
         if(getDisplay().getSelectedTableIndices().size() > 0) {
-          ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource("/datasource/" + selectedDatasource.getName() + "/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<TableDto> resource) {
-              List<TableDto> selectedTables = new ArrayList<TableDto>();
-              // table names and table dtos are both in alphabetical order
-              for(Integer idx : getDisplay().getSelectedTableIndices()) {
-                selectedTables.add(resource.get(idx));
-              }
-              eventBus.fireEvent(new TableSelectionEvent(callSource, selectedTables));
-            }
+          UriBuilder ub = UriBuilder.create().segment("datasource", selectedDatasource.getName(), "tables");
+          ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build()).get()
+              .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+                @Override
+                public void onResource(Response response, JsArray<TableDto> resource) {
+                  List<TableDto> selectedTables = new ArrayList<TableDto>();
+                  // table names and table dtos are both in alphabetical order
+                  for(Integer idx : getDisplay().getSelectedTableIndices()) {
+                    selectedTables.add(resource.get(idx));
+                  }
+                  eventBus.fireEvent(new TableSelectionEvent(callSource, selectedTables));
+                }
 
-          }).send();
+              }).send();
         }
       }
     }));

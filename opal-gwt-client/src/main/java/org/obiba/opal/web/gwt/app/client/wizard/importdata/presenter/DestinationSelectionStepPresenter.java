@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
@@ -47,9 +48,9 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
       @Override
       public void onTableSelected(String datasource, String table) {
-        // TODO Auto-generated method stub
+        UriBuilder ub = UriBuilder.create().segment("datasource", datasource, "table", table);
         ResourceRequestBuilderFactory.<TableDto>newBuilder()
-            .forResource("/datasource/" + datasource + "/table/" + table).get()//
+            .forResource(ub.build()).get()//
             .withCallback(new ResourceCallback<TableDto>() {
 
               @Override

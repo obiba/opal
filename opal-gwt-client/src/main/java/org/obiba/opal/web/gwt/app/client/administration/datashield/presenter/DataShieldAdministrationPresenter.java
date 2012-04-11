@@ -1,8 +1,15 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
-
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
@@ -16,22 +23,15 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
 
 public class DataShieldAdministrationPresenter extends PresenterWidget<DataShieldAdministrationPresenter.Display> {
 
@@ -42,7 +42,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   private DataShieldMethodPresenter dataShieldMethodPresenter;
 
   @Inject
-  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus, DataShieldMethodPresenter dataShieldMethodPresenter) {
+  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus,
+      DataShieldMethodPresenter dataShieldMethodPresenter) {
     super(eventBus, display);
     this.dataShieldMethodPresenter = dataShieldMethodPresenter;
   }
@@ -75,21 +76,23 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
         addToPopupSlot(dataShieldMethodPresenter);
       }
     }));
-    registerHandler(getEventBus().addHandler(DataShieldMethodCreatedEvent.getType(), new DataShieldMethodCreatedEvent.Handler() {
+    registerHandler(
+        getEventBus().addHandler(DataShieldMethodCreatedEvent.getType(), new DataShieldMethodCreatedEvent.Handler() {
 
-      @Override
-      public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
-        updateDataShieldMethods();
-      }
-    }));
-    registerHandler(getEventBus().addHandler(DataShieldMethodUpdatedEvent.getType(), new DataShieldMethodUpdatedEvent.Handler() {
+          @Override
+          public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
+            updateDataShieldMethods();
+          }
+        }));
+    registerHandler(
+        getEventBus().addHandler(DataShieldMethodUpdatedEvent.getType(), new DataShieldMethodUpdatedEvent.Handler() {
 
-      @Override
-      public void onDataShieldMethodUpdated(DataShieldMethodUpdatedEvent event) {
-        updateDataShieldMethods();
-      }
+          @Override
+          public void onDataShieldMethodUpdated(DataShieldMethodUpdatedEvent event) {
+            updateDataShieldMethods();
+          }
 
-    }));
+        }));
   }
 
   @Override
@@ -100,8 +103,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   // @Override
   public void authorize(HasAuthorization authorizer) {
     authorizeMethods(CascadingAuthorizer.newBuilder()//
-    .or(AclRequest.newResourceAuthorizationRequestBuilder())//
-    .authorize(authorizer).build());
+        .or(AclRequest.newResourceAuthorizationRequestBuilder())//
+        .authorize(authorizer).build());
   }
 
   private void authorize() {
@@ -112,7 +115,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   private String environment() {
-    return "/datashield/env/" + this.env;
+    return UriBuilder.create().segment("datashield", "env", "{env}").build(this.env);
   }
 
   private String methods() {
@@ -120,7 +123,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   private String method(String method) {
-    return environment() + "/method/" + method;
+    return environment() + UriBuilder.create().segment("method", "{method}").build(method);
   }
 
   private void authorizeMethods(HasAuthorization authorizer) {
@@ -132,22 +135,24 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   private void authorizeEditMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).put().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).put().authorize(
+        authorizer).send();
   }
 
   private void authorizeDeleteMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete().authorize(
+        authorizer).send();
   }
 
   private void updateDataShieldMethods() {
-    ResourceRequestBuilderFactory.<JsArray<DataShieldMethodDto>> newBuilder().forResource(methods()).get()//
-    .withCallback(new ResourceCallback<JsArray<DataShieldMethodDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<DataShieldMethodDto>>newBuilder().forResource(methods()).get()//
+        .withCallback(new ResourceCallback<JsArray<DataShieldMethodDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<DataShieldMethodDto> resource) {
-        getView().renderDataShieldMethodsRows(JsArrays.toSafeArray(resource));
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArray<DataShieldMethodDto> resource) {
+            getView().renderDataShieldMethodsRows(JsArrays.toSafeArray(resource));
+          }
+        }).send();
   }
 
   protected void doDataShieldMethodActionImpl(final DataShieldMethodDto dto, String actionName) {
@@ -170,7 +175,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
               deleteDataShieldMethod(dto);
             }
           };
-          getEventBus().fireEvent(new ConfirmationRequiredEvent(removeMethodConfirmation, "deleteDataShieldMethod", "confirmDeleteDataShieldMethod"));
+          getEventBus().fireEvent(new ConfirmationRequiredEvent(removeMethodConfirmation, "deleteDataShieldMethod",
+              "confirmDeleteDataShieldMethod"));
         }
       });
 
@@ -192,9 +198,9 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
     };
 
     ResourceRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete() //
-    .withCallback(Response.SC_OK, callbackHandler) //
-    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-    .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+        .withCallback(Response.SC_OK, callbackHandler) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   //
@@ -225,7 +231,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) && event.isConfirmed()) {
+      if(removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) && event
+          .isConfirmed()) {
         removeMethodConfirmation.run();
         removeMethodConfirmation = null;
       }

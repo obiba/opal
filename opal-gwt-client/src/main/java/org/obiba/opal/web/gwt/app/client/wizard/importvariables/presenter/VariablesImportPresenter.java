@@ -1,14 +1,24 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -24,22 +34,12 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display> {
 
@@ -66,7 +66,9 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public VariablesImportPresenter(final Display display, final EventBus eventBus, ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, ConclusionStepPresenter conclusionPresenter, FileSelectionPresenter fileSelectionPresenter) {
+  public VariablesImportPresenter(final Display display, final EventBus eventBus,
+      ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
+      ConclusionStepPresenter conclusionPresenter, FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.conclusionPresenter = conclusionPresenter;
@@ -98,23 +100,26 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   private void initDatasources() {
     if(datasourceName != null) {
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasource/" + datasourceName).get().withCallback(new ResourceCallback<DatasourceDto>() {
-        @Override
-        public void onResource(Response response, DatasourceDto resource) {
-          JsArray<DatasourceDto> datasources = JsArray.createArray().cast();
-          if(resource != null) {
-            datasources.push(resource);
-          }
-          getView().setDatasources(datasources);
-        }
-      }).send();
+      UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(new ResourceCallback<DatasourceDto>() {
+            @Override
+            public void onResource(Response response, DatasourceDto resource) {
+              JsArray<DatasourceDto> datasources = JsArray.createArray().cast();
+              if(resource != null) {
+                datasources.push(resource);
+              }
+              getView().setDatasources(datasources);
+            }
+          }).send();
     } else {
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-        @Override
-        public void onResource(Response response, JsArray<DatasourceDto> resource) {
-          getView().setDatasources(JsArrays.toSafeArray(resource));
-        }
-      }).send();
+      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get().withCallback(
+          new ResourceCallback<JsArray<DatasourceDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<DatasourceDto> resource) {
+              getView().setDatasources(JsArrays.toSafeArray(resource));
+            }
+          }).send();
     }
   }
 
@@ -164,7 +169,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private final class FileSelectionValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(getView().getSelectedFile().length() > 0 && (getView().getSelectedFile().endsWith(".xls") || getView().getSelectedFile().endsWith(".xlsx"))) {
+      if(getView().getSelectedFile().length() > 0 && (getView().getSelectedFile().endsWith(".xls") || getView()
+          .getSelectedFile().endsWith(".xlsx"))) {
         return true;
       } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExcelFileRequired").build());
@@ -221,7 +227,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
         public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == 201) {
-            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getView().getSelectedDatasource(), getView().getDatasourceCreatedCallback(), factory, resource);
+            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(),
+                getView().getSelectedDatasource(), getView().getDatasourceCreatedCallback(), factory, resource);
           }
         }
       };
@@ -238,10 +245,10 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
         }
       };
 
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder()//
-      .forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory))//
-      .withCallback(callback)//
-      .withCallback(400, errorCallback).withCallback(500, errorCallback).send();
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder()//
+          .forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory))//
+          .withCallback(callback)//
+          .withCallback(400, errorCallback).withCallback(500, errorCallback).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {

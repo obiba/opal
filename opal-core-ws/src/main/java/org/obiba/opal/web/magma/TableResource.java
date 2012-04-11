@@ -1,18 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.magma;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -25,10 +20,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import org.jboss.resteasy.annotations.cache.Cache;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
@@ -46,11 +47,6 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-
 public class TableResource extends AbstractValueTableResource {
 
   public TableResource(ValueTable valueTable, Set<Locale> locales) {
@@ -58,13 +54,13 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   public TableResource(ValueTable valueTable) {
-    this(valueTable, Collections.<Locale> emptySet());
+    this(valueTable, Collections.<Locale>emptySet());
   }
 
   @GET
   public TableDto get(@Context final UriInfo uriInfo) {
-    TableDto.Builder builder = Dtos.asDto(getValueTable()).setLink(uriInfo.getPath());
-    if(getValueTable().isView()) builder.setViewLink(uriInfo.getPath().replaceFirst("table", "view"));
+    TableDto.Builder builder = Dtos.asDto(getValueTable()).setLink(uriInfo.getPath(false));
+    if(getValueTable().isView()) builder.setViewLink(uriInfo.getPath(false).replaceFirst("table", "view"));
     return builder.build();
   }
 
@@ -76,6 +72,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get the entities, optionally filtered by a script.
+   *
    * @param script script for filtering the entities
    * @return
    */
@@ -94,22 +91,27 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get the value set from the given entity identifier, for the variables filtered by the optional 'select' script.
+   *
    * @param identifier
-   * @param select script for filtering the variables
+   * @param select     script for filtering the variables
    * @return
    */
   @Path("/valueSet/{identifier}")
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public ValueSetsResource getValueSet(@Context Request request, @Context final UriInfo uriInfo, @PathParam("identifier") String identifier, @QueryParam("select") String select, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
+  public ValueSetsResource getValueSet(@Context Request request, @Context final UriInfo uriInfo,
+      @PathParam("identifier") String identifier, @QueryParam("select") String select,
+      @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     TimestampedResponses.evaluate(request, getValueTable());
-    return new ValueSetsResource(getValueTable(), ImmutableList.<VariableEntity>of(new VariableEntityBean(this.getValueTable().getEntityType(), identifier)));
+    return new ValueSetsResource(getValueTable(),
+        ImmutableList.<VariableEntity>of(new VariableEntityBean(this.getValueTable().getEntityType(), identifier)));
   }
 
   // This should be /valueSets, but its POST is already implemented in ValueSetsResource due to GET not allowing a body
   @POST
   @Path("/valueSet")
   public Response updateValueSet(ValueSetsDto valueSetsDto) {
-    ValueTableWriter tableWriter = getDatasource().createWriter(getValueTable().getName(), valueSetsDto.getEntityType());
+    ValueTableWriter tableWriter = getDatasource()
+        .createWriter(getValueTable().getName(), valueSetsDto.getEntityType());
     try {
       for(ValueSetsDto.ValueSetDto valueSetDto : valueSetsDto.getValueSetsList()) {
         VariableEntity entity = new VariableEntityBean(valueSetsDto.getEntityType(), valueSetDto.getIdentifier());
@@ -117,7 +119,8 @@ public class TableResource extends AbstractValueTableResource {
         try {
           for(int i = 0; i < valueSetsDto.getVariablesCount(); i++) {
             Variable variable = getValueTable().getVariable(valueSetsDto.getVariables(i));
-            writer.writeValue(variable, Dtos.fromDto(valueSetDto.getValues(i), variable.getValueType(), variable.isRepeatable()));
+            writer.writeValue(variable,
+                Dtos.fromDto(valueSetDto.getValues(i), variable.getValueType(), variable.isRepeatable()));
           }
         } finally {
           Closeables.closeQuietly(writer);
@@ -142,7 +145,10 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @Path("/variable/_transient")
-  public VariableResource getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
+  public VariableResource getTransient(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
+      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
+      @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
+      @FormParam("category") List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
     if(script == null || script.equals("")) {
@@ -154,7 +160,8 @@ public class TableResource extends AbstractValueTableResource {
     if(categories == null || categories.isEmpty()) {
       categories = categoriesFP;
     }
-    Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script, categories == null ? ImmutableList.<String> of() : categories);
+    Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script,
+        categories == null ? ImmutableList.<String>of() : categories);
     JavascriptVariableValueSource jvvs = new JavascriptVariableValueSource(transientVariable, getValueTable());
     jvvs.initialise();
     return getVariableResource(jvvs);
@@ -184,8 +191,10 @@ public class TableResource extends AbstractValueTableResource {
     return new VariableResource(this.getValueTable(), source);
   }
 
-  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
-    Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
+  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script,
+      List<String> categories) {
+    Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType())
+        .extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {
       builder.repeatable();

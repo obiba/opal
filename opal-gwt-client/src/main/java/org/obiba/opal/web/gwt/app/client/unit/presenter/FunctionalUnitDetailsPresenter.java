@@ -1,14 +1,24 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Command;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
@@ -27,23 +37,13 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Command;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 
 public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUnitDetailsPresenter.Display> {
 
@@ -109,7 +109,9 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   }
 
   @Inject
-  public FunctionalUnitDetailsPresenter(final Display display, final EventBus eventBus, FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter, Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter) {
+  public FunctionalUnitDetailsPresenter(final Display display, final EventBus eventBus,
+      FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter,
+      Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter) {
     super(eventBus, display);
     this.functionalUnitUpdateDialogPresenter = functionalUnitUpdateDialogPresenter;
     this.addKeyPairDialogPresenter = addKeyPairDialogPresenter;
@@ -143,16 +145,18 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       }
     });
 
-    super.registerHandler(getEventBus().addHandler(FunctionalUnitSelectedEvent.getType(), new FunctionalUnitSelectedEvent.Handler() {
+    super.registerHandler(
+        getEventBus().addHandler(FunctionalUnitSelectedEvent.getType(), new FunctionalUnitSelectedEvent.Handler() {
 
-      @Override
-      public void onFunctionalUnitSelected(FunctionalUnitSelectedEvent event) {
-        refreshFunctionalUnitDetails(event.getFunctionalUnit());
-      }
-    }));
+          @Override
+          public void onFunctionalUnitSelected(FunctionalUnitSelectedEvent event) {
+            refreshFunctionalUnitDetails(event.getFunctionalUnit());
+          }
+        }));
 
     super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(getEventBus().addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
     super.registerHandler(getEventBus().addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
   }
 
@@ -190,44 +194,76 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     };
 
-    countIdentifiersRequest = ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/count").get()//
-    .withCallback(Response.SC_OK, callbackHandler) //
-    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-    .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "entities", "count");
+    countIdentifiersRequest = ResourceRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).get()//
+        .withCallback(Response.SC_OK, callbackHandler) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private void authorize() {
+    UriBuilder ub;
+
     // export identifiers
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").get().authorize(getView().getDownloadIdentifiersAuthorizer()).send();
+    ub = UriBuilder.create()
+        .segment("functional-unit", functionalUnit.getName(), "entities", "identifiers");
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).get()
+        .authorize(getView().getDownloadIdentifiersAuthorizer()).send();
+
     // export identifiers mapping
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/csv").get().authorize(getView().getExportIdentifiersAuthorizer()).send();
+    ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "entities", "csv");
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).get()
+        .authorize(getView().getExportIdentifiersAuthorizer()).send();
+
     // remove
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).delete().authorize(getView().getRemoveFunctionalUnitAuthorizer()).send();
+    ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build())
+        .delete().authorize(getView().getRemoveFunctionalUnitAuthorizer()).send();
 
     // generate identifiers
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").post().authorize(getView().getGenerateIdentifiersAuthorizer()).send();
+    ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "entities", "identifiers");
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).post()
+        .authorize(getView().getGenerateIdentifiersAuthorizer()).send();
+
     // add identifiers
+    ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "entities");
     ResourceAuthorizationRequestBuilderFactory.newBuilder()//
-    .forResource("/functional-unit/" + functionalUnit.getName() + "/entities").post()//
-    .authorize(CascadingAuthorizer.newBuilder().and("/functional-units/entities/table", HttpMethod.GET)//
-    .authorize(getView().getImportIdentifiersFromDataAuthorizer()).build())//
-    .send();
+        .forResource(ub.build()).post()//
+        .authorize(CascadingAuthorizer.newBuilder().and("/functional-units/entities/table", HttpMethod.GET)//
+            .authorize(getView().getImportIdentifiersFromDataAuthorizer()).build())//
+        .send();
+
     // add key pair
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").post().authorize(getView().getAddKeyPairAuthorizer()).send();
+    ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "keys");
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).post().authorize(getView().getAddKeyPairAuthorizer()).send();
 
     // edit
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).put().authorize(getView().getUpdateFunctionalUnitAuthorizer()).send();
+    ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build())
+        .put().authorize(getView().getUpdateFunctionalUnitAuthorizer()).send();
 
     // display key pairs
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/keys").get().authorize(getView().getListKeyPairsAuthorizer()).send();
+    ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "keys");
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).get().authorize(getView().getListKeyPairsAuthorizer()).send();
   }
 
   private void authorizeDownloadCertificate(KeyDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + dto.getAlias() + "/certificate").get().authorize(authorizer).send();
+    UriBuilder ub = UriBuilder.create()
+        .segment("functional-unit", functionalUnit.getName(), "key", dto.getAlias(), "certificate");
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).get().authorize(authorizer).send();
   }
 
   private void authorizeDeleteKeyPair(KeyDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + dto.getAlias()).delete().authorize(authorizer).send();
+    UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "key", dto.getAlias());
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ub.build()).delete().authorize(authorizer).send();
   }
 
   protected void doActionImpl(final KeyDto dto, String actionName) {
@@ -249,7 +285,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
               deleteKeyPair(dto);
             }
           };
-          getEventBus().fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
+          getEventBus()
+              .fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
         }
       });
     }
@@ -269,17 +306,17 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       }
 
     };
-
-    ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/key/" + dto.getAlias()).delete() //
-    .withCallback(Response.SC_OK, callbackHandler) //
-    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-    .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "key", dto.getAlias());
+    ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).delete() //
+        .withCallback(Response.SC_OK, callbackHandler) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private void downloadCertificate(final KeyDto dto) {
-    String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
-    .append("/key/").append(dto.getAlias()).append("/certificate").toString();
-    getEventBus().fireEvent(new FileDownloadEvent(url));
+    UriBuilder ub = UriBuilder.create()
+        .segment("functional-unit", functionalUnit.getName(), "key", dto.getAlias(), "certificate");
+    getEventBus().fireEvent(new FileDownloadEvent(ub.build()));
   }
 
   private void refreshFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
@@ -287,14 +324,20 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       getView().setAvailable(false);
     } else {
       String name = functionalUnit.getName();
-      ResourceRequestBuilderFactory.<FunctionalUnitDto> newBuilder().forResource("/functional-unit/" + name).get().withCallback(new FunctionalUnitFoundCallBack()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
+      UriBuilder ub = UriBuilder.create().segment("functional-unit", name);
+      ResourceRequestBuilderFactory.<FunctionalUnitDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(new FunctionalUnitFoundCallBack())
+          .withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
       refreshKeyPairs(functionalUnit);
     }
   }
 
   private void refreshKeyPairs(FunctionalUnitDto functionalUnit) {
     String name = functionalUnit.getName();
-    ResourceRequestBuilderFactory.<JsArray<KeyDto>> newBuilder().forResource("/functional-unit/" + name + "/keys").get().withCallback(new KeyPairsCallback()).withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
+    UriBuilder ub = UriBuilder.create().segment("functional-unit", name, "keys");
+    ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder().forResource(ub.build()).get()
+        .withCallback(new KeyPairsCallback())
+        .withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
   }
 
   private class AddKeyPairCommand implements Command {
@@ -316,7 +359,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
       } else {
         generateConfirmation = new GenerateConfirmationRunnable();
-        getEventBus().fireEvent(new ConfirmationRequiredEvent(generateConfirmation, "generateFunctionalUnitIdentifiers", "confirmGenerateFunctionalUnitIdentifiers"));
+        getEventBus().fireEvent(new ConfirmationRequiredEvent(generateConfirmation, "generateFunctionalUnitIdentifiers",
+            "confirmGenerateFunctionalUnitIdentifiers"));
       }
     }
   }
@@ -325,7 +369,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     @Override
     public void execute() {
       String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
-      .append("/entities/identifiers").toString();
+          .append("/entities/identifiers").toString();
       getEventBus().fireEvent(new FileDownloadEvent(url));
     }
   }
@@ -343,12 +387,17 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
             } catch(NumberFormatException e) {
             }
             if(count > 0) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().info("IdentifiersGenerationCompleted").args(functionalUnit.getName(), response.getText()).nonSticky().build());
+              getEventBus().fireEvent(NotificationEvent.newBuilder().info("IdentifiersGenerationCompleted")
+                  .args(functionalUnit.getName(), response.getText()).nonSticky().build());
             } else {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().info("NoIdentifiersGenerated").args(functionalUnit.getName()).nonSticky().build());
+              getEventBus().fireEvent(
+                  NotificationEvent.newBuilder().info("NoIdentifiersGenerated").args(functionalUnit.getName())
+                      .nonSticky().build());
             }
           } else {
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationFailed").args(functionalUnit.getName()).build());
+            getEventBus().fireEvent(
+                NotificationEvent.newBuilder().error("IdentifiersGenerationFailed").args(functionalUnit.getName())
+                    .build());
           }
           generateConfirmation = null;
           onReveal();
@@ -356,10 +405,13 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
       };
 
-      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName() + "/entities/identifiers").post()//
-      .withCallback(Response.SC_OK, callbackHandler) //
-      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-      .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+      UriBuilder ub = UriBuilder.create()
+          .segment("functional-unit", functionalUnit.getName(), "entities", "identifiers");
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(ub.build()).post()//
+          .withCallback(Response.SC_OK, callbackHandler) //
+          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+          .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
     }
   }
 
@@ -367,7 +419,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     @Override
     public void execute() {
       String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
-      .append("/entities/csv").toString();
+          .append("/entities/csv").toString();
       getEventBus().fireEvent(new FileDownloadEvent(url));
     }
   }
@@ -393,10 +445,14 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       removeConfirmation = new Runnable() {
         public void run() {
           ResponseCodeCallback callbackHandler = new FunctionalUnitDeleteCallback();
-          ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + functionalUnit.getName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+          UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
+          ResourceRequestBuilderFactory.newBuilder().forResource(ub.build())
+              .delete().withCallback(Response.SC_OK, callbackHandler)
+              .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
         }
       };
-      getEventBus().fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
+      getEventBus().fireEvent(
+          new ConfirmationRequiredEvent(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
     }
 
   }
@@ -476,7 +532,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitCannotBeFound").args(functionalUnitName).build());
+      getEventBus().fireEvent(
+          NotificationEvent.newBuilder().error("FunctionalUnitCannotBeFound").args(functionalUnitName).build());
     }
 
   }

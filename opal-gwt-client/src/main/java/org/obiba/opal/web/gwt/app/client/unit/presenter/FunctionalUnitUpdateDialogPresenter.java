@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -13,16 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -36,6 +26,16 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<FunctionalUnitUpdateDialogPresenter.Display> {
 
@@ -96,7 +96,8 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getView().getUpdateFunctionalUnitButton().addClickHandler(new CreateOrUpdateFunctionalUnitClickHandler()));
+    super.registerHandler(
+        getView().getUpdateFunctionalUnitButton().addClickHandler(new CreateOrUpdateFunctionalUnitClickHandler()));
     super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         getView().hideDialog();
@@ -113,7 +114,11 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     if(validFunctionalUnit()) {
       FunctionalUnitDto functionalUnit = getFunctionalUnitDto();
       CreateOrUpdateFunctionalUnitCallBack callbackHandler = new CreateOrUpdateFunctionalUnitCallBack(functionalUnit);
-      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-unit/" + getView().getName().getText()).put().withResourceBody(FunctionalUnitDto.stringify(functionalUnit)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      UriBuilder ub = UriBuilder.create().segment("functional-unit", getView().getName().getText());
+      ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
+          .withResourceBody(FunctionalUnitDto.stringify(functionalUnit)).withCallback(Response.SC_OK, callbackHandler)
+          .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+          .send();
     }
   }
 
@@ -121,7 +126,9 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     if(validFunctionalUnit()) {
       CreateFunctionalUnitCallBack createFunctionalUnitCallback = new CreateFunctionalUnitCallBack();
       AlreadyExistFunctionalUnitCallBack alreadyExistFunctionalUnitCallback = new AlreadyExistFunctionalUnitCallBack();
-      ResourceRequestBuilderFactory.<FunctionalUnitDto> newBuilder().forResource("/functional-unit/" + getView().getName().getText()).get().withCallback(alreadyExistFunctionalUnitCallback).withCallback(Response.SC_NOT_FOUND, createFunctionalUnitCallback).send();
+      UriBuilder ub = UriBuilder.create().segment("functional-unit", getView().getName().getText());
+      ResourceRequestBuilderFactory.<FunctionalUnitDto>newBuilder().forResource(ub.build()).get().withCallback
+          (alreadyExistFunctionalUnitCallback).withCallback(Response.SC_NOT_FOUND, createFunctionalUnitCallback).send();
     }
   }
 
@@ -157,7 +164,8 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
 
     @Override
     public void onResource(Response response, FunctionalUnitDto resource) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitAlreadyExistWithTheSpecifiedName").build());
+      getEventBus()
+          .fireEvent(NotificationEvent.newBuilder().error("FunctionalUnitAlreadyExistWithTheSpecifiedName").build());
     }
 
   }
@@ -168,7 +176,10 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     public void onResponseCode(Request request, Response response) {
       FunctionalUnitDto functionalUnit = getFunctionalUnitDto();
       CreateOrUpdateFunctionalUnitCallBack callbackHandler = new CreateOrUpdateFunctionalUnitCallBack(functionalUnit);
-      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-units/").post().withResourceBody(FunctionalUnitDto.stringify(functionalUnit)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder().forResource("/functional-units/").post()
+          .withResourceBody(FunctionalUnitDto.stringify(functionalUnit))
+          .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+          .send();
     }
   }
 

@@ -1,26 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
-
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
-import org.obiba.opal.web.model.client.magma.VariableListViewDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -38,6 +25,19 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewStepPresenter.Display> {
 
@@ -49,7 +49,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
   /**
    * {@link ViewDto} of view being configured.
-   * 
+   * <p/>
    * This is initialized upon a {@link ViewConfigurationRequiredEvent} and updated on every
    * {@link ViewSaveRequiredEvent}.
    */
@@ -65,8 +65,8 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
   @Inject
   public ConfigureViewStepPresenter(final Display display, final EventBus eventBus, //
-  DataTabPresenter dataTabPresenter, SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter, //
-  VariablesListTabPresenter variablesListTabPresenter) {
+      DataTabPresenter dataTabPresenter, SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter, //
+      VariablesListTabPresenter variablesListTabPresenter) {
     super(eventBus, display);
     this.dataTabPresenter = dataTabPresenter;
     this.selectScriptVariablesTabPresenter = selectScriptVariablesTabPresenter;
@@ -109,7 +109,8 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   //
 
   private void addEventHandlers() {
-    super.registerHandler(getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
     super.registerHandler(getEventBus().addHandler(ViewSaveRequiredEvent.getType(), new ViewSaveRequiredHandler()));
 
     super.registerHandler(getView().getViewTabs().addSelectionHandler(new SelectionHandler<Integer>() {
@@ -125,7 +126,8 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
       @Override
       public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
         if(viewSavePending) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error("cannotSwitchTabBecauseOfUnsavedChanges").build());
+          getEventBus()
+              .fireEvent(NotificationEvent.newBuilder().error("cannotSwitchTabBecauseOfUnsavedChanges").build());
           // Stop this event. If the user still wants to switch tabs we will handle it manually.
           event.cancel();
         }
@@ -197,7 +199,8 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
       PresenterWidget<?> variablesTabWidget = null;
 
       JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
-      VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      VariableListViewDto variableListDto = (VariableListViewDto) viewDto
+          .getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
       if(jsViewDto != null) {
         variablesTabWidget = selectScriptVariablesTabPresenter;
@@ -227,13 +230,15 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
     }
 
     private void saveView(ViewDto viewDto) {
+      UriBuilder ub = UriBuilder.create()
+          .segment("datasource", viewDto.getDatasourceName(), "view", viewDto.getName());
       ResourceRequestBuilderFactory.newBuilder()
-      /**/.put()
-      /**/.forResource("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName())
-      /**/.accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(viewDto))
-      /**/.withCallback(Response.SC_OK, callback)
-      /**/.withCallback(Response.SC_BAD_REQUEST, callback)
-      /**/.send();
+          .put()
+          .forResource(ub.build())
+          .accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(viewDto))
+          .withCallback(Response.SC_OK, callback)
+          .withCallback(Response.SC_BAD_REQUEST, callback)
+          .send();
     }
 
     private ResponseCodeCallback createResponseCodeCallback() {
@@ -256,7 +261,8 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event
+          .isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -13,25 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.view.KeyValueItemInputView;
-import org.obiba.opal.web.gwt.app.client.widgets.view.TextBoxItemInputView;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.ParameterDto;
-import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -49,6 +30,25 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.view.KeyValueItemInputView;
+import org.obiba.opal.web.gwt.app.client.widgets.view.TextBoxItemInputView;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.opal.ParameterDto;
+import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportTemplateUpdateDialogPresenter.Display> {
 
@@ -107,7 +107,9 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   }
 
   @Inject
-  public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus, Provider<FileSelectionPresenter> fileSelectionPresenterProvider, Provider<ItemSelectorPresenter> itemSelectorPresenterProvider) {
+  public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus,
+      Provider<FileSelectionPresenter> fileSelectionPresenterProvider,
+      Provider<ItemSelectorPresenter> itemSelectorPresenterProvider) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenterProvider.get();
     this.emailSelectorPresenter = itemSelectorPresenterProvider.get();
@@ -135,13 +137,15 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
         return null;
       }
     });
-    validators.add(new ConditionalValidator(getView().isScheduled(), new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired")));
+    validators.add(new ConditionalValidator(getView().isScheduled(),
+        new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired")));
     validators.add(new FieldValidator() {
 
       @Override
       public String validate() {
         for(String email : emailSelectorPresenter.getView().getItems()) {
-          if(!email.matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*((\\.[A-Za-z]{2,}){1}$)")) {
+          if(!email
+              .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*((\\.[A-Za-z]{2,}){1}$)")) {
             return "NotificationEmailsAreInvalid";
           }
         }
@@ -168,7 +172,8 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getView().getUpdateReportTemplateButton().addClickHandler(new CreateOrUpdateReportTemplateClickHandler()));
+    super.registerHandler(
+        getView().getUpdateReportTemplateButton().addClickHandler(new CreateOrUpdateReportTemplateClickHandler()));
 
     super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
@@ -196,7 +201,12 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     if(validReportTemplate()) {
       CreateReportTemplateCallBack createReportTemplateCallback = new CreateReportTemplateCallBack();
       AlreadyExistReportTemplateCallBack alreadyExistReportTemplateCallback = new AlreadyExistReportTemplateCallBack();
-      ResourceRequestBuilderFactory.<ReportTemplateDto> newBuilder().forResource("/report-template/" + getView().getName().getText()).get().withCallback(alreadyExistReportTemplateCallback).withCallback(Response.SC_NOT_FOUND, createReportTemplateCallback).send();
+      UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
+
+      ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder()
+          .forResource(ub.build()).get()
+          .withCallback(alreadyExistReportTemplateCallback)
+          .withCallback(Response.SC_NOT_FOUND, createReportTemplateCallback).send();
     }
   }
 
@@ -251,20 +261,28 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   private void doUpdateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
     CreateOrUpdateReportTemplateCallBack callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/report-template/" + getView().getName().getText()).put().withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+    UriBuilder ub = UriBuilder.create().segment("report-temnplate", getView().getName().getText());
+    ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
+        .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
+        .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+        .send();
   }
 
   private void doCreateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
     CreateOrUpdateReportTemplateCallBack callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/report-templates").post().withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource("/report-templates").post()
+        .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
+        .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+        .send();
   }
 
   private class AlreadyExistReportTemplateCallBack implements ResourceCallback<ReportTemplateDto> {
 
     @Override
     public void onResource(Response response, ReportTemplateDto resource) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
+      getEventBus()
+          .fireEvent(NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
     }
 
   }
@@ -344,13 +362,14 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     getView().setFormat(reportTemplate.getFormat());
     getView().setName(reportTemplate.getName());
     emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
-    parametersSelectorPresenter.getView().setItems(Iterables.transform(JsArrays.toIterable(reportTemplate.getParametersArray()), new Function<ParameterDto, String>() {
+    parametersSelectorPresenter.getView().setItems(Iterables
+        .transform(JsArrays.toIterable(reportTemplate.getParametersArray()), new Function<ParameterDto, String>() {
 
-      @Override
-      public String apply(ParameterDto input) {
-        return input.getKey() + "=" + input.getValue();
-      }
-    }));
+          @Override
+          public String apply(ParameterDto input) {
+            return input.getKey() + "=" + input.getValue();
+          }
+        }));
     getView().setSchedule(reportTemplate.getCron());
   }
 

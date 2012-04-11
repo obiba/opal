@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -12,12 +12,17 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
@@ -28,16 +33,10 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVaria
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.LocalizableDeleteEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
 
 public abstract class LocalizablesPresenter extends WidgetPresenter<LocalizablesPresenter.Display> {
   //
@@ -128,7 +127,11 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   void refreshLocales() {
     if(viewDto != null) {
-      ResourceRequestBuilderFactory.<JsArray<LocaleDto>> newBuilder().forResource("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/locales" + "?locale=en").get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+      UriBuilder ub = UriBuilder.create();
+      ub.segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName(), "locales");
+      ub.query("locale", "en");
+      ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder().forResource(ub.build())
+          .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
 
         @Override
         public void onResource(Response response, JsArray<LocaleDto> locales) {
@@ -149,8 +152,10 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-    super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredEventHandler()));
+    super.registerHandler(
+        eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
+    super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(),
+        new DerivedVariableConfigurationRequiredEventHandler()));
     super.registerHandler(getDisplay().addLocaleChangeHandler(new LocaleChangeHandler()));
     super.registerHandler(getDisplay().addAddButtonClickHandler(getAddButtonClickHandler()));
     addActionHandler(); // for "Edit" and "Delete" links
@@ -181,7 +186,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
         }
       };
 
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, getDeleteConfirmationTitle(), getDeleteConfirmationMessage()));
+      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, getDeleteConfirmationTitle(),
+          getDeleteConfirmationMessage()));
     }
   }
 
@@ -299,7 +305,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event
+          .isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }

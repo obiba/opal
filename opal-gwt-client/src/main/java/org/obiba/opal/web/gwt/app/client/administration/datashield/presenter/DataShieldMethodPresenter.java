@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -11,20 +11,6 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
-import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
-import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -37,6 +23,20 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
+import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
+import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
 public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodPresenter.Display> {
 
@@ -93,6 +93,7 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
 
   /**
    * Setup the dialog for updating an existing method
+   *
    * @param dto method to update
    */
   public void updateMethod(DataShieldMethodDto dto) {
@@ -102,6 +103,7 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
 
   /**
    * Setup the dialog for copying an existing method
+   *
    * @param dto method to copy
    */
   public void copyMethod(DataShieldMethodDto dto) {
@@ -114,20 +116,22 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
     MethodType type;
     if(dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
       type = MethodType.RSCRIPT;
-      getView().setScript(((RScriptDataShieldMethodDto) dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript());
+      getView().setScript(((RScriptDataShieldMethodDto) dto
+          .getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript());
     } else {
       type = MethodType.RFUNCTION;
-      getView().setFunction(((RFunctionDataShieldMethodDto) dto.getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getFunc());
+      getView().setFunction(((RFunctionDataShieldMethodDto) dto
+          .getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getFunc());
     }
     getView().setType(type);
   }
 
   private String method(String method) {
-    return "/datashield/env/" + this.environement + "/method/" + method;
+    return UriBuilder.create().segment("datashield", "env", this.environement, "method", "{method}").build(method);
   }
 
   private String methods() {
-    return "/datashield/env/" + this.environement + "/methods";
+    return UriBuilder.create().segment("datashield", "env", this.environement, "methods").build();
   }
 
   private void updateMethod() {
@@ -140,28 +144,29 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
     if(methodValidationHandler.validate()) {
       CreateMethodCallBack createCallback = new CreateMethodCallBack();
       AlreadyExistMethodCallBack alreadyExistCallback = new AlreadyExistMethodCallBack();
-      ResourceRequestBuilderFactory.<DataShieldMethodDto> newBuilder().forResource(method(getView().getName().getText())).get()//
-      .withCallback(alreadyExistCallback)//
-      .withCallback(Response.SC_NOT_FOUND, createCallback).send();
+      ResourceRequestBuilderFactory.<DataShieldMethodDto>newBuilder().forResource(method(getView().getName().getText()))
+          .get()//
+          .withCallback(alreadyExistCallback)//
+          .withCallback(Response.SC_NOT_FOUND, createCallback).send();
     }
   }
 
   private void postMethod(DataShieldMethodDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(methods()).post()//
-    .withResourceBody(DataShieldMethodDto.stringify(dto))//
-    .withCallback(Response.SC_OK, callbackHandler)//
-    .withCallback(Response.SC_CREATED, callbackHandler)//
-    .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+        .withResourceBody(DataShieldMethodDto.stringify(dto))//
+        .withCallback(Response.SC_OK, callbackHandler)//
+        .withCallback(Response.SC_CREATED, callbackHandler)//
+        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
   private void putMethod(DataShieldMethodDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(method(getView().getName().getText())).put()//
-    .withResourceBody(DataShieldMethodDto.stringify(dto))//
-    .withCallback(Response.SC_OK, callbackHandler)//
-    .withCallback(Response.SC_CREATED, callbackHandler)//
-    .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+        .withResourceBody(DataShieldMethodDto.stringify(dto))//
+        .withCallback(Response.SC_OK, callbackHandler)//
+        .withCallback(Response.SC_CREATED, callbackHandler)//
+        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
   private DataShieldMethodDto getDataShieldMethodDto() {
@@ -198,8 +203,10 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getView().getName(), "DataShieldMethodNameIsRequired"));
-        validators.add(new ConditionalValidator(getView().isScript(), new RequiredTextValidator(getView().getScript(), "DataShieldRScriptIsRequired")));
-        validators.add(new ConditionalValidator(getView().isFunction(), new RequiredTextValidator(getView().getFunction(), "DataShieldRFunctionIsRequired")));
+        validators.add(new ConditionalValidator(getView().isScript(),
+            new RequiredTextValidator(getView().getScript(), "DataShieldRScriptIsRequired")));
+        validators.add(new ConditionalValidator(getView().isFunction(),
+            new RequiredTextValidator(getView().getFunction(), "DataShieldRFunctionIsRequired")));
       }
       return validators;
     }
@@ -210,7 +217,8 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
 
     @Override
     public void onResource(Response response, DataShieldMethodDto resource) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("DataShieldMethodAlreadyExistWithTheSpecifiedName").build());
+      getEventBus()
+          .fireEvent(NotificationEvent.newBuilder().error("DataShieldMethodAlreadyExistWithTheSpecifiedName").build());
     }
 
   }
