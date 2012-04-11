@@ -78,9 +78,6 @@ public class UriBuilder {
       }
       sb.append("/").append(segment);
     }
-    if(query.isEmpty()) {
-      sb.append("/");
-    }
     for(int i = 0; i < query.size(); i += 2) {
       if(i == 0) sb.append("?");
       sb.append(query.get(i)).append("=").append(query.get(i + 1));
