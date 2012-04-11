@@ -50,11 +50,15 @@ public abstract class DerivedVariableGenerator {
   }
 
   public VariableDto generate() {
+    return generate(copyVariable(originalVariable));
+  }
+
+  public VariableDto generate(VariableDto destination) {
+    VariableDto derived = destination;
 
     scriptBuilder = new StringBuilder();
     newCategoriesMap.clear();
 
-    VariableDto derived = copyVariable(originalVariable);
     derived.setValueType("text");
 
     generateScript();
@@ -62,12 +66,15 @@ public abstract class DerivedVariableGenerator {
     // set script in derived variable
     setScript(derived, scriptBuilder.toString());
 
-    // new categories
-    JsArray<CategoryDto> cats = JsArrays.create();
-    for(CategoryDto cat : newCategoriesMap.values()) {
-      cats.push(cat);
+    // new categories if destination does not already define them
+    JsArray<CategoryDto> cats = destination.getCategoriesArray();
+    if(cats == null || cats.length() == 0) {
+      cats = JsArrays.create();
+      for(CategoryDto cat : newCategoriesMap.values()) {
+        cats.push(cat);
+      }
+      derived.setCategoriesArray(cats);
     }
-    derived.setCategoriesArray(cats);
 
     return derived;
   }
@@ -303,7 +310,7 @@ public abstract class DerivedVariableGenerator {
       boolean found = false;
       for(AttributeDto attr : JsArrays.toIterable(attrs)) {
         if(attr.getName().equals(origAttr.getName()) && origAttr.hasValue()) {
-          String newValue = attr.hasValue() ? attr.getValue() + " | " + origAttr.getValue() : origAttr.getValue();
+          String newValue = mergeAttributeValues(origAttr, attr);
           if((attr.hasLocale() && origAttr.hasLocale() && attr.getLocale().equals(origAttr.getLocale())) //
               || (!attr.hasLocale() && !origAttr.hasLocale())) {
             attr.setValue(newValue);
@@ -316,6 +323,23 @@ public abstract class DerivedVariableGenerator {
         attrs.push(copyAttribute(origAttr));
       }
     }
+  }
+
+  private static String mergeAttributeValues(AttributeDto origAttr, AttributeDto attr) {
+    String newValue = origAttr.getValue();
+    if(attr.hasValue()) {
+      // do not append the same value several times
+      boolean appended = false;
+      for(String value : attr.getValue().split(" | ")) {
+        if(value.compareTo(origAttr.getValue()) == 0) {
+          appended = true;
+        }
+      }
+      if(appended == false) {
+        newValue = attr.getValue() + " | " + origAttr.getValue();
+      }
+    }
+    return newValue;
   }
 
   private static AttributeDto copyAttribute(AttributeDto origAttr) {
