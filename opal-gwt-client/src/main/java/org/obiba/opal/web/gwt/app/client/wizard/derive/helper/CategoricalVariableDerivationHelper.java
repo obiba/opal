@@ -187,7 +187,18 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
       builder.newValue("2");
       if(index < 3) newIndex = 3;
     } else {
-      builder.newValue(Integer.toString(newIndex++));
+      // OPAL-1387 look for a similar entry value and apply same new value
+      boolean found = false;
+      for(ValueMapEntry entry : valueMapEntries) {
+        if(entry.getValue().trim().compareToIgnoreCase(value.trim()) == 0) {
+          builder.newValue(entry.getNewValue());
+          found = true;
+          break;
+        }
+      }
+      if(found == false) {
+        builder.newValue(Integer.toString(newIndex++));
+      }
     }
 
     valueMapEntries.add(builder.build());
