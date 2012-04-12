@@ -110,8 +110,7 @@ public class OpalJavaClient {
       throw new RuntimeException(e);
 
     }
-//    this.client = enableCaching(httpClient);
-    this.client = httpClient;
+    this.client = enableCaching(httpClient);
 
     this.ctx = new BasicHttpContext();
     this.ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
