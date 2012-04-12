@@ -23,7 +23,6 @@ import org.obiba.magma.support.VariableEntityProvider;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
-import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
@@ -163,7 +162,7 @@ class RestValueTable extends AbstractValueTable {
 
     synchronized ValueSetsDto loadValueSet() {
       if(valueSet == null) {
-        valueSet = getOpalClient().getResource(ValueSetsDto.class, newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "false").build(), ValueSetDto.newBuilder());
+        valueSet = getOpalClient().getResource(ValueSetsDto.class, newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "false").build(), ValueSetsDto.newBuilder());
       }
       return valueSet;
     }
