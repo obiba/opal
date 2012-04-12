@@ -7,12 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.HttpMessage;
 import org.apache.http.HttpResponse;
@@ -38,9 +42,14 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.cache.CacheConfig;
+import org.apache.http.impl.client.cache.CachingHttpClient;
+import org.apache.http.impl.client.cache.FileResourceFactory;
+import org.apache.http.impl.client.cache.ManagedHttpCacheStorage;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
+import com.google.common.io.Files;
 import com.google.protobuf.Message;
 
 /**
@@ -56,6 +65,8 @@ public class OpalJavaClient {
 
   private final Credentials credentials;
 
+  private ManagedHttpCacheStorage cacheStorage;
+
   public OpalJavaClient(String uri, String username, String password) throws URISyntaxException {
     if(uri == null) throw new IllegalArgumentException("uri cannot be null");
     if(username == null) throw new IllegalArgumentException("username cannot be null");
@@ -70,12 +81,36 @@ public class OpalJavaClient {
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
 
     try {
-      SSLSocketFactory factory = new SSLSocketFactory(SSLContext.getDefault(), SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+      // Accepts any SSL certificate
+      X509TrustManager tm = new X509TrustManager() {
+
+        @Override
+        public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+
+        }
+
+        @Override
+        public void checkServerTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+          return null;
+        }
+      };
+      SSLContext ctx = SSLContext.getInstance("TLS");
+      ctx.init(null, new TrustManager[] { tm }, null);
+
+      SSLSocketFactory factory = new SSLSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
       httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", 443, factory));
     } catch(NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
+    } catch(KeyManagementException e) {
+      throw new RuntimeException(e);
+
     }
-    this.client = httpClient;
+    this.client = enableCaching(httpClient);
 
     this.ctx = new BasicHttpContext();
     this.ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
@@ -194,7 +229,11 @@ public class OpalJavaClient {
   private HttpResponse execute(HttpUriRequest msg) throws ClientProtocolException, IOException {
     msg.addHeader("Accept", "application/x-protobuf, text/html");
     authenticate(msg);
-    return client.execute(msg, ctx);
+    try {
+      return client.execute(msg, ctx);
+    } finally {
+      cleanupCache();
+    }
   }
 
   private void authenticate(HttpMessage msg) {
@@ -237,4 +276,17 @@ public class OpalJavaClient {
     }
   }
 
+  private HttpClient enableCaching(HttpClient client) {
+    CacheConfig config = new CacheConfig();
+    config.setSharedCache(false);
+    // 5 MB
+    config.setMaxObjectSizeBytes(1024 * 1024 * 5);
+    return new CachingHttpClient(client, new FileResourceFactory(Files.createTempDir()), cacheStorage = new ManagedHttpCacheStorage(config), config);
+  }
+
+  private void cleanupCache() {
+    if(cacheStorage != null) {
+      cacheStorage.cleanResources();
+    }
+  }
 }
