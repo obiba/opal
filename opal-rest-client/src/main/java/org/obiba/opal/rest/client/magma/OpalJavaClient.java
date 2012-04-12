@@ -42,9 +42,14 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.cache.CacheConfig;
+import org.apache.http.impl.client.cache.CachingHttpClient;
+import org.apache.http.impl.client.cache.FileResourceFactory;
+import org.apache.http.impl.client.cache.ManagedHttpCacheStorage;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
+import com.google.common.io.Files;
 import com.google.protobuf.Message;
 
 /**
@@ -59,6 +64,8 @@ public class OpalJavaClient {
   private final BasicHttpContext ctx;
 
   private final Credentials credentials;
+
+  private ManagedHttpCacheStorage cacheStorage;
 
   public OpalJavaClient(String uri, String username, String password) throws URISyntaxException {
     if(uri == null) throw new IllegalArgumentException("uri cannot be null");
@@ -92,17 +99,18 @@ public class OpalJavaClient {
           return null;
         }
       };
-      SSLContext ctx = SSLContext.getDefault();
-      ctx.init(null, new TrustManager[]{tm}, null);
-      
+      SSLContext ctx = SSLContext.getInstance("TLS");
+      ctx.init(null, new TrustManager[] { tm }, null);
+
       SSLSocketFactory factory = new SSLSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
       httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", 443, factory));
     } catch(NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     } catch(KeyManagementException e) {
       throw new RuntimeException(e);
-      
+
     }
+//    this.client = enableCaching(httpClient);
     this.client = httpClient;
 
     this.ctx = new BasicHttpContext();
@@ -222,7 +230,11 @@ public class OpalJavaClient {
   private HttpResponse execute(HttpUriRequest msg) throws ClientProtocolException, IOException {
     msg.addHeader("Accept", "application/x-protobuf, text/html");
     authenticate(msg);
-    return client.execute(msg, ctx);
+    try {
+      return client.execute(msg, ctx);
+    } finally {
+      cleanupCache();
+    }
   }
 
   private void authenticate(HttpMessage msg) {
@@ -265,4 +277,17 @@ public class OpalJavaClient {
     }
   }
 
+  private HttpClient enableCaching(HttpClient client) {
+    CacheConfig config = new CacheConfig();
+    config.setSharedCache(false);
+    // 5 MB
+    config.setMaxObjectSizeBytes(1024 * 1024 * 5);
+    return new CachingHttpClient(client, new FileResourceFactory(Files.createTempDir()), cacheStorage = new ManagedHttpCacheStorage(config), config);
+  }
+
+  private void cleanupCache() {
+    if(cacheStorage != null) {
+      cacheStorage.cleanResources();
+    }
+  }
 }
