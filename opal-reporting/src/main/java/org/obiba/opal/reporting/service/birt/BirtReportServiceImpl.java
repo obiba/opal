@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -36,7 +36,8 @@ public class BirtReportServiceImpl implements ReportService {
   private BirtEngine engine;
 
   @Override
-  public void render(String formatName, Map<String, String> parameters, String reportDesign, String reportOutput) throws ReportException {
+  public void render(String formatName, Map<String, String> parameters, String reportDesign,
+      String reportOutput) throws ReportException {
     try {
       if(isRunning()) {
         engine.render(formatName, parameters, reportDesign, reportOutput);
@@ -57,15 +58,18 @@ public class BirtReportServiceImpl implements ReportService {
     log.info("Starting BIRT Report Engine.");
 
     if(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME) == null) {
-      log.error("System property '" + BIRT_HOME_SYSTEM_PROPERTY_NAME + "' is not defined. Cannot start reporting engine.");
+      log.error(
+          "System property '" + BIRT_HOME_SYSTEM_PROPERTY_NAME + "' is not defined. Cannot start reporting engine.");
       return;
     }
 
     // make sure BIRT_HOME is set and valid
-    File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine").getAbsoluteFile();
+    File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine")
+        .getAbsoluteFile();
 
     if(reportEngineHome.exists() == false) {
-      log.error("Could not find Birt engine distribution in directory '{}'.", System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME));
+      log.error("Could not find Birt engine distribution in directory '{}'.",
+          System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME));
       return;
     }
 
@@ -78,7 +82,7 @@ public class BirtReportServiceImpl implements ReportService {
   public void stop() {
     try {
       if(engine != null) {
-        log.info("Shuting down BIRT Report Engine.");
+        log.info("Shutting down BIRT Report Engine.");
         engine.stop();
         log.info("Sucessfully shutdown BIRT Report Engine.");
       }
@@ -110,13 +114,13 @@ public class BirtReportServiceImpl implements ReportService {
   /**
    * Creates a ClassLoader that will load classes from the BIRT dependencies and classes in the
    * {@code org.obiba.opal.reporting.service.birt.common} package before loading a class from the Opal classpath.
-   * <p>
+   * <p/>
    * Whenever BIRT and Opal have a common dependency (Rhino for example), this ClassLoader will "prefer" BIRT's version
    * over Opal's. This allows to "isolate" BIRT and its dependencies from Opal and still allow sharing exceptions.
-   * 
+   *
    * @param libDir BIRT's /lib directory
    * @return a ClassLoader that will load classes from BIRT dependencies before looking for classes in the Opal
-   * classpath.
+   *         classpath.
    */
   private ClassLoader createClassLoader(File libDir) {
     File[] jars = libDir.listFiles(new FilenameFilter() {
@@ -143,7 +147,8 @@ public class BirtReportServiceImpl implements ReportService {
       @Override
       protected Class<?> findClass(String name) throws ClassNotFoundException {
         // Anything in the common package should use the already loaded class so we can cast instances
-        return name.startsWith("org.obiba.opal.reporting.service.birt.common") ? getParent().loadClass(name) : super.findClass(name);
+        return name.startsWith("org.obiba.opal.reporting.service.birt.common") ? getParent().loadClass(name) : super
+            .findClass(name);
       }
     };
   }

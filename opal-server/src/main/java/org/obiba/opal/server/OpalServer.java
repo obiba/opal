@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
-
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import uk.co.flamingpenguin.jewel.cli.Option;
@@ -47,7 +46,8 @@ public class OpalServer {
       xmlReader.loadBeanDefinitions("classpath:/META-INF/spring/opal-server/context.xml");
       ctx.refresh();
     } catch(Exception e) {
-      System.out.println(String.format("Failed to start Opal Server. See log file for details.\nError message: %s", e.getMessage()));
+      System.out.println(
+          String.format("Failed to start Opal Server. See log file for details.\nError message: %s", e.getMessage()));
       e.printStackTrace(System.err);
       try {
         ctx.destroy();
@@ -66,7 +66,7 @@ public class OpalServer {
   }
 
   final void shutdown() {
-    System.out.println("Opal Server shuting down.");
+    System.out.println("Opal Server shutting down.");
     try {
       ctx.getBean(OpalRuntime.class).stop();
     } finally {
