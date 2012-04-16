@@ -13,6 +13,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
 import org.obiba.magma.support.Initialisables;
+import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,15 +81,8 @@ public class RestDatasource extends AbstractDatasource {
 
   @Override
   protected Set<String> getValueTableNames() {
-    Iterable<TableDto> s = opalClient.getResources(TableDto.class, newReference("tables"), TableDto.newBuilder());
-    return ImmutableSet.copyOf(Iterables.transform(s, new Function<TableDto, String>() {
-
-      @Override
-      public String apply(TableDto from) {
-        return from.getName();
-      }
-
-    }));
+    DatasourceDto d = opalClient.getResource(DatasourceDto.class, this.datasourceURI, DatasourceDto.newBuilder());
+    return ImmutableSet.copyOf(d.getTableList());
   }
 
   @Override
