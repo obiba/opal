@@ -225,7 +225,9 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
     @Override
     public void authorized() {
       // Only bind the table to its data provider if we're authorized
-      resourceDataProvider.addDataDisplay(getView().getDatabaseTable());
+      if(resourceDataProvider.getDataDisplays().size() == 0) {
+        resourceDataProvider.addDataDisplay(getView().getDatabaseTable());
+      }
     }
 
     @Override
