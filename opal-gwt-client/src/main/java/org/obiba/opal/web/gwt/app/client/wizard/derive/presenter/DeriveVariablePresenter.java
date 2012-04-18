@@ -318,6 +318,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
    * @param view
    * @param derived
    */
+  @SuppressWarnings("PMD.NcssMethodCount")
   private void saveVariable(final ViewDto view, final VariableDto derived) {
     // add or update derived variable
     int pos = getVariablePosition(view, derived);
