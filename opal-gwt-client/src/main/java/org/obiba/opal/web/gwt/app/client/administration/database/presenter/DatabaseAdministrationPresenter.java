@@ -98,7 +98,7 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post().authorize(event.getHasAuthorization()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post().authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
   }
 
   @Override
@@ -198,7 +198,6 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
     }));
 
-    resourceDataProvider.addDataDisplay(getView().getDatabaseTable());
     authorizationPresenter.setAclRequest("databases", AclRequest.newBuilder("Administrate", Resources.databases(), "*:POST/*"));
   }
 
@@ -215,6 +214,24 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
   private void refresh() {
     getView().getDatabaseTable().setVisibleRangeAndClearData(new Range(0, 10), true);
+  }
+
+  private final class ListDatabasesAuthorization implements HasAuthorization {
+
+    @Override
+    public void beforeAuthorization() {
+    }
+
+    @Override
+    public void authorized() {
+      // Only bind the table to its data provider if we're authorized
+      resourceDataProvider.addDataDisplay(getView().getDatabaseTable());
+    }
+
+    @Override
+    public void unauthorized() {
+    }
+
   }
 
   private final class PermissionsUpdate implements HasAuthorization {

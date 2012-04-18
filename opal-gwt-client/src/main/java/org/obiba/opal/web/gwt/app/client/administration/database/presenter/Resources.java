@@ -18,19 +18,11 @@ final class Resources {
   }
 
   static String database(String name) {
-    return UriBuilder.create().segment("jdbc", "database", "{database}").build(name);
+    return UriBuilder.create().segment("jdbc", "database", name).build();
   }
 
   static String database(String name, String... more) {
-    String r = database(name);
-    if(more != null) {
-      StringBuilder sb = new StringBuilder(r);
-      for(String s : more) {
-        sb.append("/").append(s);
-      }
-      r = sb.toString();
-    }
-    return r;
+    return UriBuilder.create().segment("jdbc", "database", name).segment(more).build();
   }
 
   public static String drivers() {
