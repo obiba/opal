@@ -772,8 +772,8 @@
   </distributionManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.obiba.org/opal/trunk</connection>
-    <developerConnection>scm:svn:https://svn.obiba.org/opal/trunk</developerConnection>
+    <connection>scm:svn:https://svn.obiba.org/opal/branches/opal-1.9.x</connection>
+    <developerConnection>scm:svn:https://svn.obiba.org/opal/branches/opal-1.9.x</developerConnection>
   </scm>
 
   <properties>
