@@ -104,7 +104,8 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "Use", "Use", //
   "Administrate", "Administrate", //
   "View", "View", //
-  "Summary", "Summary" })
+  "Summary", "Summary", //
+  "Values", "Values" })
   Map<String, String> permissionMap();
 
   @Description("Permission explanation map")

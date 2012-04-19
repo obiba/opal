@@ -240,7 +240,8 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
     };
 
     column.setFieldUpdater(fieldUpdater);
-    table.addColumn(column, translations.permissionMap().get(header));
+    String headerStr = translations.permissionMap().containsKey(header) ? translations.permissionMap().get(header) : header;
+    table.addColumn(column, headerStr);
 
   }
 
