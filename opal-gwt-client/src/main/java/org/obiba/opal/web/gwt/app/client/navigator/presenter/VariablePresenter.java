@@ -153,7 +153,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getView().getSummaryAuthorizer(), new SummaryUpdate())).send();
 
     // values
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getParentLink().getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer()).send();
 
     // edit variable
     if(table.hasViewLink()) {
@@ -242,8 +242,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
       authz.setAclRequest("variable", AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), //
-      AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"), //
-      AclRequest.newBuilder("Values", variable.getParentLink().getLink() + "/valueSets", "GET:GET"));
+      AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
       setInSlot(Display.Slots.Permissions, authz);
     }
   }

@@ -9,25 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -61,6 +42,26 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
+
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
   private JsArray<VariableDto> variables;
@@ -89,8 +90,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
    * @param eventBus
    */
   @Inject
-  public TablePresenter(final Display display, final EventBus eventBus, Proxy proxy,
-      ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
+  public TablePresenter(final Display display, final EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
@@ -119,10 +119,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void addEventHandlers() {
-    super.registerHandler(
-        getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
-    super.registerHandler(
-        getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
+    super.registerHandler(getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
     getView().setCreateCodingViewCommand(new CreateCodingViewCommand());
     getView().setExcelDownloadCommand(new ExcelDownloadCommand());
@@ -151,38 +149,31 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private void authorize() {
     // export variables in excel
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
-        .authorize(getView().getExcelDownloadAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get().authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
-        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
-            .and("/functional-units", HttpMethod.GET)//
-            .and("/functional-units/entities/table", HttpMethod.GET)//
-            .authorize(getView().getExportDataAuthorizer()).build())//
-        .send();
+    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+    .and("/functional-units", HttpMethod.GET)//
+    .and("/functional-units/entities/table", HttpMethod.GET)//
+    .authorize(getView().getExportDataAuthorizer()).build())//
+    .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()
-        .authorize(getView().getCopyDataAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getView().getCopyDataAuthorizer()).send();
     if(table.hasViewLink()) {
       // remove view
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete()
-          .authorize(getView().getRemoveAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete().authorize(getView().getRemoveAuthorizer()).send();
       // edit view
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put()
-          .authorize(getView().getEditAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put().authorize(getView().getEditAuthorizer()).send();
     } else {
       // Drop table
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
-          .authorize(getView().getRemoveAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete().authorize(getView().getRemoveAuthorizer()).send();
     }
 
     // values
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get()
-        .authorize(getView().getValuesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer()).send();
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
@@ -216,10 +207,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     String sortColumnName = getView().getClickableColumnName(sortColumn);
     String sortColumArg = (sortColumnName != null ? ("?sortField=" + sortColumnName) : "");
     String sortDirArg = (sortAscending != null ? (sortAscending ? "&sortDir=ASC" : "&sortDir=DESC") : "");
-    //TODO use uribuilder
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
-        .forResource(table.getLink() + "/variables" + sortColumArg + sortDirArg).get()
-        .withCallback(new VariablesResourceCallback(table)).send();
+    // TODO use uribuilder
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables" + sortColumArg + sortDirArg).get().withCallback(new VariablesResourceCallback(table)).send();
   }
 
   private void downloadMetadata() {
@@ -258,10 +247,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete()
-        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private void removeTable(String viewName) {
@@ -279,10 +265,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
-        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private boolean tableIsView() {
@@ -315,9 +298,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
-      UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table",
-          table.getName());
-      authz.setAclRequest("table", AclRequest.newBuilder("View", ub.build(), "GET:GET/GET"));
+      UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName());
+      String tableLink = ub.build();
+      authz.setAclRequest("table", AclRequest.newBuilder("View", tableLink, "GET:GET/GET"), //
+      AclRequest.newBuilder("Values", tableLink + "/valueSets", "GET:GET"));
       setInSlot(Display.Slots.Permissions, authz);
     }
   }
@@ -331,8 +315,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       for(int i = 0; i < variables.length(); i++) {
         if(variables.get(i).getName().equals(value)) {
           VariableDto selection = variables.get(i);
-          getEventBus().fireEvent(
-              new VariableSelectionChangeEvent(table, selection, getPreviousVariable(i), getNextVariable(i)));
+          getEventBus().fireEvent(new VariableSelectionChangeEvent(table, selection, getPreviousVariable(i), getNextVariable(i)));
           getView().setVariableSelection(selection, i);
           getView().clearVariableSuggestion();
           break;
@@ -369,8 +352,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void execute() {
       UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build())
-          .get().withCallback(new ResourceCallback<DatasourceDto>() {
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<DatasourceDto>() {
         @Override
         public void onResource(Response response, DatasourceDto resource) {
           getEventBus().fireEvent(new DatasourceSelectionChangeEvent(resource));
@@ -456,20 +438,17 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   final class EditCommand implements Command {
     @Override
     public void execute() {
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", table.getDatasourceName(), "view", table.getName());
-      ResourceRequestBuilderFactory.<ViewDto>newBuilder()
-          .forResource(ub.build()).get()
-          .withCallback(new ResourceCallback<ViewDto>() {
+      UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "view", table.getName());
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<ViewDto>() {
 
-            @Override
-            public void onResource(Response response, ViewDto viewDto) {
-              viewDto.setDatasourceName(table.getDatasourceName());
-              viewDto.setName(table.getName());
+        @Override
+        public void onResource(Response response, ViewDto viewDto) {
+          viewDto.setDatasourceName(table.getDatasourceName());
+          viewDto.setName(table.getName());
 
-              getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto));
-            }
-          }).send();
+          getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto));
+        }
+      }).send();
     }
   }
 
@@ -507,8 +486,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
-      getEventBus().fireEvent(
-          new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
     }
   }
 
@@ -535,9 +513,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       siblingSelection = variables.get(siblingIndex);
 
       getView().setVariableSelection(siblingSelection, siblingIndex);
-      getEventBus().fireEvent(
-          new VariableSelectionChangeEvent(table, siblingSelection, getPreviousVariable(siblingIndex),
-              getNextVariable(siblingIndex)));
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(table, siblingSelection, getPreviousVariable(siblingIndex), getNextVariable(siblingIndex)));
     }
   }
 
