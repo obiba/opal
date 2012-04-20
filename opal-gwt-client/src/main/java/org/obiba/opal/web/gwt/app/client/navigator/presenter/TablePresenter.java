@@ -301,7 +301,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName());
       String tableLink = ub.build();
       authz.setAclRequest("table", AclRequest.newBuilder("View", tableLink, "GET:GET/GET"), //
-      AclRequest.newBuilder("Values", tableLink + "/valueSets", "GET:GET").and(tableLink + "/valueSet", "GET:GET"));
+      AclRequest.newBuilder("Values", tableLink + "/valueSets", "GET:GET").and(tableLink + "/valueSet", "GET:GET/GET"));
       setInSlot(Display.Slots.Permissions, authz);
     }
   }

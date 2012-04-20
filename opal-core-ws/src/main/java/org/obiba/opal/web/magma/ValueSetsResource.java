@@ -35,6 +35,8 @@ import org.obiba.magma.VectorSource;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSortedSet;
@@ -45,9 +47,11 @@ import com.google.common.collect.Iterables;
  */
 public class ValueSetsResource extends AbstractValueTableResource {
 
+  private static final Logger log = LoggerFactory.getLogger(ValueSetsResource.class);
+
   @Nullable
   private VariableValueSource vvs;
-  
+
   @Nullable
   private Iterable<VariableEntity> entities;
 
@@ -89,7 +93,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
       vs = getValueSetsDto(uriInfo, select, entities, filterBinary);
     } else {
       // ignore select parameter if value sets are accessed by variable value source
-      vs = getValueSetsDto(uriInfo, entities);
+      vs = getValueSetsDto(uriInfo, entities, filterBinary);
     }
 
     return TimestampedResponses.ok(getValueTable(), vs).build();
@@ -114,7 +118,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
 
           @Override
           public ValueSetsDto.ValueDto apply(Variable fromVariable) {
-            String link = uriInfo.getPath().replace("valueSets", "variable/" + fromVariable.getName() + "/value/" + fromEntity.getIdentifier());
+            String link = uriInfo.getPath().replace("valueSets", "valueSet/entity/" + fromEntity.getIdentifier() + "/variable/" + fromVariable.getName() + "/value");
             Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
             return Dtos.asDto(link, value, filterBinary).build();
           }
@@ -123,20 +127,22 @@ public class ValueSetsResource extends AbstractValueTableResource {
     })).build();
   }
 
-  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final Iterable<VariableEntity> entities) {
-    ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(vvs.getVariable().getEntityType()).addVariables(vvs.getVariable().getName());
+  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, final Iterable<VariableEntity> entities, final boolean filterBinary) {
+    final Variable variable = vvs.getVariable();
+    ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(variable.getEntityType()).addVariables(vvs.getVariable().getName());
 
     VectorSource vector = vvs.asVectorSource();
     if(vector != null) {
-      addValueSetDtosFromVectorSource(uriInfo, entities, vector, builder);
+      addValueSetDtosFromVectorSource(uriInfo, entities, variable, filterBinary, vector, builder);
     } else {
+
       builder.addAllValueSets(Iterables.transform(entities, new Function<VariableEntity, ValueSetsDto.ValueSetDto>() {
 
         @Override
         public ValueSetsDto.ValueSetDto apply(final VariableEntity fromEntity) {
           final ValueSet valueSet = getValueTable().getValueSet(fromEntity);
           Value value = vvs.getValue(valueSet);
-          return getValueSetDto(uriInfo, fromEntity, value);
+          return getValueSetDto(uriInfo, fromEntity, variable, filterBinary, value);
         }
       }));
     }
@@ -144,7 +150,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
     return builder.build();
   }
 
-  private void addValueSetDtosFromVectorSource(UriInfo uriInfo, Iterable<VariableEntity> entities, VectorSource vector, ValueSetsDto.Builder builder) {
+  private void addValueSetDtosFromVectorSource(UriInfo uriInfo, Iterable<VariableEntity> entities, Variable variable, boolean filterBinary, VectorSource vector, ValueSetsDto.Builder builder) {
     ImmutableSortedSet<VariableEntity> sortedEntities = ImmutableSortedSet.<VariableEntity> naturalOrder().addAll(entities).build();
     Iterable<Value> values = vector.getValues(sortedEntities);
 
@@ -156,13 +162,14 @@ public class ValueSetsResource extends AbstractValueTableResource {
     }
 
     for(VariableEntity entity : entities) {
-      builder.addValueSets(getValueSetDto(uriInfo, entity, results.get(entity)));
+      builder.addValueSets(getValueSetDto(uriInfo, entity, variable, filterBinary, results.get(entity)));
     }
   }
 
-  private ValueSetDto getValueSetDto(final UriInfo uriInfo, VariableEntity fromEntity, Value value) {
-    String link = uriInfo.getPath().replace("valueSets", "value/" + fromEntity.getIdentifier());
-    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addValues(Dtos.asDto(link, value)).build();
+  private ValueSetDto getValueSetDto(final UriInfo uriInfo, VariableEntity fromEntity, Variable variable, boolean filterBinary, Value value) {
+    String link = uriInfo.getPath().replace("valueSets", "valueSet/entity/" + fromEntity.getIdentifier() + "/variable/" + variable.getName() + "/value");
+    log.info("getValueSetDto(uri={})", uriInfo.getPath());
+    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier()).addValues(Dtos.asDto(link, value, filterBinary)).build();
   }
 
 }

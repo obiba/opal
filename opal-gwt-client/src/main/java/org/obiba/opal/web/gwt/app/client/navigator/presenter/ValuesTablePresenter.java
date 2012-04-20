@@ -11,15 +11,6 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.List;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
@@ -32,6 +23,16 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
+
 public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display> {
 
   private TableDto table;
@@ -41,8 +42,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private ValueSequencePopupPresenter valueSequencePopupPresenter;
 
   @Inject
-  public ValuesTablePresenter(Display display, final EventBus eventBus,
-      ValueSequencePopupPresenter valueSequencePopupPresenter) {
+  public ValuesTablePresenter(Display display, final EventBus eventBus, ValueSequencePopupPresenter valueSequencePopupPresenter) {
     super(eventBus, display);
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
   }
@@ -56,7 +56,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     this.table = table;
 
     getView().setTable(table);
-    JsArray<VariableDto> variables = JsArray.createArray().<JsArray<VariableDto>>cast();
+    JsArray<VariableDto> variables = JsArray.createArray().<JsArray<VariableDto>> cast();
     variables.push(variable);
     getView().setVariables(variables);
   }
@@ -108,8 +108,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
       if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        JsArray<VariableDto> variables = (resource != null) ? resource : JsArray.createArray()
-            .<JsArray<VariableDto>>cast();
+        JsArray<VariableDto> variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
         getView().setVariables(variables);
       }
     }
@@ -181,19 +180,18 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         valuesRequest.cancel();
         valuesRequest = null;
       }
-      valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link).get()//
-          .withCallback(new ValueSetsResourceCallback(offset, table)).send();
+      valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get()//
+      .withCallback(new ValueSetsResourceCallback(offset, table)).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
-      return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=")
-          .append(limit);
+      return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=").append(limit);
     }
 
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier) {
       StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/variable/").append(variable.getName()).append("/value/").append(entityIdentifier);
+      link.append("/valueSet/entity/").append(entityIdentifier).append("/variable/").append(variable.getName()).append("/value");
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
 
@@ -213,20 +211,18 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         variablesRequest.cancel();
         variablesRequest = null;
       }
-      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
-          .withCallback(new VariablesResourceCallback(table)).withCallback(400, new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-              JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error
-                  .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
-              String firstError = errors.get(0).getMessage();
-              NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error(firstError)
-                  .build();
-              getEventBus().fireEvent(notificationEvent);
-              setTable(table);
-            }
-          }).send();
+      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get()//
+      .withCallback(new VariablesResourceCallback(table)).withCallback(400, new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+          String firstError = errors.get(0).getMessage();
+          NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error(firstError).build();
+          getEventBus().fireEvent(notificationEvent);
+          setTable(table);
+        }
+      }).send();
     }
   }
 

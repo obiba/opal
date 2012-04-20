@@ -109,7 +109,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
 
     private void requestValueSet(final List<VariableDto> variables, String filter) {
       StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/valueSet/").append(entityIdentifier).append("?select=");
+      link.append("/valueSet/entity/").append(entityIdentifier).append("?select=");
       if(filter == null || filter.isEmpty()) {
         link.append(URL.encodePathSegment("name().eq('" + variable.getName() + "')"));
       } else {
@@ -127,7 +127,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier, int index) {
       StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/variable/").append(variable.getName()).append("/value/").append(entityIdentifier).append("?pos=").append(index);
+      link.append("/valueSet/entity/").append(entityIdentifier).append("/variable/").append(variable.getName()).append("/value").append("?pos=").append(index);
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
   }
