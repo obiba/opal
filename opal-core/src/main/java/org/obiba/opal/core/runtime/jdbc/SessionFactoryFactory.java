@@ -23,6 +23,8 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.resolver.DialectFactory;
 import org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper;
 import org.obiba.magma.hibernate.cfg.MagmaNamingStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -36,6 +38,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SessionFactoryFactory {
 
+  private final static Logger log = LoggerFactory.getLogger(SessionFactoryFactory.class);
+
   @Autowired
   private ApplicationContext ac;
 
@@ -46,21 +50,8 @@ public class SessionFactoryFactory {
   @Qualifier("hibernate")
   private Properties hibernateProperties;
 
-  @SuppressWarnings("PMD.NcssMethodCount")
   public SessionFactory getSessionFactory(DataSource dataSource) {
-    AnnotationSessionFactoryBean asfb = new AnnotationSessionFactoryBean() {
-      @Override
-      protected void executeSchemaScript(Connection con, String[] sql) throws SQLException {
-        Statement stmt = con.createStatement();
-        try {
-          for(String sqlStmt : sql) {
-            executeSchemaStatement(stmt, sqlStmt);
-          }
-        } finally {
-          JdbcUtils.closeStatement(stmt);
-        }
-      }
-    };
+    AnnotationSessionFactoryBean asfb = new CustomSessionFactoryBean();
     asfb.setDataSource(dataSource);
     asfb.setJtaTransactionManager(txmgr);
     asfb.setHibernateProperties(hibernateProperties);
@@ -69,15 +60,27 @@ public class SessionFactoryFactory {
     asfb.setNamingStrategy(new MagmaNamingStrategy());
     asfb.setExposeTransactionAwareSessionFactory(false);
 
+    // Inject dependencies
     asfb = (AnnotationSessionFactoryBean) ac.getAutowireCapableBeanFactory().initializeBean(asfb, dataSource.hashCode() + "-session");
 
-    try {
-      asfb.validateDatabaseSchema();
-    } catch(DataAccessException dae) {
-      asfb.updateDatabaseSchema();
-    }
+    onSessionFactoryBeanCreated(asfb);
 
     return asfb.getObject();
+  }
+
+  protected void onSessionFactoryBeanCreated(AnnotationSessionFactoryBean asfb) {
+    try {
+      log.info("Veryfying database schema.");
+      asfb.validateDatabaseSchema();
+    } catch(DataAccessException dae) {
+      log.info("Invalid schema for hibernate datasource; updating schema.");
+      try {
+        asfb.updateDatabaseSchema();
+      } catch(RuntimeException e) {
+        log.error("Failed to update schema: {}", e.getMessage());
+        throw e;
+      }
+    }
   }
 
   private Dialect determineDialect(DataSource dataSource) {
@@ -90,4 +93,23 @@ public class SessionFactoryFactory {
       }
     });
   }
+
+  private final static class CustomSessionFactoryBean extends AnnotationSessionFactoryBean {
+
+    /**
+     * Overridden to use the current autocommit setting on the connection.
+     */
+    @Override
+    protected void executeSchemaScript(Connection con, String[] sql) throws SQLException {
+      Statement stmt = con.createStatement();
+      try {
+        for(String sqlStmt : sql) {
+          executeSchemaStatement(stmt, sqlStmt);
+        }
+      } finally {
+        JdbcUtils.closeStatement(stmt);
+      }
+    }
+  }
+
 }
