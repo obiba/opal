@@ -26,8 +26,6 @@ import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
  */
 public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrapper {
 
-  private Datasource wrappedDatasource;
-
   private final PrivateVariableEntityMap entityMap;
 
   private final boolean allowIdentifierGeneration;
@@ -37,8 +35,7 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
   private ValueTable keysTable;
 
   public FunctionalUnitDatasource(Datasource wrapped, String keyVariableName, ValueTable keysTable, IParticipantIdentifier identifierGenerator) {
-    super();
-    this.wrappedDatasource = wrapped;
+    super(wrapped);
     this.allowIdentifierGeneration = identifierGenerator != null;
 
     Variable keyVariable = keysTable.getVariable(keyVariableName);
@@ -61,7 +58,7 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
   // make sure variable entities exist in identifiers table by creating them (if allowed)
   void mapIdentifiers() {
     // TODO make it transactional, lock key table etc... see DefaultImportService
-    for(ValueTable wrappedTable : wrappedDatasource.getValueTables()) {
+    for(ValueTable wrappedTable : getWrappedDatasource().getValueTables()) {
       if(wrappedTable.isForEntityType(keysTable.getEntityType())) {
         for(VariableEntity from : wrappedTable.getVariableEntities()) {
           if(mappingFunction.apply(from) == null && allowIdentifierGeneration) {
@@ -87,11 +84,6 @@ public class FunctionalUnitDatasource extends AbstractTransformingDatasourceWrap
       return new FunctionalUnitValueTableWritter(wrappedTableWritter, mappingFunction);
     } else
       return wrappedTableWritter;
-  }
-
-  @Override
-  protected Datasource getWrappedDatasource() {
-    return wrappedDatasource;
   }
 
   private static class FunctionalUnitValueTable extends AbstractTransformingValueTableWrapper {

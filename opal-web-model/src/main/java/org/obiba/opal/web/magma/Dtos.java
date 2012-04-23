@@ -13,10 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
@@ -36,6 +32,11 @@ import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
+
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Utilities for manipulating Magma Dto instances
@@ -73,8 +74,7 @@ public final class Dtos {
   }
 
   public static VariableDto.Builder asDto(final LinkDto tableLink, Variable from, Integer index) {
-    VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType())
-        .setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
+    VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
       var.setOccurrenceGroup(from.getOccurrenceGroup());
     }
@@ -123,13 +123,14 @@ public final class Dtos {
     if(from.isLocalised()) {
       a.setLocale(from.getLocale().toString());
     }
+    if(from.hasNamespace()) {
+      a.setNamespace(from.getNamespace());
+    }
     return a;
   }
 
   public static Variable fromDto(VariableDto variableDto) {
-    Variable.Builder builder = Variable.Builder
-        .newVariable(variableDto.getName(), ValueType.Factory.forName(variableDto.getValueType()),
-            variableDto.getEntityType());
+    Variable.Builder builder = Variable.Builder.newVariable(variableDto.getName(), ValueType.Factory.forName(variableDto.getValueType()), variableDto.getEntityType());
     for(CategoryDto category : variableDto.getCategoriesList()) {
       builder.addCategory(fromDto(category));
     }
@@ -176,24 +177,27 @@ public final class Dtos {
     } else {
       builder.withValue(attributeDto.getValue());
     }
+    if(attributeDto.hasNamespace()) {
+      builder.withNamespace(attributeDto.getNamespace());
+    }
 
     return builder.build();
   }
 
   public static TableDto.Builder asDto(ValueTable valueTable) {
     TableDto.Builder builder = TableDto.newBuilder() //
-        .setName(valueTable.getName()) //
-        .setEntityType(valueTable.getEntityType()) //
-        .setDatasourceName(valueTable.getDatasource().getName()) //
-        .setVariableCount(Iterables.size(valueTable.getVariables())) //
-        .setValueSetCount(valueTable.getVariableEntities().size());
+    .setName(valueTable.getName()) //
+    .setEntityType(valueTable.getEntityType()) //
+    .setDatasourceName(valueTable.getDatasource().getName()) //
+    .setVariableCount(Iterables.size(valueTable.getVariables())) //
+    .setValueSetCount(valueTable.getVariableEntities().size());
     return builder;
   }
 
   public static DatasourceDto.Builder asDto(Datasource datasource) {
     Magma.DatasourceDto.Builder builder = Magma.DatasourceDto.newBuilder()//
-        .setName(datasource.getName())//
-        .setType(datasource.getType());
+    .setName(datasource.getName())//
+    .setType(datasource.getType());
 
     final List<String> tableNames = Lists.newArrayList();
     final List<String> viewNames = Lists.newArrayList();
@@ -216,14 +220,13 @@ public final class Dtos {
       if(valueDto.getValuesCount() == 0) {
         return type.nullSequence();
       }
-      return type
-          .sequenceOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
+      return type.sequenceOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
 
-            @Override
-            public Value apply(ValueSetsDto.ValueDto input) {
-              return fromDto(input, type, false);
-            }
-          }));
+        @Override
+        public Value apply(ValueSetsDto.ValueDto input) {
+          return fromDto(input, type, false);
+        }
+      }));
     } else {
       if(valueDto.hasValue()) {
         return type.valueOf(valueDto.getValue());

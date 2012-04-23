@@ -143,6 +143,7 @@ message AttributeDto {
   required string name = 1;
   required string value = 2;
   optional string locale = 3;
+  optional string namespace = 4;
 }
 
 message ValueSetsDto {
