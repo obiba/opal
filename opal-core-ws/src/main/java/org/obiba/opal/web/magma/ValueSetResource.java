@@ -38,7 +38,6 @@ import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.MimetypesFileExtensionsMap;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
-import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +49,7 @@ import com.google.common.collect.Iterables;
  */
 public class ValueSetResource extends AbstractValueTableResource {
 
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(ValueSetResource.class);
 
   @Nullable
@@ -96,11 +96,17 @@ public class ValueSetResource extends AbstractValueTableResource {
 
     if(!variable.isRepeatable() && pos != null) return Response.status(Status.BAD_REQUEST).build();
 
+    return getValueAtPosition(pos);
+  }
+
+  //
+  // private methods
+  //
+
+  private Response getValueAtPosition(Integer pos) {
+    ResponseBuilder builder;
     try {
       Value value = extractValue(entity.getIdentifier());
-
-      ResponseBuilder builder;
-
       if(value.isNull() || (value.isSequence() && pos != null && pos >= value.asSequence().getSize())) {
         builder = Response.status(Status.NOT_FOUND);
       } else {
@@ -111,17 +117,11 @@ public class ValueSetResource extends AbstractValueTableResource {
           builder = getValueResponse(entity.getIdentifier(), value);
         }
       }
-
-      return builder.build();
     } catch(NoSuchValueSetException ex) {
-      return Response.status(Status.NOT_FOUND).build();
+      builder = Response.status(Status.NOT_FOUND);
     }
-
+    return builder.build();
   }
-
-  //
-  // private methods
-  //
 
   private ValueSetsDto getValueSetDto(final UriInfo uriInfo, final Iterable<Variable> variables, final boolean filterBinary) {
     final ValueSet valueSet = getValueTable().getValueSet(entity);
@@ -216,7 +216,7 @@ public class ValueSetResource extends AbstractValueTableResource {
     // if file extension is defined, get the mime-type from it
     String name = getFileExtensionFromAttributes(variable);
     if(name != null) {
-      name = "patate." + name;
+      name = "file." + name;
     } else {
       // if file name is defined, get the mime-type from it
       name = getFileNameFromAttributes(variable);
@@ -254,11 +254,6 @@ public class ValueSetResource extends AbstractValueTableResource {
       }
     }
     return null;
-  }
-
-  private ValueSetDto getValueSetDto(final UriInfo uriInfo, Value value) {
-    String link = uriInfo.getPath().replace("valueSets", "value/" + entity.getIdentifier());
-    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(entity.getIdentifier()).addValues(Dtos.asDto(link, value)).build();
   }
 
 }
