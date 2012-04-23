@@ -136,6 +136,21 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
+  private class BadRequestCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      notifyError(response);
+    }
+
+    protected void notifyError(Response response) {
+      ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+      String firstError = errors.get(0).getMessage();
+      NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error(firstError).build();
+      getEventBus().fireEvent(notificationEvent);
+    }
+  }
+
   private class DataFetcherImpl implements DataFetcher {
 
     private Request variablesRequest = null;
@@ -181,7 +196,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         valuesRequest = null;
       }
       valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get()//
-      .withCallback(new ValueSetsResourceCallback(offset, table)).send();
+      .withCallback(new ValueSetsResourceCallback(offset, table)).withCallback(400, new BadRequestCallback()).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
@@ -212,14 +227,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         variablesRequest = null;
       }
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get()//
-      .withCallback(new VariablesResourceCallback(table)).withCallback(400, new ResponseCodeCallback() {
+      .withCallback(new VariablesResourceCallback(table)).withCallback(400, new BadRequestCallback() {
         @Override
         public void onResponseCode(Request request, Response response) {
-          ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
-          String firstError = errors.get(0).getMessage();
-          NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error(firstError).build();
-          getEventBus().fireEvent(notificationEvent);
+          notifyError(response);
           setTable(table);
         }
       }).send();
