@@ -9,21 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import junit.framework.Assert;
+
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,14 +49,9 @@ import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 /**
  *
@@ -112,8 +115,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(uriInfoMock);
     replay(segments.toArray());
 
-    Response r = new VariablesResource(datasource.getValueTable("Weight"), Collections.<Locale>emptySet())
-        .getVariables(uriInfoMock, null, 0, null);
+    Response r = new VariablesResource(datasource.getValueTable("Weight"), Collections.<Locale> emptySet()).getVariables(uriInfoMock, null, 0, null);
     List<VariableDto> dtos = ImmutableList.copyOf(((GenericEntity<Iterable<VariableDto>>) r.getEntity()).getEntity());
 
     verify(uriInfoMock);
@@ -131,8 +133,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     Assert.assertEquals("RES_WEIGHT", dtos.get(7).getName());
     Assert.assertEquals("RES_WEIGHT.captureMethod", dtos.get(8).getName());
 
-    Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight/variable/InstrumentRun.Contraindication.code",
-        dtos.get(0).getLink());
+    Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight/variable/InstrumentRun.Contraindication.code", dtos.get(0).getLink());
     Assert.assertEquals("Weight", dtos.get(0).getParentLink().getRel());
     Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dtos.get(0).getParentLink().getLink());
 
@@ -179,11 +180,10 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     List<VariableDto> variablesDto = Lists.newArrayList();
     for(int i = 0; i < 5; i++) {
-      variablesDto.add(VariableDto.newBuilder().setName("name").setEntityType("entityType").setValueType("text")
-          .setIsRepeatable(false).build());
+      variablesDto.add(VariableDto.newBuilder().setName("name").setEntityType("entityType").setValueType("text").setIsRepeatable(false).build());
     }
 
-    new VariablesResource(valueTableMock, Collections.<Locale>emptySet()).addOrUpdateVariables(variablesDto);
+    new VariablesResource(valueTableMock, Collections.<Locale> emptySet()).addOrUpdateVariables(variablesDto);
 
     verify(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
 
@@ -191,7 +191,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testAddOrUpdateVariables_InternalServerError() {
-    Response response = new VariablesResource(null, Collections.<Locale>emptySet()).addOrUpdateVariables(null);
+    Response response = new VariablesResource(null, Collections.<Locale> emptySet()).addOrUpdateVariables(null);
     Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
@@ -264,9 +264,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(mockTable);
 
     // Exercise
-    VariableResource variableResource = sut
-        .getTransient(TextType.get().getName(), false, script, ImmutableList.<String>of("CAT1", "CAT2"), script,
-            ImmutableList.<String>of("CAT1", "CAT2"));
+    VariableResource variableResource = sut.getTransientVariable(TextType.get().getName(), false, script, ImmutableList.<String> of("CAT1", "CAT2"), script, ImmutableList.<String> of("CAT1", "CAT2"));
 
     // Verify behaviour
     verify(mockTable);

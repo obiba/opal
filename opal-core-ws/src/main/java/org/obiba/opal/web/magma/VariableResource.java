@@ -11,14 +11,10 @@ package org.obiba.opal.web.magma;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.magma.support.DefaultPagingVectorSourceImpl;
 import org.obiba.opal.web.magma.support.PagingVectorSource;
 import org.obiba.opal.web.math.AbstractSummaryStatisticsResource;
@@ -41,16 +37,6 @@ public class VariableResource {
   @GET
   public VariableDto get() {
     return Dtos.asDto(vvs.getVariable()).build();
-  }
-
-  @Path("/valueSets")
-  public ValueSetsResource getValueSets(@Context Request request) {
-    return new ValueSetsResource(valueTable, vvs);
-  }
-
-  @Path("/valueSet/entity/{identifier}")
-  public ValueSetResource getValueSets(@Context Request request, @PathParam("identifier") String identifier) {
-    return new ValueSetResource(valueTable, vvs, new VariableEntityBean(valueTable.getEntityType(), identifier));
   }
 
   @Path("/summary")

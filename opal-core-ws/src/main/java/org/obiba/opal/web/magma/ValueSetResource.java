@@ -88,6 +88,7 @@ public class ValueSetResource extends AbstractValueTableResource {
 
   @GET
   @Path("/value")
+  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public Response getValue(@QueryParam("pos") Integer pos) {
     if(pos != null && pos < 0) return Response.status(Status.BAD_REQUEST).build();
     if(vvs == null) return Response.status(Status.BAD_REQUEST).build();
