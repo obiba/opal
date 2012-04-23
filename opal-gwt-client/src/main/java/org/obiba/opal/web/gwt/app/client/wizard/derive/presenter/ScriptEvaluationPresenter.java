@@ -206,7 +206,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
       StringBuilder link = new StringBuilder();
       appendTable(link);
-      link.append("/variable/_transient/valueSets?limit=").append(limit)//
+      link.append("/valueSets/variable/_transient?limit=").append(limit)//
       .append("&offset=").append(offset).append("&");
       appendVariableLimitArguments(link);
 
