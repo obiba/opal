@@ -115,15 +115,22 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   }
 
   private void requestSummary() {
-    String script = VariableDtos.getScript(variable);
     StringBuilder link = new StringBuilder();
-    GWT.log("requestSummary()");
     appendTable(link);
     link.append("/variable/_transient/summary?");
     appendVariableSummaryArguments(link);
 
+    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = requestSummaryBuilder(link.toString());
+
+    summaryTabPresenter.setRequestBuilder(requestBuilder);
+    summaryTabPresenter.forgetSummary();
+    summaryTabPresenter.refreshDisplay();
+  }
+
+  private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
+    String script = VariableDtos.getScript(variable);
     ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
-    .forResource(link.toString()).withFormBody("script", script).post()//
+    .forResource(link).withFormBody("script", script).post()//
     .accept("application/x-protobuf+json");
 
     if(variable != null) {
@@ -135,7 +142,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       }
     }
 
-    ResponseCodeCallback noOpCallback = new ResponseCodeCallback() {
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
@@ -149,14 +156,12 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       }
     };
 
-    requestBuilder.withCallback(Response.SC_OK, noOpCallback)//
-    .withCallback(Response.SC_BAD_REQUEST, noOpCallback)//
-    .withCallback(Response.SC_FORBIDDEN, noOpCallback)//
-    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, noOpCallback);
+    requestBuilder.withCallback(Response.SC_OK, callback)//
+    .withCallback(Response.SC_BAD_REQUEST, callback)//
+    .withCallback(Response.SC_FORBIDDEN, callback)//
+    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback);
 
-    summaryTabPresenter.setRequestBuilder(requestBuilder);
-    summaryTabPresenter.forgetSummary();
-    summaryTabPresenter.refreshDisplay();
+    return requestBuilder;
   }
 
   private void appendVariableSummaryArguments(StringBuilder link) {
