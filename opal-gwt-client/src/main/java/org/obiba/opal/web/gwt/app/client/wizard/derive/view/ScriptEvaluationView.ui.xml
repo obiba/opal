@@ -8,7 +8,7 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+  <o:HorizontalTabLayout ui:field="tabs" addStyleNames="top-margin">
     <g:Anchor><ui:msg description="Derived Summary tab title">Summary</ui:msg></g:Anchor>
     <g:SimplePanel ui:field="summary" width="100%" />
         
