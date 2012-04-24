@@ -303,6 +303,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       AclRequest.Builder viewBuilder = AclRequest.newBuilder("View", tableLink, "GET:GET").and(tableLink + "/variable", "GET:GET/GET");
       AclRequest.Builder valuesBuilder = AclRequest.newBuilder("Values", tableLink + "/valueSet", "GET:GET/GET").and(tableLink + "/entities", "GET:GET");
       if(table.hasViewLink()) {
+        viewBuilder.and(table.getViewLink() + "/xml", "GET");
+
         AclRequest.Builder editBuilder = AclRequest.newBuilder("Edit", table.getViewLink(), "PUT:GET")//
         .and(table.getViewLink(), "GET:GET")//
         .and(table.getViewLink() + "/from/variable/_transient/summary", "GET:GET")//
