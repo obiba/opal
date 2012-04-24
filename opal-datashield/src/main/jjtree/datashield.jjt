@@ -38,7 +38,7 @@ TOKEN : /* Numeric Constants */
            | <INTEGER> ( "." <INTEGER> )?
            | "." <INTEGER>
        >
- |     < #INTEGER: ( <DIGIT> )+ >
+ |     < #INTEGER: ( <DIGIT> )+ ("L")?>
  |     < #DIGIT: ["0" - "9"] >
 }
 

@@ -21,6 +21,7 @@ public class DataShieldExprTest {
   private static final Map<String, String> tests = ImmutableMap.<String, String> builder() //
   .put("A symbol", "A")//
   .put("A number", "1.0")//
+  .put("An integer", "5L")//
   .put("A negative number", "-0.43151402098822")//
   .put("An embedded symbol", "A$B$C.D")//
   .put("A formula", "A ~ B")//
