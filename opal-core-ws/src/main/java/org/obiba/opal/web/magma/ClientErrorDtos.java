@@ -43,7 +43,7 @@ public class ClientErrorDtos {
     while(cause.getCause() != null) {
       cause = cause.getCause();
     }
-    clientError.addArguments(cause.getMessage());
+    clientError.addArguments(cause.getMessage() != null ? cause.getMessage() : cause.getClass().getName());
     return clientError;
   }
 
@@ -54,7 +54,7 @@ public class ClientErrorDtos {
       cause = cause.getCause();
     }
     ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
-    clientError.addArguments(cause.getMessage());
+    clientError.addArguments(cause.getMessage() != null ? cause.getMessage() : cause.getClass().getName());
     return clientError;
   }
 
