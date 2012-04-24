@@ -14,22 +14,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.inject.Inject;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
@@ -49,6 +39,18 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.inject.Inject;
 
 public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogPresenter.Display> {
 
@@ -82,8 +84,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private void updateDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
-        .withCallback(new DatasourcesCallback()).send();
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new DatasourcesCallback()).send();
   }
 
   public void setTableVariables(TableDto table, JsArray<VariableDto> variables) {
@@ -123,10 +124,8 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private ViewDto getViewDto() {
-    ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table)
-        .defaultVariableListView().build();
-    VariableListViewDto derivedVariables = (VariableListViewDto) view
-        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table).defaultVariableListView().build();
+    VariableListViewDto derivedVariables = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
     for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
       DerivationHelper derivator = null;
@@ -178,13 +177,9 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
         CreateCodingViewCallBack createCodingViewCallback = new CreateCodingViewCallBack();
         AlreadyExistViewCallBack alreadyExistCodingViewCallback = new AlreadyExistViewCallBack();
         UriBuilder uriBuilder = UriBuilder.create();
-        uriBuilder.segment("datasource", getDisplay().getDatasourceName(), "view",
-            getDisplay().getViewName().getText());
+        uriBuilder.segment("datasource", getDisplay().getDatasourceName(), "view", getDisplay().getViewName().getText());
 
-        ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(uriBuilder.build()).get()
-            .withCallback(alreadyExistCodingViewCallback)
-            .withCallback(Response.SC_NOT_FOUND, createCodingViewCallback)
-            .send();
+        ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(uriBuilder.build()).get().withCallback(alreadyExistCodingViewCallback).withCallback(Response.SC_NOT_FOUND, createCodingViewCallback).send();
       }
     }
 
@@ -216,11 +211,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
       CreatedCodingViewCallBack callbackHandler = new CreatedCodingViewCallBack(codingView);
       UriBuilder uriBuilder = UriBuilder.create();
       uriBuilder.segment("datasource", getDisplay().getDatasourceName(), "views");
-      ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post()
-          .withResourceBody(ViewDto.stringify(codingView))
-          .withCallback(Response.SC_CREATED, callbackHandler)
-          .withCallback(Response.SC_BAD_REQUEST, callbackHandler)
-          .send();
+      ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post().withResourceBody(ViewDto.stringify(codingView)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).send();
     }
   }
 
@@ -240,6 +231,8 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
         eventBus.fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         eventBus.fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
+      } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());
       } else {
         eventBus.fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
