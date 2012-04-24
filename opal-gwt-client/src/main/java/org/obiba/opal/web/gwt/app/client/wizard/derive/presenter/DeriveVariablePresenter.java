@@ -138,7 +138,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       @Override
       public void onResource(Response response, TableDto resource) {
         table = resource;
-        scriptEvaluationPresenter.setTable(table);
+        scriptEvaluationPresenter.setTable(table, true);
         derivationPresenter.setTable(table);
       }
     }).send();

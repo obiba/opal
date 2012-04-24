@@ -300,8 +300,11 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       AuthorizationPresenter authz = authorizationPresenter.get();
       UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName());
       String tableLink = ub.build();
-      AclRequest.Builder viewBuilder = AclRequest.newBuilder("View", tableLink, "GET:GET").and(tableLink + "/variable", "GET:GET/GET");
-      AclRequest.Builder valuesBuilder = AclRequest.newBuilder("Values", tableLink + "/valueSet", "GET:GET/GET").and(tableLink + "/entities", "GET:GET");
+      AclRequest.Builder viewBuilder = AclRequest.newBuilder("View", tableLink, "GET:GET")//
+      .and(tableLink + "/variable", "GET:GET/GET") //
+      .and(tableLink + "/variable/_transient/summary", "POST");
+      AclRequest.Builder valuesBuilder = AclRequest.newBuilder("Values", tableLink + "/valueSet", "GET:GET/GET")//
+      .and(tableLink + "/entities", "GET:GET");
       if(table.hasViewLink()) {
         viewBuilder.and(table.getViewLink() + "/xml", "GET");
 

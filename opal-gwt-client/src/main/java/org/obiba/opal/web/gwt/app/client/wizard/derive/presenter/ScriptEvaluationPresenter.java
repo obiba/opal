@@ -59,6 +59,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   private TableDto table;
 
+  private boolean asTable;
+
   private ScriptEvaluationCallback scriptEvaluationCallback;
 
   //
@@ -96,6 +98,11 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   }
 
   public void setTable(TableDto table) {
+    setTable(table, false);
+  }
+
+  public void setTable(TableDto table, boolean asTable) {
+    this.asTable = asTable;
     this.table = table;
     getView().setTable(table);
   }
@@ -179,7 +186,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   }
 
   private void appendTable(StringBuilder link) {
-    if(!Strings.isNullOrEmpty(table.getViewLink())) {
+    if(Strings.isNullOrEmpty(table.getViewLink()) == false && asTable == false) {
       // OPAL-879
       link.append(table.getViewLink()).append("/from");
     } else if(!Strings.isNullOrEmpty(table.getLink())) {
