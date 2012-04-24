@@ -73,6 +73,7 @@ public class ScriptEvaluationPopupView extends PopupViewImpl implements Display 
   public void setInSlot(Object slot, Widget display) {
     if(slot == Slots.Evaluation) {
       ScrollPanel scroll = new ScrollPanel();
+      display.addStyleName("small-dual-indent");
       scroll.add(display);
       content.add(scroll);
     }
