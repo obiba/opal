@@ -9,21 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Command;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -54,6 +39,22 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Command;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
+
 public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, DatasourcePresenter.Proxy> {
 
   private String datasourceName;
@@ -67,8 +68,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   private Provider<AuthorizationPresenter> authorizationPresenter;
 
   @Inject
-  public DatasourcePresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<AuthorizationPresenter> authorizationPresenter) {
+  public DatasourcePresenter(Display display, EventBus eventBus, Proxy proxy, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
     this.authorizationPresenter = authorizationPresenter;
   }
@@ -91,8 +91,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     super.onBind();
 
     super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
-    super.registerHandler(
-        getEventBus().addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
     super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     getView().setExcelDownloadCommand(new ExcelDownloadCommand());
     getView().setExportDataCommand(new ExportDataCommand());
@@ -102,11 +101,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     getView().setAddViewCommand(new AddViewCommand());
     getView().setNextCommand(new NextCommand());
     getView().setPreviousCommand(new PreviousCommand());
-    super.registerHandler(
-        getEventBus().addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
+    super.registerHandler(getEventBus().addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
     super.getView().setTableNameFieldUpdater(new TableNameFieldUpdater());
-    super.registerHandler(
-        getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
+    super.registerHandler(getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
 
     // OPAL-975
     super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
@@ -131,31 +128,24 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   private void authorize() {
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
     // create tables
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get()
-        .authorize(getView().getAddUpdateTablesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getView().getAddUpdateTablesAuthorizer()).send();
     // create views
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/views").post()
-        .authorize(getView()
-            .getAddViewAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/views").post().authorize(getView().getAddViewAuthorizer()).send();
     // export variables in excel
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/tables/excel").get()
-        .authorize(getView().getExcelDownloadAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/tables/excel").get().authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
-        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
-            .and("/functional-units", HttpMethod.GET)//
-            .and("/functional-units/entities/table", HttpMethod.GET)//
-            .authorize(getView().getExportDataAuthorizer()).build())//
-        .send();
+    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+    .and("/functional-units", HttpMethod.GET)//
+    .and("/functional-units/entities/table", HttpMethod.GET)//
+    .authorize(getView().getExportDataAuthorizer()).build())//
+    .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()
-        .authorize(getView().getCopyDataAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getView().getCopyDataAuthorizer()).send();
     // remove
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete()
-        .authorize(getView().getRemoveDatasourceAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete().authorize(getView().getRemoveDatasourceAuthorizer()).send();
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void displayDatasource(String datasourceName) {
@@ -181,15 +171,14 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
       // make sure the list of datasources is initialized before looking for siblings
       if(datasources == null || datasources.length() == 0 || getDatasourceIndex(datasourceDto) < 0) {
-        ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
-            .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-              @Override
-              public void onResource(Response response, JsArray<DatasourceDto> resource) {
-                datasources = (resource != null) ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
-                displayDatasourceSiblings(datasourceDto);
-              }
+        ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            datasources = (resource != null) ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
+            displayDatasourceSiblings(datasourceDto);
+          }
 
-            }).send();
+        }).send();
       } else {
         displayDatasourceSiblings(datasourceDto);
       }
@@ -232,8 +221,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   private void updateTable(final String tableName) {
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "tables");
-    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build()).get().withCallback(new
-        TablesResourceCallback(datasourceName, tableName)).send();
+    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource(ub.build()).get().withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
   }
 
   private void downloadMetadata(String datasource) {
@@ -261,10 +249,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     };
     UriBuilder uriBuilder = UriBuilder.create();
     uriBuilder.segment("datasource", datasourceName);
-    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).delete()
-        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private String getPreviousTableName(int index) {
@@ -284,14 +269,13 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   }
 
   private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
-        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<DatasourceDto> resource) {
-            datasources = JsArrays.toSafeArray(resource);
-          }
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<DatasourceDto> resource) {
+        datasources = JsArrays.toSafeArray(resource);
+      }
 
-        }).send();
+    }).send();
   }
 
   //
@@ -316,7 +300,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
       UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-      authz.setAclRequest("datasource", AclRequest.newBuilder("View", ub.build(), "GET:GET/GET"));
+      String dsLink = ub.build();
+      authz.setAclRequest("datasource", AclRequest.newBuilder("View", dsLink, "GET").and(dsLink + "/tables", "GET"));
       setInSlot(null, authz);
     }
   }
@@ -365,16 +350,14 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
         }
       };
 
-      getEventBus().fireEvent(
-          new ConfirmationRequiredEvent(removeDatasourceConfirmation, "removeDatasource", "confirmRemoveDatasource"));
+      getEventBus().fireEvent(new ConfirmationRequiredEvent(removeDatasourceConfirmation, "removeDatasource", "confirmRemoveDatasource"));
     }
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(removeDatasourceConfirmation != null && event.getSource().equals(removeDatasourceConfirmation) && event
-          .isConfirmed()) {
+      if(removeDatasourceConfirmation != null && event.getSource().equals(removeDatasourceConfirmation) && event.isConfirmed()) {
         removeDatasourceConfirmation.run();
         removeDatasourceConfirmation = null;
       }
@@ -435,9 +418,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   class TableNameFieldUpdater implements FieldUpdater<TableDto, String> {
     @Override
     public void update(int index, TableDto tableDto, String value) {
-      getEventBus().fireEvent(
-          new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index),
-              getNextTableName(index)));
+      getEventBus().fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index), getNextTableName(index)));
     }
   }
 
@@ -454,14 +435,12 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     public void onTableSelectionChanged(final TableSelectionChangeEvent event) {
       if(!event.getSelection().getDatasourceName().equals(datasourceName)) {
         UriBuilder ub = UriBuilder.create().segment("datasource", event.getSelection().getDatasourceName());
-        ResourceRequestBuilderFactory.<DatasourceDto>newBuilder()
-            .forResource(ub.build()).get()
-            .withCallback(new ResourceCallback<DatasourceDto>() {
-              @Override
-              public void onResource(Response response, DatasourceDto resource) {
-                displayDatasource(resource, event.getSelection());
-              }
-            }).send();
+        ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<DatasourceDto>() {
+          @Override
+          public void onResource(Response response, DatasourceDto resource) {
+            displayDatasource(resource, event.getSelection());
+          }
+        }).send();
       } else {
         selectTable(event.getSelection().getName());
       }
@@ -477,8 +456,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       // Having an position of the current variable would be more efficient.
       int siblingIndex = 0;
       int currentTableIndex = getTableIndex(event.getCurrentSelection().getName());
-      if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.NEXT) && currentTableIndex < tables
-          .length() - 1) {
+      if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.NEXT) && currentTableIndex < tables.length() - 1) {
         siblingIndex = currentTableIndex + 1;
       } else if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.PREVIOUS) && currentTableIndex != 0) {
         siblingIndex = currentTableIndex - 1;
@@ -490,9 +468,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       // This fires a TableSelectionChangeEvent if the selection changes
       getView().setTableSelection(siblingSelection, siblingIndex);
 
-      getEventBus().fireEvent(
-          new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTableName(siblingIndex),
-              getNextTableName(siblingIndex)));
+      getEventBus().fireEvent(new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTableName(siblingIndex), getNextTableName(siblingIndex)));
     }
   }
 
@@ -547,14 +523,13 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     @Override
     public void onViewSaved(ViewSavedEvent event) {
       UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new ResourceCallback<DatasourceDto>() {
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<DatasourceDto>() {
 
-            @Override
-            public void onResource(Response response, DatasourceDto resource) {
-              displayDatasource(resource, null);
-            }
-          }).send();
+        @Override
+        public void onResource(Response response, DatasourceDto resource) {
+          displayDatasource(resource, null);
+        }
+      }).send();
     }
   }
 
