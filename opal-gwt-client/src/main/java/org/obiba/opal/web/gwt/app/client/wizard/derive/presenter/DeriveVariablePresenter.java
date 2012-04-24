@@ -381,6 +381,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
         if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
           getEventBus().fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
           close(view, derived);
+        } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());
         } else {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
@@ -396,6 +398,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     .withCallback(Response.SC_CREATED, callback)//
     .withCallback(Response.SC_OK, callback)//
     .withCallback(Response.SC_BAD_REQUEST, callback)//
+    .withCallback(Response.SC_FORBIDDEN, callback)//
     .withCallback(Response.SC_NOT_FOUND, callback)//
     .withCallback(Response.SC_METHOD_NOT_ALLOWED, callback)//
     .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback) //
