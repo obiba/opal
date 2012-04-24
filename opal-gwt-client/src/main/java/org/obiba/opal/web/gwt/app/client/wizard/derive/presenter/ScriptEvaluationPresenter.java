@@ -117,7 +117,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   private void requestSummary() {
     String script = VariableDtos.getScript(variable);
     StringBuilder link = new StringBuilder();
-
+    GWT.log("requestSummary()");
     appendTable(link);
     link.append("/variable/_transient/summary?");
     appendVariableSummaryArguments(link);
@@ -135,16 +135,24 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       }
     }
 
-    // No-op because already handled by the values request
     ResponseCodeCallback noOpCallback = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-
+        GWT.log("summary.status=" + response.getStatusCode());
+        if(scriptEvaluationCallback == null) return;
+        if(response.getStatusCode() == Response.SC_OK) {
+          scriptEvaluationCallback.onSuccess(variable);
+        } else {
+          scriptEvaluationCallback.onFailure(variable);
+        }
       }
     };
 
-    requestBuilder.withCallback(400, noOpCallback).withCallback(500, noOpCallback);
+    requestBuilder.withCallback(Response.SC_OK, noOpCallback)//
+    .withCallback(Response.SC_BAD_REQUEST, noOpCallback)//
+    .withCallback(Response.SC_FORBIDDEN, noOpCallback)//
+    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, noOpCallback);
 
     summaryTabPresenter.setRequestBuilder(requestBuilder);
     summaryTabPresenter.forgetSummary();
@@ -214,7 +222,10 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
       ResourceRequestBuilder<ValueSetsDto> requestBuilder = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder() //
       .forResource(link.toString()).post().withFormBody("script", script) //
-      .withCallback(200, callback).withCallback(400, callback).withCallback(500, callback)//
+      .withCallback(Response.SC_OK, callback)//
+      .withCallback(Response.SC_BAD_REQUEST, callback)//
+      .withCallback(Response.SC_FORBIDDEN, callback)//
+      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback)//
       .accept("application/x-protobuf+json");
       requestBuilder.send();
     }
@@ -230,23 +241,22 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      boolean success = false;
       switch(response.getStatusCode()) {
       case Response.SC_OK:
+        getView().setValuesVisible(true);
         getView().getValueSetsProvider().populateValues(offset, (ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
-        success = true;
+        break;
+      case Response.SC_FORBIDDEN:
+        getView().setValuesVisible(false);
         break;
       case Response.SC_BAD_REQUEST:
+        getView().setValuesVisible(true);
         scriptInterpretationFail(response);
         break;
       default:
+        getView().setValuesVisible(true);
         getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
         break;
-      }
-      if(scriptEvaluationCallback != null) {
-        if(success) scriptEvaluationCallback.onSuccess(variable);
-        else
-          scriptEvaluationCallback.onFailure(variable);
       }
     }
 
@@ -289,6 +299,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     }
 
     void setSummaryTabWidget(WidgetDisplay widget);
+
+    void setValuesVisible(boolean visible);
 
     void setVariable(VariableDto variable);
 

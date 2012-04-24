@@ -300,8 +300,21 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       AuthorizationPresenter authz = authorizationPresenter.get();
       UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName());
       String tableLink = ub.build();
-      authz.setAclRequest("table", AclRequest.newBuilder("View", tableLink, "GET:GET").and(tableLink + "/variable", "GET:GET/GET"), //
-      AclRequest.newBuilder("Values", tableLink + "/valueSet", "GET:GET/GET").and(tableLink + "/entities", "GET:GET"));
+      AclRequest.Builder viewBuilder = AclRequest.newBuilder("View", tableLink, "GET:GET").and(tableLink + "/variable", "GET:GET/GET");
+      AclRequest.Builder valuesBuilder = AclRequest.newBuilder("Values", tableLink + "/valueSet", "GET:GET/GET").and(tableLink + "/entities", "GET:GET");
+      if(table.hasViewLink()) {
+        AclRequest.Builder editBuilder = AclRequest.newBuilder("Edit", table.getViewLink(), "PUT:GET")//
+        .and(table.getViewLink(), "GET:GET")//
+        .and(table.getViewLink() + "/from/variable/_transient/summary", "GET:GET")//
+        .and(table.getViewLink() + "/from/variable/_transient/summary", "POST:GET");
+
+        // TODO Edit view with values requires this:
+        // .and(table.getViewLink() + "/from/valueSets/variable/_transient", "POST");
+
+        authz.setAclRequest("table", viewBuilder, valuesBuilder, editBuilder);
+      } else {
+        authz.setAclRequest("table", viewBuilder, valuesBuilder);
+      }
       setInSlot(Display.Slots.Permissions, authz);
     }
   }

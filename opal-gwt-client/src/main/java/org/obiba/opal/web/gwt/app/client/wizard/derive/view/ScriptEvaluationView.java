@@ -88,8 +88,6 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
   private ValueSetFetcher fetcher;
 
-  private VariableDto variable;
-
   @Inject
   public ScriptEvaluationView() {
     super();
@@ -110,6 +108,11 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   public void setSummaryTabWidget(WidgetDisplay widget) {
     summary.clear();
     summary.add(widget.asWidget());
+  }
+
+  @Override
+  public void setValuesVisible(boolean visible) {
+    tabs.setTabVisible(1, visible);
   }
 
   @Override
@@ -138,8 +141,6 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
   @Override
   public void setVariable(VariableDto variable) {
-    this.variable = variable;
-
     valueType.setText(variable.getValueType());
     script.setText(VariableDtos.getScript(variable));
 
