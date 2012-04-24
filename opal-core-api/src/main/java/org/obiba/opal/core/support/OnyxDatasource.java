@@ -45,7 +45,7 @@ public class OnyxDatasource extends AbstractDatasourceWrapper {
 
   @Override
   public void initialise() {
-    MultiplexingDatasource mxDatasource = new MultiplexingDatasource(getWrappedDatasource(), new VariableAttributeMultiplexer("stage"), new VariableNameTransformer() {
+    MultiplexingDatasource mxDatasource = new MultiplexingDatasource(fsDatasource, new VariableAttributeMultiplexer("stage"), new VariableNameTransformer() {
 
       @Override
       protected String transformName(Variable variable) {
