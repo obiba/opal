@@ -490,7 +490,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
         for(int j = 0; j < array.length(); j++) {
           final String viewName = array.get(j);
           UriBuilder ub = UriBuilder.create().segment("datasource", ds.getName(), "view", viewName);
-          ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<ViewDto>() {
+          ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(ub.build()).get()//
+          .withCallback(new ResourceCallback<ViewDto>() {
 
             @Override
             public void onResource(Response response, ViewDto resource) {
@@ -499,6 +500,13 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
               }
             }
 
+          })//
+          .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              // ignore
+            }
           }).send();
 
         }
