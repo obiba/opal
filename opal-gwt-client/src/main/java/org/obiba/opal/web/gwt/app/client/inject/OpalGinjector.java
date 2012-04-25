@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.inject.client;
+package org.obiba.opal.web.gwt.app.client.inject;
 
 import net.customware.gwt.presenter.client.EventBus;
 

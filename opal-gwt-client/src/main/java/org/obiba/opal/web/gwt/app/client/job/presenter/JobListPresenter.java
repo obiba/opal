@@ -9,6 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.job.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
+import org.obiba.opal.web.model.client.opal.CommandStateDto;
+
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,21 +39,6 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.inject.client.GwtEventBusAdaptor;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
-import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 /**
  *
@@ -93,8 +93,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   public boolean containsClearableJobs(JsArray<CommandStateDto> jobs) {
     for(int i = 0; i < jobs.length(); i++) {
       CommandStateDto job = jobs.get(i);
-      if(job.getStatus().toString().equals("SUCCEEDED") || job.getStatus().toString().equals("FAILED") || job
-          .getStatus().toString().equals("CANCELED")) {
+      if(job.getStatus().toString().equals("SUCCEEDED") || job.getStatus().toString().equals("FAILED") || job.getStatus().toString().equals("CANCELED")) {
         return true;
       }
     }
@@ -102,20 +101,18 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   }
 
   private void updateTable() {
-    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder().forResource("/shell/commands").get()
-        .withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<CommandStateDto> resource) {
-            getView().renderRows(resource);
-            getView().showClearJobsButton(containsClearableJobs(resource));
-          }
+    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands").get().withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<CommandStateDto> resource) {
+        getView().renderRows(resource);
+        getView().showClearJobsButton(containsClearableJobs(resource));
+      }
 
-        }).send();
+    }).send();
   }
 
   private void authorizeCancelJob(CommandStateDto dto, Authorizer authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/command/" + dto.getId() + "/status")
-        .put().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/command/" + dto.getId() + "/status").put().authorize(authorizer).send();
   }
 
   private void doActionImpl(final CommandStateDto dto, String actionName) {
@@ -123,7 +120,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
       jobDetailsPresenter.setJob(dto);
       addToPopupSlot(jobDetailsPresenter);
     } else if(CANCEL_ACTION.equals(actionName)) {
-      authorizeCancelJob(dto, new Authorizer(new GwtEventBusAdaptor(getEventBus())) {
+      authorizeCancelJob(dto, new Authorizer(getEventBus()) {
 
         @Override
         public void authorized() {
@@ -150,15 +147,11 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
         };
         UriBuilder uriBuilder = UriBuilder.create();
         uriBuilder.segment("shell", "command", dto.getId() + "", "status");
-        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder()
-            .forResource(uriBuilder.build()).put().withBody("text/plain", "CANCELED")
-            .withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler)
-            .send();
+        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource(uriBuilder.build()).put().withBody("text/plain", "CANCELED").withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler).send();
       }
     };
 
-    getEventBus()
-        .fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
+    getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
   }
 
   private void deleteCompletedJobs() {
@@ -172,13 +165,11 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
           }
         };
 
-        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder().forResource("/shell/commands/completed")
-            .delete().withCallback(200, callbackHandler).send();
+        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands/completed").delete().withCallback(200, callbackHandler).send();
       }
     };
 
-    getEventBus()
-        .fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
+    getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
   }
 
   //
@@ -222,8 +213,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event
-          .isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }

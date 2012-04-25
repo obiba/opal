@@ -4,11 +4,11 @@ import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
+import org.obiba.opal.web.gwt.app.client.inject.OpalGinjector;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
-import org.obiba.opal.web.gwt.inject.client.OpalGinjector;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;

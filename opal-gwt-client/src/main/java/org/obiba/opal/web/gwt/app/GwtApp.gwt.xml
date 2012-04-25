@@ -14,10 +14,8 @@
   <inherits name="com.gwtplatform.mvp.Mvp" />
  
   <define-configuration-property name="gin.ginjector" is-multi-valued="false" />
-  <set-configuration-property name="gin.ginjector" value="org.obiba.opal.web.gwt.inject.client.OpalGinjector" /> 
+  <set-configuration-property name="gin.ginjector" value="org.obiba.opal.web.gwt.app.client.inject.OpalGinjector" /> 
   
-  <!-- Dependency Injection -->
-  <inherits name='org.obiba.opal.web.gwt.inject.Inject' />
   <!-- Client-side REST framework -->
   <inherits name='org.obiba.opal.web.gwt.rest.Rest' />
   <!-- Opal's WS data models -->
