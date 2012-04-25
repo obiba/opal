@@ -17,6 +17,8 @@ public interface SubjectAclService {
 
   void deleteSubjectPermissions(String domain, String node, Subject subject);
 
+  void deleteSubjectPermissions(String domain, String node, Subject subject, String permission);
+
   void addSubjectPermissions(String domain, String node, Subject subject, Iterable<String> permissions);
 
   void addSubjectPermission(String domain, String node, Subject subject, String permission);

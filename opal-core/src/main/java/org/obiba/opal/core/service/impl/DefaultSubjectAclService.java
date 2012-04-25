@@ -66,6 +66,14 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
+  public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject, String permission) {
+    for(SubjectAcl acl : persistenceManager.match(new SubjectAcl(domain, node, subject, permission))) {
+      persistenceManager.delete(acl);
+    }
+    notifyListeners(subject);
+  }
+
+  @Override
   public void addSubjectPermissions(String domain, String node, SubjectAclService.Subject subject, Iterable<String> permissions) {
     for(String permission : permissions) {
       addSubjectPermission(domain, node, subject, permission);

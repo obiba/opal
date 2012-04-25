@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 @Component
@@ -51,8 +52,12 @@ public class AuthorizationResource {
   }
 
   @DELETE
-  public Opal.Acl delete(@QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type) {
-    subjectAclService.deleteSubjectPermissions("magma", getNode(), type.subjectFor(subject));
+  public Opal.Acl delete(@QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
+    if(Strings.isNullOrEmpty(permission)) {
+      subjectAclService.deleteSubjectPermissions("magma", getNode(), type.subjectFor(subject));
+    } else {
+      subjectAclService.deleteSubjectPermissions("magma", getNode(), type.subjectFor(subject), permission);
+    }
     return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), type.subjectFor(subject)));
   }
 
