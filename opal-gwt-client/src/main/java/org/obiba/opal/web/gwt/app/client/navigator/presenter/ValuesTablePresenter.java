@@ -206,7 +206,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier) {
       StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/valueSet/entity/").append(entityIdentifier).append("/variable/").append(variable.getName()).append("/value");
+      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName()).append("/value");
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
 

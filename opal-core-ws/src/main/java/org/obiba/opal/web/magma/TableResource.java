@@ -98,7 +98,7 @@ public class TableResource extends AbstractValueTableResource {
    * @param select script for filtering the variables
    * @return
    */
-  @Path("/valueSet/entity/{identifier}")
+  @Path("/valueSet/{identifier}")
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public ValueSetResource getValueSet(@Context Request request, @PathParam("identifier") String identifier, @QueryParam("select") String select, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     TimestampedResponses.evaluate(request, getValueTable());
@@ -114,7 +114,7 @@ public class TableResource extends AbstractValueTableResource {
    * @param filterBinary
    * @return
    */
-  @Path("/valueSet/entity/{identifier}/variable/{variable}")
+  @Path("/valueSet/{identifier}/variable/{variable}")
   public ValueSetResource getVariableValueSet(@Context Request request, @PathParam("identifier") String identifier, @PathParam("variable") String variable, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     TimestampedResponses.evaluate(request, getValueTable());
     return new ValueSetResource(getValueTable(), getValueTable().getVariableValueSource(variable), new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
@@ -224,7 +224,7 @@ public class TableResource extends AbstractValueTableResource {
    * @param categoriesFP
    * @return
    */
-  @Path("/valueSet/entity/{identifier}/variable/_transient")
+  @Path("/valueSet/{identifier}/variable/_transient")
   @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
   public ValueSetResource getTransientVariableValueSet(@Context Request request, @PathParam("identifier") String identifier, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary, @QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
     JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
