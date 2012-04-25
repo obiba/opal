@@ -117,7 +117,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   Anchor attributeTableTitle;
 
   @UiField(provided = true)
-  Table<AttributeDto> attributeTable;
+  AttributesTable attributeTable;
 
   @UiField
   SimplePager attributeTablePager;
@@ -145,10 +145,6 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   private MenuBar deriveBar;
 
   private MenuItem categorizeItem;
-
-  //
-  // Constructors
-  //
 
   public VariableView() {
     categoryTable = new CategoriesTable();
@@ -194,6 +190,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     attributeTableTitle.setText(translations.attributesLabel() + " (" + size + ")");
     attributeTablePager.firstPage();
     attributeTablePager.setVisible(size > NavigatorView.PAGE_SIZE);
+    attributeTable.setupSort(attributeProvider);
     attributeProvider.refresh();
     renderVariableLabels(rows);
   }

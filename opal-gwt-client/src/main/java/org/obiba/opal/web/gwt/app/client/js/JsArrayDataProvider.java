@@ -11,15 +11,17 @@ package org.obiba.opal.web.gwt.app.client.js;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.view.client.ListDataProvider;
 
-/**
- *
- */
 public class JsArrayDataProvider<T extends JavaScriptObject> extends ListDataProvider<T> {
 
   public void setArray(JsArray<T> array) {
     super.setList(JsArrays.toList(JsArrays.toSafeArray(array)));
+  }
+
+  public ColumnSortEvent.ListHandler<T> newSortHandler() {
+    return new ColumnSortEvent.ListHandler<T>(getList());
   }
 
 }
