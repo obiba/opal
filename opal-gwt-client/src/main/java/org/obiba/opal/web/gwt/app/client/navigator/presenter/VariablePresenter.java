@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -34,6 +35,7 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
@@ -241,8 +243,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
-      authz.setAclRequest("variable", AclRequest.newBuilder("View", variable.getLink(), "GET:GET"), //
-      AclRequest.newBuilder("Summary", variable.getLink() + "/summary", "GET:GET"));
+      String node = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", variable.getName()).build();
+      authz.setAclRequest("variable", new AclRequest(AclAction.VARIABLE_READ, node));
       setInSlot(Display.Slots.Permissions, authz);
     }
   }

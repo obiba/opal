@@ -9,6 +9,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 
   <!-- The Hibernate SessionFactory -->
   <bean id="keySessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <qualifier value="opal-key"/>
     <property name="dataSource">
       <ref bean="keyDataSource" />
     </property>
@@ -53,6 +54,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 
   <!-- The Hibernate SessionFactory -->
   <bean id="opalSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <qualifier value="opal-data"/>
     <property name="dataSource">
       <ref bean="opalDataSource" />
     </property>

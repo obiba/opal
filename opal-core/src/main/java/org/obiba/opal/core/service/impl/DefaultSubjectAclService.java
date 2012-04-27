@@ -9,9 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.obiba.core.service.PersistenceManager;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.SubjectAclService;
@@ -33,11 +38,14 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   private final PersistenceManager persistenceManager;
 
+  private final SessionFactory sessionFactory;
+
   private final Set<SubjectAclChangeCallback> callbacks = Sets.newHashSet();
 
   @Autowired
-  public DefaultSubjectAclService(@Qualifier("opal-data") PersistenceManager persistenceManager) {
+  public DefaultSubjectAclService(@Qualifier("opal-data") PersistenceManager persistenceManager, @Qualifier("opal-data") SessionFactory sessionFactory) {
     this.persistenceManager = persistenceManager;
+    this.sessionFactory = sessionFactory;
   }
 
   @Override
@@ -45,6 +53,22 @@ public class DefaultSubjectAclService implements SubjectAclService {
     if(callback != null) {
       callbacks.add(callback);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void deleteNodePermissions(String node) {
+    // delete exact match for any domains
+    deleteNodePermissions(null, node);
+
+    // delete starts with nodes
+    Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
+    Criteria criter = getSession().createCriteria(SubjectAcl.class).add(Restrictions.like("node", node + "/%"));
+    for(SubjectAcl acl : (List<SubjectAcl>) criter.list()) {
+      subjects.add(acl.getSubject());
+      persistenceManager.delete(acl);
+    }
+    notifyListeners(subjects);
   }
 
   @Override
@@ -154,7 +178,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Iterable<Permissions> getNodePermissions(final String domain, final String node, final SubjectType type) {
+  public Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type) {
 
     SubjectAcl template = new SubjectAcl(domain, node, type);
     return Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, Permissions>() {
@@ -165,12 +189,12 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
           @Override
           public String getNode() {
-            return node;
+            return from.getNode();
           }
 
           @Override
           public String getDomain() {
-            return domain;
+            return from.getDomain();
           }
 
           @Override
@@ -180,7 +204,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
           @Override
           public Iterable<String> getPermissions() {
-            return mergePermissions(new SubjectAcl(from.getDomain(), node, from.getSubject()));
+            return mergePermissions(new SubjectAcl(from.getDomain(), from.getNode(), from.getSubject()));
           }
 
         };
@@ -244,6 +268,10 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
     });
 
+  }
+
+  private Session getSession() {
+    return sessionFactory.getCurrentSession();
   }
 
 }

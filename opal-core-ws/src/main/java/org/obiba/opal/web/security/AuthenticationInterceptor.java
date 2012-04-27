@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AuthenticationInterceptor extends AbstractSecurityComponent implements RequestCyclePreProcess, RequestCyclePostProcess {
 
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(AuthenticationInterceptor.class);
 
   private static final String X_OPAL_AUTH = "X-Opal-Auth";

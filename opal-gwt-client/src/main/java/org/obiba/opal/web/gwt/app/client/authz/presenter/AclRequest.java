@@ -9,14 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.Acl;
+import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
 
@@ -28,36 +27,29 @@ import com.google.gwt.http.client.Response;
  */
 public class AclRequest {
 
-  private String header;
+  private final AclAction action;
 
-  private List<AclResource> aclResources;
+  private final String resource;
 
   private AclAddCallback aclAddCallback;
 
   private AclDeleteCallback aclDeleteCallback;
 
-  private AclRequest(String header, String resource, String action) {
-    this.header = header;
-    getAclResources().add(new AclResource(resource, action));
+  public AclRequest(AclAction action, String resource) {
+    this.action = action;
+    this.resource = resource;
   }
 
-  private AclRequest(AclRequest copy) {
-    this.header = copy.header;
-    for(AclResource res : copy.getAclResources()) {
-      getAclResources().add(new AclResource(res.getResource(), res.getAction()));
-    }
+  public AclRequest copy() {
+    return new AclRequest(action, resource);
   }
 
   public String getHeader() {
-    return header;
+    return action.getName();
   }
 
-  public void addAclResource(String resource, String perm) {
-    getAclResources().add(new AclResource(resource, perm));
-  }
-
-  public List<AclResource> getAclResources() {
-    return aclResources != null ? aclResources : (aclResources = new ArrayList<AclResource>());
+  public String getResource() {
+    return resource;
   }
 
   public void setAclDeleteCallback(AclDeleteCallback aclDeleteCallback) {
@@ -69,46 +61,28 @@ public class AclRequest {
   }
 
   public void add(final Subject subject) {
-    add(subject, 0);
-  }
-
-  private void add(final Subject subject, final int index) {
-    final AclResource acl = getAclResources().get(index);
-    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + acl.getResource() + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType() + "&perm=" + acl.getAction()).post()//
+    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + resource + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType() + "&perm=" + action.getName()).post()//
     .withCallback(new ResourceCallback<Acl>() {
 
       @Override
-      public void onResource(Response response, Acl resource) {
+      public void onResource(Response response, Acl acl) {
         if(response.getStatusCode() == Response.SC_OK) {
-          if(index == getAclResources().size() - 1) {
-            aclAddCallback.onAdd(resource);
-          } else {
-            add(subject, index + 1);
-          }
+          aclAddCallback.onAdd(acl);
         } else {
-          aclAddCallback.onAddFailed(response, subject, acl.getResource(), acl.getAction());
+          aclAddCallback.onAddFailed(response, subject, resource, action);
         }
       }
     }).send();
   }
 
   public void delete(final Subject subject) {
-    delete(subject, 0);
-  }
-
-  private void delete(final Subject subject, final int index) {
-    AclResource acl = getAclResources().get(index);
-    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + acl.getResource() + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType()).delete()//
+    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + resource + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType() + "&perm=" + action.getName()).delete()//
     .withCallback(new ResourceCallback<Acl>() {
 
       @Override
       public void onResource(Response response, Acl resource) {
         if(response.getStatusCode() == Response.SC_OK) {
-          if(index == getAclResources().size() - 1) {
-            aclDeleteCallback.onDelete(subject);
-          } else {
-            delete(subject, index + 1);
-          }
+          aclDeleteCallback.onDelete(subject);
         } else {
           aclDeleteCallback.onDeleteFailed(response, subject);
         }
@@ -116,35 +90,24 @@ public class AclRequest {
     }).send();
   }
 
-  public static Builder newBuilder(String name, String resource, String perm) {
-    return new Builder(name, resource, perm);
+  public boolean hasPermission(Acls acls) {
+    for(Acl acl : JsArrays.toIterable(acls.getAclsArray())) {
+      if(acl.getResource().equals(resource) && hasAction(acl)) return true;
+    }
+    return false;
+  }
+
+  private boolean hasAction(Acl acl) {
+    for(int i = 0; i < acl.getActionsArray().length(); i++) {
+      if(acl.getActionsArray().get(i).equals(action.getName())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static ResourceAuthorizationRequestBuilder newResourceAuthorizationRequestBuilder() {
     return ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/authz/query").get();
-  }
-
-  //
-  // Inner classes
-  //
-
-  public static class Builder {
-    private AclRequest request;
-
-    Builder(String name, String resource, String perm) {
-      request = new AclRequest(name, resource, perm);
-    }
-
-    public Builder and(String resource, String perm) {
-      request.addAclResource(resource, perm);
-      return this;
-    }
-
-    public AclRequest build() {
-      // make a copy to ensure callback are not conflicting between subject types
-      return new AclRequest(request);
-    }
-
   }
 
   //
@@ -166,6 +129,6 @@ public class AclRequest {
   public interface AclAddCallback {
     public void onAdd(Acl resource);
 
-    public void onAddFailed(Response response, Subject subject, String resource, String perm);
+    public void onAddFailed(Response response, Subject subject, String resource, AclAction action);
   }
 }

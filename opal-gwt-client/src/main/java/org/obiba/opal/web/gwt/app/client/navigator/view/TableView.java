@@ -258,11 +258,11 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void setDownloadViewCommand(Command cmd) {
+  public void setViewDownloadCommand(Command cmd) {
     if(cmd != null) {
-      toolbar.setDownloadViewCommand(cmd);
+      toolbar.setViewDownloadCommand(cmd);
     } else {
-      toolbar.removeDownloadViewCommand();
+      toolbar.removeViewDownloadCommand();
     }
   }
 
@@ -397,6 +397,11 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
     return new MenuItemAuthorizer(toolbar.getExcelDownloadItem());
+  }
+
+  @Override
+  public HasAuthorization getViewDownloadAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getViewDownloadItem());
   }
 
   @Override

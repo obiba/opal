@@ -41,6 +41,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
@@ -160,6 +161,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     // copy data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getView().getCopyDataAuthorizer()).send();
     if(table.hasViewLink()) {
+      // download view
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink() + "/xml").get().authorize(getView().getViewDownloadAuthorizer()).send();
       // remove view
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete().authorize(getView().getRemoveAuthorizer()).send();
       // edit view
@@ -193,10 +196,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
 
     if(tableIsView()) {
-      getView().setDownloadViewCommand(new DownloadViewCommand());
+      getView().setViewDownloadCommand(new DownloadViewCommand());
       getView().setEditCommand(new EditCommand());
     } else {
-      getView().setDownloadViewCommand(null);
+      getView().setViewDownloadCommand(null);
       getView().setEditCommand(null);
     }
 
@@ -298,27 +301,20 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
-      UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName());
-      String tableLink = ub.build();
-      AclRequest.Builder viewBuilder = AclRequest.newBuilder("View", tableLink, "GET:GET")//
-      .and(tableLink + "/variable", "GET:GET/GET") //
-      .and(tableLink + "/variable/_transient/summary", "POST");
-      AclRequest.Builder valuesBuilder = AclRequest.newBuilder("Values", tableLink + "/valueSet", "GET:GET/GET")//
-      .and(tableLink + "/entities", "GET:GET");
+      UriBuilder nodeBuilder = UriBuilder.create().segment("datasource", table.getDatasourceName());
+
       if(table.hasViewLink()) {
-        viewBuilder.and(table.getViewLink() + "/xml", "GET");
-
-        AclRequest.Builder editBuilder = AclRequest.newBuilder("Edit", table.getViewLink(), "PUT:GET")//
-        .and(table.getViewLink(), "GET:GET")//
-        .and(table.getViewLink() + "/from/variable/_transient/summary", "GET:GET")//
-        .and(table.getViewLink() + "/from/variable/_transient/summary", "POST:GET");
-
-        // TODO Edit view with values requires this:
-        // .and(table.getViewLink() + "/from/valueSets/variable/_transient", "POST");
-
-        authz.setAclRequest("table", viewBuilder, valuesBuilder, editBuilder);
+        String node = nodeBuilder.segment("view", table.getName()).build();
+        authz.setAclRequest("view", new AclRequest(AclAction.VIEW_ALL, node), //
+        new AclRequest(AclAction.VIEW_READ, node), //
+        new AclRequest(AclAction.VIEW_VALUES, node), //
+        new AclRequest(AclAction.VIEW_EDIT, node), //
+        new AclRequest(AclAction.VIEW_VALUES_EDIT, node));
       } else {
-        authz.setAclRequest("table", viewBuilder, valuesBuilder);
+        String node = nodeBuilder.segment("table", table.getName()).build();
+        authz.setAclRequest("table", new AclRequest(AclAction.TABLE_ALL, node), //
+        new AclRequest(AclAction.TABLE_READ, node), //
+        new AclRequest(AclAction.TABLE_VALUES, node));
       }
       setInSlot(Display.Slots.Permissions, authz);
     }
@@ -574,7 +570,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setExportDataCommand(Command cmd);
 
-    void setDownloadViewCommand(Command cmd);
+    void setViewDownloadCommand(Command cmd);
 
     void setParentCommand(Command cmd);
 
@@ -611,6 +607,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasAuthorization getCopyDataAuthorizer();
 
     HasAuthorization getExcelDownloadAuthorizer();
+
+    HasAuthorization getViewDownloadAuthorizer();
 
     HasAuthorization getExportDataAuthorizer();
 

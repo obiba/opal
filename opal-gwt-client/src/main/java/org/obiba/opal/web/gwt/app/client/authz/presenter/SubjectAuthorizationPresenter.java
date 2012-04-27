@@ -45,9 +45,9 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
     super(eventBus, display);
   }
 
-  public void setAclRequest(SubjectType type, AclRequest.Builder... builders) {
+  public void setAclRequest(SubjectType type, AclRequest... requests) {
     this.type = type;
-    this.subjectPermissionsRequests = new SubjectPermissionsRequest(type, new AclCallbackImpl(getEventBus()), builders);
+    this.subjectPermissionsRequests = new SubjectPermissionsRequest(type, new AclCallbackImpl(getEventBus()), requests);
 
     if(!initialized) {
       for(String header : subjectPermissionsRequests.getHeaders()) {

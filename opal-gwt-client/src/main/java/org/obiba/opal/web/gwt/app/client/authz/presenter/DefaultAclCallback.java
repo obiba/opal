@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.model.client.opal.Acl;
+import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
 
@@ -50,7 +51,7 @@ public class DefaultAclCallback implements AclCallback {
   }
 
   @Override
-  public void onAddFailed(Response response, Subject subject, String resource, String perm) {
+  public void onAddFailed(Response response, Subject subject, String resource, AclAction action) {
     eventBus.fireEvent(NotificationEvent.newBuilder().error("Failed adding permissions of " + subject).build());
   }
 

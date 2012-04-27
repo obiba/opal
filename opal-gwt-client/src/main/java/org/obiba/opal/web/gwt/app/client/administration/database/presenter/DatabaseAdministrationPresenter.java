@@ -30,6 +30,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -198,7 +199,7 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
     }));
 
-    authorizationPresenter.setAclRequest("databases", AclRequest.newBuilder("Administrate", Resources.databases(), "*:POST/*"));
+    authorizationPresenter.setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, Resources.databases()));
   }
 
   private void deleteDatabase(JdbcDataSourceDto database) {

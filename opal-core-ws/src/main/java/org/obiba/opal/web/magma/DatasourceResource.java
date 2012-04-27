@@ -40,15 +40,24 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
+import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.SubjectAclService.Subject;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
+import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.LocaleDto;
+import org.obiba.opal.web.security.AuthorizationInterceptor;
+import org.obiba.opal.web.ws.cfg.ResteasyServletConfiguration;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 @Component
 @Scope("request")
@@ -171,7 +180,7 @@ public class DatasourceResource {
 
   @POST
   @Path("/views")
-  public Response createView(ViewDto viewDto, @Context UriInfo uriInfo) {
+  public Response createView(final ViewDto viewDto, @Context UriInfo uriInfo) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
 
     if(datasourceHasTable(viewDto.getName())) {
@@ -180,9 +189,9 @@ public class DatasourceResource {
     viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class).path(DatasourceResource.class, "getView").build(name, viewDto.getName());
-    URI tableUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(name, viewDto.getName());
 
-    return Response.created(viewUri).header("X-Alt-Location", tableUri).build();
+    return Response.created(viewUri)//
+    .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, Lists.newArrayList(AclAction.VIEW_ALL))).build();
   }
 
   @Path("/view/{viewName}")
@@ -229,5 +238,45 @@ public class DatasourceResource {
     }
 
     return locales;
+  }
+
+  static final class OpalPermissions implements SubjectAclService.Permissions {
+
+    private final URI uri;
+
+    private final Iterable<String> perms;
+
+    OpalPermissions(URI uri, Iterable<AclAction> actions) {
+      this.uri = uri;
+      this.perms = Iterables.transform(actions, new Function<AclAction, String>() {
+
+        @Override
+        public String apply(AclAction input) {
+          return input.toString();
+        }
+
+      });
+    }
+
+    @Override
+    public String getDomain() {
+      return "opal";
+    }
+
+    @Override
+    public String getNode() {
+      return uri.getPath().replaceFirst(ResteasyServletConfiguration.WS_ROOT, "");
+    }
+
+    @Override
+    public Subject getSubject() {
+      return null;
+    }
+
+    @Override
+    public Iterable<String> getPermissions() {
+      return perms;
+    }
+
   }
 }

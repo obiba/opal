@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -31,9 +32,12 @@ import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
+import org.obiba.opal.web.magma.DatasourceResource.OpalPermissions;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.model.Opal.AclAction;
+import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
 import org.slf4j.Logger;
@@ -106,7 +110,9 @@ public class TablesResource {
         return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
       } else {
         writeVariablesToTable(table);
-        return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(datasource.getName(), table.getName())).build();
+        URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(datasource.getName(), table.getName());
+        return Response.created(tableUri)//
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(tableUri, Lists.newArrayList(AclAction.TABLE_ALL))).build();
       }
     } catch(Exception e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();

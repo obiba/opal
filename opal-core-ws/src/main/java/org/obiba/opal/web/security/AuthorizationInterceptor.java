@@ -52,6 +52,10 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
 
   private static final String ALLOW_HTTP_HEADER = "Allow";
 
+  public static final String ALT_LOCATION = "X-Alt-Location";
+
+  public static final String ALT_PERMISSIONS = "X-Alt-Permissions";
+
   private final SubjectAclService subjectAclService;
 
   private final RequestAttributesProvider requestAttributeProvider;
@@ -80,23 +84,14 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
       if(allowed != null && allowed.size() > 0) {
         response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
       }
-    } else if(HttpMethod.DELETE.equals(request.getHttpMethod())) {
-      subjectAclService.deleteNodePermissions("magma", request.getUri().getPath());
+    } else if(HttpMethod.DELETE.equals(request.getHttpMethod()) && response.getStatus() == 200) {
+      // TODO delete all nodes starting with resource
+      String resource = requestAttributeProvider.getResourcePath(request.getUri().getRequestUri());
+      subjectAclService.deleteNodePermissions(resource);
     }
 
     if(response.getStatus() == 201) {
-      // Add permissions
-      URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
-      if(resourceUri == null) {
-        throw new IllegalStateException("Missing Location header in 201 response");
-      }
-      List<?> altLocations = response.getMetadata().get("X-Alt-Location");
-
-      Iterable<URI> locations = ImmutableList.of(resourceUri);
-      if(altLocations != null) {
-        locations = Iterables.concat(locations, (List<URI>) altLocations);
-      }
-      addPermission(locations);
+      addPermissions(response);
     }
   }
 
@@ -116,6 +111,36 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
       return info.getPath();
     } else {
       return info.getPath();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void addPermissions(ServerResponse response) {
+    // Add permissions
+    URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
+    if(resourceUri == null) {
+      throw new IllegalStateException("Missing Location header in 201 response");
+    }
+    List<?> permissions = response.getMetadata().get(ALT_PERMISSIONS);
+    if(permissions != null) {
+      addPermission((List<SubjectAclService.Permissions>) permissions);
+      response.getMetadata().remove(ALT_PERMISSIONS);
+    }
+
+    List<?> altLocations = response.getMetadata().get(ALT_LOCATION);
+
+    Iterable<URI> locations = ImmutableList.of(resourceUri);
+    if(altLocations != null) {
+      locations = Iterables.concat(locations, (List<URI>) altLocations);
+    }
+    addPermission(locations);
+  }
+
+  private void addPermission(List<SubjectAclService.Permissions> resourcePermissions) {
+    for(SubjectAclService.Permissions resourcePermission : resourcePermissions) {
+      for(String perm : resourcePermission.getPermissions()) {
+        subjectAclService.addSubjectPermission(resourcePermission.getDomain(), resourcePermission.getNode(), SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), perm);
+      }
     }
   }
 

@@ -13,6 +13,17 @@ public interface SubjectAclService {
 
   void addListener(SubjectAclChangeCallback callback);
 
+  /**
+   * Delete all permissions starting with node.
+   * @param node
+   */
+  void deleteNodePermissions(String node);
+
+  /**
+   * Delete all permissions matching exactly node in a domain.
+   * @param domain
+   * @param node
+   */
   void deleteNodePermissions(String domain, String node);
 
   void deleteSubjectPermissions(String domain, String node, Subject subject);

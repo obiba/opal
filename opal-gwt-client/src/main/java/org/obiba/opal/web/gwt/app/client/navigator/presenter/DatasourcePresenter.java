@@ -38,6 +38,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
@@ -299,9 +300,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     @Override
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
-      UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-      String dsLink = ub.build();
-      authz.setAclRequest("datasource", AclRequest.newBuilder("View", dsLink, "GET").and(dsLink + "/tables", "GET"));
+      String node = UriBuilder.create().segment("datasource", datasourceName).build();
+      authz.setAclRequest("datasource", new AclRequest(AclAction.DATASOURCE_ALL, node), //
+      new AclRequest(AclAction.CREATE_VIEW, node));
       setInSlot(null, authz);
     }
   }

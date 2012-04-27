@@ -34,23 +34,27 @@ public class SubjectPermissionsRequest {
 
   private AclGetCallback aclGetCallback;
 
-  public SubjectPermissionsRequest(SubjectType type, AclCallback callback, AclRequest.Builder... builders) {
+  public SubjectPermissionsRequest(SubjectType type, AclCallback callback, AclRequest... requests) {
     this.type = type;
-    for(AclRequest.Builder builder : builders) {
-      aclRequests.add(builder.build());
+    for(AclRequest req : requests) {
+      // make a copy to ensure callbacks are not conflicting between subject types
+      aclRequests.add(req.copy());
     }
     setAclCallback(callback);
   }
 
   public void get() {
     StringBuilder query = new StringBuilder();
+    List<String> nodes = new ArrayList<String>();
     for(AclRequest req : aclRequests) {
-      for(AclResource res : req.getAclResources()) {
-        query.append("&").append("node=").append(res.getResource());
+      String node = req.getResource();
+      if(nodes.contains(node) == false) {
+        query.append("&").append("node=").append(node);
+        nodes.add(node);
       }
     }
 
-    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?type=" + type + query.toString()).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
+    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?domain=opal&type=" + type + query.toString()).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
 
       @Override
       public void onResource(Response response, JsArray<Acls> resource) {
@@ -64,7 +68,7 @@ public class SubjectPermissionsRequest {
   }
 
   public void getSubjects(final AclGetCallback callback) {
-    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?type=" + type).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
+    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?domain=opal&type=" + type).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
 
       @Override
       public void onResource(Response response, JsArray<Acls> resource) {
@@ -127,10 +131,8 @@ public class SubjectPermissionsRequest {
 
   public boolean hasPermission(String header, Acls acls) {
     if(hasAclRequest(header)) {
-      for(AclResource res : getAclRequest(header).getAclResources()) {
-        if(!res.hasPermission(acls)) {
-          return false;
-        }
+      if(!getAclRequest(header).hasPermission(acls)) {
+        return false;
       }
     }
     return true;

@@ -11,6 +11,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -57,7 +58,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
 
   @Override
   protected void onBind() {
-    authorizationPresenter.setAclRequest("r", AclRequest.newBuilder("Use", "/r/session", "*:GET/*"));
+    authorizationPresenter.setAclRequest("r", new AclRequest(AclAction.R_SESSION_ALL, "/r/session"));
     addEventHandlers();
   }
 

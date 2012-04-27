@@ -153,7 +153,6 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        GWT.log("summary.status=" + response.getStatusCode());
         if(scriptEvaluationCallback == null) return;
         if(response.getStatusCode() == Response.SC_OK) {
           scriptEvaluationCallback.onSuccess(variable);

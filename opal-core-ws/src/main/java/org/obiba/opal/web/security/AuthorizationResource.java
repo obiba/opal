@@ -10,6 +10,7 @@
 package org.obiba.opal.web.security;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -41,24 +42,24 @@ public class AuthorizationResource {
   }
 
   @GET
-  public Iterable<Opal.Acl> get(@QueryParam("type") SubjectAclService.SubjectType type) {
-    return Iterables.transform(subjectAclService.getNodePermissions("magma", getNode(), type), PermissionsToAclFunction.INSTANCE);
+  public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String domain, @QueryParam("type") SubjectAclService.SubjectType type) {
+    return Iterables.transform(subjectAclService.getNodePermissions(domain, getNode(), type), PermissionsToAclFunction.INSTANCE);
   }
 
   @POST
-  public Opal.Acl add(@QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
-    subjectAclService.addSubjectPermission("magma", getNode(), type.subjectFor(subject), permission);
-    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), type.subjectFor(subject)));
+  public Opal.Acl add(@QueryParam("domain") @DefaultValue("opal") String domain, @QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
+    subjectAclService.addSubjectPermission(domain, getNode(), type.subjectFor(subject), permission);
+    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions(domain, getNode(), type.subjectFor(subject)));
   }
 
   @DELETE
-  public Opal.Acl delete(@QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
+  public Opal.Acl delete(@QueryParam("domain") @DefaultValue("opal") String domain, @QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
     if(Strings.isNullOrEmpty(permission)) {
-      subjectAclService.deleteSubjectPermissions("magma", getNode(), type.subjectFor(subject));
+      subjectAclService.deleteSubjectPermissions(domain, getNode(), type.subjectFor(subject));
     } else {
-      subjectAclService.deleteSubjectPermissions("magma", getNode(), type.subjectFor(subject), permission);
+      subjectAclService.deleteSubjectPermissions(domain, getNode(), type.subjectFor(subject), permission);
     }
-    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions("magma", getNode(), type.subjectFor(subject)));
+    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions(domain, getNode(), type.subjectFor(subject)));
   }
 
   private String getNode() {

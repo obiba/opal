@@ -35,7 +35,7 @@ public class NavigatorMenuBar extends MenuBar {
 
   private MenuItem copyDataItem;
 
-  private MenuItem downloadViewItem;
+  private MenuItem viewDownloadItem;
 
   private MenuItem addItem;
 
@@ -179,20 +179,24 @@ public class NavigatorMenuBar extends MenuBar {
     return copyDataItem;
   }
 
-  public void setDownloadViewCommand(Command cmd) {
-    if(downloadViewItem == null) {
-      downloadViewItem = new MenuItem(translations.downloadViewXML(), cmd);
-      getToolsMenu().addItem(downloadViewItem);
+  public void setViewDownloadCommand(Command cmd) {
+    if(viewDownloadItem == null) {
+      viewDownloadItem = new MenuItem(translations.downloadViewXML(), cmd);
+      getToolsMenu().addItem(viewDownloadItem);
     } else {
-      downloadViewItem.setCommand(cmd);
+      viewDownloadItem.setCommand(cmd);
     }
   }
 
-  public void removeDownloadViewCommand() {
-    if(downloadViewItem != null) {
-      getToolsMenu().removeItem(downloadViewItem);
-      downloadViewItem = null;
+  public void removeViewDownloadCommand() {
+    if(viewDownloadItem != null) {
+      getToolsMenu().removeItem(viewDownloadItem);
+      viewDownloadItem = null;
     }
+  }
+
+  public MenuItem getViewDownloadItem() {
+    return viewDownloadItem;
   }
 
   public void setAddViewCommand(Command cmd) {

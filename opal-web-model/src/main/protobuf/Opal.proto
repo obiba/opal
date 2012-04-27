@@ -109,9 +109,28 @@ message Acl {
   required Subject subject = 1;
   required string resource = 2;
   repeated string actions = 3;
+  required string domain = 4;
 }
 
 message Acls {
   required Subject subject = 1;
   repeated Acl acls = 2;
+}
+
+enum AclAction {
+  DATASOURCE_ALL = 0;
+  CREATE_VIEW = 1;
+  TABLE_ALL = 2;
+  TABLE_READ = 3;
+  TABLE_VALUES = 4;
+  VIEW_ALL = 5;
+  VIEW_READ = 6;
+  VIEW_VALUES = 7;
+  VIEW_EDIT = 8;
+  VIEW_VALUES_EDIT = 9;
+  VARIABLE_READ = 10;
+  DATABASES_ALL = 11;
+  R_SESSION_ALL = 12;
+  DATASHIELD_ALL = 13;
+  DATASHIELD_SESSION_ALL = 14;
 }

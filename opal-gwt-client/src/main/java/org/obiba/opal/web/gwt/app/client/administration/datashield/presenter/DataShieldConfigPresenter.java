@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto;
 import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto.Level;
+import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -113,7 +114,7 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
   @Override
   protected void onBind() {
-    authorizationPresenter.setAclRequest("datashield", AclRequest.newBuilder("Use", "/datashield/session", "*:GET/*"), AclRequest.newBuilder("Administrate", "/datashield", "*:GET/*"));
+    authorizationPresenter.setAclRequest("datashield", new AclRequest(AclAction.DATASHIELD_SESSION_ALL, "/datashield/session"), new AclRequest(AclAction.DATASHIELD_ALL, "/datashield"));
 
     addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
     addToSlot(AssignEnvironmentSlot, assignPresenter);

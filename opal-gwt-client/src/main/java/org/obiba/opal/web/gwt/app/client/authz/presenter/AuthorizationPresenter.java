@@ -29,9 +29,9 @@ public class AuthorizationPresenter extends PresenterWidget<AuthorizationPresent
     this.groupAuthzPresenter = groupAuthzPresenter;
   }
 
-  public void setAclRequest(String key, AclRequest.Builder... builders) {
-    userAuthzPresenter.setAclRequest(SubjectType.USER, builders);
-    groupAuthzPresenter.setAclRequest(SubjectType.GROUP, builders);
+  public void setAclRequest(String key, AclRequest... requests) {
+    userAuthzPresenter.setAclRequest(SubjectType.USER, requests);
+    groupAuthzPresenter.setAclRequest(SubjectType.GROUP, requests);
     getView().setExplanation(key);
   }
 

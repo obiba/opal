@@ -10,7 +10,6 @@
 package org.obiba.opal.core.runtime.security;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -25,8 +24,8 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.obiba.opal.core.runtime.security.support.SubjectPermissionsConverterRegistry;
 import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectAclService.Permissions;
 import org.obiba.opal.core.service.SubjectAclService.Subject;
 import org.obiba.opal.core.service.SubjectAclService.SubjectAclChangeCallback;
 import org.obiba.opal.core.service.SubjectAclService.SubjectType;
@@ -37,7 +36,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 import eu.flatwhite.shiro.spatial.SingleSpaceRelationProvider;
 import eu.flatwhite.shiro.spatial.SingleSpaceResolver;
@@ -55,13 +53,16 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
 
   private final RolePermissionResolver rolePermissionResolver;
 
+  private final SubjectPermissionsConverterRegistry subjectPermissionsConverterRegistry;
+
   private Cache<Subject, Collection<Permission>> rolePermissionCache;
 
   @Autowired
-  public SpatialRealm(SubjectAclService subjectAclService) {
+  public SpatialRealm(SubjectAclService subjectAclService, SubjectPermissionsConverterRegistry subjectPermissionsConverterRegistry) {
     super();
     if(subjectAclService == null) throw new IllegalArgumentException("subjectAclService cannot be null");
     this.subjectAclService = subjectAclService;
+    this.subjectPermissionsConverterRegistry = subjectPermissionsConverterRegistry;
 
     super.setPermissionResolver(new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(), new SingleSpaceRelationProvider(new NodeRelationProvider())));
     rolePermissionResolver = new GroupPermissionResolver();
@@ -146,13 +147,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   }
 
   private Iterable<String> loadSubjectPermissions(SubjectAclService.Subject subject) {
-    final List<String> perms = Lists.newArrayList();
-    for(Permissions sp : subjectAclService.getSubjectPermissions(subject)) {
-      for(String p : sp.getPermissions()) {
-        perms.add(sp.getDomain() + ":" + sp.getNode() + ":" + p);
-      }
-    }
-    return perms;
+    return subjectPermissionsConverterRegistry.convert(subjectAclService.getSubjectPermissions(subject));
   }
 
   private Iterable<String> loadSubjectPermissions(PrincipalCollection principals) {
