@@ -22,12 +22,16 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 
 /**
@@ -39,9 +43,21 @@ public class AttributesTable extends Table<AttributeDto> {
 
   private static class Columns {
 
-    private static abstract class SortableTextColumn extends TextColumn<AttributeDto> {
+    private static abstract class SortableTextColumn extends Column<AttributeDto, String> {
 
       protected SortableTextColumn() {
+        super(new TextCell(new SafeHtmlRenderer<String>() {
+
+          @Override
+          public SafeHtml render(String object) {
+            return (object == null) ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromTrustedString(object);
+          }
+
+          @Override
+          public void render(String object, SafeHtmlBuilder appendable) {
+            appendable.append(SafeHtmlUtils.fromTrustedString(object));
+          }
+        }));
         setSortable(true);
       }
     }
@@ -50,15 +66,12 @@ public class AttributesTable extends Table<AttributeDto> {
 
       @Override
       public String getValue(AttributeDto object) {
-        return object.getName();
-      }
-    };
-
-    static Column<AttributeDto, String> namespace = new SortableTextColumn() {
-
-      @Override
-      public String getValue(AttributeDto object) {
-        return object.getNamespace();
+        StringBuilder label = new StringBuilder();
+        if(object.hasNamespace()) {
+          label.append("<span class=\"label\">").append(object.getNamespace()).append("</span> ");
+        }
+        label.append(object.getName());
+        return label.toString();
       }
     };
 
@@ -67,14 +80,6 @@ public class AttributesTable extends Table<AttributeDto> {
       @Override
       public String apply(AttributeDto input) {
         return input.getName();
-      }
-    });
-
-    static Comparator<AttributeDto> namespaceComparator = Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsFirst().onResultOf(new Function<AttributeDto, String>() {
-
-      @Override
-      public String apply(AttributeDto input) {
-        return input.getNamespace();
       }
     });
 
@@ -112,7 +117,6 @@ public class AttributesTable extends Table<AttributeDto> {
     }
     ColumnSortEvent.ListHandler<AttributeDto> handler = provider.newSortHandler();
     handler.setComparator(Columns.name, Columns.nameComparator);
-    handler.setComparator(Columns.namespace, Columns.namespaceComparator);
     registration = addColumnSortHandler(handler);
   }
 
@@ -126,9 +130,7 @@ public class AttributesTable extends Table<AttributeDto> {
   private void initColumns() {
     setPageSize(NavigatorView.PAGE_SIZE);
     setEmptyTableWidget(new InlineLabel(translations.noAttributesLabel()));
-    addColumn(Columns.namespace, translations.namespaceLabel());
     addColumn(Columns.name, translations.nameLabel());
     addColumn(new AttributeValueColumn(), translations.valueLabel());
-
   }
 }
