@@ -161,6 +161,14 @@
           <property name="appliesTo" value="1.7.0" />
         </bean>
         
+        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="description" value="Redefinition of Subject ACLs." />
+          <property name="dataSource" ref="opalDataSource" />
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.10.0/" />
+          <property name="scriptBasename" value="subject-acl" />
+          <property name="appliesTo" value="1.10.0" />
+        </bean>
+        
         <bean class="org.obiba.opal.core.runtime.upgrade.CreateDataShieldEnvironmentsUpgradeStep"/>
       </list>
     </property>
