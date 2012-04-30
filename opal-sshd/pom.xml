@@ -4,7 +4,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.9.0</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>opal-sshd</artifactId>
