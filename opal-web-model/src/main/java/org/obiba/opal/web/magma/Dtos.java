@@ -191,6 +191,13 @@ public final class Dtos {
     .setDatasourceName(valueTable.getDatasource().getName()) //
     .setVariableCount(Iterables.size(valueTable.getVariables())) //
     .setValueSetCount(valueTable.getVariableEntities().size());
+
+    String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
+    builder.setLink(link);
+    if(valueTable.isView()) {
+      builder.setViewLink(link.replaceFirst("/table/", "/view/"));
+    }
+
     return builder;
   }
 

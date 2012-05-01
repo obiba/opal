@@ -18,6 +18,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -57,6 +59,11 @@ public class ViewResource extends AbstractValueTableResource {
     viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
     return Response.ok().build();
+  }
+
+  @Path("/variables")
+  public VariablesViewResource getVariables(@Context Request request) {
+    return new VariablesViewResource(viewManager, viewDtos, getValueTable(), getLocales());
   }
 
   @DELETE

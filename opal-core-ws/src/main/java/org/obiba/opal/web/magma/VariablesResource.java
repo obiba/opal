@@ -128,12 +128,8 @@ public class VariablesResource extends AbstractValueTableResource {
       // done with the current Magma implementation).
 
       if(getValueTable().isView() == false) {
-        vw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
-        for(VariableDto variable : variables) {
-          vw.writeVariable(Dtos.fromDto(variable));
-        }
+        vw = addOrUpdateTableVariables(variables);
       } else {
-        // TODO: support this. We'll need to access the ViewManager to persist the modification though.
         return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView")).build();
       }
 
@@ -145,6 +141,14 @@ public class VariablesResource extends AbstractValueTableResource {
     }
   }
 
+  protected VariableWriter addOrUpdateTableVariables(List<VariableDto> variables) {
+    VariableWriter vw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
+    for(VariableDto variable : variables) {
+      vw.writeVariable(Dtos.fromDto(variable));
+    }
+    return vw;
+  }
+
   @Path("/locales")
   public LocalesResource getLocalesResource() {
     return super.getLocalesResource();
@@ -154,7 +158,7 @@ public class VariablesResource extends AbstractValueTableResource {
   // private methods
   //
 
-  private ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
+  protected ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
 
