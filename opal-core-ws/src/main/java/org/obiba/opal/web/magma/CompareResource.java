@@ -221,13 +221,13 @@ public class CompareResource {
       // Target (with) table already exist
       if(with != null) {
         Variable variableInCompared = compared.getVariable(name);
-        if(!variableInCompared.getEntityType().equals(with.getEntityType())) {
+        if(variableInCompared.getEntityType().equals(with.getEntityType()) == false) {
           conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE, variableInCompared.getEntityType(), with.getEntityType()));
         }
 
         try {
           Variable variableInWith = with.getVariable(name);
-          if(!variableInCompared.getValueType().equals(variableInWith.getValueType())) {
+          if(variableInCompared.getValueType().equals(variableInWith.getValueType()) == false && with.isView() == false) {
             conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE, variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
           }
         } catch(NoSuchVariableException variableDoesNotExist) {
@@ -236,7 +236,7 @@ public class CompareResource {
 
         // Target (with) will be created
       } else {
-        if(!entityType.equals(v.getEntityType())) {
+        if(entityType.equals(v.getEntityType()) == false) {
           conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(true).build(), INCOMPATIBLE_ENTITY_TYPE, entityType, v.getEntityType()));
         }
       }
