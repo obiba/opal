@@ -314,7 +314,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         String node = nodeBuilder.segment("table", table.getName()).build();
         authz.setAclRequest("table", new AclRequest(AclAction.TABLE_ALL, node), //
         new AclRequest(AclAction.TABLE_READ, node), //
-        new AclRequest(AclAction.TABLE_VALUES, node));
+        new AclRequest(AclAction.TABLE_VALUES, node), //
+        new AclRequest(AclAction.TABLE_EDIT, node));
       }
       setInSlot(Display.Slots.Permissions, authz);
     }

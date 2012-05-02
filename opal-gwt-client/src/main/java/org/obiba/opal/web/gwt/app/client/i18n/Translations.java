@@ -107,10 +107,12 @@ public interface Translations extends Constants {
   @Description("Permission map")
   @DefaultStringMapValue({ //
   "DATASOURCE_ALL", "Administrate", //
+  "CREATE_TABLE", "Add Table", //
   "CREATE_VIEW", "Add View", //
   "TABLE_ALL", "Administrate", //
   "TABLE_READ", "View dictionary and summaries", //
   "TABLE_VALUES", "View values", //
+  "TABLE_EDIT", "Edit dictionary", //
   "VIEW_ALL", "Administrate", //
   "VIEW_READ", "View dictionary and summaries", //
   "VIEW_VALUES", "View values", //
