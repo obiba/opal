@@ -53,8 +53,10 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
+        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
         magmaConvert("/datasource/{0}/tables", "POST:GET", args));
+        Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
+        return perms;
       }
     },
     CREATE_VIEW {
@@ -62,8 +64,10 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
+        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
         magmaConvert("/datasource/{0}/views", "POST:GET", args));
+        Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
+        return perms;
       }
     },
     TABLE_ALL {
@@ -104,6 +108,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
         List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
+        Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
         return perms;
       }
 

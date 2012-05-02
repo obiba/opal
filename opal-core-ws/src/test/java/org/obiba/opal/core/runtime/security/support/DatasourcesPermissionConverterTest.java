@@ -17,7 +17,7 @@ import org.obiba.opal.core.runtime.security.SubjectPermissionConverter;
 /**
  *
  */
-public class DatasourcesPermissionConverterTest {
+public class DatasourcesPermissionConverterTest extends OpalPermissionConverterTest<DatasourcesPermissionConverter.Permission> {
 
   @Test
   public void testArgs() {
@@ -35,10 +35,32 @@ public class DatasourcesPermissionConverterTest {
   }
 
   @Test
+  public void testCreateTable() {
+    testConversion("/datasource/patate", DatasourcesPermissionConverter.Permission.CREATE_TABLE, //
+    "magma:/datasource/patate/tables:GET:GET", //
+    "magma:/datasource/patate/tables:POST:GET", //
+    "magma:/files:POST:GET/POST", //
+    "magma:/files/meta:GET:GET/GET");
+  }
+
+  @Test
   public void testCreateView() {
     testConversion("/datasource/patate", DatasourcesPermissionConverter.Permission.CREATE_VIEW, //
     "magma:/datasource/patate/tables:GET:GET", //
-    "magma:/datasource/patate/views:POST:GET");
+    "magma:/datasource/patate/views:POST:GET", //
+    "magma:/files:POST:GET/POST", //
+    "magma:/files/meta:GET:GET/GET");
+  }
+
+  @Test
+  public void testTableEdit() {
+    testConversion("/datasource/patate/table/pwel", DatasourcesPermissionConverter.Permission.TABLE_EDIT, //
+    "magma:/datasource/patate/table/pwel/variables:POST:GET", //
+    "magma:/datasource/patate/table/pwel:GET:GET", //
+    "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
+    "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
+    "magma:/files:POST:GET/POST", //
+    "magma:/files/meta:GET:GET/GET");
   }
 
   @Test
@@ -57,19 +79,9 @@ public class DatasourcesPermissionConverterTest {
     "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST:GET");
   }
 
-  private void testConversion(String node, DatasourcesPermissionConverter.Permission perm, String... expected) {
-    SubjectPermissionConverter converter = new DatasourcesPermissionConverter();
-    Assert.assertTrue(converter.canConvert("opal", perm.toString()));
-    Assert.assertNotNull(expected);
-    Iterable<String> convertedIter = converter.convert("opal", node, perm.toString());
-    Assert.assertNotNull(convertedIter);
-    int i = 0;
-    for(String converted : convertedIter) {
-      Assert.assertTrue(i < expected.length);
-      Assert.assertEquals(expected[i], converted);
-      i++;
-    }
-    Assert.assertEquals(expected.length, i);
+  @Override
+  protected SubjectPermissionConverter newConverter() {
+    return new DatasourcesPermissionConverter();
   }
 
 }

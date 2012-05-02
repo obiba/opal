@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +55,10 @@ import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Opal.AclAction;
+import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
@@ -62,6 +66,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Lists;
 
 @Component
 @Path("/files")
@@ -203,7 +209,10 @@ public class FilesResource {
     try {
       file.createFolder();
       Opal.FileDto dto = getBaseFolderBuilder(file).build();
-      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build()).entity(dto).build();
+      URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build();
+      return Response.created(folderUri)//
+      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, Lists.newArrayList(AclAction.FILES_ALL)))// ;
+      .entity(dto).build();
     } catch(FileSystemException couldNotCreateTheFolder) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
     }

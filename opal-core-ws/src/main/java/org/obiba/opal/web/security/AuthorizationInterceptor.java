@@ -125,15 +125,15 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
     if(permissions != null) {
       addPermission((List<SubjectAclService.Permissions>) permissions);
       response.getMetadata().remove(ALT_PERMISSIONS);
-    }
+    } else {
+      List<?> altLocations = response.getMetadata().get(ALT_LOCATION);
 
-    List<?> altLocations = response.getMetadata().get(ALT_LOCATION);
-
-    Iterable<URI> locations = ImmutableList.of(resourceUri);
-    if(altLocations != null) {
-      locations = Iterables.concat(locations, (List<URI>) altLocations);
+      Iterable<URI> locations = ImmutableList.of(resourceUri);
+      if(altLocations != null) {
+        locations = Iterables.concat(locations, (List<URI>) altLocations);
+      }
+      addPermission(locations);
     }
-    addPermission(locations);
   }
 
   private void addPermission(List<SubjectAclService.Permissions> resourcePermissions) {
