@@ -111,6 +111,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     summaryTabPresenter.unbind();
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateDisplay(TableDto tableDto, VariableDto variableDto, VariableDto previous, VariableDto next) {
     table = tableDto;
     variable = variableDto;
