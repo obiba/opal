@@ -199,7 +199,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().addBranchStep(createChain(steps).build(), new BranchingWizardStepController.Condition() {
       @Override
       public boolean apply() {
-        return "boolean".equals(variable.getValueType());
+        return "boolean".equals(derivationPresenter.getOriginalVariable().getValueType());
       }
     });
   }
@@ -213,7 +213,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().addBranchStep(createChain(steps).build(), new BranchingWizardStepController.Condition() {
       @Override
       public boolean apply() {
-        return "text".equals(variable.getValueType()) && VariableDtos.hasCategories(variable);
+        return "text".equals(derivationPresenter.getOriginalVariable().getValueType()) && VariableDtos
+            .hasCategories(derivationPresenter.getOriginalVariable());
       }
     });
   }
@@ -227,7 +228,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().addBranchStep(createChain(steps).build(), new BranchingWizardStepController.Condition() {
       @Override
       public boolean apply() {
-        String valueType = variable.getValueType();
+        String valueType = derivationPresenter.getOriginalVariable().getValueType();
         return "date".equals(valueType) || "datetime".equals(valueType);
       }
     });
@@ -243,7 +244,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
       @Override
       public boolean apply() {
-        String valueType = variable.getValueType();
+        String valueType = derivationPresenter.getOriginalVariable().getValueType();
         return "integer".equals(valueType) || "decimal".equals(valueType);
       }
     });
@@ -258,7 +259,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().addBranchStep(createChain(steps).build(), new BranchingWizardStepController.Condition() {
       @Override
       public boolean apply() {
-        return "text".equals(variable.getValueType()) || VariableDtos.allCategoriesMissing(variable);
+        return "text".equals(derivationPresenter.getOriginalVariable().getValueType()) || VariableDtos
+            .allCategoriesMissing(derivationPresenter.getOriginalVariable());
       }
     });
   }
@@ -449,7 +451,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   /**
    * Get the position of the variable with the same name in the view
-   *
    * @param view
    * @param derived
    * @return -1 if not found
@@ -471,7 +472,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   /**
    * Update a view with the derived variable.
-   *
    * @param view
    * @param derived
    */
