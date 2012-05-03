@@ -19,6 +19,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
@@ -37,8 +38,6 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.annotations.VisibleForTesting;
 
 @NoAuthorization
 public class CompareResource {
@@ -163,7 +162,7 @@ public class CompareResource {
     }
 
     Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
-    conflicts.addAll(getMissingCsvVariableConficts(compared));
+    conflicts.addAll(getMissingCsvVariableConflicts(compared));
 
     conflicts.addAll(getConflicts(compared, with, existingVariables, false));
     conflicts.addAll(getConflicts(compared, with, newVariables, true));
@@ -196,7 +195,7 @@ public class CompareResource {
     return dtoBuilder;
   }
 
-  private Set<ConflictDto> getMissingCsvVariableConficts(ValueTable compared) {
+  private Set<ConflictDto> getMissingCsvVariableConflicts(ValueTable compared) {
     Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
     if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
       for(Variable missingVariable : ((CsvValueTable) compared).getMissingVariables()) {

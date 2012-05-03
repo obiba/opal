@@ -48,6 +48,6 @@ public class ViewSaveRequiredEvent extends GwtEvent<ViewSaveRequiredEvent.Handle
   }
 
   public interface Handler extends EventHandler {
-    public void onViewUpdate(ViewSaveRequiredEvent event);
+    void onViewUpdate(ViewSaveRequiredEvent event);
   }
 }

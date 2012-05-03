@@ -1019,6 +1019,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Custom")
   String deriveCustomLabel();
 
+  @Description("Derive From label")
+  @DefaultStringValue("From")
+  String deriveFromLabel();
+
   @Description("Invalid Destination View label")
   @DefaultStringValue("Not a valid destination view.")
   String invalidDestinationView();
@@ -1050,6 +1054,10 @@ public interface Translations extends Constants {
   @Description("Recode Boolean Step title")
   @DefaultStringValue("Recode logical values to new values.")
   String recodeBooleanStepTitle();
+
+  @Description("Derive From Variable Step title")
+  @DefaultStringValue("Select from which variable derivation should be performed")
+  String deriveFromVariableStepTitle();
 
   @Description("Empty Value label")
   @DefaultStringValue("Empty value")

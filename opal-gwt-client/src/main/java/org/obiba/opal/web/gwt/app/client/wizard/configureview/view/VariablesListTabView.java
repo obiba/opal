@@ -9,14 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -44,7 +42,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class VariablesListTabView extends ViewImpl implements VariablesListTabPresenter.Display {
 
-  private static VariablesListTabViewUiBinder uiBinder = GWT.create(VariablesListTabViewUiBinder.class);
+  private static final VariablesListTabViewUiBinder uiBinder = GWT.create(VariablesListTabViewUiBinder.class);
 
   private final Widget widget;
 
@@ -262,21 +260,12 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     if(repeatableCheckbox.getValue()) variableDto.setOccurrenceGroup(occurenceGroup.getValue());
     variableDto.setValueType(valueType.getValue(valueType.getSelectedIndex()));
     variableDto.setEntityType(entityType);
-    setScriptAttribute(variableDto, script);
     variableDto.setMimeType(mimeType.getValue());
     variableDto.setUnit(unit.getValue());
+    VariableDtos.setScript(variableDto, script);
     return variableDto;
   }
 
-  private void setScriptAttribute(VariableDto variableDto, String script) {
-    AttributeDto attributeDto = AttributeDto.create();
-    attributeDto.setName("script");
-    attributeDto.setValue(script);
-
-    JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variableDto.getAttributesArray());
-    attributes.push(attributeDto);
-    variableDto.setAttributesArray(attributes);
-  }
 
   @Override
   public HandlerRegistration addRemoveVariableClickHandler(ClickHandler handler) {

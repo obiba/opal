@@ -20,15 +20,14 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
  */
 public class BooleanVariableDerivationHelper extends DerivationHelper {
 
-  public BooleanVariableDerivationHelper(VariableDto originalVariable) {
-    super(originalVariable);
+  public BooleanVariableDerivationHelper(VariableDto originalVariable, VariableDto destination) {
+    super(originalVariable, destination);
     initializeValueMapEntries();
   }
 
   @Override
   protected void initializeValueMapEntries() {
-    this.valueMapEntries = new ArrayList<ValueMapEntry>();
-
+    valueMapEntries = new ArrayList<ValueMapEntry>();
     valueMapEntries.add(ValueMapEntry.fromDistinct(Boolean.TRUE.toString()).label(translations.trueLabel()).newValue("1").build());
     valueMapEntries.add(ValueMapEntry.fromDistinct(Boolean.FALSE.toString()).label(translations.falseLabel()).newValue("0").build());
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());

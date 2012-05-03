@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -66,7 +67,7 @@ public class NumericalVariableDerivationHelperGwtTest extends GWTTestCase {
     entries.add(ValueMapEntry.fromDistinct(888d).newValue("5").build());
 
     DerivedNumericalVariableGenerator<Double> generator = new DerivedNumericalVariableGenerator<Double>(variable, entries, entryRangeMap);
-    VariableDto derived = generator.generate();
+    VariableDto derived = generator.generate(null);
 
     assertEquals("$('numerical-variable').group([150.0, 160.0, 170.0, 180.0], [888]).map({\n" //
         + "    '-150': '1', \n" //
@@ -76,7 +77,7 @@ public class NumericalVariableDerivationHelperGwtTest extends GWTTestCase {
         + "    '888': '5'\n" //
         + "  },\n" //
         + "  null,\n" //
-        + "  null)", DerivedVariableGenerator.getScriptAttribute(derived).getValue());
+        + "  null)", VariableDtos.getScript(derived));
   }
 
   @Override

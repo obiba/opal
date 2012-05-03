@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -24,14 +24,15 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
 
   private Method method;
 
-  public OpenTextualVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto summaryStatisticsDto, Method method) {
-    super(originalVariable, summaryStatisticsDto);
+  public OpenTextualVariableDerivationHelper(VariableDto originalVariable, VariableDto destinationVariable,
+      SummaryStatisticsDto summaryStatisticsDto, Method method) {
+    super(originalVariable, destinationVariable, summaryStatisticsDto);
     this.method = method;
   }
 
   @Override
   public void initializeValueMapEntries() {
-    this.valueMapEntries = new ArrayList<ValueMapEntry>();
+    valueMapEntries = new ArrayList<ValueMapEntry>();
 
     if(method == Method.AUTOMATICALLY) {
 

@@ -3,28 +3,28 @@
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"  
   xmlns:pretty="urn:import:org.obiba.opal.web.gwt.prettify.client"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
-  <o:HorizontalTabLayout ui:field="tabs" addStyleNames="top-margin">
-    <g:Anchor><ui:msg description="Derived Summary tab title">Summary</ui:msg></g:Anchor>
-    <g:SimplePanel ui:field="summary" width="100%" />
-        
-    <g:Anchor><ui:msg description="Derived Values tab title" >Values</ui:msg></g:Anchor>
-    <g:FlowPanel>
-      <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"></c:SimplePager>
-      <o:Table width="100%" ui:field="valuesTable" addStyleNames="left-aligned"/>
-    </g:FlowPanel>
-    
-    <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
-    <g:FlowPanel>
-      <g:InlineLabel addStyleNames="key"><ui:msg description="Value Type label">Value Type</ui:msg>: </g:InlineLabel>
-      <g:InlineLabel ui:field="valueType" addStyleNames="small-indent"></g:InlineLabel>
-      <pretty:PrettyPrintLabel ui:field="script" addStyleNames="top-margin"/>
-    </g:FlowPanel>
-         
-  </o:HorizontalTabLayout>
+    <o:HorizontalTabLayout ui:field="tabs" addStyleNames="top-margin">
+
+      <g:Anchor><ui:msg description="Derived Summary tab title">Summary</ui:msg></g:Anchor>
+      <g:SimplePanel ui:field="summary" width="100%" />
+
+      <g:Anchor><ui:msg description="Derived Values tab title" >Values</ui:msg></g:Anchor>
+      <g:FlowPanel>
+        <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
+        <o:Table width="100%" ui:field="valuesTable" addStyleNames="left-aligned"/>
+      </g:FlowPanel>
+
+      <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
+      <g:FlowPanel>
+        <g:InlineLabel addStyleNames="key"><ui:msg description="Value Type label">Value Type</ui:msg>: </g:InlineLabel>
+        <g:InlineLabel ui:field="valueType" addStyleNames="small-indent"/>
+        <pretty:PrettyPrintLabel ui:field="script" addStyleNames="top-margin"/>
+      </g:FlowPanel>
+
+    </o:HorizontalTabLayout>
 
 </ui:UiBinder>

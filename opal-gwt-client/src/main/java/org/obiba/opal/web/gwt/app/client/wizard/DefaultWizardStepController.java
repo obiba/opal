@@ -9,10 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+
+import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
@@ -24,7 +27,7 @@ public class DefaultWizardStepController implements WizardStepController {
     private final DefaultWizardStepController currentStepCtrl;
 
     Builder(DefaultWizardStepController ctrl) {
-      this.currentStepCtrl = ctrl;
+      currentStepCtrl = ctrl;
     }
 
     public static Builder create(WizardStep step, Widget help, Skippable skippable) {
@@ -106,6 +109,17 @@ public class DefaultWizardStepController implements WizardStepController {
     }
 
     /**
+     * Callback to execute some code after steping out of this step
+     *
+     * @param handler
+     * @return
+     */
+    public Builder onStepOut(StepOutHandler handler) {
+      currentStepCtrl.setStepOutHandler(handler);
+      return this;
+    }
+
+    /**
      * @return
      */
     public DefaultWizardStepController build() {
@@ -122,6 +136,26 @@ public class DefaultWizardStepController implements WizardStepController {
       return this;
     }
 
+    public static Builder createChain(List<Builder> steps) {
+      switch(steps.size()) {
+        case 0:
+          return null;
+        case 1:
+          return steps.get(0);
+        default:
+          Builder start = steps.remove(0);
+          appendSteps(start, steps);
+          return start;
+      }
+    }
+
+    private static void appendSteps(Builder currentStep, List<Builder> nextSteps) {
+      if(nextSteps.isEmpty()) return;
+      Builder next = nextSteps.remove(0);
+      currentStep.next(next.build());
+      appendSteps(next, nextSteps);
+    }
+
   }
 
   private WizardStep step;
@@ -134,6 +168,8 @@ public class DefaultWizardStepController implements WizardStepController {
 
   private StepInHandler stepInHandler;
 
+  private StepOutHandler stepOutHandler;
+
   private ValidationHandler validator;
 
   private ResetHandler reset;
@@ -142,13 +178,12 @@ public class DefaultWizardStepController implements WizardStepController {
 
   private boolean conclusion = false;
 
-  DefaultWizardStepController(WizardStep step, final Widget help, Skippable skippable) {
+  DefaultWizardStepController(WizardStep step, Widget help, Skippable skippable) {
     this(step, help);
     setSkippable(skippable);
   }
 
-  DefaultWizardStepController(WizardStep step, final Widget help) {
-    super();
+  DefaultWizardStepController(WizardStep step, Widget help) {
     this.step = step;
     if(help != null) {
       this.help = new WidgetProviderImpl(help);
@@ -167,6 +202,10 @@ public class DefaultWizardStepController implements WizardStepController {
     this.stepInHandler = stepInHandler;
   }
 
+  public void setStepOutHandler(StepOutHandler stepOutHandler) {
+    this.stepOutHandler = stepOutHandler;
+  }
+
   void setValidator(ValidationHandler validator) {
     this.validator = validator;
   }
@@ -176,7 +215,7 @@ public class DefaultWizardStepController implements WizardStepController {
   }
 
   public void setHelpProvider(WidgetProvider provider) {
-    this.help = provider;
+    help = provider;
   }
 
   public void setSkippable(Skippable skippable) {
@@ -185,6 +224,20 @@ public class DefaultWizardStepController implements WizardStepController {
 
   public void setConclusion(boolean conclusion) {
     this.conclusion = conclusion;
+  }
+
+  @Override
+  public void addSteps(HasWidgets widgetsContainer) {
+    addSteps(widgetsContainer, false);
+  }
+
+  @Override
+  public void addSteps(HasWidgets widgetsContainer, boolean visible) {
+    widgetsContainer.add(step);
+    step.setVisible(visible);
+    if(next != null) {
+      next.addSteps(widgetsContainer, visible);
+    }
   }
 
   @Override
@@ -197,6 +250,7 @@ public class DefaultWizardStepController implements WizardStepController {
     return step;
   }
 
+  @Override
   public void onStepIn() {
     if(stepInHandler != null) {
       stepInHandler.onStepIn();
@@ -204,31 +258,31 @@ public class DefaultWizardStepController implements WizardStepController {
   }
 
   @Override
-  public WizardStepController onNext() {
-    WizardStepController next = getNext();
-    if(next == null) throw new IllegalStateException("No next step");
-    if(getStep().isVisible()) {
-      if(!validate()) return this;
-      getStep().setVisible(false);
-      next.onStepIn();
-      next.getStep().setVisible(true);
-      return next;
+  public void onStepOut() {
+    if(stepOutHandler != null) {
+      stepOutHandler.onStepOut();
     }
-    GWT.log("strange to be here ?");
-    return next.onNext();
+  }
+
+  @Override
+  public WizardStepController onNext() {
+    WizardStepController nextStep = getNext();
+    if(nextStep == null) throw new IllegalStateException("No next step");
+    if(getStep().isVisible() && !validate()) return this;
+    getStep().setVisible(false);
+    onStepOut();
+    nextStep.onStepIn();
+    nextStep.getStep().setVisible(true);
+    return nextStep;
   }
 
   @Override
   public WizardStepController onPrevious() {
-    WizardStepController previous = getPrevious();
-    if(previous == null) throw new IllegalStateException("No previous step");
-    if(getStep().isVisible()) {
-      getStep().setVisible(false);
-      previous.getStep().setVisible(true);
-      return previous;
-    }
-    GWT.log("strange to be here ?");
-    return previous.onPrevious();
+    WizardStepController previousStep = getPrevious();
+    if(previousStep == null) throw new IllegalStateException("No previous step");
+    getStep().setVisible(false);
+    previousStep.getStep().setVisible(true);
+    return previousStep;
   }
 
   @Override
@@ -266,17 +320,17 @@ public class DefaultWizardStepController implements WizardStepController {
 
   @Override
   public boolean validate() {
-    return validator != null ? validator.validate() : true;
+    return validator == null || validator.validate();
   }
 
   @Override
   public boolean isFinish() {
-    return (next != null && next.isConclusion()) || (hasNext() == false);
+    return (next != null && next.isConclusion()) || !hasNext();
   }
 
   @Override
   public boolean shouldSkip() {
-    return skippable != null ? skippable.skip() : false;
+    return skippable != null && skippable.skip();
   }
 
   @Override
@@ -285,7 +339,7 @@ public class DefaultWizardStepController implements WizardStepController {
   }
 
   protected WizardStepController getNext() {
-    return next.shouldSkip() ? next.onNext() : next;
+    return next == null ? null : (next.shouldSkip() ? next.onNext() : next);
   }
 
   protected WizardStepController getPrevious() {
@@ -296,8 +350,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     private Widget w;
 
-    public WidgetProviderImpl(Widget w) {
-      super();
+    private WidgetProviderImpl(Widget w) {
       this.w = w;
       w.removeFromParent();
     }

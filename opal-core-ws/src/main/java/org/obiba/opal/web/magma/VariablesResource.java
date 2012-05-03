@@ -162,10 +162,10 @@ public class VariablesResource extends AbstractValueTableResource {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
 
-  private UriBuilder tableUriBuilder(UriInfo uriInfo) {
+  private static UriBuilder tableUriBuilder(UriInfo uriInfo) {
     ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
-    final UriBuilder ub = UriBuilder.fromPath("/");
+    UriBuilder ub = UriBuilder.fromPath("/");
     for(PathSegment segment : segments) {
       ub.segment(segment.getPath());
     }

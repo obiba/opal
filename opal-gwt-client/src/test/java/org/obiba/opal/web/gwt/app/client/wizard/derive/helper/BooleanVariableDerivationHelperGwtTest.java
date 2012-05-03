@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.BooleanVariableDerivationHelper.DerivedBooleanVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -34,14 +35,14 @@ public class BooleanVariableDerivationHelperGwtTest extends GWTTestCase {
     entries.add(ValueMapEntry.createEmpties("Empty value").newValue("888").build());
 
     DerivedBooleanVariableGenerator generator = new DerivedBooleanVariableGenerator(variable, entries);
-    VariableDto derived = generator.generate();
+    VariableDto derived = generator.generate(null);
 
     assertEquals("$('boolean-variable').map({\n" //
         + "    'true': '1',\n" //
         + "    'false': '0'\n" //
         + "  },\n" //
         + "  null,\n" //
-        + "  '888');", DerivedVariableGenerator.getScriptAttribute(derived).getValue());
+        + "  '888');", VariableDtos.getScript(derived));
 
   }
 

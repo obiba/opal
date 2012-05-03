@@ -9,6 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
@@ -25,19 +39,6 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
-import org.obiba.opal.web.model.client.magma.VariableListViewDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
 
 public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewStepPresenter.Display> {
 
@@ -219,7 +220,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
     private ResponseCodeCallback callback;
 
-    public ViewSaveRequiredHandler() {
+    ViewSaveRequiredHandler() {
       callback = createResponseCodeCallback();
     }
 

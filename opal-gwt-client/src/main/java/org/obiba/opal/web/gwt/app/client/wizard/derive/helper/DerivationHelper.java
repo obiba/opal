@@ -30,9 +30,11 @@ public abstract class DerivationHelper {
   protected List<ValueMapEntry> valueMapEntries;
 
   protected VariableDto originalVariable;
+  private final VariableDto destination;
 
-  public DerivationHelper(VariableDto originalVariable) {
+  public DerivationHelper(VariableDto originalVariable, VariableDto destination) {
     this.originalVariable = originalVariable;
+    this.destination = destination;
   }
 
   protected abstract void initializeValueMapEntries();
@@ -40,7 +42,7 @@ public abstract class DerivationHelper {
   protected abstract DerivedVariableGenerator getDerivedVariableGenerator();
 
   public VariableDto getDerivedVariable() {
-    return getDerivedVariableGenerator().generate();
+    return getDerivedVariableGenerator().generate(destination);
   }
 
   public List<ValueMapEntry> getValueMapEntries() {
@@ -54,7 +56,8 @@ public abstract class DerivationHelper {
       }
     }
     for(int i = valueMapEntries.size() - 1; i >= 0; i--) {
-      if(!valueMapEntries.get(i).getType().equals(ValueMapEntryType.EMPTY_VALUES) && !valueMapEntries.get(i).getType().equals(ValueMapEntryType.OTHER_VALUES)) {
+      if(!valueMapEntries.get(i).getType().equals(ValueMapEntryType.EMPTY_VALUES)
+          && !valueMapEntries.get(i).getType().equals(ValueMapEntryType.OTHER_VALUES)) {
         valueMapEntries.add(i + 1, entryArg);
         break;
       }

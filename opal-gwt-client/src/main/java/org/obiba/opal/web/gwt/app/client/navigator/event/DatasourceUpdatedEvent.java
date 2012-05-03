@@ -27,10 +27,10 @@ public class DatasourceUpdatedEvent extends GwtEvent<DatasourceUpdatedEvent.Hand
   private final String datasourceName;
 
   /**
-   * @param selectedItem
+   * @param datasourceDto
    */
   public DatasourceUpdatedEvent(DatasourceDto datasourceDto) {
-    this.datasourceName = datasourceDto.getName();
+    datasourceName = datasourceDto.getName();
   }
 
   public DatasourceUpdatedEvent(String datasourceName) {

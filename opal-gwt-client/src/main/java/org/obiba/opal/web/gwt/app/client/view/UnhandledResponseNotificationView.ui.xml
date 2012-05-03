@@ -6,13 +6,17 @@
       <tr>
         <td/>
         <td>
-          <g:Label ui:field="titleMessage" addStyleNames="bold"><ui:msg description="Unhandled response notification title">Regrettably a system error has occurred</ui:msg></g:Label>
+          <g:Label ui:field="titleMessage" addStyleNames="bold">
+            <ui:msg description="Unhandled response notification title">Regrettably a system error has occurred</ui:msg>
+          </g:Label>
         </td>
       </tr>
       <tr>
         <td/>
         <td>
-          <g:Label ui:field="detailMessage" addStyleNames="message"><ui:msg description="Unhandled response notification message">Please notify your Opal administrator</ui:msg></g:Label>          
+          <g:Label ui:field="detailMessage" addStyleNames="message">
+            <ui:msg description="Unhandled response notification message">Please notify your Opal administrator</ui:msg>
+          </g:Label>
         </td>
       </tr>
       <tr>

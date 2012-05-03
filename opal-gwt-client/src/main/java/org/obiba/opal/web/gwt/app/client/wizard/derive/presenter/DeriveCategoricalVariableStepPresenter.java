@@ -12,18 +12,20 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
+
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
@@ -33,7 +35,7 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   private CategoricalVariableDerivationHelper derivationHelper;
 
   @Inject
-  public DeriveCategoricalVariableStepPresenter(final EventBus eventBus, final Display view) {
+  public DeriveCategoricalVariableStepPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
   }
 
@@ -42,15 +44,15 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   //
 
   @Override
-  void initialize(final VariableDto variable) {
-    super.initialize(variable);
+  void initialize(final VariableDto variable, final VariableDto derivedVariable) {
+    super.initialize(variable, derivedVariable);
     //TODO use uribuilder
     ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-        .forResource(originalVariable.getLink() + "/summary?nature=categorical&distinct=true").get()
+        .forResource(getOriginalVariable().getLink() + "/summary?nature=categorical&distinct=true").get()
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
           public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
-            derivationHelper = new CategoricalVariableDerivationHelper(variable, statisticsDto);
+            derivationHelper = new CategoricalVariableDerivationHelper(variable, derivedVariable, statisticsDto);
             derivationHelper.initializeValueMapEntries();
             getView().enableFrequencyColumn(true);
             getView().setMaxFrequency(derivationHelper.getMaxFrequency());
@@ -60,24 +62,23 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   }
 
   @Override
-  public VariableDto getDerivedVariable() {
-    return derivationHelper.getDerivedVariable();
+  public void generateDerivedVariable() {
+    setDerivedVariable(derivationHelper.getDerivedVariable());
   }
 
   @Override
-  public List<DefaultWizardStepController> getWizardSteps() {
-    List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
-
-    stepCtrls.add(getView().getMapStepController().onValidate(new ValidationHandler() {
-
-      @Override
-      public boolean validate() {
-        // TODO
-        return true;
-      }
-    }).build());
-
-    return stepCtrls;
+  List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    stepBuilders.add(getView().getMapStepController() //
+        .onStepIn(stepInHandler) //
+        .onValidate(new ValidationHandler() {
+          @Override
+          public boolean validate() {
+            // TODO
+            return true;
+          }
+        }));
+    return stepBuilders;
   }
 
   //

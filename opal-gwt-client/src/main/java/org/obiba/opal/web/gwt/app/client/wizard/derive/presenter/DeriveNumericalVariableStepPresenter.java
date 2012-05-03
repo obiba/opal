@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.NumericalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
@@ -44,7 +45,7 @@ import com.gwtplatform.mvp.client.View;
  */
 public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private SummaryTabPresenter summaryTabPresenter;
 
@@ -53,14 +54,15 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   private NumberType numberType;
 
   @Inject
-  public DeriveNumericalVariableStepPresenter(final EventBus eventBus, final Display view, SummaryTabPresenter summaryTabPresenter) {
+  public DeriveNumericalVariableStepPresenter(EventBus eventBus, Display view,
+      SummaryTabPresenter summaryTabPresenter) {
     super(eventBus, view);
     this.summaryTabPresenter = summaryTabPresenter;
   }
 
   @Override
-  void initialize(VariableDto variable) {
-    super.initialize(variable);
+  void initialize(VariableDto variable, VariableDto derivedVariable) {
+    super.initialize(variable, derivedVariable);
     getView().setNumberType(variable.getValueType());
     summaryTabPresenter.setResourceUri(variable.getLink() + "/summary");
     summaryTabPresenter.forgetSummary();
@@ -68,18 +70,18 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   }
 
   @Override
-  public List<DefaultWizardStepController> getWizardSteps() {
-    List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
-
-    stepCtrls.add(getView().getMethodStepController().onValidate(new MethodStepValidationHandler()).build());
-    stepCtrls.add(getView().getMapStepController().onStepIn(new MapStepInHandler()).build());
-
-    return stepCtrls;
+  List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    stepBuilders.add(getView().getMethodStepBuilder() //
+        .onStepIn(stepInHandler) //
+        .onValidate(new MethodStepValidationHandler()));
+    stepBuilders.add(getView().getMapStepBuilder().onStepIn(new MapStepInHandler()));
+    return stepBuilders;
   }
 
   private void newDerivationHelper() {
-    numberType = NumberType.valueOf(originalVariable.getValueType().toUpperCase());
-    derivationHelper = numberType.newDerivationHelper(originalVariable);
+    numberType = NumberType.valueOf(getOriginalVariable().getValueType().toUpperCase());
+    derivationHelper = numberType.newDerivationHelper(getOriginalVariable(), getDerivedVariable());
   }
 
   private boolean addValueMapEntry(String value, String newValue) {
@@ -100,8 +102,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   }
 
   @Override
-  public VariableDto getDerivedVariable() {
-    return derivationHelper.getDerivedVariable();
+  public void generateDerivedVariable() {
+    setDerivedVariable(derivationHelper.getDerivedVariable());
   }
 
   //
@@ -111,8 +113,9 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   @Override
   protected void onBind() {
     getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
-    super.registerHandler(getEventBus().addHandler(SummaryReceivedEvent.getType(), new OriginalVariableSummaryReceivedHandler()));
-    super.registerHandler(getView().addValueMapEntryHandler(new AddValueMapEntryHandler()));
+    registerHandler(
+        getEventBus().addHandler(SummaryReceivedEvent.getType(), new OriginalVariableSummaryReceivedHandler()));
+    registerHandler(getView().addValueMapEntryHandler(new AddValueMapEntryHandler()));
   }
 
   //
@@ -200,16 +203,16 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         getView().enableFrequency(false);
         getView().populateValues(derivationHelper.getValueMapEntries());
       } else if(getView().discreteSelected()) {
-        addDisctinctValuesMapping();
+        addDistinctValuesMapping();
       } else {
         getView().enableFrequency(false);
         getView().populateValues(derivationHelper.getValueMapEntries());
-
       }
     }
 
     private boolean newMethodChoice() {
-      if(lastChoice != null && lastChoice.isCurrentChoice(getView()) && lastChoice.sign(getView()).equals(lastChoiceSignature)) {
+      if(lastChoice != null && lastChoice.isCurrentChoice(getView()) && lastChoice.sign(getView())
+          .equals(lastChoiceSignature)) {
         return false;
       } else {
         for(MethodChoice method : MethodChoice.values()) {
@@ -223,27 +226,28 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       return true;
     }
 
-    private void addDisctinctValuesMapping() {
-      StringBuilder link = new StringBuilder(originalVariable.getLink())//
-      .append("/summary")//
-      .append("?nature=categorical")//
-      .append("&distinct=true");
+    private void addDistinctValuesMapping() {
+      String link = new String(getOriginalVariable().getLink()) //
+          + "/summary" //
+          + "?nature=categorical" //
+          + "&distinct=true";
 
       getView().populateValues(new ArrayList<ValueMapEntry>());
 
-      ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
-      .forResource(link.toString()).get()//
-      .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+      ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
+          .forResource(link.toString()).get()//
+          .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
 
-        @Override
-        public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
-          CategoricalSummaryDto categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-          double maxFreq = derivationHelper.addDistinctValues(categoricalSummaryDto);
-          getView().setMaxFrequency(maxFreq);
-          getView().enableFrequency(true);
-          getView().populateValues(derivationHelper.getValueMapEntries());
-        }
-      }).send();
+            @Override
+            public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
+              CategoricalSummaryDto categoricalSummaryDto = summaryStatisticsDto
+                  .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+              double maxFreq = derivationHelper.addDistinctValues(categoricalSummaryDto);
+              getView().setMaxFrequency(maxFreq);
+              getView().enableFrequency(true);
+              getView().populateValues(derivationHelper.getValueMapEntries());
+            }
+          }).send();
     }
 
     private void addRangesByCountMapping() {
@@ -281,7 +285,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
   private enum MethodChoice {
     RANGE {
-
       @Override
       public boolean isCurrentChoice(Display display) {
         return display.rangeSelected();
@@ -289,7 +292,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
       @Override
       public String sign(Display display) {
-        return super.sign(display) + ":" + display.getLowerLimit() + ":" + display.getUpperLimit() + ":" + (display.rangeLengthSelected() ? "lengh:" + display.getRangeLength() : "count" + display.getRangeCount());
+        return super.sign(display) + ":" + display.getLowerLimit() + ":" + display.getUpperLimit() + ":" + (display
+            .rangeLengthSelected() ? "length:" + display.getRangeLength() : "count" + display.getRangeCount());
       }
 
     },
@@ -317,21 +321,23 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
   private enum NumberType {
     INTEGER() {
-
       @Override
-      public NumericalVariableDerivationHelper<?> newDerivationHelper(VariableDto originalVariable) {
-        return new NumericalVariableDerivationHelper<Long>(originalVariable);
+      public NumericalVariableDerivationHelper<?> newDerivationHelper(VariableDto originalVariable,
+          VariableDto destinationVariable) {
+        return new NumericalVariableDerivationHelper<Long>(originalVariable, destinationVariable);
       }
 
       @SuppressWarnings("unchecked")
       @Override
-      public void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value, String newValue) {
+      public void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value,
+          String newValue) {
         ((NumericalVariableDerivationHelper<Long>) helper).addValueMapEntry(new Long(value), newValue);
       }
 
       @SuppressWarnings("unchecked")
       @Override
-      public boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower, Number upper, String newValue) {
+      public boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower,
+          Number upper, String newValue) {
         NumericalVariableDerivationHelper<Long> h = (NumericalVariableDerivationHelper<Long>) helper;
         Long l = lower == null ? null : lower.longValue();
         Long u = upper == null ? null : upper.longValue();
@@ -352,19 +358,22 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       }
 
       @Override
-      public NumericalVariableDerivationHelper<? extends Number> newDerivationHelper(VariableDto originalVariable) {
-        return new NumericalVariableDerivationHelper<Double>(originalVariable);
+      public NumericalVariableDerivationHelper<? extends Number> newDerivationHelper(VariableDto originalVariable,
+          VariableDto destinationVariable) {
+        return new NumericalVariableDerivationHelper<Double>(originalVariable, destinationVariable);
       }
 
       @SuppressWarnings("unchecked")
       @Override
-      public void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value, String newValue) {
+      public void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value,
+          String newValue) {
         ((NumericalVariableDerivationHelper<Double>) helper).addValueMapEntry(new Double(value), newValue);
       }
 
       @SuppressWarnings("unchecked")
       @Override
-      public boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower, Number upper, String newValue) {
+      public boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower,
+          Number upper, String newValue) {
         NumericalVariableDerivationHelper<Double> h = (NumericalVariableDerivationHelper<Double>) helper;
         Double l = lower == null ? null : lower.doubleValue();
         Double u = upper == null ? null : upper.doubleValue();
@@ -380,11 +389,14 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       return nb == null ? null : nb.toString();
     }
 
-    public abstract NumericalVariableDerivationHelper<? extends Number> newDerivationHelper(VariableDto originalVariable);
+    public abstract NumericalVariableDerivationHelper<? extends Number> newDerivationHelper(
+        VariableDto originalVariable, VariableDto destinationVariable);
 
-    public abstract void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value, String newValue);
+    public abstract void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value,
+        String newValue);
 
-    public abstract boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower, Number upper, String newValue);
+    public abstract boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower,
+        Number upper, String newValue);
   }
 
   /**
@@ -393,10 +405,11 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   private final class OriginalVariableSummaryReceivedHandler implements SummaryReceivedEvent.Handler {
     @Override
     public void onSummaryReceived(SummaryReceivedEvent event) {
-      if(originalVariable != null && event.getResourceUri().equals(originalVariable.getLink() + "/summary")) {
+      if(getOriginalVariable() != null && event.getResourceUri().equals(getOriginalVariable().getLink() + "/summary")) {
         SummaryStatisticsDto dto = event.getSummary();
         if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
-          ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
+          ContinuousSummaryDto continuous = dto
+              .getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
           double from = continuous.getSummary().getMin();
           double to = continuous.getSummary().getMax();
           getView().setValueLimits(Long.valueOf((long) from), Long.valueOf((long) to + 1));
@@ -426,7 +439,9 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
   public interface Display extends View {
 
-    DefaultWizardStepController.Builder getMethodStepController();
+    DefaultWizardStepController.Builder getMethodStepBuilder();
+
+    DefaultWizardStepController.Builder getMapStepBuilder();
 
     void setMaxFrequency(double maxFreq);
 
@@ -437,8 +452,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     void setUpperLimitError(boolean error);
 
     void setLowerLimitError(boolean error);
-
-    DefaultWizardStepController.Builder getMapStepController();
 
     void populateValues(List<ValueMapEntry> valuesMap);
 

@@ -49,6 +49,8 @@ import com.gwtplatform.mvp.client.ViewImpl;
  */
 public class VariableView extends ViewImpl implements VariablePresenter.Display {
 
+  private MenuItem deriveFromMenu;
+
   @UiTemplate("VariableView.ui.xml")
   interface VariableViewUiBinder extends UiBinder<Widget, VariableView> {
   }
@@ -61,9 +63,9 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   private static final Integer PERMISSIONS_TAB_INDEX = 5;
 
-  private static VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
+  private static final VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -149,7 +151,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   public VariableView() {
     categoryTable = new CategoriesTable();
     attributeTable = new AttributesTable();
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     initCategoryTable();
     initAttributeTable();
@@ -175,6 +177,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   // VariablePresenter.Display Methods
   //
 
+  @Override
   public void renderCategoryRows(JsArray<CategoryDto> rows) {
     categoryProvider.setArray(rows);
     int size = categoryProvider.getList().size();
@@ -184,7 +187,8 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     categoryProvider.refresh();
   }
 
-  public void renderAttributeRows(final JsArray<AttributeDto> rows) {
+  @Override
+  public void renderAttributeRows(JsArray<AttributeDto> rows) {
     attributeProvider.setArray(rows);
     int size = attributeProvider.getList().size();
     attributeTableTitle.setText(translations.attributesLabel() + " (" + size + ")");
@@ -195,10 +199,10 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     renderVariableLabels(rows);
   }
 
-  private void renderVariableLabels(final JsArray<AttributeDto> rows) {
+  private void renderVariableLabels(JsArray<AttributeDto> rows) {
     label.clear();
     for(AttributeDto attr : JsArrays.toIterable(rows)) {
-      if(attr.getName().equals("label")) {
+      if("label".equals(attr.getName())) {
         renderVariableLabel(attr);
       }
     }
@@ -255,6 +259,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     summary.add(widget.asWidget());
   }
 
+  @Override
   public Widget asWidget() {
     return widget;
   }
@@ -348,11 +353,21 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     withDeriveItem(new MenuItem(translations.deriveCustomLabel(), cmd));
   }
 
+  @Override
+  public void setDeriveFromCommand(Command cmd) {
+    withDeriveItem(deriveFromMenu = new MenuItem(translations.deriveFromLabel(), cmd));
+  }
+
   private void withDeriveItem(MenuItem item) {
     if(deriveBar == null) {
       toolbar.getToolsMenu().addItem(translations.deriveLabel(), deriveBar = new MenuBar(true));
     }
     deriveBar.addItem(item);
+  }
+
+  @Override
+  public void setDeriveFromMenuVisibility(boolean visible) {
+    deriveFromMenu.setVisible(visible);
   }
 
   @Override
@@ -378,7 +393,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   public void setDerivedVariable(boolean derived, String value) {
     tabs.setTabVisible(SCRIPT_TAB_INDEX, derived);
     notDerived.setVisible(!derived);
-    noScript.setVisible(derived && value.length() == 0);
+    noScript.setVisible(derived && value.isEmpty());
     script.setVisible(derived && value.length() > 0);
     script.setText(value);
     if(toolbar.getEditItem() != null) {

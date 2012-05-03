@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -51,7 +51,7 @@ import com.gwtplatform.mvp.client.View;
  */
 public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationPresenter.Display> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private SummaryTabPresenter summaryTabPresenter;
 
@@ -68,7 +68,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   //
 
   @Inject
-  public ScriptEvaluationPresenter(final EventBus eventBus, final Display view, SummaryTabPresenter summaryTabPresenter) {
+  public ScriptEvaluationPresenter(EventBus eventBus, Display view, SummaryTabPresenter summaryTabPresenter) {
     super(eventBus, view);
     this.summaryTabPresenter = summaryTabPresenter;
 
@@ -81,20 +81,18 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
         appendVariableLimitArguments(link);
         // TODO won't work with long script
         // OPAL-1346 encode script
-        link.append("&script=" + URL.encodePathSegment(VariableDtos.getScript(variable)));
+        link.append("&script=").append(URL.encodePathSegment(VariableDtos.getScript(variable)));
         getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
       }
 
       @Override
       public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
         // TODO Auto-generated method stub
-
       }
 
     });
 
     getView().setValueSetFetcher(new ValueSetFetcherImpl());
-
   }
 
   public void setTable(TableDto table) {
@@ -136,9 +134,10 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
     String script = VariableDtos.getScript(variable);
-    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
-    .forResource(link).withFormBody("script", script).post()//
-    .accept("application/x-protobuf+json");
+    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory
+        .<SummaryStatisticsDto>newBuilder() //
+        .forResource(link).withFormBody("script", script).post() //
+        .accept("application/x-protobuf+json");
 
     if(variable != null) {
       JsArray<CategoryDto> cats = variable.getCategoriesArray();
@@ -163,9 +162,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     };
 
     requestBuilder.withCallback(Response.SC_OK, callback)//
-    .withCallback(Response.SC_BAD_REQUEST, callback)//
-    .withCallback(Response.SC_FORBIDDEN, callback)//
-    .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback);
+        .withCallback(Response.SC_BAD_REQUEST, callback)//
+        .withCallback(Response.SC_FORBIDDEN, callback)//
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback);
 
     return requestBuilder;
   }
@@ -175,17 +174,17 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
     if(ValueType.TEXT.is(variable.getValueType()) && VariableDtos.allCategoriesMissing(variable)) {
       link.append("&nature=categorical")//
-      .append("&distinct=true");
+          .append("&distinct=true");
     }
   }
 
   private void appendVariableLimitArguments(StringBuilder link) {
-    link.append("valueType=" + variable.getValueType()) //
-    .append("&repeatable=" + variable.getIsRepeatable()); //
+    link.append("valueType=").append(variable.getValueType()) //
+        .append("&repeatable=").append(variable.getIsRepeatable());
   }
 
   private void appendTable(StringBuilder link) {
-    if(Strings.isNullOrEmpty(table.getViewLink()) == false && asTable == false) {
+    if(!Strings.isNullOrEmpty(table.getViewLink()) && !asTable) {
       // OPAL-879
       link.append(table.getViewLink()).append("/from");
     } else if(!Strings.isNullOrEmpty(table.getLink())) {
@@ -226,18 +225,18 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       StringBuilder link = new StringBuilder();
       appendTable(link);
       link.append("/valueSets/variable/_transient?limit=").append(limit)//
-      .append("&offset=").append(offset).append("&");
+          .append("&offset=").append(offset).append("&");
       appendVariableLimitArguments(link);
 
-      ValuesRequestCallback callback = new ValuesRequestCallback(offset);
+      ResponseCodeCallback callback = new ValuesRequestCallback(offset);
 
-      ResourceRequestBuilder<ValueSetsDto> requestBuilder = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder() //
-      .forResource(link.toString()).post().withFormBody("script", script) //
-      .withCallback(Response.SC_OK, callback)//
-      .withCallback(Response.SC_BAD_REQUEST, callback)//
-      .withCallback(Response.SC_FORBIDDEN, callback)//
-      .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback)//
-      .accept("application/x-protobuf+json");
+      ResourceRequestBuilder<ValueSetsDto> requestBuilder = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder() //
+          .forResource(link.toString()).post().withFormBody("script", script) //
+          .withCallback(Response.SC_OK, callback)//
+          .withCallback(Response.SC_BAD_REQUEST, callback)//
+          .withCallback(Response.SC_FORBIDDEN, callback)//
+          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback)//
+          .accept("application/x-protobuf+json");
       requestBuilder.send();
     }
   }
@@ -253,21 +252,22 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     @Override
     public void onResponseCode(Request request, Response response) {
       switch(response.getStatusCode()) {
-      case Response.SC_OK:
-        getView().setValuesVisible(true);
-        getView().getValueSetsProvider().populateValues(offset, (ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
-        break;
-      case Response.SC_FORBIDDEN:
-        getView().setValuesVisible(false);
-        break;
-      case Response.SC_BAD_REQUEST:
-        getView().setValuesVisible(true);
-        scriptInterpretationFail(response);
-        break;
-      default:
-        getView().setValuesVisible(true);
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
-        break;
+        case Response.SC_OK:
+          getView().setValuesVisible(true);
+          getView().getValueSetsProvider()
+              .populateValues(offset, (ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
+          break;
+        case Response.SC_FORBIDDEN:
+          getView().setValuesVisible(false);
+          break;
+        case Response.SC_BAD_REQUEST:
+          getView().setValuesVisible(true);
+          scriptInterpretationFail(response);
+          break;
+        default:
+          getView().setValuesVisible(true);
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
+          break;
       }
     }
 
@@ -277,7 +277,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
         for(JavaScriptErrorDto error : errors) {
           // TODO translate
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error("Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error.getMessage()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(
+              "Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": " + error
+                  .getMessage()).build());
         }
       }
     }
@@ -286,7 +288,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
       List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
 
-      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
+          .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
       if(errors != null) {
         for(int i = 0; i < errors.length(); i++) {
           javaScriptErrors.add(errors.get(i));
@@ -298,9 +301,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   }
 
   public interface ScriptEvaluationCallback {
-    public void onSuccess(VariableDto variable);
+    void onSuccess(VariableDto variable);
 
-    public void onFailure(VariableDto variable);
+    void onFailure(VariableDto variable);
   }
 
   public interface Display extends View {

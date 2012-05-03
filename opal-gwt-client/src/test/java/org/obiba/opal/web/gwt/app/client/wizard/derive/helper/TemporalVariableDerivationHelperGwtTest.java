@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.TemporalVariableDerivationHelper.GroupMethod;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -658,9 +659,9 @@ public class TemporalVariableDerivationHelperGwtTest extends GWTTestCase {
     List<ValueMapEntry> entries = new ArrayList<ValueMapEntry>();
     DerivedTemporalVariableGenerator generator = new DerivedTemporalVariableGenerator(variable, entries, groupMethod, fromDate, toDate);
     groupMethod.initializeValueMapEntries(entries, fromDate, toDate);
-    VariableDto derived = generator.generate();
+    VariableDto derived = generator.generate(null);
 
-    assertEquals(expectedScript, DerivedVariableGenerator.getScriptAttribute(derived).getValue());
+    assertEquals(expectedScript, VariableDtos.getScript(derived));
 
   }
 

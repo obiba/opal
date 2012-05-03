@@ -1,16 +1,16 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCustomVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ValueTypeBox;
@@ -29,7 +29,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCustomVariablePresenter.Display {
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private Translations translations = GWT.create(Translations.class);
 
@@ -55,13 +55,13 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
   HasClickHandlers testButton;
 
   public DeriveCustomVariableStepView() {
-    super();
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
-  public DefaultWizardStepController.Builder getDeriveStepController() {
-    return DefaultWizardStepController.Builder.create(deriveStep).title(translations.recodeCustomDeriveStepTitle());
+  public BranchingWizardStepController.Builder getDeriveStepController() {
+    return (BranchingWizardStepController.Builder) BranchingWizardStepController.Builder.create(deriveStep)
+        .title(translations.recodeCustomDeriveStepTitle());
   }
 
   @Override

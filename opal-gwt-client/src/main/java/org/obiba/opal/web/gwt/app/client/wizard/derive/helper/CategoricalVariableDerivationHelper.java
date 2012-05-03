@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -47,15 +47,21 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   private double maxFrequency;
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
-    this(originalVariable, null);
+    this(originalVariable, null, null);
+  }
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination) {
+    this(originalVariable, destination, null);
   }
 
-  public CategoricalVariableDerivationHelper(VariableDto originalVariable, SummaryStatisticsDto summaryStatisticsDto) {
-    super(originalVariable);
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination,
+      SummaryStatisticsDto summaryStatisticsDto) {
+    super(originalVariable, destination);
     if(summaryStatisticsDto != null) {
-      this.categoricalSummaryDto = summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-    } else
-      this.categoricalSummaryDto = null;
+      categoricalSummaryDto = summaryStatisticsDto
+          .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+    } else {
+      categoricalSummaryDto = null;
+    }
   }
 
   @Override
@@ -95,7 +101,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param missingValueMapEntries
    * @param index
    */
-  private int initializeValueMapEntriesWithoutCategory(Map<String, Double> countByCategoryName, List<ValueMapEntry> missingValueMapEntries, int index) {
+  private int initializeValueMapEntriesWithoutCategory(Map<String, Double> countByCategoryName,
+      List<ValueMapEntry> missingValueMapEntries, int index) {
     int newIndex = index;
     for(Map.Entry<String, Double> entry : countByCategoryName.entrySet()) {
       String value = entry.getKey();
@@ -115,10 +122,12 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param missingValueMapEntries
    * @param index
    */
-  private int initializeNonMissingCategoryValueMapEntries(Map<String, Double> countByCategoryName, List<ValueMapEntry> missingValueMapEntries, int index) {
+  private int initializeNonMissingCategoryValueMapEntries(Map<String, Double> countByCategoryName,
+      List<ValueMapEntry> missingValueMapEntries, int index) {
     int newIndex = index;
     for(CategoryDto category : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
-      double count = countByCategoryName.containsKey(category.getName()) ? countByCategoryName.get(category.getName()) : 0;
+      double count = countByCategoryName.containsKey(category.getName()) ? countByCategoryName
+          .get(category.getName()) : 0;
       ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(category, count);
       if(estimateIsMissing(category)) {
         builder.missing();
@@ -167,9 +176,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   /**
    * Process non-missing categories.
-   * @param missingValueMapEntries
    * @param index
-   * @param cat
+   * @param value
    * @param builder
    * @return current index value
    */

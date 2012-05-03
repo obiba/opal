@@ -32,15 +32,15 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
 
   private Map<ValueMapEntry, Range<N>> entryRangeMap;
 
-  public NumericalVariableDerivationHelper(VariableDto originalVariable) {
-    super(originalVariable);
+  public NumericalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination) {
+    super(originalVariable, destination);
     initializeValueMapEntries();
   }
 
   @Override
   protected void initializeValueMapEntries() {
-    this.valueMapEntries = new ArrayList<ValueMapEntry>();
-    this.entryRangeMap = new HashMap<ValueMapEntry, Range<N>>();
+    valueMapEntries = new ArrayList<ValueMapEntry>();
+    entryRangeMap = new HashMap<ValueMapEntry, Range<N>>();
 
     addMissingCategoriesMapping();
 
@@ -176,7 +176,9 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
         return o2.getType().equals(ValueMapEntryType.RANGE) ? compareRanges(o1, o2) : -1;
       case CATEGORY_NAME:
       case DISTINCT_VALUE:
-        if(o2.getType().equals(ValueMapEntryType.CATEGORY_NAME) || o2.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) return compareDistincts(o1, o2);
+        if(o2.getType().equals(ValueMapEntryType.CATEGORY_NAME) || o2.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
+          return compareDistincts(o1, o2);
+        }
         return o2.getType().equals(ValueMapEntryType.EMPTY_VALUES) ? -1 : 1;
       case EMPTY_VALUES:
         return o2.getType().equals(ValueMapEntryType.OTHER_VALUES) ? -1 : 1;

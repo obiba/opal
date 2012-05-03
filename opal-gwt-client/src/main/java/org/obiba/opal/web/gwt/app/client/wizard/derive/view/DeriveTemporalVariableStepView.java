@@ -43,9 +43,9 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
   interface ViewUiBinder extends UiBinder<Widget, DeriveTemporalVariableStepView> {
   }
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 

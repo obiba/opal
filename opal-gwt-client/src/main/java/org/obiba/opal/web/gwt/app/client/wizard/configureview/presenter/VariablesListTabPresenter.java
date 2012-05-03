@@ -14,31 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
-import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
-import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -67,12 +42,37 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
+import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
+import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  * Variables tab used to specify a view's variables by defining each variable using a Javascript expression.
@@ -254,38 +254,37 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getEventBus()
+    registerHandler(getEventBus()
         .addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-    super.registerHandler(getView().addPreviousVariableNameClickHandler(new PreviousVariableClickHandler()));
-    super.registerHandler(getView().addNextVariableNameClickHandler(new NextVariableClickHandler()));
-    super.registerHandler(getView().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
-    super.registerHandler(getView().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
-    super.registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
-    super.registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
-    super.registerHandler(getView().addRemoveVariableClickHandler(new RemoveVariableClickHandler()));
-    super.registerHandler(getView().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
-    super.registerHandler(
-        getEventBus().addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
-    super.registerHandler(getEventBus().addHandler(DerivedVariableConfigurationRequiredEvent.getType(),
+    registerHandler(getView().addPreviousVariableNameClickHandler(new PreviousVariableClickHandler()));
+    registerHandler(getView().addNextVariableNameClickHandler(new NextVariableClickHandler()));
+    registerHandler(getView().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
+    registerHandler(getView().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
+    registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
+    registerHandler(getView().addRemoveVariableClickHandler(new RemoveVariableClickHandler()));
+    registerHandler(getView().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
+    registerHandler(getEventBus().addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
+    registerHandler(getEventBus().addHandler(DerivedVariableConfigurationRequiredEvent.getType(),
         new DerivedVariableConfigurationRequiredHandler()));
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
     registerFormChangedHandler();
   }
 
   private void registerFormChangedHandler() {
     FormChangedHandler formChangedHandler = new FormChangedHandler();
 
-    super.registerHandler(getView().addNameChangedHandler(formChangedHandler));
-    super.registerHandler(getView().addValueTypeChangedHandler(formChangedHandler));
-    super.registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(formChangedHandler));
-    super.registerHandler(getView().addRepeatableValueChangeHandler(formChangedHandler));
-    super.registerHandler(getView().addOccurrenceGroupChangedHandler(formChangedHandler));
-    super.registerHandler(getView().addUnitChangedHandler(formChangedHandler));
-    super.registerHandler(getView().addMimeTypeChangedHandler(formChangedHandler));
-    super.registerHandler(getEventBus().addHandler(CategoryUpdateEvent.getType(), formChangedHandler));
-    super.registerHandler(getEventBus().addHandler(AttributeUpdateEvent.getType(), formChangedHandler));
-    super.registerHandler(getEventBus().addHandler(LocalizableDeleteEvent.getType(), formChangedHandler));
+    registerHandler(getView().addNameChangedHandler(formChangedHandler));
+    registerHandler(getView().addValueTypeChangedHandler(formChangedHandler));
+    registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(formChangedHandler));
+    registerHandler(getView().addRepeatableValueChangeHandler(formChangedHandler));
+    registerHandler(getView().addOccurrenceGroupChangedHandler(formChangedHandler));
+    registerHandler(getView().addUnitChangedHandler(formChangedHandler));
+    registerHandler(getView().addMimeTypeChangedHandler(formChangedHandler));
+    registerHandler(getEventBus().addHandler(CategoryUpdateEvent.getType(), formChangedHandler));
+    registerHandler(getEventBus().addHandler(AttributeUpdateEvent.getType(), formChangedHandler));
+    registerHandler(getEventBus().addHandler(LocalizableDeleteEvent.getType(), formChangedHandler));
   }
 
   private void addValidators() {
@@ -446,12 +445,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
 
     private void setScript(VariableDto variableDto) {
-      AttributeDto attr = VariableDtos.getScriptAttribute(variableDto);
-      if(attr != null) {
-        evaluateScriptPresenter.setScript(attr.getValue());
-      } else {
-        evaluateScriptPresenter.setScript("");
-      }
+      String script = VariableDtos.getScript(variableDto);
+      evaluateScriptPresenter.setScript(script == null ? "" : script);
       evaluateScriptPresenter.setRepeatable(variableDto.getIsRepeatable());
     }
   }
@@ -538,8 +533,9 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
 
       final VariableDto currentVariableDto = getView().getVariableDto(evaluateScriptPresenter.getScript());
-      UriBuilder ub = UriBuilder.create().segment("datasource", viewDto.getDatasourceName(), "table",
-          viewDto.getName());
+
+      UriBuilder ub = UriBuilder.create()
+          .segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
@@ -576,23 +572,22 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         String[] tableParts = viewDto.getFromArray().get(i).split("\\.");
         UriBuilder ub = UriBuilder.create()
             .segment("datasource", tableParts[0], "table", tableParts[1], "variable", newDerivedVariableName);
-        ResourceRequestBuilderFactory.<VariableDto>newBuilder()
-            .forResource(ub.build()).get().withCallback(new ResourceCallback<VariableDto>() {
-          @Override
-          public void onResource(Response response, VariableDto variableDto) {
-            variableDto.setName(translations.copyOf() + variableDto.getName());
-            getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
-            setButtonsWhenAddingVariable();
-          }
-        }).withCallback(Response.SC_NOT_FOUND, doNothingResponseCodeCallback()).send();
+        ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(ub.build()).get()
+            .withCallback(new ResourceCallback<VariableDto>() {
+              @Override
+              public void onResource(Response response, VariableDto variableDto) {
+                variableDto.setName(translations.copyOf() + variableDto.getName());
+                getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+                setButtonsWhenAddingVariable();
+              }
+            }).withCallback(Response.SC_NOT_FOUND, doNothingResponseCodeCallback()).send();
       }
     }
 
     private void setEmptyDerivedVariable() {
       UriBuilder ub = UriBuilder.create()
           .segment("datasource", firstTableInViewParts[0], "table", firstTableInViewParts[1]);
-      ResourceRequestBuilderFactory.<TableDto>newBuilder()
-          .forResource(ub.build()).get()
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
             public void onResource(Response response, TableDto firstTableDto) {
@@ -613,10 +608,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
 
     private void newDerivedVariableIsCopyOfExistingDerivedVariable() {
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", viewDto.getDatasourceName(), "view", viewDto.getName());
-      ResourceRequestBuilderFactory.<ViewDto>newBuilder()
-          .forResource(ub.build()).get()
+      UriBuilder ub = UriBuilder.create().segment("datasource", viewDto.getDatasourceName(), "view", viewDto.getName());
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<ViewDto>() {
 
             List<VariableDto> variablesList;
@@ -697,8 +690,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto
         .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     VariableDto variableToDelete = getView().getVariableDto(evaluateScriptPresenter.getScript());
-    @SuppressWarnings("unchecked")
-    JsArray<VariableDto> newVariables = (JsArray<VariableDto>) JsArray.createArray();
+    @SuppressWarnings("unchecked") JsArray<VariableDto> newVariables = (JsArray<VariableDto>) JsArray.createArray();
     for(int i = 0; i < variableListViewDto.getVariablesArray().length(); i++) {
       if(!variableListViewDto.getVariablesArray().get(i).getName().equals(variableToDelete.getName())) {
         newVariables.push(variableListViewDto.getVariablesArray().get(i));
@@ -904,22 +896,13 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       }
 
       private void updateAttributes() {
-        AttributeDto currentVariableScriptAttribute = VariableDtos.getScriptAttribute(currentVariableDto);
-        AttributeDto existingVariableScriptAttribute = VariableDtos
-            .getScriptAttribute(attributesPresenter.getVariableDto());
-        if(existingVariableScriptAttribute != null) {
-          // Duplicate 'script' attribute exists. Overwrite the existing 'script' attribute.
-          existingVariableScriptAttribute.setValue(currentVariableScriptAttribute.getValue());
-          currentVariableDto.setAttributesArray(attributesPresenter.getVariableDto().getAttributesArray());
-        } else {
-          // No duplicate 'script' attribute. Add the 'script' attribute.
-          currentVariableDto.setAttributesArray(attributesPresenter.getVariableDto().getAttributesArray());
-          currentVariableDto.getAttributesArray().push(currentVariableScriptAttribute);
-        }
+        String currentVariableScript = VariableDtos.getScript(currentVariableDto);
+        currentVariableDto.setAttributesArray(attributesPresenter.getVariableDto().getAttributesArray());
+        VariableDtos.setScript(currentVariableDto, currentVariableScript);
       }
 
       private boolean isEmptyVariable() {
-        return currentVariableDto.getName().equals("") && variableListViewDto.getVariablesArray().length() == 0;
+        return "".equals(currentVariableDto.getName()) && variableListViewDto.getVariablesArray().length() == 0;
       }
 
       private void updateVariable() {

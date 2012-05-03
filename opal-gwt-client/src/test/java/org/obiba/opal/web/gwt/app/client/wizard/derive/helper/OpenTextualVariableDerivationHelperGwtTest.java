@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.OpenTextualVariableDerivationHelper.DerivedOpenTextualVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -37,7 +38,7 @@ public class OpenTextualVariableDerivationHelperGwtTest extends GWTTestCase {
     entries.add(ValueMapEntry.createOthers("Other").newValue("999").build());
 
     DerivedOpenTextualVariableGenerator generator = new DerivedOpenTextualVariableGenerator(variable, entries);
-    VariableDto derived = generator.generate();
+    VariableDto derived = generator.generate(null);
 
     assertEquals("$('open-textual-variable').map({\n" //
         + "    'QC': '1',\n" //
@@ -46,7 +47,7 @@ public class OpenTextualVariableDerivationHelperGwtTest extends GWTTestCase {
         + "    'NB': '4'\n" //
         + "  },\n" //
         + "  '999',\n" //
-        + "  '888');", DerivedVariableGenerator.getScriptAttribute(derived).getValue());
+        + "  '888');", VariableDtos.getScript(derived));
 
   }
 

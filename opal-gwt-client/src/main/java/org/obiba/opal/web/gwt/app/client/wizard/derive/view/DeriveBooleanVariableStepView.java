@@ -32,9 +32,9 @@ public class DeriveBooleanVariableStepView extends ViewImpl implements DeriveBoo
   interface ViewUiBinder extends UiBinder<Widget, DeriveBooleanVariableStepView> {
   }
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -49,8 +49,7 @@ public class DeriveBooleanVariableStepView extends ViewImpl implements DeriveBoo
   //
 
   public DeriveBooleanVariableStepView() {
-    super();
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override

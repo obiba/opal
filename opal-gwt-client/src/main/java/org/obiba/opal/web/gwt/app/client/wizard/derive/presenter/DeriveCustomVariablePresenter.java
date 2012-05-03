@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,8 +15,9 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -39,14 +40,15 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   private final ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
 
   @Inject
-  public DeriveCustomVariablePresenter(final EventBus eventBus, final Display view, ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
+  public DeriveCustomVariablePresenter(EventBus eventBus, Display view,
+      ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
     super(eventBus, view);
     this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
   }
 
   @Override
-  void initialize(VariableDto variable) {
-    super.initialize(variable);
+  void initialize(VariableDto variable, VariableDto derivedVariable) {
+    super.initialize(variable, derivedVariable);
     getView().getRepeatable().setValue(variable.getIsRepeatable());
     getView().getTestButton().addClickHandler(new TestButtonClickHandler());
     getView().getValueType().setValue(variable.getValueType());
@@ -61,42 +63,44 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
     @Override
     public void onClick(ClickEvent event) {
-      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(originalVariable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
-        @Override
-        public void onResource(Response response, TableDto table) {
-          VariableDto variable = getDerivedVariable();
-          if(getView().getScriptBox().isTextSelected()) {
-            variable.setValueType(ValueType.TEXT.getLabel());
-            variable.setIsRepeatable(false);
-            VariableDtos.setScript(variable, getView().getScriptBox().getSelectedScript());
-          }
-          scriptEvaluationPopupPresenter.initialize(table, variable);
-        }
-      }).send();
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(getOriginalVariable().getParentLink().getLink()).get()
+          .withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, TableDto table) {
+              generateDerivedVariable();
+              VariableDto variable = getDerivedVariable();
+              if(getView().getScriptBox().isTextSelected()) {
+                variable.setValueType(ValueType.TEXT.getLabel());
+                variable.setIsRepeatable(false);
+                VariableDtos.setScript(variable, getView().getScriptBox().getSelectedScript());
+              }
+              scriptEvaluationPopupPresenter.initialize(table, variable);
+            }
+          }).send();
       getView().getScriptBox().focus();
     }
   }
 
   @Override
-  public VariableDto getDerivedVariable() {
-    VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, false);
+  public void generateDerivedVariable() {
+    VariableDto derived = DerivedVariableGenerator.copyVariable(getOriginalVariable(), false);
     derived.setIsRepeatable(getView().getRepeatable().getValue());
-    DerivedVariableGenerator.setScript(derived, getView().getScriptBox().getValue());
+    VariableDtos.setScript(derived, getView().getScriptBox().getValue());
+
     derived.setValueType(getView().getValueType().getValue());
-    return derived;
+    setDerivedVariable(derived);
   }
 
   @Override
-  List<DefaultWizardStepController> getWizardSteps() {
-    List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
-    stepCtrls.add(getView().getDeriveStepController().build());
-    return stepCtrls;
+  List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    stepBuilders.add(getView().getDeriveStepController());
+    return stepBuilders;
   }
 
   @Override
-  void setTable(TableDto table) {
-    super.setTable(table);
-    String name = originalVariable.getName();
+  public void setTable(TableDto table) {
+    String name = getOriginalVariable().getName();
     if(table.hasViewLink()) {
       String datasourceName = table.getDatasourceName();
       String tableName = table.getName();
@@ -109,7 +113,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
   public interface Display extends View {
 
-    Builder getDeriveStepController();
+    BranchingWizardStepController.Builder getDeriveStepController();
 
     HasClickHandlers getTestButton();
 

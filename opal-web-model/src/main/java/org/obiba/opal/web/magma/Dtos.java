@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
@@ -73,7 +75,7 @@ public final class Dtos {
     };
   }
 
-  public static VariableDto.Builder asDto(final LinkDto tableLink, Variable from, Integer index) {
+  public static VariableDto.Builder asDto(LinkDto tableLink, Variable from, @Nullable Integer index) {
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
       var.setOccurrenceGroup(from.getOccurrenceGroup());
@@ -102,7 +104,7 @@ public final class Dtos {
     return var;
   }
 
-  public static VariableDto.Builder asDto(final LinkDto tableLink, Variable from) {
+  public static VariableDto.Builder asDto(@Nullable LinkDto tableLink, Variable from) {
     return asDto(tableLink, from, null);
   }
 

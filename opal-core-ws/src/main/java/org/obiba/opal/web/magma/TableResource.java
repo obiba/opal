@@ -56,13 +56,16 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   public TableResource(ValueTable valueTable) {
-    this(valueTable, Collections.<Locale> emptySet());
+    this(valueTable, Collections.<Locale>emptySet());
   }
 
   @GET
-  public TableDto get(@Context final UriInfo uriInfo) {
-    TableDto.Builder builder = Dtos.asDto(getValueTable()).setLink(uriInfo.getPath(false));
-    if(getValueTable().isView()) builder.setViewLink(uriInfo.getPath(false).replaceFirst("table", "view"));
+  public TableDto get(@Context UriInfo uriInfo) {
+    String path = uriInfo.getPath(false);
+    TableDto.Builder builder = Dtos.asDto(getValueTable()).setLink(path);
+    if(getValueTable().isView()) {
+      builder.setViewLink(path.replaceFirst("table", "view"));
+    }
     return builder.build();
   }
 
@@ -74,12 +77,11 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get the entities, optionally filtered by a script.
-   * 
+   *
    * @param script script for filtering the entities
    * @return
    */
-  @GET
-  @Path("/entities")
+  @GET @Path("/entities")
   public Set<VariableEntityDto> getEntities(@QueryParam("script") String script) {
     Iterable<VariableEntity> entities = filterEntities(script);
 
@@ -93,21 +95,22 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get the value set from the given entity identifier, for the variables filtered by the optional 'select' script.
-   * 
+   *
    * @param identifier
-   * @param select script for filtering the variables
+   * @param select     script for filtering the variables
    * @return
    */
-  @Path("/valueSet/{identifier}")
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public ValueSetResource getValueSet(@Context Request request, @PathParam("identifier") String identifier, @QueryParam("select") String select, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
+  @Path("/valueSet/{identifier}") @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
+  public ValueSetResource getValueSet(@Context Request request, @PathParam("identifier") String identifier,
+      @QueryParam("select") String select, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     TimestampedResponses.evaluate(request, getValueTable());
-    return new ValueSetResource(getValueTable(), new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
+    return new ValueSetResource(getValueTable(),
+        new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
   }
 
   /**
    * Get the value set from the given entity identifier and variable.
-   * 
+   *
    * @param request
    * @param identifier
    * @param variable
@@ -115,16 +118,18 @@ public class TableResource extends AbstractValueTableResource {
    * @return
    */
   @Path("/valueSet/{identifier}/variable/{variable}")
-  public ValueSetResource getVariableValueSet(@Context Request request, @PathParam("identifier") String identifier, @PathParam("variable") String variable, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
+  public ValueSetResource getVariableValueSet(@Context Request request, @PathParam("identifier") String identifier,
+      @PathParam("variable") String variable, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     TimestampedResponses.evaluate(request, getValueTable());
-    return new ValueSetResource(getValueTable(), getValueTable().getVariableValueSource(variable), new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
+    return new ValueSetResource(getValueTable(), getValueTable().getVariableValueSource(variable),
+        new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
   }
 
   // This should be /valueSets, but its POST is already implemented in ValueSetsResource due to GET not allowing a body
-  @POST
-  @Path("/valueSet")
+  @POST @Path("/valueSet")
   public Response updateValueSet(ValueSetsDto valueSetsDto) {
-    ValueTableWriter tableWriter = getDatasource().createWriter(getValueTable().getName(), valueSetsDto.getEntityType());
+    ValueTableWriter tableWriter = getDatasource()
+        .createWriter(getValueTable().getName(), valueSetsDto.getEntityType());
     try {
       for(ValueSetsDto.ValueSetDto valueSetDto : valueSetsDto.getValueSetsList()) {
         VariableEntity entity = new VariableEntityBean(valueSetsDto.getEntityType(), valueSetDto.getIdentifier());
@@ -132,7 +137,8 @@ public class TableResource extends AbstractValueTableResource {
         try {
           for(int i = 0; i < valueSetsDto.getVariablesCount(); i++) {
             Variable variable = getValueTable().getVariable(valueSetsDto.getVariables(i));
-            writer.writeValue(variable, Dtos.fromDto(valueSetDto.getValues(i), variable.getValueType(), variable.isRepeatable()));
+            writer.writeValue(variable,
+                Dtos.fromDto(valueSetDto.getValues(i), variable.getValueType(), variable.isRepeatable()));
           }
         } finally {
           Closeables.closeQuietly(writer);
@@ -190,8 +196,12 @@ public class TableResource extends AbstractValueTableResource {
    * @return
    */
   @Path("/variable/_transient")
-  public VariableResource getTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
+  public VariableResource getTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
+      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
+      @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
+      @FormParam("category") List<String> categoriesFP) {
+    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
+        categoriesQP, scriptFP, categoriesFP);
     return getVariableResource(jvvs);
   }
 
@@ -206,8 +216,13 @@ public class TableResource extends AbstractValueTableResource {
    * @return
    */
   @Path("/valueSets/variable/_transient")
-  public ValueSetsResource getTransientVariableValueSets(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
+  public ValueSetsResource getTransientVariableValueSets(
+      @QueryParam("valueType") @DefaultValue("text") String valueTypeName,
+      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
+      @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
+      @FormParam("category") List<String> categoriesFP) {
+    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
+        categoriesQP, scriptFP, categoriesFP);
     return new ValueSetsResource(getValueTable(), jvvs);
   }
 
@@ -224,11 +239,18 @@ public class TableResource extends AbstractValueTableResource {
    * @param categoriesFP
    * @return
    */
-  @Path("/valueSet/{identifier}/variable/_transient")
-  @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
-  public ValueSetResource getTransientVariableValueSet(@Context Request request, @PathParam("identifier") String identifier, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary, @QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
-    return new ValueSetResource(getValueTable(), jvvs, new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
+  @Path("/valueSet/{identifier}/variable/_transient") @SuppressWarnings({"unchecked", "PMD.ExcessiveParameterList"})
+  public ValueSetResource getTransientVariableValueSet(@Context Request request,
+      @PathParam("identifier") String identifier,
+      @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary,
+      @QueryParam("valueType") @DefaultValue("text") String valueTypeName,
+      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
+      @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
+      @FormParam("category") List<String> categoriesFP) {
+    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
+        categoriesQP, scriptFP, categoriesFP);
+    return new ValueSetResource(getValueTable(), jvvs,
+        new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
   }
 
   @Path("/compare")
@@ -259,7 +281,8 @@ public class TableResource extends AbstractValueTableResource {
     return new VariableResource(this.getValueTable(), source);
   }
 
-  private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable, String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
+  private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
+      String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
     if(script == null || script.equals("")) {
@@ -271,14 +294,17 @@ public class TableResource extends AbstractValueTableResource {
     if(categories == null || categories.isEmpty()) {
       categories = categoriesFP;
     }
-    Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script, categories == null ? ImmutableList.<String> of() : categories);
+    Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script,
+        categories == null ? ImmutableList.<String>of() : categories);
     JavascriptVariableValueSource jvvs = new JavascriptVariableValueSource(transientVariable, getValueTable());
     jvvs.initialise();
     return jvvs;
   }
 
-  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
-    Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
+  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script,
+      List<String> categories) {
+    Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType())
+        .extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {
       builder.repeatable();

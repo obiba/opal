@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper.DerivedCategoricalVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -51,7 +52,7 @@ public class CategoricalVariableDerivationHelperGwtTest extends GWTTestCase {
     entries.add(ValueMapEntry.createOthers("Other").newValue("999").build());
 
     DerivedCategoricalVariableGenerator generator = new DerivedCategoricalVariableGenerator(variable, entries);
-    VariableDto derived = generator.generate();
+    VariableDto derived = generator.generate(null);
 
     assertEquals("$('categorical-variable').map({\n" //
         + "    'QC': '1',\n" //
@@ -60,7 +61,7 @@ public class CategoricalVariableDerivationHelperGwtTest extends GWTTestCase {
         + "    'NB': '4'\n" //
         + "  },\n" //
         + "  '999',\n" //
-        + "  '888');", DerivedVariableGenerator.getScriptAttribute(derived).getValue());
+        + "  '888');", VariableDtos.getScript(derived));
 
   }
 

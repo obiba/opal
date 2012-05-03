@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -12,6 +12,9 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
@@ -30,8 +33,6 @@ import com.google.gwt.core.client.JsArray;
  */
 public abstract class DerivedVariableGenerator {
 
-  public static final String DERIVED_FROM_ATTRIBUTE = "derivedFrom";
-
   protected final VariableDto originalVariable;
 
   protected final List<ValueMapEntry> valueMapEntries;
@@ -49,12 +50,8 @@ public abstract class DerivedVariableGenerator {
     this.valueMapEntries = valueMapEntries;
   }
 
-  public VariableDto generate() {
-    return generate(copyVariable(originalVariable));
-  }
-
-  public VariableDto generate(VariableDto destination) {
-    VariableDto derived = destination;
+  public VariableDto generate(@Nullable VariableDto destination) {
+    VariableDto derived = destination == null ? copyVariable(originalVariable) : destination;
 
     scriptBuilder = new StringBuilder();
     newCategoriesMap.clear();
@@ -64,7 +61,7 @@ public abstract class DerivedVariableGenerator {
     generateScript();
 
     // set script in derived variable
-    setScript(derived, scriptBuilder.toString());
+    VariableDtos.setScript(derived, scriptBuilder.toString());
 
     // new categories if destination does not already define them
     JsArray<CategoryDto> cats = destination.getCategoriesArray();
@@ -216,7 +213,7 @@ public abstract class DerivedVariableGenerator {
     }
   }
 
-  public static VariableDto copyVariable(VariableDto variable) {
+  public static VariableDto copyVariable(@Nonnull VariableDto variable) {
     return copyVariable(variable, false);
   }
 
@@ -233,7 +230,7 @@ public abstract class DerivedVariableGenerator {
     // set attributes
     derived.setAttributesArray(copyAttributes(variable.getAttributesArray()));
     if(!Strings.isNullOrEmpty(variable.getLink())) {
-      VariableDtos.setAttribute(derived, DERIVED_FROM_ATTRIBUTE, variable.getLink());
+      VariableDtos.setDerivedFrom(derived, variable);
     }
 
     // set categories
@@ -242,14 +239,6 @@ public abstract class DerivedVariableGenerator {
     }
 
     return derived;
-  }
-
-  public static void setScript(VariableDto derived, String script) {
-    VariableDtos.setScript(derived, script);
-  }
-
-  public static AttributeDto getScriptAttribute(VariableDto derived) {
-    return VariableDtos.getScriptAttribute(derived);
   }
 
   public static AttributeDto newLabelAttribute(ValueMapEntry entry) {

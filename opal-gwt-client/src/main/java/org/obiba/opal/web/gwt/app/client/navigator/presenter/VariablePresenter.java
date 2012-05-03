@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectio
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -62,7 +63,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   private TableDto table;
 
   @Inject
-  public VariablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
+  public VariablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter,
+      SummaryTabPresenter summaryTabPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
@@ -87,8 +89,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     super.onBind();
     setInSlot(Display.Slots.Values, valuesTablePresenter);
 
-    super.registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
-    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+    registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
+    registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
 
     summaryTabPresenter.bind();
     getView().setParentCommand(new ParentCommand());
@@ -100,6 +102,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     // TODO
     getView().setDeriveCategorizeCommand(new DeriveCategorizeCommand());
     getView().setDeriveCustomCommand(new DeriveCustomCommand());
+    getView().setDeriveFromCommand(new DeriveFromCommand());
   }
 
   @Override
@@ -126,7 +129,9 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
     getView().renderCategoryRows(variable.getCategoriesArray());
     getView().renderAttributeRows(variable.getAttributesArray());
-    getView().setCategorizeMenuAvailable(!variable.getValueType().equals("binary"));
+    getView().setCategorizeMenuAvailable(!"binary".equals(variable.getValueType()));
+
+    getView().setDeriveFromMenuVisibility(table.hasViewLink());
 
     updateDerivedVariableDisplay();
 
@@ -141,7 +146,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     }
 
     for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
-      if(attr.getName().equals("script")) {
+      if(VariableDtos.SCRIPT_ATTRIBUTE.equals(attr.getName())) {
         getView().setDerivedVariable(true, attr.getValue());
         getView().setEditCommand(new EditCommand());
         return;
@@ -152,32 +157,39 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
   private void authorize() {
     // summary
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get().authorize(new CompositeAuthorizer(getView().getSummaryAuthorizer(), new SummaryUpdate())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get()
+        .authorize(new CompositeAuthorizer(getView().getSummaryAuthorizer(), new SummaryUpdate())).send();
 
     // values
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getParentLink().getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(variable.getParentLink().getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer())
+        .send();
 
     // edit variable
     if(table.hasViewLink()) {
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put().authorize(getView().getEditAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put()
+          .authorize(getView().getEditAuthorizer()).send();
     }
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder()
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private boolean isCurrentVariable(VariableDto variableDto) {
-    return variableDto.getName().equals(variable.getName()) && variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
+    return variableDto.getName().equals(variable.getName()) && variableDto.getParentLink().getLink()
+        .equals(variable.getParentLink().getLink());
   }
 
   private boolean isCurrentTable(ViewDto viewDto) {
-    return this.table != null && table.getDatasourceName().equals(viewDto.getDatasourceName()) && table.getName().equals(viewDto.getName());
+    return table != null && table.getDatasourceName().equals(viewDto.getDatasourceName()) && table.getName()
+        .equals(viewDto.getName());
   }
 
   /**
    * @param selection
    */
-  private void requestSummary(final VariableDto selection) {
+  private void requestSummary(VariableDto selection) {
     getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
   }
 
@@ -194,7 +206,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void onViewSaved(ViewSavedEvent event) {
       if(isVisible() && isCurrentTable(event.getView())) {
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables")
+            .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
           @Override
           public void onResource(Response response, JsArray<VariableDto> resource) {
@@ -202,7 +215,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
             for(int i = 0; i < variables.length(); i++) {
               if(isCurrentVariable(variables.get(i))) {
                 variable = null;
-                updateDisplay(table, variables.get(i), i > 0 ? variables.get(i - 1) : null, i < (variables.length() + 1) ? variables.get(i + 1) : null);
+                updateDisplay(table, variables.get(i), i > 0 ? variables.get(i - 1) : null,
+                    i < (variables.length() + 1) ? variables.get(i + 1) : null);
                 break;
               }
             }
@@ -215,14 +229,21 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class DeriveCategorizeCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CategorizeWizardType, variable));
+      getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CategorizeWizardType, variable, table));
     }
   }
 
   final class DeriveCustomCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CustomWizardType, variable));
+      getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CustomWizardType, variable, table));
+    }
+  }
+
+  final class DeriveFromCommand implements Command {
+    @Override
+    public void execute() {
+      getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.FromWizardType, variable, table));
     }
   }
 
@@ -298,13 +319,14 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class ParentCommand implements Command {
     @Override
     public void execute() {
-      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get().withCallback(new ResourceCallback<TableDto>() {
-        @Override
-        public void onResource(Response response, TableDto resource) {
-          getEventBus().fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, resource));
-        }
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(variable.getParentLink().getLink()).get()
+          .withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, TableDto resource) {
+              getEventBus().fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, resource));
+            }
 
-      }).send();
+          }).send();
     }
   }
 
@@ -328,13 +350,14 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void execute() {
 
-      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(getViewLink()).get().withCallback(new ResourceCallback<ViewDto>() {
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(getViewLink()).get()
+          .withCallback(new ResourceCallback<ViewDto>() {
 
-        @Override
-        public void onResource(Response response, ViewDto viewDto) {
-          getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
-        }
-      }).send();
+            @Override
+            public void onResource(Response response, ViewDto viewDto) {
+              getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
+            }
+          }).send();
     }
   }
 
@@ -350,6 +373,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   }
 
   public interface Display extends View {
+
+
 
     enum Slots {
       Permissions, Values
@@ -410,6 +435,10 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     void setDeriveCategorizeCommand(Command cmd);
 
     void setDeriveCustomCommand(Command cmd);
+
+    void setDeriveFromCommand(Command cmd);
+
+    void setDeriveFromMenuVisibility(boolean visible);
 
     void setValuesTabCommand(Command cmd);
   }

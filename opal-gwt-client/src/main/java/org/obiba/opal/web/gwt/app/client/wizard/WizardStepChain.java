@@ -9,16 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
@@ -79,7 +80,7 @@ public class WizardStepChain {
   }
 
   public boolean isValid() {
-    return this.current.validate();
+    return current.validate();
   }
 
   public HandlerRegistration getNextHandlerRegistration() {
@@ -168,7 +169,7 @@ public class WizardStepChain {
         currentStepCtrl.setNext(stepCtrl);
         stepCtrl.setPrevious(currentStepCtrl);
       } else {
-        chain.first = stepCtrl;
+        chain.first = stepCtrl.shouldSkip() ? stepCtrl.onNext() : stepCtrl;
       }
       currentStepCtrl = stepCtrl;
       return this;

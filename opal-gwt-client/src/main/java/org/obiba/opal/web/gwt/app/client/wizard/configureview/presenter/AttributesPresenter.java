@@ -17,6 +17,7 @@ import java.util.TreeSet;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -75,7 +76,8 @@ public class AttributesPresenter extends LocalizablesPresenter {
       final AttributeDto attributeDto = variableDto.getAttributesArray().get(i);
 
       // Add attributes that belong to this locale as well as attributes without a locale.
-      if(!attributeDto.getName().equals("script") && (attributeDto.getLocale().equals(localeName) || isAttributeWithNoLocale(attributeDto))) {
+      if(!attributeDto.getName().equals(VariableDtos.SCRIPT_ATTRIBUTE) && (attributeDto.getLocale().equals(localeName) ||
+          isAttributeWithNoLocale(attributeDto))) {
         localizables.add(new Localizable() {
 
           @Override

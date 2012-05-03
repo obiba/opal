@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -141,36 +141,41 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
   @Inject
   public AddCryptoKeyDialogView(EventBus eventBus) {
     super(eventBus);
-    this.dialog = uiBinder.createAndBindUi(this);
+    dialog = uiBinder.createAndBindUi(this);
   }
 
   private void initWizardDialog() {
 
-    DefaultWizardStepController p = BranchingWizardStepController.Builder.create(keyTypeStep) //
-    .branch(DefaultWizardStepController.Builder.create(privateKeyStep)//
-    .title(translations.privateKeyStep())//
-    .onValidate(privateKeyValidators)//
-    .next(DefaultWizardStepController.Builder.create(publicKeyStep).title(translations.publicKeyStep()).onStepIn(new StepInHandler() {
+    DefaultWizardStepController keyPairWizardStepController = DefaultWizardStepController.Builder.create(privateKeyStep)//
+        .title(translations.privateKeyStep())//
+        .onValidate(privateKeyValidators)//
+        .next(DefaultWizardStepController.Builder.create(publicKeyStep).title(translations.publicKeyStep())
+            .onStepIn(new StepInHandler() {
 
-      @Override
-      public void onStepIn() {
-        publicKeyCreated.setVisible(privateKeyImported.getValue());
-        publicKeyImported.setVisible(privateKeyImported.getValue());
-        publicKeyPEM.setVisible(privateKeyImported.getValue());
-        updateCertFields();
-        if(privateKeyCreated.getValue()) {
-          publicKeyForm.removeStyleName("indent");
-        } else {
-          publicKeyForm.addStyleName("indent");
-        }
-      }
-    }).onValidate(publicKeyValidators).build()).build(), keyPairType)//
-    .branch(DefaultWizardStepController.Builder.create(importCertificateStep)//
-    .title(translations.importCertificateStep()).onValidate(certificateStepValidators).build(), certificateType)//
+              @Override
+              public void onStepIn() {
+                publicKeyCreated.setVisible(privateKeyImported.getValue());
+                publicKeyImported.setVisible(privateKeyImported.getValue());
+                publicKeyPEM.setVisible(privateKeyImported.getValue());
+                updateCertFields();
+                if(privateKeyCreated.getValue()) {
+                  publicKeyForm.removeStyleName("indent");
+                } else {
+                  publicKeyForm.addStyleName("indent");
+                }
+              }
+            }).onValidate(publicKeyValidators).build()).build();
+
+    DefaultWizardStepController certificateWizardStepController = DefaultWizardStepController.Builder.create(importCertificateStep)//
+        .title(translations.importCertificateStep()).onValidate(certificateStepValidators).build();
+
+    DefaultWizardStepController keyTypeWizardStepController = BranchingWizardStepController.Builder.create(keyTypeStep) //
+    .branch(keyPairWizardStepController, keyPairType)//
+    .branch(certificateWizardStepController, certificateType)//
     .title(translations.keyTypeStep())//
     .onValidate(keyTypeStepValidators).build();
 
-    stepChain = WizardStepChain.Builder.create(dialog).append(p).onNext().onPrevious().build();
+    stepChain = WizardStepChain.Builder.create(dialog).append(keyTypeWizardStepController).onNext().onPrevious().build();
 
     initImportCertificateStep();
     initPrivateKeyStep();
@@ -330,7 +335,7 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
 
   @Override
   public HasValue<String> getCertificatePem() {
-    return this.certPEM;
+    return certPEM;
   }
 
   @Override
@@ -400,7 +405,7 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
 
   @Override
   public HasValue<Boolean> isCertificate() {
-    return this.certificateType;
+    return certificateType;
   }
 
   @Override
@@ -465,22 +470,22 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
 
   @Override
   public void setKeyTypeValidationHandler(ValidationHandler handler) {
-    this.keyTypeStepValidators = handler;
+    keyTypeStepValidators = handler;
   }
 
   @Override
   public void setCertificateStepHandler(ValidationHandler handler) {
-    this.certificateStepValidators = handler;
+    certificateStepValidators = handler;
   }
 
   @Override
   public void setPrivateKeyValidationHandler(ValidationHandler validator) {
-    this.privateKeyValidators = validator;
+    privateKeyValidators = validator;
   }
 
   @Override
   public void setPublicKeyValidationHandler(ValidationHandler validator) {
-    this.publicKeyValidators = validator;
+    publicKeyValidators = validator;
   }
 
 }

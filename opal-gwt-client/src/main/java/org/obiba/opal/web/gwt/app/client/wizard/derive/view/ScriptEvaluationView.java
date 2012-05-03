@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -54,31 +54,25 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationView> {
   }
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private static final int DEFAULT_PAGE_SIZE = 20;
 
   private final Widget widget;
 
-  @UiField
-  Panel summary;
+  @UiField Panel summary;
 
-  @UiField
-  CellTable<ValueSetsDto.ValueSetDto> valuesTable;
+  @UiField CellTable<ValueSetsDto.ValueSetDto> valuesTable;
 
-  @UiField
-  SimplePager pager;
+  @UiField SimplePager pager;
 
-  @UiField
-  HorizontalTabLayout tabs;
+  @UiField HorizontalTabLayout tabs;
 
-  @UiField
-  Label valueType;
+  @UiField Label valueType;
 
-  @UiField
-  PrettyPrintLabel script;
+  @UiField PrettyPrintLabel script;
 
   private ValueSelectionHandler valueSelectionHandler;
 
@@ -90,8 +84,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
   @Inject
   public ScriptEvaluationView() {
-    super();
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     pager.setDisplay(valuesTable);
     pager.setPageSize(DEFAULT_PAGE_SIZE);
   }
@@ -195,7 +188,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
       // Get the new range.
-      final Range range = display.getVisibleRange();
+      Range range = display.getVisibleRange();
 
       // query the valuesets
       int start = range.getStart();

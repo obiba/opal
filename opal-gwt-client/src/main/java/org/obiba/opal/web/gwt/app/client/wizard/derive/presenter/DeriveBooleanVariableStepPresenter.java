@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.BooleanVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -30,7 +31,7 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
   private BooleanVariableDerivationHelper derivationHelper;
 
   @Inject
-  public DeriveBooleanVariableStepPresenter(final EventBus eventBus, final Display view) {
+  public DeriveBooleanVariableStepPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
   }
 
@@ -39,31 +40,30 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
   //
 
   @Override
-  void initialize(VariableDto variable) {
-    super.initialize(variable);
-    derivationHelper = new BooleanVariableDerivationHelper(variable);
+  void initialize(VariableDto variable, VariableDto derivedVariable) {
+    super.initialize(variable, derivedVariable);
+    derivationHelper = new BooleanVariableDerivationHelper(variable, derivedVariable);
     getView().populateValues(derivationHelper.getValueMapEntries());
   }
 
   @Override
-  public VariableDto getDerivedVariable() {
-    return derivationHelper.getDerivedVariable();
+  public void generateDerivedVariable() {
+    setDerivedVariable(derivationHelper.getDerivedVariable());
   }
 
   @Override
-  public List<DefaultWizardStepController> getWizardSteps() {
-    List<DefaultWizardStepController> stepCtrls = new ArrayList<DefaultWizardStepController>();
-
-    stepCtrls.add(getView().getMapStepController().onValidate(new ValidationHandler() {
-
-      @Override
-      public boolean validate() {
-        // TODO
-        return true;
-      }
-    }).build());
-
-    return stepCtrls;
+  List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    stepBuilders.add(getView().getMapStepController() //
+        .onStepIn(stepInHandler) //
+        .onValidate(new ValidationHandler() {
+          @Override
+          public boolean validate() {
+            // TODO
+            return true;
+          }
+        }));
+    return stepBuilders;
   }
 
   //
