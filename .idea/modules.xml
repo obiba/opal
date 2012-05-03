@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/opal.iml" filepath="$PROJECT_DIR$/opal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-core/opal-core.iml" filepath="$PROJECT_DIR$/opal-core/opal-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-core-api/opal-core-api.iml" filepath="$PROJECT_DIR$/opal-core-api/opal-core-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-core-ws/opal-core-ws.iml" filepath="$PROJECT_DIR$/opal-core-ws/opal-core-ws.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-datashield/opal-datashield.iml" filepath="$PROJECT_DIR$/opal-datashield/opal-datashield.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-fs/opal-fs.iml" filepath="$PROJECT_DIR$/opal-fs/opal-fs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-gwt-client/opal-gwt-client.iml" filepath="$PROJECT_DIR$/opal-gwt-client/opal-gwt-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-httpd/opal-httpd.iml" filepath="$PROJECT_DIR$/opal-httpd/opal-httpd.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-r/opal-r.iml" filepath="$PROJECT_DIR$/opal-r/opal-r.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-reporting/opal-reporting.iml" filepath="$PROJECT_DIR$/opal-reporting/opal-reporting.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-rest-client/opal-rest-client.iml" filepath="$PROJECT_DIR$/opal-rest-client/opal-rest-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-search/opal-search.iml" filepath="$PROJECT_DIR$/opal-search/opal-search.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-server/opal-server.iml" filepath="$PROJECT_DIR$/opal-server/opal-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-shell/opal-shell.iml" filepath="$PROJECT_DIR$/opal-shell/opal-shell.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-sshd/opal-sshd.iml" filepath="$PROJECT_DIR$/opal-sshd/opal-sshd.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-web-model/opal-web-model.iml" filepath="$PROJECT_DIR$/opal-web-model/opal-web-model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opal-ws/opal-ws.iml" filepath="$PROJECT_DIR$/opal-ws/opal-ws.iml" />
+    </modules>
+  </component>
+</project>
+

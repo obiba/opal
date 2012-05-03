@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jscience:jscience-physics:5.0-r53p01">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jscience/jscience-physics/5.0-r53p01/jscience-physics-5.0-r53p01.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jscience/jscience-physics/5.0-r53p01/jscience-physics-5.0-r53p01-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jscience/jscience-physics/5.0-r53p01/jscience-physics-5.0-r53p01-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

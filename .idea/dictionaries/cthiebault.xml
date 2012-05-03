@@ -5,6 +5,7 @@
       <w>authorizer</w>
       <w>crypto</w>
       <w>ctrls</w>
+      <w>dataschema</w>
       <w>distincts</w>
       <w>dropdown</w>
       <w>dtos</w>
