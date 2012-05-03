@@ -180,8 +180,12 @@ public class FilesResource {
 
     if(overwrite) {
       return Response.ok().build();
-    } else
-      return Response.created(uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build()).build();
+    } else {
+      URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
+      return Response.created(fileUri)//
+      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, Lists.newArrayList(AclAction.FILES_ALL)))//
+      .build();
+    }
   }
 
   @POST
@@ -211,7 +215,7 @@ public class FilesResource {
       Opal.FileDto dto = getBaseFolderBuilder(file).build();
       URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build();
       return Response.created(folderUri)//
-      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, Lists.newArrayList(AclAction.FILES_ALL)))// ;
+      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, Lists.newArrayList(AclAction.FILES_ALL)))//
       .entity(dto).build();
     } catch(FileSystemException couldNotCreateTheFolder) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
