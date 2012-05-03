@@ -36,8 +36,8 @@ public class DerivedTemporalVariableGenerator extends DerivedVariableGenerator {
 
   @Override
   protected void generateScript() {
-    scriptBuilder.append("$('" + originalVariable.getName() + "')");
-    scriptBuilder.append("." + groupMethod.getScript(fromDate, toDate));
+    scriptBuilder.append("$('").append(originalVariable.getName()).append("')");
+    scriptBuilder.append(".").append(groupMethod.getScript(fromDate, toDate));
     scriptBuilder.append(".map({");
     appendDistinctValueMapEntries();
     scriptBuilder.append("\n  }");

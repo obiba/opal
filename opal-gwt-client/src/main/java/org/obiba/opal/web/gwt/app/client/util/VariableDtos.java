@@ -72,7 +72,9 @@ public class VariableDtos {
     }
   }
 
-  public static @Nullable String getDerivedFrom(VariableDto variable) {
+  public static
+  @Nullable
+  String getDerivedFrom(VariableDto variable) {
     AttributeDto attribute = getAttribute(variable, OPAL_NAMESPACE, DERIVED_FROM_ATTRIBUTE);
     return attribute == null ? null : attribute.getValue();
   }
@@ -96,7 +98,9 @@ public class VariableDtos {
    * @param name
    * @return
    */
-  public static @Nullable AttributeDto getAttribute(VariableDto variable, String name) {
+  public static
+  @Nullable
+  AttributeDto getAttribute(VariableDto variable, String name) {
     return getAttribute(variable, null, name);
   }
 
@@ -107,16 +111,17 @@ public class VariableDtos {
    * @param name
    * @return
    */
-  public static @Nullable AttributeDto getAttribute(VariableDto variable, @Nullable String namespace, String name) {
+  public static
+  @Nullable
+  AttributeDto getAttribute(VariableDto variable, @Nullable String namespace, String name) {
     // make sure attributes array is defined
     variable.setAttributesArray(JsArrays.toSafeArray(variable.getAttributesArray()));
-
+    if(namespace == null) namespace = "";
     for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
       if(attr.getNamespace().equals(namespace) && attr.getName().equals(name)) {
         return attr;
       }
     }
-
     return null;
   }
 
@@ -136,7 +141,6 @@ public class VariableDtos {
 
   /**
    * Set the attribute value of a variable (create attribute if it does not exist).
-   *
    * @param variable
    * @param name
    * @param value
@@ -147,7 +151,6 @@ public class VariableDtos {
 
   /**
    * Set the attribute value of a variable (create attribute if it does not exist).
-   *
    * @param variable
    * @param namespace
    * @param name

@@ -56,7 +56,10 @@ public abstract class DerivedVariableGenerator {
     scriptBuilder = new StringBuilder();
     newCategoriesMap.clear();
 
-    derived.setValueType("text");
+    // don't overwrite value type if destination variable exists
+    if(destination == null || derived.getValueType() == null) {
+      derived.setValueType("text");
+    }
 
     generateScript();
 
@@ -86,7 +89,7 @@ public abstract class DerivedVariableGenerator {
 
       if(entry.isType(ValueMapEntryType.CATEGORY_NAME)) {
         // script
-        scriptBuilder.append("\n    '" + normalize(entry.getValue()) + "': ");
+        scriptBuilder.append("\n    '").append(normalize(entry.getValue())).append("': ");
         appendNewValue(entry);
         if(i < nbCategories - 1) scriptBuilder.append(",");
 
@@ -105,7 +108,7 @@ public abstract class DerivedVariableGenerator {
         } else {
           scriptBuilder.append(",");
         }
-        scriptBuilder.append("\n    '" + normalize(entry.getValue()) + "': ");
+        scriptBuilder.append("\n    '").append(normalize(entry.getValue())).append("': ");
         appendNewValue(entry);
 
         // new category
@@ -117,7 +120,7 @@ public abstract class DerivedVariableGenerator {
   protected ValueMapEntry appendValueMapEntry(String value) {
     ValueMapEntry entry = getValueMapEntry(value);
     if(entry != null) {
-      scriptBuilder.append("\n    '" + normalize(value) + "': ");
+      scriptBuilder.append("\n    '").append(normalize(value)).append("': ");
       appendNewValue(entry);
     }
     return entry;
@@ -187,7 +190,7 @@ public abstract class DerivedVariableGenerator {
   protected void appendNewValue(ValueMapEntry entry) {
     String value = entry.getNewValue();
     if(value != null && !value.isEmpty()) {
-      scriptBuilder.append("'" + normalize(value) + "'");
+      scriptBuilder.append("'").append(normalize(value)).append("'");
     } else {
       scriptBuilder.append("null");
     }

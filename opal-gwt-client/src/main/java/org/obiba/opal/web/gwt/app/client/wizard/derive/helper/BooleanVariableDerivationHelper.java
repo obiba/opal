@@ -46,7 +46,7 @@ public class BooleanVariableDerivationHelper extends DerivationHelper {
 
     @Override
     protected void generateScript() {
-      scriptBuilder.append("$('" + originalVariable.getName() + "').map({");
+      scriptBuilder.append("$('").append(originalVariable.getName()).append("').map({");
       appendBooleanValueMapEntries();
       scriptBuilder.append("  }");
       appendSpecialValuesEntry(getOtherValuesMapEntry());
