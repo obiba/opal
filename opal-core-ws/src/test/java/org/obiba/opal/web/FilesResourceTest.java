@@ -47,6 +47,7 @@ import org.apache.commons.vfs2.FileType;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
@@ -191,6 +192,7 @@ public class FilesResourceTest {
     }
   }
 
+  @Ignore("SecurityManager dependency not satisfied")
   @Test
   public void testGetFile_GetCompressedFolderFromFileSystem() throws IOException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();

@@ -51,6 +51,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
@@ -469,18 +470,22 @@ public class FilesResource {
     // Add its children files and subfolders.
     FileObject[] files = folder.getChildren();
     for(int i = 0; i < files.length; i++) {
-      if(files[i].getType() == FileType.FOLDER) {
-        addFolder(files[i], outputStream);
-        continue;
+      FileObject file = files[i];
+      String path = file.getName().getPath();
+
+      // only add files for which download is authorized
+      // TODO formalise file permissions
+      if(SecurityUtils.getSubject().isPermitted("magma:/files" + path + ":GET")) {
+        if(file.getType() == FileType.FOLDER) {
+          addFolder(file, outputStream);
+        } else {
+          outputStream.putNextEntry(new ZipEntry(file.getName().getPath().substring(1)));
+          FileInputStream inputStream = new FileInputStream(opalRuntime.getFileSystem().getLocalFile(file));
+          StreamUtil.copy(inputStream, outputStream);
+          outputStream.closeEntry();
+          StreamUtil.silentSafeClose(inputStream);
+        }
       }
-
-      outputStream.putNextEntry(new ZipEntry(files[i].getName().getPath().substring(1)));
-
-      FileInputStream inputStream = new FileInputStream(opalRuntime.getFileSystem().getLocalFile(files[i]));
-      StreamUtil.copy(inputStream, outputStream);
-
-      outputStream.closeEntry();
-      StreamUtil.silentSafeClose(inputStream);
 
     }
   }
@@ -488,4 +493,5 @@ public class FilesResource {
   private String getContentDispositionOfAttachment(String fileName) {
     return "attachment; filename=\"" + fileName + "\"";
   }
+
 }
