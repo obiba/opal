@@ -47,7 +47,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private SummaryTabPresenter summaryTabPresenter;
+  private final SummaryTabPresenter summaryTabPresenter;
 
   private NumericalVariableDerivationHelper<? extends Number> derivationHelper;
 
@@ -77,11 +77,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         .onValidate(new MethodStepValidationHandler()));
     stepBuilders.add(getView().getMapStepBuilder().onStepIn(new MapStepInHandler()));
     return stepBuilders;
-  }
-
-  private void newDerivationHelper() {
-    numberType = NumberType.valueOf(getOriginalVariable().getValueType().toUpperCase());
-    derivationHelper = numberType.newDerivationHelper(getOriginalVariable(), getDerivedVariable());
   }
 
   private boolean addValueMapEntry(String value, String newValue) {
@@ -210,24 +205,28 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       }
     }
 
+    private void newDerivationHelper() {
+      numberType = NumberType.valueOf(getOriginalVariable().getValueType().toUpperCase());
+      derivationHelper = numberType.newDerivationHelper(getOriginalVariable(), getDerivedVariable());
+    }
+
     private boolean newMethodChoice() {
       if(lastChoice != null && lastChoice.isCurrentChoice(getView()) && lastChoice.sign(getView())
           .equals(lastChoiceSignature)) {
         return false;
-      } else {
-        for(MethodChoice method : MethodChoice.values()) {
-          if(method.isCurrentChoice(getView())) {
-            lastChoice = method;
-            lastChoiceSignature = method.sign(getView());
-            break;
-          }
+      }
+      for(MethodChoice method : MethodChoice.values()) {
+        if(method.isCurrentChoice(getView())) {
+          lastChoice = method;
+          lastChoiceSignature = method.sign(getView());
+          break;
         }
       }
       return true;
     }
 
     private void addDistinctValuesMapping() {
-      String link = new String(getOriginalVariable().getLink()) //
+      String link = getOriginalVariable().getLink() //
           + "/summary" //
           + "?nature=categorical" //
           + "&distinct=true";
@@ -235,7 +234,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       getView().populateValues(new ArrayList<ValueMapEntry>());
 
       ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
-          .forResource(link.toString()).get()//
+          .forResource(link).get()//
           .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
 
             @Override
@@ -253,7 +252,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     private void addRangesByCountMapping() {
       double lowerLimit = getView().getLowerLimit().doubleValue();
       double upperLimit = getView().getUpperLimit().doubleValue();
-      long count = getView().getRangeCount().longValue();
+      long count = getView().getRangeCount();
       double length = (upperLimit - lowerLimit) / count;
       addRangesByLength(length);
     }

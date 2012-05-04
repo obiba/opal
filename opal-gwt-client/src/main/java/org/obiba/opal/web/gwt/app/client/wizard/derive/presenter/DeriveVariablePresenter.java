@@ -199,7 +199,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().addBranchStep(createChain(steps).build(), new BranchingWizardStepController.Condition() {
       @Override
       public boolean apply() {
-        return "boolean".equals(derivationPresenter.getOriginalVariable().getValueType());
+        return "boolean".equals(deriveFromVariablePresenter.getOriginalVariable().getValueType());
       }
     });
   }
@@ -213,8 +213,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().addBranchStep(createChain(steps).build(), new BranchingWizardStepController.Condition() {
       @Override
       public boolean apply() {
-        return "text".equals(derivationPresenter.getOriginalVariable().getValueType()) && VariableDtos
-            .hasCategories(derivationPresenter.getOriginalVariable());
+        VariableDto originalVariable = deriveFromVariablePresenter.getOriginalVariable();
+        return "text".equals(originalVariable.getValueType()) && VariableDtos.hasCategories(originalVariable);
       }
     });
   }
@@ -228,7 +228,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().addBranchStep(createChain(steps).build(), new BranchingWizardStepController.Condition() {
       @Override
       public boolean apply() {
-        String valueType = derivationPresenter.getOriginalVariable().getValueType();
+        String valueType = deriveFromVariablePresenter.getOriginalVariable().getValueType();
         return "date".equals(valueType) || "datetime".equals(valueType);
       }
     });
@@ -244,7 +244,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
       @Override
       public boolean apply() {
-        String valueType = derivationPresenter.getOriginalVariable().getValueType();
+        String valueType = deriveFromVariablePresenter.getOriginalVariable().getValueType();
         return "integer".equals(valueType) || "decimal".equals(valueType);
       }
     });
@@ -259,8 +259,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().addBranchStep(createChain(steps).build(), new BranchingWizardStepController.Condition() {
       @Override
       public boolean apply() {
-        return "text".equals(derivationPresenter.getOriginalVariable().getValueType()) || VariableDtos
-            .allCategoriesMissing(derivationPresenter.getOriginalVariable());
+        VariableDto originalVariable = deriveFromVariablePresenter.getOriginalVariable();
+        return "text".equals(originalVariable.getValueType()) || VariableDtos.allCategoriesMissing(originalVariable);
       }
     });
   }
@@ -542,6 +542,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     @Override
     public void onStepIn() {
+//      GWT.log("onStepIn presenter: " + presenter.getClass().getName());
+//      GWT.log("  original: " + VariableDto.stringify(derivationPresenter.getOriginalVariable()));
+//      GWT.log("  derived: " + VariableDto.stringify(derivationPresenter.getDerivedVariable()));
       presenter.initialize(derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
 
       addToSlot(Display.Slots.Derivation, presenter);

@@ -49,7 +49,6 @@ import com.gwtplatform.mvp.client.View;
  */
 public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromVariablePresenter.Display> {
 
-  private Map<String, DatasourceDto> datasourceByName = new HashMap<String, DatasourceDto>();
   private Map<String, VariableDto> variablesByName = new HashMap<String, VariableDto>();
   private WizardType wizardType;
   private TableDto table;
@@ -130,17 +129,14 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
                 .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
                   @Override
                   public void onResource(Response response, JsArray<DatasourceDto> resource) {
-                    datasourceByName.clear();
+                    List<String> datasources = new ArrayList<String>();
                     if(resource != null) {
                       for(int i = 0; i < resource.length(); i++) {
-                        DatasourceDto datasourceDto = resource.get(i);
-                        if(restrictedDatasources.contains(datasourceDto.getName())) {
-                          datasourceByName.put(datasourceDto.getName(), datasourceDto);
-                        }
+                        String name = resource.get(i).getName();
+                        if(restrictedDatasources.contains(name)) datasources.add(name);
                       }
+                      Collections.sort(datasources);
                     }
-                    List<String> datasources = new ArrayList<String>(datasourceByName.keySet());
-                    Collections.sort(datasources);
                     getView().setDatasources(datasources, preSelectedDatasource);
                     loadTables();
                   }
@@ -152,19 +148,24 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   }
 
   private void loadTables() {
-    List<String> tables = new ArrayList<String>();
-    DatasourceDto datasource = datasourceByName.get(getView().getSelectedDatasource());
-    if(datasource != null) {
-      for(int i = 0; i < datasource.getTableArray().length(); i++) {
-        String name = datasource.getTableArray().get(i);
-        if(restrictedTables.contains(name)) {
-          tables.add(name);
-        }
-      }
-      Collections.sort(tables);
-    }
-    getView().setTables(tables, preSelectedTable);
-    loadVariables();
+    UriBuilder uriBuilder = UriBuilder.create().segment("datasource", getView().getSelectedDatasource());
+    ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(uriBuilder.build()).get()
+        .withCallback(new ResourceCallback<DatasourceDto>() {
+          @Override
+          public void onResource(Response response, DatasourceDto datasource) {
+            List<String> tables = new ArrayList<String>();
+            if(datasource != null) {
+              for(int i = 0; i < datasource.getTableArray().length(); i++) {
+                String name = datasource.getTableArray().get(i);
+                if(restrictedTables.contains(name)) tables.add(name);
+              }
+              Collections.sort(tables);
+            }
+            getView().setTables(tables, preSelectedTable);
+            loadVariables();
+          }
+        }).send();
+
   }
 
   private void loadVariables() {
@@ -182,6 +183,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
                 variablesByName.put(variableDto.getName(), variableDto);
               }
             }
+            setOriginalVariable(variablesByName.get(getView().getSelectedVariable()));
           }
         }).send();
   }
@@ -208,7 +210,6 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
     @Override
     public void onStepOut() {
       if(wizardType == DeriveVariablePresenter.FromWizardType) {
-        setOriginalVariable(variablesByName.get(getView().getSelectedVariable()));
         VariableDtos.setDerivedFrom(getDerivedVariable(), getOriginalVariable());
       }
     }
@@ -225,6 +226,12 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
       @Override
       public void onChange(ChangeEvent event) {
         loadVariables();
+      }
+    });
+    getView().getVariableList().addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        setOriginalVariable(variablesByName.get(getView().getSelectedVariable()));
       }
     });
   }
@@ -255,6 +262,8 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
     String getSelectedTable();
 
     HasChangeHandlers getTableList();
+
+    HasChangeHandlers getVariableList();
 
     /**
      * Get the variable selected by the user.

@@ -94,6 +94,11 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   }
 
   @Override
+  public HasChangeHandlers getVariableList() {
+    return variableBox;
+  }
+
+  @Override
   public void setTables(List<String> tables, @Nullable String selectedTable) {
     tableBox.clear();
     for(int i = 0; i < tables.size(); i++) {
