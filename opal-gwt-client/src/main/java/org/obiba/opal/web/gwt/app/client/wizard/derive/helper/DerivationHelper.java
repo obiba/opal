@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -56,8 +56,8 @@ public abstract class DerivationHelper {
       }
     }
     for(int i = valueMapEntries.size() - 1; i >= 0; i--) {
-      if(!valueMapEntries.get(i).getType().equals(ValueMapEntryType.EMPTY_VALUES)
-          && !valueMapEntries.get(i).getType().equals(ValueMapEntryType.OTHER_VALUES)) {
+      ValueMapEntryType type = valueMapEntries.get(i).getType();
+      if(!type.equals(ValueMapEntryType.EMPTY_VALUES) && !type.equals(ValueMapEntryType.OTHER_VALUES)) {
         valueMapEntries.add(i + 1, entryArg);
         break;
       }

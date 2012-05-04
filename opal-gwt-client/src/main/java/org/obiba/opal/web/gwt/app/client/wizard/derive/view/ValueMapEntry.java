@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -25,7 +25,7 @@ public class ValueMapEntry {
     CATEGORY_NAME, DISTINCT_VALUE, RANGE, EMPTY_VALUES, OTHER_VALUES
   }
 
-  private ValueMapEntryType type;
+  private final ValueMapEntryType type;
 
   private String value;
 
@@ -37,8 +37,8 @@ public class ValueMapEntry {
 
   private double count;
 
-  private ValueMapEntry(ValueMapEntryType type, String value, String label, String newValue, boolean missing, double count) {
-    super();
+  private ValueMapEntry(ValueMapEntryType type, String value, String label, String newValue, boolean missing,
+      double count) {
     this.type = type;
     this.value = value;
     this.label = label;
@@ -115,7 +115,8 @@ public class ValueMapEntry {
   }
 
   public static Builder fromRange(Range<? extends Number> range) {
-    return fromRange(range.hasLowerBound() ? range.lowerEndpoint() : null, range.hasUpperBound() ? range.upperEndpoint() : null).label(range.toString());
+    return fromRange(range.hasLowerBound() ? range.lowerEndpoint() : null,
+        range.hasUpperBound() ? range.upperEndpoint() : null).label(range.toString());
   }
 
   public static Builder fromRange(Number lower, Number upper) {
@@ -184,7 +185,7 @@ public class ValueMapEntry {
   }
 
   public static class Builder {
-    private ValueMapEntry entry;
+    private final ValueMapEntry entry;
 
     private Builder(ValueMapEntryType type) {
       entry = new ValueMapEntry(type, "", "", "", false, 0);

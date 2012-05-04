@@ -63,13 +63,15 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     for(int i = 0; i < frequenciesList.size(); i++) {
       FrequencyDto frequencyDto = frequenciesList.get(i);
       double freq = frequencyDto.getFreq();
-      if(!frequencyDto.getValue().equals(NA)) {
+      String value = frequencyDto.getValue();
+      if(!value.equals(NA)) {
         ValueMapEntry entry;
-        if(hasValueMapEntryWithValue(frequencyDto.getValue())) {
-          entry = getValueMapEntryWithValue(frequencyDto.getValue());
-        } else {
-          entry = ValueMapEntry.fromDistinct(frequencyDto.getValue()).newValue(Integer.toString(i + 1)).build();
+        ValueMapEntry existingEntry = getValueMapEntryWithValue(value);
+        if(existingEntry == null) {
+          entry = ValueMapEntry.fromDistinct(value).newValue(Integer.toString(i + 1)).build();
           addValueMapEntry(entry);
+        } else {
+          entry = existingEntry;
         }
         entry.setCount(freq);
       } else {

@@ -34,7 +34,7 @@ public class ValueMapGrid extends FlowPanel {
 
   private static final int DEFAULT_PAGE_SIZE = 100;
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private SimplePager pager;
 
@@ -55,13 +55,11 @@ public class ValueMapGrid extends FlowPanel {
   private double maxFrequency;
 
   public ValueMapGrid() {
-    super();
-    this.pager = new SimplePager();
-    this.pager.setPageSize(DEFAULT_PAGE_SIZE);
-    this.pager.addStyleName("right-aligned");
-    this.pager.setVisible(false);
+    pager = new SimplePager();
+    pager.setPageSize(DEFAULT_PAGE_SIZE);
+    pager.addStyleName("right-aligned");
+    pager.setVisible(false);
     add(pager);
-    this.table = null;
   }
 
   public void setPageSize(int pageSize) {
@@ -151,7 +149,7 @@ public class ValueMapGrid extends FlowPanel {
   private void initializeFrequencyColumn() {
     if(allowFrequencyColumn) {
       if(frequencyColumn == null) {
-        frequencyColumn = new ValueMapColum(new StatCell(maxFrequency));
+        frequencyColumn = new ValueMapColumn(new StatCell(maxFrequency));
       }
       table.insertColumn(1, frequencyColumn, translations.frequency());
       table.setColumnWidth(frequencyColumn, "120px");
@@ -175,7 +173,7 @@ public class ValueMapGrid extends FlowPanel {
       }
     };
 
-    Column<ValueMapEntry, ValueMapEntry> valueColumn = new ValueMapColum(cell);
+    Column<ValueMapEntry, ValueMapEntry> valueColumn = new ValueMapColumn(cell);
     valueColumn.setCellStyleNames("original-value");
     table.addColumn(valueColumn, translations.originalValueLabel());
   }
@@ -190,7 +188,7 @@ public class ValueMapGrid extends FlowPanel {
       }
     };
 
-    Column<ValueMapEntry, ValueMapEntry> labelColumn = new ValueMapColum(cell);
+    Column<ValueMapEntry, ValueMapEntry> labelColumn = new ValueMapColumn(cell);
     labelColumn.setCellStyleNames("original-label");
     table.addColumn(labelColumn, translations.originalLabelLabel());
   }
@@ -260,9 +258,9 @@ public class ValueMapGrid extends FlowPanel {
     }
   }
 
-  private static class ValueMapColum extends Column<ValueMapEntry, ValueMapEntry> {
+  private static class ValueMapColumn extends Column<ValueMapEntry, ValueMapEntry> {
 
-    public ValueMapColum(Cell<ValueMapEntry> cell) {
+    private ValueMapColumn(Cell<ValueMapEntry> cell) {
       super(cell);
     }
 

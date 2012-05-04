@@ -182,7 +182,6 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
 
     rangeRadio.setValue(true, true);
     lengthRadio.setValue(true, true);
-
   }
 
   private void setAddRangeEnabled(boolean enabled) {

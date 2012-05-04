@@ -505,7 +505,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       }
     };
 
-    protected Translations translations = GWT.create(Translations.class);
+//    protected Translations translations = GWT.create(Translations.class);
 
     public abstract boolean isTimeSpan();
 
@@ -514,10 +514,11 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
     public abstract void initializeValueMapEntries(List<ValueMapEntry> valueMapEntries, Date fromDate, Date toDate);
 
     public boolean isForTimeType(String valueType) {
-      return valueType.equals("date") || valueType.equals("datetime");
+      return "date".equals(valueType) || "datetime".equals(valueType);
     }
 
     protected String translateTime(String text) {
+      Translations translations = GWT.create(Translations.class);
       return translations.timeMap().get(text);
     }
 
