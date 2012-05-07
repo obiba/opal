@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
@@ -23,17 +22,17 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.NumericalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -61,10 +60,11 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
   }
 
   @Override
-  void initialize(VariableDto variable, VariableDto derivedVariable) {
-    super.initialize(variable, derivedVariable);
-    getView().setNumberType(variable.getValueType());
-    summaryTabPresenter.setResourceUri(variable.getLink() + "/summary");
+  void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
+      VariableDto derivedVariable) {
+    super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
+    getView().setNumberType(originalVariable.getValueType());
+    summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/summary");
     summaryTabPresenter.forgetSummary();
     summaryTabPresenter.refreshDisplay();
   }
@@ -76,7 +76,14 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         .onStepIn(stepInHandler) //
         .onValidate(new MethodStepValidationHandler()));
     stepBuilders.add(getView().getMapStepBuilder() //
-        .onStepIn(new MapStepInHandler()));
+        .onStepIn(new MapStepInHandler()) //
+        .onValidate(new MapStepValidationHandler() {
+
+          @Override
+          public List<String> getErrors() {
+            return derivationHelper.validateMapStep();
+          }
+        }));
     return stepBuilders;
   }
 
@@ -113,7 +120,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         getEventBus().addHandler(SummaryReceivedEvent.getType(), new OriginalVariableSummaryReceivedHandler()));
     registerHandler(getView().addValueMapEntryHandler(new AddValueMapEntryHandler()));
   }
-
 
   /**
    *
@@ -185,7 +191,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     public void onStepIn() {
       if(!newMethodChoice()) return;
 
-      List<String> derivedCategories = getDestinationCategories();
+      List<String> derivedCategories = DerivationHelper.getDestinationCategories(getDerivedVariable());
 
       newDerivationHelper();
       if(getView().rangeSelected()) {
@@ -203,17 +209,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
         getView().enableFrequency(false);
         getView().populateValues(derivationHelper.getValueMapEntries(), derivedCategories);
       }
-    }
-
-    private List<String> getDestinationCategories() {
-      if(getDerivedVariable() == null) return null;
-      JsArray<CategoryDto> categoriesArray = getDerivedVariable().getCategoriesArray();
-      List<String> categories = new ArrayList<String>(categoriesArray.length());
-      for(int i = 0; i < categoriesArray.length(); i++) {
-        categories.add(categoriesArray.get(i).getName());
-      }
-      Collections.sort(categories);
-      return categories;
     }
 
     private void newDerivationHelper() {
@@ -242,7 +237,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
           + "?nature=categorical" //
           + "&distinct=true";
 
-      final List<String> derivedCategories = getDestinationCategories();
+      final List<String> derivedCategories = DerivationHelper.getDestinationCategories(getDerivedVariable());
       getView().populateValues(new ArrayList<ValueMapEntry>(), derivedCategories);
 
       ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
@@ -423,7 +418,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
               .getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
           double from = continuous.getSummary().getMin();
           double to = continuous.getSummary().getMax();
-          getView().setValueLimits(Long.valueOf((long) from), Long.valueOf((long) to + 1));
+          getView().setValueLimits((long) from, (long) (to + 1));
 
         }
       }

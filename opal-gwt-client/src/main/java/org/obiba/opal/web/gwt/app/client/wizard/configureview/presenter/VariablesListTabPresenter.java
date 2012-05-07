@@ -540,8 +540,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
             public void onResource(Response response, TableDto resource) {
-              scriptEvaluationPresenter.setTable(resource);
-              scriptEvaluationPresenter.setVariable(currentVariableDto);
+              scriptEvaluationPresenter.setOriginalTable(resource);
+              scriptEvaluationPresenter.setOriginalVariable(currentVariableDto);
             }
           }).send();
     }

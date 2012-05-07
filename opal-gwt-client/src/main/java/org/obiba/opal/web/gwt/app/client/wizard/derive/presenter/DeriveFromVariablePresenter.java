@@ -50,14 +50,18 @@ import com.gwtplatform.mvp.client.View;
 public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromVariablePresenter.Display> {
 
   private WizardType wizardType;
-  private TableDto table;
 
   private String preSelectedDatasource;
+
   private String preSelectedTable;
+
   private String preSelectedVariable;
 
   private final Collection<String> restrictedDatasources = new HashSet<String>();
+
   private final Collection<String> restrictedTables = new HashSet<String>();
+
+  private final Map<String, TableDto> tablesByName = new HashMap<String, TableDto>();
 
   private final Map<String, VariableDto> variablesByName = new HashMap<String, VariableDto>();
 
@@ -68,11 +72,6 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
 
   @Override
   public void generateDerivedVariable() {
-  }
-
-  @Override
-  void setTable(TableDto table) {
-    this.table = table;
   }
 
   @Override
@@ -116,7 +115,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
 
   private void initDatasources() {
 
-    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(table.getViewLink()).get()
+    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(getDestinationTable().getViewLink()).get()
         .withCallback(new ResourceCallback<ViewDto>() {
           @Override
           public void onResource(Response response, ViewDto view) {
@@ -149,24 +148,29 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   }
 
   private void loadTables() {
-    UriBuilder uriBuilder = UriBuilder.create().segment("datasource", getView().getSelectedDatasource());
-    ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(uriBuilder.build()).get()
-        .withCallback(new ResourceCallback<DatasourceDto>() {
+
+    UriBuilder uriBuilder = UriBuilder.create().segment("datasource", getView().getSelectedDatasource(), "tables");
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
-          public void onResource(Response response, DatasourceDto datasource) {
+          public void onResource(Response response, JsArray<TableDto> resource) {
             List<String> tables = new ArrayList<String>();
-            if(datasource != null) {
-              for(int i = 0; i < datasource.getTableArray().length(); i++) {
-                String name = datasource.getTableArray().get(i);
-                if(restrictedTables.contains(name)) tables.add(name);
+            tablesByName.clear();
+            if(resource != null) {
+              for(int i = 0; i < resource.length(); i++) {
+                TableDto tableDto = resource.get(i);
+                if(restrictedTables.contains(tableDto.getName())) {
+                  tablesByName.put(tableDto.getName(), tableDto);
+                }
               }
+              tables.addAll(tablesByName.keySet());
               Collections.sort(tables);
             }
             getView().setTables(tables, preSelectedTable);
+            onTableSelection();
             loadVariables();
           }
         }).send();
-
   }
 
   private void loadVariables() {
@@ -206,6 +210,10 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
     return stepBuilders;
   }
 
+  private void onTableSelection() {
+    setOriginalTable(tablesByName.get(getView().getSelectedTable()));
+  }
+
   private void onVariableSelection() {
     setOriginalVariable(variablesByName.get(getView().getSelectedVariable()));
     VariableDtos.setDerivedFrom(getDerivedVariable(), getOriginalVariable());
@@ -221,6 +229,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
     getView().getTableList().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
+        onTableSelection();
         loadVariables();
       }
     });

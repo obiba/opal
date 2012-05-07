@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.OpenTextualVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.OpenTextualVariableDerivationHelper.Method;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
@@ -42,11 +43,11 @@ import com.gwtplatform.mvp.client.View;
 
 public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<DeriveOpenTextualVariableStepPresenter.Display> {
 
+  public static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
+
   private OpenTextualVariableDerivationHelper derivationHelper;
 
   private CategoricalSummaryDto categoricalSummaryDto;
-
-  public static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
 
   @Inject
   public DeriveOpenTextualVariableStepPresenter(EventBus eventBus, Display view) {
@@ -62,54 +63,15 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
     List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
     stepBuilders.add(getView().getMethodStepController().onStepIn(stepInHandler));
-    stepBuilders.add(getView().getMapStepController().onStepIn(new StepInHandler() {
+    stepBuilders.add(getView().getMapStepController() //
+        .onStepIn(new DeriveOpenTextualVariableMapStepInHandler()) //
+        .onValidate(new MapStepValidationHandler() {
 
-      @Override
-      public void onStepIn() {
-        if(derivationHelper == null || derivationHelper.getMethod() != getView().getMethod()) {
-          String link = new String(getOriginalVariable().getLink()) //
-              + "/summary" //
-              + "?nature=categorical" //
-              + "&distinct=true";
-
-          getView().populateValues(new ArrayList<ValueMapEntry>());
-
-          ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
-              .forResource(link.toString()).get()//
-              .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
-
-                @Override
-                public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
-                  categoricalSummaryDto = summaryStatisticsDto
-                      .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-                  derivationHelper = new OpenTextualVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
-                      summaryStatisticsDto, getView().getMethod());
-                  derivationHelper.initializeValueMapEntries();
-                  JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
-                  for(int i = 0; i < frequenciesArray.length(); i++) {
-                    FrequencyDto frequencyDto = frequenciesArray.get(i);
-                    getView().addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()));
-                  }
-                  getView().getValueMapGrid().setMaxFrequency(getMaxFrequency());
-                  getView().populateValues(derivationHelper.getValueMapEntries());
-                }
-
-                private Double getMaxFrequency() {
-                  if(categoricalSummaryDto.getFrequenciesArray() == null) return 0d;
-                  return Iterables.find(JsArrays.toList(categoricalSummaryDto.getFrequenciesArray()),
-                      new Predicate<FrequencyDto>() {
-
-                        @Override
-                        public boolean apply(FrequencyDto dto) {
-                          return dto.getValue().equals(categoricalSummaryDto.getMode());
-                        }
-                      }).getFreq();
-                }
-
-              }).send();
-        }
-      }
-    }));
+          @Override
+          public List<String> getErrors() {
+            return derivationHelper.validateMapStep();
+          }
+        }));
     return stepBuilders;
   }
 
@@ -160,6 +122,56 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
   protected void onUnbind() {
   }
 
+  private final class DeriveOpenTextualVariableMapStepInHandler implements StepInHandler {
+    @Override
+    public void onStepIn() {
+      if(derivationHelper == null || derivationHelper.getMethod() != getView().getMethod()) {
+        String link = getOriginalVariable().getLink() //
+            + "/summary" //
+            + "?nature=categorical" //
+            + "&distinct=true";
+
+        final List<String> destinationCategories = DerivationHelper.getDestinationCategories(getDerivedVariable());
+        getView().populateValues(new ArrayList<ValueMapEntry>(), destinationCategories);
+
+        ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
+            .forResource(link).get()//
+            .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+
+              @Override
+              public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
+                categoricalSummaryDto = summaryStatisticsDto
+                    .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+                derivationHelper = new OpenTextualVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
+                    summaryStatisticsDto, getView().getMethod());
+                derivationHelper.initializeValueMapEntries();
+                JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+                for(int i = 0; i < frequenciesArray.length(); i++) {
+                  FrequencyDto frequencyDto = frequenciesArray.get(i);
+                  getView().addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()));
+                }
+                getView().getValueMapGrid().setMaxFrequency(getMaxFrequency());
+                getView().populateValues(derivationHelper.getValueMapEntries(), destinationCategories);
+              }
+
+              private Double getMaxFrequency() {
+                if(categoricalSummaryDto.getFrequenciesArray() == null) return 0d;
+                return Iterables
+                    .find(JsArrays.toList(categoricalSummaryDto.getFrequenciesArray()), new Predicate<FrequencyDto>() {
+
+                      @Override
+                      public boolean apply(FrequencyDto dto) {
+                        return dto.getValue().equals(categoricalSummaryDto.getMode());
+                      }
+                    }).getFreq();
+              }
+
+            }).send();
+      }
+    }
+
+  }
+
   public interface Display extends View {
 
     DefaultWizardStepController.Builder getMethodStepController();
@@ -168,7 +180,7 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
     Method getMethod();
 
-    void populateValues(List<ValueMapEntry> valueMapEntries);
+    void populateValues(List<ValueMapEntry> valueMapEntries, List<String> derivedCategories);
 
     HasClickHandlers getAddButton();
 

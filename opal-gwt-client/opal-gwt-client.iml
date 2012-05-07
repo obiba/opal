@@ -34,6 +34,7 @@
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/test-annotations" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target/.generated" />
+      <excludeFolder url="file://$MODULE_DIR$/target/antrun" />
       <excludeFolder url="file://$MODULE_DIR$/target/extra" />
       <excludeFolder url="file://$MODULE_DIR$/target/gwt-unitCache" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />

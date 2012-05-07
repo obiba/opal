@@ -18,8 +18,10 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.TemporalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.shared.EventBus;
@@ -39,9 +41,10 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
   }
 
   @Override
-  void initialize(VariableDto variable, VariableDto derivedVariable) {
-    super.initialize(variable, derivedVariable);
-    getView().setTimeType(variable.getValueType());
+  void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
+      VariableDto derivedVariable) {
+    super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
+    getView().setTimeType(originalVariable.getValueType());
   }
 
   @Override
@@ -57,27 +60,37 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
             return false;
           }
         }));
-    stepBuilders.add(getView().getMapStepController().onStepIn(new StepInHandler() {
+    stepBuilders.add(getView().getMapStepController() //
+        .onStepIn(new DeriveTemporalVariableMapStepInHandler()) //
+        .onValidate(new MapStepValidationHandler() {
 
-      @Override
-      public void onStepIn() {
-        // do not re-populate if group method selection has not changed
-        if(derivationHelper == null //
-            || !derivationHelper.getGroupMethod().toString().equalsIgnoreCase(getView().getGroupMethod()) //
-            || !derivationHelper.getFromDate().equals(getView().getFromDate()) //
-            || !derivationHelper.getToDate().equals(getView().getToDate())) {
-          derivationHelper = new TemporalVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
-              getView().getGroupMethod(), getView().getFromDate(), getView().getToDate());
-          getView().populateValues(derivationHelper.getValueMapEntries());
-        }
-      }
-    }));
+          @Override
+          public List<String> getErrors() {
+            return derivationHelper.validateMapStep();
+          }
+        }));
     return stepBuilders;
   }
 
   @Override
   public void generateDerivedVariable() {
     setDerivedVariable(derivationHelper.getDerivedVariable());
+  }
+
+  private final class DeriveTemporalVariableMapStepInHandler implements StepInHandler {
+    @Override
+    public void onStepIn() {
+      // do not re-populate if group method selection has not changed
+      if(derivationHelper == null //
+          || !derivationHelper.getGroupMethod().toString().equalsIgnoreCase(getView().getGroupMethod()) //
+          || !derivationHelper.getFromDate().equals(getView().getFromDate()) //
+          || !derivationHelper.getToDate().equals(getView().getToDate())) {
+        derivationHelper = new TemporalVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
+            getView().getGroupMethod(), getView().getFromDate(), getView().getToDate());
+        getView().populateValues(derivationHelper.getValueMapEntries(),
+            DerivationHelper.getDestinationCategories(getDerivedVariable()));
+      }
+    }
   }
 
   //
@@ -94,7 +107,7 @@ public class DeriveTemporalVariableStepPresenter extends DerivationPresenter<Der
 
     String getGroupMethod();
 
-    void populateValues(List<ValueMapEntry> valuesMap);
+    void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories);
 
     Date getFromDate();
 

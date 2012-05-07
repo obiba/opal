@@ -11,7 +11,9 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -26,14 +28,22 @@ public abstract class DerivationPresenter<V extends View> extends PresenterWidge
 
   protected static final Translations translations = GWT.create(Translations.class);
 
+  private TableDto originalTable;
+
+  private TableDto destinationTable;
+
   private VariableDto originalVariable;
+
   private VariableDto derivedVariable;
 
   public DerivationPresenter(EventBus eventBus, V view) {
     super(eventBus, view);
   }
 
-  void initialize(VariableDto originalVariable, VariableDto derivedVariable) {
+  void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
+      VariableDto derivedVariable) {
+    this.originalTable = originalTable;
+    this.destinationTable = destinationTable;
     this.originalVariable = originalVariable;
     this.derivedVariable = derivedVariable;
   }
@@ -54,19 +64,44 @@ public abstract class DerivationPresenter<V extends View> extends PresenterWidge
     this.derivedVariable = derivedVariable;
   }
 
-  public void generateDerivedVariable() {
-
+  public TableDto getOriginalTable() {
+    return originalTable;
   }
 
-  void setTable(TableDto table) {
+  public void setOriginalTable(TableDto originalTable) {
+    this.originalTable = originalTable;
+  }
 
+  public TableDto getDestinationTable() {
+    return destinationTable;
+  }
+
+  public void setDestinationTable(TableDto destinationTable) {
+    this.destinationTable = destinationTable;
   }
 
   public void onClose() {
 
   }
 
+  public abstract void generateDerivedVariable();
+
   abstract List<DefaultWizardStepController.Builder> getWizardStepBuilders(
       WizardStepController.StepInHandler stepInHandler);
+
+  public abstract class MapStepValidationHandler implements ValidationHandler {
+
+    public abstract List<String> getErrors();
+
+    @Override
+    public boolean validate() {
+      List<String> errors = getErrors();
+      if(!errors.isEmpty()) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errors).build());
+        return false;
+      }
+      return true;
+    }
+  }
 
 }

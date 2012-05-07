@@ -39,7 +39,6 @@ import com.gwtplatform.mvp.client.View;
 public class DeriveConclusionPresenter extends DerivationPresenter<DeriveConclusionPresenter.Display> {
 
   private JsArray<DatasourceDto> datasources;
-  private TableDto table;
 
   @Inject
   public DeriveConclusionPresenter(EventBus eventBus, Display view) {
@@ -52,15 +51,16 @@ public class DeriveConclusionPresenter extends DerivationPresenter<DeriveConclus
   }
 
   @Override
-  void setTable(TableDto table) {
-    this.table = table;
+  void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
+      VariableDto derivedVariable) {
+    super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
+    findDatasources();
+    getView().setDefaultDerivedName(originalVariable.getName());
   }
 
   @Override
-  void initialize(VariableDto variable, VariableDto derivedVariable) {
-    super.initialize(variable, derivedVariable);
-    findDatasources();
-    getView().setDefaultDerivedName(variable.getName());
+  public void generateDerivedVariable() {
+    // do nothing, derived variable is already generated
   }
 
   private void findDatasources() {
@@ -132,7 +132,7 @@ public class DeriveConclusionPresenter extends DerivationPresenter<DeriveConclus
     JsArrayString froms = resource.getFromArray();
     for(int i = 0; i < froms.length(); i++) {
       String from = froms.get(i);
-      if(from.equals(table.getDatasourceName() + "." + table.getName())) {
+      if(from.equals(getOriginalTable().getDatasourceName() + "." + getOriginalTable().getName())) {
         return true;
       }
     }

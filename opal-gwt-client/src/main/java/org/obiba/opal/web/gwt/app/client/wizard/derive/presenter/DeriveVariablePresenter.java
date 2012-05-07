@@ -85,13 +85,21 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   private final Translations translations;
 
   private final DeriveCategoricalVariableStepPresenter categoricalPresenter;
+
   private final DeriveBooleanVariableStepPresenter booleanPresenter;
+
   private final DeriveNumericalVariableStepPresenter numericalPresenter;
+
   private final DeriveTemporalVariableStepPresenter temporalPresenter;
+
   private final DeriveOpenTextualVariableStepPresenter openTextualPresenter;
+
   private final DeriveCustomVariablePresenter deriveCustomVariablePresenter;
+
   private final DeriveFromVariablePresenter deriveFromVariablePresenter;
+
   private final ScriptEvaluationPresenter scriptEvaluationPresenter;
+
   private final DeriveConclusionPresenter deriveConclusionPresenter;
 
   private VariableDto variable;
@@ -107,6 +115,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   private WizardType wizardType;
 
   private String destinationDatasource;
+
   private String destinationView;
 
   @Inject
@@ -170,8 +179,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       GWT.log("Unknown wizard type");
       return;
     }
-
-    prepareScriptEvaluationStep();
     prepareConclusionStep();
   }
 
@@ -179,12 +186,11 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     derivationPresenter = deriveFromVariablePresenter;
     if(wizardType == FromWizardType) {
       // input variable is the derived variable
-      deriveFromVariablePresenter.initialize(null, variable);
+      deriveFromVariablePresenter.initialize(null, table, null, variable);
     } else {
       // input variable is the variable to derive
-      deriveFromVariablePresenter.initialize(variable, null);
+      deriveFromVariablePresenter.initialize(table, null, variable, null);
     }
-    deriveFromVariablePresenter.setTable(table);
     deriveFromVariablePresenter.setWizardType(wizardType);
     getView().setStartStep(deriveFromVariablePresenter.getWizardStepBuilders(null).get(0));
     setInSlot(Display.Slots.Derivation, deriveFromVariablePresenter);
@@ -267,8 +273,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   private void prepareCustomDerivation() {
     derivationPresenter = deriveCustomVariablePresenter;
-    deriveCustomVariablePresenter.initialize(variable, null);
-    deriveCustomVariablePresenter.setTable(table);
+    deriveCustomVariablePresenter.initialize(table, null, variable, null);
+
     setInSlot(Display.Slots.Derivation, deriveCustomVariablePresenter);
 
     List<DefaultWizardStepController.Builder> steps = deriveCustomVariablePresenter
@@ -279,12 +285,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().setStartStep(createChain(steps));
   }
 
-  private void prepareScriptEvaluationStep() {
-    scriptEvaluationPresenter.setTable(table, true);
-  }
-
   private void prepareConclusionStep() {
-    deriveConclusionPresenter.setTable(table);
     addToSlot(Display.Slots.Derivation, deriveConclusionPresenter);
   }
 
@@ -528,7 +529,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     @Override
     public void onStepIn() {
       derivationPresenter.generateDerivedVariable();
-      scriptEvaluationPresenter.setVariable(derivationPresenter.getDerivedVariable());
+      scriptEvaluationPresenter.setOriginalTable(derivationPresenter.getOriginalTable(), true);
+      scriptEvaluationPresenter.setOriginalVariable(derivationPresenter.getDerivedVariable());
     }
   }
 
@@ -542,7 +544,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     @Override
     public void onStepIn() {
-      presenter.initialize(derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
+      presenter.initialize(derivationPresenter.getOriginalTable(), derivationPresenter.getDestinationTable(),
+          derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
 
       if(derivationPresenter != presenter) {
         addToSlot(Display.Slots.Derivation, presenter);
@@ -556,7 +559,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     @Override
     public void onStepIn() {
       deriveConclusionPresenter
-          .initialize(derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
+          .initialize(derivationPresenter.getOriginalTable(), derivationPresenter.getDestinationTable(),
+              derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
       derivationPresenter = deriveConclusionPresenter;
     }
   }

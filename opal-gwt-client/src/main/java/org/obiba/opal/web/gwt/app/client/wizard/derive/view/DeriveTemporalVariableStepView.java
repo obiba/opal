@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -49,54 +49,41 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
 
   private final Widget widget;
 
-  @UiField
-  WizardStep methodStep;
+  @UiField WizardStep methodStep;
 
-  @UiField
-  WizardStep mapStep;
+  @UiField WizardStep mapStep;
 
-  @UiField
-  RadioButton spanRadio;
+  @UiField RadioButton spanRadio;
 
-  @UiField
-  ListBox spanBox;
+  @UiField ListBox spanBox;
 
-  @UiField
-  RadioButton rangeRadio;
+  @UiField RadioButton rangeRadio;
 
-  @UiField
-  ListBox rangeBox;
+  @UiField ListBox rangeBox;
 
-  @UiField
-  ValueMapGrid valuesMapGrid;
+  @UiField ValueMapGrid valuesMapGrid;
 
-  @UiField
-  Panel dates;
+  @UiField Panel dates;
 
-  @UiField
-  FlowPanel from;
+  @UiField FlowPanel from;
 
-  @UiField
-  FlowPanel to;
+  @UiField FlowPanel to;
 
-  private DateBox fromDate;
+  private final DateBox fromDate;
 
-  private DateBox toDate;
-
-  private String timeType;
+  private final DateBox toDate;
 
   //
   // Constructors
   //
 
   public DeriveTemporalVariableStepView() {
-    super();
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
 
     DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
 
-    this.fromDate = new DateBox();
-    this.fromDate.setFormat(new DateBox.DefaultFormat(dateFormat));
+    fromDate = new DateBox();
+    fromDate.setFormat(new DateBox.DefaultFormat(dateFormat));
     Date now = new Date();
     CalendarUtil.addDaysToDate(now, -3650);
     CalendarUtil.setToFirstDayOfMonth(now);
@@ -104,8 +91,8 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
     fromDate.setWidth("6em");
     from.insert(fromDate, 0);
 
-    this.toDate = new DateBox();
-    this.toDate.setFormat(new DateBox.DefaultFormat(dateFormat));
+    toDate = new DateBox();
+    toDate.setFormat(new DateBox.DefaultFormat(dateFormat));
     now = new Date();
     toDate.setValue(now);
     toDate.setWidth("6em");
@@ -166,8 +153,8 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
   }
 
   @Override
-  public void populateValues(List<ValueMapEntry> valuesMap) {
-    valuesMapGrid.populate(valuesMap);
+  public void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories) {
+    valuesMapGrid.populate(valuesMap, derivedCategories);
   }
 
   @Override
@@ -182,11 +169,10 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
 
   @Override
   public void setTimeType(String valueType) {
-    this.timeType = valueType;
     spanBox.clear();
     rangeBox.clear();
     for(GroupMethod method : GroupMethod.values()) {
-      if(method.isForTimeType(timeType)) {
+      if(method.isForTimeType(valueType)) {
         if(method.isTimeSpan()) {
           spanBox.addItem(translations.timeGroupMap().get(method.toString()), method.toString());
         } else {

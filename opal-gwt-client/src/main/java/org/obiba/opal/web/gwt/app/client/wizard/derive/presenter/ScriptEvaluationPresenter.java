@@ -55,9 +55,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   private SummaryTabPresenter summaryTabPresenter;
 
-  private VariableDto variable;
+  private VariableDto originalVariable;
 
-  private TableDto table;
+  private TableDto originalTable;
 
   private boolean asTable;
 
@@ -95,23 +95,23 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     getView().setValueSetFetcher(new ValueSetFetcherImpl());
   }
 
-  public void setTable(TableDto table) {
-    setTable(table, false);
+  public void setOriginalTable(TableDto originalTable) {
+    setOriginalTable(originalTable, false);
   }
 
-  public void setTable(TableDto table, boolean asTable) {
+  public void setOriginalTable(TableDto originalTable, boolean asTable) {
     this.asTable = asTable;
-    this.table = table;
-    getView().setTable(table);
+    this.originalTable = originalTable;
+    getView().setTable(originalTable);
   }
 
   /**
    * Set the variable to be evaluated. Value type and script are extracted from the variable dto.
-   * @param variable
+   * @param originalVariable
    */
-  public void setVariable(VariableDto variable) {
-    this.variable = variable;
-    getView().setVariable(variable);
+  public void setOriginalVariable(VariableDto originalVariable) {
+    this.originalVariable = originalVariable;
+    getView().setVariable(originalVariable);
     requestSummary();
   }
 
@@ -133,14 +133,14 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   }
 
   private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
-    String script = VariableDtos.getScript(variable);
+    String script = VariableDtos.getScript(originalVariable);
     ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory
         .<SummaryStatisticsDto>newBuilder() //
         .forResource(link).withFormBody("script", script).post() //
         .accept("application/x-protobuf+json");
 
-    if(variable != null) {
-      JsArray<CategoryDto> cats = variable.getCategoriesArray();
+    if(originalVariable != null) {
+      JsArray<CategoryDto> cats = originalVariable.getCategoriesArray();
       if(cats != null) {
         for(int i = 0; i < cats.length(); i++) {
           requestBuilder.withFormBody("category", cats.get(i).getName());
@@ -154,9 +154,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       public void onResponseCode(Request request, Response response) {
         if(scriptEvaluationCallback == null) return;
         if(response.getStatusCode() == Response.SC_OK) {
-          scriptEvaluationCallback.onSuccess(variable);
+          scriptEvaluationCallback.onSuccess(originalVariable);
         } else {
-          scriptEvaluationCallback.onFailure(variable);
+          scriptEvaluationCallback.onFailure(originalVariable);
         }
       }
     };
@@ -172,25 +172,25 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   private void appendVariableSummaryArguments(StringBuilder link) {
     appendVariableLimitArguments(link);
 
-    if(ValueType.TEXT.is(variable.getValueType()) && VariableDtos.allCategoriesMissing(variable)) {
+    if(ValueType.TEXT.is(originalVariable.getValueType()) && VariableDtos.allCategoriesMissing(originalVariable)) {
       link.append("&nature=categorical")//
           .append("&distinct=true");
     }
   }
 
   private void appendVariableLimitArguments(StringBuilder link) {
-    link.append("valueType=").append(variable.getValueType()) //
-        .append("&repeatable=").append(variable.getIsRepeatable());
+    link.append("valueType=").append(originalVariable.getValueType()) //
+        .append("&repeatable=").append(originalVariable.getIsRepeatable());
   }
 
   private void appendTable(StringBuilder link) {
-    if(!Strings.isNullOrEmpty(table.getViewLink()) && !asTable) {
+    if(!Strings.isNullOrEmpty(originalTable.getViewLink()) && !asTable) {
       // OPAL-879
-      link.append(table.getViewLink()).append("/from");
-    } else if(!Strings.isNullOrEmpty(table.getLink())) {
-      link.append(table.getLink());
+      link.append(originalTable.getViewLink()).append("/from");
+    } else if(!Strings.isNullOrEmpty(originalTable.getLink())) {
+      link.append(originalTable.getLink());
     } else {
-      link.append("/datasource/").append(table.getDatasourceName()).append("/table/").append(table.getName());
+      link.append("/datasource/").append(originalTable.getDatasourceName()).append("/table/").append(originalTable.getName());
     }
   }
 
@@ -220,7 +220,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   private final class ValueSetFetcherImpl implements ValueSetFetcher {
     @Override
     public void request(int offset, int limit) {
-      String script = VariableDtos.getScript(variable);
+      String script = VariableDtos.getScript(originalVariable);
 
       StringBuilder link = new StringBuilder();
       appendTable(link);

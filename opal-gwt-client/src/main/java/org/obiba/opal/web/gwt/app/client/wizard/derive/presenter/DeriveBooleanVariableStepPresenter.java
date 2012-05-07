@@ -12,11 +12,12 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.BooleanVariableDerivationHelper;
+import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.shared.EventBus;
@@ -40,10 +41,12 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
   //
 
   @Override
-  void initialize(VariableDto variable, VariableDto derivedVariable) {
-    super.initialize(variable, derivedVariable);
-    derivationHelper = new BooleanVariableDerivationHelper(variable, derivedVariable);
-    getView().populateValues(derivationHelper.getValueMapEntries());
+  void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
+      VariableDto derivedVariable) {
+    super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
+    derivationHelper = new BooleanVariableDerivationHelper(originalVariable, derivedVariable);
+    getView().populateValues(derivationHelper.getValueMapEntries(),
+        DerivationHelper.getDestinationCategories(derivedVariable));
   }
 
   @Override
@@ -56,11 +59,11 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
     List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
     stepBuilders.add(getView().getMapStepController() //
         .onStepIn(stepInHandler) //
-        .onValidate(new ValidationHandler() {
+        .onValidate(new MapStepValidationHandler() {
+
           @Override
-          public boolean validate() {
-            // TODO
-            return true;
+          public List<String> getErrors() {
+            return derivationHelper.validateMapStep();
           }
         }));
     return stepBuilders;
@@ -74,7 +77,7 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
 
     DefaultWizardStepController.Builder getMapStepController();
 
-    void populateValues(List<ValueMapEntry> valuesMap);
+    void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories);
 
   }
 

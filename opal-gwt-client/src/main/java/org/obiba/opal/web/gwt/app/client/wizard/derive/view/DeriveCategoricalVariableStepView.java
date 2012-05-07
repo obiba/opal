@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -55,11 +55,9 @@ public class DeriveCategoricalVariableStepView extends ViewImpl implements Deriv
 
   private final Widget widget;
 
-  @UiField
-  WizardStep mapStep;
+  @UiField WizardStep mapStep;
 
-  @UiField(provided = true)
-  ValueMapGrid valuesMapGrid;
+  @UiField(provided = true) ValueMapGrid valuesMapGrid;
 
   //
   // Constructors
@@ -88,7 +86,8 @@ public class DeriveCategoricalVariableStepView extends ViewImpl implements Deriv
               String cssClasses = getCssClasses(entry.getType());
               SafeHtml safeHtml = SafeHtmlUtils.fromString(getText(entry));
               if(entry.getType() == ValueMapEntryType.DISTINCT_VALUE) {
-                sb.append(DeriveCategoricalVariableStepView.template.spanWithTile(cssClasses + " warning", translations.valueIsNotACategory(), safeHtml));
+                sb.append(DeriveCategoricalVariableStepView.template
+                    .spanWithTile(cssClasses + " warning", translations.valueIsNotACategory(), safeHtml));
               } else {
                 sb.append(template.span(cssClasses, safeHtml));
               }
@@ -119,8 +118,8 @@ public class DeriveCategoricalVariableStepView extends ViewImpl implements Deriv
   }
 
   @Override
-  public void populateValues(List<ValueMapEntry> valuesMap) {
-    valuesMapGrid.populate(valuesMap);
+  public void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories) {
+    valuesMapGrid.populate(valuesMap, derivedCategories);
   }
 
   //

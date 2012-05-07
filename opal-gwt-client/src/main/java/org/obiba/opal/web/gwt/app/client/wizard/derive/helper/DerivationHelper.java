@@ -9,14 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.common.base.Objects;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 
 /**
  *
@@ -25,7 +31,8 @@ public abstract class DerivationHelper {
 
   protected static final String NA = "N/A";
 
-  protected Translations translations = GWT.create(Translations.class);
+  protected static final Translations translations = GWT.create(Translations.class);
+  protected static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   protected List<ValueMapEntry> valueMapEntries;
 
@@ -49,6 +56,17 @@ public abstract class DerivationHelper {
     return valueMapEntries;
   }
 
+  public static List<String> getDestinationCategories(VariableDto destination) {
+    if(destination == null) return null;
+    JsArray<CategoryDto> categoriesArray = destination.getCategoriesArray();
+    List<String> categories = new ArrayList<String>(categoriesArray.length());
+    for(int i = 0; i < categoriesArray.length(); i++) {
+      categories.add(categoriesArray.get(i).getName());
+    }
+    Collections.sort(categories);
+    return categories;
+  }
+
   public boolean addEntry(ValueMapEntry entryArg) {
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getValue().equals(entryArg.getValue())) {
@@ -57,7 +75,7 @@ public abstract class DerivationHelper {
     }
     for(int i = valueMapEntries.size() - 1; i >= 0; i--) {
       ValueMapEntryType type = valueMapEntries.get(i).getType();
-      if(!type.equals(ValueMapEntryType.EMPTY_VALUES) && !type.equals(ValueMapEntryType.OTHER_VALUES)) {
+      if(type != ValueMapEntryType.EMPTY_VALUES && type != ValueMapEntryType.OTHER_VALUES) {
         valueMapEntries.add(i + 1, entryArg);
         break;
       }
@@ -75,7 +93,20 @@ public abstract class DerivationHelper {
 
   public ValueMapEntry getValueMapEntryWithValue(String value) {
     for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getValue().equals(value)) {
+      if(Objects.equal(entry.getValue(), value)) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  public boolean hasValueMapEntryWithNewValue(String newValue) {
+    return getValueMapEntryWithNewValue(newValue) != null;
+  }
+
+  public ValueMapEntry getValueMapEntryWithNewValue(String newValue) {
+    for(ValueMapEntry entry : valueMapEntries) {
+      if(Objects.equal(entry.getNewValue(), newValue)) {
         return entry;
       }
     }
@@ -92,6 +123,18 @@ public abstract class DerivationHelper {
 
   public VariableDto getOriginalVariable() {
     return originalVariable;
+  }
+
+  public List<String> validateMapStep() {
+    List<String> errors = new ArrayList<String>();
+    if(getDerivedVariable() != null) {
+      for(String derivedCategory : getDestinationCategories(getDerivedVariable())) {
+        if(!hasValueMapEntryWithNewValue(derivedCategory)) {
+          errors.add(translationMessages.destinationCategoryNotMapped(derivedCategory));
+        }
+      }
+    }
+    return errors;
   }
 
 }

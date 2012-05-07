@@ -58,8 +58,8 @@ public class DeriveBooleanVariableStepView extends ViewImpl implements DeriveBoo
   }
 
   @Override
-  public void populateValues(List<ValueMapEntry> valuesMap) {
-    valuesMapGrid.populate(valuesMap);
+  public void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories) {
+    valuesMapGrid.populate(valuesMap, derivedCategories);
   }
 
   //

@@ -34,8 +34,8 @@ public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvalua
   }
 
   public void initialize(TableDto table, VariableDto variable) {
-    scriptEvaluationPresenter.setTable(table);
-    scriptEvaluationPresenter.setVariable(variable);
+    scriptEvaluationPresenter.setOriginalTable(table);
+    scriptEvaluationPresenter.setOriginalVariable(variable);
   }
 
   @Override
@@ -57,7 +57,7 @@ public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvalua
   }
 
   private void addHandler() {
-    super.registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {

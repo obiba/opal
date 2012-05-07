@@ -44,9 +44,9 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl implements Deriv
   interface ViewUiBinder extends UiBinder<Widget, DeriveOpenTextualVariableStepView> {
   }
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -85,11 +85,10 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl implements Deriv
   MultiWordSuggestOracleWithDisplay valueOracle;
 
   public DeriveOpenTextualVariableStepView() {
-    super();
     value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplay());
     auto = new RadioButton(Method.group);
     manual = new RadioButton(Method.group);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     radioGroup = new RadioGroup<Method>();
     radioGroup.addButton(auto, Method.AUTOMATICALLY);
     radioGroup.addButton(manual, Method.MANUAL);
@@ -118,11 +117,11 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl implements Deriv
   }
 
   @Override
-  public void populateValues(List<ValueMapEntry> valueMapEntries) {
+  public void populateValues(List<ValueMapEntry> valueMapEntries, List<String> derivedCategories) {
     value.setText("");
     newValue.setText("");
     addPanel.setOpen(false);
-    valuesMapGrid.populate(valueMapEntries);
+    valuesMapGrid.populate(valueMapEntries, derivedCategories);
   }
 
   @Override

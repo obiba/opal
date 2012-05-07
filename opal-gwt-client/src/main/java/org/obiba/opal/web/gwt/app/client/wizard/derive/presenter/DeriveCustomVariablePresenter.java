@@ -47,11 +47,22 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   }
 
   @Override
-  void initialize(VariableDto variable, VariableDto derivedVariable) {
-    super.initialize(variable, derivedVariable);
-    getView().getRepeatable().setValue(variable.getIsRepeatable());
+  void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
+      VariableDto derivedVariable) {
+    super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
+    getView().getRepeatable().setValue(originalVariable.getIsRepeatable());
     getView().getTestButton().addClickHandler(new TestButtonClickHandler());
-    getView().getValueType().setValue(variable.getValueType());
+    getView().getValueType().setValue(originalVariable.getValueType());
+
+    String name = getOriginalVariable().getName();
+    if(originalTable.hasViewLink()) {
+      String datasourceName = originalTable.getDatasourceName();
+      String tableName = originalTable.getName();
+      getView().getScriptBox().setValue("$('" + datasourceName + "." + tableName + ":" + name + "')");
+    } else {
+      getView().getScriptBox().setValue("$('" + name + "')");
+    }
+    getView().addSuggestions(originalTable);
   }
 
   @Override
@@ -63,20 +74,20 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
     @Override
     public void onClick(ClickEvent event) {
-      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(getOriginalVariable().getParentLink().getLink()).get()
-          .withCallback(new ResourceCallback<TableDto>() {
-            @Override
-            public void onResource(Response response, TableDto table) {
-              generateDerivedVariable();
-              VariableDto variable = getDerivedVariable();
-              if(getView().getScriptBox().isTextSelected()) {
-                variable.setValueType(ValueType.TEXT.getLabel());
-                variable.setIsRepeatable(false);
-                VariableDtos.setScript(variable, getView().getScriptBox().getSelectedScript());
-              }
-              scriptEvaluationPopupPresenter.initialize(table, variable);
-            }
-          }).send();
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(getOriginalVariable().getParentLink().getLink())
+          .get().withCallback(new ResourceCallback<TableDto>() {
+        @Override
+        public void onResource(Response response, TableDto table) {
+          generateDerivedVariable();
+          VariableDto variable = getDerivedVariable();
+          if(getView().getScriptBox().isTextSelected()) {
+            variable.setValueType(ValueType.TEXT.getLabel());
+            variable.setIsRepeatable(false);
+            VariableDtos.setScript(variable, getView().getScriptBox().getSelectedScript());
+          }
+          scriptEvaluationPopupPresenter.initialize(table, variable);
+        }
+      }).send();
       getView().getScriptBox().focus();
     }
   }
@@ -96,19 +107,6 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
     stepBuilders.add(getView().getDeriveStepController());
     return stepBuilders;
-  }
-
-  @Override
-  public void setTable(TableDto table) {
-    String name = getOriginalVariable().getName();
-    if(table.hasViewLink()) {
-      String datasourceName = table.getDatasourceName();
-      String tableName = table.getName();
-      getView().getScriptBox().setValue("$('" + datasourceName + "." + tableName + ":" + name + "')");
-    } else {
-      getView().getScriptBox().setValue("$('" + name + "')");
-    }
-    getView().addSuggestions(table);
   }
 
   public interface Display extends View {
