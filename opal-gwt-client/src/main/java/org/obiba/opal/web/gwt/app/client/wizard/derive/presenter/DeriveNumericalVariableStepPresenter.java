@@ -10,12 +10,13 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
@@ -26,12 +27,13 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.NumericalVariableD
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -44,8 +46,6 @@ import com.gwtplatform.mvp.client.View;
  *
  */
 public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> {
-
-  private static final Translations translations = GWT.create(Translations.class);
 
   private final SummaryTabPresenter summaryTabPresenter;
 
@@ -75,7 +75,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     stepBuilders.add(getView().getMethodStepBuilder() //
         .onStepIn(stepInHandler) //
         .onValidate(new MethodStepValidationHandler()));
-    stepBuilders.add(getView().getMapStepBuilder().onStepIn(new MapStepInHandler()));
+    stepBuilders.add(getView().getMapStepBuilder() //
+        .onStepIn(new MapStepInHandler()));
     return stepBuilders;
   }
 
@@ -113,9 +114,6 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     registerHandler(getView().addValueMapEntryHandler(new AddValueMapEntryHandler()));
   }
 
-  //
-  // Interfaces
-  //
 
   /**
    *
@@ -138,7 +136,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       validateRangeDefinitionForm(errorMessages);
     }
 
-    private void validateRangeLimitsForm(List<String> errorMessages) {
+    private void validateRangeLimitsForm(Collection<String> errorMessages) {
       getView().setLowerLimitError(false);
       getView().setUpperLimitError(false);
 
@@ -160,7 +158,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
       }
     }
 
-    private void validateRangeDefinitionForm(List<String> errorMessages) {
+    private void validateRangeDefinitionForm(Collection<String> errorMessages) {
       getView().setRangeLengthError(false);
       getView().setRangeCountError(false);
 
@@ -187,6 +185,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
     public void onStepIn() {
       if(!newMethodChoice()) return;
 
+      List<String> derivedCategories = getDestinationCategories();
+
       newDerivationHelper();
       if(getView().rangeSelected()) {
         // ranges
@@ -196,13 +196,24 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
           addRangesByCountMapping();
         }
         getView().enableFrequency(false);
-        getView().populateValues(derivationHelper.getValueMapEntries());
+        getView().populateValues(derivationHelper.getValueMapEntries(), derivedCategories);
       } else if(getView().discreteSelected()) {
         addDistinctValuesMapping();
       } else {
         getView().enableFrequency(false);
-        getView().populateValues(derivationHelper.getValueMapEntries());
+        getView().populateValues(derivationHelper.getValueMapEntries(), derivedCategories);
       }
+    }
+
+    private List<String> getDestinationCategories() {
+      if(getDerivedVariable() == null) return null;
+      JsArray<CategoryDto> categoriesArray = getDerivedVariable().getCategoriesArray();
+      List<String> categories = new ArrayList<String>(categoriesArray.length());
+      for(int i = 0; i < categoriesArray.length(); i++) {
+        categories.add(categoriesArray.get(i).getName());
+      }
+      Collections.sort(categories);
+      return categories;
     }
 
     private void newDerivationHelper() {
@@ -231,7 +242,8 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
           + "?nature=categorical" //
           + "&distinct=true";
 
-      getView().populateValues(new ArrayList<ValueMapEntry>());
+      final List<String> derivedCategories = getDestinationCategories();
+      getView().populateValues(new ArrayList<ValueMapEntry>(), derivedCategories);
 
       ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
           .forResource(link).get()//
@@ -244,7 +256,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
               double maxFreq = derivationHelper.addDistinctValues(categoricalSummaryDto);
               getView().setMaxFrequency(maxFreq);
               getView().enableFrequency(true);
-              getView().populateValues(derivationHelper.getValueMapEntries());
+              getView().populateValues(derivationHelper.getValueMapEntries(), derivedCategories);
             }
           }).send();
     }
@@ -452,7 +464,7 @@ public class DeriveNumericalVariableStepPresenter extends DerivationPresenter<De
 
     void setLowerLimitError(boolean error);
 
-    void populateValues(List<ValueMapEntry> valuesMap);
+    void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories);
 
     void refreshValuesMapDisplay();
 

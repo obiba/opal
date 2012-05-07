@@ -29,15 +29,15 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
 
   public interface Display extends PopupView {
 
-    public void setMessages(List<String> messages);
+    void setMessages(List<String> messages);
 
-    public void setCaption(String txt);
+    void setCaption(String txt);
 
-    public void setNotificationType(NotificationType type);
+    void setNotificationType(NotificationType type);
 
-    public void setSticky(boolean sticky);
+    void setSticky(boolean sticky);
 
-    public void addNotificationCloseHandler(final NotificationCloseHandler handler);
+    void addNotificationCloseHandler(NotificationCloseHandler handler);
   }
 
   public interface NotificationCloseHandler {
@@ -99,7 +99,7 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
     }
   }
 
-  private void addNotificationCloseHandler(final NotificationCloseHandler handler) {
+  private void addNotificationCloseHandler(NotificationCloseHandler handler) {
     if(handler != null) {
       getView().addNotificationCloseHandler(handler);
     }

@@ -11,16 +11,20 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 public abstract class DerivationPresenter<V extends View> extends PresenterWidget<V> {
+
+  protected static final Translations translations = GWT.create(Translations.class);
 
   private VariableDto originalVariable;
   private VariableDto derivedVariable;

@@ -542,9 +542,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     @Override
     public void onStepIn() {
-//      GWT.log("onStepIn presenter: " + presenter.getClass().getName());
-//      GWT.log("  original: " + VariableDto.stringify(derivationPresenter.getOriginalVariable()));
-//      GWT.log("  derived: " + VariableDto.stringify(derivationPresenter.getDerivedVariable()));
       presenter.initialize(derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
 
       addToSlot(Display.Slots.Derivation, presenter);

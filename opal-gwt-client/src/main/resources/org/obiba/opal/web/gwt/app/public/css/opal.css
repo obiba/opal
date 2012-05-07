@@ -504,7 +504,7 @@ img.clickable {
 }
 
 .gwt-DialogBox .dialogMiddleCenter {
-  padding:0px;
+  padding: 0;
   -webkit-border-radius: 0 0 6px 6px;
   -moz-border-radius: 0 0 6px 6px;
   border-radius: 0 0 6px 6px;
@@ -729,7 +729,7 @@ td.row-actions span {
 
 .top .gwt-MenuBar-horizontal {
   background: transparent;
-  border: 0px;
+  border: 0;
   margin-left:40px;
   display: inline-block;
 }
@@ -777,7 +777,7 @@ td.row-actions span {
 
 .main-content {
   background-color: #ffffff;
-  margin:0.8em 4em 0px 4em;
+  margin:0.8em 4em 0 4em;
   border:0.2em solid #402817;
 }
 
@@ -847,7 +847,7 @@ td.row-actions span {
 }
 
 .workbench .main .panel .title  {
-  font-weight: regular;
+  font-weight: normal;
   color: #444444;
   border-bottom: solid 1px #444444;
   margin-bottom:0.8em;
@@ -992,7 +992,7 @@ td.row-actions span {
 .navigator .gwt-MenuBar-horizontal .gwt-MenuItem {
   color:#666666;
   font-weight:bold;
-  padding:0px;
+  padding:0;
   vertical-align:bottom;
 }
 
@@ -1167,7 +1167,7 @@ div.evaluateScriptPanel {
 
 .resultsPanel table.content {
   border-left-style:none;
-  margin-left:0px;
+  margin-left:0;
 }
 
 div.paging > a {
@@ -1316,7 +1316,7 @@ table.item-properties .key {
 .item-details .gwt-MenuBar-horizontal .gwt-MenuItem {
   color:#666666;
   font-weight:bold;
-  padding:0px;
+  padding:0;
   vertical-align:bottom;
 }
 
@@ -1499,7 +1499,7 @@ div.variablesListTabContent .form table {
 }
 
 .tooltip .resizable-handle.resizable-se {
-  top:0em;
+  top:0;
 }
 
 /* Vertical/Horizontal/BreadCrumb tabs */
@@ -1639,7 +1639,8 @@ ul.tabz li a, ul.tabz li a:visited, ul.tabz li a:hover {
   font-weight: bold;
 }
 
-.value-map .new-value input[type="text"] {
+.value-map .new-value input[type="text"],
+.value-map .new-value select {
   width: 8em;
 }
 

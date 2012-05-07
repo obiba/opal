@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
@@ -39,14 +38,12 @@ import com.gwtplatform.mvp.client.View;
  */
 public class DeriveConclusionPresenter extends DerivationPresenter<DeriveConclusionPresenter.Display> {
 
-  private final Translations translations;
   private JsArray<DatasourceDto> datasources;
   private TableDto table;
 
   @Inject
-  public DeriveConclusionPresenter(EventBus eventBus, Display view, Translations translations) {
+  public DeriveConclusionPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
-    this.translations = translations;
   }
 
   @Override

@@ -22,7 +22,9 @@
           <g:RadioButton name="method" ui:field="rangeRadio">
             <ui:msg description="Group by ranges of values label">Group by ranges of values</ui:msg>
           </g:RadioButton>
-          <g:Label addStyleNames="small-top-margin indent"><ui:msg description="Range mapping description label">Each range of values will be mapped to a category.</ui:msg></g:Label>
+          <g:Label addStyleNames="small-top-margin indent">
+            <ui:msg description="Range mapping description label">Each range of values will be mapped to a category.</ui:msg>
+          </g:Label>
           
           <g:Grid>
             <g:row>
@@ -77,12 +79,16 @@
              <g:RadioButton name="method" ui:field="discreteRadio">
                <ui:msg description="Map discrete values label">Map discrete values</ui:msg>
              </g:RadioButton>
-             <g:Label addStyleNames="small-top-margin indent"><ui:msg description="Discrete value mapping description label">Each value will be mapped to a category.</ui:msg></g:Label>
+             <g:Label addStyleNames="small-top-margin indent">
+               <ui:msg description="Discrete value mapping description label">Each value will be mapped to a category.</ui:msg>
+             </g:Label>
            </g:FlowPanel>
            
            <g:FlowPanel styleName="input">
       	     <g:RadioButton name="method" ui:field="manualRadio"><ui:msg description="Manually label">Manually</ui:msg></g:RadioButton>
-      	     <g:Label addStyleNames="small-top-margin indent"><ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg></g:Label>
+      	     <g:Label addStyleNames="small-top-margin indent">
+               <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
+             </g:Label>
            </g:FlowPanel>
       
          </g:FlowPanel>
@@ -112,9 +118,9 @@
                         </g:customCell>
                         <g:customCell>
                           <g:HorizontalPanel>
-                              <o:NumericTextBox ui:field="addFromBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
+                              <o:NumericTextBox ui:field="addFromBox" width="6em" minConstrained="false" maxConstrained="false"/>
                               <g:InlineLabel addStyleNames="{style.space}">-</g:InlineLabel>
-                              <o:NumericTextBox ui:field="addToBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
+                              <o:NumericTextBox ui:field="addToBox" width="6em" minConstrained="false" maxConstrained="false"/>
                           </g:HorizontalPanel>
                         </g:customCell>
                       </g:row>
@@ -125,7 +131,7 @@
                           </g:RadioButton>
                         </g:customCell>
                         <g:customCell>
-                          <o:NumericTextBox ui:field="valueBox" width="8em" enabled="false" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
+                          <o:NumericTextBox ui:field="valueBox" width="8em" enabled="false" minConstrained="false" maxConstrained="false"/>
                         </g:customCell>
                       </g:row>
                     </g:Grid>
@@ -134,7 +140,7 @@
                 <g:customCell styleName="top small-indent">
                   <g:FlowPanel styleName="input block">
                     <g:Label addStyleNames="key"><ui:msg description="New Value label">New Value</ui:msg></g:Label>
-                    <g:TextBox ui:field="newValueBox" width="8em"></g:TextBox>
+                    <g:TextBox ui:field="newValueBox" width="8em"/>
                   </g:FlowPanel>        
                 </g:customCell>
               </g:row>

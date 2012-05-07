@@ -1,15 +1,17 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
@@ -21,6 +23,7 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.SelectionCell;
 import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -36,13 +39,16 @@ public class ValueMapGrid extends FlowPanel {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private SimplePager pager;
+  private final SimplePager pager;
 
   protected AbstractCellTable<ValueMapEntry> table;
 
   private ListDataProvider<ValueMapEntry> dataProvider;
 
   private List<ValueMapEntry> valueMapEntries;
+
+  @Nullable
+  private List<String> valueChoices;
 
   private int pageSize = DEFAULT_PAGE_SIZE;
 
@@ -67,7 +73,14 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries) {
+    populate(valueMapEntries, null);
+  }
+
+  public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries,
+      @Nullable List<String> valueChoices) {
     this.valueMapEntries = valueMapEntries;
+    this.valueChoices = valueChoices;
+    if(valueChoices != null && !valueChoices.contains("")) valueChoices.add(0, "");
 
     if(dataProvider == null) {
       initializeTable();
@@ -76,7 +89,7 @@ public class ValueMapGrid extends FlowPanel {
     } else {
       dataProvider.setList(valueMapEntries);
     }
-    pager.setVisible((valueMapEntries.size() > pager.getPageSize()));
+    pager.setVisible(valueMapEntries.size() > pager.getPageSize());
     dataProvider.refresh();
 
     addStyleName("value-map");
@@ -110,8 +123,7 @@ public class ValueMapGrid extends FlowPanel {
       @Override
       public void render(Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
         // do not allow removing special rows
-        if(!entry.getType().equals(ValueMapEntryType.EMPTY_VALUES) //
-            && !entry.getType().equals(ValueMapEntryType.OTHER_VALUES)) {
+        if(entry.getType() != ValueMapEntryType.EMPTY_VALUES && entry.getType() != ValueMapEntryType.OTHER_VALUES) {
           super.render(context, entry, sb);
         }
       }
@@ -196,7 +208,8 @@ public class ValueMapGrid extends FlowPanel {
   private void initializeNewValueColumn() {
 
     // New Value
-    Column<ValueMapEntry, String> newValueColumn = new Column<ValueMapEntry, String>(new TextInputCell()) {
+    Cell<String> cell = valueChoices == null ? new TextInputCell() : new SelectionCell(valueChoices);
+    Column<ValueMapEntry, String> newValueColumn = new Column<ValueMapEntry, String>(cell) {
       @Override
       public String getValue(ValueMapEntry entry) {
         return entry.getNewValue();

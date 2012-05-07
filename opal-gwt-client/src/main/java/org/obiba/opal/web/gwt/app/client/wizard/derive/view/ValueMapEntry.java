@@ -49,7 +49,7 @@ public class ValueMapEntry {
 
   public boolean isType(ValueMapEntryType... types) {
     for(ValueMapEntryType t : types) {
-      if(type.equals(t)) return true;
+      if(type == t) return true;
     }
     return false;
   }

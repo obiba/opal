@@ -58,7 +58,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
     this.notificationType = notificationType;
     this.messages = messages;
-    this.messageArgs = (messageArgs != null) ? new ArrayList<String>(messageArgs) : new ArrayList<String>();
+    this.messageArgs = messageArgs != null ? new ArrayList<String>(messageArgs) : new ArrayList<String>();
     this.notificationCloseHandler = notificationCloseHandler;
   }
 
@@ -122,7 +122,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   }
 
   public NotificationEvent nonSticky() {
-    this.sticky = false;
+    sticky = false;
     return this;
   }
 
@@ -170,7 +170,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     }
 
     public Builder error(List<String> messages) {
-      this.event = new NotificationEvent(NotificationType.ERROR, messages, null);
+      event = new NotificationEvent(NotificationType.ERROR, messages, null);
       return this;
     }
 
@@ -179,12 +179,12 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     }
 
     public Builder warn(String... messages) {
-      this.event = new NotificationEvent(NotificationType.WARNING, Arrays.asList(messages), null);
+      event = new NotificationEvent(NotificationType.WARNING, Arrays.asList(messages), null);
       return this;
     }
 
     public Builder info(String... messages) {
-      this.event = new NotificationEvent(NotificationType.INFO, Arrays.asList(messages), null);
+      event = new NotificationEvent(NotificationType.INFO, Arrays.asList(messages), null);
       return this;
     }
 
@@ -200,12 +200,12 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     }
 
     public Builder args(List<String> messageArgs) {
-      this.event.messageArgs = messageArgs;
+      event.messageArgs = messageArgs;
       return this;
     }
 
     public Builder nonSticky() {
-      this.event.nonSticky();
+      event.nonSticky();
       return this;
     }
 

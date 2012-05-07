@@ -230,7 +230,7 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
   }
 
   @Override
-  public void populateValues(List<ValueMapEntry> valuesMap) {
+  public void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories) {
     // clear Add form
     addFromBox.setText("");
     addToBox.setText("");
@@ -239,7 +239,7 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
     addRangeRadio.setValue(true, true);
     addPanel.setOpen(false);
     // populates
-    valuesMapGrid.populate(valuesMap);
+    valuesMapGrid.populate(valuesMap, derivedCategories);
   }
 
   @Override

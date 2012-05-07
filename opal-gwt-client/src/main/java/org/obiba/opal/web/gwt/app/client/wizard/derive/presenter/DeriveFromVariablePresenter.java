@@ -49,7 +49,6 @@ import com.gwtplatform.mvp.client.View;
  */
 public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromVariablePresenter.Display> {
 
-  private Map<String, VariableDto> variablesByName = new HashMap<String, VariableDto>();
   private WizardType wizardType;
   private TableDto table;
 
@@ -59,6 +58,8 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
 
   private final Collection<String> restrictedDatasources = new HashSet<String>();
   private final Collection<String> restrictedTables = new HashSet<String>();
+
+  private final Map<String, VariableDto> variablesByName = new HashMap<String, VariableDto>();
 
   @Inject
   public DeriveFromVariablePresenter(EventBus eventBus, Display view) {

@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCategoric
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -41,16 +42,16 @@ public class DeriveCategoricalVariableStepView extends ViewImpl implements Deriv
 
   interface Template extends SafeHtmlTemplates {
 
-    @com.google.gwt.safehtml.client.SafeHtmlTemplates.Template("<span class=\"{0}\" title=\"{1}\">{2}</span>")
+    @SafeHtmlTemplates.Template("<span class=\"{0}\" title=\"{1}\">{2}</span>")
     SafeHtml spanWithTile(String cssClass, String title, SafeHtml cellContent);
 
   }
 
-  private static Template template = GWT.create(Template.class);
+  private static final Template template = GWT.create(Template.class);
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -67,7 +68,7 @@ public class DeriveCategoricalVariableStepView extends ViewImpl implements Deriv
   @Inject
   public DeriveCategoricalVariableStepView() {
     initializeValueMapGrid();
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
   }
 
   private void initializeValueMapGrid() {
@@ -82,7 +83,7 @@ public class DeriveCategoricalVariableStepView extends ViewImpl implements Deriv
           }
 
           @Override
-          public void render(com.google.gwt.cell.client.Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
+          public void render(Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
             if(entry != null) {
               String cssClasses = getCssClasses(entry.getType());
               SafeHtml safeHtml = SafeHtmlUtils.fromString(getText(entry));
