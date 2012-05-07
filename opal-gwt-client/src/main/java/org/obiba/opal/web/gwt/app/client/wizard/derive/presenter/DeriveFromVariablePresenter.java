@@ -183,7 +183,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
                 variablesByName.put(variableDto.getName(), variableDto);
               }
             }
-            setOriginalVariable(variablesByName.get(getView().getSelectedVariable()));
+            onVariableSelection();
           }
         }).send();
   }
@@ -201,18 +201,13 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
             }
             return true;
           }
-        }).onStepOut(new DeriveFromVariableStepOutHandler()));
+        }));
     return stepBuilders;
   }
 
-  private class DeriveFromVariableStepOutHandler implements WizardStepController.StepOutHandler {
-
-    @Override
-    public void onStepOut() {
-      if(wizardType == DeriveVariablePresenter.FromWizardType) {
-        VariableDtos.setDerivedFrom(getDerivedVariable(), getOriginalVariable());
-      }
-    }
+  private void onVariableSelection() {
+    setOriginalVariable(variablesByName.get(getView().getSelectedVariable()));
+    VariableDtos.setDerivedFrom(getDerivedVariable(), getOriginalVariable());
   }
 
   private void addChangeHandlers() {
@@ -231,7 +226,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
     getView().getVariableList().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        setOriginalVariable(variablesByName.get(getView().getSelectedVariable()));
+        onVariableSelection();
       }
     });
   }

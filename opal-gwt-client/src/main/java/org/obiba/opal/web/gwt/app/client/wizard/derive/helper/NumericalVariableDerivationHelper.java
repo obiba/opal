@@ -57,6 +57,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     }
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   public double addDistinctValues(CategoricalSummaryDto categoricalSummaryDto) {
     List<FrequencyDto> frequenciesList = getFrequenciesList(categoricalSummaryDto);
     double maxFreq = 0;
