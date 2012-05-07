@@ -80,7 +80,9 @@ public class ValueMapGrid extends FlowPanel {
       @Nullable List<String> valueChoices) {
     this.valueMapEntries = valueMapEntries;
     this.valueChoices = valueChoices;
-    if(valueChoices != null && !valueChoices.contains("")) valueChoices.add(0, "");
+    if(hasValueChoices() && !valueChoices.contains("")) {
+      valueChoices.add(0, "");
+    }
 
     if(dataProvider == null) {
       initializeTable();
@@ -97,6 +99,10 @@ public class ValueMapGrid extends FlowPanel {
 
   public void refreshValuesMap() {
     dataProvider.refresh();
+  }
+
+  private boolean hasValueChoices() {
+    return valueChoices != null && !valueChoices.isEmpty();
   }
 
   private void initializeTable() {
@@ -208,7 +214,7 @@ public class ValueMapGrid extends FlowPanel {
   private void initializeNewValueColumn() {
 
     // New Value
-    Cell<String> cell = valueChoices == null ? new TextInputCell() : new SelectionCell(valueChoices);
+    Cell<String> cell = hasValueChoices() ? new SelectionCell(valueChoices) : new TextInputCell();
     Column<ValueMapEntry, String> newValueColumn = new Column<ValueMapEntry, String>(cell) {
       @Override
       public String getValue(ValueMapEntry entry) {
