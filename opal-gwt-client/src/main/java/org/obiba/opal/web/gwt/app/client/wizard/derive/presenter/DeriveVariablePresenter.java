@@ -544,8 +544,10 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     public void onStepIn() {
       presenter.initialize(derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
 
-      addToSlot(Display.Slots.Derivation, presenter);
-      derivationPresenter = presenter;
+      if(derivationPresenter != presenter) {
+        addToSlot(Display.Slots.Derivation, presenter);
+        derivationPresenter = presenter;
+      }
     }
   }
 
