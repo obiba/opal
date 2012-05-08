@@ -77,6 +77,10 @@ public class VariableDtos {
     setAttributeValue(variable, OPAL_NAMESPACE, DERIVED_FROM_ATTRIBUTE, derivedFrom);
   }
 
+  public static void setDerivedFrom(VariableDto variable, VariableDto derivedFrom) {
+    setDerivedFrom(variable, derivedFrom.getLink());
+  }
+
   public static @Nullable String getDescription(VariableDto variable) {
     return getAttributeValue(variable, MAELSTROM_NAMESPACE, DESCRIPTION_ATTRIBUTE);
   }
@@ -90,6 +94,23 @@ public class VariableDtos {
     return attribute == null ? null : attribute.getValue();
   }
 
+  /**
+   * Set the attribute value of a variable (create attribute if it does not exist).
+   * @param variable
+   * @param name
+   * @param value
+   */
+  public static void setAttributeValue(VariableDto variable, String name, String value) {
+    setAttributeValue(variable, null, name, value);
+  }
+
+  /**
+   * Set the attribute value of a variable (create attribute if it does not exist).
+   * @param variable
+   * @param namespace
+   * @param name
+   * @param value
+   */
   public static void setAttributeValue(VariableDto variable, String namespace, String name, String value) {
     AttributeDto attribute = getAttribute(variable, namespace, name);
     if(attribute == null) {
@@ -98,11 +119,6 @@ public class VariableDtos {
       attribute.setValue(value);
     }
   }
-
-  public static void setDerivedFrom(VariableDto variable, VariableDto derivedFrom) {
-    setDerivedFrom(variable, derivedFrom.getLink());
-  }
-
   /**
    * Get an attribute from the provided variable.
    * @param variable
@@ -144,32 +160,6 @@ public class VariableDtos {
     variable.setAttributesArray(attributes);
 
     return attribute;
-  }
-
-  /**
-   * Set the attribute value of a variable (create attribute if it does not exist).
-   * @param variable
-   * @param name
-   * @param value
-   */
-  public static void setAttribute(VariableDto variable, String name, String value) {
-    setAttribute(variable, null, name, value);
-  }
-
-  /**
-   * Set the attribute value of a variable (create attribute if it does not exist).
-   * @param variable
-   * @param namespace
-   * @param name
-   * @param value
-   */
-  public static void setAttribute(VariableDto variable, String namespace, String name, String value) {
-    AttributeDto attr = getAttribute(variable, namespace, name);
-    if(attr == null) {
-      createAttribute(variable, namespace, name, value);
-    } else {
-      attr.setValue(value);
-    }
   }
 
   public enum ValueType {
