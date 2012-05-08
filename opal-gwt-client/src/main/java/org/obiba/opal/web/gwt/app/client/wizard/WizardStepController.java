@@ -29,8 +29,6 @@ public interface WizardStepController {
 
   void onStepIn();
 
-  void onStepOut();
-
   WizardStepController onNext();
 
   WizardStepController onPrevious();
@@ -67,9 +65,4 @@ public interface WizardStepController {
 
   }
 
-  interface StepOutHandler {
-
-    void onStepOut();
-
-  }
 }

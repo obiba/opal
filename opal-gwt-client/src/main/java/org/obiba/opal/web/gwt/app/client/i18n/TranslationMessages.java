@@ -24,4 +24,8 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Category {0} from existing derived variable is not mapped.")
   String destinationCategoryNotMapped(String categoryName);
 
+  @Description("Error at line label")
+  @DefaultMessage("Error at line {0}, column {1}: {2}.")
+  String errorAt(int lineNumber, int columnNumber, String message);
+
 }

@@ -43,9 +43,11 @@ public class DeriveVariableView extends PopupViewImpl implements DeriveVariableP
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  @UiField FlowPanel stepsFlow;
+  @UiField
+  FlowPanel stepsFlow;
 
-  @UiField WizardStep scriptEvaluationStep;
+  @UiField
+  WizardStep scriptEvaluationStep;
 
   private final WizardDialogBox dialog;
 

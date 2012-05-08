@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
@@ -53,7 +54,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private SummaryTabPresenter summaryTabPresenter;
+  private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
+
+  private final SummaryTabPresenter summaryTabPresenter;
 
   private VariableDto originalVariable;
 
@@ -87,7 +90,6 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
       @Override
       public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
-        // TODO Auto-generated method stub
       }
 
     });
@@ -102,7 +104,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   public void setOriginalTable(TableDto originalTable, boolean asTable) {
     this.asTable = asTable;
     this.originalTable = originalTable;
-    getView().setTable(originalTable);
+    getView().setOriginalTable(originalTable);
   }
 
   /**
@@ -111,7 +113,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
    */
   public void setOriginalVariable(VariableDto originalVariable) {
     this.originalVariable = originalVariable;
-    getView().setVariable(originalVariable);
+    getView().setOriginalVariable(originalVariable);
     requestSummary();
   }
 
@@ -279,13 +281,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
         for(JavaScriptErrorDto error : errors) {
-          // TODO translate
-          getEventBus().fireEvent(
-              NotificationEvent
-                  .newBuilder()
-                  .error(
-                      "Error at line " + error.getLineNumber() + ", column " + error.getColumnNumber() + ": "
-                          + error.getMessage()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder()
+              .error(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()))
+              .build());
         }
       }
     }
@@ -301,7 +299,6 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           javaScriptErrors.add(errors.get(i));
         }
       }
-
       return javaScriptErrors;
     }
   }
@@ -322,9 +319,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
     void setValuesVisible(boolean visible);
 
-    void setVariable(VariableDto variable);
+    void setOriginalVariable(VariableDto variable);
 
-    void setTable(TableDto table);
+    void setOriginalTable(TableDto table);
 
     HandlerRegistration setValueSelectionHandler(ValueSelectionHandler handler);
 

@@ -30,6 +30,8 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -39,6 +41,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
@@ -84,6 +87,9 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   @UiField
   PrettyPrintLabel script;
 
+  @UiField
+  TextArea descriptionBox;
+
   private ValueSelectionHandler valueSelectionHandler;
 
   private ValueSetsDataProvider dataProvider;
@@ -125,7 +131,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   }
 
   @Override
-  public void setTable(TableDto table) {
+  public void setOriginalTable(TableDto table) {
     this.table = table;
 
     if(dataProvider != null) {
@@ -144,9 +150,17 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   }
 
   @Override
-  public void setVariable(VariableDto variable) {
+  public void setOriginalVariable(final VariableDto variable) {
     valueType.setText(variable.getValueType());
     script.setText(VariableDtos.getScript(variable));
+
+    descriptionBox.setValue(VariableDtos.getDescription(variable));
+    descriptionBox.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        VariableDtos.setDescription(variable, descriptionBox.getValue());
+      }
+    });
 
     if(dataProvider != null) {
       dataProvider.removeDataDisplay(valuesTable);
@@ -166,7 +180,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
   @Override
   public HandlerRegistration setValueSelectionHandler(ValueSelectionHandler handler) {
-    this.valueSelectionHandler = handler;
+    valueSelectionHandler = handler;
     if(valuesTable.getColumnCount() > 1) {
       ((ValueColumn) valuesTable.getColumn(1)).setValueSelectionHandler(handler);
     }

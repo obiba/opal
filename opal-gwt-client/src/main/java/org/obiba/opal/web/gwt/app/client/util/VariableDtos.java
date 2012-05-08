@@ -21,8 +21,10 @@ import com.google.gwt.core.client.JsArray;
 public class VariableDtos {
 
   public static final String OPAL_NAMESPACE = "opal";
+  public static final String MAELSTROM_NAMESPACE = "maelstrom";
 
   public static final String SCRIPT_ATTRIBUTE = "script";
+  public static final String DESCRIPTION_ATTRIBUTE = "description";
   public static final String DERIVED_FROM_ATTRIBUTE = "derivedFrom";
 
   /**
@@ -54,8 +56,8 @@ public class VariableDtos {
    * @return
    */
   public static String getScript(VariableDto variable) {
-    AttributeDto scriptAttr = getAttribute(variable, null, SCRIPT_ATTRIBUTE);
-    return scriptAttr != null ? scriptAttr.getValue() : "null";
+    String value = getAttributeValue(variable, null, SCRIPT_ATTRIBUTE);
+    return value == null ? "null" : value;
   }
 
   /**
@@ -64,25 +66,36 @@ public class VariableDtos {
    * @param script
    */
   public static void setScript(VariableDto variable, String script) {
-    AttributeDto attr = getAttribute(variable, null, SCRIPT_ATTRIBUTE);
-    if(attr == null) {
-      createAttribute(variable, null, SCRIPT_ATTRIBUTE, script);
-    } else {
-      attr.setValue(script);
-    }
+    setAttributeValue(variable, null, SCRIPT_ATTRIBUTE, script);
   }
 
   public static @Nullable String getDerivedFrom(VariableDto variable) {
-    AttributeDto attribute = getAttribute(variable, OPAL_NAMESPACE, DERIVED_FROM_ATTRIBUTE);
-    return attribute == null ? null : attribute.getValue();
+    return getAttributeValue(variable, OPAL_NAMESPACE, DERIVED_FROM_ATTRIBUTE);
   }
 
   public static void setDerivedFrom(VariableDto variable, String derivedFrom) {
-    AttributeDto attribute = getAttribute(variable, OPAL_NAMESPACE, DERIVED_FROM_ATTRIBUTE);
+    setAttributeValue(variable, OPAL_NAMESPACE, DERIVED_FROM_ATTRIBUTE, derivedFrom);
+  }
+
+  public static @Nullable String getDescription(VariableDto variable) {
+    return getAttributeValue(variable, MAELSTROM_NAMESPACE, DESCRIPTION_ATTRIBUTE);
+  }
+
+  public static void setDescription(VariableDto variable, String description) {
+    setAttributeValue(variable, MAELSTROM_NAMESPACE, DESCRIPTION_ATTRIBUTE, description);
+  }
+
+  public static @Nullable String getAttributeValue(VariableDto variable, String namespace, String name) {
+    AttributeDto attribute = getAttribute(variable, namespace, name);
+    return attribute == null ? null : attribute.getValue();
+  }
+
+  public static void setAttributeValue(VariableDto variable, String namespace, String name, String value) {
+    AttributeDto attribute = getAttribute(variable, namespace, name);
     if(attribute == null) {
-      createAttribute(variable, OPAL_NAMESPACE, DERIVED_FROM_ATTRIBUTE, derivedFrom);
+      createAttribute(variable, namespace, name, value);
     } else {
-      attribute.setValue(derivedFrom);
+      attribute.setValue(value);
     }
   }
 
@@ -163,7 +176,7 @@ public class VariableDtos {
 
     TEXT, DECIMAL, INTEGER, BINARY, BOOLEAN, DATETIME, DATE, LOCALE;
 
-    private String label;
+    private final String label;
 
     ValueType() {
       label = name().toLowerCase();

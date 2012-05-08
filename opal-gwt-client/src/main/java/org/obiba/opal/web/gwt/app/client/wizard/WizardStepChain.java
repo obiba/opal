@@ -105,7 +105,7 @@ public class WizardStepChain {
 
   public static class Builder {
 
-    private WizardStepChain chain;
+    private final WizardStepChain chain;
 
     private DefaultWizardStepController currentStepCtrl;
 

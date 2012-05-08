@@ -22,7 +22,7 @@
             <g:Label addStyleNames="key">
               <ui:msg description="Time span type label">Time span type</ui:msg>
             </g:Label>
-            <g:ListBox ui:field="spanBox"></g:ListBox>
+            <g:ListBox ui:field="spanBox"/>
           </g:FlowPanel>
               </g:customCell>
             </g:row>
@@ -42,7 +42,7 @@
                 <g:Label addStyleNames="key">
                   <ui:msg description="Time span type label">Date range type</ui:msg>
                 </g:Label>
-                <g:ListBox ui:field="rangeBox" enabled="false"></g:ListBox>
+                <g:ListBox ui:field="rangeBox" enabled="false"/>
               </g:FlowPanel>
               </g:customCell>
             

@@ -37,9 +37,9 @@ public abstract class WizardPresenterWidget<V extends WizardView> extends Presen
   @Override
   protected void onBind() {
     super.onBind();
-    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(getView().addFinishClickHandler(new FinishClickHandler()));
-    super.registerHandler(getView().addCloseClickHandler(new CloseClickHandler()));
+    registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
+    registerHandler(getView().addFinishClickHandler(new FinishClickHandler()));
+    registerHandler(getView().addCloseClickHandler(new CloseClickHandler()));
   }
 
   /**
@@ -65,6 +65,7 @@ public abstract class WizardPresenterWidget<V extends WizardView> extends Presen
 
   class CancelClickHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent e) {
       getView().hide();
       onCancel();
@@ -73,6 +74,7 @@ public abstract class WizardPresenterWidget<V extends WizardView> extends Presen
 
   class FinishClickHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent e) {
       if(hideOnFinish()) {
         getView().hide();
@@ -83,6 +85,7 @@ public abstract class WizardPresenterWidget<V extends WizardView> extends Presen
 
   class CloseClickHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent e) {
       if(hideOnFinish() == false) {
         getView().hide();

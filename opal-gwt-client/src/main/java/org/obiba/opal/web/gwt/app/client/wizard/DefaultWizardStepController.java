@@ -44,7 +44,6 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Set the title of the last appended step.
-     *
      * @param text
      * @return
      */
@@ -55,7 +54,6 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Set a provider of help for the last appended step.
-     *
      * @param provider
      * @return
      */
@@ -67,7 +65,6 @@ public class DefaultWizardStepController implements WizardStepController {
     /**
      * Set if the last appended step is a conclusion: when entering this step the navigation buttons
      * (next/previous/finish) will be hidden and close/cancel will be available.
-     *
      * @return
      */
     public Builder conclusion() {
@@ -77,7 +74,6 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback that validates the current step before switching to the next step.
-     *
      * @param validator
      * @return
      */
@@ -88,7 +84,6 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback to ask for the step to reset its display.
-     *
      * @param handler
      * @return
      */
@@ -99,23 +94,11 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback to execute some code before steping into this step
-     *
      * @param handler
      * @return
      */
     public Builder onStepIn(StepInHandler handler) {
       currentStepCtrl.setStepInHandler(handler);
-      return this;
-    }
-
-    /**
-     * Callback to execute some code after steping out of this step
-     *
-     * @param handler
-     * @return
-     */
-    public Builder onStepOut(StepOutHandler handler) {
-      currentStepCtrl.setStepOutHandler(handler);
       return this;
     }
 
@@ -168,8 +151,6 @@ public class DefaultWizardStepController implements WizardStepController {
 
   private StepInHandler stepInHandler;
 
-  private StepOutHandler stepOutHandler;
-
   private ValidationHandler validator;
 
   private ResetHandler reset;
@@ -200,10 +181,6 @@ public class DefaultWizardStepController implements WizardStepController {
 
   public void setStepInHandler(StepInHandler stepInHandler) {
     this.stepInHandler = stepInHandler;
-  }
-
-  public void setStepOutHandler(StepOutHandler stepOutHandler) {
-    this.stepOutHandler = stepOutHandler;
   }
 
   void setValidator(ValidationHandler validator) {
@@ -258,19 +235,11 @@ public class DefaultWizardStepController implements WizardStepController {
   }
 
   @Override
-  public void onStepOut() {
-    if(stepOutHandler != null) {
-      stepOutHandler.onStepOut();
-    }
-  }
-
-  @Override
   public WizardStepController onNext() {
     WizardStepController nextStep = getNext();
     if(nextStep == null) throw new IllegalStateException("No next step");
     if(getStep().isVisible() && !validate()) return this;
     getStep().setVisible(false);
-    onStepOut();
     nextStep.onStepIn();
     nextStep.getStep().setVisible(true);
     return nextStep;

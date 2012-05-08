@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class WizardDialogBox extends DialogBox {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private DockLayoutPanel contentLayout;
 
@@ -47,8 +47,6 @@ public class WizardDialogBox extends DialogBox {
 
   private Button close;
 
-  private ResizeHandle resizeHandle;
-
   private Tooltip helpTooltip;
 
   private String helpTooltipWidth;
@@ -56,10 +54,9 @@ public class WizardDialogBox extends DialogBox {
   private String helpTooltipHeight;
 
   /**
-   * 
+   *
    */
   public WizardDialogBox() {
-    super();
     initWidget();
   }
 
@@ -73,7 +70,7 @@ public class WizardDialogBox extends DialogBox {
   }
 
   public void setAutoHide(boolean autoHide) {
-    super.setAutoHideEnabled(autoHide);
+    setAutoHideEnabled(autoHide);
   }
 
   /**
@@ -104,7 +101,8 @@ public class WizardDialogBox extends DialogBox {
     contentLayout.addSouth(south = new FlowPanel(), 4);
     south.addStyleName("footer");
 
-    south.add(resizeHandle = new ResizeHandle());
+    ResizeHandle resizeHandle = new ResizeHandle();
+    south.add(resizeHandle);
     resizeHandle.makeResizable(contentLayout);
 
     initNavigationControls(south);
@@ -191,7 +189,7 @@ public class WizardDialogBox extends DialogBox {
   }
 
   public void setStep(Widget w) {
-    this.setWidget(w);
+    setWidget(w);
   }
 
   @Override
@@ -202,7 +200,7 @@ public class WizardDialogBox extends DialogBox {
 
   @Override
   public void add(Widget w) {
-    this.setWidget(w);
+    setWidget(w);
   }
 
   public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
@@ -246,14 +244,16 @@ public class WizardDialogBox extends DialogBox {
     helpTooltip.clear();
     if(w != null) {
       helpTooltip.add(w);
-      this.helpTooltipWidth = width;
-      this.helpTooltipHeight = height;
+      helpTooltipWidth = width;
+      helpTooltipHeight = height;
     }
   }
 
   public void setProgress(boolean progress) {
-    if(progress) addStyleName("progress");
-    else
+    if(progress) {
+      addStyleName("progress");
+    } else {
       removeStyleName("progress");
+    }
   }
 }

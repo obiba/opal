@@ -59,7 +59,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     protected CategorizeWizard(EventBus eventBus, Provider<DeriveVariablePresenter> wizardProvider) {
       super(eventBus, CategorizeWizardType, wizardProvider);
     }
-
   }
 
   public static final WizardType CustomWizardType = new WizardType();
@@ -544,6 +543,15 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     @Override
     public void onStepIn() {
+//      GWT.log("current: " + derivationPresenter.getClass().getName());
+//      GWT.log("next: " + presenter.getClass().getName());
+//      GWT.log("  originalTable: " + (derivationPresenter.getOriginalTable() == null ? null : derivationPresenter
+//          .getOriginalTable().getName()));
+//      GWT.log("  destinationTable: " + (derivationPresenter.getDestinationTable() == null ? null : derivationPresenter
+//          .getDestinationTable().getName()));
+//      GWT.log("  originalVariable: " + VariableDto.stringify(derivationPresenter.getOriginalVariable()));
+//      GWT.log("  destinationVariable: " + VariableDto.stringify(derivationPresenter.getDerivedVariable()));
+
       presenter.initialize(derivationPresenter.getOriginalTable(), derivationPresenter.getDestinationTable(),
           derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
 
