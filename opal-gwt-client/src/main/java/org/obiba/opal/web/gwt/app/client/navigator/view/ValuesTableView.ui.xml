@@ -7,7 +7,7 @@
   ui:generateLocales="default">
   
   <g:FlowPanel ui:field="valuesPanel">
-     <g:InlineLabel ui:field="noValues"><ui:msg description="No Variables label">No Values</ui:msg></g:InlineLabel>
+     <g:InlineLabel ui:field="noValues"><ui:msg description="No Values label">No Values</ui:msg></g:InlineLabel>
      <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"></g:PopupPanel>
      
      <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">

@@ -12,6 +12,21 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 import java.util.AbstractList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -41,20 +56,6 @@ import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.gwtplatform.mvp.client.ViewImpl;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 
 public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Display {
 
@@ -137,8 +138,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
       @Override
       public void onClick(ClickEvent event) {
-        if(lastFilter.equals(filter.getText()) == false || maxVisibleColumns != visibleColumns.getNumberValue()
-            .intValue()) {
+        if(lastFilter.equals(filter.getText()) == false
+            || maxVisibleColumns != visibleColumns.getNumberValue().intValue()) {
           // variables list has changed so update all
           lastFilter = filter.getText();
           maxVisibleColumns = visibleColumns.getNumberValue().intValue();
@@ -431,8 +432,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(2);
         int idx = firstVisibleIndex++ + getMaxVisibleColumns();
-        valuesTable
-            .insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
+        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)),
+            getColumnLabel(idx));
       }
       valuesTable.redrawHeaders();
     }
@@ -476,7 +477,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   }
 
-  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements ValuesTablePresenter.ValueSetsProvider {
+  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements
+      ValuesTablePresenter.ValueSetsProvider {
 
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
@@ -500,8 +502,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
       setRefreshing(false);
-      listValueSetVariable = JsArrays.toList(valueSets.getVariablesArray());
-      updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
+      listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
+      updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
     }
   }
 

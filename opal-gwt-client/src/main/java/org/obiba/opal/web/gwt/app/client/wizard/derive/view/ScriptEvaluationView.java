@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluatio
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ValueSetFetcher;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -33,9 +34,9 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -62,17 +63,26 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
   private final Widget widget;
 
-  @UiField Panel summary;
+  @UiField
+  Panel summary;
 
-  @UiField CellTable<ValueSetsDto.ValueSetDto> valuesTable;
+  @UiField
+  Table<ValueSetsDto.ValueSetDto> valuesTable;
 
-  @UiField SimplePager pager;
+  @UiField
+  SimplePager pager;
 
-  @UiField HorizontalTabLayout tabs;
+  @UiField
+  InlineLabel noValues;
 
-  @UiField Label valueType;
+  @UiField
+  HorizontalTabLayout tabs;
 
-  @UiField PrettyPrintLabel script;
+  @UiField
+  Label valueType;
+
+  @UiField
+  PrettyPrintLabel script;
 
   private ValueSelectionHandler valueSelectionHandler;
 
@@ -85,6 +95,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   @Inject
   public ScriptEvaluationView() {
     widget = uiBinder.createAndBindUi(this);
+    valuesTable.setEmptyTableWidget(noValues);
     pager.setDisplay(valuesTable);
     pager.setPageSize(DEFAULT_PAGE_SIZE);
   }
@@ -122,7 +133,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
       dataProvider = null;
     }
 
-    valuesTable.setRowCount(table.getValueSetCount(), table.getValueSetCount() != 0);
+    valuesTable.setRowCount(table.getValueSetCount(), true);
 
     while(valuesTable.getColumnCount() > 0) {
       valuesTable.removeColumn(0);
@@ -183,7 +194,8 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   // Inner classes
   //
 
-  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements ValueSetsProvider {
+  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements
+      ValueSetsProvider {
 
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
@@ -205,7 +217,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
-      updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
+      updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
     }
 
   }
