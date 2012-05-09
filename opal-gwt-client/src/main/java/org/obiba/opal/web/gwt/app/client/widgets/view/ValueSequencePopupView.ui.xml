@@ -1,6 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-    xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"  
     xmlns:pretty="urn:import:org.obiba.opal.web.gwt.prettify.client"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
@@ -23,7 +23,8 @@
               </o:PropertiesTable>
               <g:FlowPanel>
                 <g:InlineLabel ui:field="noValues"><ui:msg description="No Variables label">No Values</ui:msg></g:InlineLabel>
-                <o:Table width="100%" ui:field="valuesTable" addStyleNames="top-margin left-aligned"/>
+                <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="top-margin right-aligned"></c:SimplePager>
+                <o:Table width="100%" ui:field="valuesTable" addStyleNames="left-aligned"/>
               </g:FlowPanel>
             </g:FlowPanel>
           </g:ScrollPanel>

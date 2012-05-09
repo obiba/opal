@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Table<T> extends CellTable<T> {
 
-  private static final int DEFAULT_PAGESIZE = 15;
+  public static final int DEFAULT_PAGESIZE = 15;
 
   private static final TableResources resources = GWT.<TableResources> create(TableResources.class);
 

@@ -38,6 +38,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Header;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -78,6 +79,9 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
 
   @UiField
   Label noValues;
+
+  @UiField
+  SimplePager pager;
 
   @UiField
   Button closeButton;
@@ -226,6 +230,8 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
 
   private void initValuesTable() {
     valuesTable.setEmptyTableWidget(noValues);
+    pager.setDisplay(valuesTable);
+    pager.setPageSize(Table.DEFAULT_PAGESIZE);
 
     TextColumn<ValueOccurrence> occColumn = new TextColumn<ValueOccurrence>() {
 
