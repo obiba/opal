@@ -24,6 +24,7 @@ import org.obiba.magma.views.View.Builder;
 import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.opal.web.magma.Dtos;
+import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableListViewDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -96,5 +97,15 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
       return ((ValueTableReference) vt).getReference();
     }
     return vt.getDatasource().getName() + "." + vt.getName();
+  }
+
+  @Override
+  public TableDto asTableDto(ViewDto viewDto, org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder) {
+    VariableListViewDto listDto = viewDto.getExtension(VariableListViewDto.view);
+    if(listDto.getVariablesCount() > 0) {
+      tableDtoBuilder.setEntityType(listDto.getVariables(0).getEntityType());
+    }
+    tableDtoBuilder.addAllVariables(listDto.getVariablesList());
+    return tableDtoBuilder.build();
   }
 }

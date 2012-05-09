@@ -9,19 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -39,7 +30,22 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.FileViewDto;
+import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
+import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display> {
 
@@ -101,7 +107,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private void initDatasources() {
     if(datasourceName != null) {
       UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<DatasourceDto>() {
             @Override
             public void onResource(Response response, DatasourceDto resource) {
@@ -113,8 +119,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
             }
           }).send();
     } else {
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get().withCallback(
-          new ResourceCallback<JsArray<DatasourceDto>>() {
+      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
+          .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
             @Override
             public void onResource(Response response, JsArray<DatasourceDto> resource) {
               getView().setDatasources(JsArrays.toSafeArray(resource));
@@ -169,8 +175,9 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private final class FileSelectionValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(getView().getSelectedFile().length() > 0 && (getView().getSelectedFile().endsWith(".xls") || getView()
-          .getSelectedFile().endsWith(".xlsx"))) {
+      if(getView().getSelectedFile().length() > 0
+          && (getView().getSelectedFile().endsWith(".xls") || getView().getSelectedFile().endsWith(".xlsx") || getView()
+              .getSelectedFile().endsWith(".xml"))) {
         return true;
       } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExcelFileRequired").build());
@@ -227,8 +234,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
         public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == 201) {
-            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(),
-                getView().getSelectedDatasource(), getView().getDatasourceCreatedCallback(), factory, resource);
+            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getView()
+                .getSelectedDatasource(), getView().getDatasourceCreatedCallback(), factory, resource);
           }
         }
       };
@@ -245,19 +252,48 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
         }
       };
 
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder()//
+      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder()//
           .forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory))//
           .withCallback(callback)//
           .withCallback(400, errorCallback).withCallback(500, errorCallback).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
+      if(tmpFilePath.endsWith(".xls") || tmpFilePath.endsWith(".xlsx")) {
+        return createExcelDatasourceFactoryDto(tmpFilePath);
+      } else {
+        return createStaticDatasourceFactoryDto(tmpFilePath);
+      }
+    }
+
+    private DatasourceFactoryDto createExcelDatasourceFactoryDto(String tmpFilePath) {
       ExcelDatasourceFactoryDto excelDto = ExcelDatasourceFactoryDto.create();
       excelDto.setFile(tmpFilePath);
       excelDto.setReadOnly(true);
 
       DatasourceFactoryDto dto = DatasourceFactoryDto.create();
       dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, excelDto);
+
+      return dto;
+    }
+
+    private DatasourceFactoryDto createStaticDatasourceFactoryDto(String tmpFilePath) {
+      StaticDatasourceFactoryDto staticDto = StaticDatasourceFactoryDto.create();
+      ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder();
+      String name = tmpFilePath.substring(tmpFilePath.lastIndexOf('/') + 1, tmpFilePath.lastIndexOf('.'));
+      viewDtoBuilder.setName(name);
+
+      FileViewDto fileView = FileViewDto.create();
+      fileView.setFilename(tmpFilePath);
+      fileView.setType(FileViewType.SERIALIZED_XML);
+
+      viewDtoBuilder.fileView(fileView);
+      JsArray<ViewDto> views = JsArrays.create();
+      views.push(viewDtoBuilder.build());
+      staticDto.setViewsArray(views);
+
+      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+      dto.setExtension(StaticDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, staticDto);
 
       return dto;
     }

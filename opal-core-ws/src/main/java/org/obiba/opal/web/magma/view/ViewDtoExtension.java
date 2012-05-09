@@ -10,6 +10,7 @@
 package org.obiba.opal.web.magma.view;
 
 import org.obiba.magma.views.View;
+import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 
 /**
@@ -22,6 +23,8 @@ public interface ViewDtoExtension {
   boolean isDtoOf(View view);
 
   View fromDto(ViewDto viewDto, View.Builder viewBuilder);
+
+  TableDto asTableDto(ViewDto viewDto, TableDto.Builder tableDtoBuilder);
 
   ViewDto asDto(View view);
 }

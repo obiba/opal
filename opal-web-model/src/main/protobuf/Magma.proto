@@ -88,6 +88,14 @@ message LimesurveyDatasourceFactoryDto {
   } 
 }
 
+message StaticDatasourceFactoryDto {
+  repeated TableDto tables = 1;
+  repeated ViewDto views = 2;
+  extend DatasourceFactoryDto { 
+    optional StaticDatasourceFactoryDto params = 1006; 
+  } 
+}
+
 message DatasourceParsingErrorDto {
   required string defaultMessage = 1;
   required string key = 2;

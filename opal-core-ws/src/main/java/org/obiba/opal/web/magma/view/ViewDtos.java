@@ -16,6 +16,7 @@ import java.util.Set;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
+import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,16 @@ public final class ViewDtos {
     for(ViewDtoExtension extension : extensions) {
       if(extension.isExtensionOf(viewDto)) {
         return extension.fromDto(viewDto, builder);
+      }
+    }
+    throw new IllegalStateException("Unknown view type");
+  }
+
+  public TableDto asTableDto(ViewDto viewDto) {
+    TableDto.Builder builder = TableDto.newBuilder().setName(viewDto.getName());
+    for(ViewDtoExtension extension : extensions) {
+      if(extension.isExtensionOf(viewDto)) {
+        return extension.asTableDto(viewDto, builder);
       }
     }
     throw new IllegalStateException("Unknown view type");

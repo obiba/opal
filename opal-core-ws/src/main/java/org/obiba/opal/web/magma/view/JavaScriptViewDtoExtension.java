@@ -21,6 +21,7 @@ import org.obiba.magma.views.View.Builder;
 import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.opal.web.model.Magma.JavaScriptViewDto;
+import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.stereotype.Component;
 
@@ -86,5 +87,10 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
       return ((ValueTableReference) vt).getReference();
     }
     return vt.getDatasource().getName() + "." + vt.getName();
+  }
+
+  @Override
+  public TableDto asTableDto(ViewDto viewDto, org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder) {
+    throw new UnsupportedOperationException();
   }
 }

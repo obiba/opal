@@ -15,6 +15,8 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.VariablesClause;
 import org.obiba.magma.lang.Closeables;
@@ -26,7 +28,9 @@ import org.obiba.magma.views.support.AllClause;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma.FileViewDto;
+import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -96,6 +100,54 @@ public class FileViewDtoExtension implements ViewDtoExtension {
         VariablesClause vc = new VariablesClause();
         vc.setVariables(Sets.newLinkedHashSet(t.getVariables()));
         return viewBuilder.select(new NoneClause()).list(vc).where(new AllClause()).build();
+      } finally {
+        Disposables.silentlyDispose(ed);
+      }
+    }
+    throw new IllegalStateException("unknown view file type " + fileDto.getType());
+  }
+
+  @Override
+  public TableDto asTableDto(ViewDto viewDto, org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder) {
+    FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
+    InputStream is = null;
+    try {
+      FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
+      if(file.exists()) {
+        is = file.getContent().getInputStream();
+        return makeTableDtoFromFile(tableDtoBuilder, fileDto, is);
+      }
+      throw new RuntimeException("cannot find file specified '" + fileDto.getFilename() + "'");
+    } catch(FileSystemException e) {
+      throw new RuntimeException(e);
+    } finally {
+      Closeables.closeQuietly(is);
+    }
+  }
+
+  private TableDto makeTableDtoFromFile(org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder, FileViewDto fileDto, InputStream is) {
+    switch(fileDto.getType()) {
+    case SERIALIZED_XML:
+      // Serialized view
+      View view = (View) MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream().fromXML(is);
+      view.initialise();
+      for(VariableValueSource vs : view.getListClause().getVariableValueSources()) {
+        Variable v = vs.getVariable();
+        tableDtoBuilder.setEntityType(v.getEntityType());
+        tableDtoBuilder.addVariables(Dtos.asDto(v));
+      }
+      return tableDtoBuilder.build();
+    case EXCEL:
+      ExcelDatasource ed = new ExcelDatasource("tmp", is);
+      try {
+        Initialisables.initialise(ed);
+        // Get the first table, whichever it is
+        ValueTable t = ed.getValueTables().iterator().next();
+        tableDtoBuilder.setEntityType(t.getEntityType());
+        for(Variable v : t.getVariables()) {
+          tableDtoBuilder.addVariables(Dtos.asDto(v));
+        }
+        return tableDtoBuilder.build();
       } finally {
         Disposables.silentlyDispose(ed);
       }
