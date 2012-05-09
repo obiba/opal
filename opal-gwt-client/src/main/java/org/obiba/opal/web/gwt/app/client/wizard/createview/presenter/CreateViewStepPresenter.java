@@ -13,18 +13,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
@@ -40,6 +28,8 @@ import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidato
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
@@ -59,6 +49,19 @@ import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewStepPresenter.Display> {
 
@@ -80,6 +83,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   private String datasourceName;
 
   private DatasourceDto datasourceDto;
+
+  private Runnable overwriteConfirmation;
 
   //
   // Constructors
@@ -118,9 +123,10 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getView().addConfigureHandler(new ConfigureHandler()));
+    registerHandler(getView().addConfigureHandler(new ConfigureHandler()));
     getView().setTablesValidator(new TablesValidator());
     getView().setSelectTypeValidator(new SelectTypeValidator());
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
   }
 
   @Override
@@ -149,7 +155,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       if(event.getEventParameters()[0] instanceof String) {
         datasourceName = (String) event.getEventParameters()[0];
         UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-        ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
+        ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get()
             .withCallback(new ResourceCallback<DatasourceDto>() {
 
               @Override
@@ -169,18 +175,18 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     // Get the view name and datasource name.
     String viewName = getView().getViewName().getText();
 
-    ViewFoundDoNotCreateCallback doNotCreate = new ViewFoundDoNotCreateCallback();
+    ViewFoundCallback overwrite = new ViewFoundCallback();
     ViewNotFoundCreateCallback create = new ViewNotFoundCreateCallback();
 
     // Create the resource request (the builder).
-    getViewRequest(datasourceName, viewName).withCallback(Response.SC_OK, doNotCreate)//
+    getViewRequest(datasourceName, viewName).withCallback(Response.SC_OK, overwrite)//
         .withCallback(Response.SC_NOT_FOUND, create).send();
   }
 
   private ResourceRequestBuilder<ViewDto> getViewRequest(String datasourceName, String viewName) {
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "view", viewName);
-    return ResourceRequestBuilderFactory.<ViewDto>newBuilder()
-        .get().forResource(ub.build()).accept("application/x-protobuf+json");
+    return ResourceRequestBuilderFactory.<ViewDto> newBuilder().get().forResource(ub.build())
+        .accept("application/x-protobuf+json");
   }
 
   private void createView() {
@@ -192,8 +198,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     String viewName = getView().getViewName().getText();
 
     // Build the ViewDto for the request.
-    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName)
-        .fromTables(tableListPresenter.getTables());
+    ViewDtoBuilder viewDtoBuilder =
+        ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
 
     // Create the resource request (the builder).
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "views");
@@ -205,6 +211,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
         .withCallback(Response.SC_OK, completed)//
         .withCallback(Response.SC_BAD_REQUEST, failed)//
         .withCallback(Response.SC_NOT_FOUND, failed)//
+        .withCallback(Response.SC_FORBIDDEN, failed)//
         .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
 
@@ -226,6 +233,35 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       viewDtoBuilder.fileView(fileView);
     }
     return viewDtoBuilder.build();
+  }
+
+  private void updateView() {
+    getView().renderPendingConclusion();
+
+    CompletedCallback completed = new CompletedCallback();
+    FailedCallback failed = new FailedCallback();
+
+    String viewName = getView().getViewName().getText();
+
+    // Build the ViewDto for the request.
+    ViewDtoBuilder viewDtoBuilder =
+        ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
+
+    // Create the resource request (the builder).
+    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "view", viewName);
+    ResourceRequestBuilder<JavaScriptObject> resourceRequestBuilder = ResourceRequestBuilderFactory.newBuilder()//
+        .put()//
+        .forResource(ub.build())//
+        .withResourceBody(ViewDto.stringify(createViewDto(viewDtoBuilder)))//
+        .withCallback(Response.SC_CREATED, completed)//
+        .withCallback(Response.SC_OK, completed)//
+        .withCallback(Response.SC_BAD_REQUEST, failed)//
+        .withCallback(Response.SC_NOT_FOUND, failed)//
+        .withCallback(Response.SC_FORBIDDEN, failed)//
+        .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
+
+    resourceRequestBuilder.send();
   }
 
   //
@@ -316,15 +352,15 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
       validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired"));
-      validators.add(
-          new DisallowedCharactersValidator(getView().getViewName(), new char[] {'.', ':'}, "ViewNameDisallowedChars"));
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator
-          .asSet(getView().getAddVariablesOneByOneOption(), getView().getFileViewOption(),
-              getView().getExcelFileOption()), "VariableDefinitionMethodRequired"));
-      validators.add(new ConditionalValidator(getView().getFileViewOption(),
-          new RequiredFileSelectionValidator("XMLFileRequired")));
-      validators.add(new ConditionalValidator(getView().getExcelFileOption(),
-          new RequiredFileSelectionValidator("ExcelFileRequired")));
+      validators.add(new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' },
+          "ViewNameDisallowedChars"));
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getView()
+          .getAddVariablesOneByOneOption(), getView().getFileViewOption(), getView().getExcelFileOption()),
+          "VariableDefinitionMethodRequired"));
+      validators.add(new ConditionalValidator(getView().getFileViewOption(), new RequiredFileSelectionValidator(
+          "XMLFileRequired")));
+      validators.add(new ConditionalValidator(getView().getExcelFileOption(), new RequiredFileSelectionValidator(
+          "ExcelFileRequired")));
       return validators;
     }
   }
@@ -350,11 +386,31 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
   }
 
-  class ViewFoundDoNotCreateCallback implements ResponseCodeCallback {
+  class ViewFoundCallback implements ResponseCodeCallback {
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExists").build());
+      // getEventBus().fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExists").build());
+      overwriteConfirmation = new Runnable() {
+        @Override
+        public void run() {
+          updateView();
+        }
+      };
+      getEventBus().fireEvent(
+          new ConfirmationRequiredEvent(overwriteConfirmation, "overwriteView", "confirmOverwriteView"));
+    }
+  }
+
+  private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    @SuppressWarnings("AssignmentToNull")
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(overwriteConfirmation != null && event.getSource().equals(overwriteConfirmation) && event.isConfirmed()) {
+        overwriteConfirmation.run();
+        overwriteConfirmation = null;
+      }
     }
   }
 
