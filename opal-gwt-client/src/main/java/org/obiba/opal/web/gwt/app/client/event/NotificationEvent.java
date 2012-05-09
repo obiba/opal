@@ -51,7 +51,8 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   // Constructors
   //
 
-  private NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
+  private NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs,
+      NotificationCloseHandler notificationCloseHandler) {
     if(messages.isEmpty()) {
       throw new IllegalArgumentException("Missing message");
     }
@@ -66,7 +67,8 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     this(notificationType, messages, messageArgs, null);
   }
 
-  private NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs, NotificationCloseHandler notificationCloseHandler) {
+  private NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs,
+      NotificationCloseHandler notificationCloseHandler) {
     this(notificationType, Arrays.asList(message), messageArgs, notificationCloseHandler);
   }
 
@@ -178,14 +180,22 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
       return error(Arrays.asList(messages));
     }
 
+    public Builder warn(List<String> messages) {
+      event = new NotificationEvent(NotificationType.WARNING, messages, null);
+      return this;
+    }
+
     public Builder warn(String... messages) {
-      event = new NotificationEvent(NotificationType.WARNING, Arrays.asList(messages), null);
+      return warn(Arrays.asList(messages));
+    }
+
+    public Builder info(List<String> messages) {
+      event = new NotificationEvent(NotificationType.INFO, messages, null);
       return this;
     }
 
     public Builder info(String... messages) {
-      event = new NotificationEvent(NotificationType.INFO, Arrays.asList(messages), null);
-      return this;
+      return info(Arrays.asList(messages));
     }
 
     public Builder args(String... messageArgs) {

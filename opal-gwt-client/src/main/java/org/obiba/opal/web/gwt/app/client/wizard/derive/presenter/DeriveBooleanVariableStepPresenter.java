@@ -63,7 +63,12 @@ public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<Deri
 
           @Override
           public List<String> getErrors() {
-            return derivationHelper.validateMapStep();
+            return derivationHelper.getMapStepErrors();
+          }
+
+          @Override
+          public List<String> getWarnings() {
+            return derivationHelper.getMapStepWarnings();
           }
         }));
     return stepBuilders;

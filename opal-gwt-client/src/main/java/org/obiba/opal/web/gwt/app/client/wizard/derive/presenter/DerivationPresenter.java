@@ -93,13 +93,21 @@ public abstract class DerivationPresenter<V extends View> extends PresenterWidge
 
     public abstract List<String> getErrors();
 
+    public abstract List<String> getWarnings();
+
     @Override
     public boolean validate() {
+      List<String> warnings = getWarnings();
+      if(!warnings.isEmpty()) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().warn(warnings).build());
+      }
+
       List<String> errors = getErrors();
       if(!errors.isEmpty()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errors).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().warn(errors).build());
         return false;
       }
+
       return true;
     }
   }

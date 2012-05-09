@@ -31,7 +31,8 @@ import com.gwtplatform.mvp.client.View;
 /**
  *
  */
-public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<DeriveCategoricalVariableStepPresenter.Display> {
+public class DeriveCategoricalVariableStepPresenter extends
+    DerivationPresenter<DeriveCategoricalVariableStepPresenter.Display> {
 
   private CategoricalVariableDerivationHelper derivationHelper;
 
@@ -48,14 +49,14 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
   void initialize(TableDto originalTable, TableDto destinationTable, final VariableDto originalVariable,
       final VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
-    //TODO use uribuilder
-    ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
+    // TODO use uribuilder
+    ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()
         .forResource(getOriginalVariable().getLink() + "/summary?nature=categorical&distinct=true").get()
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
           public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
-            derivationHelper = new CategoricalVariableDerivationHelper(originalVariable, derivedVariable,
-                statisticsDto);
+            derivationHelper =
+                new CategoricalVariableDerivationHelper(originalVariable, derivedVariable, statisticsDto);
             derivationHelper.initializeValueMapEntries();
             getView().enableFrequencyColumn(true);
             getView().setMaxFrequency(derivationHelper.getMaxFrequency());
@@ -79,7 +80,12 @@ public class DeriveCategoricalVariableStepPresenter extends DerivationPresenter<
 
           @Override
           public List<String> getErrors() {
-            return derivationHelper.validateMapStep();
+            return derivationHelper.getMapStepErrors();
+          }
+
+          @Override
+          public List<String> getWarnings() {
+            return derivationHelper.getMapStepWarnings();
           }
         }));
     return stepBuilders;

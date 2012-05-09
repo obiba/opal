@@ -41,7 +41,8 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;
 
-public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<DeriveOpenTextualVariableStepPresenter.Display> {
+public class DeriveOpenTextualVariableStepPresenter extends
+    DerivationPresenter<DeriveOpenTextualVariableStepPresenter.Display> {
 
   public static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
 
@@ -69,7 +70,12 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
           @Override
           public List<String> getErrors() {
-            return derivationHelper.validateMapStep();
+            return derivationHelper.getMapStepErrors();
+          }
+
+          @Override
+          public List<String> getWarnings() {
+            return derivationHelper.getMapStepWarnings();
           }
         }));
     return stepBuilders;
@@ -134,16 +140,18 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
         final List<String> destinationCategories = DerivationHelper.getDestinationCategories(getDerivedVariable());
         getView().populateValues(new ArrayList<ValueMapEntry>(), destinationCategories);
 
-        ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
+        ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
             .forResource(link).get()//
             .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
 
               @Override
               public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
-                categoricalSummaryDto = summaryStatisticsDto
-                    .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-                derivationHelper = new OpenTextualVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
-                    summaryStatisticsDto, getView().getMethod());
+                categoricalSummaryDto =
+                    summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical)
+                        .cast();
+                derivationHelper =
+                    new OpenTextualVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
+                        summaryStatisticsDto, getView().getMethod());
                 derivationHelper.initializeValueMapEntries();
                 JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
                 for(int i = 0; i < frequenciesArray.length(); i++) {
@@ -156,8 +164,8 @@ public class DeriveOpenTextualVariableStepPresenter extends DerivationPresenter<
 
               private Double getMaxFrequency() {
                 if(categoricalSummaryDto.getFrequenciesArray() == null) return 0d;
-                return Iterables
-                    .find(JsArrays.toList(categoricalSummaryDto.getFrequenciesArray()), new Predicate<FrequencyDto>() {
+                return Iterables.find(JsArrays.toList(categoricalSummaryDto.getFrequenciesArray()),
+                    new Predicate<FrequencyDto>() {
 
                       @Override
                       public boolean apply(FrequencyDto dto) {

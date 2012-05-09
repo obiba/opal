@@ -32,11 +32,13 @@ public abstract class DerivationHelper {
   protected static final String NA = "N/A";
 
   protected static final Translations translations = GWT.create(Translations.class);
+
   protected static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   protected List<ValueMapEntry> valueMapEntries;
 
   protected VariableDto originalVariable;
+
   private final VariableDto destination;
 
   public DerivationHelper(VariableDto originalVariable, VariableDto destination) {
@@ -125,16 +127,20 @@ public abstract class DerivationHelper {
     return originalVariable;
   }
 
-  public List<String> validateMapStep() {
-    List<String> errors = new ArrayList<String>();
+  public List<String> getMapStepWarnings() {
+    List<String> warnings = new ArrayList<String>();
     if(getDerivedVariable() != null) {
       for(String derivedCategory : getDestinationCategories(getDerivedVariable())) {
         if(!hasValueMapEntryWithNewValue(derivedCategory)) {
-          errors.add(translationMessages.destinationCategoryNotMapped(derivedCategory));
+          warnings.add(translationMessages.destinationCategoryNotMapped(derivedCategory));
         }
       }
     }
-    return errors;
+    return warnings;
+  }
+
+  public List<String> getMapStepErrors() {
+    return new ArrayList<String>();
   }
 
 }
