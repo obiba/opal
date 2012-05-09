@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
@@ -50,6 +51,8 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
     HasAuthorization getImportDataAuthorizer();
 
     HasAuthorization getExportDataAuthorizer();
+
+    HandlerRegistration refreshClickHandler(ClickHandler handler);
   }
 
   @ContentSlot
@@ -101,6 +104,14 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
       }
     }));
 
+    super.registerHandler(getView().refreshClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent arg0) {
+        getEventBus().fireEvent(new DatasourcesRefreshEvent());
+
+      }
+    }));
   }
 
   @Override
@@ -111,20 +122,21 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
   private void authorize() {
     // create datasource
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post().authorize(getView().getCreateDatasourceAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").post()
+        .authorize(getView().getCreateDatasourceAuthorizer()).send();
     // import data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post()//
-    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
-    .and("/functional-units", HttpMethod.GET)//
-    .authorize(getView().getImportDataAuthorizer()).build())//
-    .send();
+        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+            .and("/functional-units", HttpMethod.GET)//
+            .authorize(getView().getImportDataAuthorizer()).build())//
+        .send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
-    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
-    .and("/functional-units", HttpMethod.GET)//
-    .and("/functional-units/entities/table", HttpMethod.GET)//
-    .authorize(getView().getExportDataAuthorizer()).build())//
-    .send();
+        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+            .and("/functional-units", HttpMethod.GET)//
+            .and("/functional-units/entities/table", HttpMethod.GET)//
+            .authorize(getView().getExportDataAuthorizer()).build())//
+        .send();
   }
 
 }

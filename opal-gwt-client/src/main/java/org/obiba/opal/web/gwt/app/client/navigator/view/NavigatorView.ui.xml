@@ -21,6 +21,7 @@
           <ui:msg description="Data Export label">Export Data</ui:msg>
         </g:Button>
       </g:FlowPanel>
+      <g:Button ui:field="refreshButton" styleName="btn iconb i-sync"><ui:msg description="Refresh label">Refresh</ui:msg></g:Button>
       <o:HelpImage page="Working+with+Datasources"></o:HelpImage>
     </g:FlowPanel>
     <g:SplitLayoutPanel>

@@ -12,24 +12,17 @@ package org.obiba.opal.web.gwt.app.client.navigator.event;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
-public class DatasourceRemovedEvent extends GwtEvent<DatasourceRemovedEvent.Handler> {
+public class DatasourcesRefreshEvent extends GwtEvent<DatasourcesRefreshEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onDatasourceRemoved(DatasourceRemovedEvent event);
+    void onRefresh(DatasourcesRefreshEvent event);
 
   }
 
   private static Type<Handler> TYPE;
 
-  private final String datasourceName;
-
-  public DatasourceRemovedEvent(String datasourceName) {
-    this.datasourceName = datasourceName;
-  }
-
-  public String getDatasourceName() {
-    return datasourceName;
+  public DatasourcesRefreshEvent() {
   }
 
   public static Type<Handler> getType() {
@@ -38,7 +31,7 @@ public class DatasourceRemovedEvent extends GwtEvent<DatasourceRemovedEvent.Hand
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onDatasourceRemoved(this);
+    handler.onRefresh(this);
   }
 
   @Override

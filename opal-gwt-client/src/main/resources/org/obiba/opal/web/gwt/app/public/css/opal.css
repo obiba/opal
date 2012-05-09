@@ -815,6 +815,7 @@ td.row-actions span {
   margin-left: 0.8em;
   font-size: 0.9em;
   padding:0.1em 0.8em;
+  float: left;
 }
 
 .workbench div.top .control .btn-group {

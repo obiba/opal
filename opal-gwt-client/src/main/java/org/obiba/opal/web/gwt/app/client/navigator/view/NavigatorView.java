@@ -50,6 +50,9 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @UiField
   Button exportDataButton;
 
+  @UiField
+  Button refreshButton;
+
   public NavigatorView() {
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -123,4 +126,8 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
     return new UIObjectAuthorizer(exportDataButton);
   }
 
+  @Override
+  public HandlerRegistration refreshClickHandler(ClickHandler handler) {
+    return refreshButton.addClickHandler(handler);
+  }
 }
