@@ -109,33 +109,33 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-    .append(fileSelectionStep, fileSelectionHelp)//
-    .title(translations.variablesImportFileSelectionStep())//
-    .onReset(new ResetHandler() {
+        .append(fileSelectionStep, fileSelectionHelp)//
+        .title(translations.variablesImportFileSelectionStep())//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        fileSelection.clearFile();
-        datasources.setSelectedIndex(0);
-        hideErrors();
-      }
-    })//
+          @Override
+          public void onReset() {
+            fileSelection.clearFile();
+            datasources.setSelectedIndex(0);
+            hideErrors();
+          }
+        })//
 
-    .append(compareStep)//
-    .title(translations.variablesImportCompareStep())//
-    .help(new WidgetProvider() {
+        .append(compareStep)//
+        .title(translations.variablesImportCompareStep())//
+        .help(new WidgetProvider() {
 
-      @Override
-      public Widget getWidget() {
-        return compareDisplay.getStepHelp();
-      }
-    })//
+          @Override
+          public Widget getWidget() {
+            return compareDisplay.getStepHelp();
+          }
+        })//
 
-    .append(conclusionStep)//
-    .title(translations.variablesImportPending())//
-    .conclusion()//
+        .append(conclusionStep)//
+        .title(translations.variablesImportPending())//
+        .conclusion()//
 
-    .onPrevious().onCancel().onClose().build();
+        .onPrevious().onCancel().onClose().build();
   }
 
   private void showErrors(ClientErrorDto errorDto) {
@@ -143,6 +143,16 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
       failed.setVisible(true);
       datasourceParsingErrors.setErrors(errorDto);
       datasourceParsingErrors.setVisible(true);
+    }
+  }
+
+  @Override
+  public void setSelectedDatasource(String dsName) {
+    for(int i = 0; i < datasources.getItemCount(); i++) {
+      if(datasources.getValue(i).equals(dsName)) {
+        datasources.setSelectedIndex(i);
+        break;
+      }
     }
   }
 

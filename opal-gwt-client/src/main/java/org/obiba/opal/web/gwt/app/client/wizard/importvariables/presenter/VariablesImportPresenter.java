@@ -25,7 +25,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
@@ -105,28 +104,16 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   private void initDatasources() {
-    if(datasourceName != null) {
-      UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get()
-          .withCallback(new ResourceCallback<DatasourceDto>() {
-            @Override
-            public void onResource(Response response, DatasourceDto resource) {
-              JsArray<DatasourceDto> datasources = JsArray.createArray().cast();
-              if(resource != null) {
-                datasources.push(resource);
-              }
-              getView().setDatasources(datasources);
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            getView().setDatasources(JsArrays.toSafeArray(resource));
+            if(datasourceName != null) {
+              getView().setSelectedDatasource(datasourceName);
             }
-          }).send();
-    } else {
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
-          .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<DatasourceDto> resource) {
-              getView().setDatasources(JsArrays.toSafeArray(resource));
-            }
-          }).send();
-    }
+          }
+        }).send();
   }
 
   protected void addEventHandlers() {
@@ -141,6 +128,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   public void onWizardRequired(WizardRequiredEvent event) {
     if(event.getEventParameters().length > 0) {
       datasourceName = (String) event.getEventParameters()[0];
+      getView().setSelectedDatasource(datasourceName);
     }
   }
 
@@ -207,6 +195,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     void hideErrors();
 
     String getSelectedDatasource();
+
+    void setSelectedDatasource(String dsName);
 
     void setDatasources(JsArray<DatasourceDto> datasources);
 
