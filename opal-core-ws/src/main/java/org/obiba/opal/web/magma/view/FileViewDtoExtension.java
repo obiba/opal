@@ -88,23 +88,31 @@ public class FileViewDtoExtension implements ViewDtoExtension {
   private View makeViewFromFile(Builder viewBuilder, FileViewDto fileDto, InputStream is) {
     switch(fileDto.getType()) {
     case SERIALIZED_XML:
-      // Serialized view
-      View view = (View) MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream().fromXML(is);
-      return viewBuilder.select(view.getSelectClause()).list(view.getListClause()).where(view.getWhereClause()).build();
+      makeViewFromXMLFile(viewBuilder, fileDto, is);
     case EXCEL:
-      ExcelDatasource ed = new ExcelDatasource("tmp", is);
-      try {
-        Initialisables.initialise(ed);
-        // Get the first table, whichever it is
-        ValueTable t = ed.getValueTables().iterator().next();
-        VariablesClause vc = new VariablesClause();
-        vc.setVariables(Sets.newLinkedHashSet(t.getVariables()));
-        return viewBuilder.select(new NoneClause()).list(vc).where(new AllClause()).build();
-      } finally {
-        Disposables.silentlyDispose(ed);
-      }
+      makeViewFromExcelFile(viewBuilder, fileDto, is);
     }
     throw new IllegalStateException("unknown view file type " + fileDto.getType());
+  }
+
+  private View makeViewFromXMLFile(Builder viewBuilder, FileViewDto fileDto, InputStream is) {
+    // Serialized view
+    View view = (View) MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream().fromXML(is);
+    return viewBuilder.select(view.getSelectClause()).list(view.getListClause()).where(view.getWhereClause()).build();
+  }
+
+  private View makeViewFromExcelFile(Builder viewBuilder, FileViewDto fileDto, InputStream is) {
+    ExcelDatasource ed = new ExcelDatasource("tmp", is);
+    try {
+      Initialisables.initialise(ed);
+      // Get the first table, whichever it is
+      ValueTable t = ed.getValueTables().iterator().next();
+      VariablesClause vc = new VariablesClause();
+      vc.setVariables(Sets.newLinkedHashSet(t.getVariables()));
+      return viewBuilder.select(new NoneClause()).list(vc).where(new AllClause()).build();
+    } finally {
+      Disposables.silentlyDispose(ed);
+    }
   }
 
   @Override
@@ -128,31 +136,39 @@ public class FileViewDtoExtension implements ViewDtoExtension {
   private TableDto makeTableDtoFromFile(org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder, FileViewDto fileDto, InputStream is) {
     switch(fileDto.getType()) {
     case SERIALIZED_XML:
-      // Serialized view
-      View view = (View) MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream().fromXML(is);
-      view.initialise();
-      for(VariableValueSource vs : view.getListClause().getVariableValueSources()) {
-        Variable v = vs.getVariable();
-        tableDtoBuilder.setEntityType(v.getEntityType());
+      return makeTableDtoFromXMLFile(tableDtoBuilder, fileDto, is);
+    case EXCEL:
+      makeTableDtoFromExcelFile(tableDtoBuilder, fileDto, is);
+    }
+    throw new IllegalStateException("unknown view file type " + fileDto.getType());
+  }
+
+  private TableDto makeTableDtoFromXMLFile(org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder, FileViewDto fileDto, InputStream is) {
+    // Serialized view
+    View view = (View) MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream().fromXML(is);
+    view.initialise();
+    for(VariableValueSource vs : view.getListClause().getVariableValueSources()) {
+      Variable v = vs.getVariable();
+      tableDtoBuilder.setEntityType(v.getEntityType());
+      tableDtoBuilder.addVariables(Dtos.asDto(v));
+    }
+    return tableDtoBuilder.build();
+  }
+
+  private TableDto makeTableDtoFromExcelFile(org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder, FileViewDto fileDto, InputStream is) {
+    ExcelDatasource ed = new ExcelDatasource("tmp", is);
+    try {
+      Initialisables.initialise(ed);
+      // Get the first table, whichever it is
+      ValueTable t = ed.getValueTables().iterator().next();
+      tableDtoBuilder.setEntityType(t.getEntityType());
+      for(Variable v : t.getVariables()) {
         tableDtoBuilder.addVariables(Dtos.asDto(v));
       }
       return tableDtoBuilder.build();
-    case EXCEL:
-      ExcelDatasource ed = new ExcelDatasource("tmp", is);
-      try {
-        Initialisables.initialise(ed);
-        // Get the first table, whichever it is
-        ValueTable t = ed.getValueTables().iterator().next();
-        tableDtoBuilder.setEntityType(t.getEntityType());
-        for(Variable v : t.getVariables()) {
-          tableDtoBuilder.addVariables(Dtos.asDto(v));
-        }
-        return tableDtoBuilder.build();
-      } finally {
-        Disposables.silentlyDispose(ed);
-      }
+    } finally {
+      Disposables.silentlyDispose(ed);
     }
-    throw new IllegalStateException("unknown view file type " + fileDto.getType());
   }
 
 }
