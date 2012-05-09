@@ -1156,7 +1156,7 @@ public interface Translations extends Constants {
   String recodeBooleanStepTitle();
 
   @Description("Derive From Variable Step title")
-  @DefaultStringValue("Select from which variable derivation should be performed")
+  @DefaultStringValue("Select from which variable derivation should be performed.")
   String deriveFromVariableStepTitle();
 
   @Description("Empty Value label")
