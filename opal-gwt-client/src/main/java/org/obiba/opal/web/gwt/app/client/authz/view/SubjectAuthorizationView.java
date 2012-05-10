@@ -9,17 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.authz.view;
 
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
-
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.PermissionSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.Acls;
 
 import com.google.gwt.cell.client.CheckboxCell;
@@ -80,10 +74,6 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
 
   private JsArrayDataProvider<Acls> subjectPermissionsDataProvider = new JsArrayDataProvider<Acls>();
 
-  private boolean actionsColumnAdded;
-
-  private ActionsColumn<Acls> actionsColumn;
-
   //
   // Static Variables
   //
@@ -97,7 +87,9 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
   //
 
   public SubjectAuthorizationView() {
-    principal = new SuggestBox(suggestions = new MultiWordSuggestOracle(), new TextBox(), suggestionDisplay = new SubjectSuggestionDisplay());
+    principal =
+        new SuggestBox(suggestions = new MultiWordSuggestOracle(), new TextBox(), suggestionDisplay =
+            new SubjectSuggestionDisplay());
     widget = uiBinder.createAndBindUi(this);
     initAclsTable();
   }
@@ -120,11 +112,6 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
 
   @UiTemplate("SubjectAuthorizationView.ui.xml")
   interface AuthorizationViewUiBinder extends UiBinder<Widget, SubjectAuthorizationView> {
-  }
-
-  @Override
-  public HasActionHandler<Acls> getActionsColumn() {
-    return actionsColumn;
   }
 
   @Override
@@ -171,25 +158,16 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
 
   @Override
   public void initColumn(String header, PermissionSelectionHandler permHandler) {
-    if(!actionsColumnAdded) {
-      addPermissionColumn(header, permHandler);
-    }
+    addPermissionColumn(header, permHandler);
   }
 
   @Override
   public void renderSubjectSuggestions(JsArray<Acls> subjects) {
     suggestions.clear();
-    for(Acls acls : JsArrays.toIterable(subjects)) {
-      suggestions.add(acls.getSubject().getPrincipal());
-    }
   }
 
   @Override
   public void renderPermissions(JsArray<Acls> subjectPermissions) {
-    if(!actionsColumnAdded) {
-      table.addColumn(actionsColumn, translations.actionsLabel());
-      actionsColumnAdded = true;
-    }
     subjectPermissionsDataProvider.setArray(subjectPermissions);
     subjectPermissionsDataProvider.refresh();
 
@@ -205,10 +183,6 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
         return object.getSubject().getPrincipal();
       }
     }, translations.whoLabel());
-
-    actionsColumn = new ActionsColumn<Acls>(new ConstantActionsProvider<Acls>(DELETE_ACTION));
-
-    actionsColumnAdded = false;
 
     table.setPageSize(PAGER_SIZE);
     pager.setDisplay(table);
@@ -240,7 +214,8 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
     };
 
     column.setFieldUpdater(fieldUpdater);
-    String headerStr = translations.permissionMap().containsKey(header) ? translations.permissionMap().get(header) : header;
+    String headerStr =
+        translations.permissionMap().containsKey(header) ? translations.permissionMap().get(header) : header;
     table.addColumn(column, headerStr);
 
   }

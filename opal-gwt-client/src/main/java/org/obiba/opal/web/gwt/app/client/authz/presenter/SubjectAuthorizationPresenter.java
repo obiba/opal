@@ -9,12 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclGetCallback;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
@@ -33,6 +32,8 @@ import com.gwtplatform.mvp.client.View;
 public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthorizationPresenter.Display> {
 
   private SubjectPermissionsRequest subjectPermissionsRequests;
+
+  private JsArray<Acls> subjects;
 
   private JsArray<Acls> subjectPermissions;
 
@@ -61,22 +62,12 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
   @Override
   public void onReveal() {
     if(initialized) {
-      subjectPermissionsRequests.get();
       subjectPermissionsRequests.getSubjects(new SubjectSuggestionsCallback());
     }
   }
 
   @Override
   protected void onBind() {
-    if(getView().getActionsColumn() != null) {
-      getView().getActionsColumn().setActionHandler(new ActionHandler<Acls>() {
-        public void doAction(Acls perms, String actionName) {
-          if(actionName != null && actionName.equals(DELETE_ACTION)) {
-            subjectPermissionsRequests.delete(perms.getSubject());
-          }
-        }
-      });
-    }
     getView().addPrincipalHandler(new AddPrincipalHandlerImpl());
   }
 
@@ -113,12 +104,19 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
     @SuppressWarnings("unchecked")
     @Override
     public void onGetFailed(Response response) {
-      getView().renderSubjectSuggestions((JsArray<Acls>) JsArray.createArray());
+      subjects = (JsArray<Acls>) JsArray.createArray();
+      getSubjectPermissions();
     }
 
     @Override
     public void onGet(JsArray<Acls> resource) {
-      getView().renderSubjectSuggestions(resource);
+      subjects = JsArrays.toSafeArray(resource);
+      getSubjectPermissions();
+    }
+
+    private void getSubjectPermissions() {
+      getView().renderSubjectSuggestions(subjects);
+      subjectPermissionsRequests.get();
     }
   }
 
@@ -130,7 +128,20 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
 
     @Override
     public void onGet(JsArray<Acls> resource) {
-      subjectPermissions = resource;
+      subjectPermissions = JsArrays.toSafeArray(resource);
+      List<String> principals = new ArrayList<String>();
+      for(int i = 0; i < subjectPermissions.length(); i++) {
+        Acls acls = subjectPermissions.get(i);
+        Subject subject = acls.getSubject();
+        principals.add(subject.getPrincipal());
+      }
+      for(int i = 0; i < subjects.length(); i++) {
+        Acls acls = subjects.get(i);
+        Subject subject = acls.getSubject();
+        if(principals.contains(subject.getPrincipal()) == false) {
+          subjectPermissions.push(acls);
+        }
+      }
       getView().renderPermissions(subjectPermissions);
     }
 
@@ -174,8 +185,6 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
     void initColumn(String header, PermissionSelectionHandler permHandler);
 
     void clear();
-
-    HasActionHandler<Acls> getActionsColumn();
 
     String getPrincipal();
 

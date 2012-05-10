@@ -44,13 +44,25 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
     super.onReveal();
 
     authorize();
-    ResourceRequestBuilderFactory.newBuilder().forResource("/participants/count").get().withCallback(200, new ResponseCodeCallback() {
+
+    ResponseCodeCallback noOp = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        getView().setParticipantCount(Integer.parseInt(response.getText()));
       }
-    }).send();
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource("/participants/count").get()
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setParticipantCount(Integer.parseInt(response.getText()));
+          }
+        })//
+        .withCallback(Response.SC_FORBIDDEN, noOp)//
+        .withCallback(Response.SC_METHOD_NOT_ALLOWED, noOp)//
+        .send();
 
   }
 
@@ -60,11 +72,16 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   }
 
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(getView().getDatasourcesAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(getView().getUnitsAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(getView().getReportsAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(getView().getFilesAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(getView().getJobsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get()
+        .authorize(getView().getDatasourcesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get()
+        .authorize(getView().getUnitsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
+        .authorize(getView().getReportsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get()
+        .authorize(getView().getFilesAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get()
+        .authorize(getView().getJobsAuthorizer()).send();
   }
 
   //
