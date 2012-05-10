@@ -88,9 +88,9 @@ public class FileViewDtoExtension implements ViewDtoExtension {
   private View makeViewFromFile(Builder viewBuilder, FileViewDto fileDto, InputStream is) {
     switch(fileDto.getType()) {
     case SERIALIZED_XML:
-      makeViewFromXMLFile(viewBuilder, fileDto, is);
+      return makeViewFromXMLFile(viewBuilder, fileDto, is);
     case EXCEL:
-      makeViewFromExcelFile(viewBuilder, fileDto, is);
+      return makeViewFromExcelFile(viewBuilder, fileDto, is);
     }
     throw new IllegalStateException("unknown view file type " + fileDto.getType());
   }
@@ -138,7 +138,7 @@ public class FileViewDtoExtension implements ViewDtoExtension {
     case SERIALIZED_XML:
       return makeTableDtoFromXMLFile(tableDtoBuilder, fileDto, is);
     case EXCEL:
-      makeTableDtoFromExcelFile(tableDtoBuilder, fileDto, is);
+      return makeTableDtoFromExcelFile(tableDtoBuilder, fileDto, is);
     }
     throw new IllegalStateException("unknown view file type " + fileDto.getType());
   }
