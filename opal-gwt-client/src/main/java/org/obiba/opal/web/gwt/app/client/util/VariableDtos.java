@@ -18,14 +18,16 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
 
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.DERIVED_FROM_ATTRIBUTE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.DESCRIPTION_ATTRIBUTE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.MAELSTROM_NAMESPACE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.OPAL_NAMESPACE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.SCRIPT_ATTRIBUTE;
+
 public class VariableDtos {
 
-  public static final String OPAL_NAMESPACE = "opal";
-  public static final String MAELSTROM_NAMESPACE = "maelstrom";
-
-  public static final String SCRIPT_ATTRIBUTE = "script";
-  public static final String DESCRIPTION_ATTRIBUTE = "description";
-  public static final String DERIVED_FROM_ATTRIBUTE = "derivedFrom";
+  private VariableDtos() {
+  }
 
   /**
    * True if variable has at least one category defined.

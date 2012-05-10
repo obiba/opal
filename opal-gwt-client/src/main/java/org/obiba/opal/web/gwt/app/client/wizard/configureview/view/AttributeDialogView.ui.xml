@@ -1,36 +1,33 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:o="urn:org.obiba.opal.web.gwt.app.client.widgets.view"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder
+    xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <ui:style>
     .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
     .right-aligned { float: right; }
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="18em" width="35em">
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="38em" width="45em">
     <g:caption>
       <ui:msg description="Add new attribute title" >Add New Attribute</ui:msg>
     </g:caption>
-    <g:DockLayoutPanel unit="EM" height="18em" width="35em">
+    <g:DockLayoutPanel unit="EM" height="38em" width="45em">
       <g:center>
       <g:ScrollPanel>
         <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
             <table class="gwt-KeyValue full-width" cellspacing="10">
               <tbody>
                 <tr>
+                  <td valign="top"><ui:msg description="Namespace label">Namespace</ui:msg>:</td>
+                  <td><o:DropdownSuggestBox ui:field="namespaceBox"/></td>
+                </tr>
+                <tr>
                   <td valign="top"><ui:msg description="Name label">Name</ui:msg>:</td>
-                  <td>
-                    <g:InlineLabel ui:field="uneditableName"></g:InlineLabel>
-                    <g:FlowPanel ui:field="editableName">
-                      <g:FlowPanel>
-		                <g:RadioButton name="name" ui:field="predefinedAttributeNameRadioButton" checked="true"><ui:msg description="Predefined label">Predefined:</ui:msg></g:RadioButton><g:ListBox ui:field="labels" addStyleNames="small-indent"/>
-		              </g:FlowPanel>
-		              <g:FlowPanel addStyleNames="top-margin">
-		                <g:RadioButton name="name" ui:field="customAttributeNameRadioButton"><ui:msg description="Custom label">Custom:</ui:msg></g:RadioButton><g:TextBox name="customAttributeName" ui:field="customAttributeName" visibleLength="24"  addStyleNames="small-indent"/>
-		              </g:FlowPanel>           
-		            </g:FlowPanel>
-                  </td>
+                  <td><o:DropdownSuggestBox ui:field="nameBox"/></td>
                 </tr>
                 <tr>
                   <td valign="top"><ui:msg description="Value label">Value</ui:msg>:</td>
@@ -45,10 +42,10 @@
         <g:HTMLPanel addStyleNames="footer">
           <span class="{style.right-aligned} top-margin">
             <g:Button ui:field="saveButton" styleName="btn btn-primary">
-                <ui:msg description="Save button label">Save</ui:msg>
+              <ui:msg description="Save button label">Save</ui:msg>
             </g:Button>
             <g:Button ui:field="cancelButton" styleName="btn">
-                <ui:msg description="Cancel button label">Cancel</ui:msg>
+              <ui:msg description="Cancel button label">Cancel</ui:msg>
             </g:Button>
           </span>
         </g:HTMLPanel>

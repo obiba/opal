@@ -1,26 +1,25 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
-
-import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.EDIT_ACTION;
 
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.LabelValueColumn;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.Localizable;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -30,6 +29,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
@@ -38,14 +39,22 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 
+import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.EDIT_ACTION;
+
 public class LocalizablesView extends Composite implements LocalizablesPresenter.Display {
-  //
-  // Static Variables
-  //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  public static final int PAGE_SIZE = 10;
 
-  private static Translations translations = GWT.create(Translations.class);
+  private String valueColumnName;
+
+  @UiTemplate("LocalizablesView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, LocalizablesView> {
+  }
+
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
@@ -95,13 +104,14 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
     }
   }
 
+  @Override
   public String getSelectedLocale() {
     int selectedIndex = localeListBox.getSelectedIndex();
-    return (selectedIndex != -1) ? localeListBox.getValue(selectedIndex) : null;
+    return selectedIndex != -1 ? localeListBox.getValue(selectedIndex) : null;
   }
 
   @Override
-  public void setTableData(final List<Localizable> localizables) {
+  public void setTableData(List<Localizable> localizables) {
     dataProvider.setList(localizables);
     pager.setVisible(localizables.size() > localizablesTable.getPageSize());
     pager.firstPage();
@@ -136,10 +146,6 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   public void stopProcessing() {
   }
 
-  //
-  // Methods
-  //
-
   private void initTable() {
     addTableColumns();
     addPager();
@@ -147,35 +153,47 @@ public class LocalizablesView extends Composite implements LocalizablesPresenter
   }
 
   private void addPager() {
-    localizablesTable.setPageSize(10);
+    localizablesTable.setPageSize(PAGE_SIZE);
     pager.setDisplay(localizablesTable);
   }
 
+  @Override
+  public void setValueColumnName(String valueColumnName) {
+    this.valueColumnName = valueColumnName;
+  }
+
+  @SuppressWarnings("unchecked")
   private void addTableColumns() {
-    localizablesTable.addColumn(new TextColumn<Localizable>() {
+
+    localizablesTable.addColumn(new LabelValueColumn<Localizable>() {
+
       @Override
-      public String getValue(Localizable object) {
-        return object.getName();
+      public String getLabel(Localizable localizable) {
+        return localizable.getNamespace();
+      }
+
+      @Override
+      public String getContent(Localizable localizable) {
+        return localizable.getName();
       }
     }, translations.nameLabel());
 
-    localizablesTable.addColumn(new TextColumn<Localizable>() {
+    Header<String> valueHeader = new Header<String>(new TextCell()) {
+      @Override
+      public String getValue() {
+        return valueColumnName;
+      }
+    };
+    TextColumn<Localizable> valueColumn = new TextColumn<Localizable>() {
       @Override
       public String getValue(Localizable object) {
         return object.getLabel();
       }
-    }, translations.labelLabel());
+    };
+    localizablesTable.addColumn(valueColumn, valueHeader);
 
     actionsColumn = new ActionsColumn<Localizable>(EDIT_ACTION, DELETE_ACTION);
-    localizablesTable.addColumn((ActionsColumn<Localizable>) actionsColumn, translations.actionsLabel());
-  }
-
-  //
-  // Inner Classes / Interfaces
-  //
-
-  @UiTemplate("LocalizablesView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, LocalizablesView> {
+    localizablesTable.addColumn((Column<Localizable, ?>) actionsColumn, translations.actionsLabel());
   }
 
   @Override

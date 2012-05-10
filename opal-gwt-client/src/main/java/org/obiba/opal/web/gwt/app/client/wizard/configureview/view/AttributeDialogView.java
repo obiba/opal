@@ -1,68 +1,59 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import org.obiba.opal.web.gwt.app.client.util.AttributeDtos;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class AttributeDialogView extends Composite implements AttributeDialogPresenter.Display {
+
+  private Collection<String> uniqueNames;
 
   @UiTemplate("AttributeDialogView.ui.xml")
   interface MyUiBinder extends UiBinder<DialogBox, AttributeDialogView> {
   }
 
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   @UiField
   DialogBox dialog;
 
   @UiField
-  FlowPanel editableName;
+  DropdownSuggestBox namespaceBox;
 
   @UiField
-  RadioButton predefinedAttributeNameRadioButton;
-
-  @UiField
-  RadioButton customAttributeNameRadioButton;
-
-  @UiField
-  InlineLabel uneditableName;
-
-  private boolean nameEditable;
-
-  @UiField
-  ListBox labels;
-
-  @UiField
-  TextBox customAttributeName;
+  DropdownSuggestBox nameBox;
 
   @UiField
   SimplePanel simplePanel;
@@ -78,9 +69,8 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   public AttributeDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
-
-    nameEditable = true;
-    setAttributeNameEditable(nameEditable);
+    initNamespaces();
+    registerHandlers();
   }
 
   @Override
@@ -98,11 +88,9 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
 
   @Override
   public void clear() {
-    customAttributeName.setText("");
-
-    if(inputField != null) {
-      inputField.clearAttributes();
-    }
+    namespaceBox.clear();
+    nameBox.clear();
+    if(inputField != null) inputField.clearAttributes();
   }
 
   @Override
@@ -126,54 +114,10 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
     return saveButton;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;
-  }
-
-  @Override
-  public void setAttributeNameEditable(boolean editable) {
-    nameEditable = editable;
-
-    uneditableName.setVisible(!editable);
-    editableName.setVisible(editable);
-  }
-
-  @Override
-  public HandlerRegistration addPredefinedAttributeNameRadioButtonClickHandler(ClickHandler handler) {
-    return predefinedAttributeNameRadioButton.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addCustomAttributeNameRadioButtonClickHandler(ClickHandler handler) {
-    return customAttributeNameRadioButton.addClickHandler(handler);
-  }
-
-  @Override
-  public void setLabelsEnabled(boolean enabled) {
-    labels.setEnabled(enabled);
-  }
-
-  @Override
-  public void setCustomAttributeNameEnabled(boolean enabled) {
-    customAttributeName.setEnabled(enabled);
-  }
-
-  @Override
-  public void selectPredefinedAttributeNameRadioButton() {
-    predefinedAttributeNameRadioButton.setValue(true, true);
-    customAttributeNameRadioButton.setValue(false, true);
-  }
-
-  public void selectCustomAttributeNameRadioButton() {
-    predefinedAttributeNameRadioButton.setValue(false, true);
-    customAttributeNameRadioButton.setValue(true, true);
-  }
-
-  @Override
-  public HasText getCustomAttributeName() {
-    return customAttributeName;
   }
 
   @Override
@@ -186,15 +130,31 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   @Override
   public void removeInputField() {
     simplePanel.clear();
-    inputField = null;
   }
 
-  @Override
-  public void setNameDropdownList(List<String> labels) {
-    this.labels.clear();
-    for(String label : labels) {
-      this.labels.addItem(label, label);
-    }
+  private void initNamespaces() {
+    Set<String> namespaces = new HashSet<String>(AttributeDtos.NAMESPACE_ATTRIBUTES.keySet());
+    namespaces.remove(null);
+    namespaceBox.getSuggestOracle().clear();
+    namespaceBox.getSuggestOracle().addAll(new TreeSet<String>(namespaces));
+  }
+
+  private void registerHandlers() {
+    namespaceBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<String> stringValueChangeEvent) {
+        String value = stringValueChangeEvent.getValue();
+        GWT.log("event: "+ value);
+        GWT.log("namespaceBox: "+ namespaceBox.getSuggestOracle());
+        List<String> names = AttributeDtos.NAMESPACE_ATTRIBUTES.get(value);
+        nameBox.getSuggestOracle().clear();
+        if(names != null) {
+          SortedSet<String> sorted = new TreeSet<String>(names);
+          sorted.addAll(uniqueNames);
+          nameBox.getSuggestOracle().addAll(sorted);
+        }
+      }
+    });
   }
 
   @Override
@@ -203,50 +163,25 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
-  public HasText getAttributeName() {
-    return new HasText() {
-
-      @Override
-      public void setText(String arg0) {
-      }
-
-      @Override
-      public String getText() {
-        if(nameEditable) {
-          if(predefinedAttributeNameRadioButton.getValue()) {
-            return labels.getValue(labels.getSelectedIndex());
-          } else {
-            return customAttributeName.getText();
-          }
-        } else {
-          return uneditableName.getText();
-        }
-      }
-    };
+  public HasText getNamespace() {
+    return namespaceBox;
   }
 
   @Override
-  public void setAttributeName(String attributeName) {
-    if(nameEditable) {
-      int index = getLabelIndex(attributeName);
-      if(index != -1) {
-        labels.setItemSelected(index, true);
-        this.customAttributeName.setText("");
-      } else {
-        setLabelsEnabled(false);
-        setCustomAttributeNameEnabled(true);
-        selectCustomAttributeNameRadioButton();
-        this.customAttributeName.setText(attributeName);
-      }
-    } else {
-      uneditableName.setText(attributeName);
-    }
+  public HasText getName() {
+    return nameBox;
   }
 
-  private int getLabelIndex(String name) {
-    for(int i = 0; i < labels.getItemCount(); i++) {
-      if(labels.getValue(i).equals(name)) return i;
-    }
-    return -1;
+  @Override
+  public void setAttribute(AttributeDto attributeDto) {
+    GWT.log("attributeDto: " + AttributeDto.stringify(attributeDto));
+    namespaceBox.setValue(attributeDto == null ? "" : attributeDto.getNamespace());
+    nameBox.setValue(attributeDto == null ? "" : attributeDto.getName());
   }
+
+  @Override
+  public void setUniqueNames(Collection<String> uniqueNames) {
+    this.uniqueNames = uniqueNames;
+  }
+
 }

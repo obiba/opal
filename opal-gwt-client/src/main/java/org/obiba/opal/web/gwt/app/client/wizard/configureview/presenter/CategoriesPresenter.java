@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.List;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.util.AttributeDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoryUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -49,7 +50,7 @@ public class CategoriesPresenter extends LocalizablesPresenter {
   //
 
   @Inject
-  public CategoriesPresenter(final Display display, final EventBus eventBus) {
+  public CategoriesPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -70,7 +71,7 @@ public class CategoriesPresenter extends LocalizablesPresenter {
       for(int attributeIndex = 0; attributeIndex < categoryDto.getAttributesArray().length(); attributeIndex++) {
         final AttributeDto attributeDto = categoryDto.getAttributesArray().get(attributeIndex);
 
-        if(attributeDto.getName().equals("label")) {
+        if(attributeDto.getName().equals(AttributeDtos.LABEL_ATTRIBUTE)) {
           if(attributeDto.getLocale().equals(localeName) || isAttributeWithNoLocale(attributeDto)) {
             localizables.add(new Localizable() {
 
@@ -113,7 +114,7 @@ public class CategoriesPresenter extends LocalizablesPresenter {
   @Override
   protected void addEventHandlers() {
     super.addEventHandlers(); // call superclass method to register common handlers
-    super.registerHandler(eventBus.addHandler(CategoryUpdateEvent.getType(), new CategoryUpdateEventHandler()));
+    registerHandler(eventBus.addHandler(CategoryUpdateEvent.getType(), new CategoryUpdateEventHandler()));
   }
 
   @Override
@@ -140,18 +141,26 @@ public class CategoriesPresenter extends LocalizablesPresenter {
     return deleteActionHandler;
   }
 
+  @Override
   protected String getDeleteConfirmationTitle() {
     return "deleteCategory";
   }
 
+  @Override
   protected String getDeleteConfirmationMessage() {
     return "confirmDeleteCategory";
+  }
+
+  @Override
+  protected String getValueColumnName() {
+    return translations.labelLabel();
   }
 
   //
   // Methods
   //
 
+  @Override
   public void setVariableDto(VariableDto variableDto) {
     this.variableDto = variableDto;
   }
@@ -218,12 +227,12 @@ public class CategoriesPresenter extends LocalizablesPresenter {
 
     @Override
     public void onCategoryUpdate(CategoryUpdateEvent event) {
-      if(event.getUpdateType().equals(UpdateType.ADD)) {
+      if(event.getUpdateType() == UpdateType.ADD) {
         addCategory(event);
-      } else if(event.getUpdateType().equals(UpdateType.EDIT)) {
+      } else if(event.getUpdateType() == UpdateType.EDIT) {
         replaceCategory(event);
       }
-      CategoriesPresenter.this.refreshTableData();
+      refreshTableData();
     }
 
     @SuppressWarnings("unchecked")

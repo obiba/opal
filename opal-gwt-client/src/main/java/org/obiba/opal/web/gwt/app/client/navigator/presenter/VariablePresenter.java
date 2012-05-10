@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectio
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.util.AttributeDtos;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -147,7 +147,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     }
 
     for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
-      if(VariableDtos.SCRIPT_ATTRIBUTE.equals(attr.getName())) {
+      if(AttributeDtos.SCRIPT_ATTRIBUTE.equals(attr.getName())) {
         getView().setDerivedVariable(true, attr.getValue());
         getView().setEditCommand(new EditCommand());
         return;
@@ -374,8 +374,6 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   }
 
   public interface Display extends View {
-
-
 
     enum Slots {
       Permissions, Values

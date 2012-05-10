@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -25,13 +25,12 @@ import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
  */
 public class DropdownSuggestBox extends Composite implements HasText, HasValue<String> {
 
-  private DefaultSuggestBox suggestBox;
+  private final DefaultSuggestBox suggestBox;
 
   public DropdownSuggestBox() {
-    super();
-    this.suggestBox = new DefaultSuggestBox();
+    suggestBox = new DefaultSuggestBox();
     FlowPanel layout = new FlowPanel();
-    final Button ddBtn = new Button();
+    Button ddBtn = new Button();
     ddBtn.setStyleName("btn iconb i-sortasc");
     ddBtn.addClickHandler(new ClickHandler() {
       @Override
@@ -63,8 +62,12 @@ public class DropdownSuggestBox extends Composite implements HasText, HasValue<S
     suggestBox.setText(text);
   }
 
+  public void clear() {
+    suggestBox.setText("");
+  }
+
   public MultiWordSuggestOracle getSuggestOracle() {
-    return (MultiWordSuggestOracle) suggestBox.getSuggestOracle();
+    return suggestBox.getSuggestOracle();
   }
 
   @Override

@@ -21,13 +21,14 @@ import com.google.gwt.event.shared.GwtEvent;
  */
 public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
 
+  @SuppressWarnings("StaticNonFinalField")
   private static Type<Handler> TYPE;
 
-  private CategoryDto newCategory;
+  private final CategoryDto newCategory;
 
-  private CategoryDto originalCategory;
+  private final CategoryDto originalCategory;
 
-  private UpdateType updateType;
+  private final UpdateType updateType;
 
   public CategoryUpdateEvent(CategoryDto newCategory, CategoryDto originalCategory, UpdateType updateType) {
     this.newCategory = newCategory;
@@ -62,6 +63,6 @@ public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
   }
 
   public interface Handler extends EventHandler {
-    public void onCategoryUpdate(CategoryUpdateEvent event);
+    void onCategoryUpdate(CategoryUpdateEvent event);
   }
 }

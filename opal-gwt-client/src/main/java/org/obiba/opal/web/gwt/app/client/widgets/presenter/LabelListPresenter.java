@@ -11,15 +11,12 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
 import java.util.Map;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.inject.Inject;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
+
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -27,27 +24,21 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.TextBoxBase;
+import com.google.inject.Inject;
+
 public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Display> {
-
-  public interface Display extends WidgetDisplay {
-
-    public void setLanguages(JsArray<LocaleDto> languages);
-
-    public Map<String, TextBox> getLanguageLabelMap();
-
-    public LocaleDto getBaseLanguage();
-
-    public void displayAttributes(String attributeName, JsArray<AttributeDto> attributes);
-
-    public void clearAttributes(); // i.e., clear the attribute values
-
-  }
-
-  private String attributeToDisplay;
 
   private JsArray<AttributeDto> attributes;
 
   private String datasourceName;
+
+  private String namespace;
+
+  private String name;
 
   @Inject
   public LabelListPresenter(Display display, EventBus eventBus) {
@@ -72,8 +63,9 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
         .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
           @Override
           public void onResource(Response response, JsArray<LocaleDto> resource) {
-            @SuppressWarnings("unchecked")
-            JsArray<LocaleDto> languages = (resource != null) ? resource : (JsArray<LocaleDto>) JsArray.createArray();
+            @SuppressWarnings(
+                "unchecked") JsArray<LocaleDto> languages = resource == null ? (JsArray<LocaleDto>) JsArray
+                .createArray() : resource;
 
             // Add the 'no locale' locale to the list of locales.
             LocaleDto noLocaleDto = LocaleDto.create();
@@ -103,15 +95,16 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
     this.attributes = attributes;
   }
 
-  public void setAttributeToDisplay(String attributeToDisplay) {
-    this.attributeToDisplay = attributeToDisplay;
+  public void setAttributeToDisplay(String namespace, String name) {
+    this.namespace = namespace;
+    this.name = name;
   }
 
   public void updateFields() {
     getDisplay().clearAttributes();
 
-    if(attributeToDisplay != null) {
-      getDisplay().displayAttributes(attributeToDisplay, attributes);
+    if(name != null) {
+      getDisplay().displayAttributes(namespace, name, attributes);
     }
   }
 
@@ -129,10 +122,7 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
       // Base language not required when no locale value is provided.
       String noLocaleValue = getDisplay().getLanguageLabelMap().get("").getValue();
-      if(noLocaleValue != null && !noLocaleValue.equals("")) return false;
-
-      if(baseLanguageLabelValue == null || baseLanguageLabelValue.equals("")) return true;
-      return false;
+      return Strings.isNullOrEmpty(noLocaleValue) && Strings.isNullOrEmpty(baseLanguageLabelValue);
     }
 
   }
@@ -143,4 +133,19 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
     getLanguages();
   }
 
+  public interface Display extends WidgetDisplay {
+
+    void setLanguages(JsArray<LocaleDto> languages);
+
+    Map<String, TextBoxBase> getLanguageLabelMap();
+
+    LocaleDto getBaseLanguage();
+
+    void displayAttributes(String namespace, String name, JsArray<AttributeDto> attributes);
+
+    void clearAttributes(); // i.e., clear the attribute values
+
+    void setUseTextArea(boolean useTextArea);
+
+  }
 }

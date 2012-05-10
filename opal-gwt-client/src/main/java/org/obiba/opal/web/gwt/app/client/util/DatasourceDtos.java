@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.util;
 
-import com.google.gwt.core.client.JsArray;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
@@ -18,15 +17,20 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.LimesurveyDatasourceFactoryDto;
 
+import com.google.gwt.core.client.JsArray;
+
 /**
  *
  */
 public class DatasourceDtos {
 
+  private DatasourceDtos() {
+  }
+
   public static DatasourceFactoryDto createDatasourceFactoryDto(ImportData importData) {
-    if(importData.getImportFormat().equals(ImportFormat.CSV)) {
+    if(importData.getImportFormat() == ImportFormat.CSV) {
       return createCSVDatasourceFactoryDto(importData);
-    } else if(importData.getImportFormat().equals(ImportFormat.XML)) {
+    } else if(importData.getImportFormat() == ImportFormat.XML) {
       return createXMLDatasourceFactoryDto(importData);
     } else if(importData.getImportFormat() == ImportFormat.LIMESURVEY) {
       return createLimesurveyDatasourceFactoryDto(importData);

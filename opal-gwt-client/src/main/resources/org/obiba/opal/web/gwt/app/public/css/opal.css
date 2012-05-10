@@ -1971,3 +1971,9 @@ a.icon:hover {
 .alert .close {
   font-size: 1em;
 }
+
+/* Attributes */
+.attribute-value {
+  max-height: 200px;
+  overflow-y: auto;
+}

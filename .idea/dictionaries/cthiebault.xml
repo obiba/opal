@@ -2,6 +2,7 @@
   <dictionary name="cthiebault">
     <words>
       <w>algo</w>
+      <w>appendable</w>
       <w>authorizer</w>
       <w>crypto</w>
       <w>ctrls</w>
@@ -12,7 +13,9 @@
       <w>froms</w>
       <w>ginjector</w>
       <w>keygen</w>
+      <w>localizables</w>
       <w>lustrum</w>
+      <w>multi</w>
       <w>ncss</w>
       <w>programmatically</w>
       <w>protobuf</w>

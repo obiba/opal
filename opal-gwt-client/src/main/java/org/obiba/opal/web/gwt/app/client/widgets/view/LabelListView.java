@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -18,6 +18,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.ui.Composite;
@@ -25,20 +27,22 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.gwt.user.client.ui.Widget;
 
 public class LabelListView extends Composite implements LabelListPresenter.Display {
 
-  private FlowPanel panel;
+  private static final Translations translations = GWT.create(Translations.class);
 
-  private Grid grid;
+  private final FlowPanel panel;
 
   private LocaleDto baseLanguage;
 
-  private Map<String, TextBox> languageLabelMap = new HashMap<String, TextBox>();
+  private final Map<String, TextBoxBase> languageLabelMap = new HashMap<String, TextBoxBase>();
 
-  private Translations translations = GWT.create(Translations.class);
+  private boolean useTextArea;
 
   public LabelListView() {
     panel = new FlowPanel();
@@ -59,25 +63,47 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
   }
 
   @Override
+  public void setUseTextArea(boolean useTextArea) {
+    this.useTextArea = useTextArea;
+  }
+
+  @SuppressWarnings({"PMD.NcssMethodCount", "OverlyLongMethod"})
+  @Override
   public void setLanguages(JsArray<LocaleDto> languages) {
+    int nbLanguages = languages.length();
+    if(nbLanguages > 0) {
+      baseLanguage = languages.get(0);
+    }
     panel.clear();
     languageLabelMap.clear();
-    grid = new Grid(languages.length(), 2);
+
+    Grid grid = new Grid(useTextArea ? nbLanguages * 2 : nbLanguages, useTextArea ? 1 : 2);
     grid.addStyleName("full-width");
-    for(int i = 0; i < languages.length(); i++) {
-      if(i == 0) baseLanguage = languages.get(0);
-      grid.setWidget(i, 0, makeLabel(languages.get(i).getName(), i));
-      TextBox box;
-      languageLabelMap.put(languages.get(i).getName(), box = new TextBox());
-      box.addStyleName("not-so-full-width");
-      grid.setWidget(i, 1, languageLabelMap.get(languages.get(i).getName()));
+    int row = 0;
+    for(LocaleDto localeDto : JsArrays.toList(languages)) {
+      String localeName = localeDto.getName();
+      Label label = makeLabel(localeName);
+
+      TextBoxBase box = useTextArea ? new TextArea() : new TextBox();
+      box.addStyleName(useTextArea ? "full-width" : "not-so-full-width");
+      languageLabelMap.put(localeName, box);
+
+      if(useTextArea) {
+        label.addStyleName("full-width");
+        grid.setWidget(row++, 0, label);
+        grid.setWidget(row++, 0, box);
+      } else {
+        grid.setWidget(row, 0, label);
+        grid.setWidget(row++, 1, box);
+      }
+
     }
     panel.add(grid);
   }
 
-  private Label makeLabel(String language, int index) {
+  private Label makeLabel(String language) {
     Label label;
-    if(language.equals("")) {
+    if("".equals(language)) {
       label = new Label(translations.noLocale());
     } else {
       label = new InlineLabel(language);
@@ -87,7 +113,7 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
   }
 
   @Override
-  public Map<String, TextBox> getLanguageLabelMap() {
+  public Map<String, TextBoxBase> getLanguageLabelMap() {
     return languageLabelMap;
   }
 
@@ -97,23 +123,22 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
   }
 
   @Override
-  public void displayAttributes(String attributeName, JsArray<AttributeDto> attributes) {
+  public void displayAttributes(String namespace, String name, JsArray<AttributeDto> attributes) {
+    String safeNamespace = Strings.nullToEmpty(namespace);
     JsArray<AttributeDto> nonNullAttributes = JsArrays.toSafeArray(attributes);
-
     for(int i = 0; i < nonNullAttributes.length(); i++) {
       AttributeDto dto = nonNullAttributes.get(i);
-      if(attributeName.equals(dto.getName())) {
-        if(languageLabelMap.containsKey(dto.getLocale())) {
-          TextBox textBox = languageLabelMap.get(dto.getLocale());
-          textBox.setValue(dto.getValue());
-        }
+      if(Objects.equal(safeNamespace, dto.getNamespace()) && Objects.equal(name, dto.getName()) && languageLabelMap
+          .containsKey(dto.getLocale())) {
+        TextBoxBase textBox = languageLabelMap.get(dto.getLocale());
+        textBox.setValue(dto.getValue());
       }
     }
   }
 
   @Override
   public void clearAttributes() {
-    for(TextBox textBox : languageLabelMap.values()) {
+    for(TextBoxBase textBox : languageLabelMap.values()) {
       textBox.setText("");
     }
   }

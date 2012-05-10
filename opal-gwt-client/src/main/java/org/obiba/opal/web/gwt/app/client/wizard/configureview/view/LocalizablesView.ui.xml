@@ -4,7 +4,7 @@
   xmlns:c="urn:import:com.google.gwt.user.cellview.client">
 
   <g:FlowPanel>
-    <g:Button ui:field="addButton" styleName="btn left-aligned">Add</g:Button>
+    <g:Button ui:field="addButton" styleName="btn">Add</g:Button>
     <g:ListBox ui:field="localeListBox" addStyleNames="right-aligned" />
     <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
     <o:Table ui:field="localizablesTable" width="100%" addStyleNames="small-top-margin" />  

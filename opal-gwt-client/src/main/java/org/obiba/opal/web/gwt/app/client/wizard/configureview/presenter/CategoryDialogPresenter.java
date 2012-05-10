@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -22,6 +22,7 @@ import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.util.AttributeDtos;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -32,6 +33,7 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -43,46 +45,17 @@ import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.inject.Inject;
 
 public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
-
-    void clear();
-
-    void showDialog();
-
-    void hideDialog();
-
-    void addInputField(LabelListPresenter.Display inputField);
-
-    void removeInputField();
-
-    HasClickHandlers getSaveButton();
-
-    HasClickHandlers getCancelButton();
-
-    void setCategoryNameEditable(boolean editable);
-
-    HasText getCategoryName();
-
-    HasValue<Boolean> getMissing();
-
-    HasCloseHandlers<DialogBox> getDialog();
-
-    HasText getCaption();
-  }
+  private static final Translations translations = GWT.create(Translations.class);
 
   @Inject
   private LabelListPresenter labelListPresenter;
 
-  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-
-  private Translations translations = GWT.create(Translations.class);
-
-  private ViewDto viewDto;
+  private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   private CategoryDto categoryDto;
 
@@ -120,12 +93,16 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   @Override
   public void revealDisplay() {
     initDisplayComponents();
-
-    validators.add(new RequiredTextValidator(getDisplay().getCategoryName(), "CategoryDialogNameRequired"));
-    validators.add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), "CategoryNameAlreadyExists"));
-    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator("CategoryLabelRequired"));
-
+    addValidators();
     getDisplay().showDialog();
+  }
+
+  private void addValidators() {
+    validators
+        .add(new RequiredTextValidator(getDisplay().getCategoryName(), translations.categoryDialogNameRequired()));
+    validators
+        .add(new UniqueCategoryNameValidator(getDisplay().getCategoryName(), translations.categoryNameAlreadyExists()));
+    validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator(translations.categoryLabelRequired()));
   }
 
   @Override
@@ -139,7 +116,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   protected void initDisplayComponents() {
     setTitle();
-    labelListPresenter.setAttributeToDisplay("label");
+    labelListPresenter.setAttributeToDisplay(null, AttributeDtos.LABEL_ATTRIBUTE);
 
     if(isEdit()) {
       getDisplay().setCategoryNameEditable(false); // don't allow edits of category name
@@ -154,15 +131,12 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
   }
 
   private void setTitle() {
-    if(isEdit()) {
-      getDisplay().getCaption().setText(translations.editCategory());
-    } else {
-      getDisplay().getCaption().setText(translations.addNewCategory());
-    }
+    getDisplay().getCaption().setText(isEdit() ? translations.editCategory() : translations.addNewCategory());
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().getSaveButton().addClickHandler(new ClickHandler() {
+    registerHandler(getDisplay().getSaveButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         String errorMessageKey = validate();
         if(errorMessageKey != null) {
@@ -177,15 +151,33 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
         }
         getDisplay().hideDialog();
       }
+
+      private CategoryDto getNewCategoryDto() {
+        CategoryDto newCategory = CategoryDto.create();
+        newCategory.setName(getDisplay().getCategoryName().getText());
+        newCategory.setIsMissing(getDisplay().getMissing().getValue());
+        @SuppressWarnings("unchecked") JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) JsArray.createArray();
+        Map<String, TextBoxBase> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
+        for(Map.Entry<String, TextBoxBase> entry : labelMap.entrySet()) {
+          String value = entry.getValue().getValue();
+          if(!Strings.isNullOrEmpty(value)) {
+            String locale = entry.getKey();
+            attributes.push(AttributeDtos.create(value, locale));
+          }
+        }
+        newCategory.setAttributesArray(attributes);
+        return newCategory;
+      }
     }));
 
-    super.registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
+    registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getDisplay().hideDialog();
       }
     }));
 
-    super.registerHandler(getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
+    registerHandler(getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
       @Override
       public void onClose(CloseEvent<DialogBox> event) {
         unbind();
@@ -194,34 +186,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   }
 
-  private CategoryDto getNewCategoryDto() {
-    CategoryDto categoryDto = CategoryDto.create();
-    categoryDto.setName(getDisplay().getCategoryName().getText());
-    categoryDto.setIsMissing(getDisplay().getMissing().getValue());
-    @SuppressWarnings("unchecked")
-    JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) JsArray.createArray();
-    Map<String, TextBox> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
-    for(Map.Entry<String, TextBox> entry : labelMap.entrySet()) {
-      if(entry.getValue().getValue() != null && !entry.getValue().getValue().equals("")) {
-        AttributeDto attribute = AttributeDto.create();
-        if(entry.getKey() == null || entry.getKey().equals("")) {
-          attribute.clearLocale();
-        } else {
-          attribute.setLocale(entry.getKey());
-        }
-        attribute.setName("label");
-        attribute.setValue(entry.getValue().getValue());
-        attributes.push(attribute);
-      }
-    }
-    categoryDto.setAttributesArray(attributes);
-    return categoryDto;
-  }
-
   public void setViewDto(ViewDto viewDto) {
-    this.viewDto = viewDto;
-
-    labelListPresenter.setDatasourceName(this.viewDto.getDatasourceName());
+    labelListPresenter.setDatasourceName(viewDto.getDatasourceName());
   }
 
   public void setCategoryDto(CategoryDto categoryDto) {
@@ -255,7 +221,7 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   public class UniqueCategoryNameValidator extends AbstractFieldValidator {
 
-    private HasText hasText;
+    private final HasText hasText;
 
     public UniqueCategoryNameValidator(HasText hasText, String errorMessageKey) {
       super(errorMessageKey);
@@ -280,6 +246,33 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
 
   private boolean isEdit() {
     return categoryDto != null;
+  }
+
+  public interface Display extends WidgetDisplay {
+
+    void clear();
+
+    void showDialog();
+
+    void hideDialog();
+
+    void addInputField(LabelListPresenter.Display inputField);
+
+    void removeInputField();
+
+    HasClickHandlers getSaveButton();
+
+    HasClickHandlers getCancelButton();
+
+    void setCategoryNameEditable(boolean editable);
+
+    HasText getCategoryName();
+
+    HasValue<Boolean> getMissing();
+
+    HasCloseHandlers<DialogBox> getDialog();
+
+    HasText getCaption();
   }
 
 }

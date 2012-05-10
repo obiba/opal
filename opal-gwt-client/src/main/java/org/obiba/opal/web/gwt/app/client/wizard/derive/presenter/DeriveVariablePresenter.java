@@ -142,7 +142,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     this.deriveConclusionPresenter = deriveConclusionPresenter;
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
+  @SuppressWarnings({"PMD.NcssMethodCount", "OverlyLongMethod"})
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
     Object[] eventParameters = event.getEventParameters();

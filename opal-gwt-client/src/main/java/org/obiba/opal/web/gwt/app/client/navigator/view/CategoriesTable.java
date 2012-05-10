@@ -26,14 +26,13 @@ import com.google.gwt.user.client.ui.InlineLabel;
  */
 public class CategoriesTable extends Table<CategoryDto> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   public CategoriesTable() {
     this(null);
   }
 
   public CategoriesTable(VariableDto variableDto) {
-    super();
     initColumns();
 
     if(variableDto != null) {

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -35,11 +35,10 @@ public class DefaultSuggestBox extends SuggestBox {
       @Override
       public void onKeyUp(KeyUpEvent event) {
         if(event.isControlKeyDown() && event.getNativeEvent().getCharCode() == 0) {
-          DefaultSuggestBox.this.showSuggestionList();
+          showSuggestionList();
         } else if(event.getNativeKeyCode() == KeyCodes.KEY_ESCAPE) {
           hideSuggestions();
         }
-
       }
     });
   }
@@ -53,6 +52,7 @@ public class DefaultSuggestBox extends SuggestBox {
     ((DefaultSuggestionDisplay) getSuggestionDisplay()).hideSuggestions();
   }
 
+  @Override
   public MultiWordSuggestOracle getSuggestOracle() {
     return (MultiWordSuggestOracle) super.getSuggestOracle();
   }
@@ -64,11 +64,11 @@ public class DefaultSuggestBox extends SuggestBox {
 
   private static final class DefaultMultiWordSuggestOracle extends MultiWordSuggestOracle {
 
-    private List<String> defaults = new ArrayList<String>();
+    private final List<String> defaults = new ArrayList<String>();
 
     private boolean withDefaults = true;
 
-    public DefaultMultiWordSuggestOracle(String whitespaceChars) {
+    private DefaultMultiWordSuggestOracle(String whitespaceChars) {
       super(whitespaceChars);
     }
 

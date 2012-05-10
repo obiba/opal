@@ -50,21 +50,29 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  @UiField WizardStep conclusionStep;
+  @UiField
+  WizardStep conclusionStep;
 
-  @UiField CheckBox openEditor;
+  @UiField
+  CheckBox openEditor;
 
-  @UiField TextBox derivedNameBox;
+  @UiField
+  TextBox derivedNameBox;
 
-  @UiField FlowPanel derivedNameInput;
+  @UiField
+  FlowPanel derivedNameInput;
 
-  @UiField ListBox datasourceNameBox;
+  @UiField
+  ListBox datasourceNameBox;
 
-  @UiField DropdownSuggestBox viewNameBox;
+  @UiField
+  DropdownSuggestBox viewNameBox;
 
-  @UiField FlowPanel viewNameInput;
+  @UiField
+  FlowPanel viewNameInput;
 
   private Map<String, List<String>> viewSuggestions;
+
   private final Widget widget;
 
   public DeriveConclusionView() {

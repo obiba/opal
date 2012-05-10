@@ -12,17 +12,13 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
+
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
@@ -38,7 +34,18 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
+
 public abstract class LocalizablesPresenter extends WidgetPresenter<LocalizablesPresenter.Display> {
+
   //
   // Constants
   //
@@ -46,6 +53,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   public static final String EDIT_ACTION = "Edit";
 
   public static final String DELETE_ACTION = "Delete";
+
+  protected static final Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
@@ -61,8 +70,9 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   // Constructors
   //
 
-  public LocalizablesPresenter(final Display display, final EventBus eventBus) {
+  public LocalizablesPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
+    getDisplay().setValueColumnName(getValueColumnName());
   }
 
   //
@@ -73,6 +83,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   protected void onBind() {
     bindDependencies();
     addEventHandlers();
+
   }
 
   @Override
@@ -122,7 +133,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   }
 
   public VariableDto getVariableDto() {
-    return this.variableDto;
+    return variableDto;
   }
 
   void refreshLocales() {
@@ -130,15 +141,15 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
       UriBuilder ub = UriBuilder.create();
       ub.segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName(), "locales");
       ub.query("locale", "en");
-      ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder().forResource(ub.build())
-          .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+      ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder().forResource(ub.build()).get()
+          .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
 
-        @Override
-        public void onResource(Response response, JsArray<LocaleDto> locales) {
-          getDisplay().setLocales(JsArrays.toSafeArray(locales));
-          refreshTableData();
-        }
-      }).send();
+            @Override
+            public void onResource(Response response, JsArray<LocaleDto> locales) {
+              getDisplay().setLocales(JsArrays.toSafeArray(locales));
+              refreshTableData();
+            }
+          }).send();
     }
   }
 
@@ -152,43 +163,44 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(
+    registerHandler(
         eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-    super.registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(),
+    registerHandler(eventBus.addHandler(DerivedVariableConfigurationRequiredEvent.getType(),
         new DerivedVariableConfigurationRequiredEventHandler()));
-    super.registerHandler(getDisplay().addLocaleChangeHandler(new LocaleChangeHandler()));
-    super.registerHandler(getDisplay().addAddButtonClickHandler(getAddButtonClickHandler()));
+    registerHandler(getDisplay().addLocaleChangeHandler(new LocaleChangeHandler()));
+    registerHandler(getDisplay().addAddButtonClickHandler(getAddButtonClickHandler()));
     addActionHandler(); // for "Edit" and "Delete" links
-    super.registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
   }
 
   private void addActionHandler() {
     getDisplay().getActionsColumn().setActionHandler(new ActionHandler<Localizable>() {
+      @Override
       public void doAction(Localizable localizable, String actionName) {
         if(actionName != null) {
           doActionImpl(localizable, actionName);
         }
       }
-    });
-  }
 
-  private void doActionImpl(final Localizable localizable, String actionName) {
-    if(EDIT_ACTION.equals(actionName)) {
-      getEditActionHandler().onEdit(localizable);
-    } else if(DELETE_ACTION.equals(actionName)) {
-      actionRequiringConfirmation = new Runnable() {
+      private void doActionImpl(final Localizable localizable, String actionName) {
+        if(EDIT_ACTION.equals(actionName)) {
+          getEditActionHandler().onEdit(localizable);
+        } else if(DELETE_ACTION.equals(actionName)) {
+          actionRequiringConfirmation = new Runnable() {
 
-        @Override
-        public void run() {
-          getDeleteActionHandler().onDelete(localizable);
-          refreshTableData();
-          eventBus.fireEvent(new LocalizableDeleteEvent());
+            @Override
+            public void run() {
+              getDeleteActionHandler().onDelete(localizable);
+              refreshTableData();
+              eventBus.fireEvent(new LocalizableDeleteEvent());
+            }
+          };
+
+          eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, getDeleteConfirmationTitle(),
+              getDeleteConfirmationMessage()));
         }
-      };
-
-      eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, getDeleteConfirmationTitle(),
-          getDeleteConfirmationMessage()));
-    }
+      }
+    });
   }
 
   protected void afterViewDtoSet() {
@@ -218,6 +230,8 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
   protected abstract String getDeleteConfirmationMessage();
 
+  protected abstract String getValueColumnName();
+
   //
   // Inner Classes / Interfaces
   //
@@ -240,16 +254,17 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
     void formEnable(boolean enabled);
 
+    void setValueColumnName(String valueColumnName);
   }
 
   interface EditActionHandler {
 
-    public void onEdit(Localizable localizable);
+    void onEdit(Localizable localizable);
   }
 
   interface DeleteActionHandler {
 
-    public void onDelete(Localizable localizable);
+    void onDelete(Localizable localizable);
   }
 
   public abstract class Localizable implements Comparable<Localizable> {
@@ -258,22 +273,31 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
     public abstract String getLabel();
 
+    public String getNamespace() {
+      return null;
+    }
+
     @Override
     public int compareTo(Localizable o) {
-      return getName().compareTo(o.getName());
+      String s1 = Strings.nullToEmpty(getNamespace()) + Strings.nullToEmpty(getName());
+      String s2 = Strings.nullToEmpty(o.getNamespace()) + Strings.nullToEmpty(o.getName());
+      return s1.compareTo(s2);
     }
 
     @Override
     public boolean equals(Object o) {
       if(o instanceof Localizable) {
-        return getName().equals(((Localizable) o).getName()) && getLabel().equals(((Localizable) o).getLabel());
+        Localizable localizable = (Localizable) o;
+        return Objects.equal(getNamespace(), localizable.getNamespace()) && //
+            Objects.equal(getName(), localizable.getName()) && //
+            Objects.equal(getLabel(), localizable.getLabel());
       }
       return false;
     }
 
     @Override
     public int hashCode() {
-      return (getName() + ":" + getLabel()).hashCode();
+      return (getNamespace() + ":" + getName() + ":" + getLabel()).hashCode();
     }
   }
 
@@ -289,7 +313,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      LocalizablesPresenter.this.setViewDto(event.getView());
+      setViewDto(event.getView());
     }
   }
 
@@ -297,13 +321,14 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
 
     @Override
     public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
-      LocalizablesPresenter.this.setVariableDto(event.getVariable());
+      setVariableDto(event.getVariable());
       refreshTableData();
     }
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event
           .isConfirmed()) {

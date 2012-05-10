@@ -26,7 +26,6 @@ public class PrettyPrintLabel extends Widget {
   private static final Languages langs = Resources.INSTANCE.langs();
 
   public PrettyPrintLabel() {
-    super();
     setElement(Document.get().createPreElement());
     setStyleName("prettyprint");
   }
