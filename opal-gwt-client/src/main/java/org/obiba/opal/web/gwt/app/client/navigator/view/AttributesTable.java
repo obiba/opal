@@ -23,15 +23,9 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
-import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.text.shared.SafeHtmlRenderer;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.InlineLabel;
 
@@ -43,25 +37,6 @@ public class AttributesTable extends Table<AttributeDto> {
   private static final Translations translations = GWT.create(Translations.class);
 
   private static class Columns {
-
-    private static abstract class SortableTextColumn extends Column<AttributeDto, String> {
-
-      protected SortableTextColumn() {
-        super(new TextCell(new SafeHtmlRenderer<String>() {
-
-          @Override
-          public SafeHtml render(String object) {
-            return object == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromTrustedString(object);
-          }
-
-          @Override
-          public void render(String object, SafeHtmlBuilder appendable) {
-            appendable.append(SafeHtmlUtils.fromTrustedString(object));
-          }
-        }));
-        setSortable(true);
-      }
-    }
 
     static final LabelValueColumn<AttributeDto> NAME = new LabelValueColumn<AttributeDto>() {
 
@@ -78,6 +53,7 @@ public class AttributesTable extends Table<AttributeDto> {
 
     static {
       NAME.setCss("nowrap");
+      NAME.setSortable(true);
     }
 
     static final Comparator<AttributeDto> NAME_COMPARATOR = Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsFirst()
@@ -116,7 +92,6 @@ public class AttributesTable extends Table<AttributeDto> {
   public void setupSort(JsArrayDataProvider<AttributeDto> provider) {
     if(registration != null) {
       registration.removeHandler();
-      registration = null;
     }
     ColumnSortEvent.ListHandler<AttributeDto> handler = provider.newSortHandler();
     handler.setComparator(Columns.NAME, Columns.NAME_COMPARATOR);
