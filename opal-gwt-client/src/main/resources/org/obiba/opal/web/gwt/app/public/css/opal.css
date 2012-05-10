@@ -623,6 +623,10 @@ td.row-actions span {
   text-decoration: none;
 }
 
+.obiba-Table pre, .obiba-Grid pre {
+  margin:0;
+}
+
 /* Login */
 
 .login {
