@@ -50,7 +50,8 @@ public abstract class DerivedVariableGenerator {
     this.valueMapEntries = valueMapEntries;
   }
 
-  public VariableDto generate(@Nullable VariableDto destination) {
+  public VariableDto generate(@Nullable
+  VariableDto destination) {
     VariableDto derived = destination == null ? copyVariable(originalVariable) : destination;
 
     scriptBuilder = new StringBuilder();
@@ -216,7 +217,8 @@ public abstract class DerivedVariableGenerator {
     }
   }
 
-  public static VariableDto copyVariable(@Nonnull VariableDto variable) {
+  public static VariableDto copyVariable(@Nonnull
+  VariableDto variable) {
     return copyVariable(variable, false);
   }
 
@@ -336,6 +338,7 @@ public abstract class DerivedVariableGenerator {
 
   private static AttributeDto copyAttribute(AttributeDto origAttr) {
     AttributeDto attr = AttributeDto.create();
+    attr.setNamespace(origAttr.getNamespace());
     attr.setName(origAttr.getName());
     attr.setLocale(origAttr.getLocale());
     attr.setValue(origAttr.getValue());
