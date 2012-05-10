@@ -84,7 +84,8 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private void updateDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new DatasourcesCallback()).send();
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
+        .withCallback(new DatasourcesCallback()).send();
   }
 
   public void setTableVariables(TableDto table, JsArray<VariableDto> variables) {
@@ -124,12 +125,17 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private ViewDto getViewDto() {
-    ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table).defaultVariableListView().build();
-    VariableListViewDto derivedVariables = (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    ViewDto view =
+        ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table)
+            .defaultVariableListView().build();
+    VariableListViewDto derivedVariables =
+        (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
     for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
       DerivationHelper derivator = null;
-      if(variable.getValueType().equals("text") && VariableDtos.hasCategories(variable)) {
+      if(VariableDtos.hasCategories(variable)
+          && (variable.getValueType().equals("text") || (variable.getValueType().equals("integer") && VariableDtos
+              .allCategoriesMissing(variable) == false))) {
         CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
         d.initializeValueMapEntries();
         derivator = d;
@@ -177,9 +183,12 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
         CreateCodingViewCallBack createCodingViewCallback = new CreateCodingViewCallBack();
         AlreadyExistViewCallBack alreadyExistCodingViewCallback = new AlreadyExistViewCallBack();
         UriBuilder uriBuilder = UriBuilder.create();
-        uriBuilder.segment("datasource", getDisplay().getDatasourceName(), "view", getDisplay().getViewName().getText());
+        uriBuilder
+            .segment("datasource", getDisplay().getDatasourceName(), "view", getDisplay().getViewName().getText());
 
-        ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(uriBuilder.build()).get().withCallback(alreadyExistCodingViewCallback).withCallback(Response.SC_NOT_FOUND, createCodingViewCallback).send();
+        ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(uriBuilder.build()).get()
+            .withCallback(alreadyExistCodingViewCallback).withCallback(Response.SC_NOT_FOUND, createCodingViewCallback)
+            .send();
       }
     }
 
@@ -211,7 +220,10 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
       CreatedCodingViewCallBack callbackHandler = new CreatedCodingViewCallBack(codingView);
       UriBuilder uriBuilder = UriBuilder.create();
       uriBuilder.segment("datasource", getDisplay().getDatasourceName(), "views");
-      ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post().withResourceBody(ViewDto.stringify(codingView)).withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post()
+          .withResourceBody(ViewDto.stringify(codingView)).withCallback(Response.SC_CREATED, callbackHandler)
+          .withCallback(Response.SC_BAD_REQUEST, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
+          .send();
     }
   }
 
