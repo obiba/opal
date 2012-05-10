@@ -317,9 +317,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
       String node = UriBuilder.create().segment("datasource", datasourceName).build();
-      authz.setAclRequest("datasource", new AclRequest(AclAction.DATASOURCE_ALL, node), //
-          new AclRequest(AclAction.CREATE_TABLE, node), //
-          new AclRequest(AclAction.CREATE_VIEW, node));
+      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
+          new AclRequest(AclAction.CREATE_VIEW, node), //
+          new AclRequest(AclAction.DATASOURCE_ALL, node));
       setInSlot(null, authz);
     }
   }
