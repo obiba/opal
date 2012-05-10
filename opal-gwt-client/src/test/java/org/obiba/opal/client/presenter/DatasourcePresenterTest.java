@@ -68,12 +68,24 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
   @Ignore
   public void testThatEventHandlersAreAddedToUIComponents() throws Exception {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
-    expect(eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(), (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<DatasourceSelectionChangeEvent.Handler>) EasyMock.anyObject(), (DatasourceSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(), (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<SiblingTableSelectionEvent.Handler>) EasyMock.anyObject(), (SiblingTableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<DatasourceUpdatedEvent.Handler>) EasyMock.anyObject(), (DatasourceUpdatedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(), (ViewSavedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
+            (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<DatasourceSelectionChangeEvent.Handler>) EasyMock.anyObject(),
+            (DatasourceSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
+            (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<SiblingTableSelectionEvent.Handler>) EasyMock.anyObject(),
+            (SiblingTableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<DatasourceUpdatedEvent.Handler>) EasyMock.anyObject(),
+            (DatasourceUpdatedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(),
+            (ViewSavedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     displayMock.setExcelDownloadCommand((Command) EasyMock.anyObject());
     displayMock.setExportDataCommand((Command) EasyMock.anyObject());
@@ -85,10 +97,8 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setTableNameFieldUpdater((FieldUpdater<TableDto, String>) EasyMock.anyObject());
 
-    expect(usersAuthzDisplayMock.getActionsColumn()).andReturn(null).once();
     usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
 
-    expect(groupsAuthzDisplayMock.getActionsColumn()).andReturn(null).once();
     groupsAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
 
     replay(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);

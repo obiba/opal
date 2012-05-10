@@ -61,10 +61,12 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     eventBusMock = createMock(EventBus.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
-    ValueSequencePopupPresenter.Display valueSequenceDisplayMock = createMock(ValueSequencePopupPresenter.Display.class);
+    ValueSequencePopupPresenter.Display valueSequenceDisplayMock =
+        createMock(ValueSequencePopupPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
-    ValuesTablePresenter values = new ValuesTablePresenter(null, null, new ValueSequencePopupPresenter(null, valueSequenceDisplayMock));
+    ValuesTablePresenter values =
+        new ValuesTablePresenter(null, null, new ValueSequencePopupPresenter(null, valueSequenceDisplayMock));
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider);
   }
 
@@ -73,13 +75,23 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
   @Ignore
   public void testOnBind_RegistersHandlersAndBindsDependencies() {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
-    expect(eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(), (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(), (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(), (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(), (ViewSavedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
+            (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(),
+            (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
+            (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(
+        eventBusMock.addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(),
+            (ViewSavedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
-    expect(displayMock.addVariableSuggestionHandler((SelectionHandler<Suggestion>) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(displayMock.addVariableSuggestionHandler((SelectionHandler<Suggestion>) EasyMock.anyObject())).andReturn(
+        handlerRegistrationMock).once();
+    expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject())).andReturn(
+        handlerRegistrationMock).once();
     displayMock.setNextCommand((Command) EasyMock.anyObject());
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setParentCommand((Command) EasyMock.anyObject());
@@ -90,10 +102,8 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     displayMock.setVariableNameFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
     displayMock.setVariableIndexFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
 
-    expect(usersAuthzDisplayMock.getActionsColumn()).andReturn(null).once();
     usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
 
-    expect(groupsAuthzDisplayMock.getActionsColumn()).andReturn(null).once();
     groupsAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
 
     replay(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
