@@ -11,6 +11,9 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Button;
@@ -19,6 +22,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.SuggestOracle;
 
 /**
  *
@@ -37,6 +41,13 @@ public class DropdownSuggestBox extends Composite implements HasText, HasValue<S
       public void onClick(ClickEvent event) {
         suggestBox.setFocus(true);
         suggestBox.showSuggestionList();
+      }
+    });
+
+    suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+      @Override
+      public void onSelection(SelectionEvent<SuggestOracle.Suggestion> suggestionSelectionEvent) {
+        ValueChangeEvent.fire(suggestBox, suggestionSelectionEvent.getSelectedItem().getDisplayString());
       }
     });
 
@@ -88,5 +99,9 @@ public class DropdownSuggestBox extends Composite implements HasText, HasValue<S
   @Override
   public void setValue(String value, boolean fireEvents) {
     suggestBox.setValue(value, fireEvents);
+  }
+
+  public interface DropdownSuggestEventHandler extends com.google.gwt.event.shared.EventHandler {
+
   }
 }

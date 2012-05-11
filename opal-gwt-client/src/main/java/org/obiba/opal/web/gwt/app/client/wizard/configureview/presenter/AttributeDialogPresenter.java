@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -37,6 +36,8 @@ import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -183,18 +184,18 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     labelListPresenter.setDatasourceName(viewDto.getDatasourceName());
   }
 
-  private Collection<String> findUniqueAttributeNames() {
-    Collection<String> uniqueNames = new TreeSet<String>();
+  private Multimap<String, String> findUniqueAttributeNames() {
+    Multimap<String, String> uniqueNames = TreeMultimap.create();
     VariableListViewDto variableListDto = (VariableListViewDto) viewDto
         .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
       for(AttributeDto attribute : JsArrays.toList(variable.getAttributesArray())) {
-        uniqueNames.add(attribute.getName());
+        uniqueNames.put(attribute.getNamespace(), attribute.getName());
       }
     }
     // always add known attributes
     for(Map.Entry<String, List<String>> entry : AttributeDtos.NAMESPACE_ATTRIBUTES.entrySet()) {
-      uniqueNames.addAll(entry.getValue());
+      uniqueNames.putAll(entry.getKey(), entry.getValue());
     }
     return uniqueNames;
   }
@@ -237,8 +238,9 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
         return;
       }
       if(isEdit()) {
-        eventBus.fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), attributeDto.getNamespace(),
-            attributeDto.getName(), UpdateType.EDIT));
+        eventBus.fireEvent(
+            new AttributeUpdateEvent(getNewAttributeDtos(), attributeDto.getNamespace(), attributeDto.getName(),
+                UpdateType.EDIT));
       } else {
         eventBus.fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), UpdateType.ADD));
       }
@@ -288,6 +290,6 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     void setAttribute(AttributeDto attributeDto);
 
-    void setUniqueNames(Collection<String> uniqueNames);
+    void setUniqueNames(Multimap<String, String> uniqueNames);
   }
 }

@@ -9,19 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.obiba.opal.web.gwt.app.client.util.AttributeDtos;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
+import com.google.common.collect.Multimap;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -54,7 +50,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   @UiField
   DropdownSuggestBox nameBox;
 
-  private Collection<String> uniqueNames;
+  private Multimap<String, String> uniqueNames;
 
   @UiField
   SimplePanel simplePanel;
@@ -70,21 +66,12 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   public AttributeDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
-    initNamespaces();
     registerHandlers();
   }
 
   @Override
   public Widget asWidget() {
     return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   @Override
@@ -122,10 +109,10 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
-  public void addInputField(LabelListPresenter.Display inputField) {
+  public void addInputField(LabelListPresenter.Display inputFieldDisplay) {
     simplePanel.clear();
-    simplePanel.add(inputField.asWidget());
-    this.inputField = inputField;
+    simplePanel.add(inputFieldDisplay.asWidget());
+    inputField = inputFieldDisplay;
   }
 
   @Override
@@ -134,10 +121,10 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   private void initNamespaces() {
-    Set<String> namespaces = new HashSet<String>(AttributeDtos.NAMESPACE_ATTRIBUTES.keySet());
-    namespaces.remove(null);
+    Set<String> namespaces = new TreeSet<String>(uniqueNames.keySet());
+    namespaces.remove("");
     namespaceBox.getSuggestOracle().clear();
-    namespaceBox.getSuggestOracle().addAll(new TreeSet<String>(namespaces));
+    namespaceBox.getSuggestOracle().addAll(namespaces);
   }
 
   private void registerHandlers() {
@@ -145,14 +132,9 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
       @Override
       public void onValueChange(ValueChangeEvent<String> stringValueChangeEvent) {
         String value = stringValueChangeEvent.getValue();
-        GWT.log("event: " + value);
-        GWT.log("namespaceBox: " + namespaceBox.getSuggestOracle());
-        List<String> names = AttributeDtos.NAMESPACE_ATTRIBUTES.get(value);
         nameBox.getSuggestOracle().clear();
-        if(names != null) {
-          SortedSet<String> sorted = new TreeSet<String>(names);
-          sorted.addAll(uniqueNames);
-          nameBox.getSuggestOracle().addAll(sorted);
+        if(uniqueNames.containsKey(value)) {
+          nameBox.getSuggestOracle().addAll(uniqueNames.get(value));
         }
       }
     });
@@ -180,8 +162,16 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
   }
 
   @Override
-  public void setUniqueNames(Collection<String> uniqueNames) {
+  public void setUniqueNames(Multimap<String, String> uniqueNames) {
     this.uniqueNames = uniqueNames;
+    initNamespaces();
   }
 
+  @Override
+  public void startProcessing() {
+  }
+
+  @Override
+  public void stopProcessing() {
+  }
 }

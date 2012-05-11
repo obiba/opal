@@ -42,7 +42,8 @@ public class AttributeDtos {
   public static final Map<String, List<String>> NAMESPACE_ATTRIBUTES = new HashMap<String, List<String>>();
 
   static {
-    NAMESPACE_ATTRIBUTES.put(null, Arrays.asList(LABEL_ATTRIBUTE, SCRIPT_ATTRIBUTE));
+    // don't use null for unknown namespace but blank
+    NAMESPACE_ATTRIBUTES.put("", Arrays.asList(LABEL_ATTRIBUTE, SCRIPT_ATTRIBUTE));
     NAMESPACE_ATTRIBUTES.put(OPAL_NAMESPACE, Arrays.asList(DERIVED_FROM_ATTRIBUTE));
     NAMESPACE_ATTRIBUTES.put(MAELSTROM_NAMESPACE, Arrays.asList(DESCRIPTION_ATTRIBUTE));
   }
