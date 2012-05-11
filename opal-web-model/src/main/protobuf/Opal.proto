@@ -139,4 +139,5 @@ enum AclAction {
   FILES_ALL = 18;
   FILES_READ = 19;
   FILES_ADD = 20;
+  REPORT_TEMPLATE_ALL = 21;
 }

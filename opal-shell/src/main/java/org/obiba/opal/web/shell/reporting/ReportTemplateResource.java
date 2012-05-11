@@ -23,6 +23,7 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.cfg.ReportTemplate;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
@@ -49,24 +50,27 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   private final CommandSchedulerService commandSchedulerService;
 
+  private final OpalRuntime opalRuntime;
+
   // Added for unit tests
   ReportTemplateResource(String name, OpalConfigurationService configService) {
     this(name, configService, null);
   }
 
-  public ReportTemplateResource(String name, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
+  ReportTemplateResource(String name, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
     super();
     this.name = name;
     this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
-
+    this.opalRuntime = null;
   }
 
   @Autowired
-  public ReportTemplateResource(ReportService reportService, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
+  public ReportTemplateResource(ReportService reportService, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService, OpalRuntime opalRuntime) {
     super();
     this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
+    this.opalRuntime = opalRuntime;
   }
 
   @GET
@@ -98,7 +102,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   @PUT
-  public Response updateReportTemplate(@Context UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
+  public Response updateReportTemplate(@Context
+  UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
     if(!reportTemplateExists()) return Response.status(Status.NOT_FOUND).build();
 
     try {
@@ -111,6 +116,12 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     }
 
     return Response.ok().build();
+  }
+
+  @GET
+  @Path("/report/_latest")
+  public Response getReport() {
+    return Response.status(Status.NOT_FOUND).build();
   }
 
   private boolean reportTemplateExists() {
