@@ -112,7 +112,7 @@ public class TablesResource {
         writeVariablesToTable(table);
         URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(datasource.getName(), table.getName());
         return Response.created(tableUri)//
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(tableUri, Lists.newArrayList(AclAction.TABLE_ALL))).build();
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(tableUri, AclAction.TABLE_ALL)).build();
       }
     } catch(Exception e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();

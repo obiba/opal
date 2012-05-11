@@ -21,7 +21,7 @@ public class DatasourcesPermissionConverterTest extends OpalPermissionConverterT
 
   @Test
   public void testArgs() {
-    String[] args = OpalPermissionConverter.args("/datasource/patate/table/pwel", "/datasource/(.+)/table/(.+)");
+    String[] args = DomainPermissionConverter.args("/datasource/patate/table/pwel", "/datasource/(.+)/table/(.+)");
     Assert.assertNotNull(args);
     Assert.assertEquals(2, args.length);
     Assert.assertEquals("patate", args[0]);

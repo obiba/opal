@@ -68,8 +68,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
-
 @Component
 @Path("/files")
 public class FilesResource {
@@ -104,7 +102,8 @@ public class FilesResource {
 
   @GET
   @Path("/meta/{path:.*}")
-  public Response getFileDetails(@PathParam("path") String path) throws FileSystemException {
+  public Response getFileDetails(@PathParam("path")
+  String path) throws FileSystemException {
     FileObject file = resolveFileInFileSystem(path);
     if(!file.exists()) {
       return getPathNotExistResponse(path);
@@ -125,7 +124,8 @@ public class FilesResource {
   @GET
   @Path("/{path:.*}")
   @AuthenticatedByCookie
-  public Response getFile(@PathParam("path") String path) throws IOException {
+  public Response getFile(@PathParam("path")
+  String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
     if(!file.exists()) {
       return getPathNotExistResponse(path);
@@ -141,7 +141,9 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
-  public Response uploadFile(@Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
+  public Response uploadFile(@Context
+  UriInfo uriInfo, @Context
+  HttpServletRequest request) throws FileSystemException, FileUploadException {
     return uploadFile("/", uriInfo, request);
   }
 
@@ -151,7 +153,10 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
-  public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
+  public Response uploadFile(@PathParam("path")
+  String path, @Context
+  UriInfo uriInfo, @Context
+  HttpServletRequest request) throws FileSystemException, FileUploadException {
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
@@ -184,7 +189,7 @@ public class FilesResource {
     } else {
       URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
       return Response.created(fileUri)//
-      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, Lists.newArrayList(AclAction.FILES_ALL)))//
+      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, AclAction.FILES_ALL))//
       .build();
     }
   }
@@ -192,14 +197,17 @@ public class FilesResource {
   @POST
   @Path("/")
   @Consumes("text/plain")
-  public Response createFolder(String folderName, @Context UriInfo uriInfo) throws FileSystemException {
+  public Response createFolder(String folderName, @Context
+  UriInfo uriInfo) throws FileSystemException {
     return createFolder("/", folderName, uriInfo);
   }
 
   @POST
   @Path("/{path:.*}")
   @Consumes("text/plain")
-  public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo) throws FileSystemException {
+  public Response createFolder(@PathParam("path")
+  String path, String folderName, @Context
+  UriInfo uriInfo) throws FileSystemException {
     if(folderName == null || folderName.trim().length() == 0) return Response.status(Status.BAD_REQUEST).build();
 
     String folderPath = getPathOfFileToWrite(path);
@@ -216,7 +224,7 @@ public class FilesResource {
       Opal.FileDto dto = getBaseFolderBuilder(file).build();
       URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build();
       return Response.created(folderUri)//
-      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, Lists.newArrayList(AclAction.FILES_ALL)))//
+      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
       .entity(dto).build();
     } catch(FileSystemException couldNotCreateTheFolder) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
@@ -248,7 +256,8 @@ public class FilesResource {
 
   @DELETE
   @Path("/{path:.*}")
-  public Response deleteFile(@PathParam("path") String path) throws FileSystemException {
+  public Response deleteFile(@PathParam("path")
+  String path) throws FileSystemException {
     FileObject file = resolveFileInFileSystem(path);
 
     // File or folder does not exist.

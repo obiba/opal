@@ -53,8 +53,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
-
 @Component
 @Scope("request")
 @Path("/datasource/{name}")
@@ -149,7 +147,8 @@ public class DatasourceResource {
   }
 
   @Path("/table/{table}")
-  public TableResource getTable(@PathParam("table") String table) {
+  public TableResource getTable(@PathParam("table")
+  String table) {
     return getTableResource(getDatasource().getValueTable(table));
   }
 
@@ -176,7 +175,8 @@ public class DatasourceResource {
 
   @POST
   @Path("/views")
-  public Response createView(final ViewDto viewDto, @Context UriInfo uriInfo) {
+  public Response createView(final ViewDto viewDto, @Context
+  UriInfo uriInfo) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
 
     if(datasourceHasTable(viewDto.getName())) {
@@ -187,11 +187,12 @@ public class DatasourceResource {
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class).path(DatasourceResource.class, "getView").build(name, viewDto.getName());
 
     return Response.created(viewUri)//
-    .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, Lists.newArrayList(AclAction.VIEW_ALL))).build();
+    .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.VIEW_ALL)).build();
   }
 
   @Path("/view/{viewName}")
-  public ViewResource getView(@PathParam("viewName") String viewName) {
+  public ViewResource getView(@PathParam("viewName")
+  String viewName) {
     View view = viewManager.getView(getDatasource().getName(), viewName);
     return getViewResource(view);
   }
@@ -199,7 +200,8 @@ public class DatasourceResource {
   @GET
   @Path("/locales")
   @NoAuthorization
-  public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
+  public Iterable<LocaleDto> getLocales(@QueryParam("locale")
+  String displayLocale) {
     List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
     for(Locale locale : getLocales()) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));

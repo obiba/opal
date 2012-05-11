@@ -54,7 +54,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
         List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
-        magmaConvert("/datasource/{0}/tables", "POST:GET", args));
+            magmaConvert("/datasource/{0}/tables", "POST:GET", args));
         Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
         return perms;
       }
@@ -65,7 +65,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
         List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
-        magmaConvert("/datasource/{0}/views", "POST:GET", args));
+            magmaConvert("/datasource/{0}/views", "POST:GET", args));
         Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
         return perms;
       }
@@ -85,8 +85,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "GET:GET", args),//
-        magmaConvert("/datasource/{0}/table/{1}/variable", "GET:GET/GET", args),//
-        magmaConvert("/datasource/{0}/table/{1}/variable/_transient/summary", "POST", args));
+            magmaConvert("/datasource/{0}/table/{1}/variable", "GET:GET/GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/variable/_transient/summary", "POST", args));
       }
 
     },
@@ -96,8 +96,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
-        magmaConvert("/datasource/{0}/table/{1}/entities", "GET", args),//
-        magmaConvert("/datasource/{0}/table/{1}/variables", "GET", args));
+            magmaConvert("/datasource/{0}/table/{1}/entities", "GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/variables", "GET", args));
       }
 
     },
@@ -149,9 +149,9 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/view/(.+)");
         List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}", "PUT:GET", args),//
-        magmaConvert("/datasource/{0}/view/{1}/variables", "POST:GET", args),//
-        magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
-        magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args));
+            magmaConvert("/datasource/{0}/view/{1}/variables", "POST:GET", args),//
+            magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
+            magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args));
         Iterables.addAll(perms, VIEW_READ.convert(node));
         return perms;
       }
@@ -174,7 +174,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)/variable/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/variable/{2}", "GET:GET/GET", args),//
-        magmaConvert("/datasource/{0}/table/{1}/variable/_transient/summary", "POST:GET", args));
+            magmaConvert("/datasource/{0}/table/{1}/variable/_transient/summary", "POST:GET", args));
       }
     };
 

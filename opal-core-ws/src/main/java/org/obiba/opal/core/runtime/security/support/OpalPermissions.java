@@ -18,12 +18,17 @@ import org.obiba.opal.web.ws.cfg.ResteasyServletConfiguration;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class OpalPermissions implements SubjectAclService.Permissions {
 
   private final URI uri;
 
   private final Iterable<String> perms;
+
+  public OpalPermissions(URI uri, AclAction action) {
+    this(uri, Lists.newArrayList(action));
+  }
 
   public OpalPermissions(URI uri, Iterable<AclAction> actions) {
     this.uri = uri;
