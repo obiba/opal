@@ -21,7 +21,7 @@ import com.google.gwt.event.shared.GwtEvent;
  */
 public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
   private final CategoryDto newCategory;
 
@@ -42,11 +42,11 @@ public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   public CategoryDto getNewCategory() {

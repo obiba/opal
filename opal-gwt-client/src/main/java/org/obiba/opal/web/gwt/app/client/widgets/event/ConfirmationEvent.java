@@ -20,7 +20,7 @@ public class ConfirmationEvent extends GwtEvent<ConfirmationEvent.Handler> {
   // Static Variables
   //
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
   //
   // Instance Variables
@@ -50,7 +50,7 @@ public class ConfirmationEvent extends GwtEvent<ConfirmationEvent.Handler> {
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   //
@@ -58,7 +58,7 @@ public class ConfirmationEvent extends GwtEvent<ConfirmationEvent.Handler> {
   //
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override

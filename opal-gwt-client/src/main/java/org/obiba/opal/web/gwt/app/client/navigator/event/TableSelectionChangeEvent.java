@@ -9,9 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.event;
 
+import org.obiba.opal.web.model.client.magma.TableDto;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
-import org.obiba.opal.web.model.client.magma.TableDto;
 
 /**
  * Event to indicate that a Magma Table has been selected.
@@ -24,7 +25,7 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
   private final TableDto tableDto;
 
@@ -43,13 +44,13 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
   }
 
   public TableSelectionChangeEvent(Object source, TableDto tableDto, String previous, String next) {
-    super();
     this.source = source;
     this.tableDto = tableDto;
     this.previous = previous;
     this.next = next;
   }
 
+  @Override
   public Object getSource() {
     return source;
   }
@@ -67,7 +68,7 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -77,6 +78,6 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 }

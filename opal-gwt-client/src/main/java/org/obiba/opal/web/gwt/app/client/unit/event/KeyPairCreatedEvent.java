@@ -20,14 +20,14 @@ public class KeyPairCreatedEvent extends GwtEvent<KeyPairCreatedEvent.Handler> {
     void onKeyPairCreated(KeyPairCreatedEvent event);
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   private final FunctionalUnitDto functionalUnit;
 
   private final String alias;
 
   public KeyPairCreatedEvent(FunctionalUnitDto functionalUnit, String alias) {
-    super();
     this.functionalUnit = functionalUnit;
     this.alias = alias;
   }
@@ -41,7 +41,7 @@ public class KeyPairCreatedEvent extends GwtEvent<KeyPairCreatedEvent.Handler> {
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -50,7 +50,7 @@ public class KeyPairCreatedEvent extends GwtEvent<KeyPairCreatedEvent.Handler> {
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
-    return TYPE;
+  public GwtEvent.Type<Handler> getAssociatedType() {
+    return getType();
   }
 }

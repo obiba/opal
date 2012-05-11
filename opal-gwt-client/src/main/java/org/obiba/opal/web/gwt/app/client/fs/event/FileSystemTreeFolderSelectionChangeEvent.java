@@ -20,7 +20,8 @@ public class FileSystemTreeFolderSelectionChangeEvent extends GwtEvent<FileSyste
     void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event);
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   private final FileDto folder;
 
@@ -33,7 +34,7 @@ public class FileSystemTreeFolderSelectionChangeEvent extends GwtEvent<FileSyste
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -42,8 +43,8 @@ public class FileSystemTreeFolderSelectionChangeEvent extends GwtEvent<FileSyste
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
-    return TYPE;
+  public GwtEvent.Type<Handler> getAssociatedType() {
+    return getType();
   }
 
 }

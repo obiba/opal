@@ -20,7 +20,7 @@ public class DataShieldMethodCreatedEvent extends GwtEvent<DataShieldMethodCreat
     void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event);
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
   private final DataShieldMethodDto dto;
 
@@ -33,7 +33,7 @@ public class DataShieldMethodCreatedEvent extends GwtEvent<DataShieldMethodCreat
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class DataShieldMethodCreatedEvent extends GwtEvent<DataShieldMethodCreat
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
-    return TYPE;
+  public GwtEvent.Type<Handler> getAssociatedType() {
+    return getType();
   }
 }

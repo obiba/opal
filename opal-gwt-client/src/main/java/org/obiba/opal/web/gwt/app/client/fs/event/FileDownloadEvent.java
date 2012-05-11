@@ -22,7 +22,8 @@ public class FileDownloadEvent extends GwtEvent<FileDownloadEvent.Handler> {
     void onFileDownload(FileDownloadEvent event);
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   private final String url;
 
@@ -35,7 +36,7 @@ public class FileDownloadEvent extends GwtEvent<FileDownloadEvent.Handler> {
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -45,6 +46,6 @@ public class FileDownloadEvent extends GwtEvent<FileDownloadEvent.Handler> {
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 }

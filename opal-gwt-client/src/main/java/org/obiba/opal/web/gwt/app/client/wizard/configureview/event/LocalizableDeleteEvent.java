@@ -18,7 +18,8 @@ import com.google.gwt.event.shared.GwtEvent;
 @Deprecated
 public class LocalizableDeleteEvent extends GwtEvent<LocalizableDeleteEvent.Handler> {
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   public LocalizableDeleteEvent() {
   }
@@ -30,15 +31,15 @@ public class LocalizableDeleteEvent extends GwtEvent<LocalizableDeleteEvent.Hand
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   public interface Handler extends EventHandler {
-    public void onLocalizableDelete(LocalizableDeleteEvent event);
+    void onLocalizableDelete(LocalizableDeleteEvent event);
   }
 
 }

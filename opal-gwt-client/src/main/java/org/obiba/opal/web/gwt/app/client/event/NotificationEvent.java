@@ -33,7 +33,8 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   private NotificationType notificationType;
 
@@ -87,7 +88,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   //
@@ -95,7 +96,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   //
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   public NotificationType getNotificationType() {

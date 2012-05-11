@@ -22,7 +22,8 @@ public class FolderCreationEvent extends GwtEvent<FolderCreationEvent.Handler> {
   // Static Variables
   //
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   //
   // Instance Variables
@@ -35,7 +36,7 @@ public class FolderCreationEvent extends GwtEvent<FolderCreationEvent.Handler> {
   //
 
   public FolderCreationEvent(FileDto dto) {
-    this.folder = dto;
+    folder = dto;
   }
 
   //
@@ -49,7 +50,7 @@ public class FolderCreationEvent extends GwtEvent<FolderCreationEvent.Handler> {
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   //
@@ -57,7 +58,7 @@ public class FolderCreationEvent extends GwtEvent<FolderCreationEvent.Handler> {
   //
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   public FileDto getFolder() {
@@ -70,6 +71,6 @@ public class FolderCreationEvent extends GwtEvent<FolderCreationEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    public void onFolderCreation(FolderCreationEvent event);
+    void onFolderCreation(FolderCreationEvent event);
   }
 }

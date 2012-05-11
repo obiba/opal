@@ -22,7 +22,8 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
   // Static Variables
   //
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   //
   // Instance Variables
@@ -34,7 +35,6 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
   // Constructors
   //
   public FileSelectionUpdateEvent(Object source) {
-    super();
     this.source = source;
   }
 
@@ -49,7 +49,7 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   //
@@ -57,9 +57,10 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
   //
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
+  @Override
   public Object getSource() {
     return source;
   }
@@ -70,6 +71,6 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
 
   public interface Handler extends EventHandler {
 
-    public void onFileSelectionUpdate(FileSelectionUpdateEvent event);
+    void onFileSelectionUpdate(FileSelectionUpdateEvent event);
   }
 }

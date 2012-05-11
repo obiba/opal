@@ -20,7 +20,8 @@ public class FunctionalUnitDeletedEvent extends GwtEvent<FunctionalUnitDeletedEv
     void onFunctionalUnitDeleted(FunctionalUnitDeletedEvent event);
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   private final FunctionalUnitDto functionalUnit;
 
@@ -33,7 +34,7 @@ public class FunctionalUnitDeletedEvent extends GwtEvent<FunctionalUnitDeletedEv
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -42,7 +43,7 @@ public class FunctionalUnitDeletedEvent extends GwtEvent<FunctionalUnitDeletedEv
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
+  public GwtEvent.Type<Handler> getAssociatedType() {
     return TYPE;
   }
 }

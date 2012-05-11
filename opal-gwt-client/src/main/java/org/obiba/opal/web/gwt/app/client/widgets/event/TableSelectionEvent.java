@@ -25,7 +25,7 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
   // Static Variables
   //
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
   //
   // Instance Variables
@@ -39,7 +39,6 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
   // Constructors
   //
   public TableSelectionEvent(Object source, List<TableDto> selectedTables) {
-    super();
     this.source = source;
     this.selectedTables = selectedTables;
   }
@@ -55,7 +54,7 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   //
@@ -63,9 +62,10 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
   //
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
+  @Override
   public Object getSource() {
     return source;
   }

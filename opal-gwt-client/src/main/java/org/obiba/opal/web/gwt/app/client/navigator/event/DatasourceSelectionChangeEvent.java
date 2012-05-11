@@ -25,12 +25,12 @@ public class DatasourceSelectionChangeEvent extends GwtEvent<DatasourceSelection
 
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
   private final DatasourceDto datasourceDto;
 
   /**
-   * @param selectedItem
+   * @param datasourceDto
    */
   public DatasourceSelectionChangeEvent(DatasourceDto datasourceDto) {
     this.datasourceDto = datasourceDto;
@@ -41,7 +41,7 @@ public class DatasourceSelectionChangeEvent extends GwtEvent<DatasourceSelection
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -51,6 +51,6 @@ public class DatasourceSelectionChangeEvent extends GwtEvent<DatasourceSelection
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 }

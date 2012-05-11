@@ -20,7 +20,8 @@ public class DatabaseCreatedEvent extends GwtEvent<DatabaseCreatedEvent.Handler>
     void onCreated(DatabaseCreatedEvent event);
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   private final JdbcDataSourceDto dto;
 
@@ -33,7 +34,7 @@ public class DatabaseCreatedEvent extends GwtEvent<DatabaseCreatedEvent.Handler>
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -42,7 +43,7 @@ public class DatabaseCreatedEvent extends GwtEvent<DatabaseCreatedEvent.Handler>
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
-    return TYPE;
+  public GwtEvent.Type<Handler> getAssociatedType() {
+    return getType();
   }
 }

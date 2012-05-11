@@ -20,7 +20,7 @@ public class FunctionalUnitUpdatedEvent extends GwtEvent<FunctionalUnitUpdatedEv
     void onFunctionalUnitUpdated(FunctionalUnitUpdatedEvent event);
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
   private final FunctionalUnitDto functionalUnit;
 
@@ -33,7 +33,7 @@ public class FunctionalUnitUpdatedEvent extends GwtEvent<FunctionalUnitUpdatedEv
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class FunctionalUnitUpdatedEvent extends GwtEvent<FunctionalUnitUpdatedEv
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
-    return TYPE;
+  public GwtEvent.Type<Handler> getAssociatedType() {
+    return getType();
   }
 }

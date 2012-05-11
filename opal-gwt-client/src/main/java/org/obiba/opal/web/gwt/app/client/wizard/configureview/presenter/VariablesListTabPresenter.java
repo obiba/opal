@@ -230,6 +230,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
   }
 
+  @SuppressWarnings({"PMD.NcssMethodCount", "OverlyLongMethod"})
   private void addEventHandlers() {
     registerHandler(getEventBus()
         .addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));

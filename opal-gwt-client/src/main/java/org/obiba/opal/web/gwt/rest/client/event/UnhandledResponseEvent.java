@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,19 +19,16 @@ import com.google.gwt.http.client.Response;
  */
 public class UnhandledResponseEvent extends GwtEvent<UnhandledResponseEvent.Handler> {
 
-  private static Type<UnhandledResponseEvent.Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
-  public static interface Handler extends EventHandler {
-    public void onUnhandledResponse(UnhandledResponseEvent e);
+  public interface Handler extends EventHandler {
+    void onUnhandledResponse(UnhandledResponseEvent e);
   }
 
   private final Request request;
 
   private final Response response;
 
-  /**
-   * @param selectedItem
-   */
   public UnhandledResponseEvent(Request request, Response response) {
     this.request = request;
     this.response = response;
@@ -45,8 +42,8 @@ public class UnhandledResponseEvent extends GwtEvent<UnhandledResponseEvent.Hand
     return response;
   }
 
-  public static Type<UnhandledResponseEvent.Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<UnhandledResponseEvent.Handler>());
+  public static Type<Handler> getType() {
+    return TYPE;
   }
 
   @Override

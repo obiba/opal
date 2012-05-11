@@ -22,7 +22,8 @@ public class DatasourceUpdatedEvent extends GwtEvent<DatasourceUpdatedEvent.Hand
 
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   private final String datasourceName;
 
@@ -42,7 +43,7 @@ public class DatasourceUpdatedEvent extends GwtEvent<DatasourceUpdatedEvent.Hand
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -52,6 +53,6 @@ public class DatasourceUpdatedEvent extends GwtEvent<DatasourceUpdatedEvent.Hand
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 }

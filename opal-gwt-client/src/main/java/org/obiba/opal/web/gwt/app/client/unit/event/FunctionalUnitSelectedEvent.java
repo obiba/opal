@@ -20,7 +20,8 @@ public class FunctionalUnitSelectedEvent extends GwtEvent<FunctionalUnitSelected
     void onFunctionalUnitSelected(FunctionalUnitSelectedEvent event);
   }
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   private final FunctionalUnitDto functionalUnit;
 
@@ -33,7 +34,7 @@ public class FunctionalUnitSelectedEvent extends GwtEvent<FunctionalUnitSelected
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   @Override
@@ -42,7 +43,7 @@ public class FunctionalUnitSelectedEvent extends GwtEvent<FunctionalUnitSelected
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
-    return TYPE;
+  public GwtEvent.Type<Handler> getAssociatedType() {
+    return getType();
   }
 }

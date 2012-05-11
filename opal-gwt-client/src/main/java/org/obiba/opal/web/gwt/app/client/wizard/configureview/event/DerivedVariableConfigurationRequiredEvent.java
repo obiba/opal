@@ -22,7 +22,8 @@ public class DerivedVariableConfigurationRequiredEvent extends GwtEvent<DerivedV
   // Static Variables
   //
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
+
 
   //
   // Instance Variables
@@ -49,11 +50,11 @@ public class DerivedVariableConfigurationRequiredEvent extends GwtEvent<DerivedV
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   //

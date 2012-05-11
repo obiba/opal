@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -16,14 +16,14 @@ import com.google.gwt.event.shared.GwtEvent;
 
 /**
  * Signals that a view needs to be saved.
- * 
+ * <p/>
  * The
  */
 public class ViewSaveRequiredEvent extends GwtEvent<ViewSaveRequiredEvent.Handler> {
 
-  private static Type<Handler> TYPE;
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private ViewDto viewDto;
+  private final ViewDto viewDto;
 
   public ViewSaveRequiredEvent(ViewDto viewDto) {
     this.viewDto = viewDto;
@@ -36,11 +36,11 @@ public class ViewSaveRequiredEvent extends GwtEvent<ViewSaveRequiredEvent.Handle
 
   @Override
   public Type<Handler> getAssociatedType() {
-    return TYPE;
+    return getType();
   }
 
   public static Type<Handler> getType() {
-    return TYPE != null ? TYPE : (TYPE = new Type<Handler>());
+    return TYPE;
   }
 
   public ViewDto getViewDto() {
