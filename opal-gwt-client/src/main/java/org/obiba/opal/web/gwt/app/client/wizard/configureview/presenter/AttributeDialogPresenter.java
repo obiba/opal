@@ -207,15 +207,20 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     @Override
     protected boolean hasError() {
-      if(isEdit()) {
-        // Edits can have the same name.
-        if(getDisplay().getName().getText().equals(attributeDto.getName())) return false;
+      String safeNamespace = Strings.nullToEmpty(getDisplay().getNamespace().getText());
+      String safeName = Strings.nullToEmpty(getDisplay().getName().getText());
+
+      // Edits can have the same safeNamespace/safeName.
+      if(isEdit() && safeNamespace.equals(attributeDto.getNamespace()) && safeName.equals(attributeDto.getName())) {
+        return false;
       }
 
+      // Using the same safeNamespace/safeName as an existing attribute is not permitted.
       for(int i = 0; i < attributes.length(); i++) {
         AttributeDto dto = attributes.get(i);
-        // Using the same name as an existing attribute is not permitted.
-        if(getDisplay().getName().getText().equals(dto.getName())) return true;
+        if(safeNamespace.equals(dto.getNamespace()) && safeName.equals(dto.getName())) {
+          return true;
+        }
       }
       return false;
     }
@@ -231,7 +236,12 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
         eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessageKey).build());
         return;
       }
-      eventBus.fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), isEdit() ? UpdateType.EDIT : UpdateType.ADD));
+      if(isEdit()) {
+        eventBus.fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), attributeDto.getNamespace(),
+            attributeDto.getName(), UpdateType.EDIT));
+      } else {
+        eventBus.fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), UpdateType.ADD));
+      }
       getDisplay().hideDialog();
     }
 

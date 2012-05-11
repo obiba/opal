@@ -27,9 +27,20 @@ public class AttributeUpdateEvent extends GwtEvent<AttributeUpdateEvent.Handler>
 
   private final UpdateType updateType;
 
-  public AttributeUpdateEvent(JsArray<AttributeDto> attributes, UpdateType updateType) {
+  private final String originalNamespace;
+
+  private final String originalName;
+
+  public AttributeUpdateEvent(JsArray<AttributeDto> attributes, String originalNamespace, String originalName,
+      UpdateType updateType) {
     this.attributes = attributes;
     this.updateType = updateType;
+    this.originalNamespace = originalNamespace;
+    this.originalName = originalName;
+  }
+
+  public AttributeUpdateEvent(JsArray<AttributeDto> attributes, UpdateType updateType) {
+    this(attributes, null, null, updateType);
   }
 
   @Override
@@ -52,6 +63,14 @@ public class AttributeUpdateEvent extends GwtEvent<AttributeUpdateEvent.Handler>
 
   public UpdateType getUpdateType() {
     return updateType;
+  }
+
+  public String getOriginalNamespace() {
+    return originalNamespace;
+  }
+
+  public String getOriginalName() {
+    return originalName;
   }
 
   public interface Handler extends EventHandler {

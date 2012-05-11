@@ -51,6 +51,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -886,7 +887,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
 
     private void replaceAttribute(AttributeUpdateEvent event) {
-      deleteAttributes(event.getAttributes());
+      deleteAttribute(event.getOriginalNamespace(), event.getOriginalName());
       for(int i = 0; i < event.getAttributes().length(); i++) {
         AttributeDto updatedAttribute = event.getAttributes().get(i);
         currentVariable.getAttributesArray().push(updatedAttribute);
@@ -896,17 +897,22 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     private void deleteAttributes(JsArray<AttributeDto> attributeDtos) {
       for(int i = 0; i < attributeDtos.length(); i++) {
         AttributeDto attributeDto = attributeDtos.get(i);
-        @SuppressWarnings("unchecked")
-        JsArray<AttributeDto> result = (JsArray<AttributeDto>) JsArray.createArray();
-        for(int j = 0; j < currentVariable.getAttributesArray().length(); j++) {
-          AttributeDto attribute = currentVariable.getAttributesArray().get(j);
-          if(!(attribute.getNamespace().equals(attributeDto.getNamespace()) //
-              && attribute.getName().equals(attributeDto.getName()))) {
-            result.push(attribute);
-          }
-        }
-        currentVariable.setAttributesArray(result);
+        deleteAttribute(attributeDto.getNamespace(), attributeDto.getName());
       }
+    }
+
+    private void deleteAttribute(String namespace, String name) {
+      String safeNamespace = Strings.nullToEmpty(namespace);
+      String safeName = Strings.nullToEmpty(name);
+      @SuppressWarnings("unchecked")
+      JsArray<AttributeDto> result = (JsArray<AttributeDto>) JsArray.createArray();
+      for(int i = 0; i < currentVariable.getAttributesArray().length(); i++) {
+        AttributeDto attribute = currentVariable.getAttributesArray().get(i);
+        if(!(attribute.getNamespace().equals(safeNamespace) && attribute.getName().equals(safeName))) {
+          result.push(attribute);
+        }
+      }
+      currentVariable.setAttributesArray(result);
     }
 
   }

@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
-import static org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder.createChain;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +47,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+
+import static org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder.createChain;
 
 public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariablePresenter.Display> {
 
@@ -95,7 +95,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   private String destinationView;
 
   @Inject
-  @SuppressWarnings("PMD.ExcessiveParameterList")
+  @SuppressWarnings({"PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters"})
   public DeriveVariablePresenter(EventBus eventBus, Display view, Translations translations,
       DeriveTemporalVariableStepPresenter temporalPresenter, //
       DeriveCategoricalVariableStepPresenter categoricalPresenter, //
