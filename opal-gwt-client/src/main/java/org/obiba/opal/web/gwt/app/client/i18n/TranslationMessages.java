@@ -28,4 +28,12 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Error at line {0}, column {1}: {2}.")
   String errorAt(int lineNumber, int columnNumber, String message);
 
+  @Description("Confirm delete category label")
+  @DefaultMessage("Please confirm that you want to remove this category:<br />{0}")
+  String confirmDeleteCategory(String name);
+
+  @Description("Confirm delete attribute label")
+  @DefaultMessage("Please confirm that you want to remove this attribute:<br />{0}")
+  String confirmDeleteAttribute(String name);
+
 }

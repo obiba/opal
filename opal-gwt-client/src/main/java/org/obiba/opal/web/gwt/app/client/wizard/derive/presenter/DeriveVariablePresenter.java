@@ -204,9 +204,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       @Override
       public boolean apply() {
         VariableDto originalVariable = deriveFromVariablePresenter.getOriginalVariable();
-        return VariableDtos.hasCategories(originalVariable)
-            && ("text".equals(originalVariable.getValueType()) || ("integer".equals(originalVariable.getValueType()) && VariableDtos
-                .allCategoriesMissing(originalVariable) == false));
+        return VariableDtos.hasCategories(originalVariable) && ("text"
+            .equals(originalVariable.getValueType()) || ("integer"
+            .equals(originalVariable.getValueType()) && VariableDtos.allCategoriesMissing(originalVariable) == false));
       }
     });
   }
@@ -264,8 +264,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     setInSlot(Display.Slots.Derivation, deriveCustomVariablePresenter);
 
     List<DefaultWizardStepController.Builder> steps =
-        deriveCustomVariablePresenter.getWizardStepBuilders(new SetCurrentPresenterStepInHandler(
-            deriveCustomVariablePresenter));
+        deriveCustomVariablePresenter.getWizardStepBuilders(
+            new SetCurrentPresenterStepInHandler(deriveCustomVariablePresenter));
     steps.add(getView().getScriptEvaluationStepBuilder(null));
     steps.add(getConclusionStepBuilder());
 
@@ -326,7 +326,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       }
     }
 
-    final VariableDto derived = derivationPresenter.getDerivedVariable();
+    VariableDto derived = derivationPresenter.getDerivedVariable();
     if(wizardType == FromWizardType) {
       destinationDatasource = table.getDatasourceName();
       destinationView = table.getName();
@@ -517,7 +517,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
      * @param view
      * @param derived
      */
-    private void saveVariable(final ViewDto view, final VariableDto derived) {
+    private void saveVariable(ViewDto view, VariableDto derived) {
       // add or update derived variable
       int pos = getVariablePosition(view, derived);
       VariableListViewDto variableListViewDto =

@@ -242,14 +242,14 @@ public class CategoriesPresenter extends LocalizablesPresenter {
         variableDto.setCategoriesArray((JsArray<CategoryDto>) JsArray.createArray());
       }
 
-      variableDto.getCategoriesArray().push(event.getNewCategory());
+      variableDto.getCategoriesArray().push(event.getCategory());
     }
 
     private void replaceCategory(CategoryUpdateEvent event) {
       for(int categoryIndex = 0; categoryIndex < variableDto.getCategoriesArray().length(); categoryIndex++) {
         CategoryDto categoryDto = variableDto.getCategoriesArray().get(categoryIndex);
         if(categoryDto.getName().equals(event.getOriginalCategory().getName())) {
-          variableDto.getCategoriesArray().set(categoryIndex, event.getNewCategory());
+          variableDto.getCategoriesArray().set(categoryIndex, event.getCategory());
           break;
         }
       }

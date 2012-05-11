@@ -52,12 +52,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.EDIT_ACTION;
-
 public class VariablesListTabView extends ViewImpl implements VariablesListTabPresenter.Display {
-
-
 
   @UiTemplate("VariablesListTabView.ui.xml")
   interface VariablesListTabViewUiBinder extends UiBinder<Widget, VariablesListTabView> {
@@ -140,6 +135,10 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
 
   private String entityType;
 
+  private ActionHandler<CategoryDto> editCategoryActionHandler;
+
+  private ActionHandler<CategoryDto> deleteCategoryActionHandler;
+
   private ActionHandler<AttributeDto> editAttributeActionHandler;
 
   private ActionHandler<AttributeDto> deleteAttributeActionHandler;
@@ -174,19 +173,35 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   private void initCategoryTable() {
+
+    ActionsColumn<CategoryDto> actionsColumn = new ActionsColumn<CategoryDto>(ActionsColumn.EDIT_ACTION,
+        ActionsColumn.DELETE_ACTION);
+    actionsColumn.setActionHandler(new ActionHandler<CategoryDto>() {
+      @Override
+      public void doAction(CategoryDto categoryDto, String actionName) {
+        if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
+          editCategoryActionHandler.doAction(categoryDto, actionName);
+        } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
+          deleteCategoryActionHandler.doAction(categoryDto, actionName);
+        }
+      }
+    });
+    categoryTable.addColumn(actionsColumn, translations.actionsLabel());
+
     categoryTable.setPageSize(NavigatorView.PAGE_SIZE);
     categoryTablePager.setDisplay(categoryTable);
     categoryProvider.addDataDisplay(categoryTable);
   }
 
   private void initAttributeTable() {
-    ActionsColumn<AttributeDto> actionsColumn = new ActionsColumn<AttributeDto>(EDIT_ACTION, DELETE_ACTION);
+    ActionsColumn<AttributeDto> actionsColumn = new ActionsColumn<AttributeDto>(ActionsColumn.EDIT_ACTION,
+        ActionsColumn.DELETE_ACTION);
     actionsColumn.setActionHandler(new ActionHandler<AttributeDto>() {
       @Override
       public void doAction(AttributeDto attributeDto, String actionName) {
-        if(EDIT_ACTION.equals(actionName)) {
+        if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
           editAttributeActionHandler.doAction(attributeDto, actionName);
-        } else if(DELETE_ACTION.equals(actionName)) {
+        } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
           deleteAttributeActionHandler.doAction(attributeDto, actionName);
         }
       }
@@ -206,6 +221,16 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   @Override
   public void setDeleteAttributeActionHandler(ActionHandler<AttributeDto> deleteAttributeActionHandler) {
     this.deleteAttributeActionHandler = deleteAttributeActionHandler;
+  }
+
+  @Override
+  public void setEditCategoryActionHandler(ActionHandler<CategoryDto> editCategoryActionHandler) {
+    this.editCategoryActionHandler = editCategoryActionHandler;
+  }
+
+  @Override
+  public void setDeleteCategoryActionHandler(ActionHandler<CategoryDto> deleteCategoryActionHandler) {
+    this.deleteCategoryActionHandler = deleteCategoryActionHandler;
   }
 
   @Override
@@ -232,8 +257,8 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   @Override
-  public void addVariableNameSuggestion(String variableName) {
-    suggestions.add(variableName);
+  public void addVariableNameSuggestion(String name) {
+    suggestions.add(name);
   }
 
   @Override

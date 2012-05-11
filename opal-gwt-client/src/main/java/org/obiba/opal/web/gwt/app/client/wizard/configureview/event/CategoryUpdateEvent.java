@@ -23,16 +23,20 @@ public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final CategoryDto newCategory;
+  private final CategoryDto category;
 
   private final CategoryDto originalCategory;
 
   private final UpdateType updateType;
 
-  public CategoryUpdateEvent(CategoryDto newCategory, CategoryDto originalCategory, UpdateType updateType) {
-    this.newCategory = newCategory;
+  public CategoryUpdateEvent(CategoryDto category, CategoryDto originalCategory, UpdateType updateType) {
+    this.category = category;
     this.originalCategory = originalCategory;
     this.updateType = updateType;
+  }
+
+  public CategoryUpdateEvent(CategoryDto category, UpdateType updateType) {
+    this(category, null, updateType);
   }
 
   @Override
@@ -49,8 +53,8 @@ public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
     return TYPE;
   }
 
-  public CategoryDto getNewCategory() {
-    return newCategory;
+  public CategoryDto getCategory() {
+    return category;
   }
 
   public CategoryDto getOriginalCategory() {

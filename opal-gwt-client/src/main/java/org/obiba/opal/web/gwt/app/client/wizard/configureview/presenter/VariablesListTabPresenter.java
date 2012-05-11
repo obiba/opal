@@ -15,6 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
@@ -92,6 +93,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   private static final Translations translations = GWT.create(Translations.class);
 
+  private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
+
   @Inject
   private Provider<CategoryDialogPresenter> categoryDialogPresenterProvider;
 
@@ -144,7 +147,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     summaryPresenter.bind();
     getView().addSummaryTabWidget(summaryPresenter.getDisplay().asWidget());
 
-    addEventHandlers();
+    registerEventHandlers();
     addValidators();
   }
 
@@ -231,30 +234,17 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
   }
 
-  @SuppressWarnings({"PMD.NcssMethodCount", "OverlyLongMethod"})
-  private void addEventHandlers() {
+  private void registerEventHandlers() {
+    registerNavigationEventHandlers();
+
     registerHandler(getEventBus()
         .addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-
-    registerHandler(getView().addPreviousVariableNameClickHandler(new PreviousVariableClickHandler()));
-    registerHandler(getView().addNextVariableNameClickHandler(new NextVariableClickHandler()));
-    registerHandler(getView().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
 
     registerHandler(getView().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
     registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
 
     registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
     registerHandler(getView().addRemoveVariableClickHandler(new RemoveVariableClickHandler()));
-
-    // categories handlers
-    registerHandler(getView().addAddCategoryHandler(new AddCategoryHandler()));
-    registerHandler(getView().addAddAttributeHandler(new AddAttributeHandler()));
-
-    // attributes handlers
-    getView().setEditAttributeActionHandler(new EditAttributeActionHandler());
-    DeleteAttributeActionHandler deleteAttributeActionHandler = new DeleteAttributeActionHandler();
-    getView().setDeleteAttributeActionHandler(deleteAttributeActionHandler);
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), deleteAttributeActionHandler));
 
     registerHandler(getView().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
     registerHandler(getEventBus().addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
@@ -264,6 +254,16 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
 
     registerFormChangedHandler();
+
+    registerCategoryEventHandlers();
+
+    registerAttributeEventHandlers();
+  }
+
+  private void registerNavigationEventHandlers() {
+    registerHandler(getView().addPreviousVariableNameClickHandler(new PreviousVariableClickHandler()));
+    registerHandler(getView().addNextVariableNameClickHandler(new NextVariableClickHandler()));
+    registerHandler(getView().addVariableNameSelectedHandler(new VariableNameSelectedHandler()));
   }
 
   private void registerFormChangedHandler() {
@@ -276,7 +276,32 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     registerHandler(getView().addOccurrenceGroupChangedHandler(formChangedHandler));
     registerHandler(getView().addUnitChangedHandler(formChangedHandler));
     registerHandler(getView().addMimeTypeChangedHandler(formChangedHandler));
-    registerHandler(getEventBus().addHandler(CategoryUpdateEvent.getType(), formChangedHandler));
+  }
+
+  private void registerCategoryEventHandlers() {
+    // show dialog
+    registerHandler(getView().addAddCategoryHandler(new AddCategoryHandler()));
+    getView().setEditCategoryActionHandler(new EditCategoryHandler());
+
+    DeleteCategoryActionHandler deleteCategoryActionHandler = new DeleteCategoryActionHandler();
+    getView().setDeleteCategoryActionHandler(deleteCategoryActionHandler);
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), deleteCategoryActionHandler));
+
+    // execute category update
+    registerHandler(getEventBus().addHandler(CategoryUpdateEvent.getType(), new CategoryUpdateEventHandler()));
+  }
+
+  private void registerAttributeEventHandlers() {
+
+    // show dialog
+    registerHandler(getView().addAddAttributeHandler(new AddAttributeHandler()));
+    getView().setEditAttributeActionHandler(new EditAttributeActionHandler());
+
+    DeleteAttributeActionHandler deleteAttributeActionHandler = new DeleteAttributeActionHandler();
+    getView().setDeleteAttributeActionHandler(deleteAttributeActionHandler);
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), deleteAttributeActionHandler));
+
+    // execute attribute update
     registerHandler(getEventBus().addHandler(AttributeUpdateEvent.getType(), new AttributeUpdateEventHandler()));
   }
 
@@ -321,6 +346,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     CategoryDialogPresenter categoryDialogPresenter = categoryDialogPresenterProvider.get();
     categoryDialogPresenter.bind();
     categoryDialogPresenter.setViewDto(viewDto);
+    categoryDialogPresenter.setCategoryDto(categoryDto);
     categoryDialogPresenter.setCategories(currentVariable.getCategoriesArray());
     categoryDialogPresenter.revealDisplay();
   }
@@ -343,6 +369,10 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     void setEditAttributeActionHandler(ActionHandler<AttributeDto> editAttributeActionHandler);
 
     void setDeleteAttributeActionHandler(ActionHandler<AttributeDto> deleteAttributeActionHandler);
+
+    void setEditCategoryActionHandler(ActionHandler<CategoryDto> editCategoryActionHandler);
+
+    void setDeleteCategoryActionHandler(ActionHandler<CategoryDto> deleteCategoryActionHandler);
 
     enum Slots {
       Test
@@ -523,6 +553,43 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
   }
 
+  class EditCategoryHandler implements ActionHandler<CategoryDto> {
+
+    @Override
+    public void doAction(CategoryDto categoryDto, String actionName) {
+      if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
+        prepareCategoryDialog(categoryDto);
+      }
+    }
+  }
+
+  class DeleteCategoryActionHandler implements ActionHandler<CategoryDto>, ConfirmationEvent.Handler {
+
+    private Runnable runDelete;
+
+    @Override
+    public void doAction(final CategoryDto deletedCategory, String actionName) {
+      if(!ActionsColumn.DELETE_ACTION.equals(actionName)) return;
+      runDelete = new Runnable() {
+
+        @Override
+        public void run() {
+          fireEvent(new CategoryUpdateEvent(deletedCategory, UpdateType.DELETE));
+        }
+
+      };
+      fireEvent(ConfirmationRequiredEvent.createWithMessages(runDelete, translations.deleteCategory(),
+          translationMessages.confirmDeleteCategory(deletedCategory.getName())));
+    }
+
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(event.getSource() == runDelete) {
+        runDelete.run();
+      }
+    }
+  }
+
   class AddAttributeHandler implements ClickHandler {
 
     @Override
@@ -559,8 +626,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         }
 
       };
-      fireEvent(ConfirmationRequiredEvent
-          .createWithMessages(runDelete, translations.deleteAttribute(), translations.confirmDeleteAttribute()));
+      fireEvent(ConfirmationRequiredEvent.createWithMessages(runDelete, translations.deleteAttribute(),
+          translationMessages.confirmDeleteAttribute(deletedAttribute.getName())));
     }
 
     @Override
@@ -825,7 +892,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   }
 
-  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean>, CategoryUpdateEvent.Handler {
+  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean> {
 
     @Override
     public void onChange(ChangeEvent arg0) {
@@ -850,9 +917,54 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       }
     }
 
+  }
+
+  class CategoryUpdateEventHandler implements CategoryUpdateEvent.Handler {
+
     @Override
     public void onCategoryUpdate(CategoryUpdateEvent event) {
-      formChange();
+      switch(event.getUpdateType()) {
+        case ADD:
+          addCategory(event);
+          break;
+        case EDIT:
+          replaceCategory(event);
+          break;
+        case DELETE:
+          deleteCategory(event.getCategory());
+          break;
+      }
+      getView().renderCategoryRows(currentVariable.getCategoriesArray());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addCategory(CategoryUpdateEvent event) {
+      if(currentVariable.getCategoriesArray() == null) {
+        currentVariable.setCategoriesArray((JsArray<CategoryDto>) JsArray.createArray());
+      }
+      currentVariable.getCategoriesArray().push(event.getCategory());
+    }
+
+    private void replaceCategory(CategoryUpdateEvent event) {
+      for(int i = 0; i < currentVariable.getCategoriesArray().length(); i++) {
+        CategoryDto category = currentVariable.getCategoriesArray().get(i);
+        if(category.getName().equals(event.getOriginalCategory().getName())) {
+          currentVariable.getCategoriesArray().set(i, event.getCategory());
+          break;
+        }
+      }
+    }
+
+    private void deleteCategory(CategoryDto categoryToDelete) {
+      @SuppressWarnings("unchecked")
+      JsArray<CategoryDto> result = (JsArray<CategoryDto>) JsArray.createArray();
+      for(int i = 0; i < currentVariable.getCategoriesArray().length(); i++) {
+        CategoryDto category = currentVariable.getCategoriesArray().get(i);
+        if(!category.getName().equals(categoryToDelete.getName())) {
+          result.push(category);
+        }
+      }
+      currentVariable.setCategoriesArray(result);
     }
 
   }
