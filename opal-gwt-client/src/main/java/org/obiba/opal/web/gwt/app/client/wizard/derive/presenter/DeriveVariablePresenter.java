@@ -329,8 +329,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     UriBuilder ub = UriBuilder.create().segment("datasource", destinationDatasource, "view", destinationView);
     ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(ub.build()).get()
-        .withCallback(new SaveDerivedVariableCallback(derived))
-        .withCallback(Response.SC_NOT_FOUND, new ViewNotFoundCallback()).send();
+        .withCallback(new UpdateViewCallback(derived))
+        .withCallback(Response.SC_NOT_FOUND, new CreateViewCallback()).send();
 
   }
 
@@ -399,7 +399,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     }
   }
 
-  private final class ViewNotFoundCallback implements ResponseCodeCallback {
+  private final class CreateViewCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
       viewCreationConfirmation = new Runnable() {
@@ -470,11 +470,11 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     }
   }
 
-  private final class SaveDerivedVariableCallback implements ResourceCallback<ViewDto> {
+  private final class UpdateViewCallback implements ResourceCallback<ViewDto> {
 
     private final VariableDto derived;
 
-    private SaveDerivedVariableCallback(VariableDto derived) {
+    private UpdateViewCallback(VariableDto derived) {
       this.derived = derived;
     }
 
