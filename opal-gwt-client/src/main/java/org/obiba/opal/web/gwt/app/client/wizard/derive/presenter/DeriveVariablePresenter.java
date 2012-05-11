@@ -334,27 +334,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   }
 
-  /**
-   * Get the position of the variable with the same name in the view
-   * @param view
-   * @param derived
-   * @return -1 if not found
-   */
-  private int getVariablePosition(ViewDto view, VariableDto derived) {
-    VariableListViewDto variableListViewDto =
-        (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-    JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
-    int pos = -1;
-    for(int i = 0; i < variables.length(); i++) {
-      VariableDto var = variables.get(i);
-      if(var.getName().equals(derived.getName())) {
-        pos = i;
-        break;
-      }
-    }
-    return pos;
-  }
-
   private void close(ViewDto view, VariableDto derived) {
     getView().hide();
     derivationPresenter.onClose();
@@ -543,6 +522,27 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       variableListViewDto.setVariablesArray(variables);
 
       doRequest(view);
+    }
+
+    /**
+     * Get the position of the variable with the same name in the view
+     * @param view
+     * @param derived
+     * @return -1 if not found
+     */
+    private int getVariablePosition(ViewDto view, VariableDto derived) {
+      VariableListViewDto variableListViewDto =
+          (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
+      int pos = -1;
+      for(int i = 0; i < variables.length(); i++) {
+        VariableDto var = variables.get(i);
+        if(var.getName().equals(derived.getName())) {
+          pos = i;
+          break;
+        }
+      }
+      return pos;
     }
 
     private void doRequest(final ViewDto view) {
