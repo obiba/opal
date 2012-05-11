@@ -23,7 +23,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -49,11 +48,6 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   TextBox categoryName;
 
   @UiField
-  InlineLabel uneditableCategoryName;
-
-  private boolean categoryNameEditable;
-
-  @UiField
   CheckBox isMissing;
 
   @UiField
@@ -64,9 +58,6 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   public CategoryDialogView() {
     initWidget(uiBinder.createAndBindUi(this));
     uiBinder.createAndBindUi(this);
-
-    categoryNameEditable = true;
-    setCategoryNameEditable(categoryNameEditable);
   }
 
   @Override
@@ -85,7 +76,6 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   @Override
   public void clear() {
     categoryName.setText("");
-    uneditableCategoryName.setText("");
     isMissing.setValue(false);
 
     if(inputField != null) {
@@ -116,16 +106,8 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   }
 
   @Override
-  public void setCategoryNameEditable(boolean editable) {
-    categoryNameEditable = editable;
-
-    uneditableCategoryName.setVisible(!editable);
-    categoryName.setVisible(editable);
-  }
-
-  @Override
   public HasText getCategoryName() {
-    return categoryNameEditable ? categoryName : uneditableCategoryName;
+    return categoryName;
   }
 
   @Override

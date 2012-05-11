@@ -119,13 +119,11 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     labelListPresenter.setAttributeToDisplay(null, AttributeDtos.LABEL_ATTRIBUTE);
 
     if(isEdit()) {
-      getDisplay().setCategoryNameEditable(false); // don't allow edits of category name
       getDisplay().getCategoryName().setText(categoryDto.getName());
       getDisplay().getMissing().setValue(categoryDto.getIsMissing());
       labelListPresenter.setAttributes(categoryDto.getAttributesArray());
       labelListPresenter.updateFields();
     } else {
-      getDisplay().setCategoryNameEditable(true);
       getDisplay().clear();
     }
   }
@@ -156,7 +154,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
         CategoryDto newCategory = CategoryDto.create();
         newCategory.setName(getDisplay().getCategoryName().getText());
         newCategory.setIsMissing(getDisplay().getMissing().getValue());
-        @SuppressWarnings("unchecked") JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) JsArray.createArray();
+        @SuppressWarnings("unchecked")
+        JsArray<AttributeDto> attributes = (JsArray<AttributeDto>) JsArray.createArray();
         Map<String, TextBoxBase> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
         for(Map.Entry<String, TextBoxBase> entry : labelMap.entrySet()) {
           String value = entry.getValue().getValue();
@@ -203,8 +202,8 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     this.categories = (JsArray<CategoryDto>) JsArray.createArray();
 
     if(categories != null) {
-      for(int categoryIndex = 0; categoryIndex < categories.length(); categoryIndex++) {
-        this.categories.push(categories.get(categoryIndex));
+      for(int i = 0; i < categories.length(); i++) {
+        this.categories.push(categories.get(i));
       }
     }
   }
@@ -263,8 +262,6 @@ public class CategoryDialogPresenter extends WidgetPresenter<CategoryDialogPrese
     HasClickHandlers getSaveButton();
 
     HasClickHandlers getCancelButton();
-
-    void setCategoryNameEditable(boolean editable);
 
     HasText getCategoryName();
 

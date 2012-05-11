@@ -1,6 +1,4 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:o="urn:org.obiba.opal.web.gwt.app.client.widgets.view"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
   ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
@@ -14,7 +12,7 @@
 
   <g:DialogBox ui:field="dialog" addStyleNames="categoryDialog" autoHide="false" modal="true" height="15em" width="35em">
     <g:caption>
-      <ui:msg description="Add new attribute title" >Add New Attribute</ui:msg>
+      <ui:msg description="Add new category title" >Add New Category</ui:msg>
     </g:caption>
     <g:DockLayoutPanel unit="EM" height="16em" width="35em">
       <g:center>
@@ -23,16 +21,11 @@
             <table class="gwt-KeyValue full-width" cellspacing="10">
               <tr>
                 <td><ui:msg description="Name label">Name</ui:msg>:</td>
-                <td>
-                  <g:InlineLabel ui:field="uneditableCategoryName"></g:InlineLabel>
-                  <g:TextBox ui:field="categoryName" addStyleNames="not-so-full-width"/>
-                </td>
+                <td><g:TextBox ui:field="categoryName" addStyleNames="not-so-full-width"/></td>
               </tr>
               <tr>
                 <td><ui:msg description="Missing label">Missing</ui:msg>:</td>
-                <td>
-                  <g:CheckBox ui:field="isMissing"/>
-                </td>
+                <td><g:CheckBox ui:field="isMissing"/></td>
               </tr>
               <tr>
                 <td valign="top"><ui:msg description="Label label">Label</ui:msg>:</td>
@@ -46,10 +39,10 @@
         <g:HTMLPanel addStyleNames="footer">
           <span class="{style.right-aligned} top-margin">
             <g:Button ui:field="saveButton" styleName="btn btn-primary">
-                <ui:msg description="Save button label">Save</ui:msg>
+              <ui:msg description="Save button label">Save</ui:msg>
             </g:Button>
             <g:Button ui:field="cancelButton" styleName="btn">
-                <ui:msg description="Cancel button label">Cancel</ui:msg>
+              <ui:msg description="Cancel button label">Cancel</ui:msg>
             </g:Button>
           </span>
         </g:HTMLPanel>
