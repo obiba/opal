@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -17,19 +17,19 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  * Signals that a derived variable has been selected by the user.
  */
-public class DerivedVariableConfigurationRequiredEvent extends GwtEvent<DerivedVariableConfigurationRequiredEvent.Handler> {
+public class DerivedVariableConfigurationRequiredEvent extends
+    GwtEvent<DerivedVariableConfigurationRequiredEvent.Handler> {
   //
   // Static Variables
   //
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-
   //
   // Instance Variables
   //
 
-  private VariableDto variable;
+  private final VariableDto variable;
 
   //
   // Constructors
@@ -71,6 +71,6 @@ public class DerivedVariableConfigurationRequiredEvent extends GwtEvent<DerivedV
 
   public interface Handler extends EventHandler {
 
-    public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event);
+    void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event);
   }
 }

@@ -59,7 +59,6 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
@@ -366,6 +365,10 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   public interface Display extends View {
 
+    enum Slots {
+      Test
+    }
+
     void setEditAttributeActionHandler(ActionHandler<AttributeDto> editAttributeActionHandler);
 
     void setDeleteAttributeActionHandler(ActionHandler<AttributeDto> deleteAttributeActionHandler);
@@ -373,10 +376,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     void setEditCategoryActionHandler(ActionHandler<CategoryDto> editCategoryActionHandler);
 
     void setDeleteCategoryActionHandler(ActionHandler<CategoryDto> deleteCategoryActionHandler);
-
-    enum Slots {
-      Test
-    }
 
     void renderCategoryRows(JsArray<CategoryDto> rows);
 
@@ -396,17 +395,11 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     void setSelectedVariableName(VariableDto variable, VariableDto previousVariable, VariableDto nextVariable);
 
-    String getSelectedVariableName();
-
     HandlerRegistration addPreviousVariableNameClickHandler(ClickHandler handler);
 
     HandlerRegistration addNextVariableNameClickHandler(ClickHandler handler);
 
-    HandlerRegistration addVariableNameChangedHandler(ValueChangeHandler<String> handler);
-
     HandlerRegistration addVariableNameSelectedHandler(SelectionHandler<Suggestion> handler);
-
-    HandlerRegistration addVariableNameEnterKeyPressed(KeyDownHandler keyDownHandler);
 
     HandlerRegistration addRepeatableValueChangeHandler(ValueChangeHandler<Boolean> handler);
 
@@ -430,13 +423,9 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     HasText getName();
 
-    HandlerRegistration addVariableClickHandler(ClickHandler handler);
-
     void setNewVariable(VariableDto variableDto);
 
     VariableDto getVariableDto(String script);
-
-    void setScriptWidgetVisible(boolean visible);
 
     void saveChangesEnabled(boolean enabled);
 
@@ -445,8 +434,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     void addButtonEnabled(boolean enabled);
 
     void navigationEnabled(boolean enabled);
-
-    void variableNameEnabled(boolean enabled);
 
     HandlerRegistration addNameChangedHandler(ChangeHandler changeHandler);
 
@@ -479,6 +466,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     @Override
     public void onDerivedVariableConfigurationRequired(DerivedVariableConfigurationRequiredEvent event) {
+      currentVariable = event.getVariable();
       formEnabled(true);
       getView().saveChangesEnabled(false);
       getView().setNewVariable(event.getVariable());
@@ -491,7 +479,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     private void setScript(VariableDto variableDto) {
       String script = VariableDtos.getScript(variableDto);
-      evaluateScriptPresenter.setScript(script == null ? "" : script);
+      evaluateScriptPresenter.setScript(Strings.nullToEmpty(script));
       evaluateScriptPresenter.setRepeatable(variableDto.getIsRepeatable());
     }
   }
@@ -760,7 +748,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<ViewDto>() {
 
-            List<VariableDto> variablesList;
+            private List<VariableDto> variablesList;
 
             @Override
             public void onResource(Response response, ViewDto viewDto) {
@@ -774,11 +762,12 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
             }
 
             private VariableDto getVariableDto() {
-              VariableDto result = null;
               for(VariableDto variableDto : variablesList) {
-                if(newDerivedVariableName.equals(variableDto.getName())) result = variableDto;
+                if(newDerivedVariableName.equals(variableDto.getName())) {
+                  return variableDto;
+                }
               }
-              return result;
+              return null;
             }
           }).send();
     }

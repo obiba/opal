@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -35,9 +35,9 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
   interface SummaryTabViewUiBinder extends UiBinder<Widget, SummaryTabView> {
   }
 
-  private static SummaryTabViewUiBinder uiBinder = GWT.create(SummaryTabViewUiBinder.class);
+  private static final SummaryTabViewUiBinder uiBinder = GWT.create(SummaryTabViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget uiWidget;
 
@@ -66,14 +66,22 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
   public void renderSummary(SummaryStatisticsDto dto) {
     summary.clear();
     if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
-      ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous).cast();
+      ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous)
+          .cast();
       summary.add(new ContinuousSummaryView(continuous));
     } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
-      CategoricalSummaryDto categorical = dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+      CategoricalSummaryDto categorical = dto
+          .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
       summary.add(new CategoricalSummaryView(categorical));
     } else {
-      summary.add(new Label(translations.noSummaryDataAvailableLabel()));
+      renderNoSummary();
     }
+  }
+
+  @Override
+  public void renderNoSummary() {
+    summary.clear();
+    summary.add(new Label(translations.noSummaryDataAvailableLabel()));
   }
 
   @Override

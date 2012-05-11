@@ -9,15 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -30,6 +21,16 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
 
 public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresenter<AddDerivedVariableDialogPresenter.Display> {
 
@@ -49,7 +50,7 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
   }
 
   @Inject
-  public AddDerivedVariableDialogPresenter(final Display display, final EventBus eventBus) {
+  public AddDerivedVariableDialogPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -64,15 +65,12 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
   }
 
   private void addHandlers() {
-    super.registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
-    super.registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
-    super.registerHandler(
+    registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
+    registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
+    registerHandler(
         getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
   }
 
-  private String getVariableName() {
-    return getView().getVariableName().getText();
-  }
 
   void refreshVariableNameSuggestions(ViewDto viewDto) {
     getView().clearVariableSuggestions();
@@ -94,7 +92,7 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
       ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()//
           .forResource(ub.build())//
           .get()//
-          .withCallback(404, ResponseCodeCallbacks.noOp())//
+          .withCallback(Response.SC_NOT_FOUND, ResponseCodeCallbacks.noOp())//
           .withCallback(variablesDtoCallBack).send();
     }
   }
@@ -142,5 +140,10 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
         getEventBus().fireEvent(new VariableAddRequiredEvent(getVariableName()));
       }
     }
+
+    private String getVariableName() {
+      return getView().getVariableName().getText();
+    }
+
   }
 }

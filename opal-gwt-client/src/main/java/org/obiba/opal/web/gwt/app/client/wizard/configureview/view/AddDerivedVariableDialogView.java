@@ -33,7 +33,7 @@ public class AddDerivedVariableDialogView extends PopupViewImpl implements AddDe
   interface AddDerivedVariableDialogUiBinder extends UiBinder<DialogBox, AddDerivedVariableDialogView> {
   }
 
-  private static AddDerivedVariableDialogUiBinder uiBinder = GWT.create(AddDerivedVariableDialogUiBinder.class);
+  private static final AddDerivedVariableDialogUiBinder uiBinder = GWT.create(AddDerivedVariableDialogUiBinder.class);
 
   @UiField
   DialogBox dialog;

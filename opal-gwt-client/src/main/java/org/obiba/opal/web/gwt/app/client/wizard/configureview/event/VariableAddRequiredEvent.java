@@ -19,7 +19,7 @@ public class VariableAddRequiredEvent extends GwtEvent<VariableAddRequiredEvent.
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private String variableName;
+  private final String variableName;
 
   public VariableAddRequiredEvent(String variableName) {
     this.variableName = variableName;

@@ -28,7 +28,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -277,18 +276,8 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   @Override
-  public HandlerRegistration addVariableNameChangedHandler(ValueChangeHandler<String> handler) {
-    return variableNameSuggestBox.addValueChangeHandler(handler);
-  }
-
-  @Override
   public HandlerRegistration addVariableNameSelectedHandler(SelectionHandler<Suggestion> handler) {
     return variableNameSuggestBox.addSelectionHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addVariableNameEnterKeyPressed(KeyDownHandler handler) {
-    return variableNameSuggestBox.addKeyDownHandler(handler);
   }
 
   @Override
@@ -299,11 +288,6 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
 
     previous.setEnabled(previousVariable != null);
     next.setEnabled(nextVariable != null);
-  }
-
-  @Override
-  public String getSelectedVariableName() {
-    return variableNameSuggestBox.getTextBox().getText();
   }
 
   @Override
@@ -342,11 +326,6 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   @Override
-  public HandlerRegistration addVariableClickHandler(ClickHandler handler) {
-    return addButton.addClickHandler(handler);
-  }
-
-  @Override
   public void setNewVariable(VariableDto variableDto) {
     // Set the entity type (not displayed)
     entityType = variableDto.getEntityType();
@@ -358,6 +337,8 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     setOccurrenceGroup(variableDto);
     setUnit(variableDto);
     setMimeType(variableDto);
+    renderCategoryRows(variableDto.getCategoriesArray());
+    renderAttributeRows(variableDto.getAttributesArray());
   }
 
   @Override
@@ -394,11 +375,6 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     if(slot == Slots.Test) {
       scriptWidgetPanel.add(content);
     }
-  }
-
-  @Override
-  public void setScriptWidgetVisible(boolean visible) {
-    scriptWidgetPanel.setVisible(visible);
   }
 
   //
@@ -527,9 +503,4 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     mimeType.setText("");
   }
 
-  @Override
-  public void variableNameEnabled(boolean enabled) {
-    variableName.setEnabled(enabled);
-
-  }
 }

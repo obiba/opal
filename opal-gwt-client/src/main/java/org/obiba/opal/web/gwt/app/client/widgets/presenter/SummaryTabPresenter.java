@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.http.client.Request;
@@ -37,6 +38,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
     void renderSummary(SummaryStatisticsDto summary);
 
+    void renderNoSummary();
   }
 
   private SummaryStatisticsDto summary;
@@ -70,7 +72,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   @Override
   public void refreshDisplay() {
-    if(hasSummaryOrPendingRequest() == false) {
+    if(!hasSummaryOrPendingRequest()) {
       requestSummary(resourceRequestBuilder);
     }
   }
@@ -86,7 +88,8 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   public void setResourceUri(String resourceUri) {
     cancelPendingSummaryRequest();
-    resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder().forResource(resourceUri).get();
+    resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder().forResource(resourceUri)
+        .get();
   }
 
   public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
@@ -103,6 +106,11 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
           getDisplay().renderSummary(resource);
           eventBus.fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
         }
+      }
+    }).withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        getDisplay().renderNoSummary();
       }
     }).send();
   }
