@@ -54,6 +54,10 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   public static final WizardType CategorizeWizardType = new WizardType();
 
+  public static final WizardType CustomWizardType = new WizardType();
+
+  public static final WizardType FromWizardType = new WizardType();
+
   private final Translations translations;
 
   private final DeriveCategoricalVariableStepPresenter categoricalPresenter;
@@ -329,8 +333,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     UriBuilder ub = UriBuilder.create().segment("datasource", destinationDatasource, "view", destinationView);
     ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(ub.build()).get()
-        .withCallback(new UpdateViewCallback(derived))
-        .withCallback(Response.SC_NOT_FOUND, new CreateViewCallback()).send();
+        .withCallback(new UpdateViewCallback(derived)).withCallback(Response.SC_NOT_FOUND, new CreateViewCallback())
+        .send();
 
   }
 
@@ -582,8 +586,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     }
   }
 
-  public static final WizardType CustomWizardType = new WizardType();
-
   public static class CustomWizard extends WizardProxy<DeriveVariablePresenter> {
 
     @Inject
@@ -591,8 +593,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       super(eventBus, CustomWizardType, wizardProvider);
     }
   }
-
-  public static final WizardType FromWizardType = new WizardType();
 
   public static class FromWizard extends WizardProxy<DeriveVariablePresenter> {
 
