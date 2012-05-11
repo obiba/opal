@@ -121,17 +121,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
-    Object[] eventParameters = event.getEventParameters();
-    if(eventParameters.length != 2) {
-      throw new IllegalArgumentException("Wizard is expected 2 arguments: VariableDto & TableDto");
-    }
-    if(!(eventParameters[0] instanceof VariableDto)) {
-      throw new IllegalArgumentException("Unexpected event 1st parameter type (expected VariableDto)");
-    }
-    if(!(eventParameters[1] instanceof TableDto)) {
-      throw new IllegalArgumentException("Unexpected event 2nd parameter type (expected TableDto)");
-    }
+    checkWizardArguments(event);
 
+    Object[] eventParameters = event.getEventParameters();
     variable = (VariableDto) eventParameters[0];
     table = (TableDto) eventParameters[1];
     wizardType = (WizardType) event.getAssociatedType();
@@ -150,6 +142,19 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       return;
     }
     prepareConclusionStep();
+  }
+
+  private void checkWizardArguments(WizardRequiredEvent event) {
+    Object[] eventParameters = event.getEventParameters();
+    if(eventParameters.length != 2) {
+      throw new IllegalArgumentException("Wizard is expected 2 arguments: VariableDto & TableDto");
+    }
+    if(!(eventParameters[0] instanceof VariableDto)) {
+      throw new IllegalArgumentException("Unexpected event 1st parameter type (expected VariableDto)");
+    }
+    if(!(eventParameters[1] instanceof TableDto)) {
+      throw new IllegalArgumentException("Unexpected event 2nd parameter type (expected TableDto)");
+    }
   }
 
   private void prepareDerivation() {
