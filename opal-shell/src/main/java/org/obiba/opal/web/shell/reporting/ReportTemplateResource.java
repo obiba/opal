@@ -9,21 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.shell.reporting;
 
+import java.io.File;
+
+import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
@@ -51,6 +59,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   private final CommandSchedulerService commandSchedulerService;
 
   private final OpalRuntime opalRuntime;
+
+  private MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
   // Added for unit tests
   ReportTemplateResource(String name, OpalConfigurationService configService) {
@@ -120,8 +130,30 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   @GET
   @Path("/report/_latest")
-  public Response getReport() {
-    return Response.status(Status.NOT_FOUND).build();
+  public Response getReport() throws FileSystemException {
+    OpalFileSystem fileSystem = opalRuntime.getFileSystem();
+    FileObject reportFolder = fileSystem.getRoot().resolveFile("/reports/" + name);
+    if(reportFolder.exists() == false) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+
+    File lastReport = null;
+    for(FileObject reportFile : reportFolder.getChildren()) {
+      if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-")) {
+        File report = fileSystem.getLocalFile(reportFile);
+        if(lastReport == null || report.lastModified() > lastReport.lastModified()) {
+          lastReport = report;
+        }
+      }
+    }
+
+    if(lastReport == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    } else {
+      String mimeType = mimeTypes.getContentType(lastReport);
+      return Response.ok(lastReport, MediaType.valueOf(mimeType))//
+      .header("Content-Disposition", getContentDispositionOfAttachment(lastReport.getName())).build();
+    }
   }
 
   private boolean reportTemplateExists() {
@@ -138,4 +170,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     return commandSchedulerService;
   }
 
+  private String getContentDispositionOfAttachment(String fileName) {
+    return "attachment; filename=\"" + fileName + "\"";
+  }
 }
