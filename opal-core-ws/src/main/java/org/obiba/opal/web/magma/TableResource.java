@@ -97,10 +97,7 @@ public class TableResource extends AbstractValueTableResource {
    * @return
    */
   @Path("/valueSet/{identifier}")
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public ValueSetsResource getValueSet(@Context Request request, @Context final UriInfo uriInfo,
-      @PathParam("identifier") String identifier, @QueryParam("select") String select,
-      @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
+  public ValueSetsResource getValueSet(@Context Request request, @PathParam("identifier") String identifier) {
     TimestampedResponses.evaluate(request, getValueTable());
     return new ValueSetsResource(getValueTable(),
         ImmutableList.<VariableEntity>of(new VariableEntityBean(this.getValueTable().getEntityType(), identifier)));

@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
@@ -110,6 +111,7 @@ public class DatasourceResource {
   }
 
   @GET
+  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 10)
   public Magma.DatasourceDto get() {
     Datasource ds = getDatasource();
 

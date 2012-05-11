@@ -79,7 +79,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
   @GET
   // Required to allow passing parameters in the body
   @POST
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
+  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 10)
   public Response getValueSets(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     // filter entities
     final Iterable<VariableEntity> entities = this.entities == null ? filterEntities(null, offset, limit) : this.entities;
