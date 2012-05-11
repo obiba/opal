@@ -78,7 +78,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
   @ProxyEvent
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    if(isVisible() == false) {
+    if(!isVisible()) {
       forceReveal();
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
     }
@@ -125,8 +125,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     getView().setOccurrenceGroup(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
 
     getView().setParentName(variable.getParentLink().getRel());
-    getView().setPreviousName(previous != null ? previous.getName() : "");
-    getView().setNextName(next != null ? next.getName() : "");
+    getView().setPreviousName(previous == null ? "" : previous.getName());
+    getView().setNextName(next == null ? "" : next.getName());
 
     getView().renderCategoryRows(variable.getCategoriesArray());
     getView().renderAttributeRows(variable.getAttributesArray());

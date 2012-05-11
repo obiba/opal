@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
-import static org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder.createChain;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +46,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+
+import static org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController.Builder.createChain;
 
 public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariablePresenter.Display> {
 
@@ -142,7 +142,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     this.deriveConclusionPresenter = deriveConclusionPresenter;
   }
 
-  @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
+  @SuppressWarnings({"PMD.NcssMethodCount", "OverlyLongMethod"})
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
     Object[] eventParameters = event.getEventParameters();
@@ -196,8 +196,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   }
 
   private void prepareBooleanDerivation() {
-    List<DefaultWizardStepController.Builder> steps =
-        booleanPresenter.getWizardStepBuilders(new SetCurrentPresenterStepInHandler(booleanPresenter));
+    List<DefaultWizardStepController.Builder> steps = booleanPresenter
+        .getWizardStepBuilders(new SetCurrentPresenterStepInHandler(booleanPresenter));
     steps.add(getScriptEvaluationStep());
     steps.add(getConclusionStepBuilder());
 
@@ -210,8 +210,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   }
 
   private void prepareCategoricalDerivation() {
-    List<DefaultWizardStepController.Builder> steps =
-        categoricalPresenter.getWizardStepBuilders(new SetCurrentPresenterStepInHandler(categoricalPresenter));
+    List<DefaultWizardStepController.Builder> steps = categoricalPresenter
+        .getWizardStepBuilders(new SetCurrentPresenterStepInHandler(categoricalPresenter));
     steps.add(getScriptEvaluationStep());
     steps.add(getConclusionStepBuilder());
 
@@ -219,16 +219,16 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       @Override
       public boolean apply() {
         VariableDto originalVariable = deriveFromVariablePresenter.getOriginalVariable();
-        return VariableDtos.hasCategories(originalVariable)
-            && ("text".equals(originalVariable.getValueType()) || ("integer".equals(originalVariable.getValueType()) && VariableDtos
-                .allCategoriesMissing(originalVariable) == false));
+        return VariableDtos.hasCategories(originalVariable) && ("text"
+            .equals(originalVariable.getValueType()) || ("integer"
+            .equals(originalVariable.getValueType()) && VariableDtos.allCategoriesMissing(originalVariable) == false));
       }
     });
   }
 
   private void prepareTemporalDerivation() {
-    List<DefaultWizardStepController.Builder> steps =
-        temporalPresenter.getWizardStepBuilders(new SetCurrentPresenterStepInHandler(temporalPresenter));
+    List<DefaultWizardStepController.Builder> steps = temporalPresenter
+        .getWizardStepBuilders(new SetCurrentPresenterStepInHandler(temporalPresenter));
     steps.add(getScriptEvaluationStep());
     steps.add(getConclusionStepBuilder());
 
@@ -242,8 +242,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   }
 
   private void prepareNumericalDerivation() {
-    List<DefaultWizardStepController.Builder> steps =
-        numericalPresenter.getWizardStepBuilders(new SetCurrentPresenterStepInHandler(numericalPresenter));
+    List<DefaultWizardStepController.Builder> steps = numericalPresenter
+        .getWizardStepBuilders(new SetCurrentPresenterStepInHandler(numericalPresenter));
     steps.add(getScriptEvaluationStep());
     steps.add(getConclusionStepBuilder());
 
@@ -258,8 +258,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   }
 
   private void prepareOpenTextualDerivation() {
-    List<DefaultWizardStepController.Builder> steps =
-        openTextualPresenter.getWizardStepBuilders(new SetCurrentPresenterStepInHandler(openTextualPresenter));
+    List<DefaultWizardStepController.Builder> steps = openTextualPresenter
+        .getWizardStepBuilders(new SetCurrentPresenterStepInHandler(openTextualPresenter));
     steps.add(getScriptEvaluationStep());
     steps.add(getConclusionStepBuilder());
 
@@ -278,9 +278,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     setInSlot(Display.Slots.Derivation, deriveCustomVariablePresenter);
 
-    List<DefaultWizardStepController.Builder> steps =
-        deriveCustomVariablePresenter.getWizardStepBuilders(new SetCurrentPresenterStepInHandler(
-            deriveCustomVariablePresenter));
+    List<DefaultWizardStepController.Builder> steps = deriveCustomVariablePresenter
+        .getWizardStepBuilders(new SetCurrentPresenterStepInHandler(deriveCustomVariablePresenter));
     steps.add(getView().getScriptEvaluationStepBuilder(null));
     steps.add(getConclusionStepBuilder());
 
@@ -353,7 +352,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     }
 
     UriBuilder ub = UriBuilder.create().segment("datasource", destinationDatasource, "view", destinationView);
-    ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(ub.build()).get()
+    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
         .withCallback(new ResourceCallback<ViewDto>() {
 
           @Override
@@ -362,8 +361,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
               saveVariable(resource, derived);
             } else {
               if(!deriveConclusionPresenter.isValidDestinationView(resource)) {
-                getEventBus().fireEvent(
-                    NotificationEvent.newBuilder().error(translations.invalidDestinationView()).build());
+                getEventBus()
+                    .fireEvent(NotificationEvent.newBuilder().error(translations.invalidDestinationView()).build());
               } else {
                 if(getVariablePosition(resource, derived) != -1) {
                   overwriteConfirmation = new Runnable() {
@@ -372,9 +371,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
                       saveVariable(resource, derived);
                     }
                   };
-                  getEventBus().fireEvent(
-                      new ConfirmationRequiredEvent(overwriteConfirmation, "overwriteVariable",
-                          "confirmOverwriteVariable"));
+                  getEventBus().fireEvent(ConfirmationRequiredEvent
+                      .createWithKeys(overwriteConfirmation, "overwriteVariable", "confirmOverwriteVariable"));
                 } else {
                   saveVariable(resource, derived);
                 }
@@ -384,18 +382,18 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
         }).withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
 
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        viewCreationConfirmation = new Runnable() {
           @Override
-          public void onResponseCode(Request request, Response response) {
-            viewCreationConfirmation = new Runnable() {
-              @Override
-              public void run() {
-                saveVariable();
-              }
-            };
-            getEventBus().fireEvent(
-                new ConfirmationRequiredEvent(viewCreationConfirmation, "createView", "confirmCreateView"));
+          public void run() {
+            saveVariable();
           }
-        }).send();
+        };
+        getEventBus().fireEvent(
+            ConfirmationRequiredEvent.createWithKeys(viewCreationConfirmation, "createView", "confirmCreateView"));
+      }
+    }).send();
 
   }
 
@@ -416,8 +414,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     view.setDatasourceName(destinationDatasource);
 
     // add derived variable
-    VariableListViewDto variableListViewDto =
-        (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    VariableListViewDto variableListViewDto = (VariableListViewDto) view
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     JsArray<VariableDto> variables = JsArrays.create();
     variables.push(derived);
     variableListViewDto.setVariablesArray(variables);
@@ -460,8 +458,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
    * @return -1 if not found
    */
   private int getVariablePosition(ViewDto view, VariableDto derived) {
-    VariableListViewDto variableListViewDto =
-        (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    VariableListViewDto variableListViewDto = (VariableListViewDto) view
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
     int pos = -1;
     for(int i = 0; i < variables.length(); i++) {
@@ -483,8 +481,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   private void saveVariable(final ViewDto view, final VariableDto derived) {
     // add or update derived variable
     int pos = getVariablePosition(view, derived);
-    VariableListViewDto variableListViewDto =
-        (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    VariableListViewDto variableListViewDto = (VariableListViewDto) view
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
     if(pos != -1) {
       variables.set(pos, derived);
@@ -547,16 +545,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     @Override
     public void onStepIn() {
-      // GWT.log("current: " + derivationPresenter.getClass().getName());
-      // GWT.log("next: " + presenter.getClass().getName());
-      // GWT.log("  originalTable: " + (derivationPresenter.getOriginalTable() == null ? null : derivationPresenter
-      // .getOriginalTable().getName()));
-      // GWT.log("  destinationTable: " + (derivationPresenter.getDestinationTable() == null ? null :
-      // derivationPresenter
-      // .getDestinationTable().getName()));
-      // GWT.log("  originalVariable: " + VariableDto.stringify(derivationPresenter.getOriginalVariable()));
-      // GWT.log("  destinationVariable: " + VariableDto.stringify(derivationPresenter.getDerivedVariable()));
-
       presenter.initialize(derivationPresenter.getOriginalTable(), derivationPresenter.getDestinationTable(),
           derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
 
@@ -571,9 +559,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     @Override
     public void onStepIn() {
-      deriveConclusionPresenter.initialize(derivationPresenter.getOriginalTable(),
-          derivationPresenter.getDestinationTable(), derivationPresenter.getOriginalVariable(),
-          derivationPresenter.getDerivedVariable());
+      deriveConclusionPresenter
+          .initialize(derivationPresenter.getOriginalTable(), derivationPresenter.getDestinationTable(),
+              derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
       derivationPresenter = deriveConclusionPresenter;
     }
   }
@@ -583,10 +571,12 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     @SuppressWarnings("AssignmentToNull")
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(viewCreationConfirmation != null && event.getSource().equals(viewCreationConfirmation) && event.isConfirmed()) {
+      if(viewCreationConfirmation != null && event.getSource().equals(viewCreationConfirmation) && event
+          .isConfirmed()) {
         viewCreationConfirmation.run();
         viewCreationConfirmation = null;
-      } else if(overwriteConfirmation != null && event.getSource().equals(overwriteConfirmation) && event.isConfirmed()) {
+      } else if(overwriteConfirmation != null && event.getSource().equals(overwriteConfirmation) && event
+          .isConfirmed()) {
         overwriteConfirmation.run();
         overwriteConfirmation = null;
       }

@@ -1,20 +1,31 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.navigator.view.AttributesTable;
+import org.obiba.opal.web.gwt.app.client.navigator.view.CategoriesTable;
+import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -25,6 +36,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -40,7 +52,18 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
+import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.EDIT_ACTION;
+
 public class VariablesListTabView extends ViewImpl implements VariablesListTabPresenter.Display {
+
+
+
+  @UiTemplate("VariablesListTabView.ui.xml")
+  interface VariablesListTabViewUiBinder extends UiBinder<Widget, VariablesListTabView> {
+  }
+
+  protected static final Translations translations = GWT.create(Translations.class);
 
   private static final VariablesListTabViewUiBinder uiBinder = GWT.create(VariablesListTabViewUiBinder.class);
 
@@ -80,16 +103,32 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   HorizontalTabLayout variableDetailTabs;
 
   @UiField
-  SimplePanel categoriesTabPanel;
+  Button addCategoryButton;
+
+  @UiField(provided = true)
+  Table<CategoryDto> categoryTable;
 
   @UiField
-  SimplePanel attributesTabPanel;
+  SimplePager categoryTablePager;
+
+  JsArrayDataProvider<CategoryDto> categoryProvider = new JsArrayDataProvider<CategoryDto>();
+
+  @UiField(provided = true)
+  AttributesTable attributeTable;
+
+  @UiField
+  SimplePager attributeTablePager;
+
+  @UiField
+  Button addAttributeButton;
+
+  JsArrayDataProvider<AttributeDto> attributeProvider = new JsArrayDataProvider<AttributeDto>();
 
   @UiField
   SimplePanel summaryTabPanel;
 
   @UiField
-  TextBox occurenceGroup;
+  TextBox occurrenceGroup;
 
   @UiField
   TextBox mimeType;
@@ -101,9 +140,17 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
 
   private String entityType;
 
+  private ActionHandler<AttributeDto> editAttributeActionHandler;
+
+  private ActionHandler<AttributeDto> deleteAttributeActionHandler;
+
   public VariablesListTabView() {
+    categoryTable = new CategoriesTable();
+    attributeTable = new AttributesTable();
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
     widget = uiBinder.createAndBindUi(this);
+    initCategoryTable();
+    initAttributeTable();
   }
 
   @Override
@@ -126,16 +173,56 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     return variableDetailTabs.getSelectedIndex();
   }
 
-  @Override
-  public void addCategoriesTabWidget(Widget categoriesTabWidget) {
-    categoriesTabPanel.clear();
-    categoriesTabPanel.add(categoriesTabWidget);
+  private void initCategoryTable() {
+    categoryTable.setPageSize(NavigatorView.PAGE_SIZE);
+    categoryTablePager.setDisplay(categoryTable);
+    categoryProvider.addDataDisplay(categoryTable);
+  }
+
+  private void initAttributeTable() {
+    ActionsColumn<AttributeDto> actionsColumn = new ActionsColumn<AttributeDto>(EDIT_ACTION, DELETE_ACTION);
+    actionsColumn.setActionHandler(new ActionHandler<AttributeDto>() {
+      @Override
+      public void doAction(AttributeDto attributeDto, String actionName) {
+        if(EDIT_ACTION.equals(actionName)) {
+          editAttributeActionHandler.doAction(attributeDto, actionName);
+        } else if(DELETE_ACTION.equals(actionName)) {
+          deleteAttributeActionHandler.doAction(attributeDto, actionName);
+        }
+      }
+    });
+    attributeTable.addColumn(actionsColumn, translations.actionsLabel());
+    attributeTable.setPageSize(NavigatorView.PAGE_SIZE);
+
+    attributeTablePager.setDisplay(attributeTable);
+    attributeProvider.addDataDisplay(attributeTable);
   }
 
   @Override
-  public void addAttributesTabWidget(Widget attributesTabWidget) {
-    attributesTabPanel.clear();
-    attributesTabPanel.add(attributesTabWidget);
+  public void setEditAttributeActionHandler(ActionHandler<AttributeDto> editAttributeActionHandler) {
+    this.editAttributeActionHandler = editAttributeActionHandler;
+  }
+
+  @Override
+  public void setDeleteAttributeActionHandler(ActionHandler<AttributeDto> deleteAttributeActionHandler) {
+    this.deleteAttributeActionHandler = deleteAttributeActionHandler;
+  }
+
+  @Override
+  public void renderCategoryRows(JsArray<CategoryDto> categories) {
+    categoryProvider.setArray(categories);
+    categoryTablePager.firstPage();
+    categoryTablePager.setVisible(categoryProvider.getList().size() > categoryTable.getPageSize());
+    categoryProvider.refresh();
+  }
+
+  @Override
+  public void renderAttributeRows(JsArray<AttributeDto> attributes) {
+    attributeProvider.setArray(attributes);
+    attributeTablePager.firstPage();
+    attributeTablePager.setVisible(attributeProvider.getList().size() > attributeTable.getPageSize());
+    attributeTable.setupSort(attributeProvider);
+    attributeProvider.refresh();
   }
 
   @Override
@@ -152,10 +239,6 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   @Override
   public void clearVariableNameSuggestions() {
     suggestions.clear();
-  }
-
-  @UiTemplate("VariablesListTabView.ui.xml")
-  interface VariablesListTabViewUiBinder extends UiBinder<Widget, VariablesListTabView> {
   }
 
   @Override
@@ -184,13 +267,13 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   @Override
-  public void setSelectedVariableName(String variableName, String previousVariableName, String nextVariableName) {
-    variableNameSuggestBox.setText(variableName);
-    previous.setTitle(previousVariableName);
-    next.setTitle(nextVariableName);
+  public void setSelectedVariableName(VariableDto variable, VariableDto previousVariable, VariableDto nextVariable) {
+    variableNameSuggestBox.setText(variable == null ? null : variable.getName());
+    previous.setTitle(previousVariable == null ? null : previousVariable.getName());
+    next.setTitle(nextVariable == null ? null : nextVariable.getName());
 
-    previous.setEnabled(previousVariableName != null);
-    next.setEnabled(nextVariableName != null);
+    previous.setEnabled(previousVariable != null);
+    next.setEnabled(nextVariable != null);
   }
 
   @Override
@@ -204,18 +287,18 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   @Override
-  public void setEnabledOccurenceGroup(Boolean enabled) {
-    occurenceGroup.setEnabled(enabled);
+  public void setEnabledOccurrenceGroup(Boolean enabled) {
+    occurrenceGroup.setEnabled(enabled);
   }
 
   @Override
   public void clearOccurrenceGroup() {
-    occurenceGroup.setText("");
+    occurrenceGroup.setText("");
   }
 
   @Override
-  public HasText getOccurenceGroup() {
-    return occurenceGroup;
+  public HasText getOccurrenceGroup() {
+    return occurrenceGroup;
   }
 
   @Override
@@ -257,7 +340,7 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     VariableDto variableDto = VariableDto.create();
     variableDto.setName(variableName.getValue());
     variableDto.setIsRepeatable(repeatableCheckbox.getValue());
-    if(repeatableCheckbox.getValue()) variableDto.setOccurrenceGroup(occurenceGroup.getValue());
+    if(repeatableCheckbox.getValue()) variableDto.setOccurrenceGroup(occurrenceGroup.getValue());
     variableDto.setValueType(valueType.getValue(valueType.getSelectedIndex()));
     variableDto.setEntityType(entityType);
     variableDto.setMimeType(mimeType.getValue());
@@ -266,10 +349,19 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     return variableDto;
   }
 
-
   @Override
   public HandlerRegistration addRemoveVariableClickHandler(ClickHandler handler) {
     return removeButton.addClickHandler(handler);
+  }
+
+  @Override
+  public HandlerRegistration addAddCategoryHandler(ClickHandler addCategoryHandler) {
+    return addCategoryButton.addClickHandler(addCategoryHandler);
+  }
+
+  @Override
+  public HandlerRegistration addAddAttributeHandler(ClickHandler addAttributeHandler) {
+    return addAttributeButton.addClickHandler(addAttributeHandler);
   }
 
   @Override
@@ -299,16 +391,16 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
 
   private void setOccurrenceGroup(VariableDto variableDto) {
     if(variableDto.getIsRepeatable()) {
-      occurenceGroup.setEnabled(true);
+      occurrenceGroup.setEnabled(true);
 
       if(variableDto.hasOccurrenceGroup()) {
-        occurenceGroup.setText(variableDto.getOccurrenceGroup());
+        occurrenceGroup.setText(variableDto.getOccurrenceGroup());
       } else {
-        occurenceGroup.setText("");
+        occurrenceGroup.setText("");
       }
     } else {
-      occurenceGroup.setEnabled(false);
-      occurenceGroup.setText("");
+      occurrenceGroup.setEnabled(false);
+      occurrenceGroup.setText("");
     }
   }
 
@@ -367,7 +459,7 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
 
   @Override
   public HandlerRegistration addOccurrenceGroupChangedHandler(ChangeHandler changeHandler) {
-    return occurenceGroup.addChangeHandler(changeHandler);
+    return occurrenceGroup.addChangeHandler(changeHandler);
   }
 
   @Override
@@ -392,17 +484,20 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
     addButton.setEnabled(true); // Regardless of form state the add button is enabled.
     valueType.setEnabled(enabled);
     repeatableCheckbox.setEnabled(enabled);
-    occurenceGroup.setEnabled(enabled);
+    occurrenceGroup.setEnabled(enabled);
     unit.setEnabled(enabled);
     mimeType.setEnabled(enabled);
+
+    addCategoryButton.setEnabled(enabled);
+    addAttributeButton.setEnabled(enabled);
   }
 
   @Override
   public void formClear() {
     variableName.setText("");
     repeatableCheckbox.setValue(false);
-    occurenceGroup.setText("");
-    occurenceGroup.setEnabled(false); // Occurrence group is only enabled when repeatableCheckbox is true.
+    occurrenceGroup.setText("");
+    occurrenceGroup.setEnabled(false); // Occurrence group is only enabled when repeatableCheckbox is true.
     unit.setText("");
     mimeType.setText("");
   }

@@ -42,6 +42,7 @@ import com.google.gwt.view.client.ListDataProvider;
 import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.LocalizablesPresenter.EDIT_ACTION;
 
+@Deprecated
 public class LocalizablesView extends Composite implements LocalizablesPresenter.Display {
 
   public static final int PAGE_SIZE = 10;

@@ -155,7 +155,7 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
           }
         };
 
-        getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+        getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
       }
     }));
 

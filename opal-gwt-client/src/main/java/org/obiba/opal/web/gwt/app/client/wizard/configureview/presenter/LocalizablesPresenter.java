@@ -44,6 +44,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 
+@Deprecated
 public abstract class LocalizablesPresenter extends WidgetPresenter<LocalizablesPresenter.Display> {
 
   //
@@ -196,7 +197,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
             }
           };
 
-          eventBus.fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, getDeleteConfirmationTitle(),
+          eventBus.fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, getDeleteConfirmationTitle(),
               getDeleteConfirmationMessage()));
         }
       }
@@ -267,6 +268,7 @@ public abstract class LocalizablesPresenter extends WidgetPresenter<Localizables
     void onDelete(Localizable localizable);
   }
 
+  @Deprecated
   public abstract class Localizable implements Comparable<Localizable> {
 
     public abstract String getName();

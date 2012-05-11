@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -49,19 +49,17 @@ import com.gwtplatform.mvp.client.ViewImpl;
  */
 public class VariableView extends ViewImpl implements VariablePresenter.Display {
 
-  private MenuItem deriveFromMenu;
-
   @UiTemplate("VariableView.ui.xml")
   interface VariableViewUiBinder extends UiBinder<Widget, VariableView> {
   }
 
-  private static final Integer SCRIPT_TAB_INDEX = 2;
+  private static final int SCRIPT_TAB_INDEX = 2;
 
-  private static final Integer SUMMARY_TAB_INDEX = 3;
+  private static final int SUMMARY_TAB_INDEX = 3;
 
-  private static final Integer VALUES_TAB_INDEX = 4;
+  private static final int VALUES_TAB_INDEX = 4;
 
-  private static final Integer PERMISSIONS_TAB_INDEX = 5;
+  private static final int PERMISSIONS_TAB_INDEX = 5;
 
   private static final VariableViewUiBinder uiBinder = GWT.create(VariableViewUiBinder.class);
 
@@ -69,10 +67,12 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   private final Widget widget;
 
+  private MenuItem deriveFromMenu;
+
   @UiField
   FlowPanel toolbarPanel;
 
-  private NavigatorMenuBar toolbar;
+  private final NavigatorMenuBar toolbar;
 
   @UiField
   Label variableName;

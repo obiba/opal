@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -28,6 +28,10 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
 
   private final Object source;
 
+  private final String titleKey;
+
+  private final String messageKey;
+
   private final String title;
 
   private final String message;
@@ -36,20 +40,15 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
   // Constructors
   //
 
-  /**
-   * Creates a {@link ConfirmationRequiredEvent}.
-   * 
-   * @param source the source of the event
-   * @param title the unlocalized confirmation title
-   * @param message the unlocalized confirmation message
-   */
-  public ConfirmationRequiredEvent(Object source, String title, String message) {
+  private ConfirmationRequiredEvent(Object source, String titleKey, String messageKey, String title, String message) {
     this.source = source;
+    this.titleKey = titleKey;
+    this.messageKey = messageKey;
     this.title = title;
     this.message = message;
   }
 
-  //
+//
   // GwtEvent Methods
   //
 
@@ -76,6 +75,14 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
     return source;
   }
 
+  public String getTitleKey() {
+    return titleKey;
+  }
+
+  public String getMessageKey() {
+    return messageKey;
+  }
+
   public String getTitle() {
     return title;
   }
@@ -84,12 +91,32 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
     return message;
   }
 
+  /**
+   * Creates a {@link ConfirmationRequiredEvent}.
+   * @param source     the source of the event
+   * @param titleKey   the unlocalized confirmation title
+   * @param messageKey the unlocalized confirmation message
+   */
+  public static ConfirmationRequiredEvent createWithKeys(Object source, String titleKey, String messageKey) {
+    return new ConfirmationRequiredEvent(source, titleKey, messageKey, null, null);
+  }
+
+  /**
+   * Creates a {@link ConfirmationRequiredEvent}.
+   * @param source  the source of the event
+   * @param title   the localized confirmation title
+   * @param message the localized confirmation message
+   */
+  public static ConfirmationRequiredEvent createWithMessages(Object source, String title, String message) {
+    return new ConfirmationRequiredEvent(source, null, null, title, message);
+  }
+
   //
   // Inner Classes / Interfaces
   //
 
   public interface Handler extends EventHandler {
-
-    public void onConfirmationRequired(ConfirmationRequiredEvent event);
+    void onConfirmationRequired(ConfirmationRequiredEvent event);
   }
+
 }

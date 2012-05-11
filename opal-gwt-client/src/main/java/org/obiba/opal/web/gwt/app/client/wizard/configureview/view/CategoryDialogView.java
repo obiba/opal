@@ -1,15 +1,14 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoryDialogPresenter;
 
@@ -35,9 +34,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   interface CategoryDialogUiBinder extends UiBinder<DialogBox, CategoryDialogView> {
   }
 
-  private static CategoryDialogUiBinder uiBinder = GWT.create(CategoryDialogUiBinder.class);
-
-  private static Translations translations = GWT.create(Translations.class);
+  private static final CategoryDialogUiBinder uiBinder = GWT.create(CategoryDialogUiBinder.class);
 
   @UiField
   DialogBox dialog;
@@ -131,11 +128,12 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
     return categoryNameEditable ? categoryName : uneditableCategoryName;
   }
 
+  @Override
   public HasValue<Boolean> getMissing() {
     return isMissing;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;

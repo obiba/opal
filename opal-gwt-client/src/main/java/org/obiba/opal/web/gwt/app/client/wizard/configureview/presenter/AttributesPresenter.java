@@ -10,10 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
 
 import net.customware.gwt.presenter.client.EventBus;
 
@@ -23,7 +20,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpd
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
@@ -35,6 +31,7 @@ import com.google.inject.Provider;
 /**
  *
  */
+@Deprecated
 public class AttributesPresenter extends LocalizablesPresenter {
 
   //
@@ -50,7 +47,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
   private DeleteActionHandler deleteActionHandler;
 
-  private final Collection<String> uniqueNames = new TreeSet<String>();
+
 
   //
   // Constructors
@@ -106,7 +103,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
 
   @Override
   protected void afterViewDtoSet() {
-    loadUniqueAttributeNames();
+//    loadUniqueAttributeNames();
   }
 
   @Override
@@ -175,19 +172,6 @@ public class AttributesPresenter extends LocalizablesPresenter {
     this.variableDto = variableDto;
   }
 
-  private void loadUniqueAttributeNames() {
-    VariableListViewDto variableListDto = (VariableListViewDto) viewDto
-        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
-    for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
-      for(AttributeDto attribute : JsArrays.toList(variable.getAttributesArray())) {
-        uniqueNames.add(attribute.getName());
-      }
-    }
-    // always add known attributes
-    for(Map.Entry<String, List<String>> entry : AttributeDtos.NAMESPACE_ATTRIBUTES.entrySet()) {
-      uniqueNames.addAll(entry.getValue());
-    }
-  }
 
   private AttributeDto findAttribute(Localizable localizable) {
     return AttributeDtos.findAttribute(JsArrays.toList(variableDto.getAttributesArray()), localizable.getNamespace(),
@@ -200,7 +184,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
     attributeDialogPresenter.setViewDto(viewDto);
     attributeDialogPresenter.setAttribute(localizable == null ? null : findAttribute(localizable));
     attributeDialogPresenter.setAttributes(variableDto.getAttributesArray());
-    attributeDialogPresenter.getDisplay().setUniqueNames(uniqueNames);
+//    attributeDialogPresenter.getDisplay().setUniqueNames(uniqueNames);
     attributeDialogPresenter.revealDisplay();
   }
 
@@ -266,7 +250,7 @@ public class AttributesPresenter extends LocalizablesPresenter {
       for(int i = 0; i < event.getAttributes().length(); i++) {
         AttributeDto newAttribute = event.getAttributes().get(i);
         variableDto.getAttributesArray().push(newAttribute);
-        uniqueNames.add(newAttribute.getName());
+//        uniqueNames.add(newAttribute.getName());
       }
     }
 

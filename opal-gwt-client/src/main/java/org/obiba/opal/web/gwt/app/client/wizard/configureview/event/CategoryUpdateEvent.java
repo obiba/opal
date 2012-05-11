@@ -21,7 +21,6 @@ import com.google.gwt.event.shared.GwtEvent;
  */
 public class CategoryUpdateEvent extends GwtEvent<CategoryUpdateEvent.Handler> {
 
-  @SuppressWarnings("StaticNonFinalField")
   private static Type<Handler> TYPE;
 
   private final CategoryDto newCategory;

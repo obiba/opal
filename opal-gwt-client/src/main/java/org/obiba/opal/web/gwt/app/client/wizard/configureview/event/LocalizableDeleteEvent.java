@@ -15,6 +15,7 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  * Indicates that the form has changed, but it hasn't been saved yet.
  */
+@Deprecated
 public class LocalizableDeleteEvent extends GwtEvent<LocalizableDeleteEvent.Handler> {
 
   private static Type<Handler> TYPE;

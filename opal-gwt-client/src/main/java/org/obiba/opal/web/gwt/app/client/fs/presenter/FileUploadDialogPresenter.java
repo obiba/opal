@@ -140,7 +140,7 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
     if(fileName.equals("")) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
     } else if(fileExist(fileName)) {
-      getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
+      getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
     } else {
       submitFile();
     }

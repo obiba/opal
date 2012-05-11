@@ -31,7 +31,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
  */
 public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<T> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final ActionsProvider<T> actionsProvider;
 

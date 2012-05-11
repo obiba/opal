@@ -9,16 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Command;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
@@ -44,6 +34,17 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Command;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUnitDetailsPresenter.Display> {
 
@@ -286,7 +287,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
             }
           };
           getEventBus()
-              .fireEvent(new ConfirmationRequiredEvent(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
+              .fireEvent(ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
         }
       });
     }
@@ -359,7 +360,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
       } else {
         generateConfirmation = new GenerateConfirmationRunnable();
-        getEventBus().fireEvent(new ConfirmationRequiredEvent(generateConfirmation, "generateFunctionalUnitIdentifiers",
+        getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(generateConfirmation, "generateFunctionalUnitIdentifiers",
             "confirmGenerateFunctionalUnitIdentifiers"));
       }
     }
@@ -452,7 +453,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         }
       };
       getEventBus().fireEvent(
-          new ConfirmationRequiredEvent(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
+          ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
     }
 
   }

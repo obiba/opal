@@ -398,7 +398,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
         }
       };
       getEventBus().fireEvent(
-          new ConfirmationRequiredEvent(overwriteConfirmation, "overwriteView", "confirmOverwriteView"));
+          ConfirmationRequiredEvent.createWithKeys(overwriteConfirmation, "overwriteView", "confirmOverwriteView"));
     }
   }
 

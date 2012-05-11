@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
-
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
@@ -54,6 +51,9 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TabInfo;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
+
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
 
 public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
 
@@ -127,21 +127,21 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
   @Override
   protected void onBind() {
 
-    super.registerHandler(getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.Handler() {
 
       @Override
       public void onCreated(DatabaseCreatedEvent event) {
         refresh();
       }
     }));
-    super.registerHandler(getEventBus().addHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.Handler() {
 
       @Override
       public void onUpdated(DatabaseUpdatedEvent event) {
         refresh();
       }
     }));
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
 
       @Override
       public void onConfirmation(ConfirmationEvent event) {
@@ -156,7 +156,7 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
       @Override
       public void doAction(final JdbcDataSourceDto object, String actionName) {
         if(object.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
-          getEventBus().fireEvent(new ConfirmationRequiredEvent(confirmedCommand = new Command() {
+          getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(confirmedCommand = new Command() {
             @Override
             public void execute() {
               deleteDatabase(object);
@@ -188,7 +188,7 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
     });
 
-    super.registerHandler(getView().getAddButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getAddButton().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {

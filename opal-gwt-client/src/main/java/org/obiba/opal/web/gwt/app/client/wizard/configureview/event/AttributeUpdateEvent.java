@@ -23,9 +23,9 @@ public class AttributeUpdateEvent extends GwtEvent<AttributeUpdateEvent.Handler>
 
   private static Type<Handler> TYPE;
 
-  private JsArray<AttributeDto> attributes;
+  private final JsArray<AttributeDto> attributes;
 
-  private UpdateType updateType;
+  private final UpdateType updateType;
 
   public AttributeUpdateEvent(JsArray<AttributeDto> attributes, UpdateType updateType) {
     this.attributes = attributes;
@@ -55,6 +55,6 @@ public class AttributeUpdateEvent extends GwtEvent<AttributeUpdateEvent.Handler>
   }
 
   public interface Handler extends EventHandler {
-    public void onAttributeUpdate(AttributeUpdateEvent event);
+    void onAttributeUpdate(AttributeUpdateEvent event);
   }
 }

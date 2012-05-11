@@ -38,10 +38,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class AttributeDialogView extends Composite implements AttributeDialogPresenter.Display {
 
-  private Collection<String> uniqueNames;
-
   @UiTemplate("AttributeDialogView.ui.xml")
   interface MyUiBinder extends UiBinder<DialogBox, AttributeDialogView> {
+
   }
 
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -54,6 +53,8 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
 
   @UiField
   DropdownSuggestBox nameBox;
+
+  private Collection<String> uniqueNames;
 
   @UiField
   SimplePanel simplePanel;
@@ -144,8 +145,8 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
       @Override
       public void onValueChange(ValueChangeEvent<String> stringValueChangeEvent) {
         String value = stringValueChangeEvent.getValue();
-        GWT.log("event: "+ value);
-        GWT.log("namespaceBox: "+ namespaceBox.getSuggestOracle());
+        GWT.log("event: " + value);
+        GWT.log("namespaceBox: " + namespaceBox.getSuggestOracle());
         List<String> names = AttributeDtos.NAMESPACE_ATTRIBUTES.get(value);
         nameBox.getSuggestOracle().clear();
         if(names != null) {
@@ -174,7 +175,6 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
 
   @Override
   public void setAttribute(AttributeDto attributeDto) {
-    GWT.log("attributeDto: " + AttributeDto.stringify(attributeDto));
     namespaceBox.setValue(attributeDto == null ? "" : attributeDto.getNamespace());
     nameBox.setValue(attributeDto == null ? "" : attributeDto.getName());
   }

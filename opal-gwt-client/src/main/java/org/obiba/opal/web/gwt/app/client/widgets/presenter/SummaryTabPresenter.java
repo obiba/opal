@@ -57,7 +57,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   @Override
   protected void onBind() {
-    super.registerHandler(eventBus.addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler()));
+    registerHandler(eventBus.addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler()));
   }
 
   @Override
@@ -81,12 +81,12 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   public void forgetSummary() {
     cancelPendingSummaryRequest();
-    this.summary = null;
+    summary = null;
   }
 
   public void setResourceUri(String resourceUri) {
     cancelPendingSummaryRequest();
-    this.resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder().forResource(resourceUri).get();
+    resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder().forResource(resourceUri).get();
   }
 
   public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {

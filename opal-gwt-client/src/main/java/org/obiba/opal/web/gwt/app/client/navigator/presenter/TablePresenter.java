@@ -442,9 +442,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
       ConfirmationRequiredEvent event;
       if(tableIsView()) {
-        event = new ConfirmationRequiredEvent(removeConfirmation, "removeView", "confirmRemoveView");
+        event = ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeView", "confirmRemoveView");
       } else {
-        event = new ConfirmationRequiredEvent(removeConfirmation, "removeTable", "confirmRemoveTable");
+        event = ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeTable", "confirmRemoveTable");
       }
 
       getEventBus().fireEvent(event);

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,9 +15,11 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -27,6 +29,9 @@ import com.google.inject.Inject;
  *
  */
 public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter.Display> {
+
+  private static final Translations translations = GWT.create(Translations.class);
+
   //
   // Instance Variables
   //
@@ -46,26 +51,31 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
   // WidgetPresenter Methods
   //
 
+  @Override
   protected void onBind() {
     addEventHandlers();
   }
 
+  @Override
   protected void onUnbind() {
   }
 
+  @Override
   public void refreshDisplay() {
-    // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void revealDisplay() {
     getDisplay().showDialog();
   }
 
+  @Override
   public Place getPlace() {
     return null;
   }
 
+  @Override
   protected void onPlaceRequest(PlaceRequest request) {
   }
 
@@ -80,15 +90,15 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
   }
 
   private void addConfirmationRequiredHandler() {
-    super.registerHandler(eventBus.addHandler(ConfirmationRequiredEvent.getType(), new ConfirmationRequiredHandler()));
+    registerHandler(eventBus.addHandler(ConfirmationRequiredEvent.getType(), new ConfirmationRequiredHandler()));
   }
 
   private void addYesButtonHandler() {
-    super.registerHandler(getDisplay().addYesButtonHandler(new YesButtonHandler()));
+    registerHandler(getDisplay().addYesButtonHandler(new YesButtonHandler()));
   }
 
   private void addNoButtonHandler() {
-    super.registerHandler(getDisplay().addNoButtonHandler(new NoButtonHandler()));
+    registerHandler(getDisplay().addNoButtonHandler(new NoButtonHandler()));
   }
 
   //
@@ -112,16 +122,22 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
 
   class ConfirmationRequiredHandler implements ConfirmationRequiredEvent.Handler {
 
+    @Override
     public void onConfirmationRequired(ConfirmationRequiredEvent event) {
       confirmationRequiredSource = event.getSource();
-      getDisplay().setConfirmationTitle(event.getTitle());
-      getDisplay().setConfirmationMessage(event.getMessage());
+      getDisplay().setConfirmationTitle(
+          event.getTitleKey() == null ? event.getTitle() : translations.confirmationTitleMap()
+              .get(event.getTitleKey()));
+      getDisplay().setConfirmationMessage(
+          event.getMessageKey() == null ? event.getMessage() : translations.confirmationMessageMap()
+              .get(event.getMessageKey()));
       revealDisplay();
     }
   }
 
   class YesButtonHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
       eventBus.fireEvent(new ConfirmationEvent(confirmationRequiredSource, true));
       getDisplay().hideDialog();
@@ -130,6 +146,7 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
 
   class NoButtonHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
       eventBus.fireEvent(new ConfirmationEvent(confirmationRequiredSource, false));
       getDisplay().hideDialog();

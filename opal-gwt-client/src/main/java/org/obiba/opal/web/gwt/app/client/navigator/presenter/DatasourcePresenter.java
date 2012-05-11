@@ -363,18 +363,20 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     @Override
     public void execute() {
       removeDatasourceConfirmation = new Runnable() {
+        @Override
         public void run() {
           removeDatasource(datasourceName);
         }
       };
 
       getEventBus().fireEvent(
-          new ConfirmationRequiredEvent(removeDatasourceConfirmation, "removeDatasource", "confirmRemoveDatasource"));
+          ConfirmationRequiredEvent.createWithKeys(removeDatasourceConfirmation, "removeDatasource", "confirmRemoveDatasource"));
     }
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(removeDatasourceConfirmation != null && event.getSource().equals(removeDatasourceConfirmation)
           && event.isConfirmed()) {

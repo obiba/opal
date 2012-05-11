@@ -151,7 +151,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
       }
     };
 
-    getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
+    getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
   }
 
   private void deleteCompletedJobs() {
@@ -169,7 +169,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
       }
     };
 
-    getEventBus().fireEvent(new ConfirmationRequiredEvent(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
+    getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
   }
 
   //

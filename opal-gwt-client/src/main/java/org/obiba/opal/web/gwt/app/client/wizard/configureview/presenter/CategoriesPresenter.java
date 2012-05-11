@@ -31,6 +31,7 @@ import com.google.inject.Provider;
 /**
  *
  */
+@Deprecated
 public class CategoriesPresenter extends LocalizablesPresenter {
   //
   // Instance Variables

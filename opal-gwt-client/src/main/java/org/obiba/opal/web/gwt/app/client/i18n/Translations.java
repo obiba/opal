@@ -442,6 +442,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Log")
   String logLabel();
 
+  @Description("Delete attribute label")
+  @DefaultStringValue("Delete Attribute")
+  String deleteAttribute();
+
+  @Description("Confirm delete attribute label")
+  @DefaultStringValue("Please confirm that you want to remove this attribute.")
+  String confirmDeleteAttribute();
+
   @Description("Confirmation title map")
   @DefaultStringMapValue({ //
       "deleteVariableTitle", "Delete Variable", //
@@ -456,7 +464,6 @@ public interface Translations extends Constants {
       "removeFunctionalUnit", "Remove Unit",//
       "generateFunctionalUnitIdentifiers", "Generate Unit Identifiers",//
       "deleteCategory", "Delete Category",//
-      "deleteAttribute", "Delete Attribute",//
       "overwriteVariable", "Overwrite Variable",//
       "overwriteView", "Overwrite View",//
       "createView", "Create View",//
@@ -479,7 +486,6 @@ public interface Translations extends Constants {
       "confirmDeleteReportTemplate", "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",//
       "confirmDeleteFunctionalUnit", "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",//
       "confirmDeleteCategory", "Please confirm that you want to remove this category.",//
-      "confirmDeleteAttribute", "Please confirm that you want to remove this attribute.",//
       "confirmOverwriteVariable", "A variable with the same name already exists. Please confirm that you want to overwrite this variable.",//
       "confirmOverwriteView", "A view with the same name already exists. Please confirm that you want to overwrite this view.",//
       "confirmCreateView", "Please confirm that you want to create a new view.",//

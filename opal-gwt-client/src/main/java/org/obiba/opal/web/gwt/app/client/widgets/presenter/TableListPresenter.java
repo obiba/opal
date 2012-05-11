@@ -12,17 +12,12 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
+
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
@@ -33,6 +28,13 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
 
 /**
  *
@@ -235,7 +237,7 @@ public class TableListPresenter extends WidgetPresenter<TableListPresenter.Displ
         }
       };
       eventBus.fireEvent(
-          new ConfirmationRequiredEvent(actionRequiringConfirmation, confirmationTitleKey, confirmationMessageKey));
+          ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, confirmationTitleKey, confirmationMessageKey));
     }
   }
 

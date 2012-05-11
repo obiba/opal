@@ -11,7 +11,9 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -30,6 +32,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.common.base.Strings;
@@ -58,6 +62,8 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   @Inject
   private LabelListPresenter labelListPresenter;
+
+  private ViewDto viewDto;
 
   @SuppressWarnings("unchecked")
   @Inject
@@ -121,35 +127,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   private void addEventHandlers() {
-    registerHandler(getDisplay().getSaveButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        String errorMessageKey = validate();
-        if(errorMessageKey != null) {
-          eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessageKey).build());
-          return;
-        }
-        eventBus
-            .fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), isEdit() ? UpdateType.EDIT : UpdateType.ADD));
-        getDisplay().hideDialog();
-      }
-
-      private JsArray<AttributeDto> getNewAttributeDtos() {
-        @SuppressWarnings("unchecked")
-        JsArray<AttributeDto> attributesArray = (JsArray<AttributeDto>) JsArray.createArray();
-        Map<String, TextBoxBase> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
-        String namespace = getDisplay().getNamespace().getText();
-        String name = getDisplay().getName().getText();
-        for(Map.Entry<String, TextBoxBase> entry : labelMap.entrySet()) {
-          String value = entry.getValue().getValue();
-          if(!Strings.isNullOrEmpty(value)) {
-            String locale = entry.getKey();
-            attributesArray.push(AttributeDtos.create(namespace, name, value, locale));
-          }
-        }
-        return attributesArray;
-      }
-    }));
+    registerHandler(getDisplay().getSaveButton().addClickHandler(new SaveClickHandler()));
 
     registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
       @Override
@@ -200,7 +178,25 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
   }
 
   public void setViewDto(ViewDto viewDto) {
+    this.viewDto = viewDto;
+    getDisplay().setUniqueNames(findUniqueAttributeNames());
     labelListPresenter.setDatasourceName(viewDto.getDatasourceName());
+  }
+
+  private Collection<String> findUniqueAttributeNames() {
+    Collection<String> uniqueNames = new TreeSet<String>();
+    VariableListViewDto variableListDto = (VariableListViewDto) viewDto
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
+      for(AttributeDto attribute : JsArrays.toList(variable.getAttributesArray())) {
+        uniqueNames.add(attribute.getName());
+      }
+    }
+    // always add known attributes
+    for(Map.Entry<String, List<String>> entry : AttributeDtos.NAMESPACE_ATTRIBUTES.entrySet()) {
+      uniqueNames.addAll(entry.getValue());
+    }
+    return uniqueNames;
   }
 
   public class UniqueAttributeNameValidator extends AbstractFieldValidator {
@@ -224,6 +220,36 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       return false;
     }
 
+  }
+
+  private class SaveClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      String errorMessageKey = validate();
+      if(errorMessageKey != null) {
+        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessageKey).build());
+        return;
+      }
+      eventBus.fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), isEdit() ? UpdateType.EDIT : UpdateType.ADD));
+      getDisplay().hideDialog();
+    }
+
+    private JsArray<AttributeDto> getNewAttributeDtos() {
+      @SuppressWarnings("unchecked")
+      JsArray<AttributeDto> attributesArray = (JsArray<AttributeDto>) JsArray.createArray();
+      Map<String, TextBoxBase> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
+      String namespace = getDisplay().getNamespace().getText();
+      String name = getDisplay().getName().getText();
+      for(Map.Entry<String, TextBoxBase> entry : labelMap.entrySet()) {
+        String value = entry.getValue().getValue();
+        if(!Strings.isNullOrEmpty(value)) {
+          String locale = entry.getKey();
+          attributesArray.push(AttributeDtos.create(namespace, name, value, locale));
+        }
+      }
+      return attributesArray;
+    }
   }
 
   public interface Display extends WidgetDisplay {

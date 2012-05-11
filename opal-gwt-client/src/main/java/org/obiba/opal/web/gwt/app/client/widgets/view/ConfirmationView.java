@@ -1,15 +1,14 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
@@ -28,6 +27,11 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class ConfirmationView extends DialogBox implements Display {
+
+  @UiTemplate("ConfirmationView.ui.xml")
+  interface ConfirmationViewUiBinder extends UiBinder<DockLayoutPanel, ConfirmationView> {
+  }
+
   //
   // Constants
   //
@@ -40,9 +44,7 @@ public class ConfirmationView extends DialogBox implements Display {
   // Static Variables
   //
 
-  private static ConfirmationViewUiBinder uiBinder = GWT.create(ConfirmationViewUiBinder.class);
-
-  private static Translations translations = GWT.create(Translations.class);
+  private static final ConfirmationViewUiBinder uiBinder = GWT.create(ConfirmationViewUiBinder.class);
 
   //
   // Instance Variables
@@ -85,11 +87,11 @@ public class ConfirmationView extends DialogBox implements Display {
   }
 
   public void setConfirmationTitle(String title) {
-    setText(translations.confirmationTitleMap().get(title));
+    setText(title);
   }
 
   public void setConfirmationMessage(String message) {
-    this.message.setHTML(translations.confirmationMessageMap().get(message));
+    this.message.setHTML(message);
   }
 
   @Override
@@ -115,11 +117,4 @@ public class ConfirmationView extends DialogBox implements Display {
     return this;
   }
 
-  //
-  // Inner Classes / Interfaces
-  //
-
-  @UiTemplate("ConfirmationView.ui.xml")
-  interface ConfirmationViewUiBinder extends UiBinder<DockLayoutPanel, ConfirmationView> {
-  }
 }

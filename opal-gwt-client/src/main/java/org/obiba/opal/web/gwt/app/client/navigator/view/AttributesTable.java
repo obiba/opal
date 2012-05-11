@@ -34,7 +34,7 @@ import com.google.gwt.user.client.ui.InlineLabel;
  */
 public class AttributesTable extends Table<AttributeDto> {
 
-  private static final Translations translations = GWT.create(Translations.class);
+  protected static final Translations translations = GWT.create(Translations.class);
 
   private static class Columns {
 
@@ -92,6 +92,7 @@ public class AttributesTable extends Table<AttributeDto> {
   public void setupSort(JsArrayDataProvider<AttributeDto> provider) {
     if(registration != null) {
       registration.removeHandler();
+      registration = null;
     }
     ColumnSortEvent.ListHandler<AttributeDto> handler = provider.newSortHandler();
     handler.setComparator(Columns.NAME, Columns.NAME_COMPARATOR);
@@ -105,7 +106,7 @@ public class AttributesTable extends Table<AttributeDto> {
     setupSort(provider);
   }
 
-  private void initColumns() {
+  protected void initColumns() {
     setPageSize(NavigatorView.PAGE_SIZE);
     setEmptyTableWidget(new InlineLabel(translations.noAttributesLabel()));
     addColumn(Columns.NAME, translations.nameLabel());
