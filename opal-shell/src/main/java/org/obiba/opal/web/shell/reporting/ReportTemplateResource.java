@@ -178,7 +178,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   private ReportDto getReportDto(FileObject reportFile) {
     return ReportDto.newBuilder()//
     .setName(reportFile.getName().getBaseName())//
-    .setLink("/files" + reportFile.getName().getPath()).build();
+    .setLink("/files" + reportFile.getName().getPath())//
+    .setPublicLink("/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile)).build();
   }
 
   private FileObject getReportFolder() throws FileSystemException {
@@ -200,7 +201,4 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     return commandSchedulerService;
   }
 
-  private String getContentDispositionOfAttachment(String fileName) {
-    return "attachment; filename=\"" + fileName + "\"";
-  }
 }
