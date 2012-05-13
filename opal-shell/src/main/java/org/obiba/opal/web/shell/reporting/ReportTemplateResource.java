@@ -10,6 +10,7 @@
 package org.obiba.opal.web.shell.reporting;
 
 import java.io.File;
+import java.util.List;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.DELETE;
@@ -18,7 +19,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -34,6 +34,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.service.CommandSchedulerService;
+import org.obiba.opal.web.model.Opal.ReportDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
@@ -43,6 +44,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
+import com.google.common.collect.Lists;
 
 @Component
 @Scope("request")
@@ -129,31 +132,58 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   @GET
-  @Path("/report/_latest")
-  public Response getReport() throws FileSystemException {
-    OpalFileSystem fileSystem = opalRuntime.getFileSystem();
-    FileObject reportFolder = fileSystem.getRoot().resolveFile("/reports/" + name);
-    if(reportFolder.exists() == false) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+  @Path("/reports")
+  public List<ReportDto> getReports() throws FileSystemException {
+    FileObject reportFolder = getReportFolder();
+    List<ReportDto> reports = Lists.newArrayList();
 
-    File lastReport = null;
-    for(FileObject reportFile : reportFolder.getChildren()) {
-      if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-")) {
-        File report = fileSystem.getLocalFile(reportFile);
-        if(lastReport == null || report.lastModified() > lastReport.lastModified()) {
-          lastReport = report;
+    if(reportFolder.exists()) {
+      for(FileObject reportFile : reportFolder.getChildren()) {
+        if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-")) {
+          reports.add(getReportDto(reportFile));
         }
       }
     }
 
-    if(lastReport == null) {
+    return reports;
+  }
+
+  @GET
+  @Path("/reports/latest")
+  public Response getReport() throws FileSystemException {
+    FileObject reportFolder = getReportFolder();
+    if(reportFolder.exists() == false) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+
+    FileObject lastReportFile = null;
+    File lastReport = null;
+    for(FileObject reportFile : reportFolder.getChildren()) {
+      if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-")) {
+        File report = opalRuntime.getFileSystem().getLocalFile(reportFile);
+        if(lastReport == null || report.lastModified() > lastReport.lastModified()) {
+          lastReport = report;
+          lastReportFile = reportFile;
+        }
+      }
+    }
+
+    if(lastReportFile == null) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
-      String mimeType = mimeTypes.getContentType(lastReport);
-      return Response.ok(lastReport, MediaType.valueOf(mimeType))//
-      .header("Content-Disposition", getContentDispositionOfAttachment(lastReport.getName())).build();
+      return Response.ok(getReportDto(lastReportFile)).build();
     }
+  }
+
+  private ReportDto getReportDto(FileObject reportFile) {
+    return ReportDto.newBuilder()//
+    .setName(reportFile.getName().getBaseName())//
+    .setLink("/files" + reportFile.getName().getPath()).build();
+  }
+
+  private FileObject getReportFolder() throws FileSystemException {
+    OpalFileSystem fileSystem = opalRuntime.getFileSystem();
+    return fileSystem.getRoot().resolveFile("/reports/" + name);
   }
 
   private boolean reportTemplateExists() {

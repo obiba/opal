@@ -91,6 +91,12 @@ message ReportTemplateDto {
   repeated string emailNotification = 6;
 }
 
+message ReportDto {
+  required string name = 1;
+  required string link = 2;
+  optional string publicLink = 3;
+}
+
 message ParameterDto {
   required string key = 1;
   required string value = 2;
