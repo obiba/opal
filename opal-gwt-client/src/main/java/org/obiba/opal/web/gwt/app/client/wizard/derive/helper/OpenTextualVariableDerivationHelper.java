@@ -22,7 +22,7 @@ import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 public class OpenTextualVariableDerivationHelper extends CategoricalVariableDerivationHelper {
 
-  private Method method;
+  private final Method method;
 
   public OpenTextualVariableDerivationHelper(VariableDto originalVariable, VariableDto destinationVariable,
       SummaryStatisticsDto summaryStatisticsDto, Method method) {
@@ -95,7 +95,7 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
 
     @Override
     protected void generateScript() {
-      scriptBuilder.append("$('" + originalVariable.getName() + "').map({");
+      scriptBuilder.append("$('").append(originalVariable.getName()).append("').map({");
       appendDistinctValueMapEntries();
       scriptBuilder.append("\n  }");
       appendSpecialValuesEntry(getOtherValuesMapEntry());

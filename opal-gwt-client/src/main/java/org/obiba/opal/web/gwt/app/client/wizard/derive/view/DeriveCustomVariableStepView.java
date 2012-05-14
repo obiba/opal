@@ -31,7 +31,7 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   @UiTemplate("DeriveCustomVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveCustomVariableStepView> {

@@ -63,7 +63,7 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl implements Deriv
   @UiField(provided = true)
   RadioButton manual;
 
-  RadioGroup<Method> radioGroup;
+  final RadioGroup<Method> radioGroup;
 
   // --- Map fields ---
 
@@ -82,7 +82,7 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl implements Deriv
   @UiField
   ValueMapGrid valuesMapGrid;
 
-  MultiWordSuggestOracleWithDisplay valueOracle;
+  final MultiWordSuggestOracleWithDisplay valueOracle;
 
   public DeriveOpenTextualVariableStepView() {
     value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplay());
@@ -162,10 +162,10 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl implements Deriv
 
   private static class MultiWordSuggestOracleWithDisplay extends MultiWordSuggestOracle {
 
-    Map<String, String> map = new HashMap<String, String>();
+    final Map<String, String> map = new HashMap<String, String>();
 
     public void add(String value, String frequency) {
-      super.add(value);
+      add(value);
       map.put(value, frequency);
     }
 

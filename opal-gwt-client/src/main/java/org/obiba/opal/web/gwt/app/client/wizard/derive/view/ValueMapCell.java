@@ -14,6 +14,7 @@ import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -27,7 +28,7 @@ public abstract class ValueMapCell extends AbstractCell<ValueMapEntry> {
 
   interface Template extends SafeHtmlTemplates {
 
-    @com.google.gwt.safehtml.client.SafeHtmlTemplates.Template("<span class=\"{0}\">{1}</span>")
+    @SafeHtmlTemplates.Template("<span class=\"{0}\">{1}</span>")
     SafeHtml span(String cssClass, SafeHtml cellContent);
 
   }
@@ -35,7 +36,6 @@ public abstract class ValueMapCell extends AbstractCell<ValueMapEntry> {
   protected static final Template template = GWT.create(Template.class);
 
   /**
-   * @param renderer
    * @param consumedEvents
    */
   public ValueMapCell(Set<String> consumedEvents) {
@@ -43,7 +43,6 @@ public abstract class ValueMapCell extends AbstractCell<ValueMapEntry> {
   }
 
   /**
-   * @param renderer
    * @param consumedEvents
    */
   public ValueMapCell(String... consumedEvents) {
@@ -51,7 +50,7 @@ public abstract class ValueMapCell extends AbstractCell<ValueMapEntry> {
   }
 
   @Override
-  public void render(com.google.gwt.cell.client.Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
+  public void render(Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
     if(entry != null) {
       sb.append(template.span(getCssClasses(entry.getType()), SafeHtmlUtils.fromString(getText(entry))));
     }

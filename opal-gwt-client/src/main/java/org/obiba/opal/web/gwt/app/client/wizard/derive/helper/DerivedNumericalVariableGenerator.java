@@ -33,7 +33,7 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
 
   @Override
   protected void generateScript() {
-    scriptBuilder.append("$('" + originalVariable.getName() + "')");
+    scriptBuilder.append("$('").append(originalVariable.getName()).append("')");
     appendGroupMethod();
     appendMapMethod();
   }
@@ -44,14 +44,14 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
     List<Range<N>> ranges = new ArrayList<Range<N>>();
     List<ValueMapEntry> outliers = new ArrayList<ValueMapEntry>();
     for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.CATEGORY_NAME) || entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
+      if(entry.getType() == ValueMapEntryType.CATEGORY_NAME || entry.getType() == ValueMapEntryType.DISTINCT_VALUE) {
         outliers.add(entry);
-      } else if(entry.getType().equals(ValueMapEntryType.RANGE)) {
+      } else if(entry.getType() == ValueMapEntryType.RANGE) {
         ranges.add(entryRangeMap.get(entry));
       }
     }
 
-    if(ranges.size() == 0) return;
+    if(ranges.isEmpty()) return;
 
     scriptBuilder.append(".group(");
 
@@ -96,7 +96,7 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
   }
 
   private void appendOutliers(List<ValueMapEntry> outliers) {
-    if(outliers.size() == 0) return;
+    if(outliers.isEmpty()) return;
     scriptBuilder.append(", [");
     boolean first = true;
     for(ValueMapEntry entry : outliers) {
@@ -114,13 +114,14 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
     scriptBuilder.append(".map({");
     boolean first = true;
     for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.CATEGORY_NAME) || entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE) || entry.getType().equals(ValueMapEntryType.RANGE)) {
+      if(entry.getType() == ValueMapEntryType.CATEGORY_NAME || entry
+          .getType() == ValueMapEntryType.DISTINCT_VALUE || entry.getType() == ValueMapEntryType.RANGE) {
         if(first) {
           first = false;
         } else {
           scriptBuilder.append(", ");
         }
-        scriptBuilder.append("\n    '" + entry.getValue() + "': ");
+        scriptBuilder.append("\n    '").append(entry.getValue()).append("': ");
         appendNewValue(entry);
         addNewCategory(entry);
       }

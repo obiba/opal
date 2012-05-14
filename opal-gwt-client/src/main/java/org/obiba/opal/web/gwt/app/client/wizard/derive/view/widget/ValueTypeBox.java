@@ -44,7 +44,7 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
 
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-    return super.addChangeHandler((ChangeHandler) handler);
+    return addChangeHandler((ChangeHandler) handler);
   }
 
   @Override
@@ -54,7 +54,7 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
 
   @Override
   public void setValue(String value) {
-    this.valueType = ValueType.valueOf(value.toUpperCase());
+    valueType = ValueType.valueOf(value.toUpperCase());
     for(int i = 0; i < getItemCount(); i++) {
       String text = getItemText(i);
       if(text.equals(valueType.getLabel())) {
@@ -69,7 +69,7 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
     if(fireEvents) {
       setValue(value);
     } else {
-      this.valueType = ValueType.valueOf(value);
+      valueType = ValueType.valueOf(value);
     }
   }
 

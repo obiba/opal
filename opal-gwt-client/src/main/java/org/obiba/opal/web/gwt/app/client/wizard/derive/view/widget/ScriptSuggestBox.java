@@ -27,11 +27,11 @@ import com.google.gwt.user.client.ui.UIObject;
 
 public class ScriptSuggestBox extends Composite {
 
-  private SuggestBox variable;
+  private final SuggestBox variable;
 
-  private MultiWordSuggestOracle suggest;
+  private final MultiWordSuggestOracle suggest;
 
-  private InnerAutoCompleteTextArea inner;
+  private final InnerAutoCompleteTextArea inner;
 
   public ScriptSuggestBox() {
     suggest = new MultiWordSuggestOracle();
@@ -43,7 +43,7 @@ public class ScriptSuggestBox extends Composite {
     addStyleName("code");
   }
 
-  public void addAsyncSuggestions(final TableDto table) {
+  public void addAsyncSuggestions(TableDto table) {
     if(table.hasViewLink() == false) {
       requestVariables(table.getLink());
     } else {
@@ -60,7 +60,7 @@ public class ScriptSuggestBox extends Composite {
     }
   }
 
-  private void requestVariables(final String link) {
+  private void requestVariables(String link) {
     ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
       @Override

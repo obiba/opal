@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 import java.util.Set;
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safecss.shared.SafeStyles;
@@ -29,7 +30,7 @@ public class StatCell extends AbstractCell<ValueMapEntry> {
 
   interface Template extends SafeHtmlTemplates {
 
-    @com.google.gwt.safehtml.client.SafeHtmlTemplates.Template("<div class=\"progress-bar\" style=\"{0}\"><div class=\"inner\">{1}</div></div>")
+    @SafeHtmlTemplates.Template("<div class=\"progress-bar\" style=\"{0}\"><div class=\"inner\">{1}</div></div>")
     SafeHtml stat(SafeStyles style, int value);
   }
 
@@ -48,7 +49,7 @@ public class StatCell extends AbstractCell<ValueMapEntry> {
   }
 
   @Override
-  public void render(com.google.gwt.cell.client.Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
+  public void render(Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
     if(entry != null) {
       double width = (maxFrequency == 0 ? 0 : entry.getCount() * (100 / maxFrequency));
       String style = "width: " + WIDTH_FORMAT.format(width) + "px;";

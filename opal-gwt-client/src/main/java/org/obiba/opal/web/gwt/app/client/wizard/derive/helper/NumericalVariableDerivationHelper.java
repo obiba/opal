@@ -176,15 +176,15 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     public int compare(ValueMapEntry o1, ValueMapEntry o2) {
       switch(o1.getType()) {
       case RANGE:
-        return o2.getType().equals(ValueMapEntryType.RANGE) ? compareRanges(o1, o2) : -1;
+        return o2.getType() == ValueMapEntryType.RANGE ? compareRanges(o1, o2) : -1;
       case CATEGORY_NAME:
       case DISTINCT_VALUE:
-        if(o2.getType().equals(ValueMapEntryType.CATEGORY_NAME) || o2.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
+        if(o2.getType() == ValueMapEntryType.CATEGORY_NAME || o2.getType() == ValueMapEntryType.DISTINCT_VALUE) {
           return compareDistincts(o1, o2);
         }
-        return o2.getType().equals(ValueMapEntryType.EMPTY_VALUES) ? -1 : 1;
+        return o2.getType() == ValueMapEntryType.EMPTY_VALUES ? -1 : 1;
       case EMPTY_VALUES:
-        return o2.getType().equals(ValueMapEntryType.OTHER_VALUES) ? -1 : 1;
+        return o2.getType() == ValueMapEntryType.OTHER_VALUES ? -1 : 1;
       case OTHER_VALUES:
         return 1;
       }

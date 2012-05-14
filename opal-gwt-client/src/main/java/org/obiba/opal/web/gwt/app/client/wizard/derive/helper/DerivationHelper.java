@@ -37,7 +37,7 @@ public abstract class DerivationHelper {
 
   protected List<ValueMapEntry> valueMapEntries;
 
-  protected VariableDto originalVariable;
+  protected final VariableDto originalVariable;
 
   private final VariableDto destination;
 

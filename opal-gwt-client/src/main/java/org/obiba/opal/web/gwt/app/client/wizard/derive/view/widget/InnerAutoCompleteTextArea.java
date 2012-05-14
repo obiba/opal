@@ -34,7 +34,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
           case KeyCodes.KEY_ENTER:
           case KeyCodes.KEY_UP:
           case KeyCodes.KEY_DOWN:
-            InnerAutoCompleteTextArea.this.cancelKey();
+            cancelKey();
             break;
 
           case KeyCodes.KEY_ESCAPE:

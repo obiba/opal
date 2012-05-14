@@ -66,7 +66,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   @Override
   public void initializeValueMapEntries() {
-    this.valueMapEntries = new ArrayList<ValueMapEntry>();
+    valueMapEntries = new ArrayList<ValueMapEntry>();
 
     List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
     int index = 1;
@@ -93,7 +93,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   }
 
   private boolean isSummaryAvailable() {
-    return this.categoricalSummaryDto != null;
+    return categoricalSummaryDto != null;
   }
 
   /**
@@ -220,7 +220,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param indexMax
    */
   protected void initializeMissingCategoryValueMapEntries(List<ValueMapEntry> missingValueMapEntries, int indexMax) {
-    if(missingValueMapEntries.size() == 0) return;
+    if(missingValueMapEntries.isEmpty()) return;
 
     int missIndex = 10 - missingValueMapEntries.size();
     int factor = 1;
@@ -264,7 +264,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
     @Override
     protected void generateScript() {
-      scriptBuilder.append("$('" + originalVariable.getName() + "').map({");
+      scriptBuilder.append("$('").append(originalVariable.getName()).append("').map({");
       appendCategoryValueMapEntries();
       appendDistinctValueMapEntries();
       scriptBuilder.append("\n  }");
