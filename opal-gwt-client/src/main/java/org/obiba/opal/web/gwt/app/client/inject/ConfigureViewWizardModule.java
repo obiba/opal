@@ -13,6 +13,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.LabelListView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AddDerivedVariableDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributeDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.AttributesPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoriesPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoryDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.DataTabPresenter;
@@ -20,6 +22,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectSc
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AddDerivedVariableDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AttributeDialogView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.AttributesView;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.CategoriesView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.CategoryDialogView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.ConfigureViewStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.view.DataTabView;
@@ -42,6 +46,9 @@ public class ConfigureViewWizardModule extends AbstractPresenterModule {
         AddDerivedVariableDialogView.class);
     bindPresenterWidget(VariablesListTabPresenter.class, VariablesListTabPresenter.Display.class,
         VariablesListTabView.class);
+    bindPresenterWidget(CategoriesPresenter.class, CategoriesPresenter.Display.class, CategoriesView.class);
+    bindPresenterWidget(AttributesPresenter.class, AttributesPresenter.Display.class, AttributesView.class);
+
     bindPresenterWidget(SelectScriptVariablesTabPresenter.class, SelectScriptVariablesTabPresenter.Display.class,
         SelectScriptVariablesTabView.class);
 
