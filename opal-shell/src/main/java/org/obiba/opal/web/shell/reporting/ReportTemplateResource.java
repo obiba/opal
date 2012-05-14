@@ -87,7 +87,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @GET
   public Response getReportTemplate() {
     ReportTemplate reportTemplate = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
-    if(reportTemplate == null) {
+    if(reportTemplate == null || authzReadReportTemplate(name) == false) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
       return Response.ok(Dtos.asDto(reportTemplate)).build();
@@ -97,7 +97,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @DELETE
   public Response deleteReportTemplate() {
     ReportTemplate reportTemplateToRemove = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
-    if(reportTemplateToRemove == null) {
+    if(reportTemplateToRemove == null || authzReadReportTemplate(name) == false) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
       getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {
@@ -115,7 +115,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @PUT
   public Response updateReportTemplate(@Context
   UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
-    if(!reportTemplateExists()) return Response.status(Status.NOT_FOUND).build();
+    if(reportTemplateExists() == false) return Response.status(Status.NOT_FOUND).build();
 
     try {
       Assert.isTrue(reportTemplateDto.getName().equals(name), "The report template name in the URI does not match the name given in the request body DTO.");

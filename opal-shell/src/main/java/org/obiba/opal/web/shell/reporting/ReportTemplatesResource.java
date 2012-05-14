@@ -30,6 +30,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @Component
@@ -58,7 +61,15 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
   @GET
   public Set<ReportTemplateDto> getReportTemplates() {
     Set<ReportTemplate> templates = configService.getOpalConfiguration().getReportTemplates();
-    return Dtos.asDto(templates);
+    ImmutableSet.Builder<ReportTemplate> builder = ImmutableSet.builder();
+    builder.addAll(Iterables.filter(templates, new Predicate<ReportTemplate>() {
+
+      @Override
+      public boolean apply(ReportTemplate template) {
+        return authzReadReportTemplate(template.getName());
+      }
+    }));
+    return Dtos.asDto(builder.build());
   }
 
   @POST

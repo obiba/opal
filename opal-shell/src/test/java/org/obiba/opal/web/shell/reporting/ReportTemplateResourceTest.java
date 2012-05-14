@@ -26,9 +26,11 @@ import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
@@ -54,6 +56,7 @@ public class ReportTemplateResourceTest {
 
   @Before
   public void setUp() {
+    new MagmaEngine();
     opalRuntimeMock = createMock(OpalRuntime.class);
     opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
     opalConfiguration = new OpalConfiguration();
@@ -66,6 +69,11 @@ public class ReportTemplateResourceTest {
     opalConfiguration.setReportTemplates(reportTemplates);
 
     expect(opalConfigurationServiceMock.getOpalConfiguration()).andReturn(opalConfiguration).anyTimes();
+  }
+
+  @After
+  public void stopYourEngine() {
+    MagmaEngine.get().shutdown();
   }
 
   @Test
