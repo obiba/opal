@@ -45,7 +45,19 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/report-template/(.+)");
         return Lists.newArrayList(magmaConvert("/report-template/{0}", "*:GET/*", args),//
+            magmaConvert("/files/meta/reports/{0}", "GET:GET/GET", args),//
             magmaConvert("/files/reports/{0}", "*:GET/*", args));
+      }
+
+    },
+    REPORT_TEMPLATE_READ {
+
+      @Override
+      public Iterable<String> convert(String node) {
+        String[] args = args(node, "/report-template/(.+)");
+        return Lists.newArrayList(magmaConvert("/report-template/{0}", "GET:GET/GET", args),//
+            magmaConvert("/files/meta/reports/{0}", "GET:GET/GET", args),//
+            magmaConvert("/files/reports/{0}", "GET:GET/GET", args));
       }
 
     };

@@ -12,7 +12,6 @@ package org.obiba.opal.web.shell.reporting;
 import java.io.File;
 import java.util.List;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -52,6 +51,7 @@ import com.google.common.collect.Lists;
 @Path("/report-template/{name}")
 public class ReportTemplateResource extends AbstractReportTemplateResource {
 
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(ReportTemplateResource.class);
 
   @PathParam("name")
@@ -62,8 +62,6 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   private final CommandSchedulerService commandSchedulerService;
 
   private final OpalRuntime opalRuntime;
-
-  private MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
   // Added for unit tests
   ReportTemplateResource(String name, OpalConfigurationService configService) {
