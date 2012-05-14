@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -76,6 +77,9 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
 
   @UiField
   CellTable<FileDto> producedReportsTable;
+
+  @UiField
+  Panel permissions;
 
   @UiField
   SimplePager pager;
@@ -132,6 +136,14 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
     widget = uiBinder.createAndBindUi(this);
     initProducedReportsTable();
     initActionToolbar();
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    permissions.clear();
+    if(content != null) {
+      permissions.add(content);
+    }
   }
 
   private void initActionToolbar() {
@@ -278,7 +290,8 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
 
   @Override
   public HasAuthorization getRemoveReportTemplateAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(remove), new UIObjectAuthorizer(removeSeparator)) {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(remove),
+        new UIObjectAuthorizer(removeSeparator)) {
       @Override
       public void unauthorized() {
       }
@@ -311,6 +324,11 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   @Override
   public HasAuthorization getListReportsAuthorizer() {
     return new WidgetAuthorizer(tabs);
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new TabAuthorizer(tabs, 1);
   }
 
 }
