@@ -42,6 +42,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -157,13 +158,20 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   }
 
   private void initProducedReportsTable() {
+    producedReportsTable.addColumn(new TextColumn<FileDto>() {
+
+      @Override
+      public String getValue(FileDto object) {
+        return object.getName();
+      }
+    }, translations.nameLabel());
+
     producedReportsTable.addColumn(new DateTimeColumn<FileDto>() {
       @Override
       public Date getValue(FileDto file) {
         return new Date((long) file.getLastModifiedTime());
-        // return DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM).format(date);
       }
-    }, translations.producedDate());
+    }, translations.lastModifiedLabel());
 
     actionsColumn = new ActionsColumn<FileDto>(DOWNLOAD_ACTION, DELETE_ACTION);
     producedReportsTable.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());

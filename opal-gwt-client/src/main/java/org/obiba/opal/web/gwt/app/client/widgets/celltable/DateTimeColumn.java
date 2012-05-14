@@ -18,7 +18,7 @@ import com.google.gwt.user.cellview.client.Column;
 
 public abstract class DateTimeColumn<T> extends Column<T, Date> {
   public DateTimeColumn() {
-    super(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT)));
+    super(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM)));
   }
 
   public DateTimeColumn(DateTimeFormat dateFormat) {

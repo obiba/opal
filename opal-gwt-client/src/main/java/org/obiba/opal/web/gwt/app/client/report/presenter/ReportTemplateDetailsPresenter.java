@@ -428,7 +428,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       String node = UriBuilder.create().segment("report-template", reportTemplate.getName()).build();
       authz.setAclRequest("report-template", new AclRequest(AclAction.REPORT_TEMPLATE_READ, node), //
           new AclRequest(AclAction.REPORT_TEMPLATE_ALL, node));
-      // setInSlot(null, authz);
+      setInSlot(null, authz);
     }
   }
 

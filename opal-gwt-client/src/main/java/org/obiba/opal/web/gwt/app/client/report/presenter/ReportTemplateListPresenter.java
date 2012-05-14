@@ -44,18 +44,16 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
     addHandlers();
   }
 
-  @Override
-  public void onReset() {
-    refreshReportTemplates(getView().getSelectedReportTemplate());
-  }
-
   private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
-    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get().withCallback(new ReportTemplatesResourceCallback(templateToSelect)).send();
+    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get()
+        .withCallback(new ReportTemplatesResourceCallback(templateToSelect)).send();
   }
 
   private void addHandlers() {
-    super.registerHandler(getEventBus().addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
-    super.registerHandler(getEventBus().addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
+    super.registerHandler(getEventBus().addHandler(ReportTemplateCreatedEvent.getType(),
+        new ReportTemplateCreatedHandler()));
+    super.registerHandler(getEventBus().addHandler(ReportTemplateDeletedEvent.getType(),
+        new ReportTemplateDeletedHandler()));
     super.registerHandler(getView().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
   }
 
