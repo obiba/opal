@@ -50,8 +50,7 @@ public abstract class DerivedVariableGenerator {
     this.valueMapEntries = valueMapEntries;
   }
 
-  public VariableDto generate(@Nullable
-  VariableDto destination) {
+  public VariableDto generate(@Nullable VariableDto destination) {
     VariableDto derived = destination == null ? copyVariable(originalVariable) : destination;
 
     scriptBuilder = new StringBuilder();
@@ -68,7 +67,7 @@ public abstract class DerivedVariableGenerator {
     VariableDtos.setScript(derived, scriptBuilder.toString());
 
     // new categories if destination does not already define them
-    JsArray<CategoryDto> cats = destination.getCategoriesArray();
+    JsArray<CategoryDto> cats = destination == null ? null : destination.getCategoriesArray();
     if(cats == null || cats.length() == 0) {
       cats = JsArrays.create();
       for(CategoryDto cat : newCategoriesMap.values()) {
@@ -103,7 +102,7 @@ public abstract class DerivedVariableGenerator {
   protected void appendDistinctValueMapEntries() {
     boolean first = true;
     for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType().equals(ValueMapEntryType.DISTINCT_VALUE)) {
+      if(entry.getType() == ValueMapEntryType.DISTINCT_VALUE) {
         if(first && !categoryValuesAppended) {
           first = false;
         } else {
@@ -217,8 +216,7 @@ public abstract class DerivedVariableGenerator {
     }
   }
 
-  public static VariableDto copyVariable(@Nonnull
-  VariableDto variable) {
+  public static VariableDto copyVariable(@Nonnull VariableDto variable) {
     return copyVariable(variable, false);
   }
 
