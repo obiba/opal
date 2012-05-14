@@ -95,6 +95,8 @@ message ReportDto {
   required string name = 1;
   required string link = 2;
   optional string publicLink = 3;
+  optional int64 size = 4;
+  optional int64 lastModifiedTime = 5;
 }
 
 message ParameterDto {

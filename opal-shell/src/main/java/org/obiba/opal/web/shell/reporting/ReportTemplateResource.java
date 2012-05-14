@@ -173,11 +173,13 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     }
   }
 
-  private ReportDto getReportDto(FileObject reportFile) {
+  private ReportDto getReportDto(FileObject reportFile) throws FileSystemException {
     return ReportDto.newBuilder()//
     .setName(reportFile.getName().getBaseName())//
     .setLink("/files" + reportFile.getName().getPath())//
-    .setPublicLink("/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile)).build();
+    .setSize(reportFile.getContent().getSize())//
+    .setLastModifiedTime(reportFile.getContent().getLastModifiedTime())//
+    .setPublicLink("/report/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile)).build();
   }
 
   private FileObject getReportFolder() throws FileSystemException {
