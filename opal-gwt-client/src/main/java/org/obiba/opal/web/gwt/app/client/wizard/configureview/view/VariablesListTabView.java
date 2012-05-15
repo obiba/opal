@@ -31,6 +31,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -61,6 +62,9 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
 
   @UiField
   Button saveChangesButton;
+
+  @UiField
+  Image inProgressImg;
 
   @UiField
   Button addButton;
@@ -334,9 +338,15 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   @Override
+  public void setInProgress(boolean inProgress) {
+    saveChangesEnabled(!inProgress);
+    inProgressImg.setVisible(inProgress);
+  }
+
+  @Override
   public void formEnable(boolean enabled) {
     navigationEnabled(enabled);
-    saveChangesButton.setEnabled(enabled);
+    saveChangesEnabled(enabled);
 
     variableDetailTabs.setVisible(enabled);
 

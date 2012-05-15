@@ -6,6 +6,11 @@
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
+  <ui:style>
+    .progress { margin: 5px; }
+  </ui:style>
+
+
   <g:FlowPanel addStyleNames="variablesListTabContent">
     <g:FlowPanel>
       <g:Label addStyleNames="inline">
@@ -29,6 +34,8 @@
       <g:Button ui:field="saveChangesButton" styleName="btn btn-primary right-aligned">
         <ui:msg description="Save changes button label">Save Changes</ui:msg>
       </g:Button>
+      <g:Image ui:field="inProgressImg" url="image/in-progress.gif" visible="false"
+               addStyleNames="right-aligned small-indent {style.progress}" />
     </g:FlowPanel>
     
     <g:FlowPanel addStyleNames="form">

@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributeUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributesUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -137,7 +138,7 @@ public class AttributesPresenter extends PresenterWidget<AttributesPresenter.Dis
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(event.getSource() == runDelete) {
+      if(event.isConfirmed() && event.getSource() == runDelete) {
         runDelete.run();
       }
     }
@@ -159,6 +160,7 @@ public class AttributesPresenter extends PresenterWidget<AttributesPresenter.Dis
           break;
       }
       getView().renderAttributeRows(currentVariable.getAttributesArray());
+      fireEvent(new AttributesUpdatedEvent());
     }
 
     @SuppressWarnings("unchecked")

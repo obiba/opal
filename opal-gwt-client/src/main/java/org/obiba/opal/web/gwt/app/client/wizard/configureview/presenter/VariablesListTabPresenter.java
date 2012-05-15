@@ -27,6 +27,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.AttributesUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoriesUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.DerivedVariableConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.VariableAddRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
@@ -34,7 +36,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequ
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -272,6 +273,9 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     registerHandler(getView().addOccurrenceGroupChangedHandler(formChangedHandler));
     registerHandler(getView().addUnitChangedHandler(formChangedHandler));
     registerHandler(getView().addMimeTypeChangedHandler(formChangedHandler));
+
+    registerHandler(getEventBus().addHandler(CategoriesUpdatedEvent.getType(), formChangedHandler));
+    registerHandler(getEventBus().addHandler(AttributesUpdatedEvent.getType(), formChangedHandler));
   }
 
   private void addValidators() {
@@ -384,6 +388,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     void formEnable(boolean enabled);
 
     void formClear();
+
+    void setInProgress(boolean inProgress);
 
   }
 
@@ -507,6 +513,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
       final VariableDto currentVariableDto = getView().getVariableDto(evaluateScriptPresenter.getScript());
 
+      getView().setInProgress(true);
+
       UriBuilder ub = UriBuilder.create()
           .segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
@@ -515,6 +523,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
             public void onResource(Response response, TableDto resource) {
               scriptEvaluationPresenter.setOriginalTable(resource);
               scriptEvaluationPresenter.setOriginalVariable(currentVariableDto);
+              getView().setInProgress(false);
             }
           }).send();
     }
@@ -695,7 +704,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     } else {
       updateSelectedVariableName();
     }
-    getView().saveChangesEnabled(true);
     getView().addButtonEnabled(false);
     getView().navigationEnabled(false);
     getEventBus().fireEvent(new ViewSavePendingEvent());
@@ -726,7 +734,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   }
 
-  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean> {
+  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean>, CategoriesUpdatedEvent.Handler,
+      AttributesUpdatedEvent.Handler {
 
     @Override
     public void onChange(ChangeEvent arg0) {
@@ -735,6 +744,16 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     @Override
     public void onValueChange(ValueChangeEvent<Boolean> arg0) {
+      formChange();
+    }
+
+    @Override
+    public void onAttributesCategories(CategoriesUpdatedEvent event) {
+      formChange();
+    }
+
+    @Override
+    public void onAttributesUpdate(AttributesUpdatedEvent event) {
       formChange();
     }
 
@@ -807,71 +826,75 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   }
 
   private void setScriptEvaluationOnSaveCallback() {
-    scriptEvaluationPresenter.setScriptEvaluationCallback(new ScriptEvaluationCallback() {
-
-      private VariableListViewDto variableListViewDto;
-
-      private VariableDto currentVariableDto;
-
-      @Override
-      public void onSuccess(VariableDto variable) {
-        variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-        variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
-
-        currentVariableDto = getView().getVariableDto(evaluateScriptPresenter.getScript());
-        if(isEmptyVariable()) {
-          // This view has no variables. Clear the variable list and save.
-          variableListViewDto.clearVariablesArray();
-          getEventBus().fireEvent(new ViewSaveRequiredEvent(viewDto));
-        } else {
-          // Validate current variable and save to variable list.
-          if(validate()) {
-            updateViewDto();
-            refreshVariableSuggestions();
-          }
-        }
-      }
-
-      @Override
-      public void onFailure(VariableDto variable) {
-      }
-
-      private void updateViewDto() {
-        updateCategories();
-        updateAttributes();
-        if(addVariable) {
-          addVariable();
-        } else {
-          updateVariable();
-        }
-        setCurrentVariable(currentVariableDto); // Must do this before form is refreshed.
-        getEventBus().fireEvent(new ViewSaveRequiredEvent(viewDto));
-      }
-
-      private void updateCategories() {
-        // Set variable categories, if they exist.
-        if(currentVariable.getCategoriesArray() != null) {
-          currentVariableDto.setCategoriesArray(currentVariable.getCategoriesArray());
-        }
-      }
-
-      private void updateAttributes() {
-        String currentVariableScript = VariableDtos.getScript(currentVariableDto);
-        currentVariableDto.setAttributesArray(currentVariable.getAttributesArray());
-        VariableDtos.setScript(currentVariableDto, currentVariableScript);
-      }
-
-      private boolean isEmptyVariable() {
-        return "".equals(currentVariableDto.getName()) && variableListViewDto.getVariablesArray().length() == 0;
-      }
-
-      private void updateVariable() {
-        variableListViewDto.getVariablesArray().set(getVariableIndex(currentVariable), currentVariableDto);
-      }
-
-      private void addVariable() {
-        variableListViewDto.getVariablesArray().push(currentVariableDto);
-      }
-    });
+    scriptEvaluationPresenter.setScriptEvaluationCallback(new ScriptEvaluationCallbackImpl());
   }
+
+  private class ScriptEvaluationCallbackImpl implements ScriptEvaluationPresenter.ScriptEvaluationCallback {
+
+    private VariableListViewDto variableListViewDto;
+
+    private VariableDto currentVariableDto;
+
+    @Override
+    public void onSuccess(VariableDto variable) {
+      variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
+
+      currentVariableDto = getView().getVariableDto(evaluateScriptPresenter.getScript());
+      if(isEmptyVariable()) {
+        // This view has no variables. Clear the variable list and save.
+        variableListViewDto.clearVariablesArray();
+        getEventBus().fireEvent(new ViewSaveRequiredEvent(viewDto));
+      } else {
+        // Validate current variable and save to variable list.
+        if(validate()) {
+          updateViewDto();
+          refreshVariableSuggestions();
+        }
+      }
+    }
+
+    @Override
+    public void onFailure(VariableDto variable) {
+    }
+
+    private void updateViewDto() {
+      updateCategories();
+      updateAttributes();
+      if(addVariable) {
+        addVariable();
+      } else {
+        updateVariable();
+      }
+      setCurrentVariable(currentVariableDto); // Must do this before form is refreshed.
+      getEventBus().fireEvent(new ViewSaveRequiredEvent(viewDto));
+    }
+
+    private void updateCategories() {
+      // Set variable categories, if they exist.
+      if(currentVariable.getCategoriesArray() != null) {
+        currentVariableDto.setCategoriesArray(currentVariable.getCategoriesArray());
+      }
+    }
+
+    private void updateAttributes() {
+      String currentVariableScript = VariableDtos.getScript(currentVariableDto);
+      currentVariableDto.setAttributesArray(currentVariable.getAttributesArray());
+      VariableDtos.setScript(currentVariableDto, currentVariableScript);
+    }
+
+    private boolean isEmptyVariable() {
+      return "".equals(currentVariableDto.getName()) && variableListViewDto.getVariablesArray().length() == 0;
+    }
+
+    private void updateVariable() {
+      variableListViewDto.getVariablesArray().set(getVariableIndex(currentVariable), currentVariableDto);
+    }
+
+    private void addVariable() {
+      variableListViewDto.getVariablesArray().push(currentVariableDto);
+    }
+
+  }
+
 }

@@ -101,7 +101,4 @@ public class DropdownSuggestBox extends Composite implements HasText, HasValue<S
     suggestBox.setValue(value, fireEvents);
   }
 
-  public interface DropdownSuggestEventHandler extends com.google.gwt.event.shared.EventHandler {
-
-  }
 }

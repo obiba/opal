@@ -43,9 +43,9 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
   // Static Variables
   //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
@@ -72,29 +72,35 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
   // ResourceRequestPresenter.Display Methods
   //
 
+  @Override
   public void setResourceName(String resourceName) {
     this.resourceName.setText(resourceName);
   }
 
+  @Override
   public HandlerRegistration setResourceClickHandler(ResourceClickHandler handler) {
     return resourceName.addClickHandler(handler);
   }
 
+  @Override
   public void inProgress() {
     requestStatus.setUrl(IN_PROGRESS_IMAGE_URL);
     resourceName.setEnabled(false);
   }
 
+  @Override
   public void completed() {
     requestStatus.setUrl(COMPLETED_IMAGE_URL);
     resourceName.setEnabled(true);
   }
 
+  @Override
   public void failed() {
     requestStatus.setUrl(FAILED_IMAGE_URL);
     resourceName.setEnabled(false);
   }
 
+  @Override
   public Widget asWidget() {
     return this;
   }

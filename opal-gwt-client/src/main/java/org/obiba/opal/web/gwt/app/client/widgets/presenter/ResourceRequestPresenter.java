@@ -34,15 +34,15 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
   // Instance Variables
   //
 
-  private ResourceRequestBuilder<T> requestBuilder;
+  private final ResourceRequestBuilder<T> requestBuilder;
 
-  private ResponseCodeCallback callback;
+  private final ResponseCodeCallback callback;
 
   //
   // Constructors
   //
 
-  public ResourceRequestPresenter(final Display display, final EventBus eventBus, final ResourceRequestBuilder<T> requestBuilder, final ResponseCodeCallback callback) {
+  public ResourceRequestPresenter(Display display, EventBus eventBus, ResourceRequestBuilder<T> requestBuilder, ResponseCodeCallback callback) {
     super(display, eventBus);
 
     this.requestBuilder = requestBuilder;
@@ -87,7 +87,7 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
   //
 
   public void setSuccessCodes(Integer... codes) {
-    final ResponseCodeCallback internalCallback = new ResponseCodeCallback() {
+    ResponseCodeCallback internalCallback = new ResponseCodeCallback() {
 
       public void onResponseCode(Request request, Response response) {
         getDisplay().completed();
@@ -106,7 +106,7 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
   }
 
   public void setErrorCodes(Integer... codes) {
-    final ResponseCodeCallback internalCallback = new ResponseCodeCallback() {
+    ResponseCodeCallback internalCallback = new ResponseCodeCallback() {
 
       public void onResponseCode(Request request, Response response) {
         getDisplay().failed();
@@ -162,6 +162,6 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
 
   public interface ResourceClickHandler extends ClickHandler {
 
-    public String getResourceLink();
+    String getResourceLink();
   }
 }

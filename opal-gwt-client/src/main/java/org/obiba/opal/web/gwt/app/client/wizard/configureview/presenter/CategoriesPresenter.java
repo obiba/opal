@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoriesUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.CategoryUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.UpdateType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -132,7 +133,7 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(event.getSource() == runDelete) {
+      if(event.isConfirmed() && event.getSource() == runDelete) {
         runDelete.run();
       }
     }
@@ -154,6 +155,7 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
           break;
       }
       getView().renderCategoryRows(currentVariable.getCategoriesArray());
+      fireEvent(new CategoriesUpdatedEvent());
     }
 
     @SuppressWarnings("unchecked")
@@ -187,7 +189,6 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
     }
 
   }
-
 
   public interface Display extends View {
 

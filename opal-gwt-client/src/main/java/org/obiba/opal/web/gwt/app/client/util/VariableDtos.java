@@ -18,11 +18,13 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.JsArray;
 
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.COMMENT_ATTRIBUTE;
 import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.DERIVED_FROM_ATTRIBUTE;
 import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.DESCRIPTION_ATTRIBUTE;
 import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.MAELSTROM_NAMESPACE;
 import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.OPAL_NAMESPACE;
 import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.SCRIPT_ATTRIBUTE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.STATUS_ATTRIBUTE;
 
 public class VariableDtos {
 
@@ -89,6 +91,22 @@ public class VariableDtos {
 
   public static void setDescription(VariableDto variable, String description) {
     setAttributeValue(variable, MAELSTROM_NAMESPACE, DESCRIPTION_ATTRIBUTE, description);
+  }
+
+  public static @Nullable String getComment(VariableDto variable) {
+    return getAttributeValue(variable, MAELSTROM_NAMESPACE, COMMENT_ATTRIBUTE);
+  }
+
+  public static void setComment(VariableDto variable, String description) {
+    setAttributeValue(variable, MAELSTROM_NAMESPACE, COMMENT_ATTRIBUTE, description);
+  }
+
+  public static @Nullable String getStatus(VariableDto variable) {
+    return getAttributeValue(variable, MAELSTROM_NAMESPACE, STATUS_ATTRIBUTE);
+  }
+
+  public static void setStatus(VariableDto variable, String description) {
+    setAttributeValue(variable, MAELSTROM_NAMESPACE, STATUS_ATTRIBUTE, description);
   }
 
   public static @Nullable String getAttributeValue(VariableDto variable, String namespace, String name) {

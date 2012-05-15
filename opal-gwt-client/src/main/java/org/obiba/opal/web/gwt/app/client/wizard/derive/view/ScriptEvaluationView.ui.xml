@@ -26,9 +26,9 @@
         <pretty:PrettyPrintLabel ui:field="script" addStyleNames="top-margin"/>
       </g:FlowPanel>
 
-      <g:Anchor><ui:msg description="Description label">Description</ui:msg></g:Anchor>
+      <g:Anchor><ui:msg description="Comment label">Comment</ui:msg></g:Anchor>
       <g:FlowPanel>
-        <g:TextArea ui:field="descriptionBox" width="100%" />
+        <g:TextArea ui:field="commentBox" width="100%" />
       </g:FlowPanel>
 
     </o:HorizontalTabLayout>

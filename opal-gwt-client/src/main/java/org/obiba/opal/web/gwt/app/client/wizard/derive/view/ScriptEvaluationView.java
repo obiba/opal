@@ -88,7 +88,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   PrettyPrintLabel script;
 
   @UiField
-  TextArea descriptionBox;
+  TextArea commentBox;
 
   private ValueSelectionHandler valueSelectionHandler;
 
@@ -154,11 +154,11 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
     valueType.setText(variable.getValueType());
     script.setText(VariableDtos.getScript(variable));
 
-    descriptionBox.setValue(VariableDtos.getDescription(variable));
-    descriptionBox.addChangeHandler(new ChangeHandler() {
+    commentBox.setValue(VariableDtos.getComment(variable));
+    commentBox.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        VariableDtos.setDescription(variable, descriptionBox.getValue());
+        VariableDtos.setComment(variable, commentBox.getValue());
       }
     });
 
