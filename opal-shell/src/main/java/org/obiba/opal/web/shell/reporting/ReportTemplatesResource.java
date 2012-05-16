@@ -50,9 +50,8 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
   private final CommandRegistry commandRegistry;
 
   @Autowired
-  public ReportTemplatesResource(OpalConfigurationService configService, CommandSchedulerService commandSchedulerService, @Qualifier("web")
-  CommandRegistry commandRegistry) {
-    super();
+  public ReportTemplatesResource(OpalConfigurationService configService,
+      CommandSchedulerService commandSchedulerService, @Qualifier("web") CommandRegistry commandRegistry) {
     this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
     this.commandRegistry = commandRegistry;
@@ -74,7 +73,8 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
 
   @POST
   public Response createReportTemplate(ReportTemplateDto reportTemplateDto) {
-    if(reportTemplateDto == null || reportTemplateDto.getName().length() == 0 || reportTemplateExists(reportTemplateDto.getName())) {
+    if(reportTemplateDto == null || reportTemplateDto.getName().isEmpty() || reportTemplateExists(
+        reportTemplateDto.getName())) {
       return Response.status(Status.BAD_REQUEST).build();
     }
 
@@ -83,12 +83,14 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
       addCommand(reportTemplateDto.getName());
       updateSchedule(reportTemplateDto);
     } catch(Exception e) {
-      return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode()).setStatus("CouldNotCreateReportTemplate").build()).build();
+      return Response.status(Response.Status.BAD_REQUEST).entity(
+          ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
+              .setStatus("CouldNotCreateReportTemplate").build()).build();
     }
-    final URI reportUri = UriBuilder.fromResource(ReportTemplateResource.class).build(reportTemplateDto.getName());
+    URI reportUri = UriBuilder.fromResource(ReportTemplateResource.class).build(reportTemplateDto.getName());
     return Response.created(reportUri)//
-    .header("X-Alt-Permissions", new ReportPermissions(reportUri, AclAction.REPORT_TEMPLATE_ALL))//
-    .build();
+        .header("X-Alt-Permissions", new ReportPermissions(reportUri, AclAction.REPORT_TEMPLATE_ALL))//
+        .build();
   }
 
   private void addCommand(final String name) {
@@ -119,7 +121,7 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
     return commandSchedulerService;
   }
 
-  private final class ReportPermissions implements SubjectAclService.Permissions {
+  private static final class ReportPermissions implements SubjectAclService.Permissions {
 
     private final URI reportUri;
 
