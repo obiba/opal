@@ -82,6 +82,7 @@ public abstract class DerivedVariableGenerator {
   protected abstract void generateScript();
 
   protected void appendCategoryValueMapEntries() {
+    if(originalVariable.getCategoriesArray() == null) return;
     int nbCategories = originalVariable.getCategoriesArray().length();
     for(int i = 0; i < nbCategories; i++) {
       CategoryDto origCat = originalVariable.getCategoriesArray().get(i);

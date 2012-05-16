@@ -167,11 +167,14 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
     }
 
     private void replaceCategory(CategoryUpdateEvent event) {
-      for(int i = 0; i < currentVariable.getCategoriesArray().length(); i++) {
-        CategoryDto category = currentVariable.getCategoriesArray().get(i);
-        if(category.getName().equals(event.getOriginalCategory().getName())) {
-          currentVariable.getCategoriesArray().set(i, event.getCategory());
-          break;
+      JsArray<CategoryDto> categoriesArray = currentVariable.getCategoriesArray();
+      if(categoriesArray != null) {
+        for(int i = 0; i < categoriesArray.length(); i++) {
+          CategoryDto category = categoriesArray.get(i);
+          if(category.getName().equals(event.getOriginalCategory().getName())) {
+            categoriesArray.set(i, event.getCategory());
+            break;
+          }
         }
       }
     }
@@ -179,10 +182,12 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
     private void deleteCategory(CategoryDto categoryToDelete) {
       @SuppressWarnings("unchecked")
       JsArray<CategoryDto> result = (JsArray<CategoryDto>) JsArray.createArray();
-      for(int i = 0; i < currentVariable.getCategoriesArray().length(); i++) {
-        CategoryDto category = currentVariable.getCategoriesArray().get(i);
-        if(!category.getName().equals(categoryToDelete.getName())) {
-          result.push(category);
+      if(currentVariable.getCategoriesArray() != null) {
+        for(int i = 0; i < currentVariable.getCategoriesArray().length(); i++) {
+          CategoryDto category = currentVariable.getCategoriesArray().get(i);
+          if(!category.getName().equals(categoryToDelete.getName())) {
+            result.push(category);
+          }
         }
       }
       currentVariable.setCategoriesArray(result);

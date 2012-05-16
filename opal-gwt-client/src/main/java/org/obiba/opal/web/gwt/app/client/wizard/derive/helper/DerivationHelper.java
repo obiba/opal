@@ -60,7 +60,9 @@ public abstract class DerivationHelper {
 
   public static List<String> getDestinationCategories(VariableDto destination) {
     if(destination == null) return null;
-    JsArray<CategoryDto> categoriesArray = destination.getCategoriesArray();
+    @SuppressWarnings("unchecked")
+    JsArray<CategoryDto> categoriesArray = destination.getCategoriesArray() == null ? (JsArray<CategoryDto>) JsArray
+        .createArray() : destination.getCategoriesArray();
     List<String> categories = new ArrayList<String>(categoriesArray.length());
     for(int i = 0; i < categoriesArray.length(); i++) {
       categories.add(categoriesArray.get(i).getName());
