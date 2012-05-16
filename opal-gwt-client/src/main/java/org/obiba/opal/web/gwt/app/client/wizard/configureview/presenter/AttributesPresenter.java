@@ -194,10 +194,12 @@ public class AttributesPresenter extends PresenterWidget<AttributesPresenter.Dis
       String safeName = Strings.nullToEmpty(name);
       @SuppressWarnings("unchecked")
       JsArray<AttributeDto> result = (JsArray<AttributeDto>) JsArray.createArray();
-      for(int i = 0; i < currentVariable.getAttributesArray().length(); i++) {
-        AttributeDto attribute = currentVariable.getAttributesArray().get(i);
-        if(!(attribute.getNamespace().equals(safeNamespace) && attribute.getName().equals(safeName))) {
-          result.push(attribute);
+      if(currentVariable.getAttributesArray() != null) {
+        for(int i = 0; i < currentVariable.getAttributesArray().length(); i++) {
+          AttributeDto attribute = currentVariable.getAttributesArray().get(i);
+          if(!(attribute.getNamespace().equals(safeNamespace) && attribute.getName().equals(safeName))) {
+            result.push(attribute);
+          }
         }
       }
       currentVariable.setAttributesArray(result);

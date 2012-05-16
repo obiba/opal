@@ -51,10 +51,12 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
     }
   }
 
+  @Override
   public Client getClient() {
     return client;
   }
 
+  @Override
   public RestController getRest() {
     return ((InternalNode) esNode).injector().getInstance(RestController.class);
   }

@@ -49,6 +49,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
     this(originalVariable, null, null);
   }
+
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination) {
     this(originalVariable, destination, null);
   }
@@ -56,11 +57,11 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination,
       SummaryStatisticsDto summaryStatisticsDto) {
     super(originalVariable, destination);
-    if(summaryStatisticsDto != null) {
+    if(summaryStatisticsDto == null) {
+      categoricalSummaryDto = null;
+    } else {
       categoricalSummaryDto = summaryStatisticsDto
           .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-    } else {
-      categoricalSummaryDto = null;
     }
   }
 
@@ -144,6 +145,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param countByCategoryName
    */
   private void findFrequencies(Map<String, Double> countByCategoryName, JsArray<FrequencyDto> frequencies) {
+    if(frequencies == null) return;
     for(int i = 0; i < frequencies.length(); i++) {
       FrequencyDto frequencyDto = frequencies.get(i);
       String value = frequencyDto.getValue();
@@ -165,9 +167,11 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   protected double nbEmpty() {
     if(isSummaryAvailable()) {
       JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
-      for(int i = 0; i < frequenciesArray.length(); i++) {
-        if(frequenciesArray.get(i).getValue().equals(NA)) {
-          return frequenciesArray.get(i).getFreq();
+      if(frequenciesArray != null) {
+        for(int i = 0; i < frequenciesArray.length(); i++) {
+          if(frequenciesArray.get(i).getValue().equals(NA)) {
+            return frequenciesArray.get(i).getFreq();
+          }
         }
       }
     }
@@ -253,7 +257,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   }
 
   protected boolean estimateIsMissing(String value) {
-    return value == null || value.isEmpty() ? true : RegExp.compile(MISSING_REGEXP, "i").test(value);
+    return value == null || value.isEmpty() || RegExp.compile(MISSING_REGEXP, "i").test(value);
   }
 
   public static class DerivedCategoricalVariableGenerator extends DerivedVariableGenerator {

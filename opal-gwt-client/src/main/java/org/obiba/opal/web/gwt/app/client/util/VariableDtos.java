@@ -73,7 +73,8 @@ public class VariableDtos {
     setAttributeValue(variable, null, SCRIPT_ATTRIBUTE, script);
   }
 
-  public static @Nullable String getDerivedFrom(VariableDto variable) {
+  @Nullable
+  public static String getDerivedFrom(VariableDto variable) {
     return getAttributeValue(variable, OPAL_NAMESPACE, DERIVED_FROM_ATTRIBUTE);
   }
 
@@ -85,7 +86,8 @@ public class VariableDtos {
     setDerivedFrom(variable, derivedFrom.getLink());
   }
 
-  public static @Nullable String getDescription(VariableDto variable) {
+  @Nullable
+  public static String getDescription(VariableDto variable) {
     return getAttributeValue(variable, MAELSTROM_NAMESPACE, DESCRIPTION_ATTRIBUTE);
   }
 
@@ -93,7 +95,8 @@ public class VariableDtos {
     setAttributeValue(variable, MAELSTROM_NAMESPACE, DESCRIPTION_ATTRIBUTE, description);
   }
 
-  public static @Nullable String getComment(VariableDto variable) {
+  @Nullable
+  public static String getComment(VariableDto variable) {
     return getAttributeValue(variable, MAELSTROM_NAMESPACE, COMMENT_ATTRIBUTE);
   }
 
@@ -101,7 +104,8 @@ public class VariableDtos {
     setAttributeValue(variable, MAELSTROM_NAMESPACE, COMMENT_ATTRIBUTE, description);
   }
 
-  public static @Nullable String getStatus(VariableDto variable) {
+  @Nullable
+  public static String getStatus(VariableDto variable) {
     return getAttributeValue(variable, MAELSTROM_NAMESPACE, STATUS_ATTRIBUTE);
   }
 
@@ -109,7 +113,8 @@ public class VariableDtos {
     setAttributeValue(variable, MAELSTROM_NAMESPACE, STATUS_ATTRIBUTE, description);
   }
 
-  public static @Nullable String getAttributeValue(VariableDto variable, String namespace, String name) {
+  @Nullable
+  public static String getAttributeValue(VariableDto variable, String namespace, String name) {
     AttributeDto attribute = getAttribute(variable, namespace, name);
     return attribute == null ? null : attribute.getValue();
   }
@@ -139,13 +144,15 @@ public class VariableDtos {
       attribute.setValue(value);
     }
   }
+
   /**
    * Get an attribute from the provided variable.
    * @param variable
    * @param name
    * @return
    */
-  public static @Nullable AttributeDto getAttribute(VariableDto variable, String name) {
+  @Nullable
+  public static AttributeDto getAttribute(VariableDto variable, String name) {
     return getAttribute(variable, null, name);
   }
 
@@ -156,7 +163,8 @@ public class VariableDtos {
    * @param name
    * @return
    */
-  public static @Nullable AttributeDto getAttribute(VariableDto variable, @Nullable String namespace, String name) {
+  @Nullable
+  public static AttributeDto getAttribute(VariableDto variable, @Nullable String namespace, String name) {
     // make sure attributes array is defined
     variable.setAttributesArray(JsArrays.toSafeArray(variable.getAttributesArray()));
     String safeNamespace = namespace == null ? "" : namespace;

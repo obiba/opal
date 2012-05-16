@@ -53,9 +53,9 @@ public class EsIndexManager implements IndexManager {
 
   private static final Logger log = LoggerFactory.getLogger(EsIndexManager.class);
 
-  private final String DEFAULT_OPAL_INDEX_NAME = "opal";
+  private static final String DEFAULT_OPAL_INDEX_NAME = "opal";
 
-  private final int ES_BATCH_SIZE = 100;
+  private static final int ES_BATCH_SIZE = 100;
 
   private final ElasticSearchProvider esProvider;
 
@@ -77,18 +77,19 @@ public class EsIndexManager implements IndexManager {
   }
 
   @Override
-  public IndexSynchronization createSyncTask(final ValueTable table, final ValueTableIndex index) {
+  public IndexSynchronization createSyncTask(ValueTable table, ValueTableIndex index) {
     return new Indexer(table, (EsValueTableIndex) index);
   }
 
+  @Override
   public EsValueTableIndex getIndex(ValueTable vt) {
     Preconditions.checkNotNull(vt);
 
-    for(EsValueTableIndex i : this.indices) {
+    for(EsValueTableIndex i : indices) {
       if(i.isForTable(vt)) return i;
     }
     EsValueTableIndex i = new EsValueTableIndex(vt);
-    this.indices.add(i);
+    indices.add(i);
     return i;
   }
 
@@ -129,9 +130,9 @@ public class EsIndexManager implements IndexManager {
     private int done = 0;
 
     private Indexer(ValueTable table, EsValueTableIndex index) {
-      this.valueTable = table;
+      valueTable = table;
       this.index = index;
-      this.total = valueTable.getVariableEntities().size();
+      total = valueTable.getVariableEntities().size();
     }
 
     @Override
@@ -157,11 +158,12 @@ public class EsIndexManager implements IndexManager {
 
         private Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
 
+        @Override
         public void onBegin(List<VariableEntity> entitiesToCopy, Variable[] variables) {
           for(Variable variable : variables) {
             natures.put(variable, VariableNature.getNature(variable));
           }
-        };
+        }
 
         @Override
         public void onValues(VariableEntity entity, Variable[] variables, Value[] values) {
@@ -256,8 +258,8 @@ public class EsIndexManager implements IndexManager {
     private final String valueTableReference;
 
     private EsValueTableIndex(ValueTable vt) {
-      this.name = indexName(vt);
-      this.valueTableReference = tableReference(vt);
+      name = indexName(vt);
+      valueTableReference = tableReference(vt);
     }
 
     @Override
@@ -299,7 +301,7 @@ public class EsIndexManager implements IndexManager {
     }
 
     private ValueTable resolveTable() {
-      return MagmaEngineTableResolver.valueOf(this.valueTableReference).resolveTable();
+      return MagmaEngineTableResolver.valueOf(valueTableReference).resolveTable();
     }
 
     private void updateTimestamps() {
@@ -338,9 +340,9 @@ public class EsIndexManager implements IndexManager {
     public boolean equals(Object obj) {
       if(obj == null) return false;
       if(obj == this) return true;
-      if(obj instanceof EsValueTableIndex == false) return false;
+      if(!(obj instanceof EsValueTableIndex)) return false;
 
-      return ((EsValueTableIndex) obj).name.equals(this.name);
+      return ((EsValueTableIndex) obj).name.equals(name);
     }
 
     @Override

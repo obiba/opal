@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
@@ -108,17 +110,19 @@ public class DeriveOpenTextualVariableStepPresenter extends
       }
       ValueMapEntry entry = builder.build();
       return derivationHelper.addEntry(entry);
-
     }
     return false;
   }
 
+  @Nullable
   private Double getFreqFromValue(String value) {
     JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
-    for(int i = 0; i < frequenciesArray.length(); i++) {
-      FrequencyDto frequencyDto = frequenciesArray.get(i);
-      if(frequencyDto.getValue().equals(value)) {
-        return frequencyDto.getFreq();
+    if(frequenciesArray != null) {
+      for(int i = 0; i < frequenciesArray.length(); i++) {
+        FrequencyDto frequencyDto = frequenciesArray.get(i);
+        if(frequencyDto.getValue().equals(value)) {
+          return frequencyDto.getFreq();
+        }
       }
     }
     return null;
@@ -140,23 +144,23 @@ public class DeriveOpenTextualVariableStepPresenter extends
         final List<String> destinationCategories = DerivationHelper.getDestinationCategories(getDerivedVariable());
         getView().populateValues(new ArrayList<ValueMapEntry>(), destinationCategories);
 
-        ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()//
+        ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
             .forResource(link).get()//
             .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
 
               @Override
               public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
-                categoricalSummaryDto =
-                    summaryStatisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical)
-                        .cast();
-                derivationHelper =
-                    new OpenTextualVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
-                        summaryStatisticsDto, getView().getMethod());
+                categoricalSummaryDto = summaryStatisticsDto
+                    .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+                derivationHelper = new OpenTextualVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
+                    summaryStatisticsDto, getView().getMethod());
                 derivationHelper.initializeValueMapEntries();
                 JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
-                for(int i = 0; i < frequenciesArray.length(); i++) {
-                  FrequencyDto frequencyDto = frequenciesArray.get(i);
-                  getView().addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()));
+                if(frequenciesArray != null) {
+                  for(int i = 0; i < frequenciesArray.length(); i++) {
+                    FrequencyDto frequencyDto = frequenciesArray.get(i);
+                    getView().addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()));
+                  }
                 }
                 getView().getValueMapGrid().setMaxFrequency(getMaxFrequency());
                 getView().populateValues(derivationHelper.getValueMapEntries(), destinationCategories);
@@ -164,8 +168,8 @@ public class DeriveOpenTextualVariableStepPresenter extends
 
               private Double getMaxFrequency() {
                 if(categoricalSummaryDto.getFrequenciesArray() == null) return 0d;
-                return Iterables.find(JsArrays.toList(categoricalSummaryDto.getFrequenciesArray()),
-                    new Predicate<FrequencyDto>() {
+                return Iterables
+                    .find(JsArrays.toList(categoricalSummaryDto.getFrequenciesArray()), new Predicate<FrequencyDto>() {
 
                       @Override
                       public boolean apply(FrequencyDto dto) {
