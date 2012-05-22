@@ -126,6 +126,11 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   }
 
   @Override
+  public void setCommentVisible(boolean visible) {
+    tabs.setTabVisible(3, visible);
+  }
+
+  @Override
   public ValueSetsProvider getValueSetsProvider() {
     return dataProvider;
   }

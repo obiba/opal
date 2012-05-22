@@ -281,9 +281,12 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
         for(JavaScriptErrorDto error : errors) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder()
-              .error(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()))
-              .build());
+          getEventBus().fireEvent(
+              NotificationEvent
+                  .newBuilder()
+                  .error(
+                      translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()))
+                  .build());
         }
       }
     }
@@ -328,6 +331,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     ValueSetsProvider getValueSetsProvider();
 
     void setValueSetFetcher(ValueSetFetcher fetcher);
+
+    void setCommentVisible(boolean b);
   }
 
   public interface ValueSetFetcher {

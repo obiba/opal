@@ -28,9 +28,11 @@ public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvalua
   private ScriptEvaluationPresenter scriptEvaluationPresenter;
 
   @Inject
-  public ScriptEvaluationPopupPresenter(EventBus eventBus, Display view, ScriptEvaluationPresenter scriptEvaluationPresenter) {
+  public ScriptEvaluationPopupPresenter(EventBus eventBus, Display view,
+      ScriptEvaluationPresenter scriptEvaluationPresenter) {
     super(eventBus, view);
     this.scriptEvaluationPresenter = scriptEvaluationPresenter;
+    this.scriptEvaluationPresenter.getView().setCommentVisible(false);
   }
 
   public void initialize(TableDto table, VariableDto variable) {
