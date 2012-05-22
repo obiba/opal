@@ -1135,8 +1135,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("Custom")
   String deriveCustomLabel();
 
-  @Description("Derive From label")
-  @DefaultStringValue("From")
+  @Description("Derive Categorize Into label")
+  @DefaultStringValue("Categorize into")
   String deriveFromLabel();
 
   @Description("Invalid Destination View label")

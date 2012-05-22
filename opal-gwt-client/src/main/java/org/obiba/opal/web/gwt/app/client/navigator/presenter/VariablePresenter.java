@@ -99,10 +99,9 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setSummaryTabCommand(new SummaryCommand());
     getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
-    // TODO
     getView().setDeriveCategorizeCommand(new DeriveCategorizeCommand());
-    getView().setDeriveCustomCommand(new DeriveCustomCommand());
     getView().setDeriveFromCommand(new DeriveFromCommand());
+    getView().setDeriveCustomCommand(new DeriveCustomCommand());
   }
 
   @Override
@@ -111,10 +110,18 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     summaryTabPresenter.unbind();
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateDisplay(TableDto tableDto, VariableDto variableDto, VariableDto previous, VariableDto next) {
     table = tableDto;
     variable = variableDto;
+
+    updateVariableDisplay();
+    updateMenuDisplay(previous, next);
+    updateDerivedVariableDisplay();
+
+    authorize();
+  }
+
+  private void updateVariableDisplay() {
     getView().setVariableName(variable.getName());
     getView().setEntityType(variable.getEntityType());
     getView().setReferencedEntityType(variable.getReferencedEntityType());
@@ -123,20 +130,17 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     getView().setUnit(variable.hasUnit() ? variable.getUnit() : "");
     getView().setRepeatable(variable.getIsRepeatable());
     getView().setOccurrenceGroup(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
+    getView().renderCategoryRows(variable.getCategoriesArray());
+    getView().renderAttributeRows(variable.getAttributesArray());
+  }
 
+  private void updateMenuDisplay(VariableDto previous, VariableDto next) {
     getView().setParentName(variable.getParentLink().getRel());
     getView().setPreviousName(previous == null ? "" : previous.getName());
     getView().setNextName(next == null ? "" : next.getName());
 
-    getView().renderCategoryRows(variable.getCategoriesArray());
-    getView().renderAttributeRows(variable.getAttributesArray());
     getView().setCategorizeMenuAvailable(!"binary".equals(variable.getValueType()));
-
     getView().setDeriveFromMenuVisibility(table.hasViewLink());
-
-    updateDerivedVariableDisplay();
-
-    authorize();
   }
 
   private void updateDerivedVariableDisplay() {
@@ -163,8 +167,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
     // values
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(variable.getParentLink().getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer())
-        .send();
+        .forResource(variable.getParentLink().getLink() + "/valueSets").get()
+        .authorize(getView().getValuesAuthorizer()).send();
 
     // edit variable
     if(table.hasViewLink()) {
@@ -178,13 +182,13 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   }
 
   private boolean isCurrentVariable(VariableDto variableDto) {
-    return variableDto.getName().equals(variable.getName()) && variableDto.getParentLink().getLink()
-        .equals(variable.getParentLink().getLink());
+    return variableDto.getName().equals(variable.getName())
+        && variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
   }
 
   private boolean isCurrentTable(ViewDto viewDto) {
-    return table != null && table.getDatasourceName().equals(viewDto.getDatasourceName()) && table.getName()
-        .equals(viewDto.getName());
+    return table != null && table.getDatasourceName().equals(viewDto.getDatasourceName())
+        && table.getName().equals(viewDto.getName());
   }
 
   /**
@@ -207,22 +211,22 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void onViewSaved(ViewSavedEvent event) {
       if(isVisible() && isCurrentTable(event.getView())) {
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables")
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables")
             .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
-          @Override
-          public void onResource(Response response, JsArray<VariableDto> resource) {
-            JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
-            for(int i = 0; i < variables.length(); i++) {
-              if(isCurrentVariable(variables.get(i))) {
-                variable = null;
-                updateDisplay(table, variables.get(i), i > 0 ? variables.get(i - 1) : null,
-                    i < (variables.length() + 1) ? variables.get(i + 1) : null);
-                break;
+              @Override
+              public void onResource(Response response, JsArray<VariableDto> resource) {
+                JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
+                for(int i = 0; i < variables.length(); i++) {
+                  if(isCurrentVariable(variables.get(i))) {
+                    variable = null;
+                    updateDisplay(table, variables.get(i), i > 0 ? variables.get(i - 1) : null,
+                        i < (variables.length() + 1) ? variables.get(i + 1) : null);
+                    break;
+                  }
+                }
               }
-            }
-          }
-        }).send();
+            }).send();
       }
     }
   }
@@ -265,7 +269,11 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
-      String node = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", variable.getName()).build();
+      String node =
+          UriBuilder
+              .create()
+              .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable",
+                  variable.getName()).build();
       authz.setAclRequest("variable", new AclRequest(AclAction.VARIABLE_READ, node));
       setInSlot(Display.Slots.Permissions, authz);
     }
@@ -320,7 +328,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class ParentCommand implements Command {
     @Override
     public void execute() {
-      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(variable.getParentLink().getLink()).get()
+      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
             public void onResource(Response response, TableDto resource) {
@@ -351,7 +359,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void execute() {
 
-      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(getViewLink()).get()
+      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(getViewLink()).get()
           .withCallback(new ResourceCallback<ViewDto>() {
 
             @Override
