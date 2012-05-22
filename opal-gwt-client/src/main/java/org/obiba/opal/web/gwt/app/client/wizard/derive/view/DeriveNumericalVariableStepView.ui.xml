@@ -14,7 +14,7 @@
 
   <g:FlowPanel>
      <o:WizardStep ui:field="methodStep">
-      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="top-margin">
         <g:Anchor><ui:msg description="Options title">Options</ui:msg></g:Anchor>
         <g:FlowPanel>
       
