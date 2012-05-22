@@ -267,7 +267,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     List<DefaultWizardStepController.Builder> steps =
         deriveCustomVariablePresenter.getWizardStepBuilders(new SetCurrentPresenterStepInHandler(
             deriveCustomVariablePresenter));
-    steps.add(getView().getScriptEvaluationStepBuilder(null));
+    steps.add(getScriptEvaluationStep());
     steps.add(getConclusionStepBuilder());
 
     getView().setStartStep(createChain(steps));
