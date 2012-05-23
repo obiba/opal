@@ -28,8 +28,8 @@ import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
+import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.GWT;
@@ -77,7 +77,7 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   HorizontalTabLayout tabs;
 
   @UiField
-  CellTable<FileDto> producedReportsTable;
+  CellTable<ReportDto> producedReportsTable;
 
   @UiField
   Panel permissions;
@@ -121,9 +121,9 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
 
   private MenuItem update;
 
-  JsArrayDataProvider<FileDto> dataProvider = new JsArrayDataProvider<FileDto>();
+  JsArrayDataProvider<ReportDto> dataProvider = new JsArrayDataProvider<ReportDto>();
 
-  private HasActionHandler<FileDto> actionsColumn;
+  private HasActionHandler<ReportDto> actionsColumn;
 
   private ReportTemplateDto reportTemplate;
 
@@ -158,22 +158,22 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   }
 
   private void initProducedReportsTable() {
-    producedReportsTable.addColumn(new TextColumn<FileDto>() {
+    producedReportsTable.addColumn(new TextColumn<ReportDto>() {
 
       @Override
-      public String getValue(FileDto object) {
+      public String getValue(ReportDto object) {
         return object.getName();
       }
     }, translations.nameLabel());
 
-    producedReportsTable.addColumn(new DateTimeColumn<FileDto>() {
+    producedReportsTable.addColumn(new DateTimeColumn<ReportDto>() {
       @Override
-      public Date getValue(FileDto file) {
+      public Date getValue(ReportDto file) {
         return new Date((long) file.getLastModifiedTime());
       }
     }, translations.lastModifiedLabel());
 
-    actionsColumn = new ActionsColumn<FileDto>(DOWNLOAD_ACTION, DELETE_ACTION);
+    actionsColumn = new ActionsColumn<ReportDto>(DOWNLOAD_ACTION, DELETE_ACTION);
     producedReportsTable.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());
     producedReportsTable.setEmptyTableWidget(noReports);
     dataProvider.addDataDisplay(producedReportsTable);
@@ -199,13 +199,13 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   }
 
   @Override
-  public void setProducedReports(final JsArray<FileDto> files) {
-    pager.setVisible(files.length() > 10); // OPAL-901
-    renderProducedReports(files);
+  public void setProducedReports(final JsArray<ReportDto> reports) {
+    pager.setVisible(reports.length() > 10); // OPAL-901
+    renderProducedReports(reports);
   }
 
-  private void renderProducedReports(JsArray<FileDto> files) {
-    dataProvider.setArray(files);
+  private void renderProducedReports(JsArray<ReportDto> reports) {
+    dataProvider.setArray(reports);
     pager.firstPage();
     dataProvider.refresh();
   }
@@ -245,7 +245,7 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   }
 
   @Override
-  public HasActionHandler<FileDto> getActionColumn() {
+  public HasActionHandler<ReportDto> getActionColumn() {
     return actionsColumn;
   }
 

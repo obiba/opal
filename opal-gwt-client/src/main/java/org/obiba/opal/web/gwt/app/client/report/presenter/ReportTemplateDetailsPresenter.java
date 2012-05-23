@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.report.presenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
@@ -33,8 +32,8 @@ import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.AclAction;
-import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
+import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -101,13 +100,13 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   @SuppressWarnings("unchecked")
   private void initUiComponents() {
-    getView().setProducedReports((JsArray<FileDto>) JsArray.createArray());
+    getView().setProducedReports((JsArray<ReportDto>) JsArray.createArray());
     getView().setReportTemplateDetails(null);
   }
 
   private void addHandlers() {
-    getView().getActionColumn().setActionHandler(new ActionHandler<FileDto>() {
-      public void doAction(FileDto dto, String actionName) {
+    getView().getActionColumn().setActionHandler(new ActionHandler<ReportDto>() {
+      public void doAction(ReportDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
         }
@@ -127,14 +126,6 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
             }
           }
         }));
-
-    super.registerHandler(getEventBus().addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
-
-      @Override
-      public void onFileDeleted(FileDeletedEvent event) {
-        refreshProducedReports(reportTemplate);
-      }
-    }));
 
     super.registerHandler(getView().addReportDesignClickHandler(new ReportDesignClickHandler()));
     super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
@@ -180,23 +171,23 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
-  private void authorizeDownloadReport(FileDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get()
-        .authorize(authorizer).send();
+  private void authorizeDownloadReport(ReportDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(dto.getLink()).get().authorize(authorizer)
+        .send();
   }
 
-  private void authorizeDeleteReport(FileDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).delete()
-        .authorize(authorizer).send();
+  private void authorizeDeleteReport(ReportDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(dto.getLink()).delete().authorize(authorizer)
+        .send();
   }
 
-  protected void doActionImpl(final FileDto dto, String actionName) {
+  protected void doActionImpl(final ReportDto dto, String actionName) {
     if(actionName.equals(DOWNLOAD_ACTION)) {
       authorizeDownloadReport(dto, new Authorizer(getEventBus()) {
 
         @Override
         public void authorized() {
-          downloadFile(dto);
+          downloadReportFile(dto);
         }
       });
     } else if(actionName.equals(DELETE_ACTION)) {
@@ -206,7 +197,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
         public void authorized() {
           actionRequiringConfirmation = new Runnable() {
             public void run() {
-              deleteFile(dto);
+              deleteReportFile(dto);
             }
           };
           getEventBus().fireEvent(
@@ -216,7 +207,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     }
   }
 
-  private void deleteFile(final FileDto file) {
+  private void deleteReportFile(final ReportDto report) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
@@ -224,19 +215,19 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
         if(response.getStatusCode() != Response.SC_OK) {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         } else {
-          getEventBus().fireEvent(new FileDeletedEvent(file));
+          refreshProducedReports(reportTemplate);
         }
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete()
+    ResourceRequestBuilderFactory.newBuilder().forResource(report.getLink()).delete()
         .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
-  private void downloadFile(final FileDto file) {
-    downloadFile(file.getPath());
+  private void downloadReportFile(ReportDto report) {
+    getEventBus().fireEvent(new FileDownloadEvent(report.getLink()));
   }
 
   private void downloadFile(String filePath) {
@@ -245,8 +236,8 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   private void refreshProducedReports(ReportTemplateDto reportTemplate) {
-    UriBuilder ub = UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName());
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource(ub.build()).get()
+    UriBuilder ub = UriBuilder.create().segment("report-template", reportTemplate.getName(), "reports");
+    ResourceRequestBuilderFactory.<JsArray<ReportDto>> newBuilder().forResource(ub.build()).get()
         .withCallback(new ProducedReportsResourceCallback()).withCallback(404, new NoProducedReportsResourceCallback())
         .send();
   }
@@ -346,15 +337,15 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     @SuppressWarnings("unchecked")
     @Override
     public void onResponseCode(Request request, Response response) {
-      getView().setProducedReports((JsArray<FileDto>) JsArray.createArray());
+      getView().setProducedReports((JsArray<ReportDto>) JsArray.createArray());
     }
   }
 
-  private class ProducedReportsResourceCallback implements ResourceCallback<FileDto> {
+  private class ProducedReportsResourceCallback implements ResourceCallback<JsArray<ReportDto>> {
 
     @Override
-    public void onResource(Response response, FileDto reportFolder) {
-      getView().setProducedReports(JsArrays.toSafeArray(reportFolder.getChildrenArray()));
+    public void onResource(Response response, JsArray<ReportDto> reports) {
+      getView().setProducedReports(JsArrays.toSafeArray(reports));
     }
   }
 
@@ -436,9 +427,9 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     void setReportTemplatesAvailable(boolean available);
 
-    void setProducedReports(JsArray<FileDto> reports);
+    void setProducedReports(JsArray<ReportDto> reports);
 
-    HasActionHandler<FileDto> getActionColumn();
+    HasActionHandler<ReportDto> getActionColumn();
 
     HandlerRegistration addReportDesignClickHandler(ClickHandler handler);
 
