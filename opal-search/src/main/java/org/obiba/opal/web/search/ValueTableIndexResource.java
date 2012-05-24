@@ -61,7 +61,6 @@ public class ValueTableIndexResource {
   }
 
   @GET
-  @POST
   @Path("_schema")
   public Response search(@Context
   HttpServletRequest servletRequest) {
