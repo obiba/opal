@@ -32,7 +32,7 @@ public class ValueTableMapping {
       mapping.startObject("_all").field("enabled", false).endObject().startObject("_parent").field("type", valueTable.getEntityType()).endObject();
       mapping.startObject("properties");
       for(Variable variable : valueTable.getVariables()) {
-        variableMappings.map(variable, mapping);
+        variableMappings.map(name, variable, mapping);
       }
       mapping.endObject();// properties
 

@@ -171,12 +171,13 @@ public class EsIndexManager implements IndexManager {
           try {
             XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
             for(int i = 0; i < variables.length; i++) {
+              String fieldName = index.getName() + ":" + variables[i].getName();
               if(values[i].isSequence() && values[i].isNull() == false) {
                 for(Value v : values[i].asSequence().getValue()) {
-                  xcb.field(variables[i].getName(), esValue(variables[i], v));
+                  xcb.field(fieldName, esValue(variables[i], v));
                 }
               } else {
-                xcb.field(variables[i].getName(), esValue(variables[i], values[i]));
+                xcb.field(fieldName, esValue(variables[i], values[i]));
               }
             }
             bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));

@@ -14,18 +14,21 @@ import java.io.IOException;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.TextType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class VariableMappings {
+  private static final Logger log = LoggerFactory.getLogger(VariableMappings.class);
 
   private ValueTypeMappings valueTypeMappings = new ValueTypeMappings();
 
   private Iterable<VariableMapping> mappings = ImmutableList.<VariableMapping> of(new Categorical()/* , new Store() */);
 
-  public XContentBuilder map(Variable variable, XContentBuilder builder) {
+  public XContentBuilder map(String tableName, Variable variable, XContentBuilder builder) {
     try {
-      builder.startObject(variable.getName());
+      builder.startObject(tableName + ":" + variable.getName());
 
       valueTypeMappings.forType(variable.getValueType()).map(builder);
 
