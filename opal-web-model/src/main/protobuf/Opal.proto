@@ -150,3 +150,8 @@ enum AclAction {
   REPORT_TEMPLATE_ALL = 21;
   REPORT_TEMPLATE_READ = 22;
 }
+
+message OpalMap {
+  repeated string keys = 1;
+  repeated string values = 2;
+}

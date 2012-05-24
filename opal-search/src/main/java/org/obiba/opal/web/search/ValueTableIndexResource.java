@@ -29,9 +29,12 @@ import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.support.AbstractRestRequest;
 import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.web.model.Opal.OpalMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -59,8 +62,23 @@ public class ValueTableIndexResource {
 
   @GET
   @POST
+  @Path("_schema")
+  public Response search(@Context
+  HttpServletRequest servletRequest) {
+    String indexName = getValueTableIndex().getName();
+    OpalMap.Builder map = OpalMap.newBuilder();
+    for(Variable variable : getValueTable().getVariables()) {
+      map.addKeys(variable.getName());
+      map.addValues(indexName + ":" + variable.getName());
+    }
+    return Response.ok(map.build()).build();
+  }
+
+  @GET
+  @POST
   @Path("_search")
-  public Response search(@Context HttpServletRequest servletRequest, String body) {
+  public Response search(@Context
+  HttpServletRequest servletRequest, String body) {
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<Response> ref = new AtomicReference<Response>();
 
@@ -88,8 +106,12 @@ public class ValueTableIndexResource {
     }
   }
 
+  private ValueTable getValueTable() {
+    return MagmaEngine.get().getDatasource(datasource).getValueTable(table);
+  }
+
   private ValueTableIndex getValueTableIndex() {
-    return this.indexManager.getIndex(MagmaEngine.get().getDatasource(datasource).getValueTable(table));
+    return this.indexManager.getIndex(getValueTable());
   }
 
   private Response convert(RestResponse response) throws IOException {
