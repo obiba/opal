@@ -98,7 +98,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/entities", "GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/variables", "GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/index/_search", "GET:GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET/GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/index/_search", "POST:GET", args));
       }
 
