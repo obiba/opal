@@ -77,6 +77,7 @@ public class OpalJavaClient {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials = new UsernamePasswordCredentials(username, password));
     httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
+    httpClient.getParams().setParameter(ClientPNames.CONNECTION_MANAGER_FACTORY_CLASS_NAME, OpalClientConnectionManagerFactory.class.getName());
     httpClient.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuthScheme.NAME));
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
 
@@ -290,3 +291,4 @@ public class OpalJavaClient {
     }
   }
 }
+
