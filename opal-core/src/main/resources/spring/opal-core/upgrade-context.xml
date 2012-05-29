@@ -169,6 +169,20 @@
           <property name="appliesTo" value="1.10.0" />
         </bean>
         
+        <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
+          <property name="description" value="Upgrade Opal Schema." />
+          <property name="methodOwner" ref="&amp;opalSessionFactory" />
+          <property name="methodName" value="updateDatabaseSchema" />
+          <property name="appliesTo" value="1.10.0" />
+        </bean>
+        
+        <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
+          <property name="description" value="Upgrade Opal Schema." />
+          <property name="methodOwner" ref="&amp;keySessionFactory" />
+          <property name="methodName" value="updateDatabaseSchema" />
+          <property name="appliesTo" value="1.10.0" />
+        </bean>
+        
         <bean class="org.obiba.opal.core.runtime.upgrade.CreateDataShieldEnvironmentsUpgradeStep"/>
       </list>
     </property>
