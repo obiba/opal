@@ -146,6 +146,8 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   private MenuBar deriveBar;
 
+  private MenuBar categorizeBar;
+
   private MenuItem categorizeItem;
 
   public VariableView() {
@@ -345,7 +347,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   @Override
   public void setDeriveCategorizeCommand(Command cmd) {
-    withDeriveItem(categorizeItem = new MenuItem(translations.deriveCategorizeLabel(), cmd));
+    withCategorizeItem(categorizeItem = new MenuItem(translations.deriveThisVariableToAnotherLabel(), cmd));
   }
 
   @Override
@@ -355,14 +357,29 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   @Override
   public void setDeriveFromCommand(Command cmd) {
-    withDeriveItem(deriveFromMenu = new MenuItem(translations.deriveFromLabel(), cmd));
+    withCategorizeItem(deriveFromMenu = new MenuItem(translations.deriveAnotherVariableToThisLabel(), cmd));
   }
 
-  private void withDeriveItem(MenuItem item) {
+  private MenuBar getDeriveBar() {
     if(deriveBar == null) {
       toolbar.getToolsMenu().addItem(translations.deriveLabel(), deriveBar = new MenuBar(true));
     }
-    deriveBar.addItem(item);
+    return deriveBar;
+  }
+
+  private void withDeriveItem(MenuItem item) {
+    getDeriveBar().addItem(item);
+  }
+
+  private MenuBar getCategorizeBar() {
+    if(categorizeBar == null) {
+      getDeriveBar().addItem(translations.deriveCategorizeLabel(), categorizeBar = new MenuBar(true));
+    }
+    return categorizeBar;
+  }
+
+  private void withCategorizeItem(MenuItem item) {
+    getCategorizeBar().addItem(item);
   }
 
   @Override
