@@ -108,20 +108,27 @@ public class IndexSynchronizationManager {
 
           ValueTableIndex index = indexManager.getIndex(vt);
 
+          if(index.requiresUpgrade()) {
+            submitTask(vt, index);
+          }
           // Check that the index is older than the ValueTable
-          if(index.isUpToDate() == false) {
+          else if(index.isUpToDate() == false) {
             // The index needs to be updated
             Value value = vt.getTimestamps().getLastUpdate();
             // Check that the last modification to the ValueTable is older than the gracePeriod
             // If we don't know (null value), reindex
             if(value.isNull() || value.compareTo(gracePeriod()) < 0) {
-              IndexSynchronization sync = indexManager.createSyncTask(vt, index);
-              submit(sync);
+              submitTask(vt, index);
             }
           }
 
         }
       }
+    }
+
+    private void submitTask(ValueTable vt, ValueTableIndex index) {
+      IndexSynchronization sync = indexManager.createSyncTask(vt, index);
+      submit(sync);
     }
   }
 }

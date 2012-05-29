@@ -43,6 +43,7 @@ import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
+import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,10 +64,12 @@ public class EsIndexManager implements IndexManager {
 
   private final ThreadFactory threadFactory;
 
+  private final Version runtimeVersion;
+
   private final Set<EsValueTableIndex> indices = Sets.newHashSet();
 
   @Autowired
-  public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig, ThreadFactory threadFactory) {
+  public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig, ThreadFactory threadFactory, Version version) {
     Preconditions.checkNotNull(esProvider);
     Preconditions.checkNotNull(esConfig);
     Preconditions.checkNotNull(threadFactory);
@@ -74,6 +77,7 @@ public class EsIndexManager implements IndexManager {
     this.esProvider = esProvider;
     this.esConfig = esConfig;
     this.threadFactory = threadFactory;
+    this.runtimeVersion = version;
   }
 
   @Override
@@ -148,7 +152,7 @@ public class EsIndexManager implements IndexManager {
 
     private void index() {
 
-      XContentBuilder b = new ValueTableMapping().createMapping(index.name, valueTable);
+      XContentBuilder b = new ValueTableMapping().createMapping(runtimeVersion, index.name, valueTable);
 
       esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b).execute().actionGet();
 
@@ -271,6 +275,19 @@ public class EsIndexManager implements IndexManager {
     @Override
     public String getRequestPath() {
       return esIndexName() + "/" + getName();
+    }
+
+    @Override
+    public boolean requiresUpgrade() {
+      EsMapping.Meta meta = readMapping().meta();
+      String v = meta.getString("_opalversion");
+      if(v == null) return true;
+      try {
+        Version indexOpalVersion = new Version(v);
+        return runtimeVersion.compareTo(indexOpalVersion) > 0;
+      } catch(Exception e) {
+        return true;
+      }
     }
 
     @Override

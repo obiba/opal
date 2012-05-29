@@ -32,6 +32,12 @@ public interface ValueTableIndex extends Timestamped {
    */
   public boolean isUpToDate();
 
+  /**
+   * Returns true if the index was created using a Opal with an older version.
+   * @return
+   */
+  public boolean requiresUpgrade();
+
   public void delete();
 
 }
