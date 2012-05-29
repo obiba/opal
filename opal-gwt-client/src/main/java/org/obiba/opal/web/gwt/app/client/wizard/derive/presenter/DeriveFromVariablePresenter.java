@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -40,6 +41,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;
@@ -91,13 +93,21 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
     if(derivedFromUri == null) {
       initDatasources();
     } else {
-      ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(derivedFromUri).get()
+      ResponseCodeCallback failureCallback = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          initDatasources();
+        }
+      };
+
+      ResourceRequestBuilderFactory.<VariableDto> newBuilder().forResource(derivedFromUri).get()
           .withCallback(new ResourceCallback<VariableDto>() {
             @Override
             public void onResource(Response response, VariableDto derivedFromVariable) {
               preSelectedVariable = derivedFromVariable.getName();
 
-              ResourceRequestBuilderFactory.<TableDto>newBuilder()
+              ResourceRequestBuilderFactory.<TableDto> newBuilder()
                   .forResource(derivedFromVariable.getParentLink().getLink()).get()
                   .withCallback(new ResourceCallback<TableDto>() {
                     @Override
@@ -109,13 +119,19 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
                   }).send();
 
             }
-          }).send();
+          })
+          //
+          .withCallback(Response.SC_NOT_FOUND, failureCallback)//
+          .withCallback(Response.SC_FORBIDDEN, failureCallback)//
+          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failureCallback)//
+          .withCallback(Response.SC_BAD_REQUEST, failureCallback)//
+          .send();
     }
   }
 
   private void initDatasources() {
 
-    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(getDestinationTable().getViewLink()).get()
+    ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(getDestinationTable().getViewLink()).get()
         .withCallback(new ResourceCallback<ViewDto>() {
           @Override
           public void onResource(Response response, ViewDto view) {
@@ -125,7 +141,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
               restrictedTables.add(parts[1]);
             }
 
-            ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+            ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
                 .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
                   @Override
                   public void onResource(Response response, JsArray<DatasourceDto> resource) {
@@ -150,7 +166,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   private void loadTables() {
 
     UriBuilder uriBuilder = UriBuilder.create().segment("datasource", getView().getSelectedDatasource(), "tables");
-    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
+    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
@@ -174,9 +190,10 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   }
 
   private void loadVariables() {
-    UriBuilder uriBuilder = UriBuilder.create()
-        .segment("datasource", getView().getSelectedDatasource(), "table", getView().getSelectedTable(), "variables");
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
+    UriBuilder uriBuilder =
+        UriBuilder.create().segment("datasource", getView().getSelectedDatasource(), "table",
+            getView().getSelectedTable(), "variables");
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
           @Override
           public void onResource(Response response, JsArray<VariableDto> resource) {
@@ -196,17 +213,18 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
     List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
-    stepBuilders.add(getView().getDeriveFromVariableStepController(wizardType != DeriveVariablePresenter.FromWizardType)
-        .onValidate(new ValidationHandler() {
-          @Override
-          public boolean validate() {
-            if(wizardType == DeriveVariablePresenter.FromWizardType && getView().getSelectedVariable() == null) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error("VariableSelectionIsRequired").build());
-              return false;
-            }
-            return true;
-          }
-        }));
+    stepBuilders.add(getView()
+        .getDeriveFromVariableStepController(wizardType != DeriveVariablePresenter.FromWizardType).onValidate(
+            new ValidationHandler() {
+              @Override
+              public boolean validate() {
+                if(wizardType == DeriveVariablePresenter.FromWizardType && getView().getSelectedVariable() == null) {
+                  getEventBus().fireEvent(NotificationEvent.newBuilder().error("VariableSelectionIsRequired").build());
+                  return false;
+                }
+                return true;
+              }
+            }));
     return stepBuilders;
   }
 
@@ -252,7 +270,8 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
     /**
      * Set a collection of datasources retrieved from Opal.
      */
-    void setDatasources(List<String> datasources, @Nullable String selectedDatasource);
+    void setDatasources(List<String> datasources, @Nullable
+    String selectedDatasource);
 
     /**
      * Get the datasource selected by the user.
@@ -275,9 +294,11 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
      */
     String getSelectedVariable();
 
-    void setVariables(JsArray<VariableDto> variables, @Nullable String selectedVariable);
+    void setVariables(JsArray<VariableDto> variables, @Nullable
+    String selectedVariable);
 
-    void setTables(List<String> tables, @Nullable String selectedTable);
+    void setTables(List<String> tables, @Nullable
+    String selectedTable);
 
   }
 
