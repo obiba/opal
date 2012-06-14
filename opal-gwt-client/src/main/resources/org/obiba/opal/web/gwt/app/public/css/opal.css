@@ -1546,8 +1546,8 @@ ul.tabz.horizontal li {
   padding-bottom:0.3em;
   padding-left:0.4em;
   padding-right:0.4em;
-  -moz-border-radius-topleft: 0.5em; -webkit-border-top-left-radius: 0.5em; 
-  -moz-border-radius-topright: 0.5em; -webkit-border-top-right-radius: 0.5em;
+  -moz-border-radius-topleft: 0.5em; -webkit-border-top-left-radius: 0.5em; border-top-left-radius: 0.5em;
+  -moz-border-radius-topright: 0.5em; -webkit-border-top-right-radius: 0.5em; border-top-right-radius: 0.5em;
   position: relative;
   top: 1px;
 }
