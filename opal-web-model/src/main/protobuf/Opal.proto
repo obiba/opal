@@ -155,3 +155,8 @@ message OpalMap {
   repeated string keys = 1;
   repeated string values = 2;
 }
+
+message EntryDto {
+  required string key = 1;
+  required string value = 2;
+}
