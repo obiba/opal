@@ -68,6 +68,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Opal.EntryDto;
 import org.obiba.opal.web.model.Opal.KeyType;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.slf4j.Logger;
@@ -132,7 +133,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   }
 
   @PUT
-  public Response createOrUpdateFunctionalUnit(@Context UriInfo uri, Opal.FunctionalUnitDto unitDto) {
+  public Response createOrUpdateFunctionalUnit(@Context
+  UriInfo uri, Opal.FunctionalUnitDto unitDto) {
     if(!unit.equals(unitDto.getName())) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "WrongFunctionalUnitArgument").build()).build();
     }
@@ -235,7 +237,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @POST
   @Path("/entities")
-  public Response importIdentifiers(DatasourceFactoryDto datasourceFactoryDto, @QueryParam("select") String select) {
+  public Response importIdentifiers(DatasourceFactoryDto datasourceFactoryDto, @QueryParam("select")
+  String select) {
     Response response = null;
 
     Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
@@ -258,7 +261,10 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @POST
   @Path("/entities/identifiers")
-  public Response importIdentifiers(@QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
+  public Response importIdentifiers(@QueryParam("size")
+  Integer size, @QueryParam("zeros")
+  Boolean zeros, @QueryParam("prefix")
+  String prefix) {
     try {
       DefaultParticipantIdentifierImpl pId = new DefaultParticipantIdentifierImpl();
       if(size != null) pId.setKeySize(size);
@@ -277,7 +283,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @PUT
   @Path("/entities/identifiers/map")
-  public Response mapIdentifiers(@QueryParam("path") String path) {
+  public Response mapIdentifiers(@QueryParam("path")
+  String path) {
     try {
       // the file is expected to be of CSV format
       File mapFile = resolveLocalFile(path);
@@ -292,6 +299,27 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
         if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
           count += mapper.associate(map[unitIdx], units, map);
         }
+      }
+      mapper.write();
+      return Response.ok().entity(Integer.toString(count)).build();
+    } catch(Exception e) {
+      log.error("Mapping failed", e);
+      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
+    }
+  }
+
+  @PUT
+  @Path("/entities/identifiers/map/functional-unit/{toUnit}")
+  public Response mapIdentifiers(List<EntryDto> identifiers, @PathParam("toUnit")
+  String toUnit) {
+    try {
+      List<FunctionalUnit> units = getUnitsFromName(unit, toUnit);
+      FunctionalUnit drivingUnit = determineDrivingUnit(units);
+
+      FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
+      int count = 0;
+      for(EntryDto entry : identifiers) {
+        count += mapper.associate(entry.getKey(), units, new String[] { entry.getKey(), entry.getValue() });
       }
       mapper.write();
       return Response.ok().entity(Integer.toString(count)).build();
@@ -352,7 +380,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @DELETE
   @Path("/key/{alias}")
-  public Response deleteFunctionalUnitKeyPair(@PathParam("alias") String alias) {
+  public Response deleteFunctionalUnitKeyPair(@PathParam("alias")
+  String alias) {
     if(!unitKeyStoreService.aliasExists(unit, alias)) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -371,7 +400,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @GET
   @Path("/key/{alias}/certificate")
   @AuthenticatedByCookie
-  public Response getFunctionalUnitKeyPairCertificate(@PathParam("alias") String alias) throws KeyStoreException, IOException {
+  public Response getFunctionalUnitKeyPairCertificate(@PathParam("alias")
+  String alias) throws KeyStoreException, IOException {
     UnitKeyStore keystore = unitKeyStoreService.getUnitKeyStore(unit);
 
     return Response.ok(getPEMCertificate(keystore, alias), MediaType.TEXT_PLAIN_TYPE).header("Content-disposition", "attachment; filename=\"" + unit + "-" + alias + "-certificate.pem\"").build();

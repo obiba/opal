@@ -53,15 +53,17 @@ public abstract class AbstractFunctionalUnitResource {
   }
 
   protected List<FunctionalUnit> getUnitsFromIdentifiersMap(CSVReader reader) throws IOException {
-    String[] unitsHeader = reader.readNext();
+    return getUnitsFromName(reader.readNext());
+  }
 
+  protected List<FunctionalUnit> getUnitsFromName(String... unitNames) {
     // find the units
     List<FunctionalUnit> units = new ArrayList<FunctionalUnit>();
-    List<String> unitNames = new ArrayList<String>();
-    for(int i = 0; i < unitsHeader.length; i++) {
-      String unit = unitsHeader[i];
-      if(!unitNames.contains(unit)) {
-        unitNames.add(unit);
+    List<String> visitedUnitNames = new ArrayList<String>();
+    for(int i = 0; i < unitNames.length; i++) {
+      String unit = unitNames[i];
+      if(!visitedUnitNames.contains(unit)) {
+        visitedUnitNames.add(unit);
         FunctionalUnit functionalUnit;
         if(unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
           functionalUnit = FunctionalUnit.OPAL;
