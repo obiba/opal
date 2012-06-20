@@ -233,8 +233,14 @@ public class DefaultImportService implements ImportService {
     if(unit == null) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
-
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
+
+    importIdentifiers(unit, sourceDatasource, select);
+  }
+
+  @Override
+  public void importIdentifiers(FunctionalUnit unit, Datasource sourceDatasource, String select) throws IOException {
+
     try {
       for(ValueTable vt : sourceDatasource.getValueTables()) {
         if(vt.getEntityType().equals(identifiersTableService.getEntityType())) {
@@ -259,12 +265,16 @@ public class DefaultImportService implements ImportService {
   public void importIdentifiers(String sourceDatasourceName) throws IOException, NoSuchDatasourceException {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
-    Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
+    importIdentifiers(getDatasourceOrTransientDatasource(sourceDatasourceName));
+  }
+
+  @Override
+  public void importIdentifiers(Datasource sourceDatasource) throws IOException {
     try {
       if(sourceDatasource.getValueTables().size() == 0) {
         throw new IllegalArgumentException("source identifiers datasource is empty (no tables)");
       }
-      ValueTable sourceKeysTable = (sourceDatasource.getValueTables().size() > 1) ? sourceDatasource.getValueTable(getIdentifiersValueTable().getName()) : sourceDatasource.getValueTables().iterator().next();
+      ValueTable sourceKeysTable = sourceDatasource.getValueTable(getIdentifiersValueTable().getName());
 
       if(sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType()) == false) {
         throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + identifiersTableService.getEntityType() + "')");
