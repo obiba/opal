@@ -13,9 +13,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.unit.FunctionalUnit;
 
 /**
  * Service for import-related operations.
@@ -83,11 +85,21 @@ public interface ImportService {
    * is used if this one is defined.
    * @throws NoSuchFunctionalUnitException if the specified functional unit does not exist
    * @throws NoSuchDatasourceException if the specified source datasource does not exist
-   * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
-   * table with the same name as <code>org.obiba.opal.keys.tableReference</code>)
    * @throws IOException on any I/O error
    */
-  public void importIdentifiers(String unitName, String sourceDatasourceName, String select) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException;
+  public void importIdentifiers(String unitName, String sourceDatasourceName, String select) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IOException;
+
+  /**
+   * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the unit key variable
+   * name.
+   * 
+   * @param unit functional unit
+   * @param sourceDatasource source datasource
+   * @param select an option script for select variables representing identifiers. If not specified unit select clause
+   * is used if this one is defined.
+   * @throws IOException
+   */
+  public void importIdentifiers(FunctionalUnit unit, Datasource sourceDatasource, String select) throws IOException;
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
@@ -99,4 +111,14 @@ public interface ImportService {
    * @throws IOException on any I/O error
    */
   public void importIdentifiers(String sourceDatasourceName) throws NoSuchDatasourceException, NoSuchValueTableException, IOException;
+
+  /**
+   * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
+   * 
+   * @param sourceDatasource source datasource
+   * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
+   * table with the same name as <code>org.obiba.opal.keys.tableReference</code>)
+   * @throws IOException on any I/O error
+   */
+  public void importIdentifiers(Datasource sourceDatasource) throws NoSuchValueTableException, IOException;
 }

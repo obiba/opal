@@ -21,8 +21,10 @@ import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -49,6 +51,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.Disposables;
+import org.obiba.magma.support.StaticDatasource;
+import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -79,6 +83,7 @@ import org.springframework.stereotype.Component;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -284,18 +289,32 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @PUT
   @Path("/entities/identifiers/map")
   public Response mapIdentifiers(@QueryParam("path")
-  String path) {
+  String path, @QueryParam("create")
+  @DefaultValue("false")
+  boolean create) {
     try {
       // the file is expected to be of CSV format
       File mapFile = resolveLocalFile(path);
       CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
       List<FunctionalUnit> units = getUnitsFromIdentifiersMap(reader);
       FunctionalUnit drivingUnit = determineDrivingUnit(units);
-
       int unitIdx = units.indexOf(drivingUnit);
+      List<String[]> rows = (List<String[]>) reader.readAll();
+
+      // make sure all entities exist
+      if(create) {
+        ImmutableSet.Builder<String> ids = ImmutableSet.builder();
+        for(String[] map : rows) {
+          if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
+            ids.add(map[unitIdx]);
+          }
+        }
+        importIdentifiers(drivingUnit, ids.build());
+      }
+
       FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
       int count = 0;
-      for(String[] map : (List<String[]>) reader.readAll()) {
+      for(String[] map : rows) {
         if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
           count += mapper.associate(map[unitIdx], units, map);
         }
@@ -311,10 +330,21 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @PUT
   @Path("/entities/identifiers/map/functional-unit/{toUnit}")
   public Response mapIdentifiers(List<EntryDto> identifiers, @PathParam("toUnit")
-  String toUnit) {
+  String toUnit, @QueryParam("create")
+  @DefaultValue("false")
+  boolean create) {
     try {
       List<FunctionalUnit> units = getUnitsFromName(unit, toUnit);
       FunctionalUnit drivingUnit = determineDrivingUnit(units);
+
+      // make sure all entities exist
+      if(create) {
+        ImmutableSet.Builder<String> ids = ImmutableSet.builder();
+        for(EntryDto entry : identifiers) {
+          ids.add(entry.getKey());
+        }
+        importIdentifiers(drivingUnit, ids.build());
+      }
 
       FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
       int count = 0;
@@ -410,6 +440,17 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   //
   // Private methods
   //
+
+  private void importIdentifiers(FunctionalUnit drivingUnit, Set<String> ids) throws NoSuchValueTableException, IOException {
+    StaticDatasource ds = new StaticDatasource("ids-import");
+    StaticValueTable vt = new StaticValueTable(ds, identifiersTableService.getTableName(), ids, identifiersTableService.getEntityType());
+    ds.addValueTable(vt);
+    if(drivingUnit.getName().equals(FunctionalUnit.OPAL_INSTANCE)) {
+      importService.importIdentifiers(ds);
+    } else {
+      importService.importIdentifiers(drivingUnit, ds, null);
+    }
+  }
 
   private ResponseBuilder doImportCertificate(Opal.KeyForm kpForm) {
     try {

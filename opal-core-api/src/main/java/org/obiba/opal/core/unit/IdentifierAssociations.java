@@ -181,20 +181,17 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       for(FunctionalUnit unit : units) {
         if(identifiersTable.hasVariable(unit.getKeyVariableName())) {
           idIterator = identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource().getValues(opalEntities).iterator();
+        } else if(unit.isOpal()) {
+          idIterator = Iterables.transform(opalEntities, new Function<VariableEntity, Value>() {
+
+            @Override
+            public Value apply(VariableEntity from) {
+              return TextType.get().valueOf(from.getIdentifier());
+            }
+          }).iterator();
         } else {
-          if(unit.isOpal()) {
-            idIterator = Iterables.transform(opalEntities, new Function<VariableEntity, Value>() {
-
-              @Override
-              public Value apply(VariableEntity from) {
-                return TextType.get().valueOf(from.getIdentifier());
-              }
-            }).iterator();
-
-          } else {
-            // Make sure not to loop on iterators reuturned by this method call, or an infinite loop will happen
-            idIterator = Iterables.cycle(TextType.get().nullValue()).iterator();
-          }
+          // Make sure not to loop on iterators returned by this method call, or an infinite loop will happen
+          idIterator = Iterables.cycle(TextType.get().nullValue()).iterator();
         }
         unitIdentifiers.put(unit.getName(), idIterator);
       }
