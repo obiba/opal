@@ -41,6 +41,7 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
+import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -63,6 +64,8 @@ public class DatasourceResource {
 
   private final OpalConfigurationService configService;
 
+  private final ImportService importService;
+
   private final ViewManager viewManager;
 
   private final ViewDtos viewDtos;
@@ -76,13 +79,14 @@ public class DatasourceResource {
   private Set<Locale> locales;
 
   @Autowired
-  public DatasourceResource(OpalConfigurationService configService, ViewManager viewManager, ViewDtos viewDtos) {
+  public DatasourceResource(OpalConfigurationService configService, ImportService importService, ViewManager viewManager, ViewDtos viewDtos) {
     super();
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
 
     this.configService = configService;
+    this.importService = importService;
     this.viewManager = viewManager;
     this.viewDtos = viewDtos;
   }
@@ -98,6 +102,7 @@ public class DatasourceResource {
     this.viewManager = viewManager;
     this.viewDtos = viewDtos;
     this.name = name;
+    this.importService = null;
   }
 
   @PreDestroy
@@ -159,9 +164,9 @@ public class DatasourceResource {
 
   public TableResource getTableResource(ValueTable table) {
     if(getDatasource().canDropTable(table.getName())) {
-      return new DroppableTableResource(table, getLocales());
+      return new DroppableTableResource(table, getLocales(), importService);
     }
-    return new TableResource(table, getLocales());
+    return new TableResource(table, getLocales(), importService);
   }
 
   public ViewResource getViewResource(View view) {

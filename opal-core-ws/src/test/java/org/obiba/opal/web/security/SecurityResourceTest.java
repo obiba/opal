@@ -30,6 +30,7 @@ import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SecurityResourceTest {
@@ -53,6 +54,7 @@ public class SecurityResourceTest {
     securityResource = new AuthenticationResource(mockSecurityManager);
   }
 
+  @Ignore
   @Test
   public void testLogin() {
     mockRealm.addAccount("administrator", "password");

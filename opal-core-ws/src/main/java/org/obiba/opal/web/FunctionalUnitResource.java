@@ -303,28 +303,36 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
       // make sure all entities exist
       if(create) {
-        ImmutableSet.Builder<String> ids = ImmutableSet.builder();
-        for(String[] map : rows) {
-          if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
-            ids.add(map[unitIdx]);
-          }
-        }
-        importIdentifiers(drivingUnit, ids.build());
+        prepareMapIdentifiers(drivingUnit, rows, unitIdx);
       }
 
-      FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
-      int count = 0;
-      for(String[] map : rows) {
-        if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
-          count += mapper.associate(map[unitIdx], units, map);
-        }
-      }
-      mapper.write();
-      return Response.ok().entity(Integer.toString(count)).build();
+      return Response.ok().entity(Integer.toString(doMapIdentifiers(drivingUnit, units, rows, unitIdx))).build();
     } catch(Exception e) {
       log.error("Mapping failed", e);
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
     }
+  }
+
+  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, List<String[]> rows, int unitIdx) throws NoSuchValueTableException, IOException {
+    ImmutableSet.Builder<String> ids = ImmutableSet.builder();
+    for(String[] map : rows) {
+      if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
+        ids.add(map[unitIdx]);
+      }
+    }
+    importIdentifiers(drivingUnit, ids.build());
+  }
+
+  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, List<String[]> rows, int unitIdx) throws IOException {
+    FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
+    int count = 0;
+    for(String[] map : rows) {
+      if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
+        count += mapper.associate(map[unitIdx], units, map);
+      }
+    }
+    mapper.write();
+    return count;
   }
 
   @PUT
@@ -339,24 +347,32 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
       // make sure all entities exist
       if(create) {
-        ImmutableSet.Builder<String> ids = ImmutableSet.builder();
-        for(EntryDto entry : identifiers) {
-          ids.add(entry.getKey());
-        }
-        importIdentifiers(drivingUnit, ids.build());
+        prepareMapIdentifiers(drivingUnit, identifiers);
       }
 
-      FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
-      int count = 0;
-      for(EntryDto entry : identifiers) {
-        count += mapper.associate(entry.getKey(), units, new String[] { entry.getKey(), entry.getValue() });
-      }
-      mapper.write();
-      return Response.ok().entity(Integer.toString(count)).build();
+      return Response.ok().entity(Integer.toString(doMapIdentifiers(drivingUnit, units, identifiers))).build();
     } catch(Exception e) {
       log.error("Mapping failed", e);
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
     }
+  }
+
+  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, List<EntryDto> identifiers) throws NoSuchValueTableException, IOException {
+    ImmutableSet.Builder<String> ids = ImmutableSet.builder();
+    for(EntryDto entry : identifiers) {
+      ids.add(entry.getKey());
+    }
+    importIdentifiers(drivingUnit, ids.build());
+  }
+
+  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, List<EntryDto> identifiers) throws IOException {
+    FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
+    int count = 0;
+    for(EntryDto entry : identifiers) {
+      count += mapper.associate(entry.getKey(), units, new String[] { entry.getKey(), entry.getValue() });
+    }
+    mapper.write();
+    return count;
   }
 
   //

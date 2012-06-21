@@ -69,7 +69,7 @@ public class FunctionalUnitViewTest {
     unitDataTable = new StaticValueTable(EasyMock.createMock(Datasource.class), "unit-table", ImmutableSet.of("private-1", "private-2", "private-3", "private-4"));
     unitDataTable.addVariables(IntegerType.get(), "Var1", "Var2");
     for(int i = 1; i < 5; i++) {
-      unitDataTable.addValues("" + i, "Var1", i, "Var2", i);
+      unitDataTable.addValues("private-" + i, "Var1", i, "Var2", i);
     }
 
     // Create the following table:
@@ -112,46 +112,46 @@ public class FunctionalUnitViewTest {
   @Test
   public void test_hasValueSet_returnsTrueForPrivateIdentifier() {
     FunctionalUnitView fuv = createViewOnOpalDataTable();
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "private-1")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "private-2")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "private-3")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "private-4")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-1")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-2")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-3")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-4")), is(true));
   }
 
   @Test
   public void test_hasValueSet_returnsFalseForPrivateIdentifier() {
     // Make unit identifiers private
     FunctionalUnitView fuv = createViewOnUnitDataTable();
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "private-1")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "private-2")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "private-3")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "private-4")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-1")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-2")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-3")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-4")), is(false));
   }
 
   @Test
   public void test_hasValueSet_returnsFalseForPublicIdentifier() {
     FunctionalUnitView fuv = createViewOnOpalDataTable();
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "1")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "2")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "3")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "4")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "1")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "2")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "3")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "4")), is(false));
   }
 
   @Test
   public void test_hasValueSet_returnsTrueForPublicIdentifier() {
     // Make unit identifiers private
     FunctionalUnitView fuv = createViewOnUnitDataTable();
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "1")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "2")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "3")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("", "4")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "1")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "2")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "3")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "4")), is(true));
   }
 
   @Test
   public void test_getValueSet_returnsValueSetForPrivateIdentifier() {
     FunctionalUnitView fuv = createViewOnOpalDataTable();
     for(int i = 1; i < 5; i++) {
-      ValueSet vs = fuv.getValueSet(new VariableEntityBean("", "private-" + i));
+      ValueSet vs = fuv.getValueSet(new VariableEntityBean("Participant", "private-" + i));
       assertThat(vs.getValueTable(), is((ValueTable) fuv));
       assertThat(vs.getVariableEntity().getIdentifier(), is("private-" + i));
     }
@@ -162,7 +162,7 @@ public class FunctionalUnitViewTest {
     // Make unit identifiers private
     FunctionalUnitView fuv = createViewOnUnitDataTable();
     for(int i = 1; i < 5; i++) {
-      ValueSet vs = fuv.getValueSet(new VariableEntityBean("", "" + i));
+      ValueSet vs = fuv.getValueSet(new VariableEntityBean("Participant", "" + i));
       assertThat(vs.getValueTable(), is((ValueTable) fuv));
       assertThat(vs.getVariableEntity().getIdentifier(), is("" + i));
     }

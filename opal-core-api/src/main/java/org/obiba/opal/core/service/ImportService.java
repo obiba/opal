@@ -11,11 +11,13 @@ package org.obiba.opal.core.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
@@ -66,6 +68,15 @@ public interface ImportService {
    * @throws InterruptedException
    */
   public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException;
+
+  /**
+   * Imports data from a source table into a destination Opal datasource.
+   * @param unitName
+   * @param sourceValueTables
+   * @param destinationDatasourceName
+   * @param allowIdentifierGeneration
+   */
+  public void importData(String unitName, Set<ValueTable> sourceValueTables, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
   /**
    * Import identifiers using the given participant identifiers provider.
@@ -121,4 +132,5 @@ public interface ImportService {
    * @throws IOException on any I/O error
    */
   public void importIdentifiers(Datasource sourceDatasource) throws NoSuchValueTableException, IOException;
+
 }

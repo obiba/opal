@@ -171,7 +171,8 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void importData(String unitName, Set<ValueTable> sourceTables, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
+  @Override
+  public void importData(String unitName, Set<ValueTable> sourceTables, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
     // If unitName is the empty string, coerce it to null.
     String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
 

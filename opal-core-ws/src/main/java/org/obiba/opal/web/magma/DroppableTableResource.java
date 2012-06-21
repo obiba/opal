@@ -16,14 +16,15 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.service.ImportService;
 
 /**
  * A table resource that supports DELETE (drop)
  */
 public class DroppableTableResource extends TableResource {
 
-  public DroppableTableResource(ValueTable valueTable, Set<Locale> locales) {
-    super(valueTable, locales);
+  public DroppableTableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService) {
+    super(valueTable, locales, importService);
   }
 
   @DELETE
