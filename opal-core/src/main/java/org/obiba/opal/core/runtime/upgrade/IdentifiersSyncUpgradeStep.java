@@ -166,6 +166,16 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
     public Timestamp getUpdated() {
       return updated;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+      return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
   }
 
 }
