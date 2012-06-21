@@ -183,7 +183,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @Path("/entities/table")
   public TableResource getEntitiesTable() {
-    return new TableResource(identifiersTableService.getValueTable());
+    return new TableResource(identifiersTableService.getValueTable(), importService);
   }
 
   @GET
@@ -277,7 +277,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @GET
   @Path("/entities/identifiers/map/units")
-  public List<FunctionalUnitDto> getUnitsFromIdentifiersMap(@QueryParam("path") String path) throws IOException {
+  public List<FunctionalUnitDto> getUnitsFromIdentifiersMap(@QueryParam("path")
+  String path) throws IOException {
     // check the headers
 
     File mapFile = resolveLocalFile(path);

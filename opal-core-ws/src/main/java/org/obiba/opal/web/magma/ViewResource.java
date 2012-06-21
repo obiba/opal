@@ -62,7 +62,8 @@ public class ViewResource extends AbstractValueTableResource {
   }
 
   @Path("/variables")
-  public VariablesViewResource getVariables(@Context Request request) {
+  public VariablesViewResource getVariables(@Context
+  Request request) {
     return new VariablesViewResource(viewManager, viewDtos, getValueTable(), getLocales());
   }
 
@@ -84,7 +85,8 @@ public class ViewResource extends AbstractValueTableResource {
   @Bean
   @Scope("request")
   public TableResource getFrom() {
-    return new TableResource(asView().getWrappedValueTable(), getLocales());
+    // TODO ImportService
+    return new TableResource(asView().getWrappedValueTable(), getLocales(), null);
   }
 
   @Path("/locales")
