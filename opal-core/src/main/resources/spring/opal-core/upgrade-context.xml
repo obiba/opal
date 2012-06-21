@@ -184,6 +184,14 @@
         </bean>
         
         <bean class="org.obiba.opal.core.runtime.upgrade.CreateDataShieldEnvironmentsUpgradeStep"/>
+        
+        <bean class="org.obiba.opal.core.runtime.upgrade.IdentifiersSyncUpgradeStep">
+          <property name="description" value="Sync the variable entities between opal-data and opal-key databases." />
+          <property name="opalDataSource" ref="opalDataSource" />
+          <property name="keyDataSource" ref="keyDataSource" />
+          <property name="tableReference" value="${org.obiba.opal.keys.tableReference}"></property>
+          <property name="appliesTo" value="1.10.1" />
+        </bean>
       </list>
     </property>
 
