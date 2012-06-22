@@ -75,7 +75,8 @@ public final class Dtos {
     };
   }
 
-  public static VariableDto.Builder asDto(LinkDto tableLink, Variable from, @Nullable Integer index) {
+  public static VariableDto.Builder asDto(LinkDto tableLink, Variable from, @Nullable
+  Integer index) {
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
       var.setOccurrenceGroup(from.getOccurrenceGroup());
@@ -104,7 +105,8 @@ public final class Dtos {
     return var;
   }
 
-  public static VariableDto.Builder asDto(@Nullable LinkDto tableLink, Variable from) {
+  public static VariableDto.Builder asDto(@Nullable
+  LinkDto tableLink, Variable from) {
     return asDto(tableLink, from, null);
   }
 
@@ -190,14 +192,16 @@ public final class Dtos {
     TableDto.Builder builder = TableDto.newBuilder() //
     .setName(valueTable.getName()) //
     .setEntityType(valueTable.getEntityType()) //
-    .setDatasourceName(valueTable.getDatasource().getName()) //
     .setVariableCount(Iterables.size(valueTable.getVariables())) //
     .setValueSetCount(valueTable.getVariableEntities().size());
 
-    String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
-    builder.setLink(link);
-    if(valueTable.isView()) {
-      builder.setViewLink(link.replaceFirst("/table/", "/view/"));
+    if(valueTable.getDatasource() != null) {
+      builder.setDatasourceName(valueTable.getDatasource().getName());
+      String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
+      builder.setLink(link);
+      if(valueTable.isView()) {
+        builder.setViewLink(link.replaceFirst("/table/", "/view/"));
+      }
     }
 
     return builder;

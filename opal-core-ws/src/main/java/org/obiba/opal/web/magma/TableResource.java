@@ -59,13 +59,17 @@ public class TableResource extends AbstractValueTableResource {
 
   private final ImportService importService;
 
+  public TableResource(ValueTable valueTable) {
+    this(valueTable, Collections.<Locale> emptySet(), null);
+  }
+
+  public TableResource(ValueTable valueTable, Set<Locale> locales) {
+    this(valueTable, locales, null);
+  }
+
   public TableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService) {
     super(valueTable, locales);
     this.importService = importService;
-  }
-
-  public TableResource(ValueTable valueTable, ImportService importService) {
-    this(valueTable, Collections.<Locale> emptySet(), importService);
   }
 
   @GET
@@ -162,11 +166,19 @@ public class TableResource extends AbstractValueTableResource {
   String unitName, @QueryParam("generateIds")
   @DefaultValue("false")
   boolean generateIds) throws IOException, InterruptedException {
+    ValueTable vt = getValueTable();
+    if(vt.getDatasource() == null) {
+      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCopierIOException", "Cannot write to a table without datasource").build()).build();
+    }
     try {
-      StaticDatasource ds = new StaticDatasource("import");
-      // static writers will add entities and variables while writing values
-      writeValueSets(ds.createWriter(getValueTable().getName(), valueSetsDto.getEntityType()), valueSetsDto);
-      importService.importData(unitName, ds.getValueTables(), getValueTable().getDatasource().getName(), generateIds);
+      if(importService == null) {
+        writeValueSets(vt.getDatasource().createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
+      } else {
+        StaticDatasource ds = new StaticDatasource("import");
+        // static writers will add entities and variables while writing values
+        writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
+        importService.importData(unitName, ds.getValueTables(), vt.getDatasource().getName(), generateIds);
+      }
     } catch(NoSuchFunctionalUnitException ex) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "NoSuchFunctionalUnit", unitName).build()).build();
     } catch(RuntimeException ex) {

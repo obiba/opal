@@ -85,8 +85,7 @@ public class ViewResource extends AbstractValueTableResource {
   @Bean
   @Scope("request")
   public TableResource getFrom() {
-    // TODO ImportService
-    return new TableResource(asView().getWrappedValueTable(), getLocales(), null);
+    return new TableResource(asView().getWrappedValueTable(), getLocales());
   }
 
   @Path("/locales")

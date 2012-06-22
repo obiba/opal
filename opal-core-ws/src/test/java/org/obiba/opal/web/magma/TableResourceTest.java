@@ -82,7 +82,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testTableGET() {
     Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
-    TableResource resource = new TableResource(datasource.getValueTable("Weight"), null);
+    TableResource resource = new TableResource(datasource.getValueTable("Weight"));
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getPath(false)).andReturn("/datasource/" + DATASOURCE2 + "/table/Weight");
@@ -95,7 +95,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testTableGETVariables() {
     Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
-    TableResource resource = new TableResource(datasource.getValueTable("Weight"), null);
+    TableResource resource = new TableResource(datasource.getValueTable("Weight"));
 
     List<PathSegment> segments = new ArrayList<PathSegment>();
     segments.add(createMock(PathSegment.class));
@@ -258,7 +258,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     // Setup
     ValueTable mockTable = createMock(ValueTable.class);
     expect(mockTable.getEntityType()).andReturn("Participant").atLeastOnce();
-    TableResource sut = new TableResource(mockTable, null);
+    TableResource sut = new TableResource(mockTable);
     String script = "$('someVar')";
 
     replay(mockTable);

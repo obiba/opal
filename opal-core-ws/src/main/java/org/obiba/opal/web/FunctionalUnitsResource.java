@@ -183,7 +183,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @Path("/entities/table")
   public TableResource getEntitiesTable() {
-    return new TableResource(identifiersTableService.getValueTable(), importService);
+    return new TableResource(identifiersTableService.getValueTable());
   }
 
   @GET
