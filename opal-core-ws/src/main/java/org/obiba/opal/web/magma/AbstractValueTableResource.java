@@ -93,7 +93,7 @@ abstract class AbstractValueTableResource {
     if(offset != null) {
       entities = Iterables.skip(entities, offset);
     }
-    if(limit != null) {
+    if(limit != null && limit >= 0) {
       entities = Iterables.limit(entities, limit);
     }
     return entities;
