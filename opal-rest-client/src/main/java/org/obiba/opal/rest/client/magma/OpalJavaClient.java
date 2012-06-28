@@ -81,7 +81,8 @@ public class OpalJavaClient {
     httpClient.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuthScheme.NAME));
     httpClient.getParams().setParameter(ClientPNames.CONNECTION_MANAGER_FACTORY_CLASS_NAME, OpalClientConnectionManagerFactory.class.getName());
     // Don't wait indefinitely for packets.
-    httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 20000);
+    // 10 minutes
+    httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 10 * 60 * 1000);
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
 
     try {
