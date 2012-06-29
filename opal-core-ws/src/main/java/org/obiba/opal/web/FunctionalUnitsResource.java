@@ -252,27 +252,57 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     }
   }
 
+  /**
+   * All identifiers from the transient datasource (given the datasource factory) will be imported.
+   * @param datasourceFactoryDto
+   * @return
+   */
   @POST
   @Path("/entities")
   public Response importIdentifiers(DatasourceFactoryDto datasourceFactoryDto) {
-    Response response = null;
-
-    Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
-
     try {
-      importService.importIdentifiers(sourceDatasource.getName());
-      response = Response.ok().build();
+      importIdentifiersFromTransientDatasource(datasourceFactoryDto);
+      return Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
     } catch(IOException ex) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
-    } finally {
-      Disposables.silentlyDispose(sourceDatasource);
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
     }
+  }
 
-    return response;
+  /**
+   * If a datasource name is provided, it will be used to import all identifiers from this datasource or just the
+   * identifiers from the provided table name in the datasource. Else all datasources identifiers will be imported.
+   * @param datasource
+   * @param table
+   * @return
+   */
+  @POST
+  @Path("/entities/sync")
+  public Response importIdentifiers(@QueryParam("datasource")
+  String datasource, @QueryParam("table")
+  String table) {
+    try {
+      if(datasource != null) {
+        Datasource ds = MagmaEngine.get().getDatasource(datasource);
+        if(table != null) {
+          importIdentifiersFromTable(ds.getValueTable(table));
+        } else {
+          importIdentifiersFromDatasource(ds);
+        }
+      } else {
+        importIdentifiersFromAllDatasources();
+      }
+      return Response.ok().build();
+    } catch(NoSuchDatasourceException ex) {
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+    } catch(NoSuchValueTableException ex) {
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+    } catch(IOException ex) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
+    }
   }
 
   @GET
@@ -299,6 +329,33 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   //
   // Private methods
   //
+
+  private void importIdentifiersFromTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) throws NoSuchValueTableException, IOException {
+    Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
+    try {
+      importIdentifiersFromDatasource(sourceDatasource);
+    } finally {
+      Disposables.silentlyDispose(sourceDatasource);
+    }
+  }
+
+  private void importIdentifiersFromAllDatasources() throws IOException {
+    for(Datasource ds : MagmaEngine.get().getDatasources()) {
+      importIdentifiersFromDatasource(ds);
+    }
+  }
+
+  private void importIdentifiersFromDatasource(Datasource sourceDatasource) throws IOException {
+    for(ValueTable sourceTable : sourceDatasource.getValueTables()) {
+      importIdentifiersFromTable(sourceTable);
+    }
+  }
+
+  private void importIdentifiersFromTable(ValueTable sourceTable) throws IOException {
+    if(sourceTable.getEntityType().equals(identifiersTableService.getEntityType())) {
+      importService.importIdentifiers(sourceTable);
+    }
+  }
 
   private Datasource createTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) {
     DatasourceFactory factory = datasourceFactoryRegistry.parse(datasourceFactoryDto);

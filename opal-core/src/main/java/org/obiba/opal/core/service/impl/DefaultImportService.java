@@ -275,17 +275,24 @@ public class DefaultImportService implements ImportService {
       if(sourceDatasource.getValueTables().size() == 0) {
         throw new IllegalArgumentException("source identifiers datasource is empty (no tables)");
       }
-      ValueTable sourceKeysTable = sourceDatasource.getValueTable(getIdentifiersValueTable().getName());
+      String idTableName = getIdentifiersValueTable().getName();
+      ValueTable sourceKeysTable = sourceDatasource.hasValueTable(idTableName) ? sourceDatasource.getValueTable(idTableName) : sourceDatasource.getValueTables().iterator().next();
 
-      if(sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType()) == false) {
-        throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + identifiersTableService.getEntityType() + "')");
-      }
+      importIdentifiers(sourceKeysTable);
 
-      // Don't copy null values otherwise, we'll delete existing mappings
-      DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, getIdentifiersValueTable().getDatasource());
     } finally {
       silentlyDisposeTransientDatasource(sourceDatasource);
     }
+  }
+
+  @Override
+  public void importIdentifiers(ValueTable sourceKeysTable) throws IOException {
+    if(sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType()) == false) {
+      throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + identifiersTableService.getEntityType() + "')");
+    }
+
+    // Don't copy null values otherwise, we'll delete existing mappings
+    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, getIdentifiersValueTable().getDatasource());
   }
 
   private Datasource getDatasourceOrTransientDatasource(String datasourceName) throws NoSuchDatasourceException {

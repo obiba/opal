@@ -128,9 +128,16 @@ public interface ImportService {
    * 
    * @param sourceDatasource source datasource
    * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
-   * table with the same name as <code>org.obiba.opal.keys.tableReference</code>)
+   * table with the same name as <code>org.obiba.opal.keys.tableReference</code> or has no tables)
    * @throws IOException on any I/O error
    */
   public void importIdentifiers(Datasource sourceDatasource) throws NoSuchValueTableException, IOException;
+
+  /**
+   * Import identifiers of the entities of the given table.
+   * @param sourceValueTable
+   * @throws IOException
+   */
+  public void importIdentifiers(ValueTable sourceValueTable) throws IOException;
 
 }
