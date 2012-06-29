@@ -39,6 +39,7 @@ import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListe
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
+import org.obiba.magma.support.StaticValueTable;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
@@ -66,7 +67,9 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 /**
@@ -291,8 +294,22 @@ public class DefaultImportService implements ImportService {
       throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" + identifiersTableService.getEntityType() + "')");
     }
 
+    ValueTable sourceKeysTableCopy = sourceKeysTable;
+    String idTableName = getIdentifiersValueTable().getName();
+    if(sourceKeysTable.getName().equals(idTableName) == false) {
+      ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+      builder.addAll(Iterables.transform(sourceKeysTable.getVariableEntities(), new Function<VariableEntity, String>() {
+
+        @Override
+        public String apply(VariableEntity input) {
+          return input.getIdentifier();
+        }
+      }));
+      sourceKeysTableCopy = new StaticValueTable(sourceKeysTable.getDatasource(), idTableName, builder.build(), identifiersTableService.getEntityType());
+    }
+
     // Don't copy null values otherwise, we'll delete existing mappings
-    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTable, getIdentifiersValueTable().getDatasource());
+    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build().copy(sourceKeysTableCopy, getIdentifiersValueTable().getDatasource());
   }
 
   private Datasource getDatasourceOrTransientDatasource(String datasourceName) throws NoSuchDatasourceException {

@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.ws.rs.GET;
@@ -60,6 +61,7 @@ import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.TableIdentifiersSync;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
@@ -70,6 +72,9 @@ import org.springframework.stereotype.Component;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @Component
@@ -303,6 +308,46 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     } catch(IOException ex) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
     }
+  }
+
+  @GET
+  @Path("/entities/sync")
+  public List<TableIdentifiersSync> getIdentifiersToBeImported(@QueryParam("datasource")
+  String datasource, @QueryParam("table")
+  String table) {
+    Datasource ds = MagmaEngine.get().getDatasource(datasource);
+
+    ImmutableList.Builder<TableIdentifiersSync> builder = ImmutableList.builder();
+
+    Iterable<ValueTable> tables = Iterables.filter(ds.getValueTables(), new Predicate<ValueTable>() {
+
+      @Override
+      public boolean apply(ValueTable input) {
+        return input.getEntityType().equals(identifiersTableService.getEntityType());
+      }
+    });
+
+    Set<VariableEntity> entities = identifiersTableService.getValueTable().getVariableEntities();
+
+    for(ValueTable vt : tables) {
+      TableIdentifiersSync tsync = TableIdentifiersSync.newBuilder()//
+      .setDatasource(ds.getName()).setTable(vt.getName())//
+      .setCount(getIdentifiersToBeImportedCount(entities, vt)).build();
+      builder.add(tsync);
+    }
+
+    return builder.build();
+  }
+
+  private int getIdentifiersToBeImportedCount(Set<VariableEntity> entities, ValueTable vt) {
+    int count = 0;
+    for(VariableEntity entity : vt.getVariableEntities()) {
+      if(!entities.contains(entity)) {
+        log.info("{}: {}", vt.getName(), entity.getIdentifier());
+        count++;
+      }
+    }
+    return count;
   }
 
   @GET
