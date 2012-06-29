@@ -319,7 +319,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
     ImmutableList.Builder<TableIdentifiersSync> builder = ImmutableList.builder();
 
-    Iterable<ValueTable> tables = Iterables.filter(ds.getValueTables(), new Predicate<ValueTable>() {
+    Iterable<ValueTable> tables = Iterables.filter(table == null ? ds.getValueTables() : Collections.singleton(ds.getValueTable(table)), new Predicate<ValueTable>() {
 
       @Override
       public boolean apply(ValueTable input) {
@@ -328,7 +328,6 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     });
 
     Set<VariableEntity> entities = identifiersTableService.getValueTable().getVariableEntities();
-
     for(ValueTable vt : tables) {
       TableIdentifiersSync tsync = TableIdentifiersSync.newBuilder()//
       .setDatasource(ds.getName()).setTable(vt.getName())//
