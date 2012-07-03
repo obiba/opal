@@ -72,7 +72,7 @@ abstract class AbstractValueTableResource {
     }
 
     int fromIndex = (offset < filteredVariables.size()) ? offset : filteredVariables.size();
-    int toIndex = (limit != null) ? Math.min(fromIndex + limit, filteredVariables.size()) : filteredVariables.size();
+    int toIndex = (limit != null && limit >= 0) ? Math.min(fromIndex + limit, filteredVariables.size()) : filteredVariables.size();
 
     return filteredVariables.subList(fromIndex, toIndex);
   }

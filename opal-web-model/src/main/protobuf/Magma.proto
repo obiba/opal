@@ -256,3 +256,9 @@ message DatasourceCompareDto {
   repeated TableCompareDto tableComparisons = 3;
 }
 
+message TableIdentifiersSync {
+  required string datasource = 1;
+  required string table = 2;
+  required int32 total = 3; // count of entities in table 
+  required int32 count = 4; // count of entity identifiers to be imported
+}

@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.ws.rs.GET;
@@ -60,6 +61,7 @@ import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.Magma.TableIdentifiersSync;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
@@ -70,6 +72,10 @@ import org.springframework.stereotype.Component;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @Component
@@ -252,27 +258,106 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     }
   }
 
+  /**
+   * All identifiers from the transient datasource (given the datasource factory) will be imported.
+   * @param datasourceFactoryDto
+   * @return
+   */
   @POST
   @Path("/entities")
   public Response importIdentifiers(DatasourceFactoryDto datasourceFactoryDto) {
-    Response response = null;
-
-    Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
-
     try {
-      importService.importIdentifiers(sourceDatasource.getName());
-      response = Response.ok().build();
+      importIdentifiersFromTransientDatasource(datasourceFactoryDto);
+      return Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
     } catch(IOException ex) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
-    } finally {
-      Disposables.silentlyDispose(sourceDatasource);
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
+    }
+  }
+
+  /**
+   * If a datasource name is provided, it will be used to import all identifiers from this datasource or just the
+   * identifiers from the provided table name in the datasource. Else all datasources identifiers will be imported.
+   * @param datasource
+   * @param table
+   * @return
+   */
+  @POST
+  @Path("/entities/sync")
+  public Response importIdentifiers(@QueryParam("datasource")
+  String datasource, @QueryParam("table")
+  List<String> tableList) {
+    try {
+      if(datasource != null) {
+        Datasource ds = MagmaEngine.get().getDatasource(datasource);
+        if(tableList != null && tableList.size() > 0) {
+          for(String table : tableList) {
+            importIdentifiersFromTable(ds.getValueTable(table));
+          }
+        } else {
+          importIdentifiersFromDatasource(ds);
+        }
+      } else {
+        importIdentifiersFromAllDatasources();
+      }
+      return Response.ok().build();
+    } catch(NoSuchDatasourceException ex) {
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+    } catch(NoSuchValueTableException ex) {
+      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+    } catch(IOException ex) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
+    }
+  }
+
+  @GET
+  @Path("/entities/sync")
+  public List<TableIdentifiersSync> getIdentifiersToBeImported(@QueryParam("datasource")
+  String datasource, @QueryParam("table")
+  List<String> tableList) {
+    final Datasource ds = MagmaEngine.get().getDatasource(datasource);
+
+    ImmutableList.Builder<TableIdentifiersSync> builder = ImmutableList.builder();
+
+    Iterable<ValueTable> tables = Iterables.filter((tableList == null || tableList.size() == 0) ? ds.getValueTables() : Iterables.transform(tableList, new Function<String, ValueTable>() {
+
+      @Override
+      public ValueTable apply(String input) {
+        return ds.getValueTable(input);
+      }
+    }), new Predicate<ValueTable>() {
+
+      @Override
+      public boolean apply(ValueTable input) {
+        return input.getEntityType().equals(identifiersTableService.getEntityType());
+      }
+    });
+
+    Set<VariableEntity> entities = identifiersTableService.getValueTable().getVariableEntities();
+    for(ValueTable vt : tables) {
+      builder.add(getTableIdentifiersSync(entities, ds, vt));
     }
 
-    return response;
+    return builder.build();
+  }
+
+  private TableIdentifiersSync getTableIdentifiersSync(Set<VariableEntity> entities, Datasource ds, ValueTable vt) {
+    int count = 0;
+    Set<VariableEntity> tableEntities = vt.getVariableEntities();
+    TableIdentifiersSync.Builder builder = TableIdentifiersSync.newBuilder()//
+    .setDatasource(ds.getName()).setTable(vt.getName()).setTotal(tableEntities.size());
+
+    for(VariableEntity entity : tableEntities) {
+      if(!entities.contains(entity)) {
+        count++;
+      }
+    }
+    builder.setCount(count);
+
+    return builder.build();
   }
 
   @GET
@@ -299,6 +384,33 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   //
   // Private methods
   //
+
+  private void importIdentifiersFromTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) throws NoSuchValueTableException, IOException {
+    Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
+    try {
+      importIdentifiersFromDatasource(sourceDatasource);
+    } finally {
+      Disposables.silentlyDispose(sourceDatasource);
+    }
+  }
+
+  private void importIdentifiersFromAllDatasources() throws IOException {
+    for(Datasource ds : MagmaEngine.get().getDatasources()) {
+      importIdentifiersFromDatasource(ds);
+    }
+  }
+
+  private void importIdentifiersFromDatasource(Datasource sourceDatasource) throws IOException {
+    for(ValueTable sourceTable : sourceDatasource.getValueTables()) {
+      importIdentifiersFromTable(sourceTable);
+    }
+  }
+
+  private void importIdentifiersFromTable(ValueTable sourceTable) throws IOException {
+    if(sourceTable.getEntityType().equals(identifiersTableService.getEntityType())) {
+      importService.importIdentifiers(sourceTable);
+    }
+  }
 
   private Datasource createTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) {
     DatasourceFactory factory = datasourceFactoryRegistry.parse(datasourceFactoryDto);

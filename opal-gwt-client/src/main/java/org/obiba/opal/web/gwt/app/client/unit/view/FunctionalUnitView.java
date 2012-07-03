@@ -40,6 +40,9 @@ public class FunctionalUnitView extends ViewImpl implements FunctionalUnitPresen
   Button importButton;
 
   @UiField
+  Button syncButton;
+
+  @UiField
   ScrollPanel functionalUnitDetailsPanel;
 
   @UiField
@@ -90,6 +93,11 @@ public class FunctionalUnitView extends ViewImpl implements FunctionalUnitPresen
   }
 
   @Override
+  public HandlerRegistration addSyncIdentifiersClickHandler(ClickHandler handler) {
+    return syncButton.addClickHandler(handler);
+  }
+
+  @Override
   public HasAuthorization getAddFunctionalUnitAuthorizer() {
     return new UIObjectAuthorizer(functionalUnitButton);
   }
@@ -102,6 +110,11 @@ public class FunctionalUnitView extends ViewImpl implements FunctionalUnitPresen
   @Override
   public HasAuthorization getImportIdentifiersAuthorizer() {
     return new UIObjectAuthorizer(importButton);
+  }
+
+  @Override
+  public HasAuthorization getSyncIdentifiersAuthorizer() {
+    return new UIObjectAuthorizer(syncButton);
   }
 
 }

@@ -17,8 +17,11 @@
         <g:Button ui:field="exportButton" styleName="btn iconb i-down">
           <ui:msg description="Export All Identifiers label">Export All Identifiers</ui:msg>
         </g:Button>
-        <g:Button ui:field="importButton" styleName="btn iconb i-scale">
+        <g:Button ui:field="importButton" styleName="btn iconb i-move">
           <ui:msg description="Map Identifiers label">Map Identifiers</ui:msg>
+        </g:Button>
+        <g:Button ui:field="syncButton" styleName="btn iconb i-reblog">
+          <ui:msg description="Sync Identifiers label">Synchronize Identifiers</ui:msg>
         </g:Button>
       </g:FlowPanel>
       <o:HelpImage page="Working+with+Units"></o:HelpImage>
