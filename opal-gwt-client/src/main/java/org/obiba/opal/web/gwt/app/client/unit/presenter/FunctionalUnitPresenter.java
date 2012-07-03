@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDial
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.syncidentifiers.presenter.IdentifiersSyncPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
@@ -31,7 +32,8 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
+public class FunctionalUnitPresenter extends
+    SplitPaneWorkbenchPresenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
 
   public interface Display extends View {
 
@@ -41,11 +43,15 @@ public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<Functio
 
     HandlerRegistration addImportIdentifiersClickHandler(ClickHandler handler);
 
+    HandlerRegistration addSyncIdentifiersClickHandler(ClickHandler handler);
+
     HasAuthorization getAddFunctionalUnitAuthorizer();
 
     HasAuthorization getExportIdentifiersAuthorizer();
 
     HasAuthorization getImportIdentifiersAuthorizer();
+
+    HasAuthorization getSyncIdentifiersAuthorizer();
   }
 
   @ProxyStandard
@@ -60,7 +66,10 @@ public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<Functio
   final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
 
   @Inject
-  public FunctionalUnitPresenter(final Display display, final EventBus eventBus, final Proxy proxy, FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter, FunctionalUnitListPresenter FunctionalUnitListPresenter, FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter) {
+  public FunctionalUnitPresenter(final Display display, final EventBus eventBus, final Proxy proxy,
+      FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter,
+      FunctionalUnitListPresenter FunctionalUnitListPresenter,
+      FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter) {
     super(eventBus, display, proxy);
     this.functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
     this.functionalUnitListPresenter = FunctionalUnitListPresenter;
@@ -81,15 +90,20 @@ public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<Functio
   @Override
   protected void authorize() {
     // create unit
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").post().authorize(getView().getAddFunctionalUnitAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").post()
+        .authorize(getView().getAddFunctionalUnitAuthorizer()).send();
     // export all identifiers
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/csv").get().authorize(getView().getExportIdentifiersAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/csv").get()
+        .authorize(getView().getExportIdentifiersAuthorizer()).send();
     // map identifiers
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/table").get()//
-    .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
-    .and("/functional-units/entities/identifiers/map/units", HttpMethod.GET)//
-    .authorize(getView().getImportIdentifiersAuthorizer()).build())//
-    .send();
+        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+            .and("/functional-units/entities/identifiers/map/units", HttpMethod.GET)//
+            .authorize(getView().getImportIdentifiersAuthorizer()).build())//
+        .send();
+    // sync identifiers
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/sync").post()
+        .authorize(getView().getSyncIdentifiersAuthorizer()).send();
   }
 
   @Override
@@ -97,6 +111,7 @@ public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<Functio
     super.registerHandler(getView().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
     super.registerHandler(getView().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
     super.registerHandler(getView().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
+    super.registerHandler(getView().addSyncIdentifiersClickHandler(new SyncIdentifiersClickHandler()));
   }
 
   //
@@ -128,6 +143,13 @@ public class FunctionalUnitPresenter extends SplitPaneWorkbenchPresenter<Functio
     @Override
     public void onClick(ClickEvent arg0) {
       getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersMapPresenter.WizardType));
+    }
+  }
+
+  private final class SyncIdentifiersClickHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent arg0) {
+      getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersSyncPresenter.WizardType));
     }
   }
 

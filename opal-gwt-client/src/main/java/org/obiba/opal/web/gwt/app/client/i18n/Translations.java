@@ -407,7 +407,9 @@ public interface Translations extends Constants {
           "DriverIsRequired", "A driver is required.",//
           "UrlIsRequired", "A url is required.",//
           "UsernameIsRequired", "A username is required.",//
-          "TableSelectionIsRequired", "At least one table must be selected."//
+          "TableSelectionIsRequired", "At least one table must be selected.",//
+          "IdentifiersImportationCompleted", "Identifiers importation completed.",//
+          "IdentifiersImportationFailed", "Identifiers importation failed: {0}."//
       })
       Map<String, String> userMessageMap();
 
@@ -1382,4 +1384,15 @@ public interface Translations extends Constants {
   @DefaultStringValue("key=value")
   String keyValueLabel();
 
+  @Description("Identifiers Sync Count label")
+  @DefaultStringValue("Identifiers / Total")
+  String identifiersSyncCountLabel();
+
+  @Description("Identifiers Sync Datasource Step")
+  @DefaultStringValue("Some datasources could have entities with identifiers unknown in the identifiers database (usually after an additional database has been connected to Opal). This operation will import them in the identifiers database.")
+      String identifiersSyncDatasourceStep();
+
+  @Description("Identifiers Sync Table Step")
+  @DefaultStringValue("Preview the count of identifiers that can be imported and select from which table identifiers will be extracted.")
+      String identifiersSyncTableStep();
 }

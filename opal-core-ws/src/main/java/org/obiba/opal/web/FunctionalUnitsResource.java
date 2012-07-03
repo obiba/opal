@@ -72,6 +72,7 @@ import org.springframework.stereotype.Component;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -288,12 +289,14 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @Path("/entities/sync")
   public Response importIdentifiers(@QueryParam("datasource")
   String datasource, @QueryParam("table")
-  String table) {
+  List<String> tableList) {
     try {
       if(datasource != null) {
         Datasource ds = MagmaEngine.get().getDatasource(datasource);
-        if(table != null) {
-          importIdentifiersFromTable(ds.getValueTable(table));
+        if(tableList != null && tableList.size() > 0) {
+          for(String table : tableList) {
+            importIdentifiersFromTable(ds.getValueTable(table));
+          }
         } else {
           importIdentifiersFromDatasource(ds);
         }
@@ -314,12 +317,18 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @Path("/entities/sync")
   public List<TableIdentifiersSync> getIdentifiersToBeImported(@QueryParam("datasource")
   String datasource, @QueryParam("table")
-  String table) {
-    Datasource ds = MagmaEngine.get().getDatasource(datasource);
+  List<String> tableList) {
+    final Datasource ds = MagmaEngine.get().getDatasource(datasource);
 
     ImmutableList.Builder<TableIdentifiersSync> builder = ImmutableList.builder();
 
-    Iterable<ValueTable> tables = Iterables.filter(table == null ? ds.getValueTables() : Collections.singleton(ds.getValueTable(table)), new Predicate<ValueTable>() {
+    Iterable<ValueTable> tables = Iterables.filter((tableList == null || tableList.size() == 0) ? ds.getValueTables() : Iterables.transform(tableList, new Function<String, ValueTable>() {
+
+      @Override
+      public ValueTable apply(String input) {
+        return ds.getValueTable(input);
+      }
+    }), new Predicate<ValueTable>() {
 
       @Override
       public boolean apply(ValueTable input) {
@@ -329,24 +338,26 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
     Set<VariableEntity> entities = identifiersTableService.getValueTable().getVariableEntities();
     for(ValueTable vt : tables) {
-      TableIdentifiersSync tsync = TableIdentifiersSync.newBuilder()//
-      .setDatasource(ds.getName()).setTable(vt.getName())//
-      .setCount(getIdentifiersToBeImportedCount(entities, vt)).build();
-      builder.add(tsync);
+      builder.add(getTableIdentifiersSync(entities, ds, vt));
     }
 
     return builder.build();
   }
 
-  private int getIdentifiersToBeImportedCount(Set<VariableEntity> entities, ValueTable vt) {
+  private TableIdentifiersSync getTableIdentifiersSync(Set<VariableEntity> entities, Datasource ds, ValueTable vt) {
     int count = 0;
-    for(VariableEntity entity : vt.getVariableEntities()) {
+    Set<VariableEntity> tableEntities = vt.getVariableEntities();
+    TableIdentifiersSync.Builder builder = TableIdentifiersSync.newBuilder()//
+    .setDatasource(ds.getName()).setTable(vt.getName()).setTotal(tableEntities.size());
+
+    for(VariableEntity entity : tableEntities) {
       if(!entities.contains(entity)) {
-        log.info("{}: {}", vt.getName(), entity.getIdentifier());
         count++;
       }
     }
-    return count;
+    builder.setCount(count);
+
+    return builder.build();
   }
 
   @GET

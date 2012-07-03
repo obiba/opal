@@ -1,0 +1,36 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
+  ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
+    <g:caption>
+      <ui:msg description="Sync Identifiers label">Synchronize Identifiers</ui:msg>
+    </g:caption>
+       
+    <g:FlowPanel>
+      
+      <o:WizardStep ui:field="datasourceStep">
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
+          <g:ListBox ui:field="datasourceBox" />
+        </g:FlowPanel>
+      </o:WizardStep>
+      
+      <o:WizardStep ui:field="tableStep">
+        <o:Table ui:field="tableList" width="100%" addStyleNames="top-margin"/>
+      </o:WizardStep>
+      
+      <o:WizardStep ui:field="conclusionStep">
+        <g:SimplePanel ui:field="conclusionPanel" />
+      </o:WizardStep>
+      
+    </g:FlowPanel>
+    
+    
+  </o:WizardDialogBox>
+  
+</ui:UiBinder>
