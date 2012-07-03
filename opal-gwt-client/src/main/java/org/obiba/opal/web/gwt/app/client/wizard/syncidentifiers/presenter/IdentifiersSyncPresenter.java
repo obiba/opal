@@ -101,7 +101,7 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
             if(resource != null) {
               for(int i = 0; i < resource.length(); i++) {
                 DatasourceDto ds = resource.get(i);
-                if(ds.getTableArray().length() > 0) {
+                if(ds.getTableArray() != null && ds.getTableArray().length() > 0) {
                   datasources.push(ds);
                 }
               }
