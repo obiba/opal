@@ -120,40 +120,16 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
       return;
     }
 
-    ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        getView().hide();
-        getView().setProgress(false);
-        getEventBus().fireEvent(NotificationEvent.newBuilder().info("IdentifiersImportationCompleted").build());
-      }
-    };
-
-    ResponseCodeCallback failedCallback = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        getView().hide();
-        getView().setProgress(false);
-        try {
-          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-          getEventBus().fireEvent(
-              NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
-        } catch(Exception e) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        }
-      }
-    };
+    ResponseCodeCallback callback = new IdentifiersImportationCallback();
 
     UriBuilder ub = getDatasourceEntitiesUri();
     for(String table : selectedTables) {
       ub.query("table", table);
     }
     ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).post().withCallback(Response.SC_OK, callback)//
-        .withCallback(Response.SC_BAD_REQUEST, failedCallback)//
-        .withCallback(Response.SC_NOT_FOUND, failedCallback)//
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failedCallback)//
+        .withCallback(Response.SC_BAD_REQUEST, callback)//
+        .withCallback(Response.SC_NOT_FOUND, callback)//
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback)//
         .send();
 
     getView().setProgress(true);
@@ -162,6 +138,25 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
   private UriBuilder getDatasourceEntitiesUri() {
     return UriBuilder.create().segment("functional-units", "entities", "sync")
         .query("datasource", getView().getSelectedDatasource());
+  }
+
+  private final class IdentifiersImportationCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      getView().hide();
+      getView().setProgress(false);
+      if(response.getStatusCode() == Response.SC_OK) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().info("IdentifiersImportationCompleted").build());
+      } else {
+        try {
+          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          getEventBus().fireEvent(
+              NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
+        } catch(Exception e) {
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        }
+      }
+    }
   }
 
 }
