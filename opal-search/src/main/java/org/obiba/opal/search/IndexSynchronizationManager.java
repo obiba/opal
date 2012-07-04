@@ -105,23 +105,27 @@ public class IndexSynchronizationManager {
     public void run() {
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
-
-          ValueTableIndex index = indexManager.getIndex(vt);
-
-          if(index.requiresUpgrade()) {
-            submitTask(vt, index);
+          if(indexManager.isIndexable(vt)) {
+            maybeUpdateIndex(vt);
           }
-          // Check that the index is older than the ValueTable
-          else if(index.isUpToDate() == false) {
-            // The index needs to be updated
-            Value value = vt.getTimestamps().getLastUpdate();
-            // Check that the last modification to the ValueTable is older than the gracePeriod
-            // If we don't know (null value), reindex
-            if(value.isNull() || value.compareTo(gracePeriod()) < 0) {
-              submitTask(vt, index);
-            }
-          }
+        }
+      }
+    }
 
+    private void maybeUpdateIndex(ValueTable vt) {
+      ValueTableIndex index = indexManager.getIndex(vt);
+
+      if(index.requiresUpgrade()) {
+        submitTask(vt, index);
+      }
+      // Check that the index is older than the ValueTable
+      else if(index.isUpToDate() == false) {
+        // The index needs to be updated
+        Value value = vt.getTimestamps().getLastUpdate();
+        // Check that the last modification to the ValueTable is older than the gracePeriod
+        // If we don't know (null value), reindex
+        if(value.isNull() || value.compareTo(gracePeriod()) < 0) {
+          submitTask(vt, index);
         }
       }
     }

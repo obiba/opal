@@ -86,6 +86,12 @@ public class EsIndexManager implements IndexManager {
   }
 
   @Override
+  public boolean isIndexable(ValueTable valueTable) {
+    // Currently only based on the state of ElasticSearch
+    return esConfig.getConfig().isEnabled();
+  }
+
+  @Override
   public EsValueTableIndex getIndex(ValueTable vt) {
     Preconditions.checkNotNull(vt);
 

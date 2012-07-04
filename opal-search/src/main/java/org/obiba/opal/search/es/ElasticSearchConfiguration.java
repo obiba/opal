@@ -13,6 +13,8 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 
 public class ElasticSearchConfiguration implements OpalConfigurationExtension {
 
+  private Boolean enabled;
+
   private String clusterName;
 
   private String indexName;
@@ -24,6 +26,10 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
   private Integer replicas;
 
   private String esSettings;
+
+  public boolean isEnabled() {
+    return enabled != null ? enabled : true;
+  }
 
   public String getClusterName(String defaultName) {
     return clusterName != null ? clusterName : defaultName;
