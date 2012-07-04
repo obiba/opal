@@ -14,6 +14,8 @@ import org.elasticsearch.rest.RestController;
 
 public interface ElasticSearchProvider {
 
+  public boolean isEnabled();
+
   public Client getClient();
 
   public RestController getRest();

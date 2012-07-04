@@ -38,14 +38,19 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   }
 
   @Override
+  public boolean isEnabled() {
+    return configService.getConfig().isEnabled();
+  }
+
+  @Override
   public boolean isRunning() {
     return esNode != null;
   }
 
   @Override
   public void start() {
-    if(!isRunning()) {
-      ElasticSearchConfiguration esConfig = configService.getConfig();
+    ElasticSearchConfiguration esConfig = configService.getConfig();
+    if(!isRunning() && esConfig.isEnabled()) {
       esNode = NodeBuilder.nodeBuilder().client(true).settings(ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false)).clusterName(esConfig.getClusterName("opal")).client(esConfig.isDataNode() == false).node();
       client = esNode.client();
     }

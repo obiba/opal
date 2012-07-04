@@ -13,6 +13,8 @@ import org.obiba.magma.ValueTable;
 
 public interface IndexManager {
 
+  public boolean isIndexable(ValueTable valueTable);
+
   public ValueTableIndex getIndex(ValueTable valueTable);
 
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index);
