@@ -6,7 +6,7 @@
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal</artifactId>
   <packaging>pom</packaging>
-  <version>1.10.1</version>
+  <version>1.10-SNAPSHOT</version>
 
   <name>opal</name>
   <description>Opal Application</description>
@@ -772,8 +772,8 @@
   </distributionManagement>
 
   <scm>
-    <connection>scm:svn:https://svn.obiba.org/opal/tags/releases/1.10.1</connection>
-    <developerConnection>scm:svn:https://svn.obiba.org/opal/tags/releases/1.10.1</developerConnection>
+    <connection>scm:svn:https://svn.obiba.org/opal/branches/opal-1.10.x</connection>
+    <developerConnection>scm:svn:https://svn.obiba.org/opal/branches/opal-1.10.x</developerConnection>
   </scm>
 
   <properties>
