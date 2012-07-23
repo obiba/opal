@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -118,7 +117,6 @@ public class TableResource extends AbstractValueTableResource {
    * @return
    */
   @Path("/valueSet/{identifier}")
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public ValueSetResource getValueSet(@Context
   Request request, @PathParam("identifier")
   String identifier, @QueryParam("select")
@@ -355,7 +353,9 @@ public class TableResource extends AbstractValueTableResource {
     return new VariableResource(this.getValueTable(), source);
   }
 
-  private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable, String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
+  private
+      JavascriptVariableValueSource
+      getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable, String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
     if(script == null || script.equals("")) {
@@ -373,7 +373,8 @@ public class TableResource extends AbstractValueTableResource {
     return jvvs;
   }
 
-  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
+  private Variable
+      buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
     Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {
