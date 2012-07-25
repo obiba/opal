@@ -30,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @CommandUsage(description = "Imports one or more Onyx data files into a datasource.", syntax = "Syntax: import [--unit NAME] [--force] [--source NAME] [--tables NAMES] --destination NAME [--archive FILE] [FILES]")
@@ -155,12 +157,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
    */
   @SuppressWarnings("PMD.NcssMethodCount")
   private int importFile(FileObject file) {
-    String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
-
     getShell().printf("  Importing file: %s ...\n", file.getName().getPath());
     try {
-      importService.importData(unitName, file, options.getDestination(), options.isForce());
+      importService.importData(getUnitName(), file, options.getDestination(), options.isForce(), options.isIgnore());
       archive(file);
       errorCode = 0; // success!
     } catch(NoSuchFunctionalUnitException ex) {
@@ -185,12 +185,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   @SuppressWarnings("PMD.NcssMethodCount")
   private int importFromDatasource(FileObject file) {
-    String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
-
     getShell().printf("  Importing datasource: %s ...\n", options.getSource());
     try {
-      importService.importData(unitName, options.getSource(), options.getDestination(), options.isForce());
+      importService.importData(getUnitName(), options.getSource(), options.getDestination(), options.isForce(), options.isIgnore());
       if(file != null) archive(file);
       errorCode = 0; // success!
     } catch(NoSuchDatasourceException ex) {
@@ -212,12 +210,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   @SuppressWarnings("PMD.NcssMethodCount")
   private int importFromTables(FileObject file) {
-    String unitName = options.isUnit() ? options.getUnit() : null;
     int errorCode = 1; // critical error (or interruption)!
-
-    getShell().printf("  Importing tables: %s ...\n", Joiner.on(", ").join(options.getTables()));
+    getShell().printf("  Importing tables: %s ...\n", getTableNames());
     try {
-      importService.importData(unitName, options.getTables(), options.getDestination(), options.isForce());
+      importService.importData(getUnitName(), options.getTables(), options.getDestination(), options.isForce(), options.isIgnore());
       if(file != null) archive(file);
       errorCode = 0; // success!
     } catch(NoSuchDatasourceException ex) {
@@ -237,6 +233,32 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       runtimeExceptionHandler(ex);
     }
     return errorCode;
+  }
+
+  private String getUnitName() {
+    String unitName = options.isUnit() ? options.getUnit() : null;
+    printUnitOptions();
+    return unitName;
+  }
+
+  private void printUnitOptions() {
+    if(options.isUnit()) {
+      getShell().printf("  Importing in unit: %s\n", options.getUnit());
+      getShell().printf("  Allow identifier generation: %s\n", options.isForce());
+      if(options.isForce() == false) {
+        getShell().printf("  Ignore participants with unknown identifier: %s\n", options.isIgnore());
+      }
+    }
+  }
+
+  private String getTableNames() {
+    return Joiner.on(", ").join(Iterables.transform(options.getTables(), new Function<String, String>() {
+
+      @Override
+      public String apply(String input) {
+        return input.substring(input.indexOf('.') + 1);
+      }
+    }));
   }
 
   private void runtimeExceptionHandler(RuntimeException ex) {

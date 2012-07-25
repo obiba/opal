@@ -163,7 +163,9 @@ public class TableResource extends AbstractValueTableResource {
   public Response updateValueSet(ValueSetsDto valueSetsDto, @QueryParam("unit")
   String unitName, @QueryParam("generateIds")
   @DefaultValue("false")
-  boolean generateIds) throws IOException, InterruptedException {
+  boolean generateIds, @QueryParam("ignoreUnknownIds")
+  @DefaultValue("false")
+  boolean ignoreUnknownIds) throws IOException, InterruptedException {
     ValueTable vt = getValueTable();
     if(vt.getDatasource() == null) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCopierIOException", "Cannot write to a table without datasource").build()).build();
@@ -175,7 +177,7 @@ public class TableResource extends AbstractValueTableResource {
         StaticDatasource ds = new StaticDatasource("import");
         // static writers will add entities and variables while writing values
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
-        importService.importData(unitName, ds.getValueTables(), vt.getDatasource().getName(), generateIds);
+        importService.importData(unitName, ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
       }
     } catch(NoSuchFunctionalUnitException ex) {
       return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "NoSuchFunctionalUnit", unitName).build()).build();
@@ -353,9 +355,7 @@ public class TableResource extends AbstractValueTableResource {
     return new VariableResource(this.getValueTable(), source);
   }
 
-  private
-      JavascriptVariableValueSource
-      getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable, String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
+  private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable, String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
     if(script == null || script.equals("")) {
@@ -373,8 +373,7 @@ public class TableResource extends AbstractValueTableResource {
     return jvvs;
   }
 
-  private Variable
-      buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
+  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script, List<String> categories) {
     Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
 
     if(repeatable) {

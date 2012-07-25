@@ -117,7 +117,7 @@ public class DefaultImportService implements ImportService {
   //
 
   @Override
-  public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
+  public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
     // If unitName is the empty string, coerce it to null.
     String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
 
@@ -137,23 +137,23 @@ public class DefaultImportService implements ImportService {
       }
     }
 
-    copyToDestinationDatasource(sourceFile, destinationDatasource, unit, allowIdentifierGeneration);
+    copyToDestinationDatasource(sourceFile, destinationDatasource, unit, allowIdentifierGeneration, ignoreUnknownIdentifier);
   }
 
   @Override
-  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException, InterruptedException {
+  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException, InterruptedException {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
 
     try {
-      importData(unitName, sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration);
+      importData(unitName, sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration, ignoreUnknownIdentifier);
     } finally {
       silentlyDisposeTransientDatasource(sourceDatasource);
     }
   }
 
   @Override
-  public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException {
+  public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException {
     Assert.isTrue(sourceTableNames != null, "sourceTableNames is null");
     Assert.isTrue(sourceTableNames.size() > 0, "sourceTableNames is empty");
 
@@ -166,7 +166,7 @@ public class DefaultImportService implements ImportService {
     Set<ValueTable> sourceTables = builder.build();
 
     try {
-      importData(unitName, sourceTables, destinationDatasourceName, allowIdentifierGeneration);
+      importData(unitName, sourceTables, destinationDatasourceName, allowIdentifierGeneration, ignoreUnknownIdentifier);
     } finally {
       for(ValueTable table : sourceTables) {
         silentlyDisposeTransientDatasource(table.getDatasource());
@@ -175,7 +175,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(String unitName, Set<ValueTable> sourceTables, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
+  public void importData(String unitName, Set<ValueTable> sourceTables, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
     // If unitName is the empty string, coerce it to null.
     String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
 
@@ -193,7 +193,7 @@ public class DefaultImportService implements ImportService {
       }
     }
 
-    copyValueTables(sourceTables, destinationDatasource, unit, allowIdentifierGeneration);
+    copyValueTables(sourceTables, destinationDatasource, unit, allowIdentifierGeneration, ignoreUnknownIdentifier);
   }
 
   public int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier) {
@@ -326,7 +326,7 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyToDestinationDatasource(FileObject file, Datasource destinationDatasource, FunctionalUnit unit, boolean allowIdentifierGeneration) throws IOException, InterruptedException {
+  private void copyToDestinationDatasource(FileObject file, Datasource destinationDatasource, FunctionalUnit unit, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws IOException, InterruptedException {
     DatasourceEncryptionStrategy datasourceEncryptionStrategy = null;
     if(unit != null) datasourceEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
     // always wrap fs datasources in onyx datasource to support old onyx data dictionary (from 1.0 to 1.6 version)
@@ -334,7 +334,7 @@ public class DefaultImportService implements ImportService {
 
     try {
       sourceDatasource.initialise();
-      copyValueTables(sourceDatasource.getValueTables(), destinationDatasource, unit, allowIdentifierGeneration);
+      copyValueTables(sourceDatasource.getValueTables(), destinationDatasource, unit, allowIdentifierGeneration, ignoreUnknownIdentifier);
     } finally {
       sourceDatasource.dispose();
     }
@@ -349,7 +349,7 @@ public class DefaultImportService implements ImportService {
    * @throws IOException
    * @throws InterruptedException
    */
-  private void copyValueTables(final Set<ValueTable> sourceTables, final Datasource destination, final FunctionalUnit unit, final boolean allowIdentifierGeneration) throws IOException, InterruptedException {
+  private void copyValueTables(final Set<ValueTable> sourceTables, final Datasource destination, final FunctionalUnit unit, final boolean allowIdentifierGeneration, final boolean ignoreUnknownIdentifier) throws IOException, InterruptedException {
     try {
       new LockingActionTemplate() {
 
@@ -374,7 +374,7 @@ public class DefaultImportService implements ImportService {
 
                 if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
                   if(unit != null) {
-                    copyParticipants(valueTable, destination, unit, allowIdentifierGeneration);
+                    copyParticipants(valueTable, destination, unit, allowIdentifierGeneration, ignoreUnknownIdentifier);
                   } else {
                     addMissingEntitiesToKeysTable(valueTable);
                     MultithreadedDatasourceCopier.Builder.newCopier().withThreads(new ThreadFactory() {
@@ -447,12 +447,12 @@ public class DefaultImportService implements ImportService {
     return tablesToLock;
   }
 
-  private void copyParticipants(ValueTable participantTable, Datasource destination, FunctionalUnit unit, boolean allowIdentifierGeneration) throws IOException {
+  private void copyParticipants(ValueTable participantTable, Datasource destination, FunctionalUnit unit, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws IOException {
     final String keyVariableName = unit.getKeyVariableName();
     final View privateView = createPrivateView(participantTable, unit, null);
     final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
 
-    final FunctionalUnitView publicView = createPublicView(participantTable, unit, allowIdentifierGeneration);
+    final FunctionalUnitView publicView = createPublicView(participantTable, unit, allowIdentifierGeneration, ignoreUnknownIdentifier);
     final PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
 
     // prepare for copying participant data
@@ -534,8 +534,8 @@ public class DefaultImportService implements ImportService {
    * @param allowIdentifierGeneration
    * @return
    */
-  private FunctionalUnitView createPublicView(ValueTable participantTable, final FunctionalUnit unit, final boolean allowIdentifierGeneration) {
-    FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable, getIdentifiersValueTable(), allowIdentifierGeneration ? participantIdentifier : null);
+  private FunctionalUnitView createPublicView(ValueTable participantTable, final FunctionalUnit unit, final boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) {
+    FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable, getIdentifiersValueTable(), allowIdentifierGeneration ? participantIdentifier : null, ignoreUnknownIdentifier);
     publicTable.setSelectClause(new SelectClause() {
 
       public boolean select(Variable variable) {

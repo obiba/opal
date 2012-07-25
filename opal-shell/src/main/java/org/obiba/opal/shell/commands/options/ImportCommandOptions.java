@@ -51,4 +51,8 @@ public interface ImportCommandOptions extends HelpOption {
 
   @Option(shortName = "f", description = "Forces participant creation when an unknown participant's identifier is encountered in a functional unit. Ignored when no functional unit is specified.")
   boolean isForce();
+
+  @Option(shortName = "i", description = "Ignore participants having an unknown identifier in a functional unit. Ignored when no functional unit is specified or when participant creation is not allowed.")
+  boolean isIgnore();
+
 }

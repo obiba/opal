@@ -93,4 +93,9 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
   public boolean isForce() {
     return dto.getForce();
   }
+
+  @Override
+  public boolean isIgnore() {
+    return dto.getIgnore();
+  }
 }
