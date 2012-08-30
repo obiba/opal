@@ -6,13 +6,13 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.10.4</version>
+    <version>1.10-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal-core</artifactId>
-  <version>1.10.4</version>
+  <version>1.10-SNAPSHOT</version>
 
   <name>opal-core</name>
   <description>Opal Core Module</description>
