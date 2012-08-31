@@ -14,22 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
@@ -49,6 +33,23 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportTemplateUpdateDialogPresenter.Display> {
 
@@ -137,8 +138,8 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
         return null;
       }
     });
-    validators.add(new ConditionalValidator(getView().isScheduled(),
-        new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired")));
+    validators.add(new ConditionalValidator(getView().isScheduled(), new RequiredTextValidator(getView().getShedule(),
+        "CronExpressionIsRequired")));
     validators.add(new FieldValidator() {
 
       @Override
@@ -172,8 +173,8 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   }
 
   private void addEventHandlers() {
-    super.registerHandler(
-        getView().getUpdateReportTemplateButton().addClickHandler(new CreateOrUpdateReportTemplateClickHandler()));
+    super.registerHandler(getView().getUpdateReportTemplateButton().addClickHandler(
+        new CreateOrUpdateReportTemplateClickHandler()));
 
     super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
@@ -203,8 +204,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
       AlreadyExistReportTemplateCallBack alreadyExistReportTemplateCallback = new AlreadyExistReportTemplateCallBack();
       UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
 
-      ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder()
-          .forResource(ub.build()).get()
+      ResourceRequestBuilderFactory.<ReportTemplateDto> newBuilder().forResource(ub.build()).get()
           .withCallback(alreadyExistReportTemplateCallback)
           .withCallback(Response.SC_NOT_FOUND, createReportTemplateCallback).send();
     }
@@ -261,7 +261,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   private void doUpdateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
     CreateOrUpdateReportTemplateCallBack callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
-    UriBuilder ub = UriBuilder.create().segment("report-temnplate", getView().getName().getText());
+    UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
     ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
         .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
         .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
@@ -281,8 +281,8 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
     @Override
     public void onResource(Response response, ReportTemplateDto resource) {
-      getEventBus()
-          .fireEvent(NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
+      getEventBus().fireEvent(
+          NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
     }
 
   }
@@ -362,14 +362,15 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     getView().setFormat(reportTemplate.getFormat());
     getView().setName(reportTemplate.getName());
     emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
-    parametersSelectorPresenter.getView().setItems(Iterables
-        .transform(JsArrays.toIterable(reportTemplate.getParametersArray()), new Function<ParameterDto, String>() {
+    parametersSelectorPresenter.getView().setItems(
+        Iterables.transform(JsArrays.toIterable(reportTemplate.getParametersArray()),
+            new Function<ParameterDto, String>() {
 
-          @Override
-          public String apply(ParameterDto input) {
-            return input.getKey() + "=" + input.getValue();
-          }
-        }));
+              @Override
+              public String apply(ParameterDto input) {
+                return input.getKey() + "=" + input.getValue();
+              }
+            }));
     getView().setSchedule(reportTemplate.getCron());
   }
 
