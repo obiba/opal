@@ -4,7 +4,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.10.6</version>
     <relativePath>../</relativePath>
   </parent>
   <artifactId>opal-core-api</artifactId>
