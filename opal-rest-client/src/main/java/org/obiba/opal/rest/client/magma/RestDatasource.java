@@ -94,13 +94,13 @@ public class RestDatasource extends AbstractDatasource {
         if(response.getStatusLine().getStatusCode() != 201) {
           throw new RuntimeException("cannot create table " + response.getStatusLine().getReasonPhrase());
         }
+        addValueTable(tableName);
         EntityUtils.consume(response.getEntity());
       } catch(ClientProtocolException e) {
         throw new RuntimeException(e);
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
-      refresh();
     }
     return new RestValueTableWriter((RestValueTable) super.getValueTable(tableName));
   }
@@ -127,10 +127,14 @@ public class RestDatasource extends AbstractDatasource {
       super.removeValueTable(table);
     }
     for(String table : tablesToAdd) {
-      ValueTable vt = initialiseValueTable(table);
-      Initialisables.initialise(vt);
-      super.addValueTable(vt);
+      addValueTable(table);
     }
+  }
+
+  private void addValueTable(String table) {
+    ValueTable vt = initialiseValueTable(table);
+    Initialisables.initialise(vt);
+    super.addValueTable(vt);
   }
 
   OpalJavaClient getOpalClient() {
