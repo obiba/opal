@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
@@ -48,10 +49,11 @@ public class RestDatasource extends AbstractDatasource {
       refresh();
     } catch(RuntimeException e) {
       if(e.getCause() != null && e.getCause() instanceof ConnectException) {
-        log.warn("Failed connecting to Opal: {}", e.getCause().getMessage());
+        log.error("Failed connecting to Opal: {}", e.getCause().getMessage());
       } else {
-        log.warn("Unexpected error while communicating with Opal", e);
+        log.error("Unexpected error while communicating with Opal", e);
       }
+      throw new MagmaRuntimeException(e.getMessage(), e);
     }
     return super.getValueTables();
   }
@@ -62,10 +64,11 @@ public class RestDatasource extends AbstractDatasource {
       super.initialise();
     } catch(RuntimeException e) {
       if(e.getCause() != null && e.getCause() instanceof ConnectException) {
-        log.warn("Failed connecting to Opal: {}", e.getCause().getMessage());
+        log.error("Failed connecting to Opal: {}", e.getCause().getMessage());
       } else {
-        log.warn("Unexpected error while communicating with Opal", e);
+        log.error("Unexpected error while communicating with Opal", e);
       }
+      throw new MagmaRuntimeException(e.getMessage(), e);
     }
   }
 
