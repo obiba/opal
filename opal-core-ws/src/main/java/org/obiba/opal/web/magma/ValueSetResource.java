@@ -86,11 +86,16 @@ public class ValueSetResource extends AbstractValueTableResource {
     }
   }
 
+  /**
+   * Get a value, optionally providing the position (start at 1) of the value in the case of a value sequence.
+   * @param pos
+   * @return
+   */
   @GET
   @Path("/value")
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public Response getValue(@QueryParam("pos") Integer pos) {
-    if(pos != null && pos < 0) return Response.status(Status.BAD_REQUEST).build();
+    if(pos != null && pos <= 0) return Response.status(Status.BAD_REQUEST).build();
     if(vvs == null) return Response.status(Status.BAD_REQUEST).build();
 
     Variable variable = vvs.getVariable();
@@ -104,18 +109,23 @@ public class ValueSetResource extends AbstractValueTableResource {
   // private methods
   //
 
+  /**
+   * The position in a sequence of the value is its occurrence minus one.
+   * @param pos
+   * @return
+   */
   private Response getValueAtPosition(Integer pos) {
     ResponseBuilder builder;
     try {
       Value value = extractValue(entity.getIdentifier());
-      if(value.isNull() || (value.isSequence() && pos != null && pos >= value.asSequence().getSize())) {
+      if(value.isNull() || (value.isSequence() && pos != null && pos > value.asSequence().getSize())) {
         builder = Response.status(Status.NOT_FOUND);
       } else {
-        value = getValueAt(value, pos);
+        value = getValueAt(value, pos != null ? pos - 1 : null);
         if(value.isNull()) {
           builder = Response.status(Status.NOT_FOUND);
         } else {
-          builder = getValueResponse(entity.getIdentifier(), value);
+          builder = getValueResponse(entity.getIdentifier(), value, pos);
         }
       }
     } catch(NoSuchValueSetException ex) {
@@ -157,21 +167,21 @@ public class ValueSetResource extends AbstractValueTableResource {
     return vvs.getValue(valueSet);
   }
 
-  private Value getValueAt(Value value, Integer pos) {
-    if(value.isSequence() && pos != null) return value.asSequence().get(pos);
+  private Value getValueAt(Value value, Integer occurrence) {
+    if(value.isSequence() && occurrence != null) return value.asSequence().get(occurrence);
     else
       return value;
   }
 
-  private ResponseBuilder getValueResponse(String identifier, Value value) {
+  private ResponseBuilder getValueResponse(String identifier, Value value, Integer pos) {
     Variable variable = vvs.getVariable();
     if(variable.getValueType().equals(BinaryType.get())) {
-      return getBinaryValueResponse(identifier, value);
+      return getBinaryValueResponse(identifier, value, pos);
     }
     return TimestampedResponses.ok(getValueTable(), value.toString()).type(value.isSequence() ? "text/csv" : MediaType.TEXT_PLAIN);
   }
 
-  private ResponseBuilder getBinaryValueResponse(String identifier, Value value) {
+  private ResponseBuilder getBinaryValueResponse(String identifier, Value value, Integer pos) {
     if(value.isSequence()) return Response.status(Status.BAD_REQUEST);
 
     Variable variable = vvs.getVariable();
@@ -179,25 +189,37 @@ public class ValueSetResource extends AbstractValueTableResource {
 
     // download as a file
     builder = TimestampedResponses.ok(getValueTable(), value.getValue()).type(getVariableMimeType(variable));
-    builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier) + "\"");
+    builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier, pos) + "\"");
 
     return builder;
   }
 
-  private String getFileName(Variable variable, String identifier) {
+  private String getFileName(Variable variable, String identifier, Integer pos) {
     // first look in variables attributes
     String name = getFileNameFromAttributes(variable);
-    if(name != null) {
-      int dot = name.lastIndexOf('.');
-      if(dot != -1) {
-        StringBuilder builder = new StringBuilder(name);
-        return builder.insert(dot, "-" + identifier).toString();
-      } else {
-        return name + "-" + identifier + "." + getFileExtension(variable);
-      }
+    StringBuilder builder = new StringBuilder();
+
+    if(name == null) {
+      name = variable.getName();
     }
 
-    return variable.getName() + "-" + identifier + "." + getFileExtension(variable);
+    builder.append(name);
+    int dot = name.lastIndexOf('.');
+    if(dot != -1) {
+      String id = identifier;
+      if(pos != null) {
+        id = id + "-" + pos;
+      }
+      builder.insert(dot, "-" + id);
+    } else {
+      builder.append("-").append(identifier);
+      if(pos != null) {
+        builder.append("-").append(pos);
+      }
+      builder.append(".").append(getFileExtension(variable));
+    }
+
+    return builder.toString();
   }
 
   private String getFileExtension(Variable variable) {

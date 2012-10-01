@@ -75,8 +75,7 @@ public final class Dtos {
     };
   }
 
-  public static VariableDto.Builder asDto(LinkDto tableLink, Variable from, @Nullable
-  Integer index) {
+  public static VariableDto.Builder asDto(LinkDto tableLink, Variable from, @Nullable Integer index) {
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
       var.setOccurrenceGroup(from.getOccurrenceGroup());
@@ -105,8 +104,7 @@ public final class Dtos {
     return var;
   }
 
-  public static VariableDto.Builder asDto(@Nullable
-  LinkDto tableLink, Variable from) {
+  public static VariableDto.Builder asDto(@Nullable LinkDto tableLink, Variable from) {
     return asDto(tableLink, from, null);
   }
 
@@ -304,7 +302,7 @@ public final class Dtos {
     public String apply(Object o) {
       Value input = (Value) o;
       if(input.getValueType() == BinaryType.get()) {
-        int length = ((byte[]) input.getValue()).length;
+        int length = input.isNull() ? 0 : 1;
         return "byte[" + length + "]";
       }
       return input.toString();

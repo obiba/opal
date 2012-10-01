@@ -127,7 +127,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier, int index) {
       StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName()).append("/value").append("?pos=").append(index);
+      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName()).append("/value").append("?pos=").append(index + 1);
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
   }
