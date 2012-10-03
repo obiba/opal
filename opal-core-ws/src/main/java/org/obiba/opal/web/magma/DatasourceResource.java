@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
@@ -119,7 +118,7 @@ public class DatasourceResource {
   }
 
   @GET
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 10)
+  // @Cache(isPrivate = true, mustRevalidate = true, maxAge = 10)
   public Magma.DatasourceDto get() {
     Datasource ds = getDatasource();
 
@@ -154,8 +153,7 @@ public class DatasourceResource {
   }
 
   @Path("/table/{table}")
-  public TableResource getTable(@PathParam("table")
-  String table) {
+  public TableResource getTable(@PathParam("table") String table) {
     return getTableResource(getDatasource().getValueTable(table));
   }
 
@@ -182,8 +180,7 @@ public class DatasourceResource {
 
   @POST
   @Path("/views")
-  public Response createView(final ViewDto viewDto, @Context
-  UriInfo uriInfo) {
+  public Response createView(final ViewDto viewDto, @Context UriInfo uriInfo) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
 
     if(datasourceHasTable(viewDto.getName())) {
@@ -198,8 +195,7 @@ public class DatasourceResource {
   }
 
   @Path("/view/{viewName}")
-  public ViewResource getView(@PathParam("viewName")
-  String viewName) {
+  public ViewResource getView(@PathParam("viewName") String viewName) {
     View view = viewManager.getView(getDatasource().getName(), viewName);
     return getViewResource(view);
   }
@@ -207,8 +203,7 @@ public class DatasourceResource {
   @GET
   @Path("/locales")
   @NoAuthorization
-  public Iterable<LocaleDto> getLocales(@QueryParam("locale")
-  String displayLocale) {
+  public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
     List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
     for(Locale locale : getLocales()) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
