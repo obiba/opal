@@ -11,6 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
+      <excludeFolder url="file://$MODULE_DIR$/target/site" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire-reports" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
@@ -52,11 +53,11 @@
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.protobuf-java-format:protobuf-java-format:1.2" level="project" />
     <orderEntry type="module" module-name="opal-web-model" scope="TEST" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.obiba.magma:magma-api:1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:jcl-over-slf4j:1.6.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-log4j12:1.6.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: log4j:log4j:1.2.16" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.obiba.magma:magma-api:1.2.18" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:jcl-over-slf4j:1.7.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-log4j12:1.7.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.7" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.easymock:easymock:2.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-all:1.1" level="project" />

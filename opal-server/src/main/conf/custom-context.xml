@@ -1,0 +1,11 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!--Uncomment this to use Atlassian Crowd Realms-->
+  <!--<import resource="file:${OPAL_HOME}/conf/crowd/crowd-context.xml" />-->
+
+
+  <!-- Intentionally left empty. This is meant to be overridden by custom configuration if required. -->
+
+
+</beans>

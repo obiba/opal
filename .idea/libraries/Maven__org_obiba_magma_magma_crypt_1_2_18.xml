@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.obiba.magma:magma-crypt:1.2.18">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/obiba/magma/magma-crypt/1.2.18/magma-crypt-1.2.18.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/obiba/magma/magma-crypt/1.2.18/magma-crypt-1.2.18-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/obiba/magma/magma-crypt/1.2.18/magma-crypt-1.2.18-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

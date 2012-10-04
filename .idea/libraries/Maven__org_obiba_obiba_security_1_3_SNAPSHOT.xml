@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.obiba:obiba-security:1.3-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/obiba/obiba-security/1.3-SNAPSHOT/obiba-security-1.3-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/obiba/obiba-security/1.3-SNAPSHOT/obiba-security-1.3-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/obiba/obiba-security/1.3-SNAPSHOT/obiba-security-1.3-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -37,6 +37,7 @@
         <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="true" />
         <option name="JD_ADD_BLANK_AFTER_DESCRIPTION" value="false" />
         <XML>
+          <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="true" />
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
         <codeStyleSettings language="CSS">

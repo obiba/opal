@@ -19,6 +19,7 @@
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
+      <excludeFolder url="file://$MODULE_DIR$/target/site" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
     </content>
@@ -26,21 +27,22 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: org.apache.sshd:sshd-core:0.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.mina:mina-core:2.0.1" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.2" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.1" level="project" />
     <orderEntry type="module" module-name="opal-shell" />
-    <orderEntry type="library" name="Maven: org.obiba:obiba-core:1.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba:obiba-core:1.3-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="opal-core-api" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-api:1.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-api:1.2.18" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:10.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:1.3.9" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-crypt:1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-datasource-fs:1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-xstream:1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.thoughtworks.xstream:xstream:1.3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-crypt:1.2.18" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-datasource-fs:1.2.18" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-xstream:1.2.18" level="project" />
+    <orderEntry type="library" name="Maven: com.thoughtworks.xstream:xstream:1.4.2" level="project" />
+    <orderEntry type="library" name="Maven: xmlpull:xmlpull:1.1.3.1" level="project" />
     <orderEntry type="library" name="Maven: xpp3:xpp3_min:1.1.4c" level="project" />
     <orderEntry type="library" name="Maven: de.schlichtherle.io:truezip:6.6" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-hibernate-datasource:1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-hibernate-common:1.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-hibernate-datasource:1.2.18" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-hibernate-common:1.2.18" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-core:3.5.6-Final" level="project" />
     <orderEntry type="library" name="Maven: antlr:antlr:2.7.6" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2" level="project" />
@@ -93,30 +95,30 @@
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:7.0.2.v20100331" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.protobuf-java-format:protobuf-java-format:1.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: mysql:mysql-connector-java:5.1.17" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-security:1.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-security:1.2.18" level="project" />
     <orderEntry type="library" name="Maven: eu.flatwhite.shiro:shiro-extras:1.0.1-obiba" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:jcl-over-slf4j:1.6.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:jcl-over-slf4j:1.7.1" level="project" />
     <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.2" level="project" />
     <orderEntry type="library" name="Maven: jline:jline:0.9.94" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.7" level="project" />
     <orderEntry type="library" name="Maven: uk.co.flamingpenguin.jewelcli:jewelcli:0.6" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-datasource-null:1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-datasource-csv:1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: net.sf.opencsv:opencsv:1.8" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-datasource-excel:1.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-datasource-null:1.2.18" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-datasource-csv:1.2.18" level="project" />
+    <orderEntry type="library" name="Maven: net.sf.opencsv:opencsv:2.3" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-datasource-excel:1.2.18" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi:3.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.obiba.magma:magma-js:1.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.obiba.magma:magma-js:1.2.18" level="project" />
     <orderEntry type="library" name="Maven: rhino:js:1.7R2" level="project" />
     <orderEntry type="library" name="Maven: org.jscience:jscience-physics:5.0-r53p01" level="project" />
     <orderEntry type="library" name="Maven: org.unitsofmeasurement:unit-api:0.6.0" level="project" />
     <orderEntry type="library" name="Maven: javolution:javolution:5.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:1.8.3" level="project" />
     <orderEntry type="library" name="Maven: javax.transaction:jta:1.0.1B" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-log4j12:1.6.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: log4j:log4j:1.2.16" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-log4j12:1.7.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context-support:3.0.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: javax.mail:mail:1.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.velocity:velocity:1.6.4" level="project" />
