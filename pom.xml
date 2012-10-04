@@ -644,7 +644,7 @@
             <linkXref>false</linkXref>
             <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
             <minimumTokens>30</minimumTokens>
-            <targetJdk>${java.version}</targetJdk>
+            <targetJdk>${maven.compiler.target}</targetJdk>
             <excludeRoots>
               <excludeRoot>target/generated-sources/javacc</excludeRoot>
               <excludeRoot>target/generated-sources/jjtree</excludeRoot>
@@ -680,8 +680,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
           <encoding>${project.build.sourceEncoding}</encoding>
           <showWarnings>true</showWarnings>
         </configuration>
@@ -801,7 +801,9 @@
   </scm>
 
   <properties>
-    <java.version>1.6</java.version>
+
+    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.6</maven.compiler.source>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
     <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
