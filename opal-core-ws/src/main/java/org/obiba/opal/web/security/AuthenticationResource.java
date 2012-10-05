@@ -16,8 +16,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -48,6 +48,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     try {
       SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password));
     } catch(AuthenticationException e) {
+      log.info("Authentication failure of user '{}': {}", username, e.getMessage());
       // When a request contains credentials and they are invalid, the a 403 (Forbidden) should be returned.
       return Response.status(Status.FORBIDDEN).build();
     }
