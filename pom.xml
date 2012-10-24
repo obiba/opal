@@ -15,7 +15,7 @@
   <licenses>
     <license>
       <name>GNU Public License version 3</name>
-      <url>LICENSE</url>
+      <url>http://www.obiba.org/node/62</url>
     </license>
   </licenses>
 
@@ -670,11 +670,24 @@
           <version>${maven-surefire-plugin.version}</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${maven-deploy-plugin.version}</version>
+        </plugin>
+
       </plugins>
 
     </pluginManagement>
 
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -685,6 +698,27 @@
           <encoding>${project.build.sourceEncoding}</encoding>
           <showWarnings>true</showWarnings>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>${maven-buildnumber-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>createBuildNumber</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+            <configuration>
+              <format>{0,date,yyyyMMddHHmmss}</format>
+              <items>
+                <item>timestamp</item>
+              </items>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
@@ -706,8 +740,6 @@
         <artifactId>maven-release-plugin</artifactId>
         <version>${maven-release-plugin.version}</version>
         <configuration>
-          <branchBase>https://svn.obiba.org/opal/branches</branchBase>
-          <tagBase>https://svn.obiba.org/opal/tags/releases</tagBase>
           <!-- Use parent version as modules' version -->
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <releaseProfiles>release</releaseProfiles>
@@ -796,9 +828,28 @@
   </distributionManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.obiba.org/opal/trunk</connection>
-    <developerConnection>scm:svn:https://svn.obiba.org/opal/trunk</developerConnection>
+    <connection>scm:git:git://github.com/obiba/opal.git</connection>
+    <developerConnection>scm:git:https://github.com/obiba/opal.git</developerConnection>
+    <url>https://github.com/obiba/opal</url>
   </scm>
+
+  <issueManagement>
+    <system>JIRA</system>
+    <url>http://jira.obiba.org/</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>http://ci.obiba.org/view/Opal/job/Opal</url>
+  </ciManagement>
+
+  <mailingLists>
+    <mailingList>
+      <name>OBiBa Users</name>
+      <post>obiba-users@googlegroups.com</post>
+      <archive>https://groups.google.com/forum/?fromgroups#!forum/obiba-users</archive>
+    </mailingList>
+  </mailingLists>
 
   <properties>
 
@@ -839,87 +890,65 @@
     <cglib-nodep.version>2.2</cglib-nodep.version>
 
     <!-- maven plugins -->
-    <maven-deploy-plugin.version>2.4</maven-deploy-plugin.version>
-    <maven-source-plugin.version>2.2</maven-source-plugin.version>
-    <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
-    <maven-war-plugin.version>2.3</maven-war-plugin.version>
-    <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
-    <maven-release-plugin.version>2.3.2</maven-release-plugin.version>
-    <maven-findbugs-plugin.version>2.5.2</maven-findbugs-plugin.version>
-    <maven-javadoc-plugin.version>2.9</maven-javadoc-plugin.version>
-    <maven-surefire-plugin.version>2.10</maven-surefire-plugin.version>
+    <maven-buildnumber-plugin.version>1.2</maven-buildnumber-plugin.version>
     <maven-cobertura-plugin.version>2.5.2</maven-cobertura-plugin.version>
+    <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+    <maven-deploy-plugin.version>2.7</maven-deploy-plugin.version>
+    <maven-findbugs-plugin.version>2.5.2</maven-findbugs-plugin.version>
+    <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>2.9</maven-javadoc-plugin.version>
     <maven-pmd-plugin.version>2.7.1</maven-pmd-plugin.version>
-    <maven-buildnumber-plugin.version>1.0-beta-4</maven-buildnumber-plugin.version>
+    <maven-release-plugin.version>2.3.2</maven-release-plugin.version>
+    <maven-source-plugin.version>2.2</maven-source-plugin.version>
+    <maven-surefire-plugin.version>2.10</maven-surefire-plugin.version>
+    <maven-war-plugin.version>2.3</maven-war-plugin.version>
 
   </properties>
 
   <profiles>
     <profile>
-      <id>default</id>
-      <!-- A profile for the builds NOT performed by the continuous integration server. This profile is active by default, 
-        which means that it will be deactivated if any other profile is specifically activated (ie: using mvn -P build-id). -->
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
+      <id>release</id>
       <build>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>buildnumber-maven-plugin</artifactId>
-            <version>${maven-buildnumber-plugin.version}</version>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
             <executions>
               <execution>
-                <id>createBuildNumber</id>
-                <phase>validate</phase>
+                <id>html-aggregate-javadocs</id>
+                <phase>verify</phase>
                 <goals>
-                  <goal>create</goal>
+                  <goal>aggregate</goal>
                 </goals>
                 <configuration>
-                  <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
-                  <!-- This configuation should allow machines without the SCM client to create a buildNumber property -->
-                  <format>{0,date,yyyyMMddHHmmss}</format>
-                  <items>
-                    <item>timestamp</item>
-                  </items>
-                  <revisionOnScmFailure>LOCAL</revisionOnScmFailure>
+                  <reportOutputDirectory>${obiba.docs.url}</reportOutputDirectory>
+                  <destDir>${project.artifactId}</destDir>
                 </configuration>
               </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <!-- A profile for the builds performed by the continuous integration server -->
-      <id>ci-build</id>
-
-      <build>
-        <plugins>
-
-          <!-- Creates a ${buildNumber} variable within Maven that can be used throughout the build process -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>buildnumber-maven-plugin</artifactId>
-            <version>${maven-buildnumber-plugin.version}</version>
-            <executions>
               <execution>
-                <id>createBuildNumber</id>
-                <phase>validate</phase>
+                <id>jar-javadocs</id>
+                <phase>verify</phase>
                 <goals>
-                  <goal>create</goal>
+                  <goal>jar</goal>
+                  <goal>aggregate-jar</goal>
                 </goals>
               </execution>
             </executions>
-            <configuration>
-              <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
-            </configuration>
           </plugin>
-
+          <plugin>
+            <!-- Deploy javadoc and sources: explicitly define maven-deploy-plugin after other to force exec order -->
+            <artifactId>maven-deploy-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>deploy</id>
+                <phase>deploy</phase>
+                <goals><goal>deploy</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
-
     </profile>
   </profiles>
+
 </project>
