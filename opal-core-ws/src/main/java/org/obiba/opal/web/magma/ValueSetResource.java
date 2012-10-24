@@ -87,7 +87,7 @@ public class ValueSetResource extends AbstractValueTableResource {
   }
 
   /**
-   * Get a value, optionally providing the position (start at 1) of the value in the case of a value sequence.
+   * Get a value, optionally providing the position (start at 0) of the value in the case of a value sequence.
    * @param pos
    * @return
    */
@@ -95,7 +95,7 @@ public class ValueSetResource extends AbstractValueTableResource {
   @Path("/value")
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public Response getValue(@QueryParam("pos") Integer pos) {
-    if(pos != null && pos <= 0) return Response.status(Status.BAD_REQUEST).build();
+    if(pos != null && pos < 0) return Response.status(Status.BAD_REQUEST).build();
     if(vvs == null) return Response.status(Status.BAD_REQUEST).build();
 
     Variable variable = vvs.getVariable();
@@ -110,18 +110,18 @@ public class ValueSetResource extends AbstractValueTableResource {
   //
 
   /**
-   * The position in a sequence of the value is its occurrence minus one.
-   * @param pos
+   * The position in a sequence of the value is its occurrence.
+   * @param pos the occurrence number (start at 0)
    * @return
    */
   private Response getValueAtPosition(Integer pos) {
     ResponseBuilder builder;
     try {
       Value value = extractValue(entity.getIdentifier());
-      if(value.isNull() || (value.isSequence() && pos != null && pos > value.asSequence().getSize())) {
+      if(value.isNull() || (value.isSequence() && pos != null && pos > value.asSequence().getSize() - 1)) {
         builder = Response.status(Status.NOT_FOUND);
       } else {
-        value = getValueAt(value, pos != null ? pos - 1 : null);
+        value = getValueAt(value, pos);
         if(value.isNull()) {
           builder = Response.status(Status.NOT_FOUND);
         } else {
@@ -208,13 +208,13 @@ public class ValueSetResource extends AbstractValueTableResource {
     if(dot != -1) {
       String id = identifier;
       if(pos != null) {
-        id = id + "-" + pos;
+        id = id + "-" + (pos + 1);
       }
       builder.insert(dot, "-" + id);
     } else {
       builder.append("-").append(identifier);
       if(pos != null) {
-        builder.append("-").append(pos);
+        builder.append("-").append(pos + 1);
       }
       builder.append(".").append(getFileExtension(variable));
     }
