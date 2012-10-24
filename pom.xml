@@ -921,8 +921,8 @@
                   <goal>aggregate</goal>
                 </goals>
                 <configuration>
-                  <reportOutputDirectory>${obiba.docs.url}</reportOutputDirectory>
-                  <destDir>${project.artifactId}</destDir>
+                  <reportOutputDirectory>${obiba.docs.url}/${project.artifactId}</reportOutputDirectory>
+                  <destDir>${project.version}</destDir>
                 </configuration>
               </execution>
               <execution>
