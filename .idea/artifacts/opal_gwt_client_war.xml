@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="opal-gwt-client:war">
-    <output-path>$PROJECT_DIR$/opal-gwt-client/target</output-path>
-    <root id="archive" name="opal-gwt-client-1.11-SNAPSHOT.war">
-      <element id="artifact" artifact-name="opal-gwt-client:war exploded" />
-    </root>
-  </artifact>
-</component>
