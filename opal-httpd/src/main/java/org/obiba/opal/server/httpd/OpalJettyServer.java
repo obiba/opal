@@ -33,7 +33,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.server.httpd.security.AuthenticationFilter;
-import org.obiba.opal.server.httpd.security.X509CertificateAuthenticationFilter;
 import org.obiba.opal.server.ssl.SslContextFactory;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
@@ -72,7 +71,11 @@ public class OpalJettyServer implements Service {
 
   @Autowired
   @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
-  public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}") Integer httpPort, final @Value("${org.obiba.opal.https.port}") Integer httpsPort, final @Value("${org.obiba.opal.ajp.port}") Integer ajpPort) {
+  public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}")
+  Integer httpPort, final @Value("${org.obiba.opal.https.port}")
+  Integer httpsPort, final @Value("${org.obiba.opal.ajp.port}")
+  Integer ajpPort, final @Value("${org.obiba.opal.maxIdleTime}")
+  Integer maxIdleTime) {
     Server server = new Server();
     server.setSendServerVersion(false);
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
@@ -81,7 +84,7 @@ public class OpalJettyServer implements Service {
     if(httpPort != null && httpPort > 0) {
       SelectChannelConnector httpConnector = new SelectChannelConnector();
       httpConnector.setPort(httpPort);
-      httpConnector.setMaxIdleTime(30000);
+      httpConnector.setMaxIdleTime(maxIdleTime != null ? maxIdleTime : 30000);
       httpConnector.setRequestHeaderSize(8192);
       server.addConnector(httpConnector);
     }
@@ -106,7 +109,7 @@ public class OpalJettyServer implements Service {
 
       SslSelectChannelConnector sslConnector = new SslSelectChannelConnector(jettySsl);
       sslConnector.setPort(httpsPort);
-      sslConnector.setMaxIdleTime(30000);
+      sslConnector.setMaxIdleTime(maxIdleTime != null ? maxIdleTime : 30000);
       sslConnector.setRequestHeaderSize(8192);
 
       server.addConnector(sslConnector);
@@ -176,7 +179,8 @@ public class OpalJettyServer implements Service {
     contextHandler.setContextPath("/");
     contextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new AuthenticationFilter(securityMgr)), "/ws/*", FilterMapping.DEFAULT);
-//    contextHandler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+    // contextHandler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*",
+    // FilterMapping.DEFAULT);
     // contextHandler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);

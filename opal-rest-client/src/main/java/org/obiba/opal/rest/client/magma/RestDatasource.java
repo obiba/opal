@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
@@ -48,10 +49,11 @@ public class RestDatasource extends AbstractDatasource {
       refresh();
     } catch(RuntimeException e) {
       if(e.getCause() != null && e.getCause() instanceof ConnectException) {
-        log.warn("Failed connecting to Opal: {}", e.getCause().getMessage());
+        log.error("Failed connecting to Opal: {}", e.getCause().getMessage());
       } else {
-        log.warn("Unexpected error while communicating with Opal", e);
+        log.error("Unexpected error while communicating with Opal", e);
       }
+      throw new MagmaRuntimeException(e.getMessage(), e);
     }
     return super.getValueTables();
   }
@@ -62,10 +64,11 @@ public class RestDatasource extends AbstractDatasource {
       super.initialise();
     } catch(RuntimeException e) {
       if(e.getCause() != null && e.getCause() instanceof ConnectException) {
-        log.warn("Failed connecting to Opal: {}", e.getCause().getMessage());
+        log.error("Failed connecting to Opal: {}", e.getCause().getMessage());
       } else {
-        log.warn("Unexpected error while communicating with Opal", e);
+        log.error("Unexpected error while communicating with Opal", e);
       }
+      throw new MagmaRuntimeException(e.getMessage(), e);
     }
   }
 
@@ -94,13 +97,13 @@ public class RestDatasource extends AbstractDatasource {
         if(response.getStatusLine().getStatusCode() != 201) {
           throw new RuntimeException("cannot create table " + response.getStatusLine().getReasonPhrase());
         }
+        addValueTable(tableName);
         EntityUtils.consume(response.getEntity());
       } catch(ClientProtocolException e) {
         throw new RuntimeException(e);
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
-      refresh();
     }
     return new RestValueTableWriter((RestValueTable) super.getValueTable(tableName));
   }
@@ -127,10 +130,14 @@ public class RestDatasource extends AbstractDatasource {
       super.removeValueTable(table);
     }
     for(String table : tablesToAdd) {
-      ValueTable vt = initialiseValueTable(table);
-      Initialisables.initialise(vt);
-      super.addValueTable(vt);
+      addValueTable(table);
     }
+  }
+
+  private void addValueTable(String table) {
+    ValueTable vt = initialiseValueTable(table);
+    Initialisables.initialise(vt);
+    super.addValueTable(vt);
   }
 
   OpalJavaClient getOpalClient() {

@@ -859,7 +859,7 @@
 
     <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
 
-    <obiba.commons.version>1.3-SNAPSHOT</obiba.commons.version>
+    <obiba.commons.version>1.3.1</obiba.commons.version>
     <magma.version>1.2.18</magma.version>
     <guava.version>10.0.1</guava.version>
     <spring.version>3.0.6.RELEASE</spring.version>

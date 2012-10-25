@@ -84,7 +84,7 @@ public class ImportCommandTest {
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     OpalShell mockShell = createMockShellForRelativePathImport("my-unit", "test.zip");
     ImportService mockImportService = createMock(ImportService.class);
-    mockImportService.importData("my-unit", mockFile, "opal-data", true);
+    mockImportService.importData("my-unit", mockFile, "opal-data", true, false);
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
 
     test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir, mockFile);
@@ -104,7 +104,7 @@ public class ImportCommandTest {
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
     ImportService mockImportService = createMock(ImportService.class);
     for(FileObject mockFile : mockFilesInUnitDir) {
-      mockImportService.importData("my-unit", mockFile, "opal-data", true);
+      mockImportService.importData("my-unit", mockFile, "opal-data", true, false);
     }
 
     test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir);
@@ -176,6 +176,7 @@ public class ImportCommandTest {
     expect(mockOptions.isFiles()).andReturn(true).atLeastOnce();
     expect(mockOptions.getFiles()).andReturn(Arrays.asList(relativeFilePath)).atLeastOnce();
     expect(mockOptions.isForce()).andReturn(true).atLeastOnce();
+    expect(mockOptions.isIgnore()).andReturn(false).atLeastOnce();
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
     expect(mockOptions.isTables()).andReturn(false).atLeastOnce();
@@ -196,6 +197,8 @@ public class ImportCommandTest {
     OpalShell mockShell = createMock(OpalShell.class);
     mockShell.printf("Importing %d file%s :\n", 1, "");
     mockShell.printf("  Importing file: %s ...\n", "units" + "/" + unitName + "/" + relativeFilePath);
+    mockShell.printf("  Importing in unit: %s\n", unitName);
+    mockShell.printf("  Allow identifier generation: %s\n", true);
     mockShell.printf("Import done.\n");
 
     return mockShell;
@@ -233,6 +236,7 @@ public class ImportCommandTest {
     expect(mockOptions.getDestination()).andReturn(destination).atLeastOnce();
     expect(mockOptions.isFiles()).andReturn(false).atLeastOnce();
     expect(mockOptions.isForce()).andReturn(true).atLeastOnce();
+    expect(mockOptions.isIgnore()).andReturn(false).atLeastOnce();
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
     expect(mockOptions.isTables()).andReturn(false).atLeastOnce();
@@ -247,6 +251,11 @@ public class ImportCommandTest {
     for(String fileName : fileNames) {
       mockShell.printf("  Importing file: %s ...\n", "units" + "/" + unitName + "/" + fileName);
     }
+    mockShell.printf("  Importing in unit: %s\n", unitName);
+    mockShell.printf("  Importing in unit: %s\n", unitName);
+    mockShell.printf("  Allow identifier generation: %s\n", true);
+    mockShell.printf("  Allow identifier generation: %s\n", true);
+
     mockShell.printf("Import done.\n");
 
     return mockShell;

@@ -20,6 +20,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DisclosurePanel;
+import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 
@@ -43,6 +45,12 @@ public class CategoricalSummaryView extends Composite {
   @UiField
   DivElement frequencyElement;
 
+  @UiField
+  Grid grid;
+
+  @UiField
+  DisclosurePanel details;
+
   final HTMLPanel widget;
 
   final JqPlot plot;
@@ -53,7 +61,7 @@ public class CategoricalSummaryView extends Composite {
     frequencyElement.setId(HTMLPanel.createUniqueId());
     frequencyElement.setAttribute("style", "width:400px;");
 
-    obs.setText("" + categorical.getN());
+    obs.setText("" + Math.round(categorical.getN()));
     mode.setText(categorical.getMode());
 
     if(categorical.getFrequenciesArray() != null) {
@@ -65,15 +73,23 @@ public class CategoricalSummaryView extends Composite {
       frequencyElement.setAttribute("style", "width:" + width + "px;");
 
       FrequencyPlot freqPlot = new FrequencyPlot(frequencyElement.getId());
-      for(int i = 0; i < categorical.getFrequenciesArray().length(); i++) {
+      grid.resizeRows(count + 1);
+      for(int i = 0; i < count; i++) {
         FrequencyDto value = categorical.getFrequenciesArray().get(i);
         if(value.hasValue()) {
           freqPlot.push(value.getValue(), value.getFreq(), value.getPct() * 100);
+          grid.setWidget(i + 1, 0, new Label(value.getValue()));
+          grid.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
+          grid.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
         }
       }
       this.plot = freqPlot;
+
+      details.setVisible(true);
+
     } else {
       this.plot = null;
+      details.setVisible(false);
     }
   }
 

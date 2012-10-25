@@ -33,12 +33,13 @@ public interface ImportService {
    * @param sourceFile data file to be imported
    * @param destinationDatasourceName name of the destination datasource
    * @param allowIdentifierGeneration unknown participant will be created at importation time
+   * @param ignoreUnknownIdentifier
    * @throws NoSuchDatasourceException if the specified datasource does not exist
    * @throws IllegalArgumentException if the specified file does not exist or is not a normal file
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException, InterruptedException;
+  public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException, InterruptedException;
 
   /**
    * Imports data from a source Opal datasource into a destination Opal datasource. Usually the source datasource will
@@ -48,13 +49,14 @@ public interface ImportService {
    * @param sourceDatasourceName name of the source datasource
    * @param destinationDatasourceName name of the destination datasource
    * @param allowIdentifierGeneration unknown participant will be created at imprtation time
+   * @param ignoreUnknownIdentifier
    * @throws NoSuchFunctionalUnitException
    * @throws NonExistentVariableEntitiesException if unitName is null and the source entities do not exist as public
    * keys in the opal keys database
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException;
+  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
   /**
    * Imports data from a source Opal tables into a destination Opal datasource.
@@ -62,12 +64,13 @@ public interface ImportService {
    * @param sourceTableNames
    * @param destinationDatasourceName
    * @param allowIdentifierGeneration
+   * @param ignoreUnknownIdentifier
    * @throws NoSuchFunctionalUnitException
    * @throws NonExistentVariableEntitiesException
    * @throws IOException
    * @throws InterruptedException
    */
-  public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException;
+  public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
   /**
    * Imports data from a source table into a destination Opal datasource.
@@ -75,8 +78,9 @@ public interface ImportService {
    * @param sourceValueTables
    * @param destinationDatasourceName
    * @param allowIdentifierGeneration
+   * @param ignoreUnknownIdentifier
    */
-  public void importData(String unitName, Set<ValueTable> sourceValueTables, String destinationDatasourceName, boolean allowIdentifierGeneration) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
+  public void importData(String unitName, Set<ValueTable> sourceValueTables, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
   /**
    * Import identifiers using the given participant identifiers provider.

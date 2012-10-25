@@ -9,17 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.util.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
@@ -39,6 +28,18 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class DataImportPresenter extends WizardPresenterWidget<DataImportPresenter.Display> {
 
@@ -68,8 +69,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public DataImportPresenter(final Display display, final EventBus eventBus, //
-      CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
+  public DataImportPresenter(
+      final Display display,
+      final EventBus eventBus, //
+      CsvFormatStepPresenter csvFormatStepPresenter,
+      XmlFormatStepPresenter xmlFormatStepPresenter, //
       LimesurveyStepPresenter limesurveyStepPresenter,//
       DestinationSelectionStepPresenter destinationSelectionStepPresenter,
       UnitSelectionStepPresenter unitSelectionStepPresenter, //
@@ -102,7 +106,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     setInSlot(Slots.Values, datasourceValuesStepPresenter);
     setInSlot(Slots.Archive, archiveStepPresenter);
 
-    //TODO
+    // TODO
     setInSlot(new Object(), limesurveyStepPresenter);
 
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
@@ -220,8 +224,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     if(importData.isIdentifierSharedWithUnit()) {
       dto.setUnit(importData.getUnit());
       dto.setForce(false);
-    } else {
-      dto.setForce(true);
+      dto.setIgnore(true);
     }
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
     for(String tableName : comparedDatasourcesReportPresenter.getSelectedTables()) {
@@ -241,8 +244,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       if(response.getStatusCode() == 201) {
         String location = response.getHeader("Location");
         String jobId = location.substring(location.lastIndexOf('/') + 1);
-        getEventBus()
-            .fireEvent(NotificationEvent.newBuilder().info("DataImportationProcessLaunched").args(jobId).build());
+        getEventBus().fireEvent(
+            NotificationEvent.newBuilder().info("DataImportationProcessLaunched").args(jobId).build());
       } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
@@ -276,9 +279,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
         return false;
       }
-      datasourceValuesStepPresenter
-          .setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName(),
-              comparedDatasourcesReportPresenter.getSelectedTables());
+      datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData()
+          .getTransientDatasourceName(), comparedDatasourcesReportPresenter.getSelectedTables());
       return comparedDatasourcesReportPresenter.canBeSubmitted();
     }
   }
@@ -339,7 +341,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           // ignore
         }
       };
-      //TODO use uribuilder
+      // TODO use uribuilder
       ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + importData.getTransientDatasourceName())
           .delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
           .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
@@ -365,27 +367,30 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         }
       };
 
-      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
-          .forResource("/transient-datasources").post()//
-          .withResourceBody(DatasourceFactoryDto.stringify(factory))//
-          .withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler)
-          .send();
+      transientRequest =
+          ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/transient-datasources")
+              .post()
+              //
+              .withResourceBody(DatasourceFactoryDto.stringify(factory))
+              //
+              .withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler)
+              .send();
     }
 
     private void datasourceDiff(final DatasourceFactoryDto factory, final DatasourceDto datasourceDto) {
       diffRequest = comparedDatasourcesReportPresenter.compare(importData.getTransientDatasourceName(), //
           importData.getDestinationDatasourceName(), new DatasourceCreatedCallback() {
 
-        @Override
-        public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
-          getView().showDatasourceCreationSuccess();
-        }
+            @Override
+            public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
+              getView().showDatasourceCreationSuccess();
+            }
 
-        @Override
-        public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
-          getView().showDatasourceCreationError(error);
-        }
-      },//
+            @Override
+            public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
+              getView().showDatasourceCreationError(error);
+            }
+          },//
           factory, datasourceDto);
       getView().showDatasourceCreationSuccess();
     }
@@ -421,14 +426,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     /**
      * Get the import data as collected.
-     *
+     * 
      * @return
      */
     public ImportData getImportData();
 
     /**
      * Validate the import data were correctly provided, and send notification error messages if any.
-     *
+     * 
      * @return
      */
     public boolean validate();

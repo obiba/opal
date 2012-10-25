@@ -6,6 +6,7 @@
     .title { font-size: small; margin-right: 1em; }
     .title-light { color: gray; font-size: small; }
     .plot { float:left;margin-right:2em }
+    .details { min-width: 8em; }
   </ui:style>
 
   <g:HTMLPanel>
@@ -17,6 +18,26 @@
         <td><g:Label addStyleNames="small-indent {style.title}" ui:field="mode">mode</g:Label></td>
       </tr>
     </table>
+    <g:DisclosurePanel ui:field="details" addStyleNames="full-width">
+      <g:customHeader>
+        <g:Label><ui:msg description="Details label">Details</ui:msg></g:Label>
+      </g:customHeader>
+      <g:FlowPanel>
+        <g:Grid ui:field="grid">
+          <g:row>
+            <g:customCell styleName="top {style.details}">
+              <g:Label addStyleNames="key"><ui:msg description="Category label">Category</ui:msg></g:Label>
+            </g:customCell>
+            <g:customCell styleName="top {style.details}">
+              <g:Label addStyleNames="key"><ui:msg description="Frequency label">Frequency</ui:msg></g:Label>
+            </g:customCell>
+            <g:customCell styleName="top {style.details}">
+              <g:Label addStyleNames="key">%</g:Label>
+            </g:customCell>
+          </g:row>
+        </g:Grid>
+      </g:FlowPanel>
+    </g:DisclosurePanel>
     <div id="plot-container">
       <div ui:field="frequencyElement" class="{style.plot}"/>
     </div>

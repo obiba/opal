@@ -36,6 +36,7 @@ message ImportCommandOptionsDto {
   optional string source = 5;
   optional bool force = 6 [default = false];
   repeated string tables = 7;
+  optional bool ignore = 8 [default = false];
 }
 
 message CopyCommandOptionsDto {

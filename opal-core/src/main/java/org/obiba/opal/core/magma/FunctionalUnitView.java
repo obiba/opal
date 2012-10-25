@@ -49,10 +49,12 @@ public class FunctionalUnitView extends View {
 
   private final boolean allowIdentifierGeneration;
 
+  private final boolean ignoreUnknownIdentifier;
+
   private final BijectiveFunction<VariableEntity, VariableEntity> mappingFunction;
 
   public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable) {
-    this(unit, policy, dataTable, keysTable, null);
+    this(unit, policy, dataTable, keysTable, null, false);
   }
 
   /**
@@ -65,7 +67,7 @@ public class FunctionalUnitView extends View {
    * @param identifierGenerator strategy for generating missing identifiers. can be null, in which case, identifiers
    * will not be generated
    */
-  public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable, IParticipantIdentifier identifierGenerator) {
+  public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable, IParticipantIdentifier identifierGenerator, boolean ignoreUnknownIdentifier) {
     // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
     super(dataTable == null ? null : dataTable.getName(), dataTable);
     if(unit == null) throw new IllegalArgumentException("unit cannot be null");
@@ -75,6 +77,7 @@ public class FunctionalUnitView extends View {
 
     this.unit = unit;
     this.allowIdentifierGeneration = identifierGenerator != null;
+    this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
 
     Variable keyVariable = keysTable.getVariable(unit.getKeyVariableName());
 
@@ -123,7 +126,7 @@ public class FunctionalUnitView extends View {
   private class UnitIdentifiersArePublic implements BijectiveFunction<VariableEntity, VariableEntity> {
     public VariableEntity apply(VariableEntity from) {
       VariableEntity privateEntity = entityMap.privateEntity(from);
-      if(privateEntity == null) {
+      if(privateEntity == null && ignoreUnknownIdentifier == false) {
         throw new RuntimeException("Functional unit '" + unit.getName() + "' does not have an identifier for entity '" + from.getIdentifier() + "'");
       }
       return privateEntity;
@@ -151,7 +154,7 @@ public class FunctionalUnitView extends View {
       if(publicEntity == null) {
         if(allowIdentifierGeneration) {
           publicEntity = entityMap.createPublicEntity(from);
-        } else {
+        } else if(ignoreUnknownIdentifier == false) {
           throw new RuntimeException("Functional unit '" + unit.getName() + "' has an unknown entity with identifier '" + from.getIdentifier() + "'");
         }
       }

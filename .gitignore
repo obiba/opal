@@ -4,5 +4,11 @@ target/
 .idea/**/*.*
 *.iml
 atlassian-ide-plugin.xml
+.classpath
+.project
+opal-gwt-client/gwt-unitCache/
 opal-gwt-client/war/WEB-INF/classes/
-
+opal-gwt-client/war/WEB-INF/deploy/
+opal-gwt-client/war/WEB-INF/lib/
+opal-gwt-client/war/opal/
+opal-gwt-client/war/org.obiba.opal.web.gwt.*

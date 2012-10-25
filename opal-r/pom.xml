@@ -115,8 +115,8 @@
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
     <!-- This is the R package version. It needs to be set manually because R has restrictions on the version string format. -->
-    <package.version>1.9.0-${buildNumber}</package.version>
-    <cran.deploy.dir>unstable</cran.deploy.dir>
+    <package.version>1.10.6-${buildNumber}</package.version>
+    <cran.deploy.dir>stable</cran.deploy.dir>
   </properties>
 
 </project>

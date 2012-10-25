@@ -88,7 +88,7 @@ public class ContinuousSummaryView extends Composite {
     histogramElement.setId(HTMLPanel.createUniqueId());
     qqPlotElement.setId(HTMLPanel.createUniqueId());
 
-    obs.setText("" + continuous.getSummary().getN());
+    obs.setText("" + Math.round(continuous.getSummary().getN()));
     max.setText("" + continuous.getSummary().getMax());
     min.setText("" + continuous.getSummary().getMin());
     mean.setText("" + continuous.getSummary().getMean());
