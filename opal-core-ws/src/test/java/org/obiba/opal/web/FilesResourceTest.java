@@ -78,6 +78,10 @@ public class FilesResourceTest {
     opalRuntimeMock = createMock(OpalRuntime.class);
 
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
+    File emptyDir = new File(rootDir.replace("file:", ""), "folder4/folder41");
+    if(emptyDir.exists() == false) {
+      Assert.assertEquals(true, emptyDir.mkdirs());
+    }
     fileSystem = new DefaultOpalFileSystem(rootDir);
     filesResource = new FilesResource(opalRuntimeMock);
 
