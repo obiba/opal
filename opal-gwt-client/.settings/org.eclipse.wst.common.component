@@ -2,7 +2,6 @@
 <project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="opal-gwt-client">
         <wb-resource deploy-path="/" source-path="/war"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
@@ -19,6 +18,7 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/war/WEB-INF/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/"/>
         <property name="context-root" value="opal-gwt-client"/>
         <property name="java-output-path" value="/opal-gwt-client/war/WEB-INF/classes"/>
     </wb-module>
