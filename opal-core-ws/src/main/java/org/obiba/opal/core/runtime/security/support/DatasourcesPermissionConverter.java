@@ -155,7 +155,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/datasource/{0}/view/{1}/variables", "POST:GET", args),//
             magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
             magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args),//
-            magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/compile", "POST:GET", args));
+            magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args));
         Iterables.addAll(perms, VIEW_READ.convert(node));
         return perms;
       }

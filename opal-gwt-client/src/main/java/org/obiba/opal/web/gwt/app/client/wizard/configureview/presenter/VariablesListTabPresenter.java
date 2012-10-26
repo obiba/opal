@@ -514,7 +514,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         public void onResource(Response response, TableDto resource) {
           StringBuilder link = new StringBuilder();
           link.append(resource.getViewLink()).append("/from");
-          link.append("/variable/_transient/compile?");
+          link.append("/variable/_transient/_compile?");
           link.append("valueType=").append(currentVariableDto.getValueType()) //
           .append("&repeatable=").append(currentVariableDto.getIsRepeatable());
 
@@ -853,7 +853,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     public void onFailure(Response response) {
       try {
         ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-        GWT.log(errorDto.getExtension(ClientErrorDtoExtensions.errors).toString());
         @SuppressWarnings("unchecked")
         JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto.getExtension(ClientErrorDtoExtensions.errors);
         List<String> messages = new ArrayList<String>();
@@ -865,7 +864,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         if(messages.isEmpty() == false) {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
         } else {
-          GWT.log("no messages");
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(JsArrays.toList(errorDto.getArgumentsArray())).build());
         }
       } catch(Exception e) {
