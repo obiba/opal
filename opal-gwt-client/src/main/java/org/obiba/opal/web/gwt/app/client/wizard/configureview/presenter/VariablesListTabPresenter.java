@@ -514,7 +514,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         public void onResource(Response response, TableDto resource) {
           StringBuilder link = new StringBuilder();
           link.append(resource.getViewLink()).append("/from");
-          link.append("/variable/_transient/compile?");
+          link.append("/variable/_transient/_compile?");
           link.append("valueType=").append(currentVariableDto.getValueType()) //
           .append("&repeatable=").append(currentVariableDto.getIsRepeatable());
 

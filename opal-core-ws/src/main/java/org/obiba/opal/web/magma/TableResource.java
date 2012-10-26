@@ -232,7 +232,7 @@ public class TableResource extends AbstractValueTableResource {
    */
   @GET
   @POST
-  @Path("/variable/_transient/compile")
+  @Path("/variable/_transient/_compile")
   public Response compileTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName, @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP, @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP) {
     getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
     return Response.ok().build();
