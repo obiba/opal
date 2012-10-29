@@ -719,8 +719,11 @@
         <configuration>
           <!-- Use parent version as modules' version -->
           <autoVersionSubmodules>true</autoVersionSubmodules>
+          <!-- Comment this profile because Jenkins crashes while performing the release -->
+          <!--
           <releaseProfiles>release</releaseProfiles>
           <preparationGoals>clean verify install</preparationGoals>
+          -->
         </configuration>
       </plugin>
 
