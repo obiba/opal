@@ -628,6 +628,25 @@
   <build>
     <pluginManagement>
       <plugins>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${maven-resources-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${maven-assembly-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>${maven-antrun-plugin.version}</version>
+        </plugin>
+
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>findbugs-maven-plugin</artifactId>
@@ -680,6 +699,29 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>${maven-deploy-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${maven-war-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${maven-clean-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>${build-helper-maven-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>com.dyuproject.protostuff</groupId>
+          <artifactId>protostuff-maven-plugin</artifactId>
+          <version>${protostuff.version}</version>
         </plugin>
 
       </plugins>
@@ -742,7 +784,9 @@
         <configuration>
           <!-- Use parent version as modules' version -->
           <autoVersionSubmodules>true</autoVersionSubmodules>
-          <releaseProfiles>release</releaseProfiles>
+          <releaseProfiles>ci-build,release</releaseProfiles>
+          <!-- Comment this profile because Jenkins crashes while performing the release -->
+          <!--<preparationGoals>clean verify install</preparationGoals>-->
         </configuration>
       </plugin>
 
@@ -885,20 +929,26 @@
     <commons-fileupload.version>1.2.1</commons-fileupload.version>
     <commons-io.version>1.3.2</commons-io.version>
     <quartz.version>1.8.3</quartz.version>
+    <protostuff.version>1.0.1</protostuff.version>
     <crowd.version>2.5.1</crowd.version>
     <xfire.version>1.2.6</xfire.version>
     <cglib-nodep.version>2.2</cglib-nodep.version>
 
     <!-- maven plugins -->
+    <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
+    <maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
     <maven-buildnumber-plugin.version>1.2</maven-buildnumber-plugin.version>
+    <maven-clean-plugin.version>2.5</maven-clean-plugin.version>
     <maven-cobertura-plugin.version>2.5.2</maven-cobertura-plugin.version>
     <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>2.7</maven-deploy-plugin.version>
     <maven-findbugs-plugin.version>2.5.2</maven-findbugs-plugin.version>
+    <build-helper-maven-plugin.version>1.7</build-helper-maven-plugin.version>
     <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
     <maven-javadoc-plugin.version>2.9</maven-javadoc-plugin.version>
     <maven-pmd-plugin.version>2.7.1</maven-pmd-plugin.version>
     <maven-release-plugin.version>2.3.2</maven-release-plugin.version>
+    <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
     <maven-source-plugin.version>2.2</maven-source-plugin.version>
     <maven-surefire-plugin.version>2.10</maven-surefire-plugin.version>
     <maven-war-plugin.version>2.3</maven-war-plugin.version>
@@ -906,7 +956,8 @@
   </properties>
 
   <profiles>
-    <profile>
+    <!-- Comment this profile because Jenkins crashes while performing the release -->
+    <!-- <profile>
       <id>release</id>
       <build>
         <plugins>
@@ -936,19 +987,21 @@
             </executions>
           </plugin>
           <plugin>
-            <!-- Deploy javadoc and sources: explicitly define maven-deploy-plugin after other to force exec order -->
+            &lt;!&ndash; Deploy javadoc and sources: explicitly define maven-deploy-plugin after other to force exec order &ndash;&gt;
             <artifactId>maven-deploy-plugin</artifactId>
             <executions>
               <execution>
                 <id>deploy</id>
                 <phase>deploy</phase>
-                <goals><goal>deploy</goal></goals>
+                <goals>
+                  <goal>deploy</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>
         </plugins>
       </build>
-    </profile>
+    </profile>-->
   </profiles>
 
 </project>
