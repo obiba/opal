@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>opal</artifactId>
@@ -15,7 +16,7 @@
     <dependency>
       <groupId>commons-daemon</groupId>
       <artifactId>commons-daemon</artifactId>
-      <version>1.0.3</version>
+      <version>${commons-daemon.version}</version>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
@@ -81,7 +82,7 @@
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
-      <version>2.4.2</version>
+      <version>${ehcache-core.version}</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -119,10 +120,6 @@
       <artifactId>jcl-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -142,7 +139,6 @@
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-2</version>
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/opal-server.xml</descriptor>
@@ -170,7 +166,6 @@
         <plugins>
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.6</version>
             <executions>
               <execution>
                 <id>make-deb</id>
@@ -180,32 +175,32 @@
                 </goals>
                 <configuration>
                   <target>
-                    <property name="deb.dir" value="${basedir}/target/deb" />
-                    <property name="deb.version" value="${project.version}-b${buildNumber}" />
+                    <property name="deb.dir" value="${basedir}/target/deb"/>
+                    <property name="deb.version" value="${project.version}-b${buildNumber}"/>
                     <tstamp>
                       <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
-                      <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
+                      <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en"/>
                     </tstamp>
 
-                    <mkdir dir="${deb.dir}" />
-                    <mkdir dir="${deb.dir}/usr/share" />
-                    <mkdir dir="${deb.dir}/etc" />
+                    <mkdir dir="${deb.dir}"/>
+                    <mkdir dir="${deb.dir}/usr/share"/>
+                    <mkdir dir="${deb.dir}/etc"/>
 
                     <copy todir="${deb.dir}">
-                      <fileset dir="src/main/deb" />
+                      <fileset dir="src/main/deb"/>
                       <filterset>
-                        <filter token="project.version" value="${deb.version}" />
-                        <filter token="date" value="${deb.date}" />
+                        <filter token="project.version" value="${deb.version}"/>
+                        <filter token="date" value="${deb.date}"/>
                       </filterset>
                     </copy>
 
-                    <unzip src="${basedir}/target/opal-server-${project.version}-dist.zip" dest="${deb.dir}/usr/share" />
+                    <unzip src="${basedir}/target/opal-server-${project.version}-dist.zip" dest="${deb.dir}/usr/share"/>
                     <move todir="${deb.dir}/etc/opal">
-                      <fileset dir="${deb.dir}/usr/share/opal-server-${project.version}/conf" />
+                      <fileset dir="${deb.dir}/usr/share/opal-server-${project.version}/conf"/>
                     </move>
 
                     <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
-                      <arg value="-b" />
+                      <arg value="-b"/>
                     </exec>
                   </target>
                 </configuration>
@@ -218,9 +213,9 @@
                 </goals>
                 <configuration>
                   <target>
-                    <property name="deb.version" value="${project.version}-b${buildNumber}" />
+                    <property name="deb.version" value="${project.version}-b${buildNumber}"/>
                     <!-- Deploy deb file in deb repo -->
-                    <copy todir="${obiba.deb.dir}/${deb.deploy.dir}" file="target/opal_${deb.version}_all.deb" />
+                    <copy todir="${obiba.deb.dir}/${deb.deploy.dir}" file="target/opal_${deb.version}_all.deb"/>
                   </target>
                 </configuration>
               </execution>
@@ -234,5 +229,7 @@
   <properties>
     <deb.deploy.dir>unstable</deb.deploy.dir>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
+    <commons-daemon.version>1.0.3</commons-daemon.version>
+    <ehcache-core.version>2.4.2</ehcache-core.version>
   </properties>
 </project>

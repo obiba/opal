@@ -77,11 +77,9 @@
         </configuration>
       </plugin>
 
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.5</version>
         <executions>
           <execution>
             <id>add-source</id>
@@ -156,7 +154,6 @@
       <plugin>
         <groupId>com.dyuproject.protostuff</groupId>
         <artifactId>protostuff-maven-plugin</artifactId>
-        <version>${protostuff.version}</version>
         <configuration>
           <protoModules>
             <protoModule>
@@ -310,12 +307,8 @@
   </pluginRepositories>
 
   <properties>
-    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
     <gwt.version>2.1.1</gwt.version>
     <protobuf.version>2.3.0</protobuf.version>
-    <protostuff.version>1.0.1</protostuff.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 
