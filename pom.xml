@@ -6,7 +6,7 @@
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal</artifactId>
   <packaging>pom</packaging>
-  <version>1.10-SNAPSHOT</version>
+  <version>1.10.9</version>
 
   <name>opal</name>
   <description>Opal Application</description>
@@ -811,7 +811,7 @@
     <connection>scm:git:git://github.com/obiba/opal.git</connection>
     <developerConnection>scm:git:https://github.com/obiba/opal.git</developerConnection>
     <url>https://github.com/obiba/opal</url>
-    <tag>HEAD</tag>
+    <tag>1.10.9</tag>
   </scm>
 
   <issueManagement>
