@@ -720,6 +720,7 @@
           <!-- Use parent version as modules' version -->
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <releaseProfiles>release</releaseProfiles>
+          <preparationGoals>clean verify install</preparationGoals>
         </configuration>
       </plugin>
 
