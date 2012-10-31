@@ -817,24 +817,13 @@
   </build>
 
   <repositories>
+
     <repository>
       <id>obiba.org</id>
       <name>Obiba Maven 2.x Repository</name>
-      <url>http://www.obiba.org/maven2</url>
+      <url>http://repo.obiba.org/repo</url>
       <releases>
         <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>snapshot.obiba.org</id>
-      <name>Obiba Snaphot Maven 2.x Repository</name>
-      <url>http://www.obiba.org/maven2-snapshots</url>
-      <releases>
-        <enabled>false</enabled>
       </releases>
       <snapshots>
         <enabled>true</enabled>
@@ -860,19 +849,17 @@
   </repositories>
 
   <distributionManagement>
-    <!-- URL used to deploy the release artifacts -->
+
     <repository>
-      <id>deploy.obiba.org</id>
-      <url>${obiba.deploy.url}/maven2</url>
-      <uniqueVersion>false</uniqueVersion>
+      <id>obiba-releases</id>
+      <url>http://repo.obiba.org/libs-release-local</url>
     </repository>
 
-    <!-- URL used to deploy the SNAPSHOTS artifacts -->
     <snapshotRepository>
-      <id>deploy.obiba.org</id>
-      <url>${obiba.deploy.url}/maven2-snapshots</url>
-      <uniqueVersion>true</uniqueVersion>
+      <id>obiba-snapshots</id>
+      <url>http://repo.obiba.org/libs-snapshot-local</url>
     </snapshotRepository>
+
   </distributionManagement>
 
   <scm>
@@ -883,7 +870,7 @@
 
   <issueManagement>
     <system>JIRA</system>
-    <url>http://jira.obiba.org/</url>
+    <url>http://jira.obiba.org</url>
   </issueManagement>
 
   <ciManagement>
