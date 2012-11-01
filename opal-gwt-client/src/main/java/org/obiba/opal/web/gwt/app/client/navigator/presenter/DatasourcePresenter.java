@@ -145,7 +145,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     // copy data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post().authorize(getView().getCopyDataAuthorizer()).send();
     // remove
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete().authorize(getView().getRemoveDatasourceAuthorizer()).send();
+    // ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete().authorize(getView().getRemoveDatasourceAuthorizer()).send();
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
