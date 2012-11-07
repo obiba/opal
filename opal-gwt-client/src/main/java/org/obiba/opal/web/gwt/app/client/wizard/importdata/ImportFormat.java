@@ -10,5 +10,5 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importdata;
 
 public enum ImportFormat {
-  CSV, EXCEL, XML, LIMESURVEY;
+  CSV, EXCEL, XML, LIMESURVEY, REST;
 }

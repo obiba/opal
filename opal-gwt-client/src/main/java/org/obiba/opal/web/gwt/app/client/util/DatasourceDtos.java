@@ -16,6 +16,7 @@ import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.LimesurveyDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.RestDatasourceFactoryDto;
 
 import com.google.gwt.core.client.JsArray;
 
@@ -34,6 +35,8 @@ public class DatasourceDtos {
       return createXMLDatasourceFactoryDto(importData);
     } else if(importData.getImportFormat() == ImportFormat.LIMESURVEY) {
       return createLimesurveyDatasourceFactoryDto(importData);
+    } else if(importData.getImportFormat() == ImportFormat.REST) {
+      return createRestDatasourceFactoryDto(importData);
     } else {
       throw new IllegalArgumentException("Import data format not supported: " + importData.getImportFormat());
     }
@@ -45,6 +48,17 @@ public class DatasourceDtos {
     factoryDto.setTablePrefix(importData.getTablePrefix());
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     dto.setExtension(LimesurveyDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
+    return dto;
+  }
+
+  private static DatasourceFactoryDto createRestDatasourceFactoryDto(ImportData importData) {
+    RestDatasourceFactoryDto factoryDto = RestDatasourceFactoryDto.create();
+    factoryDto.setUrl(importData.getString("url"));
+    factoryDto.setUsername(importData.getString("username"));
+    factoryDto.setPassword(importData.getString("password"));
+    factoryDto.setRemoteDatasource(importData.getString("remoteDatasource"));
+    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    dto.setExtension(RestDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
     return dto;
   }
 

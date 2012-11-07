@@ -67,6 +67,12 @@
               </ui:msg>
             </p>
           </li>
+          <li>
+            <p>
+              <ui:msg description="Opal REST Information">Opal: import variable dictionaries and data from a remote Opal.
+              </ui:msg>
+            </p>
+          </li>
         </ul>
       </g:HTMLPanel>
 

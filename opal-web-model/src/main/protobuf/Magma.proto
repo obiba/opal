@@ -96,6 +96,16 @@ message StaticDatasourceFactoryDto {
   } 
 }
 
+message RestDatasourceFactoryDto {
+  required string url = 1;
+  required string username = 2;
+  required string password = 3;
+  required string remoteDatasource = 4;
+  extend DatasourceFactoryDto { 
+    optional RestDatasourceFactoryDto params = 1007; 
+  }
+}
+
 message DatasourceParsingErrorDto {
   required string defaultMessage = 1;
   required string key = 2;

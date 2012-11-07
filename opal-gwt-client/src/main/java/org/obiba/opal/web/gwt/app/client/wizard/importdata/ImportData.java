@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 public class ImportData {
 
   private ImportFormat importFormat;
@@ -48,6 +52,8 @@ public class ImportData {
   private String database;
 
   private String tablePrefix;
+
+  private Map<String, Object> properties;
 
   public void clear() {
     importFormat = null;
@@ -224,5 +230,26 @@ public class ImportData {
 
   public void setTablePrefix(String tablePrefix) {
     this.tablePrefix = tablePrefix;
+  }
+
+  private Map<String, Object> getProperties() {
+    if(properties == null) {
+      properties = Maps.newHashMap();
+    }
+    return properties;
+  }
+
+  public ImportData put(String key, Object value) {
+    getProperties().put(key, value);
+    return this;
+  }
+
+  public Object get(String key) {
+    return getProperties().get(key);
+  }
+
+  public String getString(String key) {
+    Object value = getProperties().get(key);
+    return value == null ? null : value.toString();
   }
 }

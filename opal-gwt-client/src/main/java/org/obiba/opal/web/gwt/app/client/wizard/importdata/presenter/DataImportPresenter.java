@@ -53,6 +53,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final LimesurveyStepPresenter limesurveyStepPresenter;
 
+  private final RestStepPresenter restStepPresenter;
+
   private final DestinationSelectionStepPresenter destinationSelectionStepPresenter;
 
   private final UnitSelectionStepPresenter unitSelectionStepPresenter;
@@ -69,21 +71,18 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public DataImportPresenter(
-      final Display display,
-      final EventBus eventBus, //
-      CsvFormatStepPresenter csvFormatStepPresenter,
-      XmlFormatStepPresenter xmlFormatStepPresenter, //
+  public DataImportPresenter(final Display display, final EventBus eventBus, //
+      CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
       LimesurveyStepPresenter limesurveyStepPresenter,//
-      DestinationSelectionStepPresenter destinationSelectionStepPresenter,
-      UnitSelectionStepPresenter unitSelectionStepPresenter, //
-      ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
-      ArchiveStepPresenter archiveStepPresenter, //
+      RestStepPresenter restStepPresenter,//
+      DestinationSelectionStepPresenter destinationSelectionStepPresenter, UnitSelectionStepPresenter unitSelectionStepPresenter, //
+      ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter, ArchiveStepPresenter archiveStepPresenter, //
       DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
     this.limesurveyStepPresenter = limesurveyStepPresenter;
+    this.restStepPresenter = restStepPresenter;
     this.destinationSelectionStepPresenter = destinationSelectionStepPresenter;
     this.unitSelectionStepPresenter = unitSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
@@ -97,6 +96,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
     limesurveyStepPresenter.bind();
+    restStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
 
     comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
@@ -107,7 +107,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     setInSlot(Slots.Archive, archiveStepPresenter);
 
     // TODO
-    setInSlot(new Object(), limesurveyStepPresenter);
+    setInSlot(Slots.Limesurvey, limesurveyStepPresenter);
+    setInSlot(Slots.Rest, restStepPresenter);
 
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
@@ -148,6 +149,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.unbind();
     xmlFormatStepPresenter.unbind();
     limesurveyStepPresenter.unbind();
+    restStepPresenter.unbind();
   }
 
   @Override
@@ -181,6 +183,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     } else if(getView().getImportFormat() == ImportFormat.LIMESURVEY) {
       this.formatStepPresenter = limesurveyStepPresenter;
       getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
+    } else if(getView().getImportFormat() == ImportFormat.REST) {
+      this.formatStepPresenter = restStepPresenter;
+      getView().setFormatStepDisplay(restStepPresenter.getView());
     } else {
       this.formatStepPresenter = null;
       throw new IllegalStateException("Unknown format: " + getView().getImportFormat());
@@ -196,6 +201,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       submitJob(createImportCommandOptionsDto(importData.getCsvFile()));
     } else if(importData.getImportFormat().equals(ImportFormat.LIMESURVEY)) {
       submitJob(createLimesurveyImportCommandOptionsDto());
+    } else if(importData.getImportFormat().equals(ImportFormat.REST)) {
+      submitJob(createRestImportCommandOptionsDto());
     }
   }
 
@@ -204,11 +211,15 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     ResponseCodeCallback callback = new SubmitJobResponseCodeCallBack();
 
     ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post() //
-        .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
-        .withCallback(201, callback).withCallback(400, callback).withCallback(500, callback).send();
+    .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
+    .withCallback(201, callback).withCallback(400, callback).withCallback(500, callback).send();
   }
 
   private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
+    return createImportCommandOptionsDto(null);
+  }
+
+  private ImportCommandOptionsDto createRestImportCommandOptionsDto() {
     return createImportCommandOptionsDto(null);
   }
 
@@ -244,8 +255,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       if(response.getStatusCode() == 201) {
         String location = response.getHeader("Location");
         String jobId = location.substring(location.lastIndexOf('/') + 1);
-        getEventBus().fireEvent(
-            NotificationEvent.newBuilder().info("DataImportationProcessLaunched").args(jobId).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().info("DataImportationProcessLaunched").args(jobId).build());
       } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
@@ -279,8 +289,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
         return false;
       }
-      datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData()
-          .getTransientDatasourceName(), comparedDatasourcesReportPresenter.getSelectedTables());
+      datasourceValuesStepPresenter.setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName(), comparedDatasourcesReportPresenter.getSelectedTables());
       return comparedDatasourcesReportPresenter.canBeSubmitted();
     }
   }
@@ -342,10 +351,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         }
       };
       // TODO use uribuilder
-      ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + importData.getTransientDatasourceName())
-          .delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-          .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + importData.getTransientDatasourceName()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
     }
 
     private void createTransientDatasource() {
@@ -367,14 +373,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         }
       };
 
-      transientRequest =
-          ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/transient-datasources")
-              .post()
-              //
-              .withResourceBody(DatasourceFactoryDto.stringify(factory))
-              //
-              .withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler)
-              .send();
+      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource("/transient-datasources").post()
+      //
+      .withResourceBody(DatasourceFactoryDto.stringify(factory))
+      //
+      .withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler).send();
     }
 
     private void datasourceDiff(final DatasourceFactoryDto factory, final DatasourceDto datasourceDto) {
@@ -399,7 +402,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public interface Display extends WizardView {
 
     enum Slots {
-      Destination, Unit, Values, Archive
+      Destination, Unit, Values, Archive, Limesurvey, Rest
     }
 
     ImportFormat getImportFormat();

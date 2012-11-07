@@ -42,6 +42,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClient;
 import org.apache.http.impl.client.cache.FileResourceFactory;
@@ -49,6 +50,8 @@ import org.apache.http.impl.client.cache.ManagedHttpCacheStorage;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 import com.google.protobuf.Message;
@@ -58,13 +61,25 @@ import com.google.protobuf.Message;
  */
 public class OpalJavaClient {
 
+  private static final Logger log = LoggerFactory.getLogger(OpalJavaClient.class);
+
+  // Don't wait indefinitely for packets.
+  // 10 minutes
+  public static final int DEFAULT_SO_TIMEOUT = 10 * 60 * 1000;
+
+  public static final int DEFAULT_MAX_ATTEMPT = 5;
+
   private final URI opalURI;
 
-  private final HttpClient client;
-
-  private final BasicHttpContext ctx;
-
   private final Credentials credentials;
+
+  private int soTimeout = DEFAULT_SO_TIMEOUT;
+
+  private int maxAttempts = DEFAULT_MAX_ATTEMPT;
+
+  private HttpClient client;
+
+  private BasicHttpContext ctx;
 
   private ManagedHttpCacheStorage cacheStorage;
 
@@ -74,15 +89,32 @@ public class OpalJavaClient {
     if(password == null) throw new IllegalArgumentException("password cannot be null");
 
     this.opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
+    this.credentials = new UsernamePasswordCredentials(username, password);
+  }
 
+  /**
+   * @see CoreConnectionPNames#SO_TIMEOUT
+   */
+  public void setSoTimeout(Integer soTimeout) {
+    this.soTimeout = soTimeout == null ? DEFAULT_SO_TIMEOUT : soTimeout;
+  }
+
+  private HttpClient getClient() {
+    if(client == null) {
+      createClient(soTimeout);
+    }
+    return client;
+  }
+
+  private void createClient(int soTimeout) {
+    log.info("Connecting to Opal: {}", opalURI);
     DefaultHttpClient httpClient = new DefaultHttpClient();
-    httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials = new UsernamePasswordCredentials(username, password));
+    httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
     httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
     httpClient.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuthScheme.NAME));
     httpClient.getParams().setParameter(ClientPNames.CONNECTION_MANAGER_FACTORY_CLASS_NAME, OpalClientConnectionManagerFactory.class.getName());
-    // Don't wait indefinitely for packets.
-    // 10 minutes
-    httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 10 * 60 * 1000);
+    httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, soTimeout);
+    httpClient.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(maxAttempts, false));
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
 
     try {
@@ -122,7 +154,9 @@ public class OpalJavaClient {
   }
 
   public void close() {
-    this.client.getConnectionManager().shutdown();
+    if(client != null) {
+      getClient().getConnectionManager().shutdown();
+    }
   }
 
   public UriBuilder newUri() {
@@ -234,8 +268,9 @@ public class OpalJavaClient {
   private HttpResponse execute(HttpUriRequest msg) throws ClientProtocolException, IOException {
     msg.addHeader("Accept", "application/x-protobuf, text/html");
     authenticate(msg);
+    log.info("{} {}", msg.getMethod(), msg.getURI());
     try {
-      return client.execute(msg, ctx);
+      return getClient().execute(msg, ctx);
     } finally {
       cleanupCache();
     }
@@ -294,4 +329,5 @@ public class OpalJavaClient {
       cacheStorage.cleanResources();
     }
   }
+
 }

@@ -1,0 +1,46 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+  <g:FlowPanel>
+
+    <g:HTMLPanel ui:field="help">
+      <g:Label addStyleNames="title">
+        <ui:msg description="Opal URL label">Opal URL</ui:msg>
+      </g:Label>
+      <p>
+        <ui:msg description="Opal URL information">The Opal url (starts with http or https)</ui:msg>
+      </p>
+    </g:HTMLPanel>
+
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key">
+        <ui:msg description="URL label">URL</ui:msg>
+      </g:Label>
+      <g:TextBox ui:field="url"></g:TextBox>
+    </g:FlowPanel>
+    
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key">
+        <ui:msg description="Username label">User</ui:msg>
+      </g:Label>
+      <g:TextBox ui:field="username"></g:TextBox>
+    </g:FlowPanel>
+    
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key">
+        <ui:msg description="Password label">Password</ui:msg>
+      </g:Label>
+      <g:PasswordTextBox ui:field="password"></g:PasswordTextBox>
+    </g:FlowPanel>
+    
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key">
+        <ui:msg description="Datasource label">Datasource</ui:msg>
+      </g:Label>
+      <g:TextBox ui:field="remoteDatasource"></g:TextBox>
+    </g:FlowPanel>
+    
+  </g:FlowPanel>
+</ui:UiBinder>

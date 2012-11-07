@@ -200,6 +200,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     formatListBox.addItem(translations.csvLabel(), ImportFormat.CSV.name());
     formatListBox.addItem(translations.opalXmlLabel(), ImportFormat.XML.name());
     formatListBox.addItem(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
+    formatListBox.addItem(translations.opalRestLabel(), ImportFormat.REST.name());
   }
 
   @Override
