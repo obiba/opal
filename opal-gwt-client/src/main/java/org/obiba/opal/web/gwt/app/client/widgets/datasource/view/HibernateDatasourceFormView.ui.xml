@@ -9,6 +9,9 @@
       <g:Label addStyleNames="key"><ui:msg description="Database label">Database</ui:msg></g:Label>
       <g:ListBox ui:field="database" visibleItemCount="1"/>
     </g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:CheckBox ui:field="binaries" addStyleNames="key"><ui:msg description="Binary Files label">Store binary values in files</ui:msg></g:CheckBox>
+    </g:FlowPanel>
   </g:FlowPanel>
 
 </ui:UiBinder>

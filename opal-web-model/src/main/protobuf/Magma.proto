@@ -74,6 +74,7 @@ message JdbcValueTableSettingsDto {
 message HibernateDatasourceFactoryDto {
   optional bool key = 1;
   optional string database = 2;
+  optional bool binFiles = 3 [default = true]; // if true, binary values will be stored in files
   extend DatasourceFactoryDto { 
     optional HibernateDatasourceFactoryDto params = 1004; 
   } 

@@ -53,6 +53,7 @@ public class HibernateDatasourceFormPresenter extends PresenterWidget<HibernateD
     if(database != null) {
       extensionDto.setDatabase(database);
     }
+    extensionDto.setBinFiles(getView().getBinaries());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     dto.setExtension(HibernateDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
@@ -89,6 +90,8 @@ public class HibernateDatasourceFormPresenter extends PresenterWidget<HibernateD
   public interface Display extends DatasourceFormPresenter.Display {
 
     String getSelectedDatabase();
+
+    boolean getBinaries();
 
     void setDatabases(JsArray<JdbcDataSourceDto> databases);
   }
