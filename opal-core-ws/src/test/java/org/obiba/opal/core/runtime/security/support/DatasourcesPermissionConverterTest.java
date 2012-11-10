@@ -80,6 +80,7 @@ public class DatasourcesPermissionConverterTest extends OpalPermissionConverterT
         "magma:/datasource/patate/table/pwel/variables:GET", //
         "magma:/datasource/patate/table/pwel/index:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/index/_search:GET:GET", //
+        "magma:/datasource/patate/table/pwel/index/_search:POST:GET", //
         "magma:/datasource/patate/table/pwel/index/_schema:GET:GET");
   }
 
