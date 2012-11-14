@@ -10,6 +10,7 @@
 package org.obiba.opal.search;
 
 import org.obiba.magma.Timestamped;
+import org.obiba.magma.Variable;
 
 /**
  * An index of a {@code ValueTable}
@@ -23,6 +24,10 @@ public interface ValueTableIndex extends Timestamped {
    */
   public String getRequestPath();
 
+  /**
+   * Name of the index (which might not be exactly the table reference).
+   * @return
+   */
   public String getName();
 
   /**
@@ -38,6 +43,15 @@ public interface ValueTableIndex extends Timestamped {
    */
   public boolean requiresUpgrade();
 
+  /**
+   * Delete the index.
+   */
   public void delete();
+
+  /**
+   * Get the variables being indexed.
+   * @return
+   */
+  public Iterable<Variable> getVariables();
 
 }

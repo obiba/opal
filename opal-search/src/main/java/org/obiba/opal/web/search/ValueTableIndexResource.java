@@ -62,13 +62,13 @@ public class ValueTableIndexResource {
 
   @GET
   @Path("_schema")
-  public Response search(@Context
-  HttpServletRequest servletRequest) {
-    String indexName = getValueTableIndex().getName();
+  public Response search(@Context HttpServletRequest servletRequest) {
+    ValueTableIndex index = getValueTableIndex();
     OpalMap.Builder map = OpalMap.newBuilder();
-    for(Variable variable : getValueTable().getVariables()) {
+
+    for(Variable variable : index.getVariables()) {
       map.addKeys(variable.getName());
-      map.addValues(indexName + ":" + variable.getName());
+      map.addValues(index.getName() + ":" + variable.getName());
     }
     return Response.ok(map.build()).build();
   }
@@ -76,8 +76,7 @@ public class ValueTableIndexResource {
   @GET
   @POST
   @Path("_search")
-  public Response search(@Context
-  HttpServletRequest servletRequest, String body) {
+  public Response search(@Context HttpServletRequest servletRequest, String body) {
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<Response> ref = new AtomicReference<Response>();
 

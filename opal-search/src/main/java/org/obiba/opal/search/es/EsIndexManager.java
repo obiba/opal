@@ -37,6 +37,7 @@ import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.Timestampeds;
+import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManager;
@@ -48,6 +49,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 @Component
 public class EsIndexManager implements IndexManager {
@@ -162,7 +166,7 @@ public class EsIndexManager implements IndexManager {
 
       esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b).execute().actionGet();
 
-      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable).to(new ConcurrentReaderCallback() {
+      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable).variables(index.getVariables()).to(new ConcurrentReaderCallback() {
 
         private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
@@ -322,6 +326,20 @@ public class EsIndexManager implements IndexManager {
         }
 
       };
+    }
+
+    @Override
+    public Iterable<Variable> getVariables() {
+      // Do not index binary values, do not even extract the binary values
+      // TODO Could be configurable at table level?
+      return Iterables.filter(resolveTable().getVariables(), new Predicate<Variable>() {
+
+        @Override
+        public boolean apply(Variable input) {
+          return input.getValueType().equals(BinaryType.get()) == false;
+        }
+
+      });
     }
 
     private ValueTable resolveTable() {
