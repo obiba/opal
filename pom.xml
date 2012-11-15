@@ -830,22 +830,6 @@
       </snapshots>
     </repository>
 
-    <repository>
-      <id>jboss.org</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-    </repository>
-
-    <repository>
-      <id>oss.sonatype</id>
-      <url>http://oss.sonatype.org/content/repositories/releases/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-
   </repositories>
 
   <distributionManagement>
