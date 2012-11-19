@@ -93,6 +93,11 @@ public class BirtReportServiceImpl implements ReportService {
     }
   }
 
+  @Override
+  public String getName() {
+    return null;
+  }
+
   private BirtEngine instantiateEngine(File birtHome) {
     try {
       File libDir = new File(birtHome, "lib");

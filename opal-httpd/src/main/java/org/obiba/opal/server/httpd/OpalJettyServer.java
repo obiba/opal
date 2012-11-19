@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -70,12 +70,13 @@ public class OpalJettyServer implements Service {
   private ConfigurableApplicationContext webApplicationContext;
 
   @Autowired
-  @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
-  public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr, final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr, final @Value("${org.obiba.opal.http.port}")
-  Integer httpPort, final @Value("${org.obiba.opal.https.port}")
-  Integer httpsPort, final @Value("${org.obiba.opal.ajp.port}")
-  Integer ajpPort, final @Value("${org.obiba.opal.maxIdleTime}")
-  Integer maxIdleTime) {
+  @SuppressWarnings({"unchecked", "PMD.ExcessiveParameterList"})
+  public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr,
+      final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr,
+      final @Value("${org.obiba.opal.http.port}") Integer httpPort,
+      final @Value("${org.obiba.opal.https.port}") Integer httpsPort,
+      final @Value("${org.obiba.opal.ajp.port}") Integer ajpPort,
+      final @Value("${org.obiba.opal.maxIdleTime}") Integer maxIdleTime) {
     Server server = new Server();
     server.setSendServerVersion(false);
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
@@ -174,8 +175,15 @@ public class OpalJettyServer implements Service {
 
   }
 
-  private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr, SecurityManager securityMgr) {
-    ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
+  @Override
+  public String getName() {
+    return null;
+  }
+
+  private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr,
+      SecurityManager securityMgr) {
+    ServletContextHandler contextHandler = new ServletContextHandler(
+        ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
     contextHandler.setContextPath("/");
     contextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new AuthenticationFilter(securityMgr)), "/ws/*", FilterMapping.DEFAULT);
@@ -189,7 +197,8 @@ public class OpalJettyServer implements Service {
     webAppCtx.setParent(ctx);
     webAppCtx.setServletContext(contextHandler.getServletContext());
     webAppCtx.setConfigLocation("classpath:/META-INF/spring/opal-httpd/context.xml");
-    contextHandler.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
+    contextHandler.getServletContext()
+        .setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
     this.webApplicationContext = webAppCtx;
 
     return contextHandler;
@@ -215,7 +224,8 @@ public class OpalJettyServer implements Service {
   public class OpalVersionFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+        FilterChain filterChain) throws ServletException, IOException {
       try {
         if(opalVersion != null) {
           response.addHeader("X-Opal-Version", opalVersion.toString());
@@ -237,7 +247,8 @@ public class OpalJettyServer implements Service {
     }
 
     @Override
-    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
+        final FilterChain filterChain) throws ServletException, IOException {
       new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
         @Override
         protected void doInTransactionWithoutResult(TransactionStatus status) {

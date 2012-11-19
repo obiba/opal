@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -50,7 +50,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   private Datasource datasource;
 
   @Autowired
-  public DefaultIdentifiersTableService(PlatformTransactionManager txManager, @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference, @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+  public DefaultIdentifiersTableService(PlatformTransactionManager txManager,
+      @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference,
+      @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
     if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
     if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
@@ -130,6 +132,11 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     });
   }
 
+  @Override
+  public String getName() {
+    return null;
+  }
+
   private void initialise(Datasource ds) {
     this.datasource = ds;
     new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
@@ -147,4 +154,5 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
       }
     });
   }
+
 }

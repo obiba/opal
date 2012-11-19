@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -214,9 +214,9 @@ public class DefaultCommandJobService implements CommandJobService {
 
   /**
    * Generates an id for a {@link CommandJob}.
-   * 
+   * <p/>
    * The sequence 1, 2, 3, ..., is returned.
-   * 
+   *
    * @return an id for a {@link CommandJob}
    */
   protected Integer nextJobId() {
@@ -261,12 +261,12 @@ public class DefaultCommandJobService implements CommandJobService {
 
   public boolean isDeletable(CommandJob commandJob) {
     switch(commandJob.getStatus()) {
-    case SUCCEEDED:
-    case FAILED:
-    case CANCELED:
-      return true;
-    default:
-      return false;
+      case SUCCEEDED:
+      case FAILED:
+      case CANCELED:
+        return true;
+      default:
+        return false;
     }
   }
 
@@ -306,5 +306,10 @@ public class DefaultCommandJobService implements CommandJobService {
         return 0;
       }
     }
+  }
+
+  @Override
+  public String getName() {
+    return null;
   }
 }

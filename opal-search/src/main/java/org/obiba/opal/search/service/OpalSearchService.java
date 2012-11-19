@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -51,7 +51,9 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   public void start() {
     ElasticSearchConfiguration esConfig = configService.getConfig();
     if(!isRunning() && esConfig.isEnabled()) {
-      esNode = NodeBuilder.nodeBuilder().client(true).settings(ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false)).clusterName(esConfig.getClusterName("opal")).client(esConfig.isDataNode() == false).node();
+      esNode = NodeBuilder.nodeBuilder().client(true).settings(
+          ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false))
+          .clusterName(esConfig.getClusterName("opal")).client(esConfig.isDataNode() == false).node();
       client = esNode.client();
     }
   }
@@ -75,4 +77,8 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
     }
   }
 
+  @Override
+  public String getName() {
+    return "search";
+  }
 }

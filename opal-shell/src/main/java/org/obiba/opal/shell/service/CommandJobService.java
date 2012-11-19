@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -22,18 +22,18 @@ public interface CommandJobService extends Service {
 
   /**
    * Assigns an id to a command job and submits it for asynchronous execution.
-   * 
+   *
    * @param commandJob the submitted command job
-   * @param the command job's owner
+   * @param owner the command job's owner
    * @return the command job's id
    */
   public Integer launchCommand(CommandJob commandJob, Subject owner);
 
   /**
    * Assigns an id to a command job and submits it for asynchronous execution.
-   * 
+   * <p/>
    * The command job's owner is set to the current user.
-   * 
+   *
    * @param commandJob the submitted command job
    * @return the command job's id
    */
@@ -41,7 +41,7 @@ public interface CommandJobService extends Service {
 
   /**
    * Returns the specified command job.
-   * 
+   *
    * @param id command job id
    * @return the command job (<code>null</code> if none)
    */
@@ -49,14 +49,14 @@ public interface CommandJobService extends Service {
 
   /**
    * Returns the history of launched commands.
-   * 
+   *
    * @return history of launched commands
    */
   public List<CommandJob> getHistory();
 
   /**
    * Cancels the specified command job.
-   * 
+   *
    * @param id command job id
    * @throws NoSuchCommandJobException if the specified command job does not exist
    * @throws IllegalStateException if the command job is not in a "cancellable" state (either NOT_STARTED or
@@ -66,7 +66,7 @@ public interface CommandJobService extends Service {
 
   /**
    * Deletes the specified command job.
-   * 
+   *
    * @param id command job id
    * @throws NoSuchCommandJobException if the specified command job does not exist
    * @throws IllegalStateException if the command job is in a "running" state (IN_PROGRESS or CANCEL_PENDING) and
@@ -78,4 +78,5 @@ public interface CommandJobService extends Service {
    * Deletes all completed commands (i.e., commands in the SUCCEEDED, FAILED or CANCELED state).
    */
   public void deleteCompletedCommands();
+
 }
