@@ -111,7 +111,7 @@ public class BasicBirtReportServiceImpl implements ReportService {
 
   @Override
   public String getName() {
-    return "basicBirth";
+    return "basicBirt";
   }
 
   static class OutputPurger extends Thread {
