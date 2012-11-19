@@ -177,7 +177,7 @@ public class OpalJettyServer implements Service {
 
   @Override
   public String getName() {
-    return null;
+    return "jetty";
   }
 
   private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr,

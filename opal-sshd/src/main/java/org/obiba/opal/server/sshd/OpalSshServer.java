@@ -122,7 +122,7 @@ public class OpalSshServer implements Service {
 
   @Override
   public String getName() {
-    return null;
+    return "ssh";
   }
 
   private class OpalShellCommand implements Command {

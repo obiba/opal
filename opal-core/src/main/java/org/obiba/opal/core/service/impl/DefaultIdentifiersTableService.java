@@ -134,7 +134,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public String getName() {
-    return null;
+    return "identifiers";
   }
 
   private void initialise(Datasource ds) {

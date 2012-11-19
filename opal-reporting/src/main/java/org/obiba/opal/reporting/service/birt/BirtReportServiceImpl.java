@@ -95,7 +95,7 @@ public class BirtReportServiceImpl implements ReportService {
 
   @Override
   public String getName() {
-    return null;
+    return "birth";
   }
 
   private BirtEngine instantiateEngine(File birtHome) {

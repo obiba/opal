@@ -93,16 +93,24 @@ public class DefaultCommandJobService implements CommandJobService {
   // Service Methods
   //
 
+  @Override
   public void start() {
     isRunning = true;
   }
 
+  @Override
   public void stop() {
     isRunning = false;
   }
 
+  @Override
   public boolean isRunning() {
     return isRunning;
+  }
+
+  @Override
+  public String getName() {
+    return "job";
   }
 
   //
@@ -308,8 +316,4 @@ public class DefaultCommandJobService implements CommandJobService {
     }
   }
 
-  @Override
-  public String getName() {
-    return null;
-  }
 }

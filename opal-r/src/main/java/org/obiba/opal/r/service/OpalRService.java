@@ -137,6 +137,6 @@ public class OpalRService implements Service, ROperationTemplate {
 
   @Override
   public String getName() {
-    return null;
+    return "r";
   }
 }

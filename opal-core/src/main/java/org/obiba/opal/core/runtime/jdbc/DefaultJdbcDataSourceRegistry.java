@@ -138,6 +138,11 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   }
 
   @Override
+  public String getName() {
+    return "databases";
+  }
+
+  @Override
   public DataSource getDataSource(String name, String usedBy) {
     if(defaultDatasource.getName().equals(name)) {
       return opalDataSource;
@@ -245,8 +250,4 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
     dataSourceCache.invalidate(name);
   }
 
-  @Override
-  public String getName() {
-    return null;
-  }
 }
