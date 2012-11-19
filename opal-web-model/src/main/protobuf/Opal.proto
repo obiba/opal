@@ -160,3 +160,32 @@ message EntryDto {
   required string key = 1;
   required string value = 2;
 }
+
+
+enum ServiceStatus {
+  RUNNING = 1;
+  STOPPED = 2;
+}
+
+message ServiceDto {
+  required string name = 1;
+  required ServiceStatus status = 2;
+  required string link = 3;
+}
+
+message ServiceCfgDto {
+  required string name = 1; // service name
+  extensions 1000 to max;
+}
+
+message ESCfgDto {
+  required string clusterName = 1;
+  optional string indexName = 2;
+  required bool dataNode = 3 [default = true];
+  required int32 shards = 4;
+  required int32 replicas = 5;
+  optional string settings = 6;
+  extend ServiceCfgDto {
+    optional ESCfgDto params = 1000;
+  }
+}
