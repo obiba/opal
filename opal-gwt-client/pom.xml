@@ -74,6 +74,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.github.gwtbootstrap</groupId>
+      <artifactId>gwt-bootstrap</artifactId>
+      <version>${gwt-bootstrap.version}</version>
+    </dependency>
+
     <!-- test -->
     <dependency>
       <groupId>junit</groupId>
@@ -175,6 +181,7 @@
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
     <gwt-presenter.version>1.0.0</gwt-presenter.version>
     <gwtp.version>0.6</gwtp.version>
+    <gwt-bootstrap.version>2.0.4.0</gwt-bootstrap.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 

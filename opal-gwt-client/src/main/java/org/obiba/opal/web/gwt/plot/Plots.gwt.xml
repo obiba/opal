@@ -1,7 +1,7 @@
 <!DOCTYPE module PUBLIC "//gwt-module/" "http://google-web-toolkit.googlecode.com/svn/tags/2.0.0/distro-source/core/src/gwt-module.dtd">
 <module>
   <inherits name="com.google.gwt.core.Core" />
-  <script src="jquery-1.4.2.min.js"/>
+  <script src="js/jquery-1.7.1.min.js"/>
   <script src="jqplot/jquery.jqplot.js"/>
   <script src="jqplot/plugins/jqplot.categoryAxisRenderer.min.js"/>
   <script src="jqplot/plugins/jqplot.barRenderer.min.js"/>
