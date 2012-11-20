@@ -7,8 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.magma.support.finder;
+package org.obiba.opal.web.finder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.magma.ValueTable;
@@ -16,16 +17,15 @@ import org.obiba.magma.ValueTable;
 /**
  *
  */
-public abstract class AbstractMagmaFinder<TQuery extends AbstractQuery, TResult> extends AbstractFinder<TQuery, TResult> {
+public abstract class AbstractFinderQuery {
 
-  public abstract void executeQuery(ValueTable valueTable, TQuery query, List<TResult> result);
+  /**
+   * Tables to search within
+   */
+  private final List<ValueTable> tableFilter = new ArrayList<ValueTable>();
 
-  @Override
-  public void find(TQuery query, List<TResult> result) {
-    for(ValueTable valueTable : query.getTableFilter()) {
-      executeQuery(valueTable, query, result);
-    }
-    next(query, result);
+  public List<ValueTable> getTableFilter() {
+    return tableFilter;
   }
 
 }

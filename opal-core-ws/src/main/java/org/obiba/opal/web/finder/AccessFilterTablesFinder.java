@@ -7,25 +7,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.magma.support.finder;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.obiba.magma.ValueTable;
+package org.obiba.opal.web.finder;
 
 /**
  *
  */
-public abstract class AbstractQuery {
+public class AccessFilterTablesFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
+    AbstractFinder<TQuery, TResult> {
 
-  /**
-   * Tables to search within
-   */
-  private final List<ValueTable> tableFilter = new ArrayList<ValueTable>();
-
-  public List<ValueTable> getTableFilter() {
-    return tableFilter;
+  @Override
+  public void find(TQuery query, TResult result) {
+    // TODO iterate on all tables for which user has at least TABLE_READ
+//    query.getTableFilter().addAll(readableTables);
+    next(query, result);
   }
 
 }

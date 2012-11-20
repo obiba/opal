@@ -7,22 +7,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.magma.support.finder;
-
-import java.util.List;
-
-import org.obiba.magma.ValueTable;
+package org.obiba.opal.web.finder;
 
 /**
  *
  */
-public abstract class AbstractFinder<TQuery extends AbstractQuery, TResult> {
+public abstract class AbstractFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> {
 
   private AbstractFinder<TQuery, TResult> nextFinder;
 
-  public abstract void find(TQuery query, List<TResult> result);
+  public abstract void find(TQuery query, TResult result);
 
-  public void next(TQuery query, List<TResult> result) {
+  public void next(TQuery query, TResult result) {
     if(nextFinder != null) nextFinder.find(query, result);
   }
 

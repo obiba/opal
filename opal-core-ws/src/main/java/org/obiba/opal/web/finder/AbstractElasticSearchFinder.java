@@ -7,18 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.magma.support.finder;
+package org.obiba.opal.web.finder;
 
-import java.util.List;
-
-import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.service.OpalSearchService;
 
 /**
  *
  */
-public abstract class AbstractElasticSearchFinder<TQuery extends AbstractQuery, TResult> extends AbstractFinder<TQuery,
-    TResult> {
+public abstract class AbstractElasticSearchFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
+    AbstractFinder<TQuery, TResult> {
 
   private final OpalSearchService opalSearchService;
 
@@ -26,11 +23,10 @@ public abstract class AbstractElasticSearchFinder<TQuery extends AbstractQuery, 
     this.opalSearchService = opalSearchService;
   }
 
-  public abstract void executeQuery(TQuery query, List<TResult> result, String... indexes);
-
+  public abstract void executeQuery(TQuery query, TResult result, String... indexes);
 
   @Override
-  public void find(TQuery query, List<TResult> result) {
+  public void find(TQuery query, TResult result) {
     if(isSearchEnabled()) {
       // iterate on query.getTableFilter() and check if table is indexed
 
