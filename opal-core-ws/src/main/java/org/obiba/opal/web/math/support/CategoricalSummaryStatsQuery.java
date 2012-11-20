@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+ * Copyright (c) 2011 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -7,16 +7,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.math;
+package org.obiba.opal.web.math.support;
 
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
+import org.obiba.opal.web.finder.AbstractFinderQuery;
 
-import com.google.common.collect.Sets;
-
-public class AbstractSummaryStatisticsResource {
+/**
+ *
+ */
+public class CategoricalSummaryStatsQuery extends AbstractFinderQuery {
 
   private final ValueTable valueTable;
 
@@ -24,10 +25,16 @@ public class AbstractSummaryStatisticsResource {
 
   private final VectorSource vectorSource;
 
-  protected AbstractSummaryStatisticsResource(ValueTable valueTable, Variable variable, VectorSource vectorSource) {
+  private final boolean distinct;
+
+  public CategoricalSummaryStatsQuery(ValueTable valueTable, Variable variable, VectorSource vectorSource,
+      boolean distinct) {
     this.valueTable = valueTable;
     this.variable = variable;
     this.vectorSource = vectorSource;
+    this.distinct = distinct;
+
+    getTableFilter().add(valueTable);
   }
 
   public ValueTable getValueTable() {
@@ -42,7 +49,7 @@ public class AbstractSummaryStatisticsResource {
     return vectorSource;
   }
 
-  protected Iterable<Value> getValues() {
-    return vectorSource.getValues(Sets.newTreeSet(getValueTable().getVariableEntities()));
+  public boolean isDistinct() {
+    return distinct;
   }
 }

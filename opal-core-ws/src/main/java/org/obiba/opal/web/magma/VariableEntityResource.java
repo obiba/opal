@@ -17,11 +17,12 @@ import javax.ws.rs.Path;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.opal.web.magma.support.finder.AbstractElasticSearchFinder;
-import org.obiba.opal.web.magma.support.finder.AbstractFinder;
-import org.obiba.opal.web.magma.support.finder.AbstractMagmaFinder;
-import org.obiba.opal.web.magma.support.finder.AbstractQuery;
-import org.obiba.opal.web.magma.support.finder.AccessFilterTablesFinder;
+import org.obiba.opal.web.finder.AbstractElasticSearchFinder;
+import org.obiba.opal.web.finder.AbstractFinder;
+import org.obiba.opal.web.finder.AbstractFinderQuery;
+import org.obiba.opal.web.finder.FinderResult;
+import org.obiba.opal.web.finder.AbstractMagmaFinder;
+import org.obiba.opal.web.finder.AccessFilterTablesFinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -47,9 +48,10 @@ public class VariableEntityResource {
 
     VariableEntity entity = getEntity();
 
-    List<ValueTable> results = new ArrayList<ValueTable>();
+    FinderResult<List<ValueTable>> results = new FinderResult<List<ValueTable>>(new ArrayList<ValueTable>());
     VariableEntityTablesFinder finder = new VariableEntityTablesFinder();
     finder.find(new VariableEntityTablesQuery(entity), results);
+    List<ValueTable> resultTables = results.getValue();
 
     // TODO...
 
@@ -61,7 +63,7 @@ public class VariableEntityResource {
     return null;
   }
 
-  public static class VariableEntityTablesQuery extends AbstractQuery {
+  public static class VariableEntityTablesQuery extends AbstractFinderQuery {
 
     private final VariableEntity entity;
 
@@ -74,15 +76,18 @@ public class VariableEntityResource {
     }
   }
 
-  public class VariableEntityTablesFinder extends AbstractFinder<VariableEntityTablesQuery, ValueTable> {
+  public class VariableEntityTablesFinder extends
+      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> {
 
     @Override
-    public void find(VariableEntityTablesQuery query, List<ValueTable> result) {
-      nextFinder(new AccessFilterTablesFinder<VariableEntityTablesQuery, ValueTable>()) //
-          .nextFinder(new AbstractElasticSearchFinder<VariableEntityTablesQuery, ValueTable>(opalSearchService) {
+    public void find(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result) {
+      nextFinder(new AccessFilterTablesFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>()) //
+          .nextFinder(new AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>(
+              opalSearchService) {
 
             @Override
-            public void executeQuery(VariableEntityTablesQuery query, List<ValueTable> result, String... indexes) {
+            public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result,
+                String... indexes) {
               // http://www.elasticsearch.org/guide/reference/query-dsl/ids-filter.html
               // {
               //  "ids" : {
@@ -95,11 +100,12 @@ public class VariableEntityResource {
               // [...]
             }
           }) //
-          .nextFinder(new AbstractMagmaFinder<VariableEntityTablesQuery, ValueTable>() {
+          .nextFinder(new AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>() {
             @Override
-            public void executeQuery(ValueTable valueTable, VariableEntityTablesQuery query, List<ValueTable> result) {
+            public void executeQuery(ValueTable valueTable, VariableEntityTablesQuery query,
+                FinderResult<List<ValueTable>> result) {
               if(valueTable.hasValueSet(query.getEntity())) {
-                result.add(valueTable);
+                result.getValue().add(valueTable);
               }
             }
           });

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -50,7 +50,8 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
 
   public ContinuousSummaryStatisticsResource(ValueTable valueTable, Variable variable, VectorSource vectorSource) {
     super(valueTable, variable, vectorSource);
-    if(variable.getValueType().isNumeric() == false) throw new IllegalArgumentException("continuous variables must be numeric");
+    if(variable.getValueType().isNumeric() == false)
+      throw new IllegalArgumentException("continuous variables must be numeric");
 
     if(variable.hasCategories()) {
       for(Category c : variable.getCategories()) {
@@ -63,17 +64,22 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
 
   @GET
   @POST
-  public Response compute(@QueryParam("d") @DefaultValue("normal") Distribution distribution, @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals) {
+  public Response compute(@QueryParam("d") @DefaultValue("normal") Distribution distribution,
+      @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals) {
     List<Double> percentilesOrDefault = null;
     if(percentiles != null && !percentiles.isEmpty()) {
       percentilesOrDefault = percentiles;
     } else { // default
-      percentilesOrDefault = ImmutableList.<Double> of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d, 90d, 95d, 99.5d, 99.95d);
+      percentilesOrDefault = ImmutableList
+          .<Double>of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d,
+              90d, 95d, 99.5d, 99.95d);
     }
 
     SummaryStatisticsDto entity = SummaryStatisticsDto.newBuilder()//
-    .setResource(getVariable().getName())//
-    .setExtension(ContinuousSummaryDto.continuous, distribution.calc(getVariable().getValueType(), missing, getValues(), percentilesOrDefault, intervals).build()).build();
+        .setResource(getVariable().getName())//
+        .setExtension(ContinuousSummaryDto.continuous,
+            distribution.calc(getVariable().getValueType(), missing, getValues(), percentilesOrDefault, intervals)
+                .build()).build();
 
     return TimestampedResponses.ok(getValueTable(), entity).build();
   }
@@ -97,13 +103,17 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
 
     abstract ContinuousDistribution getDistribution(DescriptiveStatistics ds);
 
-    public ContinuousSummaryDto.Builder calc(ValueType type, Set<Value> missing, Iterable<Value> values, List<Double> percentiles, int intervals) {
+    public ContinuousSummaryDto.Builder calc(ValueType type, Set<Value> missing, Iterable<Value> values,
+        List<Double> percentiles, int intervals) {
       DescriptiveStatistics ds = new DescriptiveStatistics();
       for(Value value : values) {
         addValue(ds, missing, value);
       }
 
-      DescriptiveStatsDto.Builder builder = DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax()).setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq()).setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness()).setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()).setMedian(ds.apply(new Median()));
+      DescriptiveStatsDto.Builder builder = DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax())
+          .setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq())
+          .setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness())
+          .setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()).setMedian(ds.apply(new Median()));
       ContinuousSummaryDto.Builder continuous = ContinuousSummaryDto.newBuilder();
       if(ds.getVariance() > 0) {
         IntervalFrequency bf = new IntervalFrequency(ds.getMin(), ds.getMax(), intervals, type == IntegerType.get());
@@ -112,7 +122,10 @@ public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisti
         }
 
         for(Interval interval : bf.intervals()) {
-          continuous.addIntervalFrequency(IntervalFrequencyDto.newBuilder().setLower(interval.getLower()).setUpper(interval.getUpper()).setFreq(interval.getFreq()).setDensity(interval.getDensity()).setDensityPct(interval.getDensityPct()));
+          continuous.addIntervalFrequency(
+              IntervalFrequencyDto.newBuilder().setLower(interval.getLower()).setUpper(interval.getUpper())
+                  .setFreq(interval.getFreq()).setDensity(interval.getDensity())
+                  .setDensityPct(interval.getDensityPct()));
         }
 
         ContinuousDistribution cd = getDistribution(ds);
