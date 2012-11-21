@@ -185,6 +185,7 @@ message ESCfgDto {
   required int32 shards = 4;
   required int32 replicas = 5;
   optional string settings = 6;
+  optional bool enabled = 7;
   extend ServiceCfgDto {
     optional ESCfgDto params = 1000;
   }

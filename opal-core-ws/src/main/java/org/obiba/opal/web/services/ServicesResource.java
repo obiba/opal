@@ -9,21 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.web.services;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.UriBuilder;
 
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import org.obiba.opal.web.model.Opal;
-import org.obiba.opal.web.model.Opal.ServiceDto;
-import org.obiba.opal.web.model.Opal.ServiceStatus;
 
 import com.google.common.collect.Lists;
 
@@ -46,9 +44,9 @@ public class ServicesResource {
 
     for(Service service : services) {
       Opal.ServiceStatus status = service.isRunning() ? Opal.ServiceStatus.RUNNING : Opal.ServiceStatus.STOPPED;
-      String link = "/service/" + service.getName();
-      Opal.ServiceDto dto = Opal.ServiceDto.newBuilder().setName(service.getName()).setStatus(status).setLink(link)
-          .build();
+      URI link = UriBuilder.fromPath("/").path(ServiceResource.class).build(service.getName());
+      Opal.ServiceDto dto = Opal.ServiceDto.newBuilder().setName(service.getName()).setStatus(status)
+          .setLink(link.getPath()).build();
       serviceDtos.add(dto);
     }
 

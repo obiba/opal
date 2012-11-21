@@ -31,6 +31,8 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.server.httpd.security.AuthenticationFilter;
 import org.obiba.opal.server.ssl.SslContextFactory;
@@ -178,6 +180,11 @@ public class OpalJettyServer implements Service {
   @Override
   public String getName() {
     return "jetty";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
   }
 
   private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr,

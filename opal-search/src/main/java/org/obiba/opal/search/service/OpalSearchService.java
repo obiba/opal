@@ -15,6 +15,8 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.node.internal.InternalNode;
 import org.elasticsearch.rest.RestController;
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
@@ -53,7 +55,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
     if(!isRunning() && esConfig.isEnabled()) {
       esNode = NodeBuilder.nodeBuilder().client(true).settings(
           ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false))
-          .clusterName(esConfig.getClusterName("opal")).client(esConfig.isDataNode() == false).node();
+          .clusterName(esConfig.getClusterName()).client(esConfig.isDataNode() == false).node();
       client = esNode.client();
     }
   }
@@ -80,5 +82,10 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   @Override
   public String getName() {
     return "search";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    return configService.getConfig();
   }
 }

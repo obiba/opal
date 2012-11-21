@@ -12,11 +12,11 @@ package org.obiba.opal.core.runtime;
 /**
  * Thrown when a service refers to a non-existing {@link org.obiba.opal.core.runtime.Service}.
  */
-public class NoSuchServiceRuntimeException extends RuntimeException {
+public class NoSuchServiceException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public NoSuchServiceRuntimeException(String serviceName) {
+  public NoSuchServiceException(String serviceName) {
     super("No such service (" + serviceName + ")");
   }
 
