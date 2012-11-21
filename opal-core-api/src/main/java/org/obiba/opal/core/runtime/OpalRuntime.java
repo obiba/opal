@@ -32,8 +32,8 @@ public interface OpalRuntime {
    * Get the service with the given name.
    *
    * @param name Service name
-   * @throw NoSuchService runtime exception if not found (hasService() must be evaluated first)
+   * @throws throw NoSuchService runtime exception if not found (hasService() must be evaluated first)
    */
-  public Service getService(String name) throws NoSuchServiceRuntimeException;
+  public Service getService(String name) throws org.obiba.opal.core.runtime.NoSuchServiceException;
 
 }

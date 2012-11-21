@@ -21,6 +21,7 @@ import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,6 +141,11 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   @Override
   public String getName() {
     return "databases";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    return configSupplier.get();
   }
 
   @Override

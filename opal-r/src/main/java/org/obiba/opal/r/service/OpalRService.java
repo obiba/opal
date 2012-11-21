@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
@@ -138,5 +140,10 @@ public class OpalRService implements Service, ROperationTemplate {
   @Override
   public String getName() {
     return "r";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
   }
 }

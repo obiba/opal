@@ -15,6 +15,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.reporting.service.birt.common.BirtEngine;
@@ -96,6 +98,11 @@ public class BirtReportServiceImpl implements ReportService {
   @Override
   public String getName() {
     return "birt";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
   }
 
   private BirtEngine instantiateEngine(File birtHome) {

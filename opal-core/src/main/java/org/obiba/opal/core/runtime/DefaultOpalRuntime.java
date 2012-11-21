@@ -59,7 +59,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private Object syncFs = new Object();
 
-  private Throwable NoSuchServiceRuntimeException;
+  private Throwable NoSuchServiceException;
 
   @Override
   public void start() {
@@ -118,8 +118,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
-  public Service getService(String name) throws NoSuchServiceRuntimeException {
-    if(!hasService(name)) throw new NoSuchServiceRuntimeException(name);
+  public Service getService(String name) throws NoSuchServiceException {
+    if(!hasService(name)) throw new NoSuchServiceException(name);
 
     Service service = null;
     for(Service s : services) {

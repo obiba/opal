@@ -17,6 +17,8 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +114,11 @@ public class BasicBirtReportServiceImpl implements ReportService {
   @Override
   public String getName() {
     return "basic-birt";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
   }
 
   static class OutputPurger extends Thread {

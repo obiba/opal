@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -31,12 +31,12 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
     return enabled != null ? enabled : true;
   }
 
-  public String getClusterName(String defaultName) {
-    return clusterName != null ? clusterName : defaultName;
+  public String getClusterName() {
+    return clusterName != null ? clusterName : EsIndexManager.DEFAULT_CLUSTER_NAME;
   }
 
-  public String getIndexName(String defaultName) {
-    return indexName != null ? indexName : defaultName;
+  public String getIndexName() {
+    return indexName != null ? indexName : EsIndexManager.DEFAULT_OPAL_INDEX_NAME;
   }
 
   public boolean isDataNode() {
@@ -55,4 +55,31 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
     return replicas != null ? replicas : 1;
   }
 
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public void setClusterName(String clusterName) {
+    this.clusterName = clusterName;
+  }
+
+  public void setIndexName(String indexName) {
+    this.indexName = indexName;
+  }
+
+  public void setDataNode(Boolean dataNode) {
+    this.dataNode = dataNode;
+  }
+
+  public void setShards(Integer shards) {
+    this.shards = shards;
+  }
+
+  public void setReplicas(Integer replicas) {
+    this.replicas = replicas;
+  }
+
+  public void setEsSettings(String esSettings) {
+    this.esSettings = esSettings;
+  }
 }

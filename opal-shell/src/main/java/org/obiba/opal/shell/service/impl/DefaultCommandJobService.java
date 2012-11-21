@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
@@ -111,6 +113,11 @@ public class DefaultCommandJobService implements CommandJobService {
   @Override
   public String getName() {
     return "job";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
   }
 
   //
