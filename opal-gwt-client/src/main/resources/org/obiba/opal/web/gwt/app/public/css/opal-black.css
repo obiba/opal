@@ -1,26 +1,26 @@
-/* An example of customized style with blue flavor */
+/* An example of customized style with black flavor */
 
 body {
   background: #EEE;
 }
 
 .login {
-	color: #003366;
+	color: #111;
 }
 
 .login > table {
-	border-color: #003366;
+	border-color: #111;
 	background-color: #F3F4EB;
 }
 
 .topbar {
-	background:-moz-linear-gradient(top,#1e5799 0,#1762ae 0,#003366 100%);
-	background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#1e5799),color-stop(0%,#1762ae),color-stop(100%,#003366));
-	background:-webkit-linear-gradient(top,#1e5799 0,#1762ae 0,#003366 100%);
-	background:-o-linear-gradient(top,#1e5799 0,#1762ae 0,#003366 100%);
-	background:-ms-linear-gradient(top,#1e5799 0,#1762ae 0,#003366 100%);
-	background:linear-gradient(top,#1e5799 0,#1762ae 0,#003366 100%);
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#1762ae',endColorstr='#003366',GradientType=0);
+	background:-moz-linear-gradient(top,#1e5799 0,#222 0,#111 100%);
+	background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#1e5799),color-stop(0%,#222),color-stop(100%,#111));
+	background:-webkit-linear-gradient(top,#1e5799 0,#222 0,#111 100%);
+	background:-o-linear-gradient(top,#1e5799 0,#222 0,#111 100%);
+	background:-ms-linear-gradient(top,#1e5799 0,#222 0,#111 100%);
+	background:linear-gradient(top,#1e5799 0,#222 0,#111 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#222',endColorstr='#111',GradientType=0);
 }
 
 .topbar span, .topbar a, .topbar a:hover {
@@ -36,7 +36,7 @@ body {
 }
 
 .top .gwt-MenuBar-horizontal .gwt-MenuItem.gwt-MenuItem-selected {
-	background-color: #003366
+	background-color: #111
 }
 
 .main-content {
@@ -53,15 +53,15 @@ body {
 	background:-ms-linear-gradient(top,#1e5799 0,#FEFFF6 0,#E5E6DD 100%);
 	background:linear-gradient(top,#1e5799 0,#FEFFF6 0,#E5E6DD 100%);
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FEFFF6',endColorstr='#E5E6DD',GradientType=0);
-    color:#003366;
+    color:#111;
 }
 
 .gwt-TabLayoutPanel .gwt-TabLayoutPanelTab.gwt-TabLayoutPanelTab-selected {
-	background-color: #003366;
+	background-color: #111;
 }
 
 .tooltip.gwt-PopupPanel {
-	border: 0.2em solid #003366;
+	border: 0.2em solid #111;
 }
 
 .footbar {
@@ -72,5 +72,5 @@ body {
 }
 
 .footbar a {
-	color: #003366;
+	color: #111;
 }

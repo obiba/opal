@@ -35,6 +35,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeSocketFactory;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
@@ -118,29 +119,7 @@ public class OpalJavaClient {
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
 
     try {
-      // Accepts any SSL certificate
-      X509TrustManager tm = new X509TrustManager() {
-
-        @Override
-        public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
-
-        }
-
-        @Override
-        public void checkServerTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
-
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-          return null;
-        }
-      };
-      SSLContext ctx = SSLContext.getInstance("TLS");
-      ctx.init(null, new TrustManager[] { tm }, null);
-
-      SSLSocketFactory factory = new SSLSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-      httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", 443, factory));
+      httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", 443, getSocketFactory()));
     } catch(NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     } catch(KeyManagementException e) {
@@ -151,6 +130,31 @@ public class OpalJavaClient {
 
     this.ctx = new BasicHttpContext();
     this.ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
+  }
+
+  private SchemeSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException {
+    // Accepts any SSL certificate
+    X509TrustManager tm = new X509TrustManager() {
+
+      @Override
+      public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+
+      }
+
+      @Override
+      public void checkServerTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+
+      }
+
+      @Override
+      public X509Certificate[] getAcceptedIssuers() {
+        return null;
+      }
+    };
+    SSLContext ctx = SSLContext.getInstance("TLS");
+    ctx.init(null, new TrustManager[] { tm }, null);
+
+    return new SSLSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
   }
 
   public void close() {

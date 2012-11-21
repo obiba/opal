@@ -171,6 +171,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateFormatStepDisplay() {
     destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
     if(getView().getImportFormat().equals(ImportFormat.CSV)) {
