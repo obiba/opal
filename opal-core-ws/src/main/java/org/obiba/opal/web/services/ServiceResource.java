@@ -12,7 +12,9 @@ package org.obiba.opal.web.services;
 import java.net.URI;
 import java.util.Set;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -74,6 +76,24 @@ public class ServiceResource {
         .setLink(link.getPath()).build();
 
     return Response.ok().entity(dto).build();
+  }
+
+  @POST
+  public Response start() {
+
+    Service service = opalRuntime.getService(name);
+    service.start();
+
+    return Response.ok().build();
+  }
+
+  @DELETE
+  public Response stop() {
+
+    Service service = opalRuntime.getService(name);
+    service.stop();
+
+    return Response.ok().build();
   }
 
   @GET
