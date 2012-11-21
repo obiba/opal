@@ -44,7 +44,7 @@ public class ServiceConfigurationHandlerRegistry {
     if(configExtension == null) throw new IllegalArgumentException("configExtension cannot be null");
     for(ServiceConfigurationHandler handler : handlers) {
       if(handler.canGet(configExtension)) {
-        return handler.get(configExtension, name);
+        return handler.get(configExtension);
       }
     }
     throw new NoSuchServiceConfigurationException("No configuration for service: " + name);
