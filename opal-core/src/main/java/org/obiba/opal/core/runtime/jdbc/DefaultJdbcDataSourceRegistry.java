@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -21,6 +21,7 @@ import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,52 +66,57 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   private final ExtensionConfigurationSupplier<JdbcDataSourcesConfig> configSupplier;
 
-  private final Cache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder().removalListener(new RemovalListener<String, BasicDataSource>() {
+  private final Cache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder()
+      .removalListener(new RemovalListener<String, BasicDataSource>() {
 
-    @Override
-    public void onRemoval(RemovalNotification<String, BasicDataSource> notification) {
-      try {
-        log.info("Destroying DataSource {}", notification.getKey());
-        notification.getValue().close();
-      } catch(SQLException e) {
-        log.warn("Ignoring exception during shutdown: ", e);
-      }
-    }
-  }).build(new CacheLoader<String, BasicDataSource>() {
+        @Override
+        public void onRemoval(RemovalNotification<String, BasicDataSource> notification) {
+          try {
+            log.info("Destroying DataSource {}", notification.getKey());
+            notification.getValue().close();
+          } catch(SQLException e) {
+            log.warn("Ignoring exception during shutdown: ", e);
+          }
+        }
+      }).build(new CacheLoader<String, BasicDataSource>() {
 
-    @Override
-    public BasicDataSource load(String key) throws Exception {
-      log.info("Building DataSource {}", key);
-      return dataSourceFactory.createDataSource(getJdbcDataSource(key));
-    }
-  });
+        @Override
+        public BasicDataSource load(String key) throws Exception {
+          log.info("Building DataSource {}", key);
+          return dataSourceFactory.createDataSource(getJdbcDataSource(key));
+        }
+      });
 
-  private final Cache<String, SessionFactory> sessionFactoryCache = CacheBuilder.newBuilder().removalListener(new RemovalListener<String, SessionFactory>() {
-    @Override
-    public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
-      try {
-        log.info("Destroying session factory {}", notification.getKey());
-        notification.getValue().close();
-      } catch(HibernateException e) {
-        log.warn("Ignoring exception during shutdown: ", e);
-      }
-    }
-  }).build(new CacheLoader<String, SessionFactory>() {
+  private final Cache<String, SessionFactory> sessionFactoryCache = CacheBuilder.newBuilder()
+      .removalListener(new RemovalListener<String, SessionFactory>() {
+        @Override
+        public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
+          try {
+            log.info("Destroying session factory {}", notification.getKey());
+            notification.getValue().close();
+          } catch(HibernateException e) {
+            log.warn("Ignoring exception during shutdown: ", e);
+          }
+        }
+      }).build(new CacheLoader<String, SessionFactory>() {
 
-    @Override
-    public SessionFactory load(String key) throws Exception {
-      log.info("Building SessionFactory {}", key);
-      return sessionFactoryFactory.getSessionFactory(getDataSource(key, null));
-    }
-  });
+        @Override
+        public SessionFactory load(String key) throws Exception {
+          log.info("Building SessionFactory {}", key);
+          return sessionFactoryFactory.getSessionFactory(getDataSource(key, null));
+        }
+      });
 
-  private final SetMultimap<String, String> registrations = Multimaps.synchronizedSetMultimap(HashMultimap.<String, String> create());
+  private final SetMultimap<String, String> registrations = Multimaps
+      .synchronizedSetMultimap(HashMultimap.<String, String>create());
 
   @Autowired
-  public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, SessionFactoryFactory sessionFactoryFactory, OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
+  public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, SessionFactoryFactory sessionFactoryFactory,
+      OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
     this.dataSourceFactory = dataSourceFactory;
     this.sessionFactoryFactory = sessionFactoryFactory;
-    this.configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService, JdbcDataSourcesConfig.class);
+    this.configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService,
+        JdbcDataSourcesConfig.class);
     this.opalDataSource = opalDataSource;
     this.defaultDatasource = buildDefaultDataSource(opalDataSource);
 
@@ -130,6 +136,16 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   public void stop() {
     sessionFactoryCache.invalidateAll();
     dataSourceCache.invalidateAll();
+  }
+
+  @Override
+  public String getName() {
+    return "databases";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    return configSupplier.get();
   }
 
   @Override
@@ -158,16 +174,17 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public Iterable<JdbcDataSource> listDataSources() {
-    return Iterables.transform(Iterables.concat(ImmutableList.of(defaultDatasource), get().datasources), new Function<JdbcDataSource, JdbcDataSource>() {
+    return Iterables.transform(Iterables.concat(ImmutableList.of(defaultDatasource), get().datasources),
+        new Function<JdbcDataSource, JdbcDataSource>() {
 
-      @Override
-      public JdbcDataSource apply(JdbcDataSource input) {
-        if(input.getName().equals(DEFAULT_NAME) || registrations.containsKey(input.getName())) {
-          return input.immutable();
-        }
-        return input.mutable();
-      }
-    });
+          @Override
+          public JdbcDataSource apply(JdbcDataSource input) {
+            if(input.getName().equals(DEFAULT_NAME) || registrations.containsKey(input.getName())) {
+              return input.immutable();
+            }
+            return input.mutable();
+          }
+        });
   }
 
   @Override
@@ -230,7 +247,8 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   private JdbcDataSource buildDefaultDataSource(DataSource opalDataSource) {
     BasicDataSource bds = (BasicDataSource) opalDataSource;
-    return new JdbcDataSource(DEFAULT_NAME, bds.getUrl(), bds.getDriverClassName(), bds.getUsername(), bds.getPassword(), null).immutable();
+    return new JdbcDataSource(DEFAULT_NAME, bds.getUrl(), bds.getDriverClassName(), bds.getUsername(),
+        bds.getPassword(), null).immutable();
   }
 
   private void destroyDataSource(String name) {
