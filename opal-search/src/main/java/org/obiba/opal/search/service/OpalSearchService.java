@@ -27,6 +27,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpalSearchService implements Service, ElasticSearchProvider {
 
+  public static String SERVICE_NAME = "search";
+
   private final ElasticSearchConfigurationService configService;
 
   private Node esNode;
@@ -81,7 +83,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   @Override
   public String getName() {
-    return "search";
+    return SERVICE_NAME;
   }
 
   @Override

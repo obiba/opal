@@ -26,7 +26,7 @@ public interface ServiceConfigurationHandler {
    * @param config
    * @return the service dto
    */
-  public Opal.ServiceCfgDto get(OpalConfigurationExtension config, String name);
+  public Opal.ServiceCfgDto get(OpalConfigurationExtension config);
 
   /**
    * Parses the provided {@code Opal.ServiceCfgDto} instance and builds a corresponding {@code

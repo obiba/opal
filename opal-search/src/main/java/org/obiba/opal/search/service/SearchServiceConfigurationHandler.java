@@ -19,14 +19,15 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
   }
 
   @Override
-  public Opal.ServiceCfgDto get(OpalConfigurationExtension opalConfig, String name) {
+  public Opal.ServiceCfgDto get(OpalConfigurationExtension opalConfig) {
     ElasticSearchConfiguration config = (ElasticSearchConfiguration) opalConfig;
 
     Opal.ESCfgDto escDto = Opal.ESCfgDto.newBuilder().setClusterName(config.getClusterName())
         .setIndexName(config.getIndexName()).setDataNode(config.isDataNode()).setShards(config.getShards())
         .setEnabled(config.isEnabled()).setReplicas(config.getReplicas()).setSettings(config.getEsSettings()).build();
 
-    return Opal.ServiceCfgDto.newBuilder().setName(name).setExtension(Opal.ESCfgDto.params, escDto).build();
+    return Opal.ServiceCfgDto.newBuilder().setName(OpalSearchService.SERVICE_NAME)
+        .setExtension(Opal.ESCfgDto.params, escDto).build();
   }
 
   @Override
