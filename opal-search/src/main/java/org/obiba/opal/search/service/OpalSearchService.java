@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,6 +15,8 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.node.internal.InternalNode;
 import org.elasticsearch.rest.RestController;
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
@@ -51,7 +53,9 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   public void start() {
     ElasticSearchConfiguration esConfig = configService.getConfig();
     if(!isRunning() && esConfig.isEnabled()) {
-      esNode = NodeBuilder.nodeBuilder().client(true).settings(ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false)).clusterName(esConfig.getClusterName("opal")).client(esConfig.isDataNode() == false).node();
+      esNode = NodeBuilder.nodeBuilder().client(true).settings(
+          ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", false))
+          .clusterName(esConfig.getClusterName()).client(esConfig.isDataNode() == false).node();
       client = esNode.client();
     }
   }
@@ -75,4 +79,13 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
     }
   }
 
+  @Override
+  public String getName() {
+    return "search";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    return configService.getConfig();
+  }
 }

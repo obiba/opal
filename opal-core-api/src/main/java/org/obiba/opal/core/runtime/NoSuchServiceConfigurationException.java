@@ -9,24 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime;
 
-import org.obiba.opal.core.cfg.OpalConfigurationExtension;
-
 /**
- * A high-level abstraction of a component offering some type of service which has its own lifecycle. Service instances
- * are managed by the {@code OpalRuntime}
+ * Thrown when a service refers to a non-existing {@link org.obiba.opal.core.cfg.OpalConfiguration}.
  */
-public interface Service {
+public class NoSuchServiceConfigurationException extends RuntimeException {
 
-  public boolean isRunning();
+  private static final long serialVersionUID = 1L;
 
-  public void start();
+  public NoSuchServiceConfigurationException(String serviceName) {
+    super("No such service configuration (" + serviceName + ")");
+  }
 
-  public void stop();
-
-  /**
-   * Service unique name.
-   */
-  public String getName();
-
-  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException;
 }

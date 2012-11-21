@@ -1,14 +1,16 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
@@ -40,7 +42,10 @@ public class OpalRService implements Service, ROperationTemplate {
   private String encoding;
 
   @Autowired
-  public OpalRService(@Value("${org.obiba.opal.Rserve.host}") String host, @Value("${org.obiba.opal.Rserve.port}") Integer port, @Value("${org.obiba.opal.Rserve.username}") String username, @Value("${org.obiba.opal.Rserve.password}") String password, @Value("${org.obiba.opal.Rserve.encoding}") String encoding) {
+  public OpalRService(@Value("${org.obiba.opal.Rserve.host}") String host,
+      @Value("${org.obiba.opal.Rserve.port}") Integer port, @Value("${org.obiba.opal.Rserve.username}") String username,
+      @Value("${org.obiba.opal.Rserve.password}") String password,
+      @Value("${org.obiba.opal.Rserve.encoding}") String encoding) {
     super();
     this.host = host;
     this.port = port;
@@ -51,6 +56,7 @@ public class OpalRService implements Service, ROperationTemplate {
 
   /**
    * Creates a new connection to R server.
+   *
    * @return
    * @throws RserveException
    */
@@ -131,4 +137,13 @@ public class OpalRService implements Service, ROperationTemplate {
 
   }
 
+  @Override
+  public String getName() {
+    return "r";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
+  }
 }
