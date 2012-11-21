@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -17,6 +17,8 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +64,8 @@ public class BasicBirtReportServiceImpl implements ReportService {
     }
   }
 
-  private String getBirtCommandLine(String format, Map<String, String> parameters, String reportDesign, String reportOutput) {
+  private String getBirtCommandLine(String format, Map<String, String> parameters, String reportDesign,
+      String reportOutput) {
     StringBuffer cmd = new StringBuffer(birtExec);
 
     if(format != null) {
@@ -90,7 +93,8 @@ public class BasicBirtReportServiceImpl implements ReportService {
 
   @Override
   public void start() {
-    birtExec = System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME) + File.separator + "ReportEngine" + File.separator + "genReport";
+    birtExec = System
+        .getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME) + File.separator + "ReportEngine" + File.separator + "genReport";
     if(System.getProperty("os.name").contains("Windows")) {
       birtExec = "cmd.exe /c " + birtExec;
       birtExec += ".bat";
@@ -105,6 +109,16 @@ public class BasicBirtReportServiceImpl implements ReportService {
   @Override
   public void stop() {
     running = false;
+  }
+
+  @Override
+  public String getName() {
+    return "basic-birt";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
   }
 
   static class OutputPurger extends Thread {

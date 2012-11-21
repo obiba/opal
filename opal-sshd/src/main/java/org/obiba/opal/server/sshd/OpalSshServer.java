@@ -18,6 +18,8 @@ import org.apache.sshd.server.FileSystemView;
 import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.sftp.SftpSubsystem;
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.shell.CommandRegistry;
@@ -53,14 +55,16 @@ public class OpalSshServer implements Service {
   private boolean isRunning = false;
 
   @Autowired
-  public OpalSshServer(@Qualifier("ssh") CommandRegistry commandRegistry, OpalShellFactory shellFactory, OpalShellHolder opalShellHolder, @Value("${org.obiba.opal.ssh.port}") Integer port) {
+  public OpalSshServer(@Qualifier("ssh") CommandRegistry commandRegistry, OpalShellFactory shellFactory,
+      OpalShellHolder opalShellHolder, @Value("${org.obiba.opal.ssh.port}") Integer port) {
     this.commandRegistry = commandRegistry;
     this.shellFactory = shellFactory;
     this.opalShellHolder = opalShellHolder;
 
     sshd = SshServer.setUpDefaultServer();
     sshd.setPort(port);
-    sshd.setKeyPairProvider(new PEMGeneratorHostKeyProvider(System.getProperty("OPAL_HOME") + "/conf/sshd.pem", "RSA", 2048));
+    sshd.setKeyPairProvider(
+        new PEMGeneratorHostKeyProvider(System.getProperty("OPAL_HOME") + "/conf/sshd.pem", "RSA", 2048));
     sshd.setShellFactory(new Factory<Command>() {
 
       public Command create() {
@@ -72,7 +76,8 @@ public class OpalSshServer implements Service {
 
       public boolean authenticate(String username, String password, ServerSession session) {
         try {
-          SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password.toCharArray(), session.getIoSession().getRemoteAddress().toString()));
+          SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password.toCharArray(),
+              session.getIoSession().getRemoteAddress().toString()));
           // Sessions don't expire automatically
           SecurityUtils.getSubject().getSession().setTimeout(-1);
         } catch(AuthenticationException ae) {
@@ -88,7 +93,7 @@ public class OpalSshServer implements Service {
         return new OpalFileSystemView(opalRuntime, userName);
       }
     });
-    sshd.setSubsystemFactories(ImmutableList.<NamedFactory<Command>> of(new SftpSubsystem.Factory()));
+    sshd.setSubsystemFactories(ImmutableList.<NamedFactory<Command>>of(new SftpSubsystem.Factory()));
   }
 
   @Override
@@ -115,6 +120,16 @@ public class OpalSshServer implements Service {
     } catch(InterruptedException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public String getName() {
+    return "ssh";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
   }
 
   private class OpalShellCommand implements Command {

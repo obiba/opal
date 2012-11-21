@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
@@ -93,16 +95,29 @@ public class DefaultCommandJobService implements CommandJobService {
   // Service Methods
   //
 
+  @Override
   public void start() {
     isRunning = true;
   }
 
+  @Override
   public void stop() {
     isRunning = false;
   }
 
+  @Override
   public boolean isRunning() {
     return isRunning;
+  }
+
+  @Override
+  public String getName() {
+    return "job";
+  }
+
+  @Override
+  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
+    throw new NoSuchServiceConfigurationException(getName());
   }
 
   //
@@ -214,9 +229,9 @@ public class DefaultCommandJobService implements CommandJobService {
 
   /**
    * Generates an id for a {@link CommandJob}.
-   * 
+   * <p/>
    * The sequence 1, 2, 3, ..., is returned.
-   * 
+   *
    * @return an id for a {@link CommandJob}
    */
   protected Integer nextJobId() {
@@ -261,12 +276,12 @@ public class DefaultCommandJobService implements CommandJobService {
 
   public boolean isDeletable(CommandJob commandJob) {
     switch(commandJob.getStatus()) {
-    case SUCCEEDED:
-    case FAILED:
-    case CANCELED:
-      return true;
-    default:
-      return false;
+      case SUCCEEDED:
+      case FAILED:
+      case CANCELED:
+        return true;
+      default:
+        return false;
     }
   }
 
@@ -307,4 +322,5 @@ public class DefaultCommandJobService implements CommandJobService {
       }
     }
   }
+
 }
