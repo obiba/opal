@@ -30,8 +30,7 @@ import com.google.common.collect.Lists;
 @Path("/services")
 public class ServicesResource {
 
-  @Autowired
-  private Set<Service> services;
+  private final Set<Service> services;
 
   @Autowired
   public ServicesResource(Set<Service> services) {

@@ -18,17 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * Registry of {@code ServiceConfigurationHandler}
  */
 @Component
-public class ServiceConfigurationConverterRegistry {
+public class ServiceConfigurationHandlerRegistry {
 
-  private final Set<ServiceConfigurationConverter> converters;
+  private final Set<ServiceConfigurationHandler> handlers;
 
   @Autowired
-  public ServiceConfigurationConverterRegistry(Set<ServiceConfigurationConverter> converters) {
-    if(converters == null) throw new IllegalArgumentException("converters cannot be null");
-    this.converters = converters;
+  public ServiceConfigurationHandlerRegistry(Set<ServiceConfigurationHandler> handlers) {
+    if(handlers == null) throw new IllegalArgumentException("handlers cannot be null");
+    this.handlers = handlers;
   }
 
   /**
@@ -42,9 +42,9 @@ public class ServiceConfigurationConverterRegistry {
   public Opal.ServiceCfgDto get(OpalConfigurationExtension configExtension,
       String name) throws NoSuchServiceConfigurationException {
     if(configExtension == null) throw new IllegalArgumentException("configExtension cannot be null");
-    for(ServiceConfigurationConverter converter : converters) {
-      if(converter.canGet(configExtension)) {
-        return converter.get(configExtension, name);
+    for(ServiceConfigurationHandler handler : handlers) {
+      if(handler.canGet(configExtension)) {
+        return handler.get(configExtension, name);
       }
     }
     throw new NoSuchServiceConfigurationException("No configuration for service: " + name);
@@ -59,9 +59,9 @@ public class ServiceConfigurationConverterRegistry {
    */
   public void put(Opal.ServiceCfgDto serviceDto, String name) throws RuntimeException {
     if(serviceDto == null) throw new IllegalArgumentException("serviceDto cannot be null");
-    for(ServiceConfigurationConverter converter : converters) {
-      if(converter.canPut(serviceDto)) {
-        converter.put(serviceDto);
+    for(ServiceConfigurationHandler handler : handlers) {
+      if(handler.canPut(serviceDto)) {
+        handler.put(serviceDto);
       }
     }
   }

@@ -14,7 +14,6 @@ import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -38,28 +37,23 @@ public class ServiceResource {
   @PathParam("name")
   private String name;
 
-  @Autowired
-  private Set<Service> services;
+  private final Set<Service> services;
 
-  @Autowired
-  private OpalRuntime opalRuntime;
+  private final OpalRuntime opalRuntime;
 
-  @Autowired
-  private ServiceConfigurationConverterRegistry configConverter;
+  private final ServiceConfigurationHandlerRegistry configHandler;
 
-  @Autowired
-  private OpalConfigurationService configService;
+  private final OpalConfigurationService configService;
 
-  @Autowired
-  private ExtensionConfigurationSupplier configSupplier;
+  private final ExtensionConfigurationSupplier configSupplier;
 
   @Autowired
   public ServiceResource(Set<Service> services, OpalRuntime opalRuntime,
-      ServiceConfigurationConverterRegistry configConverter, OpalConfigurationService configService,
+      ServiceConfigurationHandlerRegistry configHandler, OpalConfigurationService configService,
       ExtensionConfigurationSupplier configSupplier) {
     this.services = services;
     this.opalRuntime = opalRuntime;
-    this.configConverter = configConverter;
+    this.configHandler = configHandler;
     this.configService = configService;
     this.configSupplier = configSupplier;
   }
@@ -78,7 +72,7 @@ public class ServiceResource {
     return Response.ok().entity(dto).build();
   }
 
-  @POST
+  @PUT
   public Response start() {
 
     Service service = opalRuntime.getService(name);
@@ -101,7 +95,7 @@ public class ServiceResource {
   public Response getConfig() {
     Service service = opalRuntime.getService(name);
 
-    Opal.ServiceCfgDto dto = configConverter.get(service.getConfig(), name);
+    Opal.ServiceCfgDto dto = configHandler.get(service.getConfig(), name);
 
     return Response.ok().entity(dto).build();
   }
@@ -111,7 +105,7 @@ public class ServiceResource {
   public Response saveConfig(Opal.ServiceCfgDto serviceDto) {
 
     Service service = opalRuntime.getService(name);
-    configConverter.put(serviceDto, name);
+    configHandler.put(serviceDto, name);
 
     return Response.ok().build();
 

@@ -13,9 +13,10 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.web.model.Opal;
 
 /**
- * A service configuration dto factory from its configuration.
+ * A service configuration handler to get a {@code Opal.ServiceCfgDto} given an {@code OpalConfigurationExtension}
+ * and to update a {@code OpalConfigurationExtension} for a given {@code Opal.ServiceCfgDto} .
  */
-public interface ServiceConfigurationConverter {
+public interface ServiceConfigurationHandler {
 
   /**
    * Parses the provided {@code OpalConfigurationExtension} instance and builds a corresponding {@code

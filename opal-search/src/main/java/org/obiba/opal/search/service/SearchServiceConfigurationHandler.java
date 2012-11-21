@@ -4,17 +4,17 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.web.model.Opal;
-import org.obiba.opal.web.services.ServiceConfigurationConverter;
+import org.obiba.opal.web.services.ServiceConfigurationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SearchServiceConfigurationConverter implements ServiceConfigurationConverter {
+public class SearchServiceConfigurationHandler implements ServiceConfigurationHandler {
 
   private final ElasticSearchConfigurationService configService;
 
   @Autowired
-  public SearchServiceConfigurationConverter(ElasticSearchConfigurationService configService) {
+  public SearchServiceConfigurationHandler(ElasticSearchConfigurationService configService) {
     this.configService = configService;
   }
 

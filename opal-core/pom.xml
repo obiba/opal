@@ -33,12 +33,6 @@
 
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-core-ws</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-fs</artifactId>
       <version>${project.version}</version>
     </dependency>
