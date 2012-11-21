@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.r;
 
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -38,6 +39,7 @@ import org.rosuda.REngine.REXPRaw;
 import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.RList;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -47,7 +49,7 @@ public enum VectorType {
 
   booleans(BooleanType.get()) {
     @Override
-    protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
+    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
       byte booleans[] = new byte[size];
       int i = 0;
       for(Value value : values) {
@@ -66,25 +68,76 @@ public enum VectorType {
 
   ints(IntegerType.get()) {
     @Override
-    protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
+    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
+      List<Long> missings = getMissings(variable);
       int ints[] = new int[size];
       int i = 0;
       for(Value value : values) {
-        ints[i++] = value.isNull() ? REXPInteger.NA : ((Number) value.getValue()).intValue();
+        if(value.isNull()) {
+          ints[i++] = REXPInteger.NA;
+        } else {
+          Long val = (Long) value.getValue();
+          // OPAL-1536 do not push missings
+          if(missings.contains(val) == false) {
+            ints[i++] = val.intValue();
+          }
+        }
       }
       return new REXPInteger(ints);
     }
+
+    private List<Long> getMissings(Variable variable) {
+      List<Long> missings = Lists.newArrayList();
+      if(variable.hasCategories()) {
+        for(Category cat : variable.getCategories()) {
+          if(cat.isMissing()) {
+            try {
+              missings.add(Long.parseLong(cat.getName()));
+            } catch(NumberFormatException e) {
+              // ignore
+            }
+          }
+        }
+      }
+      return missings;
+    }
+
   },
 
   doubles(DecimalType.get()) {
     @Override
-    protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
+    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
+      List<Double> missings = getMissings(variable);
       double doubles[] = new double[size];
       int i = 0;
       for(Value value : values) {
-        doubles[i++] = value.isNull() ? REXPDouble.NA : ((Number) value.getValue()).doubleValue();
+        if(value.isNull()) {
+          doubles[i++] = REXPDouble.NA;
+        } else {
+          Double val = (Double) value.getValue();
+          // OPAL-1536 do not push missings
+          if(missings.contains(val) == false) {
+            doubles[i++] = val.doubleValue();
+          }
+        }
       }
       return new REXPDouble(doubles);
+    }
+
+    private List<Double> getMissings(Variable variable) {
+      List<Double> missings = Lists.newArrayList();
+      if(variable.hasCategories()) {
+        for(Category cat : variable.getCategories()) {
+          if(cat.isMissing()) {
+            try {
+              missings.add(Double.parseDouble(cat.getName()));
+            } catch(NumberFormatException e) {
+              // ignore
+            }
+          }
+        }
+      }
+      return missings;
     }
   },
 
@@ -98,7 +151,7 @@ public enum VectorType {
 
   binaries(BinaryType.get()) {
     @Override
-    protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
+    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
       REXPRaw raws[] = new REXPRaw[size];
       int i = 0;
       for(Value value : values) {
@@ -151,10 +204,10 @@ public enum VectorType {
     case CATEGORICAL:
       return asFactors(variable, size, values);
     }
-    return asConinuousVector(variable, size, values);
+    return asContinuousVector(variable, size, values);
   }
 
-  protected REXP asConinuousVector(Variable variable, int size, Iterable<Value> values) {
+  protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
     return asStringValuesVector(variable, size, values);
   }
 
@@ -208,7 +261,6 @@ public enum VectorType {
    */
   protected REXP asStringValuesVector(Variable variable, int size, Iterable<Value> values) {
     String strings[] = new String[size];
-
     int i = 0;
     for(Value value : values) {
       if(i >= size) {
