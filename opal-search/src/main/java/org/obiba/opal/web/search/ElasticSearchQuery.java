@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.rest.RestChannel;
@@ -160,7 +161,7 @@ public class ElasticSearchQuery {
 
     @Override
     public BytesReference content() {
-      return null;  //To change body of implemented methods use File | Settings | File Templates.
+      return new BytesArray(body);
     }
 
     @Override
