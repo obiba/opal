@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.elasticsearch.common.base.Charsets;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
@@ -159,23 +159,8 @@ public class ElasticSearchQuery {
     }
 
     @Override
-    public byte[] contentByteArray() {
-      return body.getBytes(Charsets.UTF_8);
-    }
-
-    @Override
-    public int contentByteArrayOffset() {
-      return 0;
-    }
-
-    @Override
-    public int contentLength() {
-      return contentByteArray().length;
-    }
-
-    @Override
-    public String contentAsString() {
-      return body;
+    public BytesReference content() {
+      return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
