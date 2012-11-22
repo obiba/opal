@@ -908,6 +908,7 @@
     <crowd.version>2.5.1</crowd.version>
     <xfire.version>1.2.6</xfire.version>
     <cglib-nodep.version>2.2</cglib-nodep.version>
+    <elasticsearch.version>0.19.11</elasticsearch.version>
 
     <!-- maven plugins -->
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
