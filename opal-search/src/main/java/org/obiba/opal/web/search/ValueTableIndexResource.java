@@ -22,7 +22,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.elasticsearch.common.base.Charsets;
+import org.elasticsearch.common.bytes.BytesArray;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
@@ -179,26 +180,6 @@ public class ValueTableIndexResource {
     }
 
     @Override
-    public byte[] contentByteArray() {
-      return body.getBytes(Charsets.UTF_8);
-    }
-
-    @Override
-    public int contentByteArrayOffset() {
-      return 0;
-    }
-
-    @Override
-    public int contentLength() {
-      return contentByteArray().length;
-    }
-
-    @Override
-    public String contentAsString() {
-      return body;
-    }
-
-    @Override
     public String header(String name) {
       return servletRequest.getHeader(name);
     }
@@ -221,6 +202,11 @@ public class ValueTableIndexResource {
     @Override
     public String param(String key, String defaultValue) {
       return hasParam(key) ? param(key) : defaultValue;
+    }
+
+    @Override
+    public BytesReference content() {
+      return new BytesArray(body);
     }
 
   }

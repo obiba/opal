@@ -16,8 +16,11 @@ import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class EsMapping {
+  private static final Logger log = LoggerFactory.getLogger(EsMapping.class);
 
   private final String name;
 

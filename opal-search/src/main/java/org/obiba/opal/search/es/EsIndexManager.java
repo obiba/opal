@@ -17,8 +17,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
+import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.client.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.base.Preconditions;
@@ -27,7 +29,7 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.indices.IndexMissingException;
+import org.elasticsearch.indices.TypeMissingException;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -75,8 +77,7 @@ public class EsIndexManager implements IndexManager {
   private final Set<EsValueTableIndex> indices = Sets.newHashSet();
 
   @Autowired
-  public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
-      ThreadFactory threadFactory, Version version) {
+  public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig, ThreadFactory threadFactory, Version version) {
     Preconditions.checkNotNull(esProvider);
     Preconditions.checkNotNull(esConfig);
     Preconditions.checkNotNull(threadFactory);
@@ -123,21 +124,21 @@ public class EsIndexManager implements IndexManager {
   }
 
   private Settings getIndexSettings() {
-    return ImmutableSettings.settingsBuilder().put("number_of_shards", esConfig.getConfig().getShards())
-        .put("number_of_replicas", esConfig.getConfig().getReplicas()).build();
+    return ImmutableSettings.settingsBuilder().put("number_of_shards", esConfig.getConfig().getShards()).put("number_of_replicas", esConfig.getConfig().getReplicas()).build();
   }
 
   private IndexMetaData getIndexMetaData() {
-    IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName())
-        .execute().actionGet().getState().getMetaData().index(esIndexName());
+    IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName()).execute().actionGet().getState().getMetaData().index(esIndexName());
     return imd != null ? imd : createIndex();
   }
 
   private IndexMetaData createIndex() {
-    esProvider.getClient().admin().indices().prepareCreate(esIndexName()).setSettings(getIndexSettings()).execute()
-        .actionGet();
-    return esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName()).execute().actionGet()
-        .getState().getMetaData().index(esIndexName());
+    IndicesAdminClient idxAdmin = esProvider.getClient().admin().indices();
+    if(idxAdmin.exists(new IndicesExistsRequest(esIndexName())).actionGet().exists() == false) {
+      log.info("Creating index [{}]", esIndexName());
+      idxAdmin.prepareCreate(esIndexName()).setSettings(getIndexSettings()).execute().actionGet();
+    }
+    return esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName()).execute().actionGet().getState().getMetaData().index(esIndexName());
   }
 
   private class Indexer implements IndexSynchronization {
@@ -159,11 +160,15 @@ public class EsIndexManager implements IndexManager {
     @Override
     public void run() {
       log.info("Updating ValueTable index {}", index.valueTableReference);
-      try {
-        esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(index.name).execute()
-            .actionGet();
-      } catch(IndexMissingException e) {
+      IndicesAdminClient idxAdmin = esProvider.getClient().admin().indices();
+      if(idxAdmin.exists(new IndicesExistsRequest(esIndexName())).actionGet().exists() == false) {
         createIndex();
+      } else {
+        try {
+          idxAdmin.prepareDeleteMapping(esIndexName()).setType(index.name).execute().actionGet();
+        } catch(TypeMissingException e) {
+          // ignored
+        }
       }
       index();
     }
@@ -172,11 +177,9 @@ public class EsIndexManager implements IndexManager {
 
       XContentBuilder b = new ValueTableMapping().createMapping(runtimeVersion, index.name, valueTable);
 
-      esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b)
-          .execute().actionGet();
+      esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b).execute().actionGet();
 
-      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable)
-          .variables(index.getVariables()).to(new ConcurrentReaderCallback() {
+      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable).variables(index.getVariables()).to(new ConcurrentReaderCallback() {
 
         private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
@@ -191,9 +194,7 @@ public class EsIndexManager implements IndexManager {
 
         @Override
         public void onValues(VariableEntity entity, Variable[] variables, Value[] values) {
-          bulkRequest.add(
-              esProvider.getClient().prepareIndex(esIndexName(), valueTable.getEntityType(), entity.getIdentifier())
-                  .setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
+          bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), valueTable.getEntityType(), entity.getIdentifier()).setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
           try {
             XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
             for(int i = 0; i < variables.length; i++) {
@@ -206,8 +207,7 @@ public class EsIndexManager implements IndexManager {
                 xcb.field(fieldName, esValue(variables[i], values[i]));
               }
             }
-            bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.name, entity.getIdentifier())
-                .setParent(entity.getIdentifier()).setSource(xcb.endObject()));
+            bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));
             done++;
             if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
               sendAndCheck();
@@ -231,10 +231,10 @@ public class EsIndexManager implements IndexManager {
          */
         private Object esValue(Variable variable, Value value) {
           switch(natures.get(variable)) {
-            case CONTINUOUS:
-              if(variable.isMissingValue(value)) {
-                return null;
-              }
+          case CONTINUOUS:
+            if(variable.isMissingValue(value)) {
+              return null;
+            }
           }
           return value.getValue();
         }
@@ -363,8 +363,7 @@ public class EsIndexManager implements IndexManager {
       try {
         EsMapping mapping = readMapping();
         mapping.meta().setString("_updated", DateTimeType.get().valueOf(new Date()).toString());
-        esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(name)
-            .setSource(mapping.toXContent()).execute().actionGet();
+        esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(name).setSource(mapping.toXContent()).execute().actionGet();
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
