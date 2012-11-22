@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 public class ElasticSearchQuery {
 
-  private static final Logger log = LoggerFactory.getLogger(FacetIndexResource.class);
+  private static final Logger log = LoggerFactory.getLogger(ElasticSearchQuery.class);
 
   private final ElasticSearchProvider esProvider;
 

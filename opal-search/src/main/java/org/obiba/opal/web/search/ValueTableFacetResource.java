@@ -36,9 +36,9 @@ import org.springframework.stereotype.Component;
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/facet")
 
-public class FacetIndexResource {
+public class ValueTableFacetResource {
 
-  private static final Logger log = LoggerFactory.getLogger(FacetIndexResource.class);
+  private static final Logger log = LoggerFactory.getLogger(ValueTableFacetResource.class);
 
   private final ElasticSearchProvider esProvider;
 
@@ -51,7 +51,7 @@ public class FacetIndexResource {
   private String table;
 
   @Autowired
-  public FacetIndexResource(IndexManager indexManager, ElasticSearchProvider esProvider) {
+  public ValueTableFacetResource(IndexManager indexManager, ElasticSearchProvider esProvider) {
     this.indexManager = indexManager;
     this.esProvider = esProvider;
   }
