@@ -45,7 +45,9 @@ public abstract class IndexResource {
     // Set schedule
     Schedule schedule = configService.getConfig().getSchedule(getValueTable(datasource, table));
 
-    if(schedule == null) return Opal.ScheduleDto.newBuilder().setType(Opal.ScheduleType.NOT_SCHEDULED).build();
+    if(schedule == null) {
+      return Opal.ScheduleDto.newBuilder().setType(Opal.ScheduleType.MINUTES_15).build();
+    }
 
     return Opal.ScheduleDto.newBuilder().setType(schedule.getType()).setDay(schedule.getDay())
         .setHours(schedule.getHours()).setMinutes(schedule.getMinutes()).build();

@@ -212,9 +212,12 @@ message TableIndexStatusDto {
 
 enum ScheduleType {
   NOT_SCHEDULED = 1;
-  HOURLY = 2;
-  DAILY = 3;
-  WEEKLY = 4;
+  MINUTES_5 = 2;
+  MINUTES_15 = 3;
+  MINUTES_30 = 4;
+  HOURLY = 5;
+  DAILY = 6;
+  WEEKLY = 7;
 }
 
 enum Day {

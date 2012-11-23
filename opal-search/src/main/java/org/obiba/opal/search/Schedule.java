@@ -21,6 +21,10 @@ public class Schedule {
 
   private Integer minutes;
 
+  public Schedule() {
+    this.type = Opal.ScheduleType.MINUTES_15;
+  }
+
   public Opal.ScheduleType getType() {
     return type;
   }

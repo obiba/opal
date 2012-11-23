@@ -31,8 +31,8 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
    * Get from the Index manager configuration whether a given value table is indexable or not.
    */
   public boolean isIndexable(ValueTable vt) {
-    return indexConfigurations.containsKey(vt.getName()) && !indexConfigurations.get(vt.getName()).getType()
-        .equals(Opal.ScheduleType.NOT_SCHEDULED);
+    return indexConfigurations.containsKey(getFullyQualifiedName(vt)) && !indexConfigurations
+        .get(getFullyQualifiedName(vt)).getType().equals(Opal.ScheduleType.NOT_SCHEDULED);
   }
 
   /**
@@ -42,7 +42,6 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
   public boolean isReadyForIndexing(ValueTable vt, IndexManager indexManager) {
     if(isIndexable(vt) && !indexManager.getIndex(vt).isUpToDate()) {
       // check with schedule
-      // compare  indexManager.getIndex(vt).
       Value value = indexManager.getIndex(vt).getTimestamps().getLastUpdate();
 
       if(value.isNull() || value.compareTo(gracePeriod(indexConfigurations.get(vt.getName()))) < 0) {
@@ -53,18 +52,19 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
   }
 
   public void updateSchedule(ValueTable vt, Schedule schedule) {
-    indexConfigurations.put(vt.getName(), schedule);
+    indexConfigurations.put(getFullyQualifiedName(vt), schedule);
   }
 
   public void removeSchedule(ValueTable vt) {
-    Schedule schedule = indexConfigurations.get(vt.getName());
+    Schedule schedule = indexConfigurations.get(getFullyQualifiedName(vt));
     schedule.setType(Opal.ScheduleType.NOT_SCHEDULED);
     indexConfigurations.put(vt.getName(), schedule);
   }
 
   public Schedule getSchedule(ValueTable vt) {
+    Schedule schedule = indexConfigurations.get(getFullyQualifiedName(vt));
 
-    return indexConfigurations.get(vt.getName());
+    return schedule == null ? new Schedule() : schedule;
   }
 
   private Value gracePeriod(Schedule schedule) {
@@ -84,5 +84,9 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
 
     // Things modified before this value can be reindexed
     return DateTimeType.get().valueOf(gracePeriod);
+  }
+
+  private String getFullyQualifiedName(ValueTable vt) {
+    return vt.getName() + "." + vt.getDatasource().getName();
   }
 }

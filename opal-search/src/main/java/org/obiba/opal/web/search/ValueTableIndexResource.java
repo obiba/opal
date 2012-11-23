@@ -113,7 +113,9 @@ public class ValueTableIndexResource extends IndexResource {
     if(esProvider.isEnabled()) {
 
       // cancel indexation if in progress
-      if(synchroManager.hasTask() && synchroManager.getCurrentTask().getValueTable().getName().equals(table)) {
+      if(synchroManager.hasTask() &&
+          synchroManager.getCurrentTask().getValueTable().getName().equals(table) &&
+          synchroManager.getCurrentTask().getValueTable().getDatasource().getName().equals(datasource)) {
         // Stop task
       }
 
