@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2011 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
@@ -6,7 +6,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.search.es;
 
 import java.io.IOException;
@@ -41,6 +41,7 @@ import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManager;
+import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
@@ -68,6 +69,8 @@ public class EsIndexManager implements IndexManager {
 
   private final ElasticSearchConfigurationService esConfig;
 
+  private final IndexManagerConfigurationService indexConfig;
+
   private final ThreadFactory threadFactory;
 
   private final Version runtimeVersion;
@@ -76,13 +79,16 @@ public class EsIndexManager implements IndexManager {
 
   @Autowired
   public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
-      ThreadFactory threadFactory, Version version) {
+      IndexManagerConfigurationService indexConfig, ThreadFactory threadFactory, Version version) {
+
     Preconditions.checkNotNull(esProvider);
     Preconditions.checkNotNull(esConfig);
+    Preconditions.checkNotNull(indexConfig);
     Preconditions.checkNotNull(threadFactory);
 
     this.esProvider = esProvider;
     this.esConfig = esConfig;
+    this.indexConfig = indexConfig;
     this.threadFactory = threadFactory;
     this.runtimeVersion = version;
   }
@@ -95,7 +101,7 @@ public class EsIndexManager implements IndexManager {
   @Override
   public boolean isIndexable(ValueTable valueTable) {
     // Currently only based on the state of ElasticSearch
-    return esConfig.getConfig().isEnabled();
+    return esConfig.getConfig().isEnabled() && indexConfig.getConfig().isIndexable(valueTable);
   }
 
   @Override
