@@ -371,7 +371,11 @@ public class EsIndexManager implements IndexManager {
 
     @Override
     public void delete() {
-      esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute().actionGet();
+      try {
+        esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute().actionGet();
+      } catch(TypeMissingException e) {
+        // ignored
+      }
     }
 
     boolean isForTable(ValueTable valueTable) {
