@@ -10,12 +10,19 @@
 package org.obiba.opal.web.search;
 
 import org.obiba.opal.web.model.Search;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryTermDtoBuilder {
 
+  private static final Logger log = LoggerFactory.getLogger(QueryTermDtoBuilder.class);
+
+  private final IndexManagerHelper indexManagerHelper;
+
   private Search.QueryTermDto.Builder dto;
 
-  public QueryTermDtoBuilder(String facet) {
+  public QueryTermDtoBuilder(IndexManagerHelper indexManagerHelper, String facet) {
+    this.indexManagerHelper = indexManagerHelper;
     dto = Search.QueryTermDto.newBuilder().setFacet(facet);
   }
 
@@ -24,7 +31,24 @@ public class QueryTermDtoBuilder {
     return this;
   }
 
-  public QueryTermDtoBuilder categoricalVariableTermDto(String variable) {
+  public QueryTermDtoBuilder variableTermDto(String variable) {
+    log.info("* Variable " + variable);
+
+    switch(indexManagerHelper.getVariableNature(variable)) {
+      case CATEGORICAL:
+        return categoricalVariableTermDto(variable);
+
+      case CONTINUOUS:
+        return continuousVariableTermDto(variable);
+
+      default:
+        throw new UnsupportedOperationException("Variable nature not supported");
+    }
+  }
+
+  private QueryTermDtoBuilder categoricalVariableTermDto(String variable) {
+    log.info("categoricalVariableTermDto() - " + variable);
+
     Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
     variableDto.setVariable(variable);
     variableDto.setExtension(Search.InTermDto.params, Search.InTermDto.newBuilder().build());
@@ -34,7 +58,9 @@ public class QueryTermDtoBuilder {
     return this;
   }
 
-  public QueryTermDtoBuilder continuousVariableTermDto(String variable) {
+  private QueryTermDtoBuilder continuousVariableTermDto(String variable) {
+    log.info("continuousVariableTermDto() - " + variable);
+
     Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
     variableDto.setVariable(variable);
     variableDto.setExtension(Search.RangeTermDto.params, Search.RangeTermDto.newBuilder().build());

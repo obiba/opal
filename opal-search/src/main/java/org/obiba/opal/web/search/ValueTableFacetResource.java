@@ -18,12 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManager;
-import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
@@ -36,13 +31,16 @@ import org.springframework.stereotype.Component;
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/facet")
 
+/**
+ *
+ */
 public class ValueTableFacetResource {
 
   private static final Logger log = LoggerFactory.getLogger(ValueTableFacetResource.class);
 
-  private final ElasticSearchProvider esProvider;
-
   private final IndexManager indexManager;
+
+  private final ElasticSearchProvider esProvider;
 
   @PathParam("ds")
   private String datasource;
@@ -61,44 +59,22 @@ public class ValueTableFacetResource {
   public Response search(@Context HttpServletRequest servletRequest, @PathParam("variable") String variable) {
     log.info("Searching facet for " + datasource + "." + table + ":" + variable);
 
-    Variable var = getValueTable().getVariable(variable);
-    VariableNature nature = VariableNature.getNature(var);
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().build();
 
     try {
-      QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0");
-
-      switch(nature) {
-        case CATEGORICAL:
-          dtoBuilder.categoricalVariableTermDto(variable);
-          break;
-
-        case CONTINUOUS:
-          dtoBuilder.continuousVariableTermDto(variable);
-          break;
-
-        case TEMPORAL: // fall through
-        case UNDETERMINED:
-          log.warn(variable + " not processed");
-          return Response.status(501).build();
-      }
+      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
+      QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder(indexManagerHelper, "0").variableTermDto(variable);
 
       ElasticSearchQuery esQuery = new ElasticSearchQuery(servletRequest, esProvider);
-      dtoResult = esQuery.execute(getValueTableIndex(), dtoBuilder.build());
+      dtoResult = esQuery.execute(indexManagerHelper, dtoBuilder.build());
 
+    } catch(UnsupportedOperationException e) {
+      return Response.status(501).build();
     } catch(JSONException e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
     return Response.ok().entity(dtoResult).build();
-  }
-
-  private ValueTableIndex getValueTableIndex() {
-    return this.indexManager.getIndex(getValueTable());
-  }
-
-  private ValueTable getValueTable() {
-    return MagmaEngine.get().getDatasource(datasource).getValueTable(table);
   }
 
 }

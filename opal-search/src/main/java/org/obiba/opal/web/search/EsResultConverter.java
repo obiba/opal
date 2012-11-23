@@ -14,11 +14,11 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.web.model.Search;
 
-public class JsonToDtoConverter {
+public class EsResultConverter {
 
   private Search.QueryTermDto dtoQuery;
 
-  public JsonToDtoConverter(Search.QueryTermDto dtoQuery) {
+  public EsResultConverter(Search.QueryTermDto dtoQuery) {
     this.dtoQuery = dtoQuery;
   }
 

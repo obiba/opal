@@ -13,11 +13,11 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.web.model.Search;
 
-public class DtoToJsonConverter {
+public class QueryTermConverter {
 
   private String fieldPrefix;
 
-  public DtoToJsonConverter(String fieldPrefix) {
+  public QueryTermConverter(String fieldPrefix) {
     this.fieldPrefix = fieldPrefix;
   }
 

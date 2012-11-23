@@ -45,31 +45,33 @@ public class ElasticSearchQuery {
     this.esProvider = esProvider;
   }
 
-  public Search.QueryResultDto execute(ValueTableIndex index, Search.QueryTermDto dtoQuery) throws JSONException {
+  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
+      Search.QueryTermDto dtoQuery) throws JSONException {
     log.info("Executing query");
 
-    String body = build(dtoQuery, index.getName());
+    String body = build(dtoQuery, indexManagerHelper.getIndexName());
 
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<Response> ref = new AtomicReference<Response>();
 
     esProvider.getRest()
-        .dispatchRequest(new JaxRsRestRequest(index, servletRequest, body, "_search"), new RestChannel() {
+        .dispatchRequest(new JaxRsRestRequest(indexManagerHelper.getValueTableIndex(), servletRequest, body, "_search"),
+            new RestChannel() {
 
-          @Override
-          public void sendResponse(RestResponse response) {
-            log.info(response.toString());
+              @Override
+              public void sendResponse(RestResponse response) {
+                log.info(response.toString());
 
-            try {
-              ref.set(convert(response));
-            } catch(IOException e) {
-              // Not gonna happen
-            } finally {
-              latch.countDown();
-            }
-          }
+                try {
+                  ref.set(convert(response));
+                } catch(IOException e) {
+                  // Not gonna happen
+                } finally {
+                  latch.countDown();
+                }
+              }
 
-        });
+            });
 
     try {
 
@@ -77,7 +79,7 @@ public class ElasticSearchQuery {
       Response r = ref.get();
 
       JSONObject jsonContent = new JSONObject(new String((byte[]) r.getEntity()));
-      JsonToDtoConverter converter = new JsonToDtoConverter(dtoQuery);
+      EsResultConverter converter = new EsResultConverter(dtoQuery);
 
       return converter.convert(jsonContent);
 
@@ -98,7 +100,7 @@ public class ElasticSearchQuery {
   }
 
   private String build(Search.QueryTermDto dto, String indexName) throws JSONException {
-    DtoToJsonConverter converter = new DtoToJsonConverter(indexName);
+    QueryTermConverter converter = new QueryTermConverter(indexName);
     JSONObject queryJSON = converter.convert(dto);
 
     return queryJSON.toString();
