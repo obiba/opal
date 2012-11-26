@@ -1,12 +1,12 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.search;
 
 import java.util.Calendar;
@@ -52,8 +52,8 @@ public class IndexSynchronizationManager {
     // this.indexManager = indexManager;
   }
 
-  // Every ten seconds
-  @Scheduled(fixedDelay = 10 * 1000)
+  // Every minute
+  @Scheduled(fixedDelay = 60 * 1000)
   public void synchronizeIndices() {
     getSubject().execute(sync);
   }
@@ -69,7 +69,8 @@ public class IndexSynchronizationManager {
   private Subject getSubject() {
     // Login as background job user
     try {
-      PrincipalCollection principals = SecurityUtils.getSecurityManager().authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
+      PrincipalCollection principals = SecurityUtils.getSecurityManager()
+          .authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
       return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
     } catch(AuthenticationException e) {
       log.warn("Failed to obtain system user credentials: {}", e.getMessage());
@@ -88,7 +89,8 @@ public class IndexSynchronizationManager {
 
   /**
    * Returns a {@code Value} with the date and time at which things are reindexed.
-   * @return
+   *
+   * @return value
    */
   private Value gracePeriod() {
     // Now
