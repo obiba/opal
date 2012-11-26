@@ -47,6 +47,7 @@ import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
+import org.obiba.opal.web.magma.ValueTableUpdateListener;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 @Component
-public class EsIndexManager implements IndexManager {
+public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   private static final Logger log = LoggerFactory.getLogger(EsIndexManager.class);
 
@@ -151,6 +152,12 @@ public class EsIndexManager implements IndexManager {
         .getState().getMetaData().index(esIndexName());
   }
 
+  @Override
+  public void onDelete(ValueTable vt) {
+    // Delete index
+    getIndex(vt).delete();
+  }
+
   private class Indexer implements IndexSynchronization {
 
     private final ValueTable valueTable;
@@ -240,9 +247,9 @@ public class EsIndexManager implements IndexManager {
 
         /**
          * OPAL-1158: missing values are indexed as null for continuous variables
-         * @param variable
-         * @param value
-         * @return
+         * @param variable the variable
+         * @param value the value
+         * @return an object
          */
         private Object esValue(Variable variable, Value value) {
           switch(natures.get(variable)) {

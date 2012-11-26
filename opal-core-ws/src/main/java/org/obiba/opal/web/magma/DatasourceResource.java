@@ -1,16 +1,17 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+/*
+ * Copyright (c) 2011 OBiBa. All rights reserved.
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.magma;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -72,6 +73,8 @@ public class DatasourceResource {
 
   private Datasource transientDatasourceInstance;
 
+  private final Set<ValueTableUpdateListener> tableListeners;
+
   @Autowired
   @Value("${org.obiba.opal.languages}")
   private String localesProperty;
@@ -79,8 +82,10 @@ public class DatasourceResource {
   private Set<Locale> locales;
 
   @Autowired
-  public DatasourceResource(OpalConfigurationService configService, ImportService importService, ViewManager viewManager, ViewDtos viewDtos) {
+  public DatasourceResource(OpalConfigurationService configService, ImportService importService,
+      ViewManager viewManager, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
     super();
+
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
@@ -89,6 +94,7 @@ public class DatasourceResource {
     this.importService = importService;
     this.viewManager = viewManager;
     this.viewDtos = viewDtos;
+    this.tableListeners = tableListeners;
   }
 
   // Used for testing
@@ -102,6 +108,7 @@ public class DatasourceResource {
     this.viewManager = viewManager;
     this.viewDtos = viewDtos;
     this.name = name;
+    this.tableListeners = new HashSet<ValueTableUpdateListener>();
     this.importService = null;
   }
 
@@ -146,7 +153,8 @@ public class DatasourceResource {
 
       response = Response.ok();
     } else {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));
+      response = Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));
     }
 
     return response.build();
@@ -164,7 +172,7 @@ public class DatasourceResource {
 
   public TableResource getTableResource(ValueTable table) {
     if(getDatasource().canDropTable(table.getName())) {
-      return new DroppableTableResource(table, getLocales(), importService);
+      return new DroppableTableResource(table, getLocales(), importService, tableListeners);
     }
     return new TableResource(table, getLocales(), importService);
   }
@@ -184,14 +192,16 @@ public class DatasourceResource {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
 
     if(datasourceHasTable(viewDto.getName())) {
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
     viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
-    URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class).path(DatasourceResource.class, "getView").build(name, viewDto.getName());
+    URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
+        .path(DatasourceResource.class, "getView").build(name, viewDto.getName());
 
     return Response.created(viewUri)//
-    .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.VIEW_ALL)).build();
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.VIEW_ALL)).build();
   }
 
   @Path("/view/{viewName}")
