@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.service.ImportService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A table resource that supports DELETE (drop)
@@ -26,7 +25,6 @@ public class DroppableTableResource extends TableResource {
 
   private final Set<ValueTableUpdateListener> tableListeners;
 
-  @Autowired
   public DroppableTableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService,
       Set<ValueTableUpdateListener> tableListeners) {
     super(valueTable, locales, importService);
