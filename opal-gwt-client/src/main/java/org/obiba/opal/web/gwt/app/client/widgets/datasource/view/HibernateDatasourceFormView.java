@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -39,9 +39,6 @@ public class HibernateDatasourceFormView extends ViewImpl implements HibernateDa
   @UiField
   ListBox database;
 
-  @UiField
-  CheckBox binaries;
-
   public HibernateDatasourceFormView() {
     widget = uiBinder.createAndBindUi(this);
   }
@@ -57,7 +54,6 @@ public class HibernateDatasourceFormView extends ViewImpl implements HibernateDa
     for(JdbcDataSourceDto d : JsArrays.toIterable(databases)) {
       database.addItem(d.getName());
     }
-    binaries.setValue(true);
   }
 
   @Override
@@ -66,8 +62,4 @@ public class HibernateDatasourceFormView extends ViewImpl implements HibernateDa
     return selectedIndex == 0 ? null : database.getItemText(selectedIndex);
   }
 
-  @Override
-  public boolean getBinaries() {
-    return binaries.getValue();
-  }
 }

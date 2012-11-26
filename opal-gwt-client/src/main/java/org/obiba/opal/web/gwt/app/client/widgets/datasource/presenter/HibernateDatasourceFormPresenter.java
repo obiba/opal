@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -24,7 +24,8 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 /**
  *
  */
-public class HibernateDatasourceFormPresenter extends PresenterWidget<HibernateDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+public class HibernateDatasourceFormPresenter extends
+    PresenterWidget<HibernateDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
 
   public static class Subscriber extends DatasourceFormPresenterSubscriber {
 
@@ -53,7 +54,6 @@ public class HibernateDatasourceFormPresenter extends PresenterWidget<HibernateD
     if(database != null) {
       extensionDto.setDatabase(database);
     }
-    extensionDto.setBinFiles(getView().getBinaries());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     dto.setExtension(HibernateDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
@@ -78,20 +78,19 @@ public class HibernateDatasourceFormPresenter extends PresenterWidget<HibernateD
   @Override
   protected void onReveal() {
     super.onReveal();
-    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>> newBuilder().forResource("/jdbc/databases").withCallback(new ResourceCallback<JsArray<JdbcDataSourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder().forResource("/jdbc/databases")
+        .withCallback(new ResourceCallback<JsArray<JdbcDataSourceDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<JdbcDataSourceDto> resource) {
-        getView().setDatabases(resource);
-      }
-    }).get().send();
+          @Override
+          public void onResource(Response response, JsArray<JdbcDataSourceDto> resource) {
+            getView().setDatabases(resource);
+          }
+        }).get().send();
   }
 
   public interface Display extends DatasourceFormPresenter.Display {
 
     String getSelectedDatabase();
-
-    boolean getBinaries();
 
     void setDatabases(JsArray<JdbcDataSourceDto> databases);
   }
