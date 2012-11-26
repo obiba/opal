@@ -13,14 +13,28 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.web.model.Search;
 
+/**
+ * Converts a DTO query to an elastic search JSON query
+ */
 public class QueryTermConverter {
 
   private String fieldPrefix;
 
+  /**
+   * @param fieldPrefix - the field prefix is in the form of 'datasource.table' and is needed to fully qualify a
+   * variable.
+   */
   public QueryTermConverter(String fieldPrefix) {
     this.fieldPrefix = fieldPrefix;
   }
 
+  /**
+   * Converts a DTO query to an elastic search JSON query
+   *
+   * @param dto
+   * @return
+   * @throws JSONException
+   */
   public JSONObject convert(Search.QueryTermDto dto) throws JSONException {
 
     Search.VariableTermDto variableDto = dto.getExtension(Search.VariableTermDto.params);

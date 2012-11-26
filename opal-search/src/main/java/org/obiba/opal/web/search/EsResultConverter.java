@@ -14,14 +14,27 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.web.model.Search;
 
+/**
+ * Utility class used to convert an elastic search JSON query to a DTO query.
+ */
 public class EsResultConverter {
 
   private Search.QueryTermDto dtoQuery;
 
+  /**
+   * @param dtoQuery - keeps the original DTO query in order to retrieve the variable and facet names
+   */
   public EsResultConverter(Search.QueryTermDto dtoQuery) {
     this.dtoQuery = dtoQuery;
   }
 
+  /**
+   * Converts the JSON query to DTO query
+   *
+   * @param json
+   * @return
+   * @throws JSONException
+   */
   public Search.QueryResultDto convert(JSONObject json) throws JSONException {
     Search.QueryResultDto.Builder dtoResultBuilder = Search.QueryResultDto.newBuilder();
     Search.FacetResultDto dtoFacet = convertFacets(json.getJSONObject("facets"));

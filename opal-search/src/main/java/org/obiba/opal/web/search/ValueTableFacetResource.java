@@ -7,11 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.obiba.opal.web.search;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -32,7 +30,8 @@ import org.springframework.stereotype.Component;
 @Path("/datasource/{ds}/table/{table}/facet")
 
 /**
- *
+ * Elastic Search API resource that provides a secure mechanism of performing queries on the indexes without exposing
+ * individual data,
  */
 public class ValueTableFacetResource {
 
@@ -54,7 +53,15 @@ public class ValueTableFacetResource {
     this.esProvider = esProvider;
   }
 
-  @POST
+  /**
+   * Given a variable name, returns its corresponding facet (terms, statistical). Only categorical and continuous
+   * variables are treated.
+   *
+   * @param servletRequest
+   * @param variable
+   * @return
+   */
+  @GET
   @Path("/variable/{variable}/_search")
   public Response search(@Context HttpServletRequest servletRequest, @PathParam("variable") String variable) {
     log.info("Searching facet for " + datasource + "." + table + ":" + variable);

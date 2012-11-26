@@ -32,6 +32,9 @@ import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class is responsible for executing an elastic search. The input and output of this class are DTO format.
+ */
 public class ElasticSearchQuery {
 
   private static final Logger log = LoggerFactory.getLogger(ElasticSearchQuery.class);
@@ -45,6 +48,14 @@ public class ElasticSearchQuery {
     this.esProvider = esProvider;
   }
 
+  /**
+   * Executes an elastic search query.
+   *
+   * @param indexManagerHelper
+   * @param dtoQuery
+   * @return
+   * @throws JSONException
+   */
   public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
       Search.QueryTermDto dtoQuery) throws JSONException {
     log.info("Executing query");

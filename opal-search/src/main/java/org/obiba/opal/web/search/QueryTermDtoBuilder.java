@@ -13,6 +13,9 @@ import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Builder class used to build simple DTO queries used to extract a variable facet (terms, statistical)
+ */
 public class QueryTermDtoBuilder {
 
   private static final Logger log = LoggerFactory.getLogger(QueryTermDtoBuilder.class);
@@ -31,6 +34,12 @@ public class QueryTermDtoBuilder {
     return this;
   }
 
+  /**
+   * Given a variable name and depending on its nature, returns a DTO query
+   *
+   * @param variable
+   * @return
+   */
   public QueryTermDtoBuilder variableTermDto(String variable) {
     log.info("* Variable " + variable);
 
@@ -44,6 +53,10 @@ public class QueryTermDtoBuilder {
       default:
         throw new UnsupportedOperationException("Variable nature not supported");
     }
+  }
+
+  public Search.QueryTermDto build() {
+    return dto.build();
   }
 
   private QueryTermDtoBuilder categoricalVariableTermDto(String variable) {
@@ -68,10 +81,6 @@ public class QueryTermDtoBuilder {
     dto.setExtension(Search.VariableTermDto.params, variableDto.build());
 
     return this;
-  }
-
-  public Search.QueryTermDto build() {
-    return dto.build();
   }
 
 }
