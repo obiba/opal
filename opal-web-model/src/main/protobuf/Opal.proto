@@ -190,3 +190,49 @@ message ESCfgDto {
     optional ESCfgDto params = 1000;
   }
 }
+
+enum TableIndexationStatus {
+  NOT_INDEXED = 1;        // this table is not indexable
+  OUTDATED = 2;    // this table is indexable, index is not up-to-date and is not in progress
+  IN_PROGRESS = 3; // this table is indexable, index is not up-to-date and is in progress
+  UPTODATE = 4;     // this table is indexable and index is up-to-date
+}
+
+message TableIndexStatusDto {
+  required string datasource = 1;
+  required string table = 2;
+  optional string indexCreated = 3;
+  optional string indexLastUpdate = 4;
+  optional string tableLastUpdate = 5;
+  required ScheduleDto schedule = 6; // if no schedule is defined in the index manager configuration, the default one is returned
+  required TableIndexationStatus status = 7;
+  optional float progress = 8;
+  required string link = 9; // link to this index
+}
+
+enum ScheduleType {
+  NOT_SCHEDULED = 1;
+  MINUTES_5 = 2;
+  MINUTES_15 = 3;
+  MINUTES_30 = 4;
+  HOURLY = 5;
+  DAILY = 6;
+  WEEKLY = 7;
+}
+
+enum Day {
+  SUNDAY = 1;
+  MONDAY = 2;
+  TUESDAY = 3;
+  WEDNESDAY = 4;
+  THURSDAY = 5;
+  FRIDAY = 6;
+  SATURDAY = 7;
+}
+
+message ScheduleDto {
+  required ScheduleType type = 1;
+  optional Day day = 2;
+  optional int32 hours = 3;
+  optional int32 minutes = 4;
+}
