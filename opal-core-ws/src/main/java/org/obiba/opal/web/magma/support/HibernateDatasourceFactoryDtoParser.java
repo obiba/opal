@@ -1,15 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
-
-import java.io.File;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
@@ -32,7 +30,8 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
   private final JdbcDataSourceRegistry jdbcDataSourceRegistry;
 
   @Autowired
-  public HibernateDatasourceFactoryDtoParser(ApplicationContext applicationContext, JdbcDataSourceRegistry jdbcDataSourceRegistry) {
+  public HibernateDatasourceFactoryDtoParser(ApplicationContext applicationContext,
+      JdbcDataSourceRegistry jdbcDataSourceRegistry) {
     this.applicationContext = applicationContext;
     this.jdbcDataSourceRegistry = jdbcDataSourceRegistry;
   }
@@ -45,15 +44,14 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
       factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "keySessionFactory"));
     } else {
       if(hDto.hasDatabase()) {
-        factory.setSessionFactoryProvider(new DatabaseSessionFactoryProvider(dto.getName(), jdbcDataSourceRegistry, hDto.getDatabase()));
+        factory.setSessionFactoryProvider(
+            new DatabaseSessionFactoryProvider(dto.getName(), jdbcDataSourceRegistry, hDto.getDatabase()));
       } else {
-        factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "opalSessionFactory"));
+        factory
+            .setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "opalSessionFactory"));
       }
     }
 
-    if(hDto.getBinFiles()) {
-      factory.setBinariesDirectory("${OPAL_HOME}" + File.separator + "binaries");
-    }
     factory.setName(dto.getName());
     return factory;
   }
