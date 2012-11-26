@@ -44,6 +44,9 @@ public class ElasticSearchQuery {
   private final HttpServletRequest servletRequest;
 
   public ElasticSearchQuery(HttpServletRequest servletRequest, ElasticSearchProvider esProvider) {
+    assert (servletRequest != null);
+    assert (esProvider != null);
+
     this.servletRequest = servletRequest;
     this.esProvider = esProvider;
   }

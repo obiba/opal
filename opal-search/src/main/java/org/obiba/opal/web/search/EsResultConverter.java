@@ -25,6 +25,8 @@ public class EsResultConverter {
    * @param dtoQuery - keeps the original DTO query in order to retrieve the variable and facet names
    */
   public EsResultConverter(Search.QueryTermDto dtoQuery) {
+    assert (dtoQuery != null);
+
     this.dtoQuery = dtoQuery;
   }
 
@@ -36,6 +38,8 @@ public class EsResultConverter {
    * @throws JSONException
    */
   public Search.QueryResultDto convert(JSONObject json) throws JSONException {
+    assert (json != null);
+
     Search.QueryResultDto.Builder dtoResultBuilder = Search.QueryResultDto.newBuilder();
     Search.FacetResultDto dtoFacet = convertFacets(json.getJSONObject("facets"));
 

@@ -25,6 +25,8 @@ public class QueryTermConverter {
    * variable.
    */
   public QueryTermConverter(String fieldPrefix) {
+    assert (fieldPrefix != null);
+
     this.fieldPrefix = fieldPrefix;
   }
 
@@ -36,6 +38,7 @@ public class QueryTermConverter {
    * @throws JSONException
    */
   public JSONObject convert(Search.QueryTermDto dto) throws JSONException {
+    assert (dto != null);
 
     Search.VariableTermDto variableDto = dto.getExtension(Search.VariableTermDto.params);
 
