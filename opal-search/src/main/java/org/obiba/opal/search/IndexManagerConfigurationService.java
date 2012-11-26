@@ -12,11 +12,12 @@ package org.obiba.opal.search;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.web.magma.ValueTableUpdateListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IndexManagerConfigurationService {
+public class IndexManagerConfigurationService implements ValueTableUpdateListener {
 
   private final ExtensionConfigurationSupplier<IndexManagerConfiguration> configSupplier;
 
@@ -52,5 +53,10 @@ public class IndexManagerConfigurationService {
     IndexManagerConfiguration config = getConfig();
     config.removeSchedule(vt);
     configSupplier.addExtension(config);
+  }
+
+  @Override
+  public void onDelete(ValueTable vt) {
+    remove(vt);
   }
 }
