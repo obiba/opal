@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+/*
+ * Copyright (c) 2012 OBiBa. All rights reserved.
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.magma;
 
 import java.util.Locale;
@@ -23,13 +23,24 @@ import org.obiba.opal.core.service.ImportService;
  */
 public class DroppableTableResource extends TableResource {
 
-  public DroppableTableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService) {
+  private final Set<ValueTableUpdateListener> tableListeners;
+
+  public DroppableTableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService,
+      Set<ValueTableUpdateListener> tableListeners) {
     super(valueTable, locales, importService);
+
+    this.tableListeners = tableListeners;
   }
 
   @DELETE
   public Response drop() {
     getDatasource().dropTable(this.getValueTable().getName());
+    if(tableListeners != null && tableListeners.isEmpty()) {
+      for(ValueTableUpdateListener listener : tableListeners) {
+        listener.onDelete(this.getValueTable());
+      }
+    }
+
     return Response.ok().build();
   }
 }

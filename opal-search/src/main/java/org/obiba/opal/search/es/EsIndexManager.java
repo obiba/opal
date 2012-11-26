@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2011 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
@@ -6,7 +6,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.search.es;
 
 import java.io.IOException;
@@ -43,9 +43,11 @@ import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManager;
+import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
+import org.obiba.opal.web.magma.ValueTableUpdateListener;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +58,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 @Component
-public class EsIndexManager implements IndexManager {
+public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   private static final Logger log = LoggerFactory.getLogger(EsIndexManager.class);
 
@@ -70,6 +72,8 @@ public class EsIndexManager implements IndexManager {
 
   private final ElasticSearchConfigurationService esConfig;
 
+  private final IndexManagerConfigurationService indexConfig;
+
   private final ThreadFactory threadFactory;
 
   private final Version runtimeVersion;
@@ -77,13 +81,17 @@ public class EsIndexManager implements IndexManager {
   private final Set<EsValueTableIndex> indices = Sets.newHashSet();
 
   @Autowired
-  public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig, ThreadFactory threadFactory, Version version) {
+  public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
+      IndexManagerConfigurationService indexConfig, ThreadFactory threadFactory, Version version) {
+
     Preconditions.checkNotNull(esProvider);
     Preconditions.checkNotNull(esConfig);
+    Preconditions.checkNotNull(indexConfig);
     Preconditions.checkNotNull(threadFactory);
 
     this.esProvider = esProvider;
     this.esConfig = esConfig;
+    this.indexConfig = indexConfig;
     this.threadFactory = threadFactory;
     this.runtimeVersion = version;
   }
@@ -96,7 +104,7 @@ public class EsIndexManager implements IndexManager {
   @Override
   public boolean isIndexable(ValueTable valueTable) {
     // Currently only based on the state of ElasticSearch
-    return esConfig.getConfig().isEnabled();
+    return esConfig.getConfig().isEnabled() && indexConfig.getConfig().isIndexable(valueTable);
   }
 
   @Override
@@ -124,11 +132,13 @@ public class EsIndexManager implements IndexManager {
   }
 
   private Settings getIndexSettings() {
-    return ImmutableSettings.settingsBuilder().put("number_of_shards", esConfig.getConfig().getShards()).put("number_of_replicas", esConfig.getConfig().getReplicas()).build();
+    return ImmutableSettings.settingsBuilder().put("number_of_shards", esConfig.getConfig().getShards())
+        .put("number_of_replicas", esConfig.getConfig().getReplicas()).build();
   }
 
   private IndexMetaData getIndexMetaData() {
-    IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName()).execute().actionGet().getState().getMetaData().index(esIndexName());
+    IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName())
+        .execute().actionGet().getState().getMetaData().index(esIndexName());
     return imd != null ? imd : createIndex();
   }
 
@@ -138,7 +148,14 @@ public class EsIndexManager implements IndexManager {
       log.info("Creating index [{}]", esIndexName());
       idxAdmin.prepareCreate(esIndexName()).setSettings(getIndexSettings()).execute().actionGet();
     }
-    return esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName()).execute().actionGet().getState().getMetaData().index(esIndexName());
+    return esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName()).execute().actionGet()
+        .getState().getMetaData().index(esIndexName());
+  }
+
+  @Override
+  public void onDelete(ValueTable vt) {
+    // Delete index
+    getIndex(vt).delete();
   }
 
   private class Indexer implements IndexSynchronization {
@@ -177,9 +194,11 @@ public class EsIndexManager implements IndexManager {
 
       XContentBuilder b = new ValueTableMapping().createMapping(runtimeVersion, index.name, valueTable);
 
-      esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b).execute().actionGet();
+      esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b)
+          .execute().actionGet();
 
-      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable).variables(index.getVariables()).to(new ConcurrentReaderCallback() {
+      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable)
+          .variables(index.getVariables()).to(new ConcurrentReaderCallback() {
 
         private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
@@ -194,7 +213,9 @@ public class EsIndexManager implements IndexManager {
 
         @Override
         public void onValues(VariableEntity entity, Variable[] variables, Value[] values) {
-          bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), valueTable.getEntityType(), entity.getIdentifier()).setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
+          bulkRequest.add(
+              esProvider.getClient().prepareIndex(esIndexName(), valueTable.getEntityType(), entity.getIdentifier())
+                  .setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
           try {
             XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
             for(int i = 0; i < variables.length; i++) {
@@ -207,7 +228,8 @@ public class EsIndexManager implements IndexManager {
                 xcb.field(fieldName, esValue(variables[i], values[i]));
               }
             }
-            bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.name, entity.getIdentifier()).setParent(entity.getIdentifier()).setSource(xcb.endObject()));
+            bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.name, entity.getIdentifier())
+                .setParent(entity.getIdentifier()).setSource(xcb.endObject()));
             done++;
             if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
               sendAndCheck();
@@ -225,16 +247,16 @@ public class EsIndexManager implements IndexManager {
 
         /**
          * OPAL-1158: missing values are indexed as null for continuous variables
-         * @param variable
-         * @param value
-         * @return
+         * @param variable the variable
+         * @param value the value
+         * @return an object
          */
         private Object esValue(Variable variable, Value value) {
           switch(natures.get(variable)) {
-          case CONTINUOUS:
-            if(variable.isMissingValue(value)) {
-              return null;
-            }
+            case CONTINUOUS:
+              if(variable.isMissingValue(value)) {
+                return null;
+              }
           }
           return value.getValue();
         }
@@ -363,7 +385,8 @@ public class EsIndexManager implements IndexManager {
       try {
         EsMapping mapping = readMapping();
         mapping.meta().setString("_updated", DateTimeType.get().valueOf(new Date()).toString());
-        esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(name).setSource(mapping.toXContent()).execute().actionGet();
+        esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(name)
+            .setSource(mapping.toXContent()).execute().actionGet();
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
@@ -372,7 +395,8 @@ public class EsIndexManager implements IndexManager {
     @Override
     public void delete() {
       try {
-        esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute().actionGet();
+        esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute()
+            .actionGet();
       } catch(TypeMissingException e) {
         // ignored
       }
