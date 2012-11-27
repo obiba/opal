@@ -31,8 +31,7 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
    * Get from the Index manager configuration whether a given value table is indexable or not.
    */
   public boolean isIndexable(ValueTable vt) {
-    return indexConfigurations.containsKey(getFullyQualifiedName(vt)) && !indexConfigurations
-        .get(getFullyQualifiedName(vt)).getType().equals(Opal.ScheduleType.NOT_SCHEDULED);
+    return getSchedule(vt).getType().equals(Opal.ScheduleType.NOT_SCHEDULED) == false;
   }
 
   /**

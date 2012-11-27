@@ -10,6 +10,8 @@
 package org.obiba.opal.search;
 
 import java.util.Calendar;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -44,18 +46,26 @@ public class IndexSynchronizationManager {
   // Grace period before reindexing (in seconds)
   private final int GRACE_PERIOD = 300;
 
-  private final Sync sync = new Sync();
+  private final SyncProducer syncProducer = new SyncProducer();
+
+  private boolean consumerStarted = false;
 
   private IndexSynchronization currentTask;
 
+  private BlockingQueue<IndexSynchronization> indexSyncQueue = new LinkedBlockingQueue<IndexSynchronization>();
+
   public IndexSynchronizationManager() {
-    // this.indexManager = indexManager;
   }
 
   // Every minute
   @Scheduled(fixedDelay = 60 * 1000)
   public void synchronizeIndices() {
-    getSubject().execute(sync);
+    getSubject().execute(syncProducer);
+    if(consumerStarted == false) {
+      // start one IndexSynchronization consumer thread
+      new Thread(new SyncConsumer()).start();
+      consumerStarted = true;
+    }
   }
 
   public boolean hasTask() {
@@ -78,15 +88,6 @@ public class IndexSynchronizationManager {
     }
   }
 
-  private void submit(IndexSynchronization sync) {
-    currentTask = sync;
-    try {
-      sync.run();
-    } finally {
-      currentTask = null;
-    }
-  }
-
   /**
    * Returns a {@code Value} with the date and time at which things are reindexed.
    *
@@ -101,12 +102,13 @@ public class IndexSynchronizationManager {
     return DateTimeType.get().valueOf(gracePeriod);
   }
 
-  private class Sync implements Runnable {
+  private class SyncProducer implements Runnable {
 
     @Override
     public void run() {
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
+          log.info("Check index for table: {}.{}", ds.getName(), vt.getName());
           if(indexManager.isIndexable(vt)) {
             maybeUpdateIndex(vt);
           }
@@ -133,8 +135,42 @@ public class IndexSynchronizationManager {
     }
 
     private void submitTask(ValueTable vt, ValueTableIndex index) {
-      IndexSynchronization sync = indexManager.createSyncTask(vt, index);
-      submit(sync);
+      boolean alreadyQueued = false;
+      for(IndexSynchronization s : indexSyncQueue) {
+        if(s.getValueTableIndex().getName().equals(index.getName())) {
+          alreadyQueued = true;
+          break;
+        }
+      }
+      if(alreadyQueued == false) {
+        log.info("Queueing for indexing {}", index.getName());
+        IndexSynchronization sync = indexManager.createSyncTask(vt, index);
+        indexSyncQueue.offer(sync);
+      }
+    }
+  }
+
+  private class SyncConsumer implements Runnable {
+
+    @Override
+    public void run() {
+      log.info("Starting indexing consumer");
+      try {
+        while(true) {
+          consume(indexSyncQueue.take());
+        }
+      } catch(InterruptedException ex) {
+      }
+    }
+
+    private void consume(IndexSynchronization sync) {
+      log.info("*************** Indexing {}", sync.getValueTableIndex().getName());
+      currentTask = sync;
+      try {
+        getSubject().execute(sync);
+      } finally {
+        currentTask = null;
+      }
     }
   }
 }
