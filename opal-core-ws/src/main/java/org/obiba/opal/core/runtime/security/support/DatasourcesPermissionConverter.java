@@ -1,12 +1,12 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.core.runtime.security.support;
 
 import java.util.List;
@@ -40,7 +40,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
   enum Permission {
     DATASOURCE_ALL {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
@@ -49,7 +48,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     CREATE_TABLE {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
@@ -60,7 +58,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       }
     },
     CREATE_VIEW {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
@@ -71,7 +68,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       }
     },
     TABLE_ALL {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
@@ -80,7 +76,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     TABLE_READ {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
@@ -91,7 +86,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     TABLE_VALUES {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
@@ -106,11 +100,12 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     TABLE_EDIT {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET", args));
+        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET", args),
+            magmaConvert("/datasource/{0}/table/{1}/index", "*:GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/index/schedule", "*:GET", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
         Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
         return perms;
@@ -118,7 +113,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     VIEW_ALL {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/view/(.+)");
@@ -129,7 +123,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     VIEW_READ {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/view/(.+)");
@@ -140,7 +133,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     VIEW_VALUES {
-
       @Override
       public Iterable<String> convert(String node) {
         return TABLE_VALUES.convert(node.replace("/view/", "/table/"));
@@ -148,7 +140,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     VIEW_EDIT {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/view/(.+)");
@@ -163,11 +154,11 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
 
     },
     VIEW_VALUES_EDIT {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/view/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args));
+        List<String> perms = Lists
+            .newArrayList(magmaConvert("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args));
         Iterables.addAll(perms, VIEW_VALUES.convert(node));
         Iterables.addAll(perms, VIEW_EDIT.convert(node));
         return perms;
