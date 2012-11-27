@@ -1,0 +1,79 @@
+import "Ws.proto";
+
+package Search;
+
+option java_package = "org.obiba.opal.web.model";
+
+message QueryTermDto {
+  optional bool not = 1 [default = false];
+  optional string facet = 2; // name of the facet, if not provided no facet is returned for this term
+  extensions 1000 to max;
+}
+
+enum TermOperator {
+  AND = 0;
+  OR = 1;
+}
+
+message LogicalTermDto {
+  required TermOperator operator = 1 [default = AND];
+  repeated QueryTermDto terms = 2;
+  extend QueryTermDto {
+    optional LogicalTermDto params = 1000;
+  }
+}
+
+message VariableTermDto {
+  required string variable = 1;
+
+  extend QueryTermDto {
+    optional VariableTermDto params = 1001;
+  }
+  extensions 1000 to max;
+}
+
+message InTermDto {
+  repeated string values = 1;
+  optional int32 minimum_match = 2 [default = 1];
+  extend VariableTermDto {
+    optional InTermDto params = 1000;
+  }
+}
+
+// do we need specialized ranges depending on the value type ?
+message RangeTermDto {
+  optional string lower = 1;
+  optional string upper = 2;
+  optional bool include_lower = 3 [default = true];
+  optional bool include_upper = 4 [default = false];
+  extend VariableTermDto {
+    optional RangeTermDto params = 1001;
+  }
+}
+
+message QueryResultDto {
+  repeated FacetResultDto facets = 2;
+}
+
+message FacetResultDto {
+    required string  variable = 1;
+
+    message TermFrequencyDto {
+        required string term = 1;
+        required int32 count = 2;
+    }
+
+    message StatisticalResultDto {
+        required int64 count = 1 [default = 0];
+        optional int64 total = 2;
+        optional float min = 3;
+        optional float max = 4;
+        optional float mean = 5;
+        optional float sum_of_squares = 6;
+        optional float variance = 7;
+        optional float std_deviation = 8;
+    }
+
+    repeated TermFrequencyDto frequencies = 2;
+    optional StatisticalResultDto statistics = 3;
+}
