@@ -13,6 +13,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.web.model.Search;
+import org.springframework.util.Assert;
 
 /**
  * Utility class used to convert an elastic search JSON query to a DTO query.
@@ -25,7 +26,7 @@ public class EsResultConverter {
    * @param dtoQuery - keeps the original DTO query in order to retrieve the variable and facet names
    */
   public EsResultConverter(Search.QueryTermDto dtoQuery) {
-    assert (dtoQuery != null);
+    Assert.notNull(dtoQuery, "Original query DTO is null!");
 
     this.dtoQuery = dtoQuery;
   }
@@ -38,7 +39,7 @@ public class EsResultConverter {
    * @throws JSONException
    */
   public Search.QueryResultDto convert(JSONObject json) throws JSONException {
-    assert (json != null);
+    Assert.notNull(json, "Result JSON is null!");
 
     Search.QueryResultDto.Builder dtoResultBuilder = Search.QueryResultDto.newBuilder();
     Search.FacetResultDto dtoFacet = convertFacets(json.getJSONObject("facets"));

@@ -22,13 +22,6 @@ import org.obiba.opal.web.model.Search;
 
 import junit.framework.Assert;
 
-/**
- * Created with IntelliJ IDEA.
- * User: rhaeri
- * Date: 26/11/12
- * Time: 2:05 PM
- * To change this template use File | Settings | File Templates.
- */
 public class QueryTermConverterTest {
   private Search.QueryTermDto dtoCategoricalQuery;
 
@@ -49,9 +42,7 @@ public class QueryTermConverterTest {
 
     JSONObject jsonResult = converter.convert(dtoCategoricalQuery);
     Assert.assertNotNull(jsonResult);
-    new JsonAssert().assertEquals(jsonExpected, jsonResult);
-    new JsonAssert().assertEquals(jsonExpected, jsonResult);
-
+    JsonAssert.assertEquals(jsonExpected, jsonResult);
   }
 
   @Test
@@ -63,7 +54,7 @@ public class QueryTermConverterTest {
 
     JSONObject jsonResult = converter.convert(dtoStatisticalQuery);
     Assert.assertNotNull(jsonResult);
-    new JsonAssert().assertEquals(jsonExpected, jsonResult);
+    JsonAssert.assertEquals(jsonExpected, jsonResult);
   }
 
   private Search.QueryTermDto createCategoricalQueryDto() {
@@ -90,13 +81,17 @@ public class QueryTermConverterTest {
     return dtoBuilder.build();
   }
 
+  /**
+   * Utility class that asserts the equality of two JSON objects.
+   * TODO extract the class and add the JSONArray recursion as well. For now it asserts two simple JSON objects
+   */
   private static class JsonAssert {
 
-    JsonAssert() {
+    private JsonAssert() {
     }
 
     @SuppressWarnings("unchecked")
-    public void assertEquals(@Nonnull JSONObject expected, @Nonnull JSONObject target) {
+    public static void assertEquals(@Nonnull JSONObject expected, @Nonnull JSONObject target) {
 
       try {
 
@@ -113,11 +108,13 @@ public class QueryTermConverterTest {
           Assert.assertEquals(expectedValue.getClass(), targetValue.getClass());
 
           if(expectedValue instanceof JSONObject) {
+            // For now, recurse only the JSON object
             assertEquals(expected.getJSONObject(key), target.getJSONObject(key));
           } else if(expectedValue instanceof JSONArray) {
             // TODO handle JSONArray in the future
             Assert.assertFalse(true);
           } else {
+            // compare values
             Assert.assertEquals(expectedValue, targetValue);
           }
         }

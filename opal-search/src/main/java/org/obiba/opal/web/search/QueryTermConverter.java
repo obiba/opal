@@ -12,6 +12,7 @@ package org.obiba.opal.web.search;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.web.model.Search;
+import org.springframework.util.Assert;
 
 /**
  * Converts a DTO query to an elastic search JSON query
@@ -25,7 +26,7 @@ public class QueryTermConverter {
    * variable.
    */
   public QueryTermConverter(String fieldPrefix) {
-    assert (fieldPrefix != null);
+    Assert.notNull(fieldPrefix, "Field prefix is null!");
 
     this.fieldPrefix = fieldPrefix;
   }
@@ -38,7 +39,7 @@ public class QueryTermConverter {
    * @throws JSONException
    */
   public JSONObject convert(Search.QueryTermDto dto) throws JSONException {
-    assert (dto != null);
+    Assert.notNull(dto, "Query term DTO is null!");
 
     Search.VariableTermDto variableDto = dto.getExtension(Search.VariableTermDto.params);
 
@@ -66,5 +67,4 @@ public class QueryTermConverter {
     // termsJSON.put("all_fields", true);
     return termsJSON;
   }
-
 }

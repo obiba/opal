@@ -31,6 +31,7 @@ import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 /**
  * This class is responsible for executing an elastic search. The input and output of this class are DTO format.
@@ -44,8 +45,8 @@ public class ElasticSearchQuery {
   private final HttpServletRequest servletRequest;
 
   public ElasticSearchQuery(HttpServletRequest servletRequest, ElasticSearchProvider esProvider) {
-    assert (servletRequest != null);
-    assert (esProvider != null);
+    Assert.notNull(servletRequest, "Servlet Request is null!");
+    Assert.notNull(esProvider, "Elastic Search provider is null!");
 
     this.servletRequest = servletRequest;
     this.esProvider = esProvider;
@@ -61,7 +62,9 @@ public class ElasticSearchQuery {
    */
   public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
       Search.QueryTermDto dtoQuery) throws JSONException {
-    log.info("Executing query");
+
+    Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
+    Assert.notNull(dtoQuery, "Query dto request is null!");
 
     String body = build(dtoQuery, indexManagerHelper.getIndexName());
 
