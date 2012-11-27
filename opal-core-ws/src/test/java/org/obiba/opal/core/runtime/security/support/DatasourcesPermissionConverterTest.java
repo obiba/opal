@@ -56,6 +56,8 @@ public class DatasourcesPermissionConverterTest extends OpalPermissionConverterT
   public void testTableEdit() {
     testConversion("/datasource/patate/table/pwel", DatasourcesPermissionConverter.Permission.TABLE_EDIT, //
         "magma:/datasource/patate/table/pwel/variables:POST:GET", //
+        "magma:/datasource/patate/table/pwel/index:*:GET", //
+        "magma:/datasource/patate/table/pwel/index/schedule:*:GET", //
         "magma:/datasource/patate/table/pwel:GET:GET", //
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
