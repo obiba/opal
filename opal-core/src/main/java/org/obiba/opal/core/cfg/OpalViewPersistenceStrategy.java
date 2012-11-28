@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -60,7 +61,8 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   private final Lock w = rwl.writeLock();
 
   public OpalViewPersistenceStrategy() {
-    String viewsDirectoryName = System.getProperty(OPAL_HOME_SYSTEM_PROPERTY_NAME) + File.separator + CONF_DIRECTORY_NAME + File.separator + VIEWS_DIRECTORY_NAME;
+    String viewsDirectoryName = System.getProperty(OPAL_HOME_SYSTEM_PROPERTY_NAME) + File.separator //
+        + CONF_DIRECTORY_NAME + File.separator + VIEWS_DIRECTORY_NAME;
     viewsDirectory = new File(viewsDirectoryName);
   }
 
@@ -84,7 +86,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     }
   }
 
-  private void doWriteViews(String datasourceName, Set<View> views) {
+  private void doWriteViews(String datasourceName, Collection<View> views) {
     createViewsDirectory(); // Creates the views directory if it doesn't exist.
     if(views.isEmpty()) {
       if(getDatasourceViewsFile(datasourceName).exists()) {
@@ -108,9 +110,11 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
         }
 
       } catch(FileNotFoundException e) {
-        throw new RuntimeException("Could not find the views file '" + getDatasourceViewsFile(datasourceName).getAbsolutePath() + "'. " + e);
+        throw new RuntimeException(
+            "Could not find the views file '" + getDatasourceViewsFile(datasourceName).getAbsolutePath() + "'. " + e);
       } catch(IOException e) {
-        throw new RuntimeException("Failed to create the views file '" + getDatasourceViewsFile(datasourceName).getAbsolutePath() + "'. " + e);
+        throw new RuntimeException(
+            "Failed to create the views file '" + getDatasourceViewsFile(datasourceName).getAbsolutePath() + "'. " + e);
       } finally {
         StreamUtil.silentSafeClose(writer);
       }
@@ -143,11 +147,14 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   private void createViewsDirectory() {
     if(!viewsDirectory.isDirectory()) {
-      if(!viewsDirectory.mkdirs()) throw new RuntimeException("The views directory '" + viewsDirectory.getAbsolutePath() + "' could not be created.");
+      if(!viewsDirectory.mkdirs()) {
+        throw new RuntimeException(
+            "The views directory '" + viewsDirectory.getAbsolutePath() + "' could not be created.");
+      }
     }
   }
 
-  private String normalizeDatasourceName(String datasourceName) {
+  private String normalizeDatasourceName(@SuppressWarnings("TypeMayBeWeakened") String datasourceName) {
     Pattern escaper = Pattern.compile("([^a-zA-Z0-9-_. ])");
     return escaper.matcher(datasourceName).replaceAll("");
   }

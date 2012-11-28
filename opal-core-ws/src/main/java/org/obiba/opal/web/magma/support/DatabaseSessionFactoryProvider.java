@@ -1,5 +1,7 @@
 package org.obiba.opal.web.magma.support;
 
+import javax.annotation.Nullable;
+
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.hibernate.SessionFactoryProvider;
@@ -14,15 +16,19 @@ public class DatabaseSessionFactoryProvider implements SessionFactoryProvider, D
 
   private String databaseName;
 
+  // need to be transient because of XML serialization
+  @SuppressWarnings("TransientFieldInNonSerializableClass")
   @Autowired
   private transient JdbcDataSourceRegistry jdbcDataSourceRegistry;
 
-  // Public ctor for XStream de-ser.
+  // Public constructor for XStream de-ser.
+  @SuppressWarnings("UnusedDeclaration")
   public DatabaseSessionFactoryProvider() {
 
   }
 
-  public DatabaseSessionFactoryProvider(String datasourceName, JdbcDataSourceRegistry jdbcDataSourceRegistry, String databaseName) {
+  public DatabaseSessionFactoryProvider(@Nullable String datasourceName,
+      @Nullable JdbcDataSourceRegistry jdbcDataSourceRegistry, @Nullable String databaseName) {
     Preconditions.checkArgument(datasourceName != null);
     Preconditions.checkArgument(jdbcDataSourceRegistry != null);
     Preconditions.checkArgument(databaseName != null);

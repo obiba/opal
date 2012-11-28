@@ -5,31 +5,30 @@ import java.io.IOException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
+
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import uk.co.flamingpenguin.jewel.cli.Option;
 
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class OpalServer {
 
   public interface OpalServerOptions {
 
     @Option(description = "Performs an Opal upgrade. Required after Opal installation.")
-    public boolean isUpgrade();
+    boolean isUpgrade();
 
   }
 
   private final GenericApplicationContext ctx;
 
   OpalServer(OpalServerOptions options) {
-    // Tell Carol not to initialize its CMI component. This helps us
-    // minimize dependencies brought in by JOTM.
-    // See:
-    // http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements
-    // for details.
+    // Tell Carol not to initialize its CMI component. This helps us minimize dependencies brought in by JOTM.
+    // See http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements for details.
     System.setProperty("cmi.disabled", "true");
 
     // Disable EHCache and Quartz usage tracker
-    // http://martijndashorst.com/blog/2011/02/21/ehcache-and-quartz-phone-home-during-startup/
+    // http://martijndashorst.com/blog/2011/02/21/ehcache-and-quartz-phone-home-during-startup
     System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
     System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
 
@@ -54,7 +53,6 @@ public class OpalServer {
       } catch(RuntimeException ignore) {
         // ignore
       }
-      return;
     }
   }
 
@@ -82,12 +80,13 @@ public class OpalServer {
     }
   }
 
-  public static void main(String[] args) throws ArgumentValidationException, IOException {
+  public static void main(String... args) throws ArgumentValidationException, IOException {
     checkSystemProperty("OPAL_HOME", "OPAL_DIST");
 
     final OpalServer opal = new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args));
     opal.boot();
     Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
       public void run() {
         opal.shutdown();
       }

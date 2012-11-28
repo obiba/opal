@@ -1,19 +1,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:tx="http://www.springframework.org/schema/tx"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
-  <import resource="datasource.xml" />
-  <import resource="hibernate-session.xml" />
+  <import resource="datasource.xml"/>
+  <import resource="hibernate-session.xml"/>
 
   <bean id="persistenceManager" class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
     <qualifier value="opal-data"/>
-    <property name="sessionFactory" ref="opalSessionFactory" />
+    <property name="sessionFactory" ref="opalSessionFactory"/>
   </bean>
 
-  <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService" />
-  <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl" />
+  <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService"/>
+  <bean id="exportService" class="org.obiba.opal.core.service.impl.DefaultExportServiceImpl"/>
   <bean id="decryptService" class="org.obiba.opal.core.service.impl.DefaultDecryptService"/>
 
   <bean id="unitKeyStoreService" class="org.obiba.opal.core.service.impl.DefaultUnitKeyStoreServiceImpl">
@@ -21,10 +18,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   </bean>
 
   <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">
-    <property name="sessionFactory" ref="opalSessionFactory" />
-    <property name="userProvider" ref="userProvider" />
+    <property name="sessionFactory" ref="opalSessionFactory"/>
+    <property name="userProvider" ref="userProvider"/>
   </bean>
 
-  <bean id="userProvider" class="org.obiba.opal.audit.OpalUserProvider" />
+  <bean id="userProvider" class="org.obiba.opal.audit.OpalUserProvider"/>
 
 </beans>
