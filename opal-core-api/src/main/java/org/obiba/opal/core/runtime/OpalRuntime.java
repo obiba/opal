@@ -15,18 +15,18 @@ import org.obiba.opal.fs.OpalFileSystem;
 
 public interface OpalRuntime {
 
-  public Set<Service> getServices();
+  Set<Service> getServices();
 
-  public OpalFileSystem getFileSystem();
+  OpalFileSystem getFileSystem();
 
-  public void start();
+  void start();
 
-  public void stop();
+  void stop();
 
   /**
    * True if service with given name is available in Opal Runtime.
    */
-  public boolean hasService(String name);
+  boolean hasService(String name);
 
   /**
    * Get the service with the given name.
@@ -34,6 +34,6 @@ public interface OpalRuntime {
    * @param name Service name
    * @throws throw NoSuchService runtime exception if not found (hasService() must be evaluated first)
    */
-  public Service getService(String name) throws org.obiba.opal.core.runtime.NoSuchServiceException;
+  Service getService(String name) throws NoSuchServiceException;
 
 }

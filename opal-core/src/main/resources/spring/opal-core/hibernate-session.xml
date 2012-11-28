@@ -1,31 +1,26 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:tx="http://www.springframework.org/schema/tx"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
-  <bean id="datasourceClasses" class="org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper" />
-  <bean id="auditClasses" class="org.obiba.magma.audit.hibernate.support.AnnotationConfigurationHelper" />
+  <bean id="datasourceClasses" class="org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper"/>
+  <bean id="auditClasses" class="org.obiba.magma.audit.hibernate.support.AnnotationConfigurationHelper"/>
 
   <!-- The Hibernate SessionFactory -->
   <bean id="keySessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
     <qualifier value="opal-key"/>
-    <property name="dataSource">
-      <ref bean="keyDataSource" />
-    </property>
+    <property name="dataSource" ref="keyDataSource"/>
     <property name="namingStrategy">
-      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy" />
+      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy"/>
     </property>
     <property name="annotatedClasses">
-      <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes" />
+      <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes"/>
     </property>
 
     <!-- This is required to allow Hibernate to register transaction synchronisations. -->
-    <property name="jtaTransactionManager" ref="jotm" />
+    <property name="jtaTransactionManager" ref="jotm"/>
     <!-- By setting this to false, the CurrentSessionContext implementation must be specified through hibernate.current_session_context_class -->
-    <property name="exposeTransactionAwareSessionFactory" value="false" />
+    <property name="exposeTransactionAwareSessionFactory" value="false"/>
 
-    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
+    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration"/>
     <property name="hibernateProperties">
       <bean class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
         <property name="properties">
@@ -55,28 +50,26 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   <!-- The Hibernate SessionFactory -->
   <bean id="opalSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
     <qualifier value="opal-data"/>
-    <property name="dataSource">
-      <ref bean="opalDataSource" />
-    </property>
+    <property name="dataSource" ref="opalDataSource"/>
     <property name="namingStrategy">
-      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy" />
+      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy"/>
     </property>
     <property name="annotatedClasses">
       <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper">
         <property name="additionalClasses">
           <list>
-            <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes" />
+            <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes"/>
           </list>
         </property>
       </bean>
     </property>
 
     <!-- This is required to allow Hibernate to register transaction synchronisations. -->
-    <property name="jtaTransactionManager" ref="jotm" />
+    <property name="jtaTransactionManager" ref="jotm"/>
     <!-- By setting this to false, the CurrentSessionContext implementation must be specified through hibernate.current_session_context_class -->
-    <property name="exposeTransactionAwareSessionFactory" value="false" />
+    <property name="exposeTransactionAwareSessionFactory" value="false"/>
 
-    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration" />
+    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration"/>
     <property name="hibernateProperties">
       <bean class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
         <property name="properties">
@@ -104,7 +97,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   </bean>
 
   <bean id="hibernate-properties" class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
-    <qualifier value="hibernate" />
+    <qualifier value="hibernate"/>
     <property name="properties">
       <props>
         <prop key="hibernate.generate_statistics">true</prop>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -384,7 +384,7 @@
         </exclusions>
       </dependency>
 
-      <!-- JOTM requires javax.resource and javax.transaction Java APIs; these are missing due to the exclusions declared 
+      <!-- JOTM requires javax.resource and javax.transaction Java APIs; these are missing due to the exclusions declared
         above for the JOTM dependency. -->
       <!-- javax.resource -->
       <dependency>
@@ -719,7 +719,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>${build-helper-maven-plugin.version}</version>
+          <version>${maven-build-helper-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -878,48 +878,48 @@
 
     <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
 
-    <obiba.commons.version>1.3.1</obiba.commons.version>
-    <magma.version>1.3-SNAPSHOT</magma.version>
-    <guava.version>10.0.1</guava.version>
-    <spring.version>3.1.2.RELEASE</spring.version>
-    <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
-    <slf4j.version>1.7.1</slf4j.version>
-    <jta.version>1.0.1B</jta.version>
-    <jpa.version>1.0</jpa.version>
-    <hsqldb.version>2.2.6</hsqldb.version>
-    <dbunit.version>2.2.2</dbunit.version>
-    <junit.version>4.7</junit.version>
-    <easymock.version>2.4</easymock.version>
-    <hamcrest.version>1.1</hamcrest.version>
-    <mysql-connector-java.version>5.1.17</mysql-connector-java.version>
+    <bouncycastle.version>1.46</bouncycastle.version>
+    <cglib-nodep.version>2.2</cglib-nodep.version>
     <commons-dbcp.version>1.4</commons-dbcp.version>
     <commons-collections.version>3.2</commons-collections.version>
-    <xstream.version>1.4.2</xstream.version>
-    <hibernate.version>3.5.6-Final</hibernate.version>
-    <jotm.version>2.1.9</jotm.version>
-    <ow2.spec.version>1.0.2</ow2.spec.version>
-    <liquibase.version>1.9.4</liquibase.version>
-    <shiro.version>1.1.0</shiro.version>
-    <bouncycastle.version>1.46</bouncycastle.version>
-    <commons-fileupload.version>1.2.1</commons-fileupload.version>
     <commons-io.version>1.3.2</commons-io.version>
-    <quartz.version>1.8.3</quartz.version>
-    <protostuff.version>1.0.1</protostuff.version>
+    <commons-fileupload.version>1.2.1</commons-fileupload.version>
     <crowd.version>2.5.1</crowd.version>
-    <xfire.version>1.2.6</xfire.version>
-    <cglib-nodep.version>2.2</cglib-nodep.version>
+    <dbunit.version>2.2.2</dbunit.version>
+    <easymock.version>2.4</easymock.version>
     <elasticsearch.version>0.19.11</elasticsearch.version>
+    <guava.version>10.0.1</guava.version>
+    <hamcrest.version>1.1</hamcrest.version>
+    <hibernate.version>3.5.6-Final</hibernate.version>
+    <hsqldb.version>2.2.6</hsqldb.version>
+    <jotm.version>2.1.9</jotm.version>
+    <jpa.version>1.0</jpa.version>
+    <jta.version>1.0.1B</jta.version>
+    <junit.version>4.7</junit.version>
+    <liquibase.version>1.9.4</liquibase.version>
+    <magma.version>1.3-SNAPSHOT</magma.version>
+    <mysql-connector-java.version>5.1.17</mysql-connector-java.version>
+    <obiba.commons.version>1.3.1</obiba.commons.version>
+    <ow2.spec.version>1.0.2</ow2.spec.version>
+    <protostuff.version>1.0.1</protostuff.version>
+    <quartz.version>1.8.3</quartz.version>
+    <shiro.version>1.1.0</shiro.version>
+    <slf4j.version>1.7.1</slf4j.version>
+    <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
+    <spring.version>3.1.2.RELEASE</spring.version>
+    <xfire.version>1.2.6</xfire.version>
+    <xstream.version>1.4.2</xstream.version>
 
     <!-- maven plugins -->
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
     <maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
+    <maven-build-helper-plugin.version>1.7</maven-build-helper-plugin.version>
     <maven-buildnumber-plugin.version>1.2</maven-buildnumber-plugin.version>
     <maven-clean-plugin.version>2.5</maven-clean-plugin.version>
     <maven-cobertura-plugin.version>2.5.2</maven-cobertura-plugin.version>
     <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>2.7</maven-deploy-plugin.version>
     <maven-findbugs-plugin.version>2.5.2</maven-findbugs-plugin.version>
-    <build-helper-maven-plugin.version>1.7</build-helper-maven-plugin.version>
     <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
     <maven-javadoc-plugin.version>2.9</maven-javadoc-plugin.version>
     <maven-pmd-plugin.version>2.7.1</maven-pmd-plugin.version>

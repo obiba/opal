@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -24,9 +24,13 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
 
   private String tablePrefix;
 
+  // transient because of XML serialization
+  @SuppressWarnings("TransientFieldInNonSerializableClass")
   @Autowired
   private transient JdbcDataSourceRegistry dataSourceRegistry;
 
+  // empty public constructor because of XML serialization
+  @SuppressWarnings("UnusedDeclaration")
   public DatabaseLimesurveyDatasourceFactory() {
   }
 
@@ -36,8 +40,9 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
    * @param tablePrefix
    * @param dataSourceRegistry
    */
-  public DatabaseLimesurveyDatasourceFactory(String name, String databaseName, String tablePrefix, JdbcDataSourceRegistry dataSourceRegistry) {
-    super.setName(name);
+  public DatabaseLimesurveyDatasourceFactory(String name, String databaseName, String tablePrefix,
+      JdbcDataSourceRegistry dataSourceRegistry) {
+    setName(name);
     Preconditions.checkArgument(name != null);
     Preconditions.checkArgument(databaseName != null);
     Preconditions.checkArgument(dataSourceRegistry != null);
