@@ -1,28 +1,39 @@
-<!DOCTYPE module PUBLIC "//gwt-module/" "http://google-web-toolkit.googlecode.com/svn/tags/1.6.2/distro-source/core/src/gwt-module.dtd">
+<!--
+  ~ Copyright (c) 2012 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<!DOCTYPE module PUBLIC "//gwt-module/"
+    "http://google-web-toolkit.googlecode.com/svn/tags/1.6.2/distro-source/core/src/gwt-module.dtd">
 <module>
   <!-- Inherit the core Web Toolkit stuff. -->
-  <inherits name='com.google.gwt.user.User' />
+  <inherits name='com.google.gwt.user.User'/>
+  <inherits name="org.obiba.opal.web.gwt.app.GwtApp"/>
 
   <!--
     This tells GWT to use this concrete implementation whenever a call to GWT.create() is made for the interface type.
   -->
-  
+
   <!-- Authorization -->
   <replace-with class="org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder">
-    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilder" />
+    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilder"/>
   </replace-with>
-  
+
   <!-- Fallthrough for all other browsers -->
   <replace-with class="org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder">
-    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder" />
+    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder"/>
   </replace-with>
 
   <!-- Specific impl for IE -->
   <replace-with class="org.obiba.opal.web.gwt.rest.client.IeResourceRequestBuilder">
-    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder" />
+    <when-type-assignable class="org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder"/>
     <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
 </module>

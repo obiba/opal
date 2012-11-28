@@ -1,0 +1,244 @@
+/*
+ * Copyright (c) 2012 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
+
+import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceDataProvider;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
+
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.Range;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TabInfo;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
+import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
+
+public class IndexAdministrationPresenter extends
+    ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
+
+  @ProxyStandard
+  @NameToken("!admin.indices")
+  @TabInfo(container = AdministrationPresenter.class, label = "Indices", priority = 4)
+  public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {
+  }
+
+  public interface Display extends View {
+
+    String TEST_ACTION = "Test";
+
+    String INDEX_ACTION = "Index now";
+
+    String CLEAR_ACTION = "Clear";
+
+    String CANCEL_ACTION = "Cancel";
+
+    enum Slots {
+      Drivers, Permissions
+    }
+
+    HasActionHandler<TableIndexStatusDto> getActions();
+
+    HasData<TableIndexStatusDto> getIndexTable();
+  }
+
+  private final Provider<IndexPresenter> indexPresenter;
+
+  private final AuthorizationPresenter authorizationPresenter;
+
+  private final ResourceDataProvider<TableIndexStatusDto> resourceDataProvider = new ResourceDataProvider<TableIndexStatusDto>(
+      Resources.indices());
+
+  private Command confirmedCommand;
+
+  @Inject
+  public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
+      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
+    super(eventBus, display, proxy);
+    this.indexPresenter = indexPresenter;
+    this.authorizationPresenter = authorizationPresenter.get();
+  }
+
+  @ProxyEvent
+  @Override
+  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.indices()).get()
+        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListIndicesAuthorization())).send();
+  }
+
+  @Override
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, AdministrationPresenter.TabSlot, this);
+  }
+
+  @Override
+  public String getName() {
+    return "Indices";
+  }
+
+  @Override
+  protected void onReveal() {
+    refresh();
+    // set permissions
+    // AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+  }
+
+  @Override
+  public void authorize(HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.indices()).get().authorize(authorizer)
+        .send();
+  }
+
+  @Override
+  protected void onBind() {
+//    registerHandler(getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.Handler() {
+//
+//      @Override
+//      public void onCreated(DatabaseCreatedEvent event) {
+//        refresh();
+//      }
+//    }));
+//    registerHandler(getEventBus().addHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.Handler() {
+//
+//      @Override
+//      public void onUpdated(DatabaseUpdatedEvent event) {
+//        refresh();
+//      }
+//    }));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
+
+      @Override
+      public void onConfirmation(ConfirmationEvent event) {
+        if(event.getSource() == confirmedCommand && event.isConfirmed()) {
+          confirmedCommand.execute();
+        }
+      }
+    }));
+
+    getView().getActions().setActionHandler(new ActionHandler<TableIndexStatusDto>() {
+
+      @Override
+      public void doAction(final TableIndexStatusDto object, String actionName) {
+//        if(object.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
+//          getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(confirmedCommand = new Command() {
+//            @Override
+//            public void execute() {
+//              deleteDatabase(object);
+//            }
+//          }, "deleteDatabase", "confirmDeleteDatabase"));
+//        } else if(object.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
+//          DatabasePresenter dialog = jdbcDataSourcePresenter.get();
+//          dialog.updateDatabase(object);
+//          addToPopupSlot(dialog);
+//        } else if(actionName.equalsIgnoreCase(Display.TEST_ACTION)) {
+//          ResponseCodeCallback callback = new ResponseCodeCallback() {
+//
+//            @Override
+//            public void onResponseCode(Request request, Response response) {
+//              if(response.getStatusCode() == 200) {
+//                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
+//              } else {
+//                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+//                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray()).build());
+//              }
+//            }
+//
+//          };
+//          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>> newBuilder()//
+//          .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
+//          .withCallback(200, callback).withCallback(503, callback).post().send();
+//        }
+      }
+
+    });
+
+//    registerHandler(getView().getAddButton().addClickHandler(new ClickHandler() {
+//
+//      @Override
+//      public void onClick(ClickEvent event) {
+//        DatabasePresenter dialog = jdbcDataSourcePresenter.get();
+//        dialog.createNewDatabase();
+//        addToPopupSlot(dialog);
+//      }
+//
+//    }));
+
+    //authorizationPresenter.setAclRequest("indices", new AclRequest(AclAction.TABLE_ALL, Resources.indices()));
+  }
+
+//  private void deleteDatabase(TableIndexStatusDto database) {
+//    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>> newBuilder().forResource(Resources.index(
+//        database.getDatasource())).withCallback(200, new ResponseCodeCallback() {
+//
+//      @Override
+//      public void onResponseCode(Request request, Response response) {
+//        refresh();
+//      }
+//
+//    }).delete().send();
+//  }
+
+  private void refresh() {
+    getView().getIndexTable().setVisibleRangeAndClearData(new Range(0, 10), true);
+  }
+
+  private final class ListIndicesAuthorization implements HasAuthorization {
+
+    @Override
+    public void beforeAuthorization() {
+    }
+
+    @Override
+    public void authorized() {
+      // Only bind the table to its data provider if we're authorized
+      if(resourceDataProvider.getDataDisplays().size() == 0) {
+        resourceDataProvider.addDataDisplay(getView().getIndexTable());
+      }
+    }
+
+    @Override
+    public void unauthorized() {
+    }
+
+  }
+
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+      clearSlot(Display.Slots.Permissions);
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      setInSlot(Display.Slots.Permissions, authorizationPresenter);
+    }
+  }
+
+}
