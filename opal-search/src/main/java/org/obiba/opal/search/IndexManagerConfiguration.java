@@ -29,7 +29,7 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
    * Get from the Index manager configuration whether a given value table is indexable or not.
    */
   public boolean isIndexable(ValueTable vt) {
-    return getSchedule(vt).getType().equals(Opal.ScheduleType.NOT_SCHEDULED) == false;
+    return getSchedule(vt).getType() != Opal.ScheduleType.NOT_SCHEDULED;
   }
 
   /**
@@ -37,15 +37,7 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
    * the last update of the table with the last update of the index (and a grace period).
    */
   public boolean isReadyForIndexing(ValueTable vt, ValueTableIndex index) {
-    if(isIndexable(vt) && !index.isUpToDate()) {
-      // check with schedule
-      //Value value = index.getTimestamps().getLastUpdate();
-
-      if(shouldUpdate(getSchedule(vt), index.now())) {
-        return true;
-      }
-    }
-    return false;
+    return isIndexable(vt) && !index.isUpToDate() && shouldUpdate(getSchedule(vt), index.now());
   }
 
   public void updateSchedule(ValueTable vt, Schedule schedule) {
@@ -67,13 +59,13 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
   private boolean shouldUpdate(Schedule schedule, Calendar now) {
     switch(schedule.getType()) {
       case MINUTES_5:
-        return (now.get(Calendar.MINUTE) % 5 <= 1);
+        return now.get(Calendar.MINUTE) % 5 <= 1;
 
       case MINUTES_15:
-        return (now.get(Calendar.MINUTE) % 15 <= 1);
+        return now.get(Calendar.MINUTE) % 15 <= 1;
 
       case MINUTES_30:
-        return (now.get(Calendar.MINUTE) % 30 <= 1);
+        return now.get(Calendar.MINUTE) % 30 <= 1;
 
       case HOURLY:
         return now.get(Calendar.MINUTE) <= 1;
