@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -22,13 +22,6 @@ import org.obiba.opal.web.model.Search;
 
 import junit.framework.Assert;
 
-/**
- * Created with IntelliJ IDEA.
- * User: rhaeri
- * Date: 26/11/12
- * Time: 2:05 PM
- * To change this template use File | Settings | File Templates.
- */
 public class QueryTermConverterTest {
   private Search.QueryTermDto dtoCategoricalQuery;
 

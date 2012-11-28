@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -10,6 +10,7 @@
 package org.obiba.opal.search.es;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -433,5 +434,11 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
       return name.hashCode();
     }
 
+    @Override
+    public Calendar now() {
+      Calendar c = Calendar.getInstance();
+      c.setTime(new Date());
+      return c;
+    }
   }
 }
