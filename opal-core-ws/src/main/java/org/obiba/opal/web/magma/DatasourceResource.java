@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -72,6 +73,8 @@ public class DatasourceResource {
 
   private Datasource transientDatasourceInstance;
 
+  private final Set<ValueTableUpdateListener> tableListeners;
+
   @Autowired
   @Value("${org.obiba.opal.languages}")
   private String localesProperty;
@@ -80,7 +83,8 @@ public class DatasourceResource {
 
   @Autowired
   public DatasourceResource(OpalConfigurationService configService, ImportService importService,
-      ViewManager viewManager, ViewDtos viewDtos) {
+      ViewManager viewManager, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
+
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
@@ -89,6 +93,7 @@ public class DatasourceResource {
     this.importService = importService;
     this.viewManager = viewManager;
     this.viewDtos = viewDtos;
+    this.tableListeners = tableListeners;
   }
 
   // Used for testing
@@ -102,6 +107,7 @@ public class DatasourceResource {
     this.viewManager = viewManager;
     this.viewDtos = viewDtos;
     this.name = name;
+    tableListeners = new HashSet<ValueTableUpdateListener>();
     importService = null;
   }
 
@@ -165,7 +171,7 @@ public class DatasourceResource {
 
   public TableResource getTableResource(ValueTable table) {
     if(getDatasource().canDropTable(table.getName())) {
-      return new DroppableTableResource(table, getLocales(), importService);
+      return new DroppableTableResource(table, getLocales(), importService, tableListeners);
     }
     return new TableResource(table, getLocales(), importService);
   }
@@ -211,7 +217,6 @@ public class DatasourceResource {
     for(Locale locale : getLocales()) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
     }
-
     return localeDtos;
   }
 
