@@ -204,6 +204,7 @@
           <property name="description" value="Update Magma hibernate datasource binaries storage."/>
           <property name="opalConfigurationProvider" ref="opalConfigurationProvider"/>
           <property name="opalDataSource" ref="opalDataSource"/>
+          <property name="keyDataSource" ref="keyDataSource"/>
           <property name="dataSourceFactory" ref="dataSourceFactory"/>
           <property name="appliesTo" value="1.11.0"/>
           <property name="sqlScriptUpgradeStep">

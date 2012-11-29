@@ -51,6 +51,8 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
 
   private DataSource opalDataSource;
 
+  private DataSource keyDataSource;
+
   private DataSourceFactory dataSourceFactory;
 
   private SqlScriptUpgradeStep sqlScriptUpgradeStep;
@@ -60,6 +62,7 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
 
     Collection<DataSource> dataSources = new ArrayList<DataSource>();
     dataSources.add(opalDataSource);
+    dataSources.add(keyDataSource);
 
     OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration();
     JdbcDataSourcesConfig dataSourcesConfig = configuration.getExtension(JdbcDataSourcesConfig.class);
@@ -177,5 +180,9 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
 
   public void setSqlScriptUpgradeStep(SqlScriptUpgradeStep sqlScriptUpgradeStep) {
     this.sqlScriptUpgradeStep = sqlScriptUpgradeStep;
+  }
+
+  public void setKeyDataSource(DataSource keyDataSource) {
+    this.keyDataSource = keyDataSource;
   }
 }
