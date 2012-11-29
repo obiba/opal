@@ -8,15 +8,11 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
-import uk.co.flamingpenguin.jewel.cli.Option;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class OpalServer {
 
   public interface OpalServerOptions {
-
-    @Option(description = "Performs an Opal upgrade. Required after Opal installation.")
-    boolean isUpgrade();
 
   }
 
@@ -32,11 +28,9 @@ public class OpalServer {
     System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
     System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
 
-    if(options.isUpgrade()) {
-      System.out.println("Upgrading Opal.");
-      new UpgradeCommand().execute();
-      System.out.println("Upgrade successful.");
-    }
+    System.out.println("Upgrading Opal.");
+    new UpgradeCommand().execute();
+    System.out.println("Upgrade successful.");
 
     System.out.println("Starting Opal.");
     ctx = new GenericApplicationContext();
