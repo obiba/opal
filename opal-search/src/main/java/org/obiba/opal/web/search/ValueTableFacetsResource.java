@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -10,7 +10,7 @@
 package org.obiba.opal.web.search;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -26,13 +26,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("request")
-@Path("/datasource/{ds}/table/{table}/facet")
+@Path("/datasource/{ds}/table/{table}/facets")
 
 /**
  * Elastic Search API resource that provides a secure mechanism of performing queries on the indexes without exposing
  * individual data,
  */
-public class ValueTableFacetResource {
+public class ValueTableFacetsResource {
 
   private final IndexManager indexManager;
 
@@ -45,31 +45,21 @@ public class ValueTableFacetResource {
   private String table;
 
   @Autowired
-  public ValueTableFacetResource(IndexManager indexManager, ElasticSearchProvider esProvider) {
+  public ValueTableFacetsResource(IndexManager indexManager, ElasticSearchProvider esProvider) {
     this.indexManager = indexManager;
     this.esProvider = esProvider;
   }
 
-  /**
-   * Given a variable name, returns its corresponding facet (terms, statistical). Only categorical and continuous
-   * variables are treated.
-   *
-   * @param servletRequest
-   * @param variable
-   * @return
-   */
-  @GET
-  @Path("/variable/{variable}/_search")
-  public Response search(@Context HttpServletRequest servletRequest, @PathParam("variable") String variable) {
+  @POST
+  @Path("/_search")
+  public Response search(@Context HttpServletRequest servletRequest, Search.QueryTermsDto dtoQueries) {
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().build();
 
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
-      QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable);
-
       ElasticSearchQuery esQuery = new ElasticSearchQuery(servletRequest, esProvider);
 
-      dtoResult = esQuery.execute(indexManagerHelper, dtoBuilder.build());
+      dtoResult = esQuery.execute(indexManagerHelper, dtoQueries);
 
     } catch(UnsupportedOperationException e) {
       return Response.status(501).build();

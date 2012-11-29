@@ -56,20 +56,20 @@ public class ElasticSearchQuery {
    * Executes an elastic search query.
    *
    * @param indexManagerHelper
-   * @param dtoQuery
+   * @param dtoQueries
    * @return
    * @throws JSONException
    */
   public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
-      Search.QueryTermDto dtoQuery) throws JSONException {
+      Search.QueryTermsDto dtoQueries) throws JSONException {
 
     Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
-    Assert.notNull(dtoQuery, "Query dto request is null!");
-
-    String body = build(dtoQuery, indexManagerHelper.getIndexName());
+    Assert.notNull(dtoQueries, "Query dto request is null!");
 
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<Response> ref = new AtomicReference<Response>();
+
+    String body = build(dtoQueries, indexManagerHelper);
 
     esProvider.getRest()
         .dispatchRequest(new JaxRsRestRequest(indexManagerHelper.getValueTableIndex(), servletRequest, body, "_search"),
@@ -96,13 +96,36 @@ public class ElasticSearchQuery {
       Response r = ref.get();
 
       JSONObject jsonContent = new JSONObject(new String((byte[]) r.getEntity()));
-      EsResultConverter converter = new EsResultConverter(dtoQuery);
+
+      // TODO separate the methods for GET and POST ; one with one query, other with many
+      EsResultConverter converter = new EsResultConverter();
 
       return converter.convert(jsonContent);
 
     } catch(InterruptedException e) {
       throw new RuntimeException(e);
     }
+
+  }
+
+  /**
+   * Executes a single elastic search query.
+   *
+   * @param indexManagerHelper
+   * @param dtoQueries
+   * @return
+   * @throws JSONException
+   */
+  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
+      Search.QueryTermDto dtoQuery) throws JSONException {
+
+    Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
+    Assert.notNull(dtoQuery, "Query dto request is null!");
+
+    // wrap in a QueryTermsDto for API uniformity
+    Search.QueryTermsDto dtoQueries = Search.QueryTermsDto.newBuilder().addQueries(dtoQuery).build();
+
+    return execute(indexManagerHelper, dtoQueries);
   }
 
   private Response convert(RestResponse response) throws IOException {
@@ -116,9 +139,9 @@ public class ElasticSearchQuery {
     return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
   }
 
-  private String build(Search.QueryTermDto dto, String indexName) throws JSONException {
-    QueryTermConverter converter = new QueryTermConverter(indexName);
-    JSONObject queryJSON = converter.convert(dto);
+  private String build(Search.QueryTermsDto dtoQueries, IndexManagerHelper indexManagerHelper) throws JSONException {
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
+    JSONObject queryJSON = converter.convert(dtoQueries);
 
     return queryJSON.toString();
   }
