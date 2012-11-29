@@ -15,6 +15,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -57,40 +61,62 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
 
   private SqlScriptUpgradeStep sqlScriptUpgradeStep;
 
+  private final Map<DataSource, String> dataSourceNames = new LinkedHashMap<DataSource, String>();
+
   @Override
   public void execute(Version currentVersion) {
 
-    Collection<DataSource> dataSources = new ArrayList<DataSource>();
-    dataSources.add(opalDataSource);
-    dataSources.add(keyDataSource);
+    dataSourceNames.put(opalDataSource, "Default");
+    dataSourceNames.put(keyDataSource, "Key");
 
     OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration();
     JdbcDataSourcesConfig dataSourcesConfig = configuration.getExtension(JdbcDataSourcesConfig.class);
     for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
       log.debug("Found datasource {}", jdbcDataSource.getUrl());
-      dataSources.add(dataSourceFactory.createDataSource(jdbcDataSource));
+      dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
     }
 
-    for(DataSource dataSource : dataSources) {
+    for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
+      long start = System.currentTimeMillis();
+
+      DataSource dataSource = entry.getKey();
+      String dataSourceName = entry.getValue();
+
       log.debug("Process dataSource {}", dataSource);
       if(hasHibernateDatasource(dataSource)) {
         log.debug("Process Hibernate Datasource for {}", dataSource);
-        sqlScriptUpgradeStep.setDataSource(dataSource);
-        try {
-          sqlScriptUpgradeStep.initialize();
-        } catch(IOException e) {
-          throw new RuntimeException("Cannot upgrade schema for binaries storage", e);
-        }
-        sqlScriptUpgradeStep.execute(currentVersion);
-        moveBinary(dataSource);
+        upgradeSchema(currentVersion, dataSource, dataSourceName);
+        moveBinary(dataSource, dataSourceName);
       }
+
+      System.out
+          .println(dataSourceName + ": upgrade completed in " + formatExecutionTime(System.currentTimeMillis() - start));
     }
+  }
+
+  private String formatExecutionTime(long millis) {
+    return String.format("%d min. %d sec.", TimeUnit.MILLISECONDS.toMinutes(millis),
+        TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+  }
+
+  private void upgradeSchema(Version currentVersion, DataSource dataSource, String name) {
+    long start = System.currentTimeMillis();
+
+    sqlScriptUpgradeStep.setDataSource(dataSource);
+    try {
+      sqlScriptUpgradeStep.initialize();
+    } catch(IOException e) {
+      throw new RuntimeException("Cannot upgrade schema for binaries storage", e);
+    }
+    sqlScriptUpgradeStep.execute(currentVersion);
+
+    System.out.println(name + ": schema upgraded in " + formatExecutionTime(System.currentTimeMillis() - start));
   }
 
   private boolean hasHibernateDatasource(DataSource dataSource) {
     try {
       DatabaseMetaData meta = dataSource.getConnection().getMetaData();
-      ResultSet res = meta.getTables(null, null, null, new String[] {"TABLE"});
+      ResultSet res = meta.getTables(null, null, null, new String[] { "TABLE" });
       while(res.next()) {
         if("value_set_value".equalsIgnoreCase(res.getString("TABLE_NAME"))) return true;
       }
@@ -100,19 +126,22 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
     return false;
   }
 
-  private void moveBinary(DataSource dataSource) {
+  private void moveBinary(DataSource dataSource, String name) {
+    long start = System.currentTimeMillis();
 
     try {
 
       final JdbcTemplate template = new JdbcTemplate(dataSource);
       template.query("SELECT id, created, updated, is_sequence FROM value_set_value WHERE value_type = ?",
-          new Object[] {"binary"}, new RowCallbackHandler() {
+          new Object[] { "binary" }, new RowCallbackHandler() {
 
         @Override
         public void processRow(ResultSet rs) throws SQLException {
           int valueSetValueId = rs.getInt("id");
+          log.debug("Process value_set_id {}", valueSetValueId);
+
           String stringValue = template
-              .queryForObject("SELECT value FROM value_set_value WHERE id = ?", new Object[] {valueSetValueId},
+              .queryForObject("SELECT value FROM value_set_value WHERE id = ?", new Object[] { valueSetValueId },
                   String.class);
           Value newValue = null;
           if(rs.getBoolean("is_sequence")) {
@@ -132,6 +161,8 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
             newValue = writeBinaries(valueSetValueId, 0, value, template);
           }
 
+          log.debug("Set JSON value {} for {}", newValue.getValue(), valueSetValueId);
+
           template.update("UPDATE value_set_value SET value = ? WHERE id = ?", newValue.getValue(), valueSetValueId);
         }
 
@@ -143,6 +174,7 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
             byte[] binary = (byte[]) value.getValue();
             int size = binary.length;
             newValue = getBinaryMetadata(size);
+            log.debug("Write {} bytes for {}", size, valueSetValueId);
             template.update(
                 "INSERT INTO value_set_binary_value(occurrence, size, value, value_set_value_id) VALUES (?, ?, ?, ?)",
                 occurrence, size, value, valueSetValueId);
@@ -164,6 +196,9 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
     } finally {
       MagmaEngine.get().shutdown();
     }
+
+    System.out.println(name + ": binary moved in " + formatExecutionTime(System.currentTimeMillis() - start));
+
   }
 
   public void setOpalDataSource(DataSource opalDataSource) {
