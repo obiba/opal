@@ -5,8 +5,6 @@ ALTER TABLE `value_set_value`
 
 CREATE TABLE `value_set_binary_value` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `created` datetime NOT NULL,
-  `updated` datetime NOT NULL,
   `occurrence` int(11) NOT NULL,
   `size` int(11) NOT NULL,
   `value` longblob,
