@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -49,8 +49,19 @@ public abstract class IndexResource {
       return Opal.ScheduleDto.newBuilder().setType(Opal.ScheduleType.MINUTES_15).build();
     }
 
-    return Opal.ScheduleDto.newBuilder().setType(schedule.getType()).setDay(schedule.getDay())
-        .setHours(schedule.getHours()).setMinutes(schedule.getMinutes()).build();
+    Opal.ScheduleDto dto = Opal.ScheduleDto.newBuilder().setType(schedule.getType()).build();
+
+    if(schedule.getDay() != null) {
+      dto = dto.toBuilder().setDay(schedule.getDay()).build();
+    }
+    if(schedule.getHours() != null) {
+      dto = dto.toBuilder().setHours(schedule.getHours()).build();
+    }
+    if(schedule.getMinutes() != null) {
+      dto = dto.toBuilder().setMinutes(schedule.getMinutes()).build();
+    }
+
+    return dto;
   }
 
   protected ValueTable getValueTable(String datasource, String table) {
@@ -67,11 +78,11 @@ public abstract class IndexResource {
   }
 
   protected boolean isInProgress(String table) {
-    return (Float.compare(getValueTableIndexationProgress(table), 0f) > 1);
+    return Float.compare(getValueTableIndexationProgress(table), 0f) > 1;
   }
 
   protected ValueTableIndex getValueTableIndex(String datasource, String table) {
-    return this.indexManager.getIndex(getValueTable(datasource, table));
+    return indexManager.getIndex(getValueTable(datasource, table));
   }
 
   protected Opal.TableIndexationStatus getTableIndexationStatus(String datasource, String table) {
@@ -82,9 +93,11 @@ public abstract class IndexResource {
     boolean upToDate = getValueTableIndex(datasource, table).isUpToDate();
     if(indexManager.isIndexable(valueTable) && !upToDate && !inProgress) {
       return Opal.TableIndexationStatus.OUTDATED;
-    } else if(indexManager.isIndexable(valueTable) && !upToDate && inProgress) {
+    }
+    if(indexManager.isIndexable(valueTable) && !upToDate && inProgress) {
       return Opal.TableIndexationStatus.IN_PROGRESS;
-    } else if(indexManager.isIndexable(valueTable) && upToDate) {
+    }
+    if(indexManager.isIndexable(valueTable) && upToDate) {
       return Opal.TableIndexationStatus.UPTODATE;
     }
     return Opal.TableIndexationStatus.NOT_INDEXED;

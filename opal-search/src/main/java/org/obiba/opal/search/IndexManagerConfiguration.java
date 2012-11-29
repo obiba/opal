@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -13,9 +13,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.web.model.Opal;
 
@@ -31,24 +29,15 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
    * Get from the Index manager configuration whether a given value table is indexable or not.
    */
   public boolean isIndexable(ValueTable vt) {
-    return indexConfigurations.containsKey(getFullyQualifiedName(vt)) && !indexConfigurations
-        .get(getFullyQualifiedName(vt)).getType().equals(Opal.ScheduleType.NOT_SCHEDULED);
+    return getSchedule(vt).getType() != Opal.ScheduleType.NOT_SCHEDULED;
   }
 
   /**
    * Get from the Index manager configuration whether a given value table is ready for indexing by comparing
    * the last update of the table with the last update of the index (and a grace period).
    */
-  public boolean isReadyForIndexing(ValueTable vt, IndexManager indexManager) {
-    if(isIndexable(vt) && !indexManager.getIndex(vt).isUpToDate()) {
-      // check with schedule
-      Value value = indexManager.getIndex(vt).getTimestamps().getLastUpdate();
-
-      if(value.isNull() || value.compareTo(gracePeriod(indexConfigurations.get(vt.getName()))) < 0) {
-        return true;
-      }
-    }
-    return false;
+  public boolean isReadyForIndexing(ValueTable vt, ValueTableIndex index) {
+    return isIndexable(vt) && !index.isUpToDate() && shouldUpdate(getSchedule(vt), index.now());
   }
 
   public void updateSchedule(ValueTable vt, Schedule schedule) {
@@ -67,26 +56,37 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
     return schedule == null ? new Schedule() : schedule;
   }
 
-  private Value gracePeriod(Schedule schedule) {
-    // Now
-    Calendar gracePeriod = Calendar.getInstance();
+  private boolean shouldUpdate(Schedule schedule, Calendar now) {
+    switch(schedule.getType()) {
+      case MINUTES_5:
+        return now.get(Calendar.MINUTE) % 5 <= 1;
 
-    if(schedule.getType().equals(Opal.ScheduleType.HOURLY)) {
-      // Move back in time by X minutes
-      gracePeriod.add(Calendar.MINUTE, -schedule.getMinutes());
-    } else if(schedule.getType().equals(Opal.ScheduleType.DAILY)) {
-      // Move back in time by X hours
-      gracePeriod.add(Calendar.HOUR, -schedule.getHours());
-    } else {
-      // Move back in time by X days
-      gracePeriod.add(Calendar.DAY_OF_WEEK, -schedule.getDay().getNumber());
+      case MINUTES_15:
+        return now.get(Calendar.MINUTE) % 15 <= 1;
+
+      case MINUTES_30:
+        return now.get(Calendar.MINUTE) % 30 <= 1;
+
+      case HOURLY:
+        return now.get(Calendar.MINUTE) <= 1;
+
+      case DAILY:
+        // must be the exact time of the day (+ 1 min).
+        return now.get(Calendar.HOUR_OF_DAY) == schedule.getHours() && (now.get(Calendar.MINUTE) == schedule
+            .getMinutes() || now.get(Calendar.MINUTE) - 1 == schedule.getMinutes());
+
+      case WEEKLY:
+        // must be the exact day at the exact time
+        return now.get(Calendar.DAY_OF_WEEK) == schedule.getDay().getNumber() && now
+            .get(Calendar.HOUR_OF_DAY) == schedule.getHours() && (now.get(Calendar.MINUTE) == schedule
+            .getMinutes() || now.get(Calendar.MINUTE) - 1 == schedule.getMinutes());
+
+      default:
+        return false;
     }
-
-    // Things modified before this value can be reindexed
-    return DateTimeType.get().valueOf(gracePeriod);
   }
 
   private String getFullyQualifiedName(ValueTable vt) {
-    return vt.getName() + "." + vt.getDatasource().getName();
+    return vt.getDatasource().getName() + "." + vt.getName();
   }
 }
