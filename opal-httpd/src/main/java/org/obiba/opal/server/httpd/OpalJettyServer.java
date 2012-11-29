@@ -94,7 +94,7 @@ public class OpalJettyServer implements Service {
 
     if(httpsPort != null && httpsPort > 0) {
 
-      org.eclipse.jetty.http.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.http.ssl.SslContextFactory() {
+      org.eclipse.jetty.util.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.util.ssl.SslContextFactory() {
 
         @Override
         protected void doStart() throws Exception {
@@ -102,8 +102,7 @@ public class OpalJettyServer implements Service {
         }
 
         @Override
-        public boolean checkConfig() {
-          return true;
+        public void checkKeyStore() {
         }
       };
 

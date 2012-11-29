@@ -17,42 +17,10 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <version>${resteasy.version}-p01</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-simple</artifactId>
-        </exclusion>
-        <!-- Ideally we would exclude org.scannotation:scannotation, but that's not possible due to ConfigurationBootstrap -->
-        <exclusion>
-          <groupId>javassist</groupId>
-          <artifactId>javassist</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-httpclient</groupId>
-          <artifactId>commons-httpclient</artifactId>
-        </exclusion>
-        <!-- Exclude stax-api in favour of the newer version that poi-ooxml pulls in (transitively, via xmlbeans). -->
-        <exclusion>
-          <groupId>javax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-spring</artifactId>
-      <version>${resteasy.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-httpclient</groupId>
-          <artifactId>commons-httpclient</artifactId>
-        </exclusion>
-        </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -69,17 +37,14 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>${protobuf.version}</version>
     </dependency>
     <dependency>
       <groupId>com.googlecode.protobuf-java-format</groupId>
       <artifactId>protobuf-java-format</artifactId>
-      <version>${protobuf-java-format.version}</version>
     </dependency>
 
     <!-- Declared this dependency so that we have Message types to use for testing purposes. Ideally, this module would have 
@@ -92,18 +57,7 @@
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>jboss.org</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-    </repository>
-  </repositories>
-
   <properties>
-    <resteasy.version>2.1.0.GA</resteasy.version>
-    <jetty.version>7.0.2.v20100331</jetty.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
-    <protobuf.version>2.3.0</protobuf.version>
-    <protobuf-java-format.version>1.2</protobuf-java-format.version>
   </properties>
 </project>
