@@ -61,7 +61,7 @@ public class TableResource extends AbstractValueTableResource {
   private final ImportService importService;
 
   public TableResource(ValueTable valueTable) {
-    this(valueTable, Collections.<Locale>emptySet(), null);
+    this(valueTable, Collections.<Locale> emptySet(), null);
   }
 
   public TableResource(ValueTable valueTable, Set<Locale> locales) {
@@ -91,7 +91,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get the entities, optionally filtered by a script.
-   *
+   * 
    * @param script script for filtering the entities
    * @return
    */
@@ -110,7 +110,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get the value set from the given entity identifier, for the variables filtered by the optional 'select' script.
-   *
+   * 
    * @param identifier
    * @param select script for filtering the variables
    * @return
@@ -121,7 +121,7 @@ public class TableResource extends AbstractValueTableResource {
     // TODO timestamp is a composite of value set timestamp that fall backs to value table timestamps
     TimestampedResponses.evaluate(request, getValueTable());
     return new ValueSetResource(getValueTable(),
-        new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
+        new VariableEntityBean(getValueTable().getEntityType(), identifier));
   }
 
   /**
@@ -215,7 +215,6 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get value sets resource for provided variable.
-   *
    * @param request
    * @param name
    * @return
@@ -228,7 +227,6 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get variable resource.
-   *
    * @param request
    * @param name
    * @return
@@ -241,7 +239,6 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get transient derived variable.
-   *
    * @param valueTypeName
    * @param repeatable
    * @param scriptQP
@@ -262,7 +259,6 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Compile a derived variable script.
-   *
    * @param valueTypeName
    * @param repeatable
    * @param scriptQP
@@ -284,7 +280,6 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get value sets resource for the transient derived variable.
-   *
    * @param valueTypeName
    * @param repeatable
    * @param scriptQP
@@ -306,7 +301,6 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get value set resource for the transient derived variable and entity.
-   *
    * @param request
    * @param identifier
    * @param filterBinary

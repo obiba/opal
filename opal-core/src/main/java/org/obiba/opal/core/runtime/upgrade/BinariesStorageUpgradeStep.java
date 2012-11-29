@@ -11,7 +11,6 @@ package org.obiba.opal.core.runtime.upgrade;
 
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -109,8 +108,6 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
         @Override
         public void processRow(ResultSet rs) throws SQLException {
           int valueSetValueId = rs.getInt("id");
-          Date created = rs.getDate("created");
-          Date updated = rs.getDate("updated");
           String stringValue = template
               .queryForObject("SELECT value FROM value_set_value WHERE id = ?", new Object[] {valueSetValueId},
                   String.class);
@@ -123,20 +120,19 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
               Collection<Value> newValues = new ArrayList<Value>(valueSequence.getSize());
               int occurrence = 0;
               for(Value value : valueSequence.getValue()) {
-                newValues.add(writeBinaries(valueSetValueId, created, updated, occurrence++, value, template));
+                newValues.add(writeBinaries(valueSetValueId, occurrence++, value, template));
               }
               newValue = TextType.get().sequenceOf(newValues);
             }
           } else {
             Value value = BinaryType.get().valueOf(stringValue);
-            newValue = writeBinaries(valueSetValueId, created, updated, 0, value, template);
+            newValue = writeBinaries(valueSetValueId, 0, value, template);
           }
 
           template.update("UPDATE value_set_value SET value = ? WHERE id = ?", newValue.getValue(), valueSetValueId);
         }
 
-        private Value writeBinaries(int valueSetValueId, Date created, Date updated, int occurrence, Value value,
-            JdbcTemplate template) {
+        private Value writeBinaries(int valueSetValueId, int occurrence, Value value, JdbcTemplate template) {
           Value newValue;
           if(value.isNull()) {
             newValue = TextType.get().nullValue();
@@ -145,8 +141,8 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
             int size = binary.length;
             newValue = getBinaryMetadata(size);
             template.update(
-                "INSERT INTO value_set_binary_value(created, updated, occurrence, size, value, value_set_value_id) VALUES (?, ?, ?, ?, ?, ?)",
-                created, updated, occurrence, size, value, valueSetValueId);
+                "INSERT INTO value_set_binary_value(occurrence, size, value, value_set_value_id) VALUES (?, ?, ?, ?)",
+                occurrence, size, value, valueSetValueId);
           }
           return newValue;
         }
