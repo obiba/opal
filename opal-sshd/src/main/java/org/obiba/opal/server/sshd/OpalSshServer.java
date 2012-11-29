@@ -10,6 +10,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.common.NamedFactory;
+import org.apache.sshd.common.Session;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
@@ -89,8 +90,8 @@ public class OpalSshServer implements Service {
     sshd.setFileSystemFactory(new FileSystemFactory() {
 
       @Override
-      public FileSystemView createFileSystemView(String userName) {
-        return new OpalFileSystemView(opalRuntime, userName);
+      public FileSystemView createFileSystemView(Session session) throws IOException {
+        return new OpalFileSystemView(opalRuntime, session.getUsername());
       }
     });
     sshd.setSubsystemFactories(ImmutableList.<NamedFactory<Command>>of(new SftpSubsystem.Factory()));
