@@ -678,6 +678,13 @@
         <version>${protobuf-java-format.version}</version>
       </dependency>
 
+      <!-- SSHd dependencies -->
+      <dependency>
+        <groupId>org.apache.sshd</groupId>
+        <artifactId>sshd-core</artifactId>
+        <version>${sshd.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -1009,6 +1016,7 @@
     <jetty.version>7.6.8.v20121106</jetty.version>
     <protobuf.version>2.3.0</protobuf.version>
     <protobuf-java-format.version>1.2</protobuf-java-format.version>
+    <sshd.version>0.8.0</sshd.version>
 
     <!-- maven plugins -->
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>

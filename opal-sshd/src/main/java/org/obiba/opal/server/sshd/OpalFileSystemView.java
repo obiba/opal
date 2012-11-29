@@ -49,6 +49,11 @@ public class OpalFileSystemView implements FileSystemView {
     return new OpalFsSshFile(fo.getName().getPath(), opalfs.getLocalFile(fo), user);
   }
 
+  @Override
+  public SshFile getFile(SshFile baseDir, String file) {
+    return getFile(new File(baseDir.getAbsolutePath(),file).getAbsolutePath());
+  }
+
   private FileObject resolve(String file) {
     FileObject resolved = null;
     try {
@@ -132,6 +137,11 @@ public class OpalFileSystemView implements FileSystemView {
     }
 
     @Override
+    public boolean create() throws IOException {
+      return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public boolean doesExist() {
       try {
         return this.file.exists();
@@ -157,6 +167,11 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public String getName() {
       return this.file.getName().getBaseName();
+    }
+
+    @Override
+    public String getOwner() {
+      return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -225,6 +240,11 @@ public class OpalFileSystemView implements FileSystemView {
       } catch(FileSystemException e) {
         throw new RuntimeException(e);
       }
+    }
+
+    @Override
+    public boolean isExecutable() {
+      return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
