@@ -41,6 +41,8 @@
   <!-- Syntax Highlighting -->
   <inherits name='org.obiba.opal.web.gwt.prettify.Prettify'/>
 
+  <inherits name='com.watopi.chosen.Chosen'/>
+
   <!-- Specify the app entry point class. -->
   <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp' />
   
