@@ -105,6 +105,8 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
   @Override
   public boolean isIndexable(ValueTable valueTable) {
     // Currently only based on the state of ElasticSearch
+
+    // is running
     return esConfig.getConfig().isEnabled() && indexConfig.getConfig().isIndexable(valueTable);
   }
 
@@ -138,6 +140,8 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
   }
 
   private IndexMetaData getIndexMetaData() {
+    if(esProvider.getClient() == null) return null;
+
     IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName())
         .execute().actionGet().getState().getMetaData().index(esIndexName());
     return imd != null ? imd : createIndex();

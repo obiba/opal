@@ -21,4 +21,7 @@ final class Resources {
     return UriBuilder.create().segment("datasource", datasource, "table", table, "index").build();
   }
 
+  static String searchService() {
+    return "/service/search";
+  }
 }

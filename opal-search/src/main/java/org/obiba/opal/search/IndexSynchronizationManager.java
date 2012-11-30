@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -119,11 +119,8 @@ public class IndexSynchronizationManager {
     private void maybeUpdateIndex(ValueTable vt) {
       ValueTableIndex index = indexManager.getIndex(vt);
 
-      if(index.requiresUpgrade()) {
-        submitTask(vt, index);
-      }
       // Check that the index is older than the ValueTable
-      else if(index.isUpToDate() == false) {
+      if(index.requiresUpgrade() || !index.isUpToDate()) {
         // The index needs to be updated
         Value value = vt.getTimestamps().getLastUpdate();
         // Check that the last modification to the ValueTable is older than the gracePeriod

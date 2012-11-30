@@ -9,10 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
@@ -22,14 +18,26 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceDataProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.ServiceDto;
+import org.obiba.opal.web.model.client.opal.ServiceStatus;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
@@ -42,14 +50,13 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TabInfo;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 public class IndexAdministrationPresenter extends
     ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken("!admin.indices")
-  @TabInfo(container = AdministrationPresenter.class, label = "Indices", priority = 4)
+  @NameToken("!admin.search")
+  @TabInfo(container = AdministrationPresenter.class, label = "Search", priority = 4)
   public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {
   }
 
@@ -66,6 +73,12 @@ public class IndexAdministrationPresenter extends
     enum Slots {
       Drivers, Permissions
     }
+
+    Button getStartButton();
+
+    Button getStopButton();
+
+    HasClickHandlers getRefreshButton();
 
     HasActionHandler<TableIndexStatusDto> getActions();
 
@@ -121,6 +134,24 @@ public class IndexAdministrationPresenter extends
 
   @Override
   protected void onBind() {
+    /* stop start search service */
+    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(Resources.searchService()).get()
+        .withCallback(new ResourceCallback<ServiceDto>() {
+          @Override
+          public void onResource(Response response, ServiceDto resource) {
+            //GWT.log("RES: "+resource.getStatus());
+            if(response.getStatusCode() == 200) {
+              if(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)) {
+                getView().getStartButton().setVisible(false);
+                getView().getStopButton().setVisible(true);
+              } else {
+                getView().getStartButton().setVisible(true);
+                getView().getStopButton().setVisible(false);
+              }
+            }
+          }
+        }).send();
+
 //    registerHandler(getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.Handler() {
 //
 //      @Override
@@ -160,38 +191,99 @@ public class IndexAdministrationPresenter extends
 //          DatabasePresenter dialog = jdbcDataSourcePresenter.get();
 //          dialog.updateDatabase(object);
 //          addToPopupSlot(dialog);
-       if(actionName.equalsIgnoreCase(Display.CLEAR_ACTION)) {
+        if(actionName.equalsIgnoreCase(Display.CLEAR_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
 
             @Override
             public void onResponseCode(Request request, Response response) {
               if(response.getStatusCode() == 200) {
-                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
+                refresh();
+                getEventBus()
+                    .fireEvent(NotificationEvent.Builder.newNotification().info("IndexClearCompleted").build());
               } else {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray()).build());
+                getEventBus().fireEvent(
+                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                        .build());
               }
             }
 
           };
-          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>> newBuilder()//
-          .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-          .withCallback(200, callback).withCallback(503, callback).delete().send();
+          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+              .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
+              .withCallback(200, callback).withCallback(503, callback).delete().send();
         }
       }
 
     });
 
-//    registerHandler(getView().getAddButton().addClickHandler(new ClickHandler() {
-//
-//      @Override
-//      public void onClick(ClickEvent event) {
-//        DatabasePresenter dialog = jdbcDataSourcePresenter.get();
-//        dialog.createNewDatabase();
-//        addToPopupSlot(dialog);
-//      }
-//
-//    }));
+    // REFRESH
+    registerHandler(getView().getRefreshButton().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        refresh();
+      }
+    }));
+
+    // STOP
+    registerHandler(getView().getStopButton().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == 200) {
+              getView().getStopButton().setVisible(false);
+              getView().getStartButton().setVisible(true);
+              refresh();
+              getEventBus()
+                  .fireEvent(NotificationEvent.Builder.newNotification().info("ServiceSearchStopCompleted").build());
+            } else {
+              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                      .build());
+            }
+          }
+
+        };
+        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+            .forResource(Resources.searchService()).accept("application/json")//
+            .withCallback(200, callback).withCallback(500, callback).delete().send();
+      }
+    }));
+    // START
+    registerHandler(getView().getStartButton().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == 200) {
+              getView().getStopButton().setVisible(true);
+              getView().getStartButton().setVisible(false);
+              refresh();
+              getEventBus()
+                  .fireEvent(NotificationEvent.Builder.newNotification().info("ServiceSearchStartCompleted").build());
+            } else {
+              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                      .build());
+            }
+          }
+
+        };
+        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+            .forResource(Resources.searchService()).accept("application/json")//
+            .withCallback(200, callback).withCallback(500, callback).put().send();
+      }
+    }));
 
     //authorizationPresenter.setAclRequest("indices", new AclRequest(AclAction.TABLE_ALL, Resources.indices()));
   }
