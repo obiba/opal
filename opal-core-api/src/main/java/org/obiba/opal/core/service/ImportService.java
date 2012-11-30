@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -28,7 +28,7 @@ public interface ImportService {
 
   /**
    * Imports data into an Opal datasource .
-   * 
+   *
    * @param unitName functional unit name
    * @param sourceFile data file to be imported
    * @param destinationDatasourceName name of the destination datasource
@@ -39,12 +39,15 @@ public interface ImportService {
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException, InterruptedException;
+  void importData(String unitName, FileObject sourceFile, String destinationDatasourceName,
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException,
+      IllegalArgumentException, IOException, InterruptedException;
 
   /**
    * Imports data from a source Opal datasource into a destination Opal datasource. Usually the source datasource will
    * be a transient datasource created temporarily when importing from a non-datasource source such as a csv file or
    * excel file.
+   *
    * @param unitName functional unit name
    * @param sourceDatasourceName name of the source datasource
    * @param destinationDatasourceName name of the destination datasource
@@ -56,10 +59,14 @@ public interface ImportService {
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException;
+  void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName,
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException,
+      NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException,
+      InterruptedException;
 
   /**
    * Imports data from a source Opal tables into a destination Opal datasource.
+   *
    * @param unitName
    * @param sourceTableNames
    * @param destinationDatasourceName
@@ -70,30 +77,37 @@ public interface ImportService {
    * @throws IOException
    * @throws InterruptedException
    */
-  public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException, InterruptedException;
+  void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName,
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException,
+      NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException,
+      InterruptedException;
 
   /**
    * Imports data from a source table into a destination Opal datasource.
+   *
    * @param unitName
    * @param sourceValueTables
    * @param destinationDatasourceName
    * @param allowIdentifierGeneration
    * @param ignoreUnknownIdentifier
    */
-  public void importData(String unitName, Set<ValueTable> sourceValueTables, String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
+  void importData(String unitName, Set<ValueTable> sourceValueTables, String destinationDatasourceName,
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException,
+      NonExistentVariableEntitiesException, IOException, InterruptedException;
 
   /**
    * Import identifiers using the given participant identifiers provider.
+   *
    * @param unitName
    * @param pIdentifier
    * @return the number of identifiers added
    */
-  public int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier);
+  int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier);
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the unit key variable
    * name.
-   * 
+   *
    * @param unitName functional unit name
    * @param sourceDatasourceName name of the source datasource
    * @param select an option script for select variables representing identifiers. If not specified unit select clause
@@ -102,46 +116,49 @@ public interface ImportService {
    * @throws NoSuchDatasourceException if the specified source datasource does not exist
    * @throws IOException on any I/O error
    */
-  public void importIdentifiers(String unitName, String sourceDatasourceName, String select) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IOException;
+  void importIdentifiers(String unitName, String sourceDatasourceName, String select) throws
+      NoSuchFunctionalUnitException, NoSuchDatasourceException, IOException;
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the unit key variable
    * name.
-   * 
+   *
    * @param unit functional unit
    * @param sourceDatasource source datasource
    * @param select an option script for select variables representing identifiers. If not specified unit select clause
    * is used if this one is defined.
    * @throws IOException
    */
-  public void importIdentifiers(FunctionalUnit unit, Datasource sourceDatasource, String select) throws IOException;
+  void importIdentifiers(FunctionalUnit unit, Datasource sourceDatasource, String select) throws IOException;
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
-   * 
+   *
    * @param sourceDatasourceName name of the source datasource
    * @throws NoSuchDatasourceException if the specified datasource does not exist
    * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
    * table with the same name as <code>org.obiba.opal.keys.tableReference</code>)
    * @throws IOException on any I/O error
    */
-  public void importIdentifiers(String sourceDatasourceName) throws NoSuchDatasourceException, NoSuchValueTableException, IOException;
+  void importIdentifiers(String sourceDatasourceName) throws NoSuchDatasourceException, NoSuchValueTableException,
+      IOException;
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
-   * 
+   *
    * @param sourceDatasource source datasource
    * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
    * table with the same name as <code>org.obiba.opal.keys.tableReference</code> or has no tables)
    * @throws IOException on any I/O error
    */
-  public void importIdentifiers(Datasource sourceDatasource) throws NoSuchValueTableException, IOException;
+  void importIdentifiers(Datasource sourceDatasource) throws NoSuchValueTableException, IOException;
 
   /**
    * Import identifiers of the entities of the given table.
+   *
    * @param sourceValueTable
    * @throws IOException
    */
-  public void importIdentifiers(ValueTable sourceValueTable) throws IOException;
+  void importIdentifiers(ValueTable sourceValueTable) throws IOException;
 
 }
