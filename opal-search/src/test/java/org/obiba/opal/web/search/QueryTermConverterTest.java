@@ -16,80 +16,156 @@ import javax.annotation.Nonnull;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.magma.type.DecimalType;
+import org.obiba.magma.type.TextType;
+import org.obiba.opal.search.IndexManager;
+import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.web.model.Search;
 
 import junit.framework.Assert;
 
-public class QueryTermConverterTest {
-  private Search.QueryTermDto dtoCategoricalQuery;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
 
-  private Search.QueryTermDto dtoStatisticalQuery;
+public class QueryTermConverterTest {
 
   @Before
   public void setUp() throws Exception {
-    dtoCategoricalQuery = createCategoricalQueryDto();
-    dtoStatisticalQuery = createStatisticalQueryDto();
+    new MagmaEngine();
+  }
+
+  @After
+  public void tearDown() {
+    MagmaEngine.get().shutdown();
   }
 
   @Test
-  public void testConvert_ValidCategoricalResultJson() throws Exception {
-    QueryTermConverter converter = new QueryTermConverter("opal-data.cipreliminaryquestionnaire");
+  public void testConvert_ValidCategoricalQueryJson() throws Exception {
 
-    JSONObject jsonExpected = new JSONObject(
-        "{\"query\":{\"match_all\":{} }, \"size\":0, " + "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data.cipreliminaryquestionnaire:LAST_MEAL_WHEN\" } } } }");
+    String variableName = "LAST_MEAL_WHEN";
+    IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "CIPreliminaryQuestionnaire",
+        "opal-data.cipreliminaryquestionnaire", variableName, createCategoricalVariable(variableName));
 
-    JSONObject jsonResult = converter.convert(dtoCategoricalQuery);
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
+    Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
+
+    JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
+        "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data.cipreliminaryquestionnaire:LAST_MEAL_WHEN\" } } } }");
+
+    JSONObject jsonResult = converter.convert(dtoQuery);
     Assert.assertNotNull(jsonResult);
-    new JsonAssert().assertEquals(jsonExpected, jsonResult);
-    new JsonAssert().assertEquals(jsonExpected, jsonResult);
-
+    JsonAssert.assertEquals(jsonExpected, jsonResult);
   }
 
   @Test
-  public void testConvert_ValidStatisticalResultJson() throws Exception {
-    QueryTermConverter converter = new QueryTermConverter("opal-data.standingheight");
+  public void testConvert_ValidStatisticalQueryJson() throws Exception {
+    String variableName = "RES_FIRST_HEIGHT";
+    IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "StandingHeight",
+        "opal-data.standingheight", variableName, createContinuousVariable(variableName));
 
-    JSONObject jsonExpected = new JSONObject(
-        "{\"query\":{\"match_all\":{} }, \"size\":0, \"facets\":{\"0\":{\"statistical\":{\"field\":\"opal-data.standingheight:RES_FIRST_HEIGHT\"} } } }");
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
+    Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
-    JSONObject jsonResult = converter.convert(dtoStatisticalQuery);
+    JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
+        "\"facets\":{\"0\":{\"statistical\":{\"field\":\"opal-data" + //
+        ".standingheight:RES_FIRST_HEIGHT\"} } } }");
+
+    JSONObject jsonResult = converter.convert(dtoQuery);
     Assert.assertNotNull(jsonResult);
-    new JsonAssert().assertEquals(jsonExpected, jsonResult);
+    JsonAssert.assertEquals(jsonExpected, jsonResult);
   }
 
-  private Search.QueryTermDto createCategoricalQueryDto() {
+  private Search.QueryTermsDto createSimpleQueryDto(String variable) {
     Search.QueryTermDto.Builder dtoBuilder = Search.QueryTermDto.newBuilder().setFacet("0");
 
     Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
-    variableDto.setVariable("LAST_MEAL_WHEN");
-    variableDto.setExtension(Search.InTermDto.params, Search.InTermDto.newBuilder().build());
+    variableDto.setVariable(variable);
+    dtoBuilder.setExtension(Search.VariableTermDto.field, variableDto.build());
 
-    dtoBuilder.setExtension(Search.VariableTermDto.params, variableDto.build());
-
-    return dtoBuilder.build();
+    return Search.QueryTermsDto.newBuilder().addQueries(dtoBuilder.build()).build();
   }
 
-  private Search.QueryTermDto createStatisticalQueryDto() {
-    Search.QueryTermDto.Builder dtoBuilder = Search.QueryTermDto.newBuilder().setFacet("0");
+  private IndexManagerHelper createIndexManagerHelper(String datasource, String table, String indexName,
+      String variableName, Variable variable) {
 
-    Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
-    variableDto.setVariable("RES_FIRST_HEIGHT");
-    variableDto.setExtension(Search.RangeTermDto.params, Search.RangeTermDto.newBuilder().build());
+    IndexManager indexManager = setupMockObjects(datasource, table, indexName, variableName, variable);
 
-    dtoBuilder.setExtension(Search.VariableTermDto.params, variableDto.build());
-
-    return dtoBuilder.build();
+    return new IndexManagerHelper(indexManager, datasource, table);
   }
 
+  private IndexManager setupMockObjects(String dsName, String table, String indexName, String variableName,
+      Variable variable) {
+    IndexManager indexManager = createMock(IndexManager.class);
+    Datasource datasource = createMockDatasource(dsName, table);
+
+    ValueTable mockTable = datasource.getValueTable(table);
+    reset(mockTable);
+    ValueTableIndex mockTableIndex = createMock(ValueTableIndex.class);
+    expect(mockTableIndex.getName()).andReturn(indexName).anyTimes();
+    replay(mockTableIndex);
+
+    expect(mockTable.getVariable(variableName)).andReturn(variable).anyTimes();
+    expect(indexManager.getIndex(mockTable)).andReturn(mockTableIndex).anyTimes();
+    replay(indexManager);
+    replay(mockTable);
+
+    MagmaEngine.get().addDatasource(datasource);
+
+    return indexManager;
+  }
+
+  private Variable createCategoricalVariable(String variableName) {
+    Variable.Builder builder = Variable.Builder.newVariable(variableName, TextType.get(), "dummy")
+        .addCategories("dummy");
+
+    return builder.build();
+  }
+
+  private Variable createContinuousVariable(String variableName) {
+    Variable.Builder builder = Variable.Builder.newVariable(variableName, DecimalType.get(), "dummy");
+
+    return builder.build();
+  }
+
+  private Datasource createMockDatasource(String dsName, String... tables) {
+    Datasource mockDatasource = createMock(Datasource.class);
+    mockDatasource.initialise();
+    EasyMock.expectLastCall().once();
+    mockDatasource.dispose();
+    EasyMock.expectLastCall().once();
+
+    expect(mockDatasource.getName()).andReturn(dsName).anyTimes();
+    for(String table : tables) {
+      ValueTable mockTable = createMock(ValueTable.class);
+      expect(mockTable.getName()).andReturn(table).anyTimes();
+      expect(mockDatasource.getValueTable(table)).andReturn(mockTable).anyTimes();
+      replay(mockTable);
+    }
+    replay(mockDatasource);
+    return mockDatasource;
+  }
+
+  /**
+   * Utility class that asserts the equality of two JSON objects.
+   * TODO extract the class and add the JSONArray recursion as well. For now it asserts two simple JSON objects
+   */
   private static class JsonAssert {
 
-    JsonAssert() {
+    private JsonAssert() {
     }
 
     @SuppressWarnings("unchecked")
-    public void assertEquals(@Nonnull JSONObject expected, @Nonnull JSONObject target) {
+    public static void assertEquals(@Nonnull JSONObject expected, @Nonnull JSONObject target) {
 
       try {
 
@@ -106,11 +182,13 @@ public class QueryTermConverterTest {
           Assert.assertEquals(expectedValue.getClass(), targetValue.getClass());
 
           if(expectedValue instanceof JSONObject) {
+            // For now, recurse only the JSON object
             assertEquals(expected.getJSONObject(key), target.getJSONObject(key));
           } else if(expectedValue instanceof JSONArray) {
             // TODO handle JSONArray in the future
             Assert.assertFalse(true);
           } else {
+            // compare values
             Assert.assertEquals(expectedValue, targetValue);
           }
         }

@@ -29,9 +29,7 @@ public class EsResultConverterTest {
 
     Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
     variableDto.setVariable("LAST_MEAL_WHEN");
-    variableDto.setExtension(Search.InTermDto.params, Search.InTermDto.newBuilder().build());
-
-    dtoBuilder.setExtension(Search.VariableTermDto.params, variableDto.build());
+    dtoBuilder.setExtension(Search.VariableTermDto.field, variableDto.build());
 
     dtoQuery = dtoBuilder.build();
   }
@@ -39,9 +37,11 @@ public class EsResultConverterTest {
   @Test
   public void testConvert_ValidCategoricalResultDto() throws Exception {
     JSONObject jsonQuery = new JSONObject(
-        "{\"took\":38, \"timed_out\":false, \"_shards\":{\"total\":5, \"successful\":5, \"failed\":0 }, \"hits\":{\"total\":20, \"max_score\":1.0, \"hits\":[] }, \"facets\":{\"0\":{\"_type\":\"terms\", \"missing\":0, \"total\":20, \"other\":0, \"terms\":[{\"term\":\"TIME_24\", \"count\":20 } ] } } }");
+        "{\"took\":38, \"timed_out\":false, \"_shards\":{\"total\":5, \"successful\":5, \"failed\":0 }, " +
+            "" + "\"hits\":{\"total\":20, \"max_score\":1.0, \"hits\":[] }, \"facets\":{\"0\":{\"_type\":\"terms\", " +
+            "\"missing\":0, \"total\":20, \"other\":0, \"terms\":[{\"term\":\"TIME_24\", \"count\":20 } ] } } }");
 
-    EsResultConverter converter = new EsResultConverter(dtoQuery);
+    EsResultConverter converter = new EsResultConverter();
     Search.QueryResultDto dtoResult = converter.convert(jsonQuery);
 
     validateCategoricalQueryResultDto(dtoResult);
@@ -50,9 +50,12 @@ public class EsResultConverterTest {
   @Test
   public void testConvert_ValidStatisticalResultDto() throws Exception {
     JSONObject jsonQuery = new JSONObject(
-        "{\"took\": 32, \"timed_out\": false, \"_shards\": {\"total\": 5, \"successful\": 5, \"failed\": 0 }, \"hits\": {\"total\": 5, \"max_score\": 1.0, \"hits\": [] }, \"facets\": {\"0\": {\"_type\": \"statistical\", \"count\": 5, \"total\": 820.8, \"min\": 155.6, \"max\": 179.9, \"mean\": 164.16, \"sum_of_squares\": 135096.62, \"variance\": 70.81840000000084, \"std_deviation\": 8.415366896339151 } } }");
+        "{\"took\": 32, \"timed_out\": false, \"_shards\": {\"total\": 5, \"successful\": 5, \"failed\": 0 }," +
+            " \"hits\": {\"total\": 5, \"max_score\": 1.0, \"hits\": [] }, \"facets\": {\"0\": {\"_type\": \"statistical\", " +
+            "\"count\": 5, \"total\": 820.8, \"min\": 155.6, \"max\": 179.9, \"mean\": 164.16, \"sum_of_squares\": 135096.62, " +
+            "\"variance\": 70.81840000000084, \"std_deviation\": 8.415366896339151 } } }");
 
-    EsResultConverter converter = new EsResultConverter(dtoQuery);
+    EsResultConverter converter = new EsResultConverter();
     Search.QueryResultDto dtoResult = converter.convert(jsonQuery);
 
     validateStatisticalQueryResultDto(dtoResult);
@@ -64,7 +67,7 @@ public class EsResultConverterTest {
     JSONObject jsonQuery = new JSONObject(
         "{\"took\" 38, \"timed_out\":false, \"_shards\":{\"total\":5, \"successful\":5, " + "\"failed\":0 }, \"hits\":{\"total\":20, \"max_score\":1.0, \"hits\":[] }, \"facets\":{\"0\":{\"_type\":\"terms\", \"missing\":0, \"total\":20, \"other\":0, \"terms\":[{\"term\":\"TIME_24\", \"count\":20 } ] } } }");
 
-    EsResultConverter converter = new EsResultConverter(dtoQuery);
+    EsResultConverter converter = new EsResultConverter();
     Search.QueryResultDto dtoResult = converter.convert(jsonQuery);
   }
 
@@ -73,9 +76,9 @@ public class EsResultConverterTest {
 
     Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
     Assert.assertNotNull(dtoFacetResult);
-    Assert.assertEquals("LAST_MEAL_WHEN", dtoFacetResult.getVariable());
+    Assert.assertEquals(dtoQuery.getFacet(), dtoFacetResult.getFacet());
 
-    List<Search.FacetResultDto.TermFrequencyDto> listTermDto = dtoFacetResult.getFrequenciesList();
+    List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
 
     Assert.assertNotNull(listTermDto);
 
@@ -88,13 +91,13 @@ public class EsResultConverterTest {
 
     Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
     Assert.assertNotNull(dtoFacetResult);
-    Assert.assertEquals("LAST_MEAL_WHEN", dtoFacetResult.getVariable());
+    Assert.assertEquals(dtoQuery.getFacet(), dtoFacetResult.getFacet());
 
     Search.FacetResultDto.StatisticalResultDto dtoStatistical = dtoFacetResult.getStatistics();
     Assert.assertNotNull(dtoStatistical);
     Assert.assertTrue(dtoStatistical.hasCount());
 
-    List<Search.FacetResultDto.TermFrequencyDto> listTermDto = dtoFacetResult.getFrequenciesList();
+    List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
     Assert.assertTrue(listTermDto.isEmpty());
   }
 }
