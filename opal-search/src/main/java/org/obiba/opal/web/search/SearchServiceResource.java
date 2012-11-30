@@ -67,10 +67,16 @@ public class SearchServiceResource extends IndexResource {
             .setSchedule(getScheduleDto(datasource.getName(), table.getName()))
             .setStatus(getTableIndexationStatus(datasource.getName(), table.getName())).setProgress(progress)
             .setLink(link.getPath())
-            .setIndexCreated(indexManager.getIndex(valueTable).getTimestamps().getCreated().toString())
-            .setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString())
+            //.setIndexCreated(indexManager.getIndex(valueTable).getTimestamps().getCreated().toString())
+            //.setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate() == null ? .toString())
             .setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
 
+//          if (indexManager.getIndex(valueTable).getTimestamps().getCreated() != null){
+//              tableStatusDto = tableStatusDto.toBuilder().setIndexCreated(indexManager.getIndex(valueTable).getTimestamps().getCreated().toString()).build();
+//          }
+//          if (indexManager.getIndex(valueTable).getTimestamps().getLastUpdate() != null){
+//              tableStatusDto = tableStatusDto.toBuilder().setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
+//          }
         tableStatusDtos.add(tableStatusDto);
       }
     }

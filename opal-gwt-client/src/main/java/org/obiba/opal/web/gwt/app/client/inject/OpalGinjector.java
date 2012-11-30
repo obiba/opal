@@ -186,7 +186,7 @@ public interface OpalGinjector extends Ginjector {
 
   ExcelDatasourceFormPresenter getExcelDatasourceFormPresenter();
 
-  FsDatasourceFormPresenter getFsDatasourceFormPresenter();
+  FsDatasourceFormPresenter getxresourFsDatasourceFormPresenter();
 
   JdbcDatasourceFormPresenter getJdbcDatasourceFormPresenter();
 
@@ -217,4 +217,5 @@ public interface OpalGinjector extends Ginjector {
   Provider<DatabasePresenter> getDatabasePresenter();
 
   Provider<IndexAdministrationPresenter> getIndexAdministrationPresenter();
+//  Provider<IndexAdministrationPresenter> getIndexAdministrationPresenter();
 }

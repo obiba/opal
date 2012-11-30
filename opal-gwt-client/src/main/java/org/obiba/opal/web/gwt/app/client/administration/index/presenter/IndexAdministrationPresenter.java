@@ -9,15 +9,22 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceDataProvider;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
@@ -35,6 +42,7 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TabInfo;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 public class IndexAdministrationPresenter extends
     ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
@@ -64,7 +72,7 @@ public class IndexAdministrationPresenter extends
     HasData<TableIndexStatusDto> getIndexTable();
   }
 
-  private final Provider<IndexPresenter> indexPresenter;
+//  private final Provider<IndexPresenter> indexPresenter;
 
   private final AuthorizationPresenter authorizationPresenter;
 
@@ -75,9 +83,9 @@ public class IndexAdministrationPresenter extends
 
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
+      Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
-    this.indexPresenter = indexPresenter;
+//    this.indexPresenter = indexPresenter;
     this.authorizationPresenter = authorizationPresenter.get();
   }
 
@@ -152,24 +160,24 @@ public class IndexAdministrationPresenter extends
 //          DatabasePresenter dialog = jdbcDataSourcePresenter.get();
 //          dialog.updateDatabase(object);
 //          addToPopupSlot(dialog);
-//        } else if(actionName.equalsIgnoreCase(Display.TEST_ACTION)) {
-//          ResponseCodeCallback callback = new ResponseCodeCallback() {
-//
-//            @Override
-//            public void onResponseCode(Request request, Response response) {
-//              if(response.getStatusCode() == 200) {
-//                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
-//              } else {
-//                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-//                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray()).build());
-//              }
-//            }
-//
-//          };
-//          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>> newBuilder()//
-//          .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-//          .withCallback(200, callback).withCallback(503, callback).post().send();
-//        }
+       if(actionName.equalsIgnoreCase(Display.CLEAR_ACTION)) {
+          ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == 200) {
+                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
+              } else {
+                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray()).build());
+              }
+            }
+
+          };
+          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>> newBuilder()//
+          .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
+          .withCallback(200, callback).withCallback(503, callback).delete().send();
+        }
       }
 
     });
