@@ -1012,7 +1012,7 @@
     <xfire.version>1.2.6</xfire.version>
     <cglib-nodep.version>2.2</cglib-nodep.version>
     <elasticsearch.version>0.19.11</elasticsearch.version>
-    <resteasy.version>2.3.5.Final</resteasy.version>
+    <resteasy.version>2.1.0.GA</resteasy.version>
     <jetty.version>7.6.8.v20121106</jetty.version>
     <protobuf.version>2.3.0</protobuf.version>
     <protobuf-java-format.version>1.2</protobuf-java-format.version>
