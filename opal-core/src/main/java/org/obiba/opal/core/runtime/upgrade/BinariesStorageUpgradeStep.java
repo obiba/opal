@@ -13,9 +13,8 @@ import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -32,6 +31,7 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
 import org.obiba.opal.core.runtime.support.OpalConfigurationProvider;
+import org.obiba.opal.core.support.TimedExecution;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep;
@@ -40,10 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
-import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import com.google.common.collect.Lists;
+
 import static org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig;
 
 /**
@@ -79,7 +77,8 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
     }
 
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
-      long start = System.currentTimeMillis();
+
+      TimedExecution timedExecution = new TimedExecution().start();
 
       DataSource dataSource = entry.getKey();
       String dataSourceName = entry.getValue();
@@ -91,21 +90,12 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
         moveBinary(dataSource, dataSourceName);
       }
 
-      System.out.println(
-          dataSourceName + ": upgrade completed in " + formatExecutionTime(System.currentTimeMillis() - start));
+      log.info("Database {}: upgrade completed in {}", dataSourceName, timedExecution.end().formatExecutionTime());
     }
   }
 
-  private String formatExecutionTime(long executionMillis) {
-    long hours = MILLISECONDS.toHours(executionMillis);
-    long minutes = MILLISECONDS.toMinutes(executionMillis) - HOURS.toMinutes(hours);
-    long seconds = MILLISECONDS.toSeconds(executionMillis) - MINUTES.toSeconds(minutes);
-    long millis = MILLISECONDS.toMillis(executionMillis) - SECONDS.toMillis(seconds);
-    return String.format("%d hours %d min %d sec %d ms", hours, minutes, seconds, millis);
-  }
-
   private void upgradeSchema(Version currentVersion, DataSource dataSource, String name) {
-    long start = System.currentTimeMillis();
+    TimedExecution timedExecution = new TimedExecution().start();
 
     sqlScriptUpgradeStep.setDataSource(dataSource);
     try {
@@ -115,7 +105,7 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
     }
     sqlScriptUpgradeStep.execute(currentVersion);
 
-    System.out.println(name + ": schema upgraded in " + formatExecutionTime(System.currentTimeMillis() - start));
+    log.info("Database {}: schema upgraded in {}", name, timedExecution.end().formatExecutionTime());
   }
 
   private boolean hasHibernateDatasource(DataSource dataSource) {
@@ -132,7 +122,7 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
   }
 
   private void moveBinary(DataSource dataSource, String name) {
-    long start = System.currentTimeMillis();
+    TimedExecution timedExecution = new TimedExecution().start();
 
     try {
 
@@ -154,12 +144,12 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
             if(valueSequence.isNull()) {
               newValue = TextType.get().nullSequence();
             } else {
-              Collection<Value> newValues = new ArrayList<Value>(valueSequence.getSize());
+              List<Value> sequenceValues = Lists.newArrayList();
               int occurrence = 0;
               for(Value value : valueSequence.getValue()) {
-                newValues.add(writeBinaries(valueSetValueId, occurrence++, value, template));
+                sequenceValues.add(writeBinaries(valueSetValueId, occurrence++, value, template));
               }
-              newValue = TextType.get().sequenceOf(newValues);
+              newValue = TextType.get().sequenceOf(sequenceValues);
             }
           } else {
             Value value = BinaryType.get().valueOf(stringValue);
@@ -168,7 +158,7 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
 
           log.debug("Set JSON value {} for {}", newValue.getValue(), valueSetValueId);
 
-          template.update("UPDATE value_set_value SET value = ? WHERE id = ?", newValue.getValue(), valueSetValueId);
+          template.update("UPDATE value_set_value SET value = ? WHERE id = ?", newValue.toString(), valueSetValueId);
         }
 
         private Value writeBinaries(int valueSetValueId, int occurrence, Value value, JdbcTemplate template) {
@@ -182,7 +172,7 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
             log.debug("Write {} bytes for {}", size, valueSetValueId);
             template.update(
                 "INSERT INTO value_set_binary_value(occurrence, size, value, value_set_value_id) VALUES (?, ?, ?, ?)",
-                occurrence, size, value, valueSetValueId);
+                occurrence, size, binary, valueSetValueId);
           }
           return newValue;
         }
@@ -202,8 +192,7 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
       MagmaEngine.get().shutdown();
     }
 
-    System.out.println(name + ": binary moved in " + formatExecutionTime(System.currentTimeMillis() - start));
-
+    log.info("Database {}: binary moved in {}", name, timedExecution.end().formatExecutionTime());
   }
 
   public void setOpalDataSource(DataSource opalDataSource) {

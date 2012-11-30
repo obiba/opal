@@ -26,6 +26,7 @@ import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
+import org.obiba.opal.core.support.TimedExecution;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +36,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 @CommandUsage(description = "Imports one or more Onyx data files into a datasource.",
     syntax = "Syntax: import [--unit NAME] [--force] [--source NAME] [--tables NAMES] --destination NAME [--archive FILE] [FILES]")
@@ -63,7 +59,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       return 1; // error!
     }
 
-    long start = System.currentTimeMillis();
+    TimedExecution timedExecution = new TimedExecution().start();
 
     List<FileObject> filesToImport = getFilesToImport();
     errorCode = executeImports(filesToImport);
@@ -74,22 +70,12 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       errorCode = 1;
     } else if(errorCode != 0) {
       getShell().printf("Import failed.\n");
-      log.info("Import failed in {}", formatExecutionTime(start));
+      log.info("Import failed in {}", timedExecution.end().formatExecutionTime());
     } else {
       getShell().printf("Import done.\n");
-      log.info("Import succeed in {}", formatExecutionTime(start));
+      log.info("Import succeed in {}", timedExecution.end().formatExecutionTime());
     }
-
     return errorCode;
-  }
-
-  private String formatExecutionTime(long start) {
-    long executionMillis = start - System.currentTimeMillis();
-    long hours = MILLISECONDS.toHours(executionMillis);
-    long minutes = MILLISECONDS.toMinutes(executionMillis) - HOURS.toMinutes(hours);
-    long seconds = MILLISECONDS.toSeconds(executionMillis) - MINUTES.toSeconds(minutes);
-    long millis = MILLISECONDS.toMillis(executionMillis) - SECONDS.toMillis(seconds);
-    return String.format("%d hours %d min %d sec %d ms", hours, minutes, seconds, millis);
   }
 
   private int executeImports(List<FileObject> filesToImport) {
