@@ -15,10 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -42,6 +40,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig;
 
 /**
@@ -89,14 +91,17 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
         moveBinary(dataSource, dataSourceName);
       }
 
-      System.out
-          .println(dataSourceName + ": upgrade completed in " + formatExecutionTime(System.currentTimeMillis() - start));
+      System.out.println(
+          dataSourceName + ": upgrade completed in " + formatExecutionTime(System.currentTimeMillis() - start));
     }
   }
 
-  private String formatExecutionTime(long millis) {
-    return String.format("%d min. %d sec.", TimeUnit.MILLISECONDS.toMinutes(millis),
-        TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+  private String formatExecutionTime(long executionMillis) {
+    long hours = MILLISECONDS.toHours(executionMillis);
+    long minutes = MILLISECONDS.toMinutes(executionMillis) - HOURS.toMinutes(hours);
+    long seconds = MILLISECONDS.toSeconds(executionMillis) - MINUTES.toSeconds(minutes);
+    long millis = MILLISECONDS.toMillis(executionMillis) - SECONDS.toMillis(seconds);
+    return String.format("%d hours %d min %d sec %d ms", hours, minutes, seconds, millis);
   }
 
   private void upgradeSchema(Version currentVersion, DataSource dataSource, String name) {
