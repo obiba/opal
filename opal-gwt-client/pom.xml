@@ -86,6 +86,21 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- GWTQuery related dependencies -->
+    <dependency>
+      <groupId>com.googlecode.gwtquery</groupId>
+      <artifactId>gwtquery</artifactId>
+      <version>${gwtquery.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.watopi</groupId>
+      <artifactId>gwtchosen</artifactId>
+      <version>${gwtchosen.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -182,6 +197,8 @@
     <gwt-presenter.version>1.0.0</gwt-presenter.version>
     <gwtp.version>0.6</gwtp.version>
     <gwt-bootstrap.version>2.0.4.0</gwt-bootstrap.version>
+    <gwtquery.version>1.2.0</gwtquery.version>
+    <gwtchosen.version>1.1.0</gwtchosen.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 
