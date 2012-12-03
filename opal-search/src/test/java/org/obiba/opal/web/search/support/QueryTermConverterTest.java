@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search;
+package org.obiba.opal.web.search.support;
 
 import java.util.Iterator;
 
@@ -29,6 +29,7 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.web.model.Search;
+import org.obiba.opal.web.search.support.QueryTermConverter;
 
 import junit.framework.Assert;
 

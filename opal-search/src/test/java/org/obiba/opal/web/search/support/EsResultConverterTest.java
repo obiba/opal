@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search;
+package org.obiba.opal.web.search.support;
 
 import java.util.List;
 
@@ -16,6 +16,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.model.Search;
+import org.obiba.opal.web.search.support.EsResultConverter;
 
 import junit.framework.Assert;
 

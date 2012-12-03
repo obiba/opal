@@ -20,6 +20,8 @@ import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,8 @@ import org.springframework.stereotype.Component;
  * individual data,
  */
 public class ValueTableFacetResource {
+
+  private static final Logger log = LoggerFactory.getLogger(ValueTableFacetResource.class);
 
   private final IndexManager indexManager;
 
@@ -61,14 +65,15 @@ public class ValueTableFacetResource {
   @GET
   @Path("/variable/{variable}/_search")
   public Response search(@Context HttpServletRequest servletRequest, @PathParam("variable") String variable) {
+    log.info("Searching facet for " + datasource + "." + table + ":" + variable);
+
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().build();
 
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
-      QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable);
+      QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder(indexManagerHelper, "0").variableTermDto(variable);
 
       ElasticSearchQuery esQuery = new ElasticSearchQuery(servletRequest, esProvider);
-
       dtoResult = esQuery.execute(indexManagerHelper, dtoBuilder.build());
 
     } catch(UnsupportedOperationException e) {
@@ -79,4 +84,5 @@ public class ValueTableFacetResource {
 
     return Response.ok().entity(dtoResult).build();
   }
+
 }
