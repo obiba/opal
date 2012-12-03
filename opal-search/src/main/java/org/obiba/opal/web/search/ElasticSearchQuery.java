@@ -31,6 +31,7 @@ import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 /**
  * This class is responsible for executing an elastic search. The input and output of this class are DTO format.
@@ -44,8 +45,8 @@ public class ElasticSearchQuery {
   private final HttpServletRequest servletRequest;
 
   public ElasticSearchQuery(HttpServletRequest servletRequest, ElasticSearchProvider esProvider) {
-    assert (servletRequest != null);
-    assert (esProvider != null);
+    Assert.notNull(servletRequest, "Servlet Request is null!");
+    Assert.notNull(esProvider, "Elastic Search provider is null!");
 
     this.servletRequest = servletRequest;
     this.esProvider = esProvider;
@@ -55,18 +56,20 @@ public class ElasticSearchQuery {
    * Executes an elastic search query.
    *
    * @param indexManagerHelper
-   * @param dtoQuery
+   * @param dtoQueries
    * @return
    * @throws JSONException
    */
   public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
-      Search.QueryTermDto dtoQuery) throws JSONException {
-    log.info("Executing query");
+      Search.QueryTermsDto dtoQueries) throws JSONException {
 
-    String body = build(dtoQuery, indexManagerHelper.getIndexName());
+    Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
+    Assert.notNull(dtoQueries, "Query dto request is null!");
 
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<Response> ref = new AtomicReference<Response>();
+
+    String body = build(dtoQueries, indexManagerHelper);
 
     esProvider.getRest()
         .dispatchRequest(new JaxRsRestRequest(indexManagerHelper.getValueTableIndex(), servletRequest, body, "_search"),
@@ -93,13 +96,36 @@ public class ElasticSearchQuery {
       Response r = ref.get();
 
       JSONObject jsonContent = new JSONObject(new String((byte[]) r.getEntity()));
-      EsResultConverter converter = new EsResultConverter(dtoQuery);
+
+      // TODO separate the methods for GET and POST ; one with one query, other with many
+      EsResultConverter converter = new EsResultConverter();
 
       return converter.convert(jsonContent);
 
     } catch(InterruptedException e) {
       throw new RuntimeException(e);
     }
+
+  }
+
+  /**
+   * Executes a single elastic search query.
+   *
+   * @param indexManagerHelper
+   * @param dtoQueries
+   * @return
+   * @throws JSONException
+   */
+  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
+      Search.QueryTermDto dtoQuery) throws JSONException {
+
+    Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
+    Assert.notNull(dtoQuery, "Query dto request is null!");
+
+    // wrap in a QueryTermsDto for API uniformity
+    Search.QueryTermsDto dtoQueries = Search.QueryTermsDto.newBuilder().addQueries(dtoQuery).build();
+
+    return execute(indexManagerHelper, dtoQueries);
   }
 
   private Response convert(RestResponse response) throws IOException {
@@ -113,9 +139,9 @@ public class ElasticSearchQuery {
     return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
   }
 
-  private String build(Search.QueryTermDto dto, String indexName) throws JSONException {
-    QueryTermConverter converter = new QueryTermConverter(indexName);
-    JSONObject queryJSON = converter.convert(dto);
+  private String build(Search.QueryTermsDto dtoQueries, IndexManagerHelper indexManagerHelper) throws JSONException {
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
+    JSONObject queryJSON = converter.convert(dtoQueries);
 
     return queryJSON.toString();
   }
