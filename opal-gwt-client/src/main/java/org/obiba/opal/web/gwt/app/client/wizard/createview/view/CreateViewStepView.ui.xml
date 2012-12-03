@@ -1,10 +1,11 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
-  
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             xmlns:chzn="urn:import:com.watopi.chosen.client.gwt"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
   <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
     <g:caption>
       <ui:msg description="Add View label">Add View</ui:msg>
@@ -13,91 +14,117 @@
       <o:WizardStep ui:field="selectTypeStep">
         <g:FlowPanel>
           <g:FlowPanel addStyleNames="input">
-            <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Name label">Name</ui:msg>
+            </g:Label>
             <g:TextBox ui:field="viewNameTextBox"/>
           </g:FlowPanel>
           <g:FlowPanel addStyleNames="input">
-            <g:Label><ui:msg description="Select how the variables will be defined label">Select how the variables will be defined:</ui:msg></g:Label>
-            <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton" addStyleNames="block small-top-margin"><ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg></g:RadioButton>
-            <g:RadioButton name="variablesGroup" ui:field="useAnExistingView" addStyleNames="block small-top-margin"><ui:msg description="Use an existing view">Use an existing view</ui:msg></g:RadioButton>
+            <g:Label>
+              <ui:msg description="Select how the variables will be defined label">Select how the variables will be
+                defined:
+              </ui:msg>
+            </g:Label>
+            <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton"
+                           addStyleNames="block small-top-margin">
+              <ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg>
+            </g:RadioButton>
+            <g:RadioButton name="variablesGroup" ui:field="useAnExistingView" addStyleNames="block small-top-margin">
+              <ui:msg description="Use an existing view">Use an existing view</ui:msg>
+            </g:RadioButton>
             <g:SimplePanel ui:field="xmlFileSelectionPanel" addStyleNames="block indent"/>
-            <g:RadioButton name="variablesGroup" ui:field="useAnExcelFile" addStyleNames="block small-top-margin"><ui:msg description="Use an existing dictionnary">Use an existing dictionary (Excel format)</ui:msg></g:RadioButton>
+            <g:RadioButton name="variablesGroup" ui:field="useAnExcelFile" addStyleNames="block small-top-margin">
+              <ui:msg description="Use an existing dictionnary">Use an existing dictionary (Excel format)</ui:msg>
+            </g:RadioButton>
             <g:SimplePanel ui:field="excelFileSelectionPanel" addStyleNames="block indent"/>
           </g:FlowPanel>
-	    </g:FlowPanel>
+        </g:FlowPanel>
       </o:WizardStep>
-      
+
       <o:WizardStep ui:field="tablesStep">
         <g:FlowPanel addStyleNames="input">
-	      <g:Label addStyleNames="key"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
-	      <g:SimplePanel ui:field="tableSelectorPanel" />
-	    </g:FlowPanel>
+          <g:Label addStyleNames="key">
+            <ui:msg description="Tables label">Tables</ui:msg>
+          </g:Label>
+          <chzn:ChosenListBox ui:field="tableChosen"/>
+        </g:FlowPanel>
       </o:WizardStep>
-      
+
       <o:WizardStep ui:field="conclusionStep">
-        <g:Button ui:field="configureLink" styleName="btn small-indent"><ui:msg description="Configure View link">You can now configure the view.</ui:msg></g:Button>
+        <g:Button ui:field="configureLink" styleName="btn small-indent">
+          <ui:msg description="Configure View link">You can now configure the view.</ui:msg>
+        </g:Button>
       </o:WizardStep>
-      
-       <g:HTMLPanel ui:field="selectTypeHelp">
-         <g:Label addStyleNames="title"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
-         <p>
-           <ui:msg description="Datasource information for view creation">
-           A view is always attached to a datasource. This datasource can be an existing one (any of kind) or can 
-           be created for that purpose.
-           </ui:msg>
-         </p>
-         
-         <g:Label addStyleNames="title"><ui:msg description="Name label">Name</ui:msg></g:Label>
-         <p>
-           <ui:msg description="Name information for view creation">
-           The view name is required and should not include special characters such as ':'.
-           </ui:msg>
-         </p>
-         
-         <g:Label addStyleNames="title"><ui:msg description="Variables label">Variables</ui:msg></g:Label>
-         <p>
-           <ui:msg description="Variables information for view creation">
-           There are different ways of specifying the variables of a view:
-           </ui:msg>
-         <ul>
-           <li>
-             <ui:msg description="Selection of variables information for view creation">
-             selection of variables: variables are filtered using a script.
-             </ui:msg>
-           </li>
-           <li>
-             <ui:msg description="Derived variables information for view creation">
-             list of derived variables: some variables can be enumerated and for each of them a script will be executed on demand to get the values.
-             </ui:msg>
-           </li>
-           <li>
-             <ui:msg description="Use an existing view definition for view creation">
-             existing view definition: read a view definition from a file.
-             </ui:msg>
-           </li>
-           <li>
-             <ui:msg description="Use a dictionnary in Excel format">
-             existing dictionary: read variables from an Excel formated dictionary
-             </ui:msg>
-           </li>
-         </ul>
-         </p>
-       </g:HTMLPanel>
-       
-       <g:HTMLPanel ui:field="tablesHelp">
-         
-         <g:Label addStyleNames="title"><ui:msg description="Tables label">Tables</ui:msg></g:Label>
-         <p>
-           <ui:msg description="Tables information for view creation">
-           The view is always built on top of one or more tables.
-           The view can define a subset of the tables' entities, a subset of the tables' variables, 
-           or can define variables derived from the tables' variables.
-           </ui:msg>
-         </p>
-         
-       </g:HTMLPanel>
-       
-     </g:FlowPanel>      
+
+      <g:HTMLPanel ui:field="selectTypeHelp">
+        <g:Label addStyleNames="title">
+          <ui:msg description="Datasource label">Datasource</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Datasource information for view creation">
+            A view is always attached to a datasource. This datasource can be an existing one (any of kind) or can
+            be created for that purpose.
+          </ui:msg>
+        </p>
+
+        <g:Label addStyleNames="title">
+          <ui:msg description="Name label">Name</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Name information for view creation">
+            The view name is required and should not include special characters such as ':'.
+          </ui:msg>
+        </p>
+
+        <g:Label addStyleNames="title">
+          <ui:msg description="Variables label">Variables</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Variables information for view creation">
+            There are different ways of specifying the variables of a view:
+          </ui:msg>
+          <ul>
+            <li>
+              <ui:msg description="Selection of variables information for view creation">
+                selection of variables: variables are filtered using a script.
+              </ui:msg>
+            </li>
+            <li>
+              <ui:msg description="Derived variables information for view creation">
+                list of derived variables: some variables can be enumerated and for each of them a script will be
+                executed on demand to get the values.
+              </ui:msg>
+            </li>
+            <li>
+              <ui:msg description="Use an existing view definition for view creation">
+                existing view definition: read a view definition from a file.
+              </ui:msg>
+            </li>
+            <li>
+              <ui:msg description="Use a dictionnary in Excel format">
+                existing dictionary: read variables from an Excel formated dictionary
+              </ui:msg>
+            </li>
+          </ul>
+        </p>
+      </g:HTMLPanel>
+
+      <g:HTMLPanel ui:field="tablesHelp">
+
+        <g:Label addStyleNames="title">
+          <ui:msg description="Tables label">Tables</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Tables information for view creation">
+            The view is always built on top of one or more tables.
+            The view can define a subset of the tables' entities, a subset of the tables' variables,
+            or can define variables derived from the tables' variables.
+          </ui:msg>
+        </p>
+
+      </g:HTMLPanel>
+
+    </g:FlowPanel>
   </o:WizardDialogBox>
 
 </ui:UiBinder>

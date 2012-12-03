@@ -76,7 +76,8 @@ public final class Dtos {
   }
 
   public static VariableDto.Builder asDto(LinkDto tableLink, Variable from, @Nullable Integer index) {
-    VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
+    VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType())
+        .setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
       var.setOccurrenceGroup(from.getOccurrenceGroup());
     }
@@ -132,7 +133,9 @@ public final class Dtos {
   }
 
   public static Variable fromDto(VariableDto variableDto) {
-    Variable.Builder builder = Variable.Builder.newVariable(variableDto.getName(), ValueType.Factory.forName(variableDto.getValueType()), variableDto.getEntityType());
+    Variable.Builder builder = Variable.Builder
+        .newVariable(variableDto.getName(), ValueType.Factory.forName(variableDto.getValueType()),
+            variableDto.getEntityType());
     for(CategoryDto category : variableDto.getCategoriesList()) {
       builder.addCategory(fromDto(category));
     }
@@ -187,11 +190,18 @@ public final class Dtos {
   }
 
   public static TableDto.Builder asDto(ValueTable valueTable) {
+    return asDto(valueTable, true);
+  }
+
+  public static TableDto.Builder asDto(ValueTable valueTable, boolean withCounts) {
     TableDto.Builder builder = TableDto.newBuilder() //
-    .setName(valueTable.getName()) //
-    .setEntityType(valueTable.getEntityType()) //
-    .setVariableCount(Iterables.size(valueTable.getVariables())) //
-    .setValueSetCount(valueTable.getVariableEntities().size());
+        .setName(valueTable.getName()) //
+        .setEntityType(valueTable.getEntityType());
+
+    if(withCounts) {
+      builder.setVariableCount(Iterables.size(valueTable.getVariables())) //
+          .setValueSetCount(valueTable.getVariableEntities().size());
+    }
 
     if(valueTable.getDatasource() != null) {
       builder.setDatasourceName(valueTable.getDatasource().getName());
@@ -207,8 +217,8 @@ public final class Dtos {
 
   public static DatasourceDto.Builder asDto(Datasource datasource) {
     Magma.DatasourceDto.Builder builder = Magma.DatasourceDto.newBuilder()//
-    .setName(datasource.getName())//
-    .setType(datasource.getType());
+        .setName(datasource.getName())//
+        .setType(datasource.getType());
 
     final List<String> tableNames = Lists.newArrayList();
     final List<String> viewNames = Lists.newArrayList();
@@ -231,13 +241,14 @@ public final class Dtos {
       if(valueDto.getValuesCount() == 0) {
         return type.nullSequence();
       }
-      return type.sequenceOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
+      return type
+          .sequenceOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
 
-        @Override
-        public Value apply(ValueSetsDto.ValueDto input) {
-          return fromDto(input, type, false);
-        }
-      }));
+            @Override
+            public Value apply(ValueSetsDto.ValueDto input) {
+              return fromDto(input, type, false);
+            }
+          }));
     } else {
       if(valueDto.hasValue()) {
         return type.valueOf(valueDto.getValue());

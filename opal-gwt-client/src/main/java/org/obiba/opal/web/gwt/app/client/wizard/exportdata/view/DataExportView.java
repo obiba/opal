@@ -1,23 +1,30 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.view;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
@@ -42,6 +49,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.watopi.chosen.client.gwt.ChosenListBox;
 
 /**
  * View of the dialog used to export data from Opal.
@@ -73,8 +81,8 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   @UiField
   ListBox units;
 
-  @UiField
-  SimplePanel tablesPanel;
+  @UiField(provided = true)
+  ChosenListBox tableChosen;
 
   @UiField
   SimplePanel filePanel;
@@ -108,17 +116,18 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   private FileSelectionPresenter.Display fileSelection;
 
-  private TableListPresenter.Display tablesList;
-
   private ValidationHandler tablesValidator;
 
   private ValidationHandler destinationValidator;
 
   private WizardStepChain stepChain;
 
+  private Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
+
   @Inject
   public DataExportView(EventBus eventBus) {
     super(eventBus);
+    tableChosen = new ChosenListBox(true);
     this.widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
@@ -126,52 +135,54 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-    .append(tablesStep)//
-    .title(translations.dataExportInstructions())//
-    .onValidate(new ValidationHandler() {
+        .append(tablesStep)//
+        .title(translations.dataExportInstructions())//
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return tablesValidator.validate();
-      }
-    })//
-    .onReset(new ResetHandler() {
+          @Override
+          public boolean validate() {
+            return tablesValidator.validate();
+          }
+        })//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        clearTablesStep();
-      }
-    })//
-    .append(destinationStep, destinationHelpPanel)//
-    .title(translations.dataExportDestination())//
-    .onValidate(new ValidationHandler() {
+          @Override
+          public void onReset() {
+            clearTablesStep();
+          }
+        })//
+        .append(destinationStep, destinationHelpPanel)//
+        .title(translations.dataExportDestination())//
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return destinationValidator.validate();
-      }
-    })//
-    .onReset(new ResetHandler() {
+          @Override
+          public boolean validate() {
+            return destinationValidator.validate();
+          }
+        })//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        clearDestinationStep();
-      }
-    })//
-    .append(unitStep, unitHelpPanel)//
-    .title(translations.dataExportUnit())//
-    .onReset(new ResetHandler() {
+          @Override
+          public void onReset() {
+            clearDestinationStep();
+          }
+        })//
+        .append(unitStep, unitHelpPanel)//
+        .title(translations.dataExportUnit())//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        clearUnitStep();
-      }
-    })//
+          @Override
+          public void onReset() {
+            clearUnitStep();
+          }
+        })//
 
-    .onNext().onPrevious().build();
+        .onNext().onPrevious().build();
   }
 
   private void initWidgets() {
+    tableChosen.setPlaceholderText(translations.selectSomeTables());
+    tableChosen.setSearchContains(true);
     opalId.addClickHandler(new ClickHandler() {
 
       @Override
@@ -250,15 +261,77 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   }
 
   @Override
-  public String getFileFormat() {
-    return fileFormat.getValue(fileFormat.getSelectedIndex());
+  public void addTableSelections(JsArray<TableDto> tables) {
+    tableChosen.clear();
+    tableDtoMap.clear();
+    HashMap<String, List<TableDto>> datasourceMap = new LinkedHashMap<String, List<TableDto>>();
+    for(TableDto table : JsArrays.toIterable(tables)) {
+      if(datasourceMap.containsKey(table.getDatasourceName()) == false) {
+        datasourceMap.put(table.getDatasourceName(), new ArrayList<TableDto>());
+      }
+      datasourceMap.get(table.getDatasourceName()).add(table);
+    }
+    if(datasourceMap.keySet().size() > 1) {
+      addDatasourceTableSelections(datasourceMap);
+    } else {
+      addTableSelections(datasourceMap.get(datasourceMap.keySet().iterator().next()));
+    }
+    tableChosen.update();
+  }
+
+  private void addDatasourceTableSelections(HashMap<String, List<TableDto>> datasourceMap) {
+    for(String ds : datasourceMap.keySet()) {
+      tableChosen.addGroup(ds);
+      for(TableDto table : datasourceMap.get(ds)) {
+        String fullName = table.getDatasourceName() + "." + table.getName();
+        tableChosen.addItemToGroup(fullName, fullName);
+        tableDtoMap.put(fullName, table);
+      }
+    }
+  }
+
+  private void addTableSelections(List<TableDto> tables) {
+    for(TableDto table : tables) {
+      String fullName = table.getDatasourceName() + "." + table.getName();
+      tableChosen.addItem(table.getName(), fullName);
+      tableDtoMap.put(fullName, table);
+    }
   }
 
   @Override
-  public void setTableWidgetDisplay(TableListPresenter.Display display) {
-    tablesList = display;
-    display.setListWidth("28em");
-    tablesPanel.setWidget(display.asWidget());
+  public void selectTable(TableDto table) {
+    for(int i = 0; i < tableChosen.getItemCount(); i++) {
+      if(tableChosen.getItemText(i).equals(table.getName())) {
+        tableChosen.setSelectedIndex(i);
+        break;
+      }
+    }
+  }
+
+  @Override
+  public void selectAllTables() {
+    for(int i = 0; i < tableChosen.getItemCount(); i++) {
+      GWT.log("select " + i);
+      tableChosen.setItemSelected(i, true);
+    }
+    tableChosen.update();
+    ;
+  }
+
+  @Override
+  public List<TableDto> getSelectedTables() {
+    List<TableDto> tables = new ArrayList<TableDto>();
+    for(int i = 0; i < tableChosen.getItemCount(); i++) {
+      if(tableChosen.isItemSelected(i)) {
+        tables.add(tableDtoMap.get(tableChosen.getValue(i)));
+      }
+    }
+    return tables;
+  }
+
+  @Override
+  public String getFileFormat() {
+    return fileFormat.getValue(fileFormat.getSelectedIndex());
   }
 
   @Override
@@ -283,7 +356,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   private void clearTablesStep() {
     tablesStep.setVisible(true);
     dialog.setHelpEnabled(false);
-    if(tablesList != null) tablesList.clear();
+    tableChosen.clear();
   }
 
   private void clearDestinationStep() {

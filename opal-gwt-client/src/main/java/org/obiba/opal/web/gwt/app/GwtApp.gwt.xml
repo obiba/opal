@@ -41,6 +41,8 @@
   <!-- Syntax Highlighting -->
   <inherits name='org.obiba.opal.web.gwt.prettify.Prettify'/>
 
+  <!-- GWT Query Plugins -->
+  <inherits name='com.google.gwt.query.Query'/>
   <inherits name='com.watopi.chosen.Chosen'/>
 
   <!-- Specify the app entry point class. -->

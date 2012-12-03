@@ -173,7 +173,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
     @Override
     public void onSavePending(ViewSavePendingEvent event) {
-      viewSavePending = true;
+      viewSavePending = event.isPending();
     }
 
   }

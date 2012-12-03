@@ -12,7 +12,7 @@
   
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
     <g:caption><ui:msg description="Configure View title">Configure View</ui:msg></g:caption>
-	 <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="60em" width="60em">
+	 <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="50em" width="60em">
     <g:center>
 		<g:ScrollPanel>
 			<g:FlowPanel addStyleNames="{style.content-margin}">

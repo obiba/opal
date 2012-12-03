@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -16,10 +16,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -40,6 +43,7 @@ import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,17 +61,29 @@ public class TablesResource {
     this.datasource = datasource;
   }
 
+  /**
+   * Get the tables of the datasource.
+   * @param counts Set the count of entities and of variables (default is true).
+   * @param entityType Filter the tables with provided entity type (default is no filter).
+   * @return
+   */
   @GET
-  public List<Magma.TableDto> getTables() {
+  public List<Magma.TableDto> getTables(@QueryParam("counts") @DefaultValue("true") Boolean counts,
+      @Nullable @QueryParam("entityType") String entityType) {
     final List<Magma.TableDto> tables = Lists.newArrayList();
-    UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable");
-    UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getView");
+    UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
+        .path(DatasourceResource.class, "getTable");
+    UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
+        .path(DatasourceResource.class, "getView");
     for(ValueTable valueTable : datasource.getValueTables()) {
-      TableDto.Builder builder = Dtos.asDto(valueTable).setLink(tableLink.build(datasource.getName(), valueTable.getName()).toString());
-      if(valueTable.isView()) {
-        builder.setViewLink(viewLink.build(datasource.getName(), valueTable.getName()).toString());
+      if(entityType == null || valueTable.getEntityType().equals(entityType)) {
+        TableDto.Builder builder = Dtos.asDto(valueTable, counts)
+            .setLink(tableLink.build(datasource.getName(), valueTable.getName()).toString());
+        if(valueTable.isView()) {
+          builder.setViewLink(viewLink.build(datasource.getName(), valueTable.getName()).toString());
+        }
+        tables.add(builder.build());
       }
-      tables.add(builder.build());
     }
     sortByName(tables);
 
@@ -91,7 +107,8 @@ public class TablesResource {
     } finally {
       Disposables.silentlyDispose(destinationDatasource);
     }
-    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
+    return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel")
+        .header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
   @POST
@@ -107,15 +124,19 @@ public class TablesResource {
       // } else
 
       if(datasource.hasValueTable(table.getName())) {
-        return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
+        return Response.status(Status.BAD_REQUEST)
+            .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
       } else {
         writeVariablesToTable(table);
-        URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable").build(datasource.getName(), table.getName());
+        URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class)
+            .path(DatasourceResource.class, "getTable").build(datasource.getName(), table.getName());
         return Response.created(tableUri)//
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(tableUri, AclAction.TABLE_ALL)).build();
+            .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(tableUri, AclAction.TABLE_ALL))
+            .build();
       }
     } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();
     }
   }
 

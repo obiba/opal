@@ -1309,4 +1309,8 @@ public interface Translations extends Constants {
   @Description("Identifiers Sync Table Step")
   @DefaultStringValue("Preview the count of identifiers that can be imported and select from which table identifiers will be extracted.")
   String identifiersSyncTableStep();
+
+  @Description("Select some Tables label")
+  @DefaultStringValue("Select some tables...")
+  String selectSomeTables();
 }

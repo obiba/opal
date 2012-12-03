@@ -19,7 +19,17 @@ public class ViewSavePendingEvent extends GwtEvent<ViewSavePendingEvent.Handler>
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
+  private boolean pending = true;
+
   public ViewSavePendingEvent() {
+  }
+
+  public ViewSavePendingEvent(boolean pending) {
+    this.pending = pending;
+  }
+
+  public boolean isPending() {
+    return pending;
   }
 
   @Override

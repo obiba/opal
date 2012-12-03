@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+  xmlns:chzn="urn:import:com.watopi.chosen.client.gwt"
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
@@ -12,7 +13,7 @@
     <g:FlowPanel>
     
       <o:WizardStep ui:field="tablesStep">
-        <g:SimplePanel ui:field="tablesPanel" />
+        <chzn:ChosenListBox ui:field="tableChosen"/>
       </o:WizardStep>
       
       <o:WizardStep ui:field="destinationStep">
