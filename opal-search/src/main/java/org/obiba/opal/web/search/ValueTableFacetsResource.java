@@ -64,7 +64,7 @@ public class ValueTableFacetsResource {
       dtoResult = esQuery.execute(indexManagerHelper, dtoQueries);
 
     } catch(UnsupportedOperationException e) {
-      return Response.status(501).build();
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     } catch(JSONException e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
