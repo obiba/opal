@@ -62,8 +62,8 @@ public class EsResultConverter {
       }
 
       if (dtoFacetResultBuilder.getFiltersCount() > 0
-            || dtoFacetResultBuilder.getFrequenciesCount() > 0
-            || dtoFacetResultBuilder.hasStatistics()) {
+          || dtoFacetResultBuilder.getFrequenciesCount() > 0
+          || dtoFacetResultBuilder.hasStatistics()) {
 
         dtoResultsBuilder.addFacets(dtoFacetResultBuilder.build());
       }
@@ -78,7 +78,7 @@ public class EsResultConverter {
     if (countAboveThreshold(jsonFacet.getInt("count"))) {
       Search.FacetResultDto.FilterResultDto dtoFilter =
           Search.FacetResultDto.FilterResultDto.newBuilder()
-          .setCount(jsonFacet.getInt("count")).build();
+              .setCount(jsonFacet.getInt("count")).build();
 
       dtoResultBuilder.addFilters(dtoFilter);
     }
@@ -92,7 +92,7 @@ public class EsResultConverter {
       if (countAboveThreshold(term.getInt("count"))) {
         Search.FacetResultDto.TermFrequencyResultDto dtoTermFrequency = Search.FacetResultDto.TermFrequencyResultDto.newBuilder()
             .setTerm(term.getString("term")).setCount(term.getInt("count")).build();
-  
+
         dtoFacetResultBuilder.addFrequencies(dtoTermFrequency);
       }
     }

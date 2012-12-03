@@ -20,6 +20,8 @@ import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
+import org.obiba.opal.web.search.support.ElasticSearchQuery;
+import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
