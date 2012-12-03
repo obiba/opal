@@ -18,10 +18,9 @@ import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.IndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.ElasticSearchQuery;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
+import org.obiba.opal.web.search.support.SearchQueryExecutorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -38,7 +37,7 @@ public class ValueTableFacetsResource {
 
   private final IndexManager indexManager;
 
-  private final ElasticSearchProvider esProvider;
+  private final SearchQueryExecutorFactory searchQueryFactory;
 
   @PathParam("ds")
   private String datasource;
@@ -47,9 +46,9 @@ public class ValueTableFacetsResource {
   private String table;
 
   @Autowired
-  public ValueTableFacetsResource(IndexManager indexManager, ElasticSearchProvider esProvider) {
+  public ValueTableFacetsResource(IndexManager indexManager, SearchQueryExecutorFactory searchQueryFactory) {
     this.indexManager = indexManager;
-    this.esProvider = esProvider;
+    this.searchQueryFactory = searchQueryFactory;
   }
 
   @POST
@@ -59,9 +58,7 @@ public class ValueTableFacetsResource {
 
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
-      ElasticSearchQuery esQuery = new ElasticSearchQuery(servletRequest, esProvider);
-
-      dtoResult = esQuery.execute(indexManagerHelper, dtoQueries);
+      dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoQueries);
 
     } catch(UnsupportedOperationException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

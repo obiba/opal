@@ -9,20 +9,17 @@
  */
 package org.obiba.opal.web.search;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.IndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.ElasticSearchQuery;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.obiba.opal.web.search.support.QueryTermDtoBuilder;
+import org.obiba.opal.web.search.support.SearchQueryExecutorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -39,7 +36,7 @@ public class ValueTableFacetResource {
 
   private final IndexManager indexManager;
 
-  private final ElasticSearchProvider esProvider;
+  private final SearchQueryExecutorFactory searchQueryFactory;
 
   @PathParam("ds")
   private String datasource;
@@ -48,9 +45,9 @@ public class ValueTableFacetResource {
   private String table;
 
   @Autowired
-  public ValueTableFacetResource(IndexManager indexManager, ElasticSearchProvider esProvider) {
+  public ValueTableFacetResource(IndexManager indexManager, SearchQueryExecutorFactory searchQueryFactory) {
     this.indexManager = indexManager;
-    this.esProvider = esProvider;
+    this.searchQueryFactory = searchQueryFactory;
   }
 
   /**
@@ -63,16 +60,14 @@ public class ValueTableFacetResource {
    */
   @GET
   @Path("/variable/{variable}/_search")
-  public Response search(@Context HttpServletRequest servletRequest, @PathParam("variable") String variable) {
+  public Response search(@PathParam("variable") String variable) {
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().build();
 
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
       QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable);
 
-      ElasticSearchQuery esQuery = new ElasticSearchQuery(servletRequest, esProvider);
-
-      dtoResult = esQuery.execute(indexManagerHelper, dtoBuilder.build());
+      dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoBuilder.build());
 
     } catch(UnsupportedOperationException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

@@ -10,22 +10,21 @@
 package org.obiba.opal.web.search.support;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.collect.Maps;
+import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.support.AbstractRestRequest;
-import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
@@ -36,19 +35,14 @@ import org.springframework.util.Assert;
 /**
  * This class is responsible for executing an elastic search. The input and output of this class are DTO format.
  */
-public class ElasticSearchQuery {
+public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
-  private static final Logger log = LoggerFactory.getLogger(ElasticSearchQuery.class);
+  private static final Logger log = LoggerFactory.getLogger(EsSearchQueryExecutor.class);
 
   private final ElasticSearchProvider esProvider;
 
-  private final HttpServletRequest servletRequest;
-
-  public ElasticSearchQuery(HttpServletRequest servletRequest, ElasticSearchProvider esProvider) {
-    Assert.notNull(servletRequest, "Servlet Request is null!");
+  public EsSearchQueryExecutor(ElasticSearchProvider esProvider) {
     Assert.notNull(esProvider, "Elastic Search provider is null!");
-
-    this.servletRequest = servletRequest;
     this.esProvider = esProvider;
   }
 
@@ -72,7 +66,7 @@ public class ElasticSearchQuery {
     String body = build(dtoQueries, indexManagerHelper);
 
     esProvider.getRest()
-        .dispatchRequest(new JaxRsRestRequest(indexManagerHelper.getValueTableIndex(), servletRequest, body, "_search"),
+        .dispatchRequest(new EsRestRequest(indexManagerHelper.getValueTableIndex(), body, "_search"),
             new RestChannel() {
 
               @Override
@@ -146,34 +140,29 @@ public class ElasticSearchQuery {
     return queryJSON.toString();
   }
 
-  private static class JaxRsRestRequest extends AbstractRestRequest {
+  private static class EsRestRequest extends AbstractRestRequest {
 
     private final String body;
 
-    private final HttpServletRequest servletRequest;
-
     private final Map<String, String> params;
-
-    private final String rawPath;
 
     private final String esUri;
 
-    JaxRsRestRequest(ValueTableIndex tableIndex, HttpServletRequest servletRequest, String body, String path) {
+    private final Map<String, String> headers = ImmutableMap.of("Content-Type","application/json");
+
+    EsRestRequest(ValueTableIndex tableIndex, String body, String path) {
+      this(tableIndex,body, path, new HashMap<String, String>());
+    }
+
+    EsRestRequest(ValueTableIndex tableIndex, String body, String path, Map<String, String> params) {
       this.body = body;
-      this.servletRequest = servletRequest;
-      params = Maps.newHashMap();
-      rawPath = tableIndex.getRequestPath() + "/" + path;
-
-      // Reconstruct the uri
-      String queryString = servletRequest.getQueryString();
-      esUri = rawPath + (queryString != null ? ('?' + queryString) : "");
-
-      RestUtils.decodeQueryString(queryString != null ? queryString : "", 0, params);
+      this.params = params;
+      this.esUri = tableIndex.getRequestPath() + "/" + path;
     }
 
     @Override
     public Method method() {
-      return Method.valueOf(servletRequest.getMethod().toUpperCase());
+      return Method.GET;
     }
 
     @Override
@@ -208,7 +197,7 @@ public class ElasticSearchQuery {
 
     @Override
     public String header(String name) {
-      return servletRequest.getHeader(name);
+      return headers.get(name);
     }
 
     @Override
