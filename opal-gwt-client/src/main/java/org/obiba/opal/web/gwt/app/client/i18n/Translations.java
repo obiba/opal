@@ -353,8 +353,9 @@ public interface Translations extends Constants {
       "TableSelectionIsRequired", "At least one table must be selected.",//
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
-      "IndexClearCompleted", "Index clear completed.",//
-      "ServiceSearchStartCompleted", "Search service started.", "ServiceSearchStopCompleted", "Search service stopped."//
+      "IndexClearCompleted", "Index clear completed",//
+      "ServiceSearchStartCompleted", "Search service started.", "ServiceSearchStopCompleted", "Search service stopped.", "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
+      "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule."//
   })
   Map<String, String> userMessageMap();
 
@@ -1328,4 +1329,69 @@ public interface Translations extends Constants {
   @Description("Schedule")
   @DefaultStringValue("Schedule")
   String scheduleLabel();
+
+  @Description("All")
+  @DefaultStringValue("All")
+  String allLabel();
+
+  @Description("Manually")
+  @DefaultStringValue("Manually")
+  String manuallyLabel();
+
+  @Description("Every 5 minutes")
+  @DefaultStringValue("Every 5 minutes")
+  String minutes5Label();
+
+  @Description("Every 15 minutes")
+  @DefaultStringValue("Every 15 minutes")
+  String minutes15Label();
+
+  @Description("Every 30 minutes")
+  @DefaultStringValue("Every 30 minutes")
+  String minutes30Label();
+
+  @Description("Every hour")
+  @DefaultStringValue("Every hour")
+  String hourlyLabel();
+
+  @Description("Every day")
+  @DefaultStringValue("Every day")
+  String dailyLabel();
+
+  @Description("Every week")
+  @DefaultStringValue("Every week")
+  String weeklyLabel();
+
+  @Description("Edit schedule")
+  @DefaultStringValue("Edit schedule")
+  String editScheduleLabel();
+
+  @Description("Sunday")
+  @DefaultStringValue("Sunday")
+  String sundayLabel();
+
+  @Description("Monday")
+  @DefaultStringValue("Monday")
+  String mondayLabel();
+
+  @Description("Tuesday")
+  @DefaultStringValue("Tuesday")
+  String tuesdayLabel();
+
+  @Description("Wednesday")
+  @DefaultStringValue("Wednesday")
+  String wednesdayLabel();
+
+  @Description("Thursday")
+  @DefaultStringValue("Thursday")
+  String thursdayLabel();
+
+  @Description("Friday")
+  @DefaultStringValue("Friday")
+  String fridayLabel();
+
+  @Description("Saturday")
+  @DefaultStringValue("Saturday")
+  String saturdayLabel();
+
 }

@@ -9,18 +9,15 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
-import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
+import org.obiba.opal.web.model.client.opal.ScheduleDto;
+import org.obiba.opal.web.model.client.opal.ScheduleType;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -40,7 +37,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   private Mode dialogMode;
 
   public enum Mode {
-    CREATE, UPDATE
+    UPDATE
   }
 
   private MethodValidationHandler methodValidationHandler;
@@ -52,7 +49,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
   @Override
   protected void onBind() {
-    setDialogMode(Mode.CREATE);
+    setDialogMode(Mode.UPDATE);
 
     registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
 
@@ -62,15 +59,6 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
       }
     }));
 
-//    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>> newBuilder().forResource(
-//        org.obiba.opal.web.gwt.app.client.administration.database.presenter.Resources.drivers()).withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
-//
-//      @Override
-//      public void onResource(Response response, JsArray<JdbcDriverDto> resource) {
-//        getView().setAvailableDrivers(resource);
-//      }
-//    }).get().send();
-
     this.methodValidationHandler = new MethodValidationHandler(getEventBus());
   }
 
@@ -79,25 +67,25 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     getView().setDialogMode(dialogMode);
   }
 
-  /**
-   * Setup the dialog for creating a method
-   */
-  public void createNewDatabase() {
-    setDialogMode(Mode.CREATE);
-  }
+//  /**
+//   * Setup the dialog for creating a method
+//   */
+//  public void createNewDatabase() {
+//    setDialogMode(Mode.CREATE);
+//  }
 
   /**
    * Setup the dialog for updating an existing method
    *
    * @param dto method to update
    */
-  public void updateDatabase(TableIndexStatusDto dto) {
+  public void updateSchedule(TableIndexStatusDto dto) {
     setDialogMode(Mode.UPDATE);
-    displayIndex(dto.getDatasource(), dto);
+    displaySchedule(dto.getSchedule());
   }
 
-  private void displayIndex(String name, TableIndexStatusDto dto) {
-    getView().getName().setText(name);
+  private void displaySchedule(ScheduleDto dto) {
+    getView().getType().setText(dto.getType().getName());
 //    getView().getDriver().setText(dto.getDriverClass());
 //    getView().getUrl().setText(dto.getUrl());
 //    getView().getUsername().setText(dto.getUsername());
@@ -105,48 +93,33 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 //    getView().getProperties().setText(dto.getProperties());
   }
 
-  private void updateIndex() {
+  private void updateDatabase() {
     if(methodValidationHandler.validate()) {
-      putIndex(getTableIndexationStatusDto());
+      putDatabase(getTableIndexStatusDto());
     }
   }
 
-//  private void createIndex() {
-//    if(methodValidationHandler.validate()) {
-//      CreateMethodCallBack createCallback = new CreateMethodCallBack();
-//      AlreadyExistMethodCallBack alreadyExistCallback = new AlreadyExistMethodCallBack();
-//      ResourceRequestBuilderFactory.<JdbcDataSourceDto> newBuilder().forResource(
-//          org.obiba.opal.web.gwt.app.client.administration.database.presenter.Resources
-//              .database(getView().getName().getText())).get()//
-//      .withCallback(alreadyExistCallback)//
-//      .withCallback(Response.SC_NOT_FOUND, createCallback).send();
-//    }
-//  }
-//
-//  private void postDatabase(JdbcDataSourceDto dto) {
-//    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-//    ResourceRequestBuilderFactory.newBuilder().forResource(
-//        org.obiba.opal.web.gwt.app.client.administration.database.presenter.Resources.databases()).post()//
-//    .withResourceBody(JdbcDataSourceDto.stringify(dto))//
-//    .withCallback(Response.SC_OK, callbackHandler)//
-//    .withCallback(Response.SC_CREATED, callbackHandler)//
-//    .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-//  }
-
-  private void putIndex(TableIndexStatusDto dto) {
+  private void postDatabase(TableIndexStatusDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource(
-        org.obiba.opal.web.gwt.app.client.administration.index.presenter.Resources
-            .index(getView().getName().getText(), getView().getName().getText())).put()//
-        .withResourceBody(TableIndexStatusDto.stringify(dto))//
-        .withCallback(Response.SC_OK, callbackHandler)//
-        .withCallback(Response.SC_CREATED, callbackHandler)//
-        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+//    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()//
+//        .withResourceBody(JdbcDataSourceDto.stringify(dto))//
+//        .withCallback(Response.SC_OK, callbackHandler)//
+//        .withCallback(Response.SC_CREATED, callbackHandler)//
+//        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
-  private TableIndexStatusDto getTableIndexationStatusDto() {
+  private void putDatabase(TableIndexStatusDto dto) {
+    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+//    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.database(getView().getName().getText())).put()//
+//        .withResourceBody(JdbcDataSourceDto.stringify(dto))//
+//        .withCallback(Response.SC_OK, callbackHandler)//
+//        .withCallback(Response.SC_CREATED, callbackHandler)//
+//        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+  }
+
+  private TableIndexStatusDto getTableIndexStatusDto() {
     TableIndexStatusDto dto = TableIndexStatusDto.create();
-    dto.setDatasource(getView().getName().getText());
+    //dto.setTable(getView().getTable().getText());
 //    dto.setUrl(getView().getUrl().getText());
 //    dto.setDriverClass(getView().getDriver().getText());
 //    dto.setUsername(getView().getUsername().getText());
@@ -170,42 +143,32 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
-        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired"));
+//        validators = new LinkedHashSet<FieldValidator>();
+//        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired"));
+//        validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired"));
+//        validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired"));
+//        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired"));
       }
       return validators;
     }
 
   }
 
-  private class AlreadyExistMethodCallBack implements ResourceCallback<JdbcDataSourceDto> {
+  private class AlreadyExistMethodCallBack implements ResourceCallback<TableIndexStatusDto> {
 
     @Override
-    public void onResource(Response response, JdbcDataSourceDto resource) {
+    public void onResource(Response response, TableIndexStatusDto resource) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatabaseAlreadyExists").build());
     }
 
   }
 
-//  private class CreateMethodCallBack implements ResponseCodeCallback {
-//
-//    @Override
-//    public void onResponseCode(Request request, Response response) {
-//      postDatabase(getTableIndexationStatusDto());
-//    }
-//  }
-
   public class CreateOrUpdateMethodClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent arg0) {
-      if(dialogMode == Mode.CREATE) {
-//        createIndex();
-      } else if(dialogMode == Mode.UPDATE) {
-        updateIndex();
+      if(dialogMode == Mode.UPDATE) {
+        updateDatabase();
       }
     }
 
@@ -236,7 +199,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
     void hideDialog();
 
-    void setAvailableDrivers(JsArray<JdbcDriverDto> resource);
+    void setAvailableType(JsArray<ScheduleType> resource);
 
     void setDialogMode(Mode dialogMode);
 
@@ -244,17 +207,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
     HasClickHandlers getCancelButton();
 
-    HasText getName();
-
-    HasText getUrl();
-
-    HasText getDriver();
-
-    HasText getUsername();
-
-    HasText getPassword();
-
-    HasText getProperties();
+    HasText getType();
 
   }
 

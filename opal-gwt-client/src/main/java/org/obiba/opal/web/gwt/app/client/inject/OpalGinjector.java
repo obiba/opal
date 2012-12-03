@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Datab
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
@@ -217,5 +218,6 @@ public interface OpalGinjector extends Ginjector {
   Provider<DatabasePresenter> getDatabasePresenter();
 
   Provider<IndexAdministrationPresenter> getIndexAdministrationPresenter();
-//  Provider<IndexAdministrationPresenter> getIndexAdministrationPresenter();
+
+  Provider<IndexPresenter> getIndexPresenter();
 }

@@ -17,6 +17,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
+import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ImageCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -26,10 +28,12 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.MultiSelectionModel;
+import com.google.gwt.view.client.ProvidesKey;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 import static org.obiba.opal.web.model.client.opal.ScheduleType.DAILY;
@@ -61,13 +65,24 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   com.github.gwtbootstrap.client.ui.Button stopButton;
 
   @UiField
-  Button refreshIndicesButton;
+  com.github.gwtbootstrap.client.ui.Button refreshIndicesButton;
+
+  @UiField
+  com.github.gwtbootstrap.client.ui.DropdownButton actionsDropdown;
 
   @UiField
   SimplePager indexTablePager;
 
   @UiField
   Table<TableIndexStatusDto> indexTable;
+
+  final static MultiSelectionModel<TableIndexStatusDto> selectedIndices = new MultiSelectionModel<TableIndexStatusDto>(
+      new ProvidesKey<TableIndexStatusDto>() {
+        @Override
+        public Object getKey(TableIndexStatusDto item) {
+          return item == null ? null : item.getTable();
+        }
+      });
 
   ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
       new ActionsProvider<TableIndexStatusDto>() {
@@ -92,6 +107,11 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     super();
     uiWidget = uiBinder.createAndBindUi(this);
     indexTablePager.setDisplay(indexTable);
+
+    indexTable
+        .setSelectionModel(selectedIndices, DefaultSelectionEventManager.<TableIndexStatusDto>createCheckboxManager());
+
+    indexTable.addColumn(Columns.select, ""); //translations.allLabel()
     indexTable.addColumn(Columns.datasource, translations.datasourceLabel());
     indexTable.addColumn(Columns.table, translations.tableLabel());
     indexTable.addColumn(Columns.tableLastUpdate, translations.tableLastUpdateLabel());
@@ -100,6 +120,10 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTable.addColumn(Columns.status, translations.statusLabel());
     indexTable.addColumn(actionsColumn, translations.actionsLabel());
     indexTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
+  }
+
+  private boolean createCheckboxManager() {
+    return false;
   }
 
   @Override
@@ -123,6 +147,20 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   @Override
+  public DropdownButton getActionsDropdown() {
+    return actionsDropdown;
+  }
+
+  public void as() {
+
+  }
+
+  @Override
+  public MultiSelectionModel getSelectedIndices() {
+    return selectedIndices;
+  }
+
+  @Override
   public HasActionHandler<TableIndexStatusDto> getActions() {
     return actionsColumn;
   }
@@ -133,6 +171,14 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   private static final class Columns {
+
+    static Column<TableIndexStatusDto, Boolean> select = new Column<TableIndexStatusDto, Boolean>(
+        new CheckboxCell(true, false)) {
+      @Override
+      public Boolean getValue(TableIndexStatusDto object) {
+        return selectedIndices.isSelected(object);
+      }
+    };
 
     static Column<TableIndexStatusDto, String> datasource = new TextColumn<TableIndexStatusDto>() {
 
@@ -227,6 +273,11 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
       }
     };
   }
+
+  /**
+   * The key provider that provides the unique ID of a contact.
+   */
+//  public static final ProvidesKey<TableIndexStatusDto> KEY_PROVIDER =
 
 //  @Override
 //  public HasAuthorization getPermissionsAuthorizer() {

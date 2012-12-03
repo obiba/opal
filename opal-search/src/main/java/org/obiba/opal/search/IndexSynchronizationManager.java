@@ -106,6 +106,7 @@ public class IndexSynchronizationManager {
 
     @Override
     public void run() {
+
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
           log.info("Check index for table: {}.{}", ds.getName(), vt.getName());

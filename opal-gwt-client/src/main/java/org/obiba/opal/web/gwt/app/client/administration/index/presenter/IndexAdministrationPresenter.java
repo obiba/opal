@@ -30,8 +30,12 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -40,6 +44,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -70,6 +75,8 @@ public class IndexAdministrationPresenter extends
 
     String CANCEL_ACTION = "Cancel";
 
+    String SCHEDULE = "Schedule indexing";
+
     enum Slots {
       Drivers, Permissions
     }
@@ -80,12 +87,16 @@ public class IndexAdministrationPresenter extends
 
     HasClickHandlers getRefreshButton();
 
+    MultiSelectionModel<TableIndexStatusDto> getSelectedIndices();
+
+    DropdownButton getActionsDropdown();
+
     HasActionHandler<TableIndexStatusDto> getActions();
 
     HasData<TableIndexStatusDto> getIndexTable();
   }
 
-//  private final Provider<IndexPresenter> indexPresenter;
+  private final Provider<IndexPresenter> indexPresenter;
 
   private final AuthorizationPresenter authorizationPresenter;
 
@@ -96,9 +107,9 @@ public class IndexAdministrationPresenter extends
 
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<AuthorizationPresenter> authorizationPresenter) {
+      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
     super(eventBus, display, proxy);
-//    this.indexPresenter = indexPresenter;
+    this.indexPresenter = indexPresenter;
     this.authorizationPresenter = authorizationPresenter.get();
   }
 
@@ -176,6 +187,57 @@ public class IndexAdministrationPresenter extends
       }
     }));
 
+    // Dropdown Actions
+    getView().getActionsDropdown().addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        GWT.log(getView().getActionsDropdown().getLastSelectedNavLink().getText());
+        if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().CLEAR_ACTION)) {
+          if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+
+            for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
+              ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+                @Override
+                public void onResponseCode(Request request, Response response) {
+                  refresh();
+                }
+
+              };
+              ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+                  .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
+                  .withCallback(200, callback).withCallback(503, callback).delete().send();
+
+              getView().getSelectedIndices().setSelected(object, false);
+            }
+          } else {
+            getEventBus()
+                .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
+          }
+        } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().SCHEDULE)) {
+          if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+            for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
+
+              IndexPresenter dialog = indexPresenter.get();
+              dialog.updateSchedule(object);
+              addToPopupSlot(dialog);
+
+              break;
+            }
+          } else {
+            getEventBus()
+                .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
+          }
+        }
+      }
+    });
+//    getView().getSelectedIndices().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+//      @Override
+//      public void onSelectionChange(SelectionChangeEvent event) {
+//        refresh();
+//      }
+//    });
+
     getView().getActions().setActionHandler(new ActionHandler<TableIndexStatusDto>() {
 
       @Override
@@ -189,7 +251,7 @@ public class IndexAdministrationPresenter extends
 //          }, "deleteDatabase", "confirmDeleteDatabase"));
 //        } else if(object.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
 //          DatabasePresenter dialog = jdbcDataSourcePresenter.get();
-//          dialog.updateDatabase(object);
+//          dialog.updateSchedule(object);
 //          addToPopupSlot(dialog);
         if(actionName.equalsIgnoreCase(Display.CLEAR_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
