@@ -134,17 +134,17 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
              * @return
              */
             private JsArray<TableDto> filterTables(JsArray<TableDto> tables, TableDto viewTableDto) {
+              JsArray<TableDto> filteredTables = tables;
               if(viewTableDto != null) {
-                JsArray<TableDto> filteredTables = JsArrays.create();
+                filteredTables = JsArrays.create();
                 for(TableDto table : JsArrays.toIterable(tables)) {
                   if(table.equals(viewTableDto) == false && table.getEntityType()
                       .equals(viewTableDto.getEntityType())) {
                     filteredTables.push(table);
                   }
                 }
-                tables = filteredTables;
               }
-              return tables;
+              return filteredTables;
             }
 
           }).send();
