@@ -108,23 +108,31 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
             @Override
             public void onResource(Response response, JsArray<TableDto> resource) {
               JsArray<TableDto> tables = JsArrays.toSafeArray((JsArray<TableDto>) resource);
-              TableDto viewTableDto = null;
-              // search for the table corresponding to the view
-              if(viewDto != null) {
-                for(TableDto table : JsArrays.toIterable(tables)) {
-                  if(viewDto.getDatasourceName().equals(table.getDatasourceName()) && viewDto.getName()
-                      .equals(table.getName())) {
-                    viewTableDto = table;
-                    break;
-                  }
-                }
-              }
-
+              TableDto viewTableDto = findViewTabledto(tables);
               getDisplay().addTableSelections(filterTables(tables, viewTableDto));
               if(viewDto != null) {
                 getDisplay().selectTables(viewDto.getFromArray());
               }
               refreshRequest = null;
+            }
+
+            /**
+             * Search for the table corresponding to the view.
+             * @param tables
+             * @return
+             */
+            private TableDto findViewTabledto(JsArray<TableDto> tables) {
+              if(viewDto == null) return null;
+
+              TableDto viewTableDto = null;
+              for(TableDto table : JsArrays.toIterable(tables)) {
+                if(viewDto.getDatasourceName().equals(table.getDatasourceName()) && viewDto.getName()
+                    .equals(table.getName())) {
+                  viewTableDto = table;
+                  break;
+                }
+              }
+              return viewTableDto;
             }
 
             /**
@@ -134,14 +142,12 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
              * @return
              */
             private JsArray<TableDto> filterTables(JsArray<TableDto> tables, TableDto viewTableDto) {
-              JsArray<TableDto> filteredTables = tables;
-              if(viewTableDto != null) {
-                filteredTables = JsArrays.create();
-                for(TableDto table : JsArrays.toIterable(tables)) {
-                  if(table.equals(viewTableDto) == false && table.getEntityType()
-                      .equals(viewTableDto.getEntityType())) {
-                    filteredTables.push(table);
-                  }
+              if(viewTableDto == null) return tables;
+
+              JsArray<TableDto> filteredTables = JsArrays.create();
+              for(TableDto table : JsArrays.toIterable(tables)) {
+                if(table.equals(viewTableDto) == false && table.getEntityType().equals(viewTableDto.getEntityType())) {
+                  filteredTables.push(table);
                 }
               }
               return filteredTables;
