@@ -677,12 +677,82 @@
         <artifactId>protobuf-java-format</artifactId>
         <version>${protobuf-java-format.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.dyuproject.protostuff</groupId>
+        <artifactId>protostuff-core</artifactId>
+        <version>${protostuff.version}</version>
+      </dependency>
 
       <!-- SSHd dependencies -->
       <dependency>
         <groupId>org.apache.sshd</groupId>
         <artifactId>sshd-core</artifactId>
         <version>${sshd.version}</version>
+      </dependency>
+
+      <!-- GWT dependencies -->
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-servlet</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-user</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-dev</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt.inject</groupId>
+        <artifactId>gin</artifactId>
+        <version>${gin.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt.google-apis</groupId>
+        <artifactId>gwt-visualization</artifactId>
+        <version>${gwt-visualization.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.gwtplatform</groupId>
+        <artifactId>gwtp-mvp-client</artifactId>
+        <version>${gwtp.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.customware.gwt.presenter</groupId>
+        <artifactId>gwt-presenter</artifactId>
+        <version>${gwt-presenter.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava-gwt</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+
+      <!-- GWT Bootstrap -->
+      <dependency>
+        <groupId>com.github.gwtbootstrap</groupId>
+        <artifactId>gwt-bootstrap</artifactId>
+        <version>${gwt-bootstrap.version}</version>
+      </dependency>
+
+      <!-- GWTQuery related dependencies -->
+      <dependency>
+        <groupId>com.googlecode.gwtquery</groupId>
+        <artifactId>gwtquery</artifactId>
+        <version>${gwtquery.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.watopi</groupId>
+        <artifactId>gwtchosen</artifactId>
+        <version>${gwtchosen.version}</version>
       </dependency>
 
     </dependencies>
@@ -1017,6 +1087,16 @@
     <protobuf.version>2.3.0</protobuf.version>
     <protobuf-java-format.version>1.2</protobuf-java-format.version>
     <sshd.version>0.8.0</sshd.version>
+
+    <!-- GWT -->
+    <gwt.version>2.4.0</gwt.version>
+    <gin.version>1.5.0</gin.version>
+    <gwt-visualization.version>1.0.2</gwt-visualization.version>
+    <gwt-presenter.version>1.0.0</gwt-presenter.version>
+    <gwtp.version>0.6</gwtp.version>
+    <gwt-bootstrap.version>2.0.4.0</gwt-bootstrap.version>
+    <gwtquery.version>1.2.0</gwtquery.version>
+    <gwtchosen.version>1.1.0</gwtchosen.version>
 
     <!-- maven plugins -->
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>

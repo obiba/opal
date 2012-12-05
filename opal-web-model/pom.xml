@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -21,18 +22,15 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>${protobuf.version}</version>
     </dependency>
     <dependency>
       <groupId>com.dyuproject.protostuff</groupId>
       <artifactId>protostuff-core</artifactId>
-      <version>${protostuff.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -124,8 +122,6 @@
 
                 <fail message="No protoc binary for your OS: ${os.name} ${os.arch}." unless="os.protoc" />
 
-                <mkdir dir="target/generated-sources/protobuf-server" />
-
                 <path id="protofiles">
                   <fileset dir="src/main/protobuf">
                     <include name="*.proto" />
@@ -136,8 +132,17 @@
                 </pathconvert>
 
                 <!-- Compile our .proto file -->
+                <!-- Java -->
+                <mkdir dir="target/generated-sources/protobuf-server" />
                 <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
                   <arg value="--java_out=target/generated-sources/protobuf-server" />
+                  <arg line="${protofilesList}" />
+                  <arg line="-Isrc/main/protobuf" />
+                </exec>
+                <!-- Python -->
+                <mkdir dir="target/generated-sources/protobuf-python" />
+                <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
+                  <arg value="--python_out=target/generated-sources/protobuf-python" />
                   <arg line="${protofilesList}" />
                   <arg line="-Isrc/main/protobuf" />
                 </exec>
@@ -307,8 +312,6 @@
   </pluginRepositories>
 
   <properties>
-    <gwt.version>2.1.1</gwt.version>
-    <protobuf.version>2.3.0</protobuf.version>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 
