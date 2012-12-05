@@ -20,6 +20,7 @@ import org.obiba.magma.support.NullTimestamps;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableEntityProvider;
+import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
@@ -149,7 +150,7 @@ class RestValueTable extends AbstractValueTable {
     }
 
     public Value get(Variable variable) {
-      ValueSetsDto valueSet = loadValueSet();
+      loadValueSet();
       ValueSetsDto.ValueSetDto values = valueSet.getValueSets(0);
 
       for(int i = 0; i < valueSet.getVariablesCount(); i++) {
@@ -158,6 +159,30 @@ class RestValueTable extends AbstractValueTable {
         }
       }
       throw new NoSuchVariableException(variable.getName());
+    }
+
+    @Override
+    public Timestamps getTimestamps() {
+      // TODO optimize by loading only timestamps
+      loadValueSet();
+      return new Timestamps() {
+
+        @Override
+        public Value getLastUpdate() {
+          if (valueSet.getValueSets(0).hasLastUpdate()) {
+            return DateTimeType.get().valueOf(valueSet.getValueSets(0).getLastUpdate());
+          }
+          return RestValueTable.this.getTimestamps().getLastUpdate();
+        }
+
+        @Override
+        public Value getCreated() {
+          if (valueSet.getValueSets(0).hasCreated()) {
+            return DateTimeType.get().valueOf(valueSet.getValueSets(0).getCreated());
+          }
+          return RestValueTable.this.getTimestamps().getCreated();
+        }
+      };
     }
 
     synchronized ValueSetsDto loadValueSet() {
@@ -170,6 +195,23 @@ class RestValueTable extends AbstractValueTable {
 
   @Override
   public Timestamps getTimestamps() {
-    return NullTimestamps.get();
+    return new Timestamps() {
+
+      @Override
+      public Value getLastUpdate() {
+        if (tableDto.hasLastUpdate()) {
+          return DateTimeType.get().valueOf(tableDto.getLastUpdate());
+        }
+        return DateTimeType.get().nullValue();
+      }
+
+      @Override
+      public Value getCreated() {
+        if (tableDto.hasCreated()) {
+          return DateTimeType.get().valueOf(tableDto.getCreated());
+        }
+        return DateTimeType.get().nullValue();
+      }
+    };
   }
 }

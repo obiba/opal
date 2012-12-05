@@ -18,7 +18,9 @@ import javax.annotation.Nullable;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
+import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
@@ -203,6 +205,14 @@ public final class Dtos {
           .setValueSetCount(valueTable.getVariableEntities().size());
     }
 
+    Timestamps ts = valueTable.getTimestamps();
+    if(ts.getCreated().isNull() == false) {
+      builder.setCreated(ts.getCreated().toString());
+    }
+    if(ts.getLastUpdate().isNull() == false) {
+      builder.setLastUpdate(ts.getLastUpdate().toString());
+    }
+
     if(valueTable.getDatasource() != null) {
       builder.setDatasourceName(valueTable.getDatasource().getName());
       String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
@@ -291,6 +301,23 @@ public final class Dtos {
   public static VariableEntityDto.Builder asDto(VariableEntity from) {
     return VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).setEntityType(from.getType());
   }
+
+  public static ValueSetsDto.ValueSetDto.Builder asDto(ValueSet valueSet) {
+    ValueSetsDto.ValueSetDto.Builder vsBuilder = ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(valueSet.getVariableEntity()
+        .getIdentifier());
+
+    // add timestamps
+    Timestamps ts = valueSet.getTimestamps();
+    if(ts.getCreated().isNull() == false) {
+      vsBuilder.setCreated(ts.getCreated().toString());
+    }
+    if(ts.getLastUpdate().isNull() == false) {
+      vsBuilder.setLastUpdate(ts.getLastUpdate().toString());
+    }
+
+    return vsBuilder;
+  }
+
 
   public static LocaleDto asDto(Locale locale, Locale displayLocale) {
     LocaleDto.Builder builder = LocaleDto.newBuilder().setName(locale.toString());
