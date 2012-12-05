@@ -19,6 +19,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.type.DateTimeType;
@@ -108,7 +110,7 @@ public class IndexSynchronizationManager {
     public void run() {
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
-          log.info("Check index for table: {}.{}", ds.getName(), vt.getName());
+          log.debug("Check index for table: {}.{}", ds.getName(), vt.getName());
           if(indexManager.isIndexable(vt)) {
             maybeUpdateIndex(vt);
           }
@@ -134,7 +136,14 @@ public class IndexSynchronizationManager {
       }
     }
 
+    /**
+     * Check if the index is not the current task, or in the queue before adding it to the indexation queue.
+     * @param vt
+     * @param index
+     */
     private void submitTask(ValueTable vt, ValueTableIndex index) {
+      if (currentTask != null && currentTask.getValueTableIndex().getName().equals(index.getName())) return;
+
       boolean alreadyQueued = false;
       for(IndexSynchronization s : indexSyncQueue) {
         if(s.getValueTableIndex().getName().equals(index.getName())) {
@@ -143,7 +152,7 @@ public class IndexSynchronizationManager {
         }
       }
       if(alreadyQueued == false) {
-        log.info("Queueing for indexing {}", index.getName());
+        log.trace("Queueing for indexing {}", index.getName());
         IndexSynchronization sync = indexManager.createSyncTask(vt, index);
         indexSyncQueue.offer(sync);
       }
@@ -154,7 +163,7 @@ public class IndexSynchronizationManager {
 
     @Override
     public void run() {
-      log.info("Starting indexing consumer");
+      log.debug("Starting indexing consumer");
       try {
         while(true) {
           consume(indexSyncQueue.take());
@@ -164,10 +173,13 @@ public class IndexSynchronizationManager {
     }
 
     private void consume(IndexSynchronization sync) {
-      log.info("*************** Indexing {}", sync.getValueTableIndex().getName());
+      log.trace("Prepare indexing {}", sync.getValueTableIndex().getName());
       currentTask = sync;
       try {
-        getSubject().execute(sync);
+        // check if still indexable: indexation config could have changed
+        if(indexManager.isIndexable(sync.getValueTable())) {
+          getSubject().execute(sync);
+        }
       } finally {
         currentTask = null;
       }
