@@ -17,7 +17,7 @@
           <g:Label addStyleNames="key">
             <ui:msg description="Data format label">Data Format</ui:msg>
           </g:Label>
-          <g:ListBox ui:field='formatListBox' visibleItemCount='1'/>
+          <o:Chooser ui:field='formatChooser'/>
         </g:FlowPanel>
       </o:WizardStep>
 

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.watopi.chosen.client.ChosenOptions;
 import com.watopi.chosen.client.gwt.ChosenListBox;
@@ -19,22 +20,31 @@ import com.watopi.chosen.client.gwt.ChosenListBox;
 public class Chooser extends ChosenListBox {
 
   public Chooser() {
+    initWidget();
   }
 
   public Chooser(ChosenOptions options) {
     super(options);
+    initWidget();
   }
 
   public Chooser(boolean isMultipleSelect) {
     super(isMultipleSelect);
+    initWidget();
   }
 
   public Chooser(boolean isMultipleSelect, ChosenOptions options) {
     super(isMultipleSelect, options);
+    initWidget();
   }
 
   public Chooser(Element element) {
     super(element);
+    initWidget();
+  }
+
+  private void initWidget() {
+    setDisableSearchThreshold(5);
   }
 
   @Override
@@ -47,5 +57,15 @@ public class Chooser extends ChosenListBox {
   public void removeItem(int index) {
     super.removeItem(index);
     update();
+  }
+
+  @Override
+  public void insertItemToGroup(String item, String value, int groupIndex, int itemIndex) {
+    // TODO should be fixed in next gwtchosen release
+    insertItemToGroup(item, null, value, groupIndex, itemIndex);
+  }
+
+  public String getSelectedValue() {
+    return getValue(getSelectedIndex());
   }
 }

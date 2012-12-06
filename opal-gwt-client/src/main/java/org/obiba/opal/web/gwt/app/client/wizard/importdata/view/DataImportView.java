@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -102,7 +103,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   HTMLPanel archiveHelp;
 
   @UiField
-  ListBox formatListBox;
+  Chooser formatChooser;
 
   private final EventBus eventBus;
 
@@ -127,80 +128,82 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-    .append(formatSelectionStep, formatSelectionHelp)//
-    .title(translations.dataImportFormatStep())//
+        .append(formatSelectionStep, formatSelectionHelp)//
+        .title(translations.dataImportFormatStep())//
 
-    .append(formatStep)//
-    .help(new WidgetProvider() {
+        .append(formatStep)//
+        .help(new WidgetProvider() {
 
-      @Override
-      public Widget getWidget() {
-        return formatStepDisplay.getStepHelp();
-      }
-    }) //
-    .onValidate(new ValidationHandler() {
+          @Override
+          public Widget getWidget() {
+            return formatStepDisplay.getStepHelp();
+          }
+        }) //
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return importDataInputsHandler.validateFormat();
-      }
-    }).title(translations.dataImportFileStep())//
+          @Override
+          public boolean validate() {
+            return importDataInputsHandler.validateFormat();
+          }
+        }).title(translations.dataImportFileStep())//
 
-    .append(destinationSelectionStep, destinationSelectionHelp)//
-    .title(translations.dataImportDestinationStep())//
-    .onValidate(new ValidationHandler() {
+        .append(destinationSelectionStep, destinationSelectionHelp)//
+        .title(translations.dataImportDestinationStep())//
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return importDataInputsHandler.validateDestination();
-      }
-    })//
+          @Override
+          public boolean validate() {
+            return importDataInputsHandler.validateDestination();
+          }
+        })//
 
-    .append(unitSelectionStep, unitSelectionHelp)//
-    .title(translations.dataImportUnitStep())//
+        .append(unitSelectionStep, unitSelectionHelp)//
+        .title(translations.dataImportUnitStep())//
 
-    .append(comparedDatasourcesReportStep)//
-    .title(translations.dataImportComparedDatasourcesReportStep())//
-    .help(new WidgetProvider() {
+        .append(comparedDatasourcesReportStep)//
+        .title(translations.dataImportComparedDatasourcesReportStep())//
+        .help(new WidgetProvider() {
 
-      @Override
-      public Widget getWidget() {
-        return comparedDatasourcesReportHelp;
-      }
-    })//
-    .onStepIn(new StepInHandler() {
+          @Override
+          public Widget getWidget() {
+            return comparedDatasourcesReportHelp;
+          }
+        })//
+        .onStepIn(new StepInHandler() {
 
-      @Override
-      public void onStepIn() {
-        comparedDatasourcesReportStepInHandler.onStepIn();
-      }
-    })//
-    .onValidate(new ValidationHandler() {
+          @Override
+          public void onStepIn() {
+            comparedDatasourcesReportStepInHandler.onStepIn();
+          }
+        })//
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return importDataInputsHandler.validateComparedDatasourcesReport();
-      }
-    })//
+          @Override
+          public boolean validate() {
+            return importDataInputsHandler.validateComparedDatasourcesReport();
+          }
+        })//
 
-    .append(valuesStep)//
-    .title(translations.dataImportValuesStep())//
+        .append(valuesStep)//
+        .title(translations.dataImportValuesStep())//
 
-    .append(archiveStep, archiveHelp, new Skippable() {
-      @Override
-      public boolean skip() {
-        return ImportFormat.LIMESURVEY.name().equals(formatListBox.getValue(formatListBox.getSelectedIndex()));
-      }
-    })//
-    .title(translations.dataImportArchiveStep())//
-    .onNext().onPrevious().build();
+        .append(archiveStep, archiveHelp, new Skippable() {
+          @Override
+          public boolean skip() {
+            return ImportFormat.LIMESURVEY.name().equals(formatChooser.getSelectedValue());
+          }
+        })//
+        .title(translations.dataImportArchiveStep())//
+        .onNext().onPrevious().build();
   }
 
   private void initWidgets() {
-    formatListBox.addItem(translations.csvLabel(), ImportFormat.CSV.name());
-    formatListBox.addItem(translations.opalXmlLabel(), ImportFormat.XML.name());
-    formatListBox.addItem(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
-    formatListBox.addItem(translations.opalRestLabel(), ImportFormat.REST.name());
+    formatChooser.addGroup(translations.fileBasedDatasources());
+    formatChooser.addItemToGroup(translations.csvLabel(), ImportFormat.CSV.name());
+    formatChooser.addItemToGroup(translations.opalXmlLabel(), ImportFormat.XML.name());
+    formatChooser.addGroup(translations.remoteServerBasedDatasources());
+    formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
+    formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
   }
 
   @Override
@@ -232,8 +235,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public ImportFormat getImportFormat() {
-    String formatString = formatListBox.getValue(formatListBox.getSelectedIndex());
-    return ImportFormat.valueOf(formatString);
+    return ImportFormat.valueOf(formatChooser.getSelectedValue());
   }
 
   @Override
@@ -254,7 +256,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public HandlerRegistration addFormatChangeHandler(ChangeHandler handler) {
-    return formatListBox.addChangeHandler(handler);
+    return formatChooser.addChangeHandler(handler);
   }
 
   @Override
@@ -311,7 +313,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         parsingErrors.setErrors(errorDto);
         parsingErrors.setVisible(true);
       } else {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
+        eventBus.fireEvent(
+            NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
       }
     }
     datasourceErrors.setVisible(true);
