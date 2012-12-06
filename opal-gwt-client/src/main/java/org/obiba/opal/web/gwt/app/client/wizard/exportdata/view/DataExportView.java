@@ -9,19 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.view;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -49,7 +45,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
-import com.watopi.chosen.client.gwt.ChosenListBox;
 
 /**
  * View of the dialog used to export data from Opal.
@@ -82,7 +77,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   ListBox units;
 
   @UiField(provided = true)
-  ChosenListBox tableChosen;
+  TableChooser tableChooser;
 
   @UiField
   SimplePanel filePanel;
@@ -122,12 +117,10 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   private WizardStepChain stepChain;
 
-  private Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
-
   @Inject
   public DataExportView(EventBus eventBus) {
     super(eventBus);
-    tableChosen = new ChosenListBox(true);
+    tableChooser = new TableChooser(true);
     this.widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
@@ -181,8 +174,6 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   }
 
   private void initWidgets() {
-    tableChosen.setPlaceholderText(translations.selectSomeTables());
-    tableChosen.setSearchContains(true);
     opalId.addClickHandler(new ClickHandler() {
 
       @Override
@@ -262,71 +253,23 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   @Override
   public void addTableSelections(JsArray<TableDto> tables) {
-    tableChosen.clear();
-    tableDtoMap.clear();
-    HashMap<String, List<TableDto>> datasourceMap = new LinkedHashMap<String, List<TableDto>>();
-    for(TableDto table : JsArrays.toIterable(tables)) {
-      if(datasourceMap.containsKey(table.getDatasourceName()) == false) {
-        datasourceMap.put(table.getDatasourceName(), new ArrayList<TableDto>());
-      }
-      datasourceMap.get(table.getDatasourceName()).add(table);
-    }
-    if(datasourceMap.keySet().size() > 1) {
-      addDatasourceTableSelections(datasourceMap);
-    } else {
-      addTableSelections(datasourceMap.get(datasourceMap.keySet().iterator().next()));
-    }
-    tableChosen.update();
-  }
-
-  private void addDatasourceTableSelections(HashMap<String, List<TableDto>> datasourceMap) {
-    for(String ds : datasourceMap.keySet()) {
-      tableChosen.addGroup(ds);
-      for(TableDto table : datasourceMap.get(ds)) {
-        String fullName = table.getDatasourceName() + "." + table.getName();
-        tableChosen.addItemToGroup(fullName, fullName);
-        tableDtoMap.put(fullName, table);
-      }
-    }
-  }
-
-  private void addTableSelections(List<TableDto> tables) {
-    for(TableDto table : tables) {
-      String fullName = table.getDatasourceName() + "." + table.getName();
-      tableChosen.addItem(table.getName(), fullName);
-      tableDtoMap.put(fullName, table);
-    }
+    tableChooser.clear();
+    tableChooser.addTableSelections(tables);
   }
 
   @Override
   public void selectTable(TableDto table) {
-    for(int i = 0; i < tableChosen.getItemCount(); i++) {
-      if(tableChosen.getItemText(i).equals(table.getName())) {
-        tableChosen.setSelectedIndex(i);
-        break;
-      }
-    }
+    tableChooser.selectTable(table);
   }
 
   @Override
   public void selectAllTables() {
-    for(int i = 0; i < tableChosen.getItemCount(); i++) {
-      GWT.log("select " + i);
-      tableChosen.setItemSelected(i, true);
-    }
-    tableChosen.update();
-    ;
+    tableChooser.selectAllTables();
   }
 
   @Override
   public List<TableDto> getSelectedTables() {
-    List<TableDto> tables = new ArrayList<TableDto>();
-    for(int i = 0; i < tableChosen.getItemCount(); i++) {
-      if(tableChosen.isItemSelected(i)) {
-        tables.add(tableDtoMap.get(tableChosen.getValue(i)));
-      }
-    }
-    return tables;
+    return tableChooser.getSelectedTables();
   }
 
   @Override
@@ -356,7 +299,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   private void clearTablesStep() {
     tablesStep.setVisible(true);
     dialog.setHelpEnabled(false);
-    tableChosen.clear();
+    tableChooser.clear();
   }
 
   private void clearDestinationStep() {

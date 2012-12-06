@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -67,7 +68,7 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   WizardStep tablesStep;
 
   @UiField(provided = true)
-  ChosenListBox tableChosen;
+  TableChooser tableChooser;
 
   @UiField
   WizardStep conclusionStep;
@@ -107,12 +108,10 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
 
   private ValidationHandler tablesValidator;
 
-  private Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
-
   @Inject
   public CreateViewStepView(EventBus eventBus) {
     super(eventBus);
-    tableChosen = new ChosenListBox(true);
+    tableChooser = new TableChooser(true);
     this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
 
@@ -133,8 +132,6 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
     addingVariablesOneByOneRadioButton.addValueChangeHandler(handler);
     useAnExistingView.addValueChangeHandler(handler);
     useAnExcelFile.addValueChangeHandler(handler);
-    tableChosen.setPlaceholderText(translations.selectSomeTables());
-    tableChosen.setSearchContains(true);
   }
 
   private void initWizardDialog() {
@@ -164,7 +161,7 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
 
           @Override
           public void onReset() {
-            tableChosen.clear();
+            tableChooser.clear();
           }
         })//
 
@@ -249,36 +246,12 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
 
   @Override
   public void addTableSelections(JsArray<TableDto> tables) {
-    tableChosen.clear();
-    tableDtoMap.clear();
-    HashMap<String, List<TableDto>> datasourceMap = new LinkedHashMap<String, List<TableDto>>();
-    for(TableDto table : JsArrays.toIterable(tables)) {
-      if(datasourceMap.containsKey(table.getDatasourceName()) == false) {
-        datasourceMap.put(table.getDatasourceName(), new ArrayList<TableDto>());
-      }
-      datasourceMap.get(table.getDatasourceName()).add(table);
-    }
-
-    for(String ds : datasourceMap.keySet()) {
-      tableChosen.addGroup(ds);
-      for(TableDto table : datasourceMap.get(ds)) {
-        String fullName = table.getDatasourceName() + "." + table.getName();
-        tableChosen.addItemToGroup(fullName, fullName);
-        tableDtoMap.put(fullName, table);
-      }
-      tableChosen.update();
-    }
+    tableChooser.addTableSelections(tables);
   }
 
   @Override
   public List<TableDto> getSelectedTables() {
-    List<TableDto> tables = new ArrayList<TableDto>();
-    for(int i = 0; i < tableChosen.getItemCount(); i++) {
-      if(tableChosen.isItemSelected(i)) {
-        tables.add(tableDtoMap.get(tableChosen.getValue(i)));
-      }
-    }
-    return tables;
+    return tableChooser.getSelectedTables();
   }
 
   @Override

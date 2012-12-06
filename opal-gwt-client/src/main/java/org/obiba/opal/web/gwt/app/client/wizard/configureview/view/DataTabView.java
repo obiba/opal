@@ -18,6 +18,7 @@ import java.util.Map;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.DataTabPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.GWT;
@@ -48,15 +49,13 @@ public class DataTabView extends Composite implements DataTabPresenter.Display {
   Button saveChangesButton;
 
   @UiField(provided = true)
-  ChosenListBox tableChosen;
+  TableChooser tableChooser;
 
   private Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
 
   public DataTabView() {
-    tableChosen = new ChosenListBox(true);
+    tableChooser = new TableChooser(true);
     initWidget(uiBinder.createAndBindUi(this));
-    tableChosen.setPlaceholderText(translations.selectSomeTables());
-    tableChosen.setSearchContains(true);
   }
 
   @Override
@@ -82,59 +81,27 @@ public class DataTabView extends Composite implements DataTabPresenter.Display {
 
   @Override
   public void clear() {
-    tableChosen.clear();
+    tableChooser.clear();
   }
 
   @Override
   public void addTableSelections(JsArray<TableDto> tables) {
-    tableChosen.clear();
-    tableDtoMap.clear();
-    HashMap<String, List<TableDto>> datasourceMap = new LinkedHashMap<String, List<TableDto>>();
-    for(TableDto table : JsArrays.toIterable(tables)) {
-      if(datasourceMap.containsKey(table.getDatasourceName()) == false) {
-        datasourceMap.put(table.getDatasourceName(), new ArrayList<TableDto>());
-      }
-      datasourceMap.get(table.getDatasourceName()).add(table);
-    }
-
-    for(String ds : datasourceMap.keySet()) {
-      tableChosen.addGroup(ds);
-      for(TableDto table : datasourceMap.get(ds)) {
-        String fullName = table.getDatasourceName() + "." + table.getName();
-        tableChosen.addItemToGroup(fullName, fullName);
-        tableDtoMap.put(fullName, table);
-      }
-      tableChosen.update();
-    }
+    tableChooser.addTableSelections(tables);
   }
 
   @Override
   public void selectTables(JsArrayString tableFullNames) {
-    for(String tableFullName : JsArrays.toIterable(tableFullNames)) {
-      for(int i = 0; i < tableChosen.getItemCount(); i++) {
-        if(tableChosen.getItemText(i).equals(tableFullName)) {
-          tableChosen.setItemSelected(i, true);
-          break;
-        }
-      }
-    }
-    tableChosen.update();
+    tableChooser.selectTables(tableFullNames);
   }
 
   @Override
   public List<TableDto> getSelectedTables() {
-    List<TableDto> tables = new ArrayList<TableDto>();
-    for(int i = 0; i < tableChosen.getItemCount(); i++) {
-      if(tableChosen.isItemSelected(i)) {
-        tables.add(tableDtoMap.get(tableChosen.getValue(i)));
-      }
-    }
-    return tables;
+    return tableChooser.getSelectedTables();
   }
 
   @Override
   public void setTableListListener(final DataTabPresenter.TableListListener listener) {
-    tableChosen.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
+    tableChooser.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
       @Override
       public void onChange(ChosenChangeEvent chosenChangeEvent) {
         listener.onTableListUpdated();

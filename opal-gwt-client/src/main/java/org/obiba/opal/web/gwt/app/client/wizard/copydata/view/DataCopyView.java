@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -77,7 +78,7 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   Anchor jobLink;
 
   @UiField(provided = true)
-  ChosenListBox tableChosen;
+  TableChooser tableChooser;
 
   @UiField
   ListBox datasources;
@@ -97,15 +98,12 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
 
   private WizardStepChain stepChain;
 
-  private Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
-
   @Inject
   public DataCopyView(EventBus eventBus) {
     super(eventBus);
-    tableChosen = new ChosenListBox(true);
+    tableChooser = new TableChooser(true);
     this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
-    tableChosen.setPlaceholderText(translations.selectSomeTables());
   }
 
   private void initWizardDialog() {
@@ -234,7 +232,7 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   private void clearTablesStep() {
     tablesStep.setVisible(true);
     dialog.setHelpEnabled(false);
-    tableChosen.clear();
+    tableChooser.clear();
   }
 
   private void clearDestinationStep() {
@@ -269,46 +267,23 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   }
 
   @Override
-  public void addTableSelections(JsArray<TableDto> tableDtoJsArray) {
-    tableChosen.clear();
-    tableDtoMap.clear();
-    for(TableDto table : JsArrays.toIterable(tableDtoJsArray)) {
-      String fullName = table.getDatasourceName() + "." + table.getName();
-      tableChosen.addItem(table.getName(), fullName);
-      tableDtoMap.put(fullName, table);
-    }
-    tableChosen.update();
+  public void addTableSelections(JsArray<TableDto> tables) {
+    tableChooser.addTableSelections(tables);
   }
 
   @Override
   public void selectTable(TableDto table) {
-    for(int i = 0; i < tableChosen.getItemCount(); i++) {
-      if(tableChosen.getItemText(i).equals(table.getName())) {
-        tableChosen.setSelectedIndex(i);
-        break;
-      }
-    }
+    tableChooser.selectTable(table);
   }
 
   @Override
   public void selectAllTables() {
-    for(int i = 0; i < tableChosen.getItemCount(); i++) {
-      GWT.log("select " + i);
-      tableChosen.setItemSelected(i, true);
-    }
-    tableChosen.update();
-    ;
+    tableChooser.selectAllTables();
   }
 
   @Override
   public List<TableDto> getSelectedTables() {
-    List<TableDto> tables = new ArrayList<TableDto>();
-    for(int i = 0; i < tableChosen.getItemCount(); i++) {
-      if(tableChosen.isItemSelected(i)) {
-        tables.add(tableDtoMap.get(tableChosen.getValue(i)));
-      }
-    }
-    return tables;
+    return tableChooser.getSelectedTables();
   }
 
 }
