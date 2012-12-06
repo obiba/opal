@@ -988,6 +988,7 @@ td.row-actions span {
   background: url("../image/16/search.png") no-repeat scroll left center #ffffff;
   border: 1px solid #bbbbbb;
   padding-left: 20px;
+  margin-top: -1em;
 }
 
 .navigator .gwt-MenuBar {
@@ -1792,7 +1793,7 @@ textarea.error:focus {
   -webkit-border-radius:0 4px 4px 0;
   -moz-border-radius:0 4px 4px 0;
   border-radius: 0 4px 4px 0;
-  height: 24px;
+  height: 28px;
   padding: 0;
   vertical-align: top;
   width: 20px;
