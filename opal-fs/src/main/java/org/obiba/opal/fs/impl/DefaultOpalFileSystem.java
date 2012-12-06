@@ -132,9 +132,9 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     FileObject currentFile = virtualFile;
     while(true) {
       if(currentFile instanceof DelegateFileObject) {
-        currentFile = ((DelegateFileObject) virtualFile).getDelegateFile();
+        currentFile = ((DelegateFileObject) currentFile).getDelegateFile();
       } else if(currentFile instanceof DecoratedFileObject) {
-        currentFile = ((DecoratedFileObject) virtualFile).getDecoratedFileObject();
+        currentFile = ((DecoratedFileObject) currentFile).getDecoratedFileObject();
       } else if(currentFile instanceof LocalFile) {
         return true;
       } else {

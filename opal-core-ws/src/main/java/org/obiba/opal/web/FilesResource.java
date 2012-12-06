@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -102,10 +102,9 @@ public class FilesResource {
 
   @GET
   @Path("/meta/{path:.*}")
-  public Response getFileDetails(@PathParam("path")
-  String path) throws FileSystemException {
+  public Response getFileDetails(@PathParam("path") String path) throws FileSystemException {
     FileObject file = resolveFileInFileSystem(path);
-    if(!file.exists()) {
+    if(file.exists() == false) {
       return getPathNotExistResponse(path);
     } else if(file.getType() == FileType.FILE) {
       return getFileDetails(file);
@@ -124,8 +123,7 @@ public class FilesResource {
   @GET
   @Path("/{path:.*}")
   @AuthenticatedByCookie
-  public Response getFile(@PathParam("path")
-  String path) throws IOException {
+  public Response getFile(@PathParam("path") String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
     if(!file.exists()) {
       return getPathNotExistResponse(path);
@@ -141,9 +139,8 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
-  public Response uploadFile(@Context
-  UriInfo uriInfo, @Context
-  HttpServletRequest request) throws FileSystemException, FileUploadException {
+  public Response uploadFile(@Context UriInfo uriInfo,
+      @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
     return uploadFile("/", uriInfo, request);
   }
 
@@ -153,10 +150,8 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
-  public Response uploadFile(@PathParam("path")
-  String path, @Context
-  UriInfo uriInfo, @Context
-  HttpServletRequest request) throws FileSystemException, FileUploadException {
+  public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo,
+      @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
@@ -169,13 +164,16 @@ public class FilesResource {
 
     FileItem uploadedFile = getUploadedFile(request);
     if(uploadedFile == null) {
-      return Response.status(Status.BAD_REQUEST).entity("No file has been submitted. Please make sure that you are submitting a file with your resquest.").build();
+      return Response.status(Status.BAD_REQUEST)
+          .entity("No file has been submitted. Please make sure that you are submitting a file with your resquest.")
+          .build();
     }
 
     return doUploadFile(folderPath, folder, uploadedFile, uriInfo);
   }
 
-  private Response doUploadFile(String folderPath, FileObject folder, FileItem uploadedFile, UriInfo uriInfo) throws FileSystemException {
+  private Response doUploadFile(String folderPath, FileObject folder, FileItem uploadedFile,
+      UriInfo uriInfo) throws FileSystemException {
     String fileName = uploadedFile.getName();
     FileObject file = folder.resolveFile(fileName);
     boolean overwrite = file.exists();
@@ -189,25 +187,23 @@ public class FilesResource {
     } else {
       URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
       return Response.created(fileUri)//
-      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, AclAction.FILES_ALL))//
-      .build();
+          .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, AclAction.FILES_ALL))//
+          .build();
     }
   }
 
   @POST
   @Path("/")
   @Consumes("text/plain")
-  public Response createFolder(String folderName, @Context
-  UriInfo uriInfo) throws FileSystemException {
+  public Response createFolder(String folderName, @Context UriInfo uriInfo) throws FileSystemException {
     return createFolder("/", folderName, uriInfo);
   }
 
   @POST
   @Path("/{path:.*}")
   @Consumes("text/plain")
-  public Response createFolder(@PathParam("path")
-  String path, String folderName, @Context
-  UriInfo uriInfo) throws FileSystemException {
+  public Response createFolder(@PathParam("path") String path, String folderName,
+      @Context UriInfo uriInfo) throws FileSystemException {
     if(folderName == null || folderName.trim().length() == 0) return Response.status(Status.BAD_REQUEST).build();
 
     String folderPath = getPathOfFileToWrite(path);
@@ -224,8 +220,8 @@ public class FilesResource {
       Opal.FileDto dto = getBaseFolderBuilder(file).build();
       URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build();
       return Response.created(folderUri)//
-      .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
-      .entity(dto).build();
+          .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
+          .entity(dto).build();
     } catch(FileSystemException couldNotCreateTheFolder) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
     }
@@ -256,8 +252,7 @@ public class FilesResource {
 
   @DELETE
   @Path("/{path:.*}")
-  public Response deleteFile(@PathParam("path")
-  String path) throws FileSystemException {
+  public Response deleteFile(@PathParam("path") String path) throws FileSystemException {
     FileObject file = resolveFileInFileSystem(path);
 
     // File or folder does not exist.
@@ -306,7 +301,7 @@ public class FilesResource {
   @Path("/charsets/default")
   @NoAuthorization
   public Response getDefaultCharset() {
-    return Response.ok(new JSONArray(Arrays.asList(new String[] { defaultCharset })).toString()).build();
+    return Response.ok(new JSONArray(Arrays.asList(new String[] {defaultCharset})).toString()).build();
   }
 
   //
@@ -321,19 +316,23 @@ public class FilesResource {
     File localFile = opalRuntime.getFileSystem().getLocalFile(file);
     String mimeType = mimeTypes.getContentType(localFile);
 
-    return Response.ok(localFile, mimeType).header("Content-Disposition", getContentDispositionOfAttachment(localFile.getName())).build();
+    return Response.ok(localFile, mimeType)
+        .header("Content-Disposition", getContentDispositionOfAttachment(localFile.getName())).build();
   }
 
   private Response getFolder(FileObject folder) throws IOException {
     SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
     String folderName = folder.getName().getBaseName();
-    File compressedFolder = new File(System.getProperty("java.io.tmpdir"), (folderName.equals("") ? "filesystem" : folderName) + "_" + dateTimeFormatter.format(System.currentTimeMillis()) + ".zip");
+    File compressedFolder = new File(System.getProperty("java.io.tmpdir"),
+        (folderName.equals("") ? "filesystem" : folderName) + "_" + dateTimeFormatter
+            .format(System.currentTimeMillis()) + ".zip");
     compressedFolder.deleteOnExit();
     String mimeType = mimeTypes.getContentType(compressedFolder);
 
     compressFolder(compressedFolder, folder);
 
-    return Response.ok(compressedFolder, mimeType).header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
+    return Response.ok(compressedFolder, mimeType)
+        .header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
   }
 
   private Response getFileDetails(FileObject file) throws FileSystemException {
@@ -342,6 +341,7 @@ public class FilesResource {
     fileBuilder = Opal.FileDto.newBuilder();
     fileBuilder.setName(file.getName().getBaseName()).setPath(file.getName().getPath());
     fileBuilder.setType(file.getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
+    fileBuilder.setReadable(file.isReadable()).setWritable(file.isWriteable());
 
     // Set size on files only, not folders.
     if(file.getType() == FileType.FILE) {
@@ -367,12 +367,15 @@ public class FilesResource {
   private Opal.FileDto.Builder getBaseFolderBuilder(FileObject folder) throws FileSystemException {
     Opal.FileDto.Builder fileBuilder = Opal.FileDto.newBuilder();
     String folderName = folder.getName().getBaseName();
-    fileBuilder.setName(folderName.equals("") ? "root" : folderName).setType(Opal.FileDto.FileType.FOLDER).setPath(folder.getName().getPath());
+    fileBuilder.setName(folderName.equals("") ? "root" : folderName).setType(Opal.FileDto.FileType.FOLDER)
+        .setPath(folder.getName().getPath());
     fileBuilder.setLastModifiedTime(folder.getContent().getLastModifiedTime());
+    fileBuilder.setReadable(folder.isReadable()).setWritable(folder.isWriteable());
     return fileBuilder;
   }
 
-  private void addChildren(Opal.FileDto.Builder folderBuilder, FileObject parentFolder, int level) throws FileSystemException {
+  private void addChildren(Opal.FileDto.Builder folderBuilder, FileObject parentFolder,
+      int level) throws FileSystemException {
     Opal.FileDto.Builder fileBuilder;
 
     // Get the children for the current folder (list of files & folders).
@@ -388,12 +391,11 @@ public class FilesResource {
 
     // Loop through all children.
     for(FileObject child : children) {
-      if(child.isReadable() == false) continue;
-
       // Build a FileDto representing the child.
       fileBuilder = Opal.FileDto.newBuilder();
       fileBuilder.setName(child.getName().getBaseName()).setPath(child.getName().getPath());
       fileBuilder.setType(child.getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
+      fileBuilder.setReadable(child.isReadable()).setWritable(child.isWriteable());
 
       // Set size on files only, not folders.
       if(child.getType() == FileType.FILE) {
@@ -402,7 +404,7 @@ public class FilesResource {
 
       fileBuilder.setLastModifiedTime(child.getContent().getLastModifiedTime());
 
-      if(child.getType().hasChildren() && child.getChildren().length > 0 && (level - 1) > 0) {
+      if(child.getType().hasChildren() && child.getChildren().length > 0 && (level - 1) > 0 && child.isReadable()) {
         addChildren(fileBuilder, child, level - 1);
       }
 
@@ -422,6 +424,7 @@ public class FilesResource {
   /**
    * Returns the first {@code FileItem} that is reprensents a file upload field. If no such field exists, this method
    * returns null
+   *
    * @param request
    * @return
    * @throws FileUploadException
@@ -451,7 +454,9 @@ public class FilesResource {
         public synchronized void write(byte[] b, int off, int len) throws IOException {
           flush();
           super.write(b, off, len);
-        };
+        }
+
+        ;
 
       };
       uploadedFileStream = uploadedFile.getInputStream();

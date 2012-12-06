@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,22 +19,31 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.InvalidSessionException;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.security.support.FilesPermissionConverter;
+import org.obiba.opal.core.runtime.security.support.OpalPermissionConverter;
+import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Iterables;
+
 @Component
 @Path("/auth")
 public class AuthenticationResource extends AbstractSecurityComponent {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationResource.class);
+
 
   @Autowired
   public AuthenticationResource(SessionsSecurityManager securityManager) {
@@ -44,7 +53,8 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @POST
   @Path("/sessions")
   @NotAuthenticated
-  public Response createSession(@FormParam("username") String username, @FormParam("password") String password) {
+  public Response createSession(@FormParam("username") String username,
+      @FormParam("password") String password) throws FileSystemException {
     try {
       SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password));
     } catch(AuthenticationException e) {
@@ -54,7 +64,10 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     }
     String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
     log.info("Successfull session creation for user '{}' session ID is '{}'.", username, sessionId);
-    return Response.created(UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession").build(sessionId)).build();
+
+    return Response.created(
+        UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
+            .build(sessionId)).build();
   }
 
   @HEAD

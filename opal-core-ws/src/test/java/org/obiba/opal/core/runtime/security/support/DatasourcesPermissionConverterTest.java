@@ -39,18 +39,14 @@ public class DatasourcesPermissionConverterTest extends
   public void testCreateTable() {
     testConversion("/datasource/patate", DatasourcesPermissionConverter.Permission.CREATE_TABLE, //
         "magma:/datasource/patate/tables:GET:GET", //
-        "magma:/datasource/patate/tables:POST:GET", //
-        "magma:/files:POST:GET/POST", //
-        "magma:/files/meta:GET:GET/GET");
+        "magma:/datasource/patate/tables:POST:GET");
   }
 
   @Test
   public void testCreateView() {
     testConversion("/datasource/patate", DatasourcesPermissionConverter.Permission.CREATE_VIEW, //
         "magma:/datasource/patate/tables:GET:GET", //
-        "magma:/datasource/patate/views:POST:GET", //
-        "magma:/files:POST:GET/POST", //
-        "magma:/files/meta:GET:GET/GET");
+        "magma:/datasource/patate/views:POST:GET");
   }
 
   @Test
@@ -61,9 +57,7 @@ public class DatasourcesPermissionConverterTest extends
         "magma:/datasource/patate/table/pwel/index/schedule:*:GET", //
         "magma:/datasource/patate/table/pwel:GET:GET", //
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
-        "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
-        "magma:/files:POST:GET/POST", //
-        "magma:/files/meta:GET:GET/GET");
+        "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST");
   }
 
   @Test

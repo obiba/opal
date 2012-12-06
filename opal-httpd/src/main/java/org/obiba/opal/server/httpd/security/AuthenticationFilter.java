@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -18,6 +18,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.mgt.SecurityManager;
@@ -30,6 +32,8 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.eclipse.jetty.http.HttpStatus;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.core.unit.security.X509CertificateAuthenticationToken;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
 import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
@@ -50,15 +54,22 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private final SessionsSecurityManager securityManager;
 
-  public AuthenticationFilter(final SecurityManager mgr) {
+  private final OpalRuntime opalRuntime;
+
+  private final SubjectAclService subjectAclService;
+
+  public AuthenticationFilter(SecurityManager mgr, OpalRuntime opalRuntime, SubjectAclService subjectAclService) {
     if(mgr instanceof SessionsSecurityManager == false) {
       throw new IllegalStateException("SecurityManager does not support session management");
     }
-    this.securityManager = (SessionsSecurityManager) mgr;
+    securityManager = (SessionsSecurityManager) mgr;
+    this.opalRuntime = opalRuntime;
+    this.subjectAclService = subjectAclService;
   }
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
     if(ThreadContext.getSubject() != null) {
       log.warn("Previous executing subject was not properly unbound from executing thread. Unbinding now.");
       ThreadContext.unbindSubject();
@@ -94,7 +105,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
    * This method will try to authenticate the user using the provided sessionId or the "Authorization" header. When no
    * credentials are provided, this method does nothing. This will invoke the filter chain with an anonymous subject,
    * which allows fetching public web resources.
-   * 
+   *
    * @param request
    */
   private void authenticateAndBind(HttpServletRequest request) {
@@ -119,11 +130,54 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     if(subject != null) {
       Session session = subject.getSession();
-      log.debug("Binding subject {} session {} to executing thread {}", new Object[] { subject.getPrincipal(), session.getId(), Thread.currentThread().getId() });
+      log.debug("Binding subject {} session {} to executing thread {}", subject.getPrincipal(), session.getId(),
+          Thread.currentThread().getId());
       session.touch();
-      return;
+      String username = subject.getPrincipal().toString();
+      ensureUserHomeExists(username);
+      ensureFolderPermissions(username, "/home/" + username);
+      ensureFolderPermissions(username, "/tmp");
     }
+  }
 
+  private void ensureUserHomeExists(String username) {
+    try {
+      FileObject home = opalRuntime.getFileSystem().getRoot().resolveFile("/home/" + username);
+      if(home.exists() == false) {
+        log.info("Creating user home: /home/{}", username);
+        home.createFolder();
+      }
+    } catch(FileSystemException e) {
+      log.error("Failed creating user home.", e);
+    }
+  }
+
+  private void ensureFolderPermissions(String username, String path) {
+    String folderNode = "/files" + path;
+    String homePerm = "FILES_SHARE";
+    boolean found = false;
+    for(SubjectAclService.Permissions acl : subjectAclService
+        .getNodePermissions("opal", folderNode, SubjectAclService.SubjectType.USER)) {
+      found = findPermission(acl, homePerm);
+      if(found) break;
+    }
+    if(found == false) {
+      subjectAclService
+          .addSubjectPermission("opal", folderNode, SubjectAclService.SubjectType.USER.subjectFor(username), homePerm);
+      subjectAclService.addSubjectPermission("opal", folderNode.replace("/files/", "/files/meta/"),
+          SubjectAclService.SubjectType.USER.subjectFor(username), "FILES_META");
+    }
+  }
+
+  private boolean findPermission(SubjectAclService.Permissions acl, String permission) {
+    boolean found = false;
+    for(String perm : acl.getPermissions()) {
+      if(perm.equals(permission)) {
+        found = true;
+        break;
+      }
+    }
+    return found;
   }
 
   private Subject authenticateBySslCert(HttpServletRequest request) {
@@ -178,7 +232,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         Subject s = ThreadContext.getSubject();
         if(s != null) {
           Session session = s.getSession(false);
-          log.debug("Unbinding subject {} session {} from executing thread {}", new Object[] { s.getPrincipal(), (session != null ? session.getId() : "null"), Thread.currentThread().getId() });
+          log.debug("Unbinding subject {} session {} from executing thread {}", s.getPrincipal(),
+              session != null ? session.getId() : "null", Thread.currentThread().getId());
         }
       }
     } finally {

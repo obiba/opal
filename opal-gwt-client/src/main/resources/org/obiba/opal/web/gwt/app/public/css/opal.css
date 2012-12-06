@@ -1085,6 +1085,11 @@ td.row-actions span {
   padding-left:20px;
 }
 
+.folder-details .folder.forbidden a {
+  background:transparent url(../image/16/folder-forbidden.png) no-repeat scroll left center;
+  padding-left:20px;
+}
+
 .folder-details .folder-up a {
   background:transparent url(../image/folder-up.png) no-repeat scroll left center;
   padding-left:20px;
@@ -1095,8 +1100,18 @@ td.row-actions span {
   padding-left:20px;
 }
 
+.folder-details .file.forbidden a {
+  background:transparent url(../image/16/document-forbidden.png) no-repeat scroll left center;
+  padding-left:20px;
+}
+
 .gwt-Tree .folder .gwt-TreeItem {
   background:transparent url(../image/16/folder.png) no-repeat scroll left center;
+  padding-left:20px;
+}
+
+.gwt-Tree .folder.forbidden .gwt-TreeItem {
+  background:transparent url(../image/16/folder-forbidden.png) no-repeat scroll left center;
   padding-left:20px;
 }
 

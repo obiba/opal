@@ -24,6 +24,7 @@ import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
+import org.obiba.opal.fs.security.SecuredOpalFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,7 +179,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private void initFileSystem() {
     synchronized(syncFs) {
       try {
-        opalFileSystem = new DefaultOpalFileSystem(opalConfigurationService.getOpalConfiguration().getFileSystemRoot());
+        opalFileSystem = new SecuredOpalFileSystem(
+            new DefaultOpalFileSystem(opalConfigurationService.getOpalConfiguration().getFileSystemRoot()));
 
         // Create tmp folder, if it does not exist.
         FileObject tmpFolder = getFileSystem().getRoot().resolveFile("tmp");

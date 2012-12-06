@@ -16,8 +16,10 @@ import org.obiba.opal.web.model.Opal.AclAction;
  */
 public abstract class OpalPermissionConverter extends DomainPermissionConverter {
 
+  public static final String OPAL_DOMAIN = "opal";
+
   public OpalPermissionConverter() {
-    super("opal");
+    super(OPAL_DOMAIN);
   }
 
   @Override

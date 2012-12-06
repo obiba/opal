@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -20,17 +20,27 @@ public class FilesPermissionConverterTest extends OpalPermissionConverterTest<Fi
   @Test
   public void testFilesAll() {
     testConversion("/files", FilesPermissionConverter.Permission.FILES_ALL, //
-    "magma:/files:*:GET/*");
+        "magma:/files:*:GET/*");
     testConversion("/files/patate", FilesPermissionConverter.Permission.FILES_ALL, //
-    "magma:/files/patate:*:GET/*");
+        "magma:/files/patate:*:GET/*");
+  }
+
+  @Test
+  public void testFilesShare() {
+    testConversion("/files", FilesPermissionConverter.Permission.FILES_SHARE, //
+        "magma:/files:GET:GET/*", //
+        "magma:/files:POST:GET/*");
+    testConversion("/files/patate", FilesPermissionConverter.Permission.FILES_SHARE, //
+        "magma:/files/patate:GET:GET/*", //
+        "magma:/files/patate:POST:GET/*");
   }
 
   @Test
   public void testFilesMeta() {
     testConversion("/files/meta", FilesPermissionConverter.Permission.FILES_META, //
-    "magma:/files/meta:GET:GET/GET");
+        "magma:/files/meta:GET:GET/GET");
     testConversion("/files/meta/patate", FilesPermissionConverter.Permission.FILES_META, //
-    "magma:/files/meta/patate:GET:GET/GET");
+        "magma:/files/meta/patate:GET:GET/GET");
   }
 
   @Override

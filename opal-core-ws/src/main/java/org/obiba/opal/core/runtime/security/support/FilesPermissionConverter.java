@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -38,11 +38,10 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
     return Permission.valueOf(permission.toUpperCase()).convert(node);
   }
 
-  enum Permission {
+  public enum Permission {
     FILES_META {
-
       @Override
-      public Iterable<String> convert(String node) {
+      Iterable<String> convert(String node) {
         String[] args = args(node, "/files/meta/(.+)");
         if(args.length == 0) {
           return Lists.newArrayList(magmaConvert("/files/meta", "GET:GET/GET"));
@@ -52,10 +51,12 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
       }
 
     },
+    /**
+     * Read, write and delete.
+     */
     FILES_ALL {
-
       @Override
-      public Iterable<String> convert(String node) {
+      Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
         if(args.length == 0) {
           return Lists.newArrayList(magmaConvert("/files", "*:GET/*"));
@@ -64,10 +65,28 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
         }
       }
     },
-    FILES_READ {
-
+    /**
+     * Read, write but cannot delete.
+     */
+    FILES_SHARE {
       @Override
-      public Iterable<String> convert(String node) {
+      Iterable<String> convert(String node) {
+        String[] args = args(node, "/files/(.+)");
+        if(args.length == 0) {
+          return Lists.newArrayList(magmaConvert("/files", "GET:GET/*"), //
+              magmaConvert("/files", "POST:GET/*"));
+        } else {
+          return Lists.newArrayList(magmaConvert("/files/{0}", "GET:GET/*", args),//
+              magmaConvert("/files/{0}", "POST:GET/*", args));
+        }
+      }
+    },
+    /**
+     * Read only.
+     */
+    FILES_READ {
+      @Override
+      Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
         if(args.length == 0) {
           return Lists.newArrayList(magmaConvert("/files", "GET:GET/GET"));
@@ -76,25 +95,9 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
         }
       }
 
-    },
-    FILES_ADD {
-
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/files/(.+)");
-        List<String> perms;
-        if(args.length == 0) {
-          perms = Lists.newArrayList(magmaConvert("/files", "POST:GET/POST"));
-        } else {
-          perms = Lists.newArrayList(magmaConvert("/files/{0}", "POST:GET/POST", args));
-        }
-        Iterables.addAll(perms, FILES_META.convert(node.replaceFirst("/files", "/files/meta")));
-        return perms;
-      }
-
     };
 
-    public abstract Iterable<String> convert(String node);
+    abstract Iterable<String> convert(String node);
 
   }
 
