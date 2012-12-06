@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -79,10 +79,10 @@ public class FunctionalUnitPresenter extends
   @Override
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
     switch(slot) {
-    case CENTER:
-      return functionalUnitDetailsPresenter;
-    case LEFT:
-      return functionalUnitListPresenter;
+      case CENTER:
+        return functionalUnitDetailsPresenter;
+      case LEFT:
+        return functionalUnitListPresenter;
     }
     return null;
   }
@@ -97,7 +97,7 @@ public class FunctionalUnitPresenter extends
         .authorize(getView().getExportIdentifiersAuthorizer()).send();
     // map identifiers
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units/entities/table").get()//
-        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+        .authorize(CascadingAuthorizer.newBuilder()//
             .and("/functional-units/entities/identifiers/map/units", HttpMethod.GET)//
             .authorize(getView().getImportIdentifiersAuthorizer()).build())//
         .send();

@@ -35,14 +35,6 @@ public class FilesPermissionConverterTest extends OpalPermissionConverterTest<Fi
         "magma:/files/patate:POST:GET/*");
   }
 
-  @Test
-  public void testFilesMeta() {
-    testConversion("/files/meta", FilesPermissionConverter.Permission.FILES_META, //
-        "magma:/files/meta:GET:GET/GET");
-    testConversion("/files/meta/patate", FilesPermissionConverter.Permission.FILES_META, //
-        "magma:/files/meta/patate:GET:GET/GET");
-  }
-
   @Override
   protected SubjectPermissionConverter newConverter() {
     return new FilesPermissionConverter();

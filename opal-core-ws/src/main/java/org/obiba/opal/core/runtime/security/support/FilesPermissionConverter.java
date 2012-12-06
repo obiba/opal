@@ -39,18 +39,6 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
   }
 
   public enum Permission {
-    FILES_META {
-      @Override
-      Iterable<String> convert(String node) {
-        String[] args = args(node, "/files/meta/(.+)");
-        if(args.length == 0) {
-          return Lists.newArrayList(magmaConvert("/files/meta", "GET:GET/GET"));
-        } else {
-          return Lists.newArrayList(magmaConvert("/files/meta/{0}", "GET:GET/GET", args));
-        }
-      }
-
-    },
     /**
      * Read, write and delete.
      */

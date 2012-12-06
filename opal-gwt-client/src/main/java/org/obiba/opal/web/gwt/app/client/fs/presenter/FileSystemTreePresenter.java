@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -67,13 +67,14 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
 
   @Override
   public void onReveal() {
-    ResourceRequestBuilderFactory.<FileDto> newBuilder().forResource("/files/meta").get().withCallback(new ResourceCallback<FileDto>() {
-      @Override
-      public void onResource(Response response, FileDto root) {
-        getView().initTree(root);
-        getView().selectFile(root, false);
-      }
-    }).send();
+    ResourceRequestBuilderFactory.<FileDto>newBuilder().forResource("/files/_meta").get()
+        .withCallback(new ResourceCallback<FileDto>() {
+          @Override
+          public void onResource(Response response, FileDto root) {
+            getView().initTree(root);
+            getView().selectFile(root, false);
+          }
+        }).send();
   }
 
   private void addTreeItemSelectionHandler() {
@@ -91,12 +92,13 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
 
         if(childrenNotAdded(selectedItem)) {
 
-          FileResourceRequest.newBuilder(getEventBus()).path(selectedFile.getPath()).withCallback(new ResourceCallback<FileDto>() {
-            @Override
-            public void onResource(Response response, FileDto file) {
-              getView().addBranch(selectedItem, file);
-            }
-          }).send();
+          FileResourceRequest.newBuilder(getEventBus()).path(selectedFile.getPath())
+              .withCallback(new ResourceCallback<FileDto>() {
+                @Override
+                public void onResource(Response response, FileDto file) {
+                  getView().addBranch(selectedItem, file);
+                }
+              }).send();
 
         }
       }
@@ -111,13 +113,14 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
   private void addEventHandlers() {
     addTreeItemSelectionHandler();
 
-    super.registerHandler(getEventBus().addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
+    super.registerHandler(
+        getEventBus().addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
 
-      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-        getView().selectFile(event.getFolder(), false);
-      }
+          public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+            getView().selectFile(event.getFolder(), false);
+          }
 
-    }));
+        }));
 
     super.registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 

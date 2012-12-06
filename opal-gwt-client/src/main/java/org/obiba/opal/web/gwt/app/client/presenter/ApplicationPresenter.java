@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -97,7 +97,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus, RequestCredentials credentials, NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter, RequestUrlBuilder urlBuilder) {
+  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus,
+      RequestCredentials credentials, NotificationPresenter messageDialog,
+      Provider<FileSelectorPresenter> fileSelectorPresenter, RequestUrlBuilder urlBuilder) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
@@ -113,15 +115,16 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Override
   protected void onBind() {
 
-    super.registerHandler(getEventBus().addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
+    super.registerHandler(
+        getEventBus().addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
 
-      @Override
-      public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
-        FileSelectorPresenter fsp = fileSelectorPresenter.get();
-        fsp.handle(event);
-        addToPopupSlot(fsp);
-      }
-    }));
+          @Override
+          public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
+            FileSelectorPresenter fsp = fileSelectorPresenter.get();
+            fsp.handle(event);
+            addToPopupSlot(fsp);
+          }
+        }));
     super.registerHandler(getEventBus().addHandler(FileDownloadEvent.getType(), new FileDownloadEvent.Handler() {
 
       public void onFileDownload(FileDownloadEvent event) {
@@ -209,11 +212,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get().authorize(new UIObjectAuthorizer(getView().getDatasourcesItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get().authorize(new UIObjectAuthorizer(getView().getUnitsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get().authorize(new UIObjectAuthorizer(getView().getReportsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get().authorize(new UIObjectAuthorizer(getView().getFileExplorerItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get().authorize(new UIObjectAuthorizer(getView().getListJobsItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get()
+        .authorize(new UIObjectAuthorizer(getView().getDatasourcesItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get()
+        .authorize(new UIObjectAuthorizer(getView().getUnitsItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
+        .authorize(new UIObjectAuthorizer(getView().getReportsItem())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get()
+        .authorize(new UIObjectAuthorizer(getView().getListJobsItem())).send();
 
     getEventBus().fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
 

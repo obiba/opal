@@ -95,13 +95,15 @@ public class FilesResource {
   //
 
   @GET
-  @Path("/meta")
+  @Path("/_meta")
+  @NoAuthorization
   public Response getFileSystemRootDetails() throws FileSystemException {
     return getFileDetails("/");
   }
 
   @GET
-  @Path("/meta/{path:.*}")
+  @Path("/_meta/{path:.*}")
+  @NoAuthorization
   public Response getFileDetails(@PathParam("path") String path) throws FileSystemException {
     FileObject file = resolveFileInFileSystem(path);
     if(file.exists() == false) {
@@ -358,7 +360,9 @@ public class FilesResource {
     Opal.FileDto.Builder folderBuilder = getBaseFolderBuilder(folder);
 
     // Create FileDtos for each file & folder in the folder corresponding to the path.
-    addChildren(folderBuilder, folder, 2);
+    if(folder.isReadable()) {
+      addChildren(folderBuilder, folder, 2);
+    }
 
     return Response.ok(folderBuilder.build()).build();
 

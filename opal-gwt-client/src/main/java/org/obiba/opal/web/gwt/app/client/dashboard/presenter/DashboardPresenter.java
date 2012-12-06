@@ -78,8 +78,6 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
         .authorize(getView().getUnitsAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
         .authorize(getView().getReportsAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files/meta").get()
-        .authorize(getView().getFilesAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get()
         .authorize(getView().getJobsAuthorizer()).send();
   }
