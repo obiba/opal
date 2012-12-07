@@ -205,13 +205,11 @@ public final class Dtos {
           .setValueSetCount(valueTable.getVariableEntities().size());
     }
 
-    Timestamps ts = valueTable.getTimestamps();
-    if(ts.getCreated().isNull() == false) {
-      builder.setCreated(ts.getCreated().toString());
+    Magma.TimestampsDto.Builder tsBuilder = asDto(valueTable.getTimestamps());
+    if (tsBuilder != null) {
+      builder.setTimestamps(tsBuilder);
     }
-    if(ts.getLastUpdate().isNull() == false) {
-      builder.setLastUpdate(ts.getLastUpdate().toString());
-    }
+
 
     if(valueTable.getDatasource() != null) {
       builder.setDatasourceName(valueTable.getDatasource().getName());
@@ -223,6 +221,22 @@ public final class Dtos {
     }
 
     return builder;
+  }
+
+  public static Magma.TimestampsDto.Builder asDto(Timestamps ts) {
+    Magma.TimestampsDto.Builder tsBuilder = null;
+    if(ts.getCreated().isNull() == false) {
+      tsBuilder = Magma.TimestampsDto.newBuilder();
+      tsBuilder.setCreated(ts.getCreated().toString());
+    }
+    if(ts.getLastUpdate().isNull() == false) {
+      if (tsBuilder == null) {
+        tsBuilder = Magma.TimestampsDto.newBuilder();
+      }
+      tsBuilder.setLastUpdate(ts.getLastUpdate().toString());
+    }
+
+    return tsBuilder;
   }
 
   public static DatasourceDto.Builder asDto(Datasource datasource) {
@@ -307,12 +321,9 @@ public final class Dtos {
         .getIdentifier());
 
     // add timestamps
-    Timestamps ts = valueSet.getTimestamps();
-    if(ts.getCreated().isNull() == false) {
-      vsBuilder.setCreated(ts.getCreated().toString());
-    }
-    if(ts.getLastUpdate().isNull() == false) {
-      vsBuilder.setLastUpdate(ts.getLastUpdate().toString());
+    Magma.TimestampsDto.Builder tsBuilder = asDto(valueSet.getTimestamps());
+    if (tsBuilder != null) {
+      vsBuilder.setTimestamps(tsBuilder);
     }
 
     return vsBuilder;
