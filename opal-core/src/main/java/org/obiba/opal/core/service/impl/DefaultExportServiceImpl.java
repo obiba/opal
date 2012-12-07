@@ -213,7 +213,7 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   private View getIncrementalView(ValueTable valueTable, Datasource destination) {
-    IncrementalWhereClause whereClause = new IncrementalWhereClause(valueTable.getDatasource().getName() + "." + valueTable.getName(), destination.getName() + "." + valueTable.getName());
+    IncrementalWhereClause whereClause = new IncrementalWhereClause(destination.getName() + "." + valueTable.getName());
 
     return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).build();
   }
