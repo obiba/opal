@@ -100,7 +100,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Response response = createNewDatasource("newDatasourceCreated");
     Assert.assertTrue(MagmaEngine.get().hasDatasource("newDatasourceCreated"));
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-
+    MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newDatasourceCreated"));
   }
 
   private Response createNewDatasource(String name) {
@@ -134,6 +134,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     Assert.assertEquals(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build(), response.getEntity());
+    MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newDatasourceDuplicate"));
   }
 
   @Test
@@ -203,6 +204,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     }
 
     verify(uriInfoMock, opalruntimeMock);
+    MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("patate"));
   }
 
   @Test
