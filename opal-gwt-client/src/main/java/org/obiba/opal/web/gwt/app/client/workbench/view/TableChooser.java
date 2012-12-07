@@ -60,7 +60,6 @@ public class TableChooser extends Chooser {
 
   private void initWidget() {
     setPlaceholderText(translations.selectSomeTables());
-    setSearchContains(true);
   }
 
   public void addTableSelections(JsArray<TableDto> tables) {

@@ -290,7 +290,7 @@ img.clickable {
 
 .help-inline, .help-block {
   color: #888888;
-  margin-top: 0;
+  margin-top: -5px;
 }
 
 /* GWT */

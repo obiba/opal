@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.widgets.view.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter.TableSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;
@@ -43,7 +44,7 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
   private final Widget widget;
 
   @UiField
-  ListBox datasetListBox;
+  Chooser datasourceListBox;
 
   @UiField
   EditableListBox tableListBox;
@@ -71,11 +72,11 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
   }
 
   private void addHandlers() {
-    datasetListBox.addChangeHandler(new ChangeHandler() {
+    datasourceListBox.addChangeHandler(new ChangeHandler() {
 
       @Override
       public void onChange(ChangeEvent event) {
-        displayTablesFor(datasetListBox.getValue(datasetListBox.getSelectedIndex()));
+        displayTablesFor(datasourceListBox.getSelectedValue());
       }
     });
 
@@ -99,14 +100,14 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
 
   @Override
   public String getSelectedDatasource() {
-    return this.datasetListBox.getValue(this.datasetListBox.getSelectedIndex());
+    return datasourceListBox.getSelectedValue();
   }
 
   @Override
   public void setDatasources(JsArray<DatasourceDto> datasources) {
-    this.datasetListBox.clear();
+    datasourceListBox.clear();
     for(int i = 0; i < datasources.length(); i++) {
-      this.datasetListBox.addItem(datasources.get(i).getName(), datasources.get(i).getName());
+      datasourceListBox.addItem(datasources.get(i).getName(), datasources.get(i).getName());
     }
     this.datasources = datasources;
     if(datasources.length() > 0) displayTablesFor(datasources.get(0).getName());

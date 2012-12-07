@@ -1,5 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
              ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
              ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
              ui:generateLocales="default">
@@ -24,15 +25,27 @@
 
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
-        <ui:msg description="Database label">Database</ui:msg>
+        <ui:msg description="Limesurvey Database label">LimeSurvey Database</ui:msg>
       </g:Label>
-      <g:ListBox ui:field="database" visibleItemCount="1"/>
+      <o:Chooser ui:field="database"/>
+      <g:Label
+          styleName="help-block">
+        <ui:msg description="Limesurvey Database Description label">If missing, ask your Opal
+          administrator to register the LimeSurvey SQL database.
+        </ui:msg>
+      </g:Label>
     </g:FlowPanel>
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
         <ui:msg description="Table prefix label">Table prefix</ui:msg>
       </g:Label>
       <g:TextBox ui:field="tablePrefix"></g:TextBox>
+      <g:Label
+          styleName="help-block">
+        <ui:msg description="Table prefix Description label">At LimeSurvey install, SQL tables can be optionally
+          prefixed by a string.
+        </ui:msg>
+      </g:Label>
     </g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>
