@@ -162,7 +162,6 @@ class RestValueTable extends AbstractValueTable {
     }
 
     public Value get(Variable variable) {
-      log.info("{} get({}.{})", getVariableEntity().getIdentifier(), variable.getName(), tableDto.getName());
       loadValueSet();
       ValueSetsDto.ValueSetDto values = valueSet.getValueSets(0);
 
@@ -177,15 +176,11 @@ class RestValueTable extends AbstractValueTable {
     @Override
     public Timestamps getTimestamps() {
       if(timestamps != null) return timestamps;
-      log.info("{} getTimestamps({})", getVariableEntity().getIdentifier(), tableDto.getName());
-      // TODO optimize by loading only timestamps
       loadTimestamps();
-
       return timestamps;
     }
 
     synchronized private void loadTimestamps() {
-      log.info("  loading timestamps from value set 1st method");
       try {
         Magma.TimestampsDto tsDto = getOpalClient().getResource(Magma.TimestampsDto.class,
             newUri("valueSet", getVariableEntity().getIdentifier(), "timestamps").build(),
@@ -193,7 +188,6 @@ class RestValueTable extends AbstractValueTable {
         timestamps = new ValueSetTimestamps(tsDto);
       } catch(RuntimeException e) {
         // legacy with older opals: fallback to table timestamps
-        e.printStackTrace();
         timestamps = RestValueTable.this.getTimestamps();
       }
     }
