@@ -45,6 +45,25 @@ public class Chooser extends ChosenListBox {
 
   private void initWidget() {
     setDisableSearchThreshold(5);
+    setSearchContains(true);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    update();
+  }
+
+  @Override
+  public void addItem(String item) {
+    super.addItem(item);
+    update();
+  }
+
+  @Override
+  public void addItem(String item, String value) {
+    super.addItem(item, value);
+    update();
   }
 
   @Override
