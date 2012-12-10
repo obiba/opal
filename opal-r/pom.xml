@@ -8,7 +8,8 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses />.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -66,7 +67,7 @@
           <descriptors>
             <descriptor>src/main/assembly/r-package.xml</descriptor>
           </descriptors>
-          <filters />
+          <filters/>
         </configuration>
         <executions>
           <execution>
@@ -99,8 +100,8 @@
                 <configuration>
                   <target>
                     <!-- Deploy R package file in R repo -->
-                    <copy todir="${obiba.cran.dir}/${opal.deploy.dir}/src/contrib" fil
-                          e="target/opal_${package.version}.tar.gz" />
+                    <copy todir="${obiba.cran.dir}/${opal.deploy.dir}/src/contrib"
+                          file="target/opal_${package.version}.tar.gz"/>
                   </target>
                 </configuration>
               </execution>
