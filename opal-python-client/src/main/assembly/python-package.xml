@@ -1,0 +1,31 @@
+<!--
+  ~ Copyright (c) 2012 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<assembly>
+  <id>dist</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/python</directory>
+      <outputDirectory>opal-python/bin</outputDirectory>
+      <filtered>true</filtered>
+    </fileSet>
+
+    <fileSet>
+      <directory>../opal-web-model/target/generated-sources/protobuf-python/</directory>
+      <outputDirectory>opal-python/bin/opal/protobuf</outputDirectory>
+      <includes>
+        <include>**/*.*</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>
