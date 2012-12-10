@@ -92,6 +92,7 @@
   </profiles>
   <properties>
     <deb.deploy.dir>unstable</deb.deploy.dir>
+    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 
 </project>
