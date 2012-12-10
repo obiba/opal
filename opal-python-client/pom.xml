@@ -78,7 +78,7 @@
                 <configuration>
                   <target>
                     <!-- Deploy Python package file in download repo -->
-                    <copy todir="${obiba.download.dir}/opal/${deb.deploy.dir}"
+                    <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}"
                           file="target/opal-python_${project.version}.zip"/>
                   </target>
                 </configuration>
@@ -91,7 +91,6 @@
     </profile>
   </profiles>
   <properties>
-    <deb.deploy.dir>unstable</deb.deploy.dir>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
   </properties>
 

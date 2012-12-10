@@ -99,7 +99,8 @@
                 <configuration>
                   <target>
                     <!-- Deploy R package file in R repo -->
-                    <copy todir="${obiba.cran.dir}/${cran.deploy.dir}/src/contrib" file="target/opal_${package.version}.tar.gz" />
+                    <copy todir="${obiba.cran.dir}/${opal.deploy.dir}/src/contrib" fil
+                          e="target/opal_${package.version}.tar.gz" />
                   </target>
                 </configuration>
               </execution>
@@ -114,7 +115,6 @@
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
     <!-- This is the R package version. It needs to be set manually because R has restrictions on the version string format. -->
     <package.version>1.11.0-${buildNumber}</package.version>
-    <cran.deploy.dir>stable</cran.deploy.dir>
     <REngine.version>0.6-3</REngine.version>
   </properties>
 
