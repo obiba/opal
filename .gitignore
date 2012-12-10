@@ -12,3 +12,4 @@ opal-gwt-client/war/WEB-INF/deploy/
 opal-gwt-client/war/WEB-INF/lib/
 opal-gwt-client/war/opal/
 opal-gwt-client/war/org.obiba.opal.web.gwt.*
+*.pyc
