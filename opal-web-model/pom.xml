@@ -146,6 +146,11 @@
                   <arg line="${protofilesList}" />
                   <arg line="-Isrc/main/protobuf" />
                 </exec>
+                <!-- PHP -->
+                <mkdir dir="target/generated-sources/protobuf-php" />
+                <exec dir="${basedir}" executable="touch" failonerror="true">
+                  <arg line="target/generated-sources/protobuf-php/README" />
+                </exec>
               </tasks>
             </configuration>
             <goals>
