@@ -24,9 +24,6 @@ public class EsResultConverter {
 
   private static final int MINIMUM_RESULT_COUNT = 0;
 
-  /**
-   * @param dtoQuery - keeps the original DTO query in order to retrieve the variable and facet names
-   */
   public EsResultConverter() {
   }
 
@@ -61,12 +58,7 @@ public class EsResultConverter {
         convertFiltered(jsonFacet, dtoFacetResultBuilder);
       }
 
-      if (dtoFacetResultBuilder.getFiltersCount() > 0
-          || dtoFacetResultBuilder.getFrequenciesCount() > 0
-          || dtoFacetResultBuilder.hasStatistics()) {
-
-        dtoResultsBuilder.addFacets(dtoFacetResultBuilder.build());
-      }
+      dtoResultsBuilder.addFacets(dtoFacetResultBuilder.build());
     }
 
 
@@ -103,10 +95,10 @@ public class EsResultConverter {
 
     if (countAboveThreshold(jsonStatistical.getInt("count"))) {
       Search.FacetResultDto.StatisticalResultDto dtoStatistical = Search.FacetResultDto.StatisticalResultDto.newBuilder()
-          .setCount(jsonStatistical.getInt("count")).setTotal(jsonStatistical.getInt("total"))
-          .setMin(jsonStatistical.getInt("min")).setMax(jsonStatistical.getInt("max"))
-          .setMean(jsonStatistical.getInt("mean")).setSumOfSquares(jsonStatistical.getInt("sum_of_squares"))
-          .setVariance(jsonStatistical.getInt("variance")).setStdDeviation(jsonStatistical.getInt("std_deviation"))
+          .setCount(jsonStatistical.getInt("count")).setTotal((float)jsonStatistical.getDouble("total"))
+          .setMin((float)jsonStatistical.getDouble("min")).setMax((float)jsonStatistical.getDouble("max"))
+          .setMean((float)jsonStatistical.getDouble("mean")).setSumOfSquares((float)jsonStatistical.getDouble("sum_of_squares"))
+          .setVariance((float)jsonStatistical.getDouble("variance")).setStdDeviation((float)jsonStatistical.getDouble("std_deviation"))
           .build();
 
       dtoFacetResultBuilder.setStatistics(dtoStatistical);
