@@ -1,4 +1,3 @@
-import "Ws.proto";
 
 package Search;
 
@@ -27,10 +26,6 @@ message FilterDto {
   required string variable = 1;
   optional bool not = 2;
 
-  extend QueryTermDto {
-    optional FilterDto facet_filter = 2001;
-  }
-
   extend LogicalTermDto {
     repeated FilterDto filters = 1001;
   }
@@ -48,6 +43,7 @@ message LogicalTermDto {
 
   extend QueryTermDto {
     optional LogicalTermDto filter = 3000;
+    optional LogicalTermDto facet_filter = 3001;
   }
 
   extensions 1000 to max;
