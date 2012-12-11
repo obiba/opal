@@ -348,6 +348,9 @@ public interface Translations extends Constants {
       "DriverIsRequired", "A driver is required.",//
       "UrlIsRequired", "A url is required.",//
       "UsernameIsRequired", "A username is required.",//
+      "PasswordIsRequired", "A password is required.",//
+      "OpalURLIsRequired", "Opal address is required.",//
+      "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
       "TableSelectionIsRequired", "At least one table must be selected.",//
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}."//

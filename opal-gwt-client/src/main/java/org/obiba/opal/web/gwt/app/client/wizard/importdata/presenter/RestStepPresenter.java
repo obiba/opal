@@ -52,6 +52,10 @@ public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("UsernameIsRequired").build());
       return false;
     }
+    if(getView().getPassword().isEmpty()) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("PasswordRequired").build());
+      return false;
+    }
     if(getView().getRemoteDatasource().isEmpty()) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("RemoteDatasourceIsRequired").build());
       return false;
