@@ -52,7 +52,7 @@ public class QueryTermConverter {
       JSONObject jsonFacet = new JSONObject();
 
       if (dtoQuery.hasExtension(Search.LogicalTermDto.filter)) {
-        convertLogicalFilter(dtoQuery.getExtension(Search.LogicalTermDto.filter), jsonFacet);
+        convertLogicalFilter("filter", dtoQuery.getExtension(Search.LogicalTermDto.filter), jsonFacet);
       }
       else {
         if (dtoQuery.hasExtension(Search.VariableTermDto.field))
@@ -60,8 +60,8 @@ public class QueryTermConverter {
           convertField(dtoQuery.getExtension(Search.VariableTermDto.field), jsonFacet);
         }
 
-        if (dtoQuery.hasExtension(Search.FilterDto.facetFilter)) {
-          convertFacetFilter(dtoQuery.getExtension(Search.FilterDto.facetFilter), jsonFacet);
+        if (dtoQuery.hasExtension(Search.LogicalTermDto.facetFilter)) {
+          convertLogicalFilter("facet_filter", dtoQuery.getExtension(Search.LogicalTermDto.facetFilter), jsonFacet);
         }
       }
 
@@ -77,7 +77,7 @@ public class QueryTermConverter {
     return jsonQuery;
   }
 
-  private void convertLogicalFilter(Search.LogicalTermDto dtoLogicalFilter, JSONObject jsonFacet) throws JSONException {
+  private void convertLogicalFilter(String filterName, Search.LogicalTermDto dtoLogicalFilter, JSONObject jsonFacet) throws JSONException {
     Search.TermOperator operator = dtoLogicalFilter.getOperator();
     String operatorName = operator == Search.TermOperator.AND ? "and" : "or";
     JSONObject jsonOperator = new JSONObject();
@@ -89,10 +89,10 @@ public class QueryTermConverter {
         jsonOperator.accumulate(operatorName, convertFilterType(iterator.next()));
       }
 
-      jsonFacet.put("filter", jsonOperator);
+      jsonFacet.put(filterName, jsonOperator);
     }
     else {
-      jsonFacet.put("filter", convertFilterType(filters.get(0)));
+      jsonFacet.put(filterName, convertFilterType(filters.get(0)));
     }
   }
 
@@ -115,10 +115,6 @@ public class QueryTermConverter {
       default:
         throw new UnsupportedOperationException("Variable nature not supported");
     }
-  }
-
-  private void convertFacetFilter(Search.FilterDto dtoFacetFilter, JSONObject jsonFacet)  throws JSONException {
-    jsonFacet.put("facet_filter", convertFilterType(dtoFacetFilter));
   }
 
   private JSONObject convertFilterType(Search.FilterDto dtoFilter) throws JSONException {

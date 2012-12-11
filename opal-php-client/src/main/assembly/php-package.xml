@@ -16,7 +16,14 @@
   <fileSets>
     <fileSet>
       <directory>../opal-web-model/target/generated-sources/protobuf-php/</directory>
-      <outputDirectory>opal-php</outputDirectory>
+      <outputDirectory>opal-php/protos</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>../opal-web-model/tools/protobuf-php/library/DrSlump</directory>
+      <outputDirectory>opal-php/protobuf</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>

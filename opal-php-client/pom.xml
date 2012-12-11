@@ -25,7 +25,7 @@
   <version>1.11-SNAPSHOT</version>
 
   <name>opal-php-client</name>
-  <description>Opal Python Client Module</description>
+  <description>Opal PHP Client Module</description>
 
   <dependencies>
     <dependency>
