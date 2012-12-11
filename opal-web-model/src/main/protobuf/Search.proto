@@ -92,7 +92,7 @@ message FacetResultDto {
 
     message StatisticalResultDto {
         required int64 count = 1 [default = 0];
-        optional int64 total = 2;
+        optional float total = 2;
         optional float min = 3;
         optional float max = 4;
         optional float mean = 5;
