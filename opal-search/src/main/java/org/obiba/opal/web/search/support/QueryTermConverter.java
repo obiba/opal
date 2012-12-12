@@ -79,7 +79,7 @@ public class QueryTermConverter {
 
   private void convertLogicalFilter(String filterName, Search.LogicalTermDto dtoLogicalFilter, JSONObject jsonFacet) throws JSONException {
     Search.TermOperator operator = dtoLogicalFilter.getOperator();
-    String operatorName = operator == Search.TermOperator.AND ? "and" : "or";
+    String operatorName = operator == Search.TermOperator.AND_OP ? "and" : "or";
     JSONObject jsonOperator = new JSONObject();
 
     List<Search.FilterDto> filters = dtoLogicalFilter.getExtension(Search.FilterDto.filters);
