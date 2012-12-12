@@ -30,24 +30,24 @@ public class EsResultConverter {
   /**
    * Converts the JSON query to DTO query
    *
-   * @param json
-   * @return
+   * @param json - query response
+   * @return Search.QueryResultDto
    * @throws JSONException
    */
   public Search.QueryResultDto convert(JSONObject json) throws JSONException {
     Assert.notNull(json, "Result JSON is null!");
 
-    return convertFacets(json.getJSONObject("facets"));
-  }
-
-  private Search.QueryResultDto convertFacets(JSONObject jsonFacets) throws JSONException {
-
+    JSONObject jsonHits = json.getJSONObject("hits");
+    JSONObject jsonFacets = json.getJSONObject("facets");
     Search.QueryResultDto.Builder dtoResultsBuilder = Search.QueryResultDto.newBuilder();
 
     for (Iterator<String> iterator = jsonFacets.keys(); iterator.hasNext(); ) {
       String facet = iterator.next();
       JSONObject jsonFacet = jsonFacets.getJSONObject(facet);
-      Search.FacetResultDto.Builder dtoFacetResultBuilder = Search.FacetResultDto.newBuilder().setFacet(facet);
+      Search.FacetResultDto.Builder dtoFacetResultBuilder =
+        Search.FacetResultDto.newBuilder()
+          .setFacet(facet)
+          .setTotalHits(jsonHits.getInt("total"));
 
       if("terms".equals(jsonFacet.get("_type"))) {
         convertTerms(jsonFacet.getJSONArray("terms"), dtoFacetResultBuilder);
