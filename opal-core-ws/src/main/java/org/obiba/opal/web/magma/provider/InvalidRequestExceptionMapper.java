@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.web.magma.support.InvalidRequestException;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.springframework.stereotype.Component;
 

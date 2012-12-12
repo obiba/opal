@@ -20,7 +20,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.web.magma.support.InvalidRequestException;
+import org.obiba.opal.web.support.InvalidRequestException;
 
 import au.com.bytecode.opencsv.CSVReader;
 

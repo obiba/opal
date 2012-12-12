@@ -152,18 +152,19 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void authorize() {
+    UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
     // export variables in excel
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
         .authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() +"/commands/_copy").post()//
         .authorize(CascadingAuthorizer.newBuilder()//
             .and("/functional-units", HttpMethod.GET)//
             .and("/functional-units/entities/table", HttpMethod.GET)//
             .authorize(getView().getExportDataAuthorizer()).build())//
         .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() +"/commands/_copy").post()
         .authorize(getView().getCopyDataAuthorizer()).send();
     if(table.hasViewLink()) {
       // download view

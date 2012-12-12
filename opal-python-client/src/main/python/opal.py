@@ -6,16 +6,19 @@ import opal.data
 import opal.file
 import argparse
 
-#
-# Add Opal access arguments
-#
 def add_opal_arguments(parser):
+  """
+  Add Opal access arguments
+  """
   parser.add_argument('--opal', '-o', required=False, help='Opal server base url')
   parser.add_argument('--user', '-u', required=False, help='User name')
   parser.add_argument('--password', '-p', required=False, help='User password')
   parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
 
 def add_subcommand(name,help,add_args_func,default_func):
+  """
+  Make a sub-parser, add default arguments to it, add sub-command arguments and set the sub-command callback function.
+  """
   subparser = subparsers.add_parser(name, help=help)
   add_opal_arguments(subparser)
   add_args_func(subparser)

@@ -66,7 +66,7 @@ def do_command(args):
       request.accept_json()
 
     if args.content_type:
-      request.content_type(args.content)
+      request.content_type(args.content_type)
       print 'Enter content:'
       request.content(sys.stdin.read())
 

@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportP
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
@@ -211,7 +212,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     ResponseCodeCallback callback = new SubmitJobResponseCodeCallBack();
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/import").post() //
+    UriBuilder uriBuilder = UriBuilder.create();
+    uriBuilder.segment("datasource", dto.getDestination(), "commands", "_import");
+    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
     .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
     .withCallback(201, callback).withCallback(400, callback).withCallback(500, callback).send();
   }
