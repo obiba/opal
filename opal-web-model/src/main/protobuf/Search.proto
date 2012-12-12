@@ -75,8 +75,6 @@ message QueryResultDto {
 }
 
 message FacetResultDto {
-    required string facet = 1;
-
     message FilterResultDto {
         required int32 count = 1;
     }
@@ -97,7 +95,10 @@ message FacetResultDto {
         optional float std_deviation = 8;
     }
 
-    repeated TermFrequencyResultDto frequencies = 2;
-    optional StatisticalResultDto statistics = 3;
-    repeated FilterResultDto filters = 4;
+    required string facet = 1;
+    required int32 total_hits = 2;
+
+    repeated TermFrequencyResultDto frequencies = 3;
+    optional StatisticalResultDto statistics = 4;
+    repeated FilterResultDto filters = 5;
 }
