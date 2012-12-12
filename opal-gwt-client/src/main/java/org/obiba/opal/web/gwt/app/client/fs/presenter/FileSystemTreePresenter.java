@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
@@ -86,12 +87,17 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
         final TreeItem selectedItem = event.getSelectedItem();
         FileDto selectedFile = ((FileDto) selectedItem.getUserObject());
 
+        if(selectedFile.getReadable() == false) {
+          // reset to previous selection
+          getView().selectFile(getView().getSelectedFile(), false);
+          return;
+        }
+
         getEventBus().fireEvent(new FileSystemTreeFolderSelectionChangeEvent(selectedFile));
         getEventBus().fireEvent(new FileSelectionChangeEvent(selectedFile));
         getView().selectFile(selectedFile, false);
 
         if(childrenNotAdded(selectedItem)) {
-
           FileResourceRequest.newBuilder(getEventBus()).path(selectedFile.getPath())
               .withCallback(new ResourceCallback<FileDto>() {
                 @Override
@@ -99,7 +105,6 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
                   getView().addBranch(selectedItem, file);
                 }
               }).send();
-
         }
       }
 
