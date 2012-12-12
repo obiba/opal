@@ -34,12 +34,12 @@ message FilterDto {
 }
 
 enum TermOperator {
-  AND = 0;
-  OR = 1;
+  AND_OP = 0;
+  OR_OP = 1;
 }
 
 message LogicalTermDto {
-  required TermOperator operator = 1 [default = AND];
+  required TermOperator operator = 1 [default = AND_OP];
 
   extend QueryTermDto {
     optional LogicalTermDto filter = 3000;
