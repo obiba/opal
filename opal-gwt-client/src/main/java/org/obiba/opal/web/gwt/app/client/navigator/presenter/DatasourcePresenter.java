@@ -143,14 +143,14 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/tables/excel").get()
         .authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()//
         .authorize(CascadingAuthorizer.newBuilder()//
             .and("/functional-units", HttpMethod.GET)//
             .and("/functional-units/entities/table", HttpMethod.GET)//
             .authorize(getView().getExportDataAuthorizer()).build())//
         .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()
         .authorize(getView().getCopyDataAuthorizer()).send();
     // remove
     // ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete().authorize(getView().getRemoveDatasourceAuthorizer()).send();

@@ -45,7 +45,7 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.web.TimestampedResponses;
-import org.obiba.opal.web.magma.support.InvalidRequestException;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;

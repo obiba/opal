@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
@@ -77,7 +78,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   protected void initDisplayComponents() {
     initFileSelectionType();
     fileSelectionPresenter.bind();
-    super.registerHandler(getView().addFileFormatChangeHandler(new FileFormatChangeHandler()));
+    registerHandler(getView().addFileFormatChangeHandler(new FileFormatChangeHandler()));
     getView().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
     getView().setTablesValidator(new TablesValidator());
     getView().setDestinationValidator(new DestinationValidator());
@@ -147,6 +148,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
           }).send();
     } else {
+      datasourceName = null;
       ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
           .withCallback(new ResourceCallback<JsArray<TableDto>>() {
             @Override
@@ -166,7 +168,14 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   @Override
   protected void onFinish() {
     super.onFinish();
-    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
+
+    UriBuilder uriBuilder = UriBuilder.create();
+    if(datasourceName == null) {
+      uriBuilder.segment("shell", "copy");
+    } else {
+      uriBuilder.segment("datasource", datasourceName, "commands", "_copy");
+    }
+    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
         .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
         .withCallback(400, new ClientFailureResponseCodeCallBack()) //
         .withCallback(201, new SuccessResponseCodeCallBack()).send();
@@ -270,7 +279,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
           .fireEvent(NotificationEvent.newBuilder().info("DataExportationProcessLaunched").args(jobId).build());
     }
   }
-
 
   public interface Display extends WizardView {
 

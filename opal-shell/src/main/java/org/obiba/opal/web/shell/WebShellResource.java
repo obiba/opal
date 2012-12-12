@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path("/shell")
-public class WebShellResource {
+public class WebShellResource extends AbstractCommandsResource {
   //
   // Constants
   //
@@ -58,10 +58,6 @@ public class WebShellResource {
   // Instance Variables
   //
 
-  private OpalRuntime opalRuntime;
-
-  private CommandJobService commandJobService;
-
   private CommandRegistry commandRegistry;
 
   //
@@ -70,8 +66,7 @@ public class WebShellResource {
 
   @Autowired
   public WebShellResource(OpalRuntime opalRuntime, CommandJobService commandJobService, @Qualifier("web") CommandRegistry commandRegistry) {
-    this.opalRuntime = opalRuntime;
-    this.commandJobService = commandJobService;
+    super(opalRuntime, commandJobService);
     this.commandRegistry = commandRegistry;
   }
 
@@ -189,20 +184,8 @@ public class WebShellResource {
   // Methods
   //
 
-  public void setCommandJobService(CommandJobService commandJobService) {
-    this.commandJobService = commandJobService;
-  }
-
-  public void setCommandRegistry(CommandRegistry commandRegistry) {
-    this.commandRegistry = commandRegistry;
-  }
-
-  private Response launchCommand(Command<?> command) {
-    CommandJob commandJob = new CommandJob(command);
-    return buildLaunchCommandResponse(commandJobService.launchCommand(commandJob));
-  }
-
-  private Response buildLaunchCommandResponse(Integer jobId) {
+  @Override
+  protected Response buildLaunchCommandResponse(Integer jobId) {
     return Response.created(UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId)).build();
   }
 

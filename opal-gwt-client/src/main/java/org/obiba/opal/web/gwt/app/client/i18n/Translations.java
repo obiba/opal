@@ -353,7 +353,9 @@ public interface Translations extends Constants {
       "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
       "TableSelectionIsRequired", "At least one table must be selected.",//
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
-      "IdentifiersImportationFailed", "Identifiers importation failed: {0}."//
+      "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
+      "DataWriteNotAuthorized", "You are not allowed to write in datasource: {0}.",//
+      "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}."//
   })
   Map<String, String> userMessageMap();
 
