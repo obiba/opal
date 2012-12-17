@@ -61,7 +61,7 @@ public class ValueTableFacetResource {
   @GET
   @Path("/variable/{variable}/_search")
   public Response search(@PathParam("variable") String variable) {
-    Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().build();
+    Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
