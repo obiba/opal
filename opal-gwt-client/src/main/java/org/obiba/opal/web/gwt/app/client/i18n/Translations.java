@@ -346,6 +346,7 @@ public interface Translations extends Constants {
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
       "NameIsRequired", "A name is required.",//
       "DriverIsRequired", "A driver is required.",//
+      "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
       "UrlIsRequired", "A url is required.",//
       "UsernameIsRequired", "A username is required.",//
       "PasswordIsRequired", "A password is required.",//
@@ -931,6 +932,10 @@ public interface Translations extends Constants {
   @Description("Paste Public Key PEM label")
   @DefaultStringValue("(paste public certificate in PEM format)")
   String pastePublicKeyPEM();
+
+  @Description("Data import title")
+  @DefaultStringValue("Import Data")
+  String importData();
 
   @Description("Data export title")
   @DefaultStringValue("Export Data")

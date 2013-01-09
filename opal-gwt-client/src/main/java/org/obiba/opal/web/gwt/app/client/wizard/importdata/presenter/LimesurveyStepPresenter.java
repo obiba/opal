@@ -11,15 +11,19 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 
 public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPresenter.Display> implements
@@ -38,13 +42,18 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
   @Override
   public void onReveal() {
     super.onReveal();
-    ResourceRequestBuilderFactory
-        .<JsArray<JdbcDataSourceDto>>newBuilder().forResource("/jdbc/databases")
+    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder().forResource("/jdbc/databases")
         .withCallback(new ResourceCallback<JsArray<JdbcDataSourceDto>>() {
 
           @Override
           public void onResource(Response response, JsArray<JdbcDataSourceDto> resource) {
             getView().setDatabases(resource);
+          }
+        })//
+        .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // ignore
           }
         }).get().send();
   }
@@ -60,6 +69,10 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
 
   @Override
   public boolean validate() {
+    if(getView().getSelectedDatabase().isEmpty()) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("LimeSurveyDatabaseIsRequired").build());
+      return false;
+    }
     return true;
   }
 
