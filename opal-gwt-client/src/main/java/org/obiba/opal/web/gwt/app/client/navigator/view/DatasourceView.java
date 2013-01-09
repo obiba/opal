@@ -169,6 +169,7 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   public void afterRenderRows() {
     pager.setVisible(table.getRowCount() > NavigatorView.PAGE_SIZE);
     toolbar.setExportDataItemEnabled(table.getRowCount() > 0);
+    toolbar.setCopyDataItemEnabled(table.getRowCount() > 0);
     table.setEmptyTableWidget(noTables);
   }
 
@@ -228,6 +229,11 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   }
 
   @Override
+  public void setImportDataCommand(Command cmd) {
+    toolbar.setImportDataCommand(cmd);
+  }
+
+  @Override
   public void setExportDataCommand(Command cmd) {
     toolbar.setExportDataCommand(cmd);
   }
@@ -266,6 +272,11 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
       }
 
     };
+  }
+
+  @Override
+  public HasAuthorization getImportDataAuthorizer() {
+    return new MenuItemAuthorizer(toolbar.getImportDataItem());
   }
 
   @Override

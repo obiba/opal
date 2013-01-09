@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPrese
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -66,7 +67,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   private Runnable removeDatasourceConfirmation;
 
-  private Provider<AuthorizationPresenter> authorizationPresenter;
+  private final Provider<AuthorizationPresenter> authorizationPresenter;
 
   @Inject
   public DatasourcePresenter(Display display, EventBus eventBus, Proxy proxy,
@@ -92,10 +93,10 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   protected void onBind() {
     super.onBind();
 
-    super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
-    super.registerHandler(
+    registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionHandler()));
+    registerHandler(
         getEventBus().addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionHandler()));
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     getView().setExcelDownloadCommand(new ExcelDownloadCommand());
     getView().setExportDataCommand(new ExportDataCommand());
     getView().setCopyDataCommand(new CopyDataCommand());
@@ -103,16 +104,17 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     // OPAL-1510
     // getView().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
     getView().setAddViewCommand(new AddViewCommand());
+    getView().setImportDataCommand(new ImportDataCommand());
     getView().setNextCommand(new NextCommand());
     getView().setPreviousCommand(new PreviousCommand());
-    super.registerHandler(
+    registerHandler(
         getEventBus().addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
-    super.getView().setTableNameFieldUpdater(new TableNameFieldUpdater());
-    super.registerHandler(
+    getView().setTableNameFieldUpdater(new TableNameFieldUpdater());
+    registerHandler(
         getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
 
     // OPAL-975
-    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+    registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
   }
 
   private int getTableIndex(String tableName) {
@@ -152,6 +154,13 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     // copy data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()
         .authorize(getView().getCopyDataAuthorizer()).send();
+    // import data
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_import").post()//
+        .authorize(CascadingAuthorizer.newBuilder()//
+            .and("/functional-units", HttpMethod.GET)//
+            .and("/functional-units/entities/table", HttpMethod.GET)//
+            .authorize(getView().getImportDataAuthorizer()).build())//
+        .send();
     // remove
     // ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete().authorize(getView().getRemoveDatasourceAuthorizer()).send();
     // set permissions
@@ -393,6 +402,13 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     }
   }
 
+  final class ImportDataCommand implements Command {
+    @Override
+    public void execute() {
+      getEventBus().fireEvent(new WizardRequiredEvent(DataImportPresenter.WizardType, datasourceName));
+    }
+  }
+
   final class ExportDataCommand implements Command {
     @Override
     public void execute() {
@@ -428,7 +444,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     @Override
     public void onResource(Response response, JsArray<TableDto> resource) {
-      if(this.datasourceName.equals(DatasourcePresenter.this.datasourceName)) {
+      if(datasourceName.equals(DatasourcePresenter.this.datasourceName)) {
         tables = JsArrays.toSafeArray(resource);
         getView().renderRows(resource);
         selectTable(selectTableName);
@@ -584,6 +600,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     void setExcelDownloadCommand(Command cmd);
 
+    void setImportDataCommand(Command cmd);
+
     void setExportDataCommand(Command cmd);
 
     void setAddUpdateTablesCommand(Command cmd);
@@ -603,6 +621,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     HasAuthorization getAddUpdateTablesAuthorizer();
 
     HasAuthorization getAddViewAuthorizer();
+
+    HasAuthorization getImportDataAuthorizer();
 
     HasAuthorization getExportDataAuthorizer();
 

@@ -15,6 +15,7 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -30,6 +31,8 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   private ImportFormat importFormat;
 
   JsArray<DatasourceDto> datasources;
+
+  private String destination;
 
   @Inject
   public DestinationSelectionStepPresenter(final EventBus eventBus, final Display display) {
@@ -49,8 +52,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
       @Override
       public void onTableSelected(String datasource, String table) {
         UriBuilder ub = UriBuilder.create().segment("datasource", datasource, "table", table);
-        ResourceRequestBuilderFactory.<TableDto>newBuilder()
-            .forResource(ub.build()).get()//
+        ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()//
             .withCallback(new ResourceCallback<TableDto>() {
 
               @Override
@@ -65,21 +67,36 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   }
 
   private void refreshDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
-        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<DatasourceDto> resource) {
-            datasources = JsArrays.toSafeArray(resource);
-
-            for(int i = 0; i < datasources.length(); i++) {
-              DatasourceDto d = datasources.get(i);
-              d.setTableArray(JsArrays.toSafeArray(d.getTableArray()));
-              d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
+    if(destination != null) {
+      UriBuilder ub = UriBuilder.create().segment("datasource", destination);
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(new ResourceCallback<DatasourceDto>() {
+            @Override
+            public void onResource(Response response, DatasourceDto resource) {
+              datasources = JsArrays.create();
+              datasources.push(resource);
+              refreshDatasources(datasources);
             }
+          }).send();
+    } else {
+      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+          .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<DatasourceDto> resource) {
+              refreshDatasources(JsArrays.toSafeArray(resource));
+            }
+          }).send();
+    }
+  }
 
-            getView().setDatasources(datasources);
-          }
-        }).send();
+  private void refreshDatasources(JsArray<DatasourceDto> datasources) {
+    for(int i = 0; i < datasources.length(); i++) {
+      DatasourceDto d = datasources.get(i);
+      d.setTableArray(JsArrays.toSafeArray(d.getTableArray()));
+      d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
+    }
+
+    getView().setDatasources(datasources);
   }
 
   public boolean validate() {
@@ -134,6 +151,10 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     } else {
       importData.setDestinationTableName(null);
     }
+  }
+
+  public void setDestination(String datasourceName) {
+    destination = datasourceName;
   }
 
   //
