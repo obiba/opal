@@ -43,7 +43,10 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}", "*:GET/*", args));
+        return Lists.newArrayList(magmaConvert("/datasource/{0}", "*:GET/*", args),//
+            magmaConvert("/shell/command", "*:GET/*"), //
+            magmaConvert("/functional-units/unit", "GET:GET/GET"),  //
+            magmaConvert("/functional-units/entities/table", "GET"));
       }
 
     },
@@ -53,7 +56,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/datasource/(.+)");
         List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
             magmaConvert("/datasource/{0}/tables", "POST:GET", args));
-        Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
         return perms;
       }
     },
@@ -63,7 +65,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/datasource/(.+)");
         List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
             magmaConvert("/datasource/{0}/views", "POST:GET", args));
-        Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
         return perms;
       }
     },
@@ -107,7 +108,6 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/datasource/{0}/table/{1}/index", "*:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/index/schedule", "*:GET", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
-        Iterables.addAll(perms, FilesPermissionConverter.Permission.FILES_ADD.convert("/files"));
         return perms;
       }
 

@@ -58,6 +58,8 @@ message FileDto {
   repeated FileDto children = 4;
   optional int64 size = 5;
   optional int64 lastModifiedTime = 6;
+  required bool readable = 7;
+  required bool writable = 8;
 }
 
 message LocaleDto {
@@ -143,10 +145,9 @@ enum AclAction {
   R_SESSION_ALL = 14;
   DATASHIELD_ALL = 15;
   DATASHIELD_SESSION_ALL = 16;
-  FILES_META = 17;
   FILES_ALL = 18;
   FILES_READ = 19;
-  FILES_ADD = 20;
+  FILES_SHARE = 20;
   REPORT_TEMPLATE_ALL = 21;
   REPORT_TEMPLATE_READ = 22;
 }

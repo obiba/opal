@@ -34,6 +34,8 @@
     <module>opal-web-model</module>
     <module>opal-gwt-client</module>
     <module>opal-rest-client</module>
+    <module>opal-python-client</module>
+    <module>opal-php-client</module>
     <module>opal-datashield</module>
     <module>opal-search</module>
   </modules>
@@ -582,6 +584,179 @@
         <version>${xfire.version}</version>
       </dependency>
 
+      <!-- RESTEasy dependencies -->
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxrs</artifactId>
+        <version>${resteasy.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+          </exclusion>
+          <!-- Ideally we would exclude org.scannotation:scannotation, but that's not possible due to ConfigurationBootstrap -->
+          <exclusion>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+          </exclusion>
+          <!-- Exclude stax-api in favour of the newer version that poi-ooxml pulls in (transitively, via xmlbeans). -->
+          <exclusion>
+            <groupId>javax.xml.stream</groupId>
+            <artifactId>stax-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-spring</artifactId>
+        <version>${resteasy.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+          </exclusion>
+          </exclusions>
+      </dependency>
+
+      <!-- Jetty dependencies -->
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-util</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlet</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlets</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-continuation</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-io</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-http</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-ajp</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+      <!-- Protobuf dependencies -->
+      <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>${protobuf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.protobuf-java-format</groupId>
+        <artifactId>protobuf-java-format</artifactId>
+        <version>${protobuf-java-format.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.dyuproject.protostuff</groupId>
+        <artifactId>protostuff-core</artifactId>
+        <version>${protostuff.version}</version>
+      </dependency>
+
+      <!-- SSHd dependencies -->
+      <dependency>
+        <groupId>org.apache.sshd</groupId>
+        <artifactId>sshd-core</artifactId>
+        <version>${sshd.version}</version>
+      </dependency>
+
+      <!-- GWT dependencies -->
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-servlet</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-user</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt</groupId>
+        <artifactId>gwt-dev</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt.inject</groupId>
+        <artifactId>gin</artifactId>
+        <version>${gin.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.gwt.google-apis</groupId>
+        <artifactId>gwt-visualization</artifactId>
+        <version>${gwt-visualization.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.gwtplatform</groupId>
+        <artifactId>gwtp-mvp-client</artifactId>
+        <version>${gwtp.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.customware.gwt.presenter</groupId>
+        <artifactId>gwt-presenter</artifactId>
+        <version>${gwt-presenter.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava-gwt</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+
+      <!-- GWT Bootstrap -->
+      <dependency>
+        <groupId>com.github.gwtbootstrap</groupId>
+        <artifactId>gwt-bootstrap</artifactId>
+        <version>${gwt-bootstrap.version}</version>
+      </dependency>
+
+      <!-- GWTQuery related dependencies -->
+      <dependency>
+        <groupId>com.googlecode.gwtquery</groupId>
+        <artifactId>gwtquery</artifactId>
+        <version>${gwtquery.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.watopi</groupId>
+        <artifactId>gwtchosen</artifactId>
+        <version>${gwtchosen.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -871,6 +1046,7 @@
   </mailingLists>
 
   <properties>
+    <opal.deploy.dir>unstable</opal.deploy.dir>
 
     <maven.compiler.target>1.6</maven.compiler.target>
     <maven.compiler.source>1.6</maven.compiler.source>
@@ -909,6 +1085,21 @@
     <xfire.version>1.2.6</xfire.version>
     <cglib-nodep.version>2.2</cglib-nodep.version>
     <elasticsearch.version>0.19.11</elasticsearch.version>
+    <resteasy.version>2.1.0.GA</resteasy.version>
+    <jetty.version>7.6.8.v20121106</jetty.version>
+    <protobuf.version>2.3.0</protobuf.version>
+    <protobuf-java-format.version>1.2</protobuf-java-format.version>
+    <sshd.version>0.8.0</sshd.version>
+
+    <!-- GWT -->
+    <gwt.version>2.4.0</gwt.version>
+    <gin.version>1.5.0</gin.version>
+    <gwt-visualization.version>1.0.2</gwt-visualization.version>
+    <gwt-presenter.version>1.0.0</gwt-presenter.version>
+    <gwtp.version>0.6</gwtp.version>
+    <gwt-bootstrap.version>2.0.4.0</gwt-bootstrap.version>
+    <gwtquery.version>1.2.0</gwtquery.version>
+    <gwtchosen.version>1.1.0</gwtchosen.version>
 
     <!-- maven plugins -->
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>

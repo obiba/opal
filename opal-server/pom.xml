@@ -234,7 +234,21 @@
                   <target>
                     <property name="deb.version" value="${project.version}-b${buildNumber}"/>
                     <!-- Deploy deb file in deb repo -->
-                    <copy todir="${obiba.deb.dir}/${deb.deploy.dir}" file="target/opal_${deb.version}_all.deb"/>
+                    <copy todir="${obiba.deb.dir}/${opal.deploy.dir}" file="target/opal_${deb.version}_all.deb"/>
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-package</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <!-- Deploy Opal package file in download repo -->
+                    <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}"
+                          file="target/opal-server-${project.version}-dist.zip"/>
                   </target>
                 </configuration>
               </execution>
@@ -246,7 +260,6 @@
     </profile>
   </profiles>
   <properties>
-    <deb.deploy.dir>unstable</deb.deploy.dir>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
     <commons-daemon.version>1.0.3</commons-daemon.version>
     <ehcache-core.version>2.4.2</ehcache-core.version>

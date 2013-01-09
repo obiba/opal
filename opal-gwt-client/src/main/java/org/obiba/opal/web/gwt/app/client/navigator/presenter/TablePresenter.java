@@ -121,10 +121,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(),
-        new TableSelectionChangeHandler()));
-    super.registerHandler(getEventBus().addHandler(SiblingVariableSelectionEvent.getType(),
-        new SiblingVariableSelectionHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
     getView().setCreateCodingViewCommand(new CreateCodingViewCommand());
     getView().setExcelDownloadCommand(new ExcelDownloadCommand());
@@ -152,18 +152,19 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void authorize() {
+    UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
     // export variables in excel
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
         .authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
-        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() +"/commands/_copy").post()//
+        .authorize(CascadingAuthorizer.newBuilder()//
             .and("/functional-units", HttpMethod.GET)//
             .and("/functional-units/entities/table", HttpMethod.GET)//
             .authorize(getView().getExportDataAuthorizer()).build())//
         .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() +"/commands/_copy").post()
         .authorize(getView().getCopyDataAuthorizer()).send();
     if(table.hasViewLink()) {
       // download view
@@ -222,7 +223,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     String sortColumArg = (sortColumnName != null ? ("?sortField=" + sortColumnName) : "");
     String sortDirArg = (sortAscending != null ? (sortAscending ? "&sortDir=ASC" : "&sortDir=DESC") : "");
     // TODO use uribuilder
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder()
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
         .forResource(table.getLink() + "/variables" + sortColumArg + sortDirArg).get()
         .withCallback(new VariablesResourceCallback(table)).send();
   }
@@ -387,7 +388,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void execute() {
       UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get()
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<DatasourceDto>() {
             @Override
             public void onResource(Response response, DatasourceDto resource) {
@@ -475,7 +476,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void execute() {
       UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "view", table.getName());
-      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(ub.build()).get()
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<ViewDto>() {
 
             @Override

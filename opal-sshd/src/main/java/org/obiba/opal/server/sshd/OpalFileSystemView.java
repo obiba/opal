@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -46,7 +46,12 @@ public class OpalFileSystemView implements FileSystemView {
   @Override
   public SshFile getFile(String file) {
     FileObject fo = resolve(file);
-    return new OpalFsSshFile(fo.getName().getPath(), opalfs.getLocalFile(fo), user);
+    return new FileObjectSshFile(fo, user);
+  }
+
+  @Override
+  public SshFile getFile(SshFile baseDir, String file) {
+    return getFile(new File(baseDir.getAbsolutePath(), file).getAbsolutePath());
   }
 
   private FileObject resolve(String file) {
@@ -60,141 +65,23 @@ public class OpalFileSystemView implements FileSystemView {
   }
 
   /**
-   * It may be preferable to implement SshFile on top of FileObject instead of the native file system file.
-   */
-  private class OpalFsSshFile extends NativeSshFile {
-
-    private final boolean isRoot;
-
-    protected OpalFsSshFile(String fileName, File file, String userName) {
-      super(fileName, file, userName);
-      this.isRoot = opalfs.getLocalFile(opalfs.getRoot()).equals(file);
-    }
-
-    @Override
-    public SshFile getParentFile() {
-      return isRoot() ? this : super.getParentFile();
-    }
-
-    /* Overriden to make findbugs happy. The super implementation is fine. */
-    @Override
-    public boolean equals(Object obj) {
-      return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-      return super.getAbsolutePath().hashCode();
-    }
-
-    private boolean isRoot() {
-      return isRoot;
-    }
-  }
-
-  /**
-   * Implementation on top of FileObject. Not used because some methods are not implemented correctly (getOutputStream,
-   * truncate)
+   * Implementation on top of FileObject.
    */
   @SuppressWarnings("unused")
-  private class FileObjectSshFile implements SshFile {
+  private class FileObjectSshFile extends NativeSshFile {
 
     private final FileObject file;
 
-    private FileObjectSshFile(FileObject fo) {
+    private FileObjectSshFile(FileObject fo, String userName) {
+      super(fo.getName().getPath(), opalfs.getLocalFile(fo), userName);
       this.file = fo;
     }
 
     @Override
-    public InputStream createInputStream(long offset) throws IOException {
-      InputStream is = this.file.getContent().getInputStream();
-      long skipped = is.skip(offset);
-      if(skipped != offset) {
-        is.close();
-        throw new IOException("could not skip to " + offset);
-      }
-      return is;
-    }
-
-    @Override
-    public OutputStream createOutputStream(long offset) throws IOException {
-      // TODO implement offset writing
-      return this.file.getContent().getOutputStream();
-    }
-
-    @Override
-    public boolean delete() {
-      try {
-        return this.file.delete();
-      } catch(FileSystemException e) {
-        return false;
-      }
-    }
-
-    @Override
-    public boolean doesExist() {
-      try {
-        return this.file.exists();
-      } catch(FileSystemException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    @Override
-    public String getAbsolutePath() {
-      return this.file.getName().getPath();
-    }
-
-    @Override
-    public long getLastModified() {
-      try {
-        return this.file.getContent().getLastModifiedTime();
-      } catch(FileSystemException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    @Override
-    public String getName() {
-      return this.file.getName().getBaseName();
-    }
-
-    @Override
     public SshFile getParentFile() {
       try {
-        return new FileObjectSshFile(this.file.getParent() == null ? opalfs.getRoot() : this.file.getParent());
-      } catch(FileSystemException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    @Override
-    public long getSize() {
-      try {
-        return this.file.getType() == FileType.FILE ? this.file.getContent().getSize() : 0;
-      } catch(FileSystemException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    @Override
-    public void handleClose() throws IOException {
-
-    }
-
-    @Override
-    public boolean isDirectory() {
-      try {
-        return this.file.getType() == FileType.FOLDER;
-      } catch(FileSystemException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    @Override
-    public boolean isFile() {
-      try {
-        return this.file.getType() == FileType.FILE;
+        return new FileObjectSshFile(this.file.getParent() == null ? opalfs.getRoot() : this.file.getParent(),
+            getOwner());
       } catch(FileSystemException e) {
         throw new RuntimeException(e);
       }
@@ -212,6 +99,7 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public boolean isRemovable() {
       try {
+        // TODO not enough: check DELETE permission on corresponding resource
         return this.file.getParent().isWriteable();
       } catch(FileSystemException e) {
         throw new RuntimeException(e);
@@ -245,7 +133,7 @@ public class OpalFileSystemView implements FileSystemView {
 
             @Override
             public SshFile apply(FileObject from) {
-              return new FileObjectSshFile(from);
+              return new FileObjectSshFile(from, getOwner());
             }
           }));
         }
@@ -276,19 +164,14 @@ public class OpalFileSystemView implements FileSystemView {
     }
 
     @Override
-    public boolean setLastModified(long time) {
+    public boolean delete() {
       try {
-        this.file.getContent().setLastModifiedTime(time);
-        return true;
+        return this.file.delete();
       } catch(FileSystemException e) {
         return false;
       }
     }
 
-    @Override
-    public void truncate() throws IOException {
-      this.file.getContent().getOutputStream().close();
-    }
   }
 
 }

@@ -132,6 +132,7 @@ message TableDto {
   optional string datasourceName = 6;
   repeated VariableDto variables = 7;
   optional string viewLink = 8;
+  optional TimestampsDto timestamps = 9;
 }
 
 message VariableDto {
@@ -168,6 +169,7 @@ message ValueSetsDto {
   message ValueSetDto {
     required string identifier = 1;
     repeated ValueDto values = 2;
+    optional TimestampsDto timestamps = 3;
   }
   message ValueDto {
     optional string value = 1;
@@ -182,6 +184,11 @@ message ValueSetsDto {
 message VariableEntityDto {
   required string identifier = 1;
   optional string entityType = 2;
+}
+
+message TimestampsDto {
+  optional string created = 1;
+  optional string lastUpdate = 2;
 }
 
 message LinkDto {

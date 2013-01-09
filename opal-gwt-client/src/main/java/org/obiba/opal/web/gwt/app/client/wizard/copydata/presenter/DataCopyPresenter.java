@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -18,8 +18,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.event.TableListUpdateEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
@@ -28,13 +26,16 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -58,8 +59,6 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
 
   }
 
-  private final TableListPresenter tableListPresenter;
-
   private String datasourceName;
 
   private TableDto table;
@@ -69,24 +68,19 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
    * @param eventBus
    */
   @Inject
-  public DataCopyPresenter(Display display, EventBus eventBus, TableListPresenter tableListPresenter) {
+  public DataCopyPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.tableListPresenter = tableListPresenter;
   }
 
   @Override
   protected void onBind() {
     super.onBind();
     initDisplayComponents();
-    tableListPresenter.clear();
 
   }
 
   protected void initDisplayComponents() {
-    tableListPresenter.bind();
-    getView().setTableWidgetDisplay(tableListPresenter.getDisplay());
     super.registerHandler(getView().addJobLinkClickHandler(new JobLinkClickHandler()));
-    super.registerHandler(getEventBus().addHandler(TableListUpdateEvent.getType(), new TablesToExportChangedHandler()));
     getView().setTablesValidator(new TablesValidator());
     getView().setDestinationValidator(new DestinationValidator());
   }
@@ -94,7 +88,6 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    tableListPresenter.unbind();
     datasourceName = null;
     table = null;
   }
@@ -102,21 +95,18 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
   @Override
   public void onReveal() {
     initDatasources();
-    if(datasourceName != null) {
-      tableListPresenter.selectDatasourceTables(datasourceName);
-    } else if(table != null) {
-      tableListPresenter.selectTable(table);
-    }
   }
 
   @Override
   protected void onFinish() {
     super.onFinish();
     getView().renderPendingConclusion();
-    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/copy").post() //
-    .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
-    .withCallback(400, new ClientFailureResponseCodeCallBack()) //
-    .withCallback(201, new SuccessResponseCodeCallBack()).send();
+    UriBuilder uriBuilder = UriBuilder.create();
+    uriBuilder.segment("datasource", datasourceName, "commands", "_copy");
+    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
+        .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
+        .withCallback(400, new ClientFailureResponseCodeCallBack()) //
+        .withCallback(201, new SuccessResponseCodeCallBack()).send();
   }
 
   private CopyCommandOptionsDto createCopycommandOptions() {
@@ -126,7 +116,7 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     if(table != null) {
       selectedTables.push(table.getDatasourceName() + "." + table.getName());
     } else {
-      for(TableDto table : tableListPresenter.getTables()) {
+      for(TableDto table : getView().getSelectedTables()) {
         selectedTables.push(table.getDatasourceName() + "." + table.getName());
       }
     }
@@ -141,21 +131,22 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
   }
 
   private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        List<DatasourceDto> datasources = null;
-        if(resource != null && resource.length() > 0) {
-          datasources = filterDatasources(resource);
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            List<DatasourceDto> datasources = null;
+            if(resource != null && resource.length() > 0) {
+              datasources = filterDatasources(resource);
 
-        }
-        if(datasources != null && datasources.size() > 0) {
-          getView().setDatasources(datasources);
-        } else {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error("NoDataToCopy").build());
-        }
-      }
-    }).send();
+            }
+            if(datasources != null && datasources.size() > 0) {
+              getView().setDatasources(datasources);
+            } else {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error("NoDataToCopy").build());
+            }
+          }
+        }).send();
   }
 
   private List<DatasourceDto> filterDatasources(JsArray<DatasourceDto> datasources) {
@@ -172,7 +163,7 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
 
   private Set<String> getOriginDatasourceNames() {
     Set<String> originDatasourceNames = new HashSet<String>();
-    for(TableDto table : tableListPresenter.getTables()) {
+    for(TableDto table : getView().getSelectedTables()) {
       originDatasourceNames.add(table.getDatasourceName());
     }
     // can't copy in itself
@@ -194,9 +185,24 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
         datasourceName = (String) event.getEventParameters()[0];
       } else if(event.getEventParameters()[0] instanceof TableDto) {
         table = (TableDto) event.getEventParameters()[0];
+        datasourceName = table.getDatasourceName();
       } else {
         throw new IllegalArgumentException("unexpected event parameter type (expected String)");
       }
+      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
+          .forResource("/datasource/" + datasourceName + "/tables").get()
+          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<TableDto> resource) {
+              getView().addTableSelections(JsArrays.toSafeArray((JsArray<TableDto>) resource));
+              if(table != null) {
+                getView().selectTable(table);
+              } else {
+                getView().selectAllTables();
+              }
+            }
+
+          }).send();
     }
   }
 
@@ -225,7 +231,7 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
   private final class TablesValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(tableListPresenter.getTables().size() == 0) {
+      if(getView().getSelectedTables().size() == 0) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
         return false;
       }
@@ -236,7 +242,14 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      NotificationEvent.Builder builder = NotificationEvent.newBuilder();
+      try {
+      ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+        builder.error(errorDto.getStatus()).args(errorDto.getArgumentsArray());
+      } catch(Exception e) {
+        builder.error(response.getText());
+      }
+      getEventBus().fireEvent(builder.build());
       getView().renderFailedConclusion();
     }
   }
@@ -262,34 +275,34 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     }
   }
 
-  public class TablesToExportChangedHandler implements TableListUpdateEvent.Handler {
-
-    @Override
-    public void onTableListUpdate(TableListUpdateEvent event) {
-      initDatasources();
-    }
-  }
-
   public interface Display extends WizardView {
 
     void setTablesValidator(ValidationHandler validationHandler);
 
     void setDestinationValidator(ValidationHandler handler);
 
-    /** Set a collection of datasources retrieved from Opal. */
+    /**
+     * Set a collection of datasources retrieved from Opal.
+     */
     void setDatasources(List<DatasourceDto> datasources);
 
-    /** Get the datasource selected by the user. */
+    /**
+     * Get the datasource selected by the user.
+     */
     String getSelectedDatasource();
 
-    /** Display the conclusion step */
+    /**
+     * Display the conclusion step
+     */
     void renderCompletedConclusion(String jobId);
 
     void renderFailedConclusion();
 
     void renderPendingConclusion();
 
-    /** Add a handler to the job list */
+    /**
+     * Add a handler to the job list
+     */
     HandlerRegistration addJobLinkClickHandler(ClickHandler handler);
 
     boolean isIncremental();
@@ -298,7 +311,13 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
 
     boolean isUseAlias();
 
-    void setTableWidgetDisplay(TableListPresenter.Display display);
+    void addTableSelections(JsArray<TableDto> tables);
+
+    void selectTable(TableDto table);
+
+    void selectAllTables();
+
+    List<TableDto> getSelectedTables();
 
   }
 

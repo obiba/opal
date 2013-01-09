@@ -33,7 +33,9 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.server.httpd.security.AuthenticationFilter;
 import org.obiba.opal.server.ssl.SslContextFactory;
 import org.obiba.runtime.Version;
@@ -66,6 +68,10 @@ public class OpalJettyServer implements Service {
 
   private final ServletContextHandler contextHandler;
 
+  private final OpalRuntime opalRuntime;
+
+  private final SubjectAclService subjectAclService;
+
   @Autowired
   private Version opalVersion;
 
@@ -73,12 +79,14 @@ public class OpalJettyServer implements Service {
 
   @Autowired
   @SuppressWarnings({"unchecked", "PMD.ExcessiveParameterList"})
-  public OpalJettyServer(final ApplicationContext ctx, final SecurityManager securityMgr,
-      final SslContextFactory sslContextFactory, final PlatformTransactionManager txmgr,
-      final @Value("${org.obiba.opal.http.port}") Integer httpPort,
-      final @Value("${org.obiba.opal.https.port}") Integer httpsPort,
-      final @Value("${org.obiba.opal.ajp.port}") Integer ajpPort,
-      final @Value("${org.obiba.opal.maxIdleTime}") Integer maxIdleTime) {
+  public OpalJettyServer(ApplicationContext ctx, SecurityManager securityMgr, final SslContextFactory sslContextFactory,
+      PlatformTransactionManager txmgr, OpalRuntime opalRuntime, SubjectAclService subjectAclService,
+      @Value("${org.obiba.opal.http.port}") Integer httpPort, @Value("${org.obiba.opal.https.port}") Integer httpsPort,
+      @Value("${org.obiba.opal.ajp.port}") Integer ajpPort, @Value("${org.obiba.opal.maxIdleTime}") Integer maxIdleTime
+
+  ) {
+    this.opalRuntime = opalRuntime;
+    this.subjectAclService = subjectAclService;
     Server server = new Server();
     server.setSendServerVersion(false);
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
@@ -94,7 +102,7 @@ public class OpalJettyServer implements Service {
 
     if(httpsPort != null && httpsPort > 0) {
 
-      org.eclipse.jetty.http.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.http.ssl.SslContextFactory() {
+      org.eclipse.jetty.util.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.util.ssl.SslContextFactory() {
 
         @Override
         protected void doStart() throws Exception {
@@ -102,8 +110,7 @@ public class OpalJettyServer implements Service {
         }
 
         @Override
-        public boolean checkConfig() {
-          return true;
+        public void checkKeyStore() {
         }
       };
 
@@ -193,7 +200,9 @@ public class OpalJettyServer implements Service {
         ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
     contextHandler.setContextPath("/");
     contextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
-    contextHandler.addFilter(new FilterHolder(new AuthenticationFilter(securityMgr)), "/ws/*", FilterMapping.DEFAULT);
+    contextHandler
+        .addFilter(new FilterHolder(new AuthenticationFilter(securityMgr, opalRuntime, subjectAclService)), "/ws/*",
+            FilterMapping.DEFAULT);
     // contextHandler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*",
     // FilterMapping.DEFAULT);
     // contextHandler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);

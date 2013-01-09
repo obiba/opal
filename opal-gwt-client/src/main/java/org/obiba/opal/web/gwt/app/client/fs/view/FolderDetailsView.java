@@ -232,7 +232,11 @@ public class FolderDetailsView extends ViewImpl implements Display {
       if(type.isFileType(FileType.FOLDER) && dto.getName().equals("..")) {
         return "folder-up";
       }
-      return dto.getType().getName().toLowerCase();
+      String styles = dto.getType().getName().toLowerCase();
+      if (dto.getReadable() == false) {
+        styles += " forbidden";
+      }
+      return styles;
     }
 
     public HandlerRegistration addFileSelectionHandler(final FileSelectionHandler handler) {

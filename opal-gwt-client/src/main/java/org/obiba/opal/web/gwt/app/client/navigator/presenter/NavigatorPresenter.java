@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -126,13 +126,13 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         .authorize(getView().getCreateDatasourceAuthorizer()).send();
     // import data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/import").post()//
-        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+        .authorize(CascadingAuthorizer.newBuilder()//
             .and("/functional-units", HttpMethod.GET)//
             .authorize(getView().getImportDataAuthorizer()).build())//
         .send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/copy").post()//
-        .authorize(CascadingAuthorizer.newBuilder().and("/files/meta", HttpMethod.GET)//
+        .authorize(CascadingAuthorizer.newBuilder()//
             .and("/functional-units", HttpMethod.GET)//
             .and("/functional-units/entities/table", HttpMethod.GET)//
             .authorize(getView().getExportDataAuthorizer()).build())//

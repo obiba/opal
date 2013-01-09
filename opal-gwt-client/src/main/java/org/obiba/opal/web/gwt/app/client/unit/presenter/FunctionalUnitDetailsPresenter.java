@@ -325,7 +325,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       getView().setAvailable(false);
     } else {
       String name = functionalUnit.getName();
-      UriBuilder ub = UriBuilder.create().segment("functional-unit", name);
+      UriBuilder ub = UriBuilder.create().segment("functional-units","unit", name);
       ResourceRequestBuilderFactory.<FunctionalUnitDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new FunctionalUnitFoundCallBack())
           .withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();

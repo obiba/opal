@@ -16,31 +16,48 @@
 
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
-        <ui:msg description="URL label">URL</ui:msg>
+        <ui:msg description="Opal URL label">Opal address</ui:msg>
       </g:Label>
       <g:TextBox ui:field="url"></g:TextBox>
+      <g:Label
+          styleName="help-block">
+        <ui:msg description="Opal URL Description label">Opal address starts with
+          http:// or https://
+        </ui:msg>
+      </g:Label>
     </g:FlowPanel>
-    
+
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
         <ui:msg description="Username label">User</ui:msg>
       </g:Label>
       <g:TextBox ui:field="username"></g:TextBox>
+      <g:Label
+          styleName="help-block">
+        <ui:msg description="Username Description label">Name of the user valid for the
+          remote Opal.
+        </ui:msg>
+      </g:Label>
     </g:FlowPanel>
-    
+
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
         <ui:msg description="Password label">Password</ui:msg>
       </g:Label>
       <g:PasswordTextBox ui:field="password"></g:PasswordTextBox>
     </g:FlowPanel>
-    
+
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
-        <ui:msg description="Datasource label">Datasource</ui:msg>
+        <ui:msg description="Remote Datasource label">Remote datasource</ui:msg>
       </g:Label>
       <g:TextBox ui:field="remoteDatasource"></g:TextBox>
+      <g:Label
+          styleName="help-block">
+        <ui:msg description="Remote Datasource Description label">Name of the datasource from which data will
+          be imported.</ui:msg>
+      </g:Label>
     </g:FlowPanel>
-    
+
   </g:FlowPanel>
 </ui:UiBinder>

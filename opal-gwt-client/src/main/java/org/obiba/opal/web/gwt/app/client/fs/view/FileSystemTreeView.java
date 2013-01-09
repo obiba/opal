@@ -110,7 +110,7 @@ public class FileSystemTreeView extends ViewImpl implements Display {
 
   private TreeItem createTreeItem(FileDto fileItem) {
     final TreeItem item = new TreeItem(fileItem.getName());
-    item.addStyleName("folder");
+    item.addStyleName("folder" + (fileItem.getReadable() ? "" : " forbidden"));
     item.setUserObject(fileItem);
     return item;
   }

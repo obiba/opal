@@ -18,7 +18,9 @@ import javax.annotation.Nullable;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
+import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
@@ -76,7 +78,8 @@ public final class Dtos {
   }
 
   public static VariableDto.Builder asDto(LinkDto tableLink, Variable from, @Nullable Integer index) {
-    VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType()).setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
+    VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType())
+        .setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
       var.setOccurrenceGroup(from.getOccurrenceGroup());
     }
@@ -132,7 +135,9 @@ public final class Dtos {
   }
 
   public static Variable fromDto(VariableDto variableDto) {
-    Variable.Builder builder = Variable.Builder.newVariable(variableDto.getName(), ValueType.Factory.forName(variableDto.getValueType()), variableDto.getEntityType());
+    Variable.Builder builder = Variable.Builder
+        .newVariable(variableDto.getName(), ValueType.Factory.forName(variableDto.getValueType()),
+            variableDto.getEntityType());
     for(CategoryDto category : variableDto.getCategoriesList()) {
       builder.addCategory(fromDto(category));
     }
@@ -187,11 +192,24 @@ public final class Dtos {
   }
 
   public static TableDto.Builder asDto(ValueTable valueTable) {
+    return asDto(valueTable, true);
+  }
+
+  public static TableDto.Builder asDto(ValueTable valueTable, boolean withCounts) {
     TableDto.Builder builder = TableDto.newBuilder() //
-    .setName(valueTable.getName()) //
-    .setEntityType(valueTable.getEntityType()) //
-    .setVariableCount(Iterables.size(valueTable.getVariables())) //
-    .setValueSetCount(valueTable.getVariableEntities().size());
+        .setName(valueTable.getName()) //
+        .setEntityType(valueTable.getEntityType());
+
+    if(withCounts) {
+      builder.setVariableCount(Iterables.size(valueTable.getVariables())) //
+          .setValueSetCount(valueTable.getVariableEntities().size());
+    }
+
+    Magma.TimestampsDto.Builder tsBuilder = asDto(valueTable.getTimestamps());
+    if (tsBuilder != null) {
+      builder.setTimestamps(tsBuilder);
+    }
+
 
     if(valueTable.getDatasource() != null) {
       builder.setDatasourceName(valueTable.getDatasource().getName());
@@ -205,10 +223,26 @@ public final class Dtos {
     return builder;
   }
 
+  public static Magma.TimestampsDto.Builder asDto(Timestamps ts) {
+    Magma.TimestampsDto.Builder tsBuilder = null;
+    if(ts.getCreated().isNull() == false) {
+      tsBuilder = Magma.TimestampsDto.newBuilder();
+      tsBuilder.setCreated(ts.getCreated().toString());
+    }
+    if(ts.getLastUpdate().isNull() == false) {
+      if (tsBuilder == null) {
+        tsBuilder = Magma.TimestampsDto.newBuilder();
+      }
+      tsBuilder.setLastUpdate(ts.getLastUpdate().toString());
+    }
+
+    return tsBuilder;
+  }
+
   public static DatasourceDto.Builder asDto(Datasource datasource) {
     Magma.DatasourceDto.Builder builder = Magma.DatasourceDto.newBuilder()//
-    .setName(datasource.getName())//
-    .setType(datasource.getType());
+        .setName(datasource.getName())//
+        .setType(datasource.getType());
 
     final List<String> tableNames = Lists.newArrayList();
     final List<String> viewNames = Lists.newArrayList();
@@ -231,13 +265,14 @@ public final class Dtos {
       if(valueDto.getValuesCount() == 0) {
         return type.nullSequence();
       }
-      return type.sequenceOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
+      return type
+          .sequenceOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
 
-        @Override
-        public Value apply(ValueSetsDto.ValueDto input) {
-          return fromDto(input, type, false);
-        }
-      }));
+            @Override
+            public Value apply(ValueSetsDto.ValueDto input) {
+              return fromDto(input, type, false);
+            }
+          }));
     } else {
       if(valueDto.hasValue()) {
         return type.valueOf(valueDto.getValue());
@@ -280,6 +315,20 @@ public final class Dtos {
   public static VariableEntityDto.Builder asDto(VariableEntity from) {
     return VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).setEntityType(from.getType());
   }
+
+  public static ValueSetsDto.ValueSetDto.Builder asDto(ValueSet valueSet) {
+    ValueSetsDto.ValueSetDto.Builder vsBuilder = ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(valueSet.getVariableEntity()
+        .getIdentifier());
+
+    // add timestamps
+    Magma.TimestampsDto.Builder tsBuilder = asDto(valueSet.getTimestamps());
+    if (tsBuilder != null) {
+      vsBuilder.setTimestamps(tsBuilder);
+    }
+
+    return vsBuilder;
+  }
+
 
   public static LocaleDto asDto(Locale locale, Locale displayLocale) {
     LocaleDto.Builder builder = LocaleDto.newBuilder().setName(locale.toString());

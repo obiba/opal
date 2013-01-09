@@ -1,27 +1,33 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.copydata.view;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -39,6 +45,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.watopi.chosen.client.gwt.ChosenListBox;
 
 /**
  * View of the dialog used to export data from Opal.
@@ -70,8 +77,8 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   @UiField
   Anchor jobLink;
 
-  @UiField
-  SimplePanel tablesPanel;
+  @UiField(provided = true)
+  TableChooser tableChooser;
 
   @UiField
   ListBox datasources;
@@ -85,8 +92,6 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   @UiField
   CheckBox useAlias;
 
-  private TableListPresenter.Display tablesList;
-
   private ValidationHandler tablesValidator;
 
   private ValidationHandler destinationValidator;
@@ -96,49 +101,50 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   @Inject
   public DataCopyView(EventBus eventBus) {
     super(eventBus);
+    tableChooser = new TableChooser(true);
     this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
   }
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-    .append(tablesStep)//
-    .title(translations.dataCopyInstructions())//
-    .onValidate(new ValidationHandler() {
+        .append(tablesStep)//
+        .title(translations.dataCopyInstructions())//
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return tablesValidator.validate();
-      }
-    })//
-    .onReset(new ResetHandler() {
+          @Override
+          public boolean validate() {
+            return tablesValidator.validate();
+          }
+        })//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        clearTablesStep();
-      }
-    })//
-    .append(destinationStep, destinationHelpPanel)//
-    .title(translations.dataCopyDestination())//
-    .onValidate(new ValidationHandler() {
+          @Override
+          public void onReset() {
+            clearTablesStep();
+          }
+        })//
+        .append(destinationStep, destinationHelpPanel)//
+        .title(translations.dataCopyDestination())//
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return destinationValidator.validate();
-      }
-    })//
-    .onReset(new ResetHandler() {
+          @Override
+          public boolean validate() {
+            return destinationValidator.validate();
+          }
+        })//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        clearDestinationStep();
-      }
-    })//
-    .append(conclusionStep)//
-    .title(translations.dataCopyPendingConclusion())//
-    .conclusion()//
+          @Override
+          public void onReset() {
+            clearDestinationStep();
+          }
+        })//
+        .append(conclusionStep)//
+        .title(translations.dataCopyPendingConclusion())//
+        .conclusion()//
 
-    .onNext().onPrevious().build();
+        .onNext().onPrevious().build();
   }
 
   @Override
@@ -191,13 +197,6 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   }
 
   @Override
-  public void setTableWidgetDisplay(TableListPresenter.Display display) {
-    tablesList = display;
-    display.setListWidth("28em");
-    tablesPanel.setWidget(display.asWidget());
-  }
-
-  @Override
   public void renderPendingConclusion() {
     conclusionStep.setStepTitle(translations.dataCopyPendingConclusion());
     jobLink.setText("");
@@ -233,7 +232,7 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   private void clearTablesStep() {
     tablesStep.setVisible(true);
     dialog.setHelpEnabled(false);
-    if(tablesList != null) tablesList.clear();
+    tableChooser.clear();
   }
 
   private void clearDestinationStep() {
@@ -265,6 +264,26 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   @Override
   public boolean isUseAlias() {
     return useAlias.getValue();
+  }
+
+  @Override
+  public void addTableSelections(JsArray<TableDto> tables) {
+    tableChooser.addTableSelections(tables);
+  }
+
+  @Override
+  public void selectTable(TableDto table) {
+    tableChooser.selectTable(table);
+  }
+
+  @Override
+  public void selectAllTables() {
+    tableChooser.selectAllTables();
+  }
+
+  @Override
+  public List<TableDto> getSelectedTables() {
+    return tableChooser.getSelectedTables();
   }
 
 }

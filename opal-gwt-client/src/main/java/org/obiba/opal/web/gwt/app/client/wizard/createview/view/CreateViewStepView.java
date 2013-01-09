@@ -1,25 +1,34 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -39,6 +48,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.watopi.chosen.client.gwt.ChosenListBox;
 
 public class CreateViewStepView extends PopupViewImpl implements CreateViewStepPresenter.Display {
 
@@ -57,6 +67,9 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   @UiField
   WizardStep tablesStep;
 
+  @UiField(provided = true)
+  TableChooser tableChooser;
+
   @UiField
   WizardStep conclusionStep;
 
@@ -65,9 +78,6 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
 
   @UiField
   HTMLPanel tablesHelp;
-
-  @UiField
-  SimplePanel tableSelectorPanel;
 
   @UiField
   TextBox viewNameTextBox;
@@ -90,8 +100,6 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   @UiField
   Button configureLink;
 
-  private TableListPresenter.Display tableSelector;
-
   private FileSelectionPresenter.Display fileSelection;
 
   private WizardStepChain stepChain;
@@ -103,6 +111,7 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   @Inject
   public CreateViewStepView(EventBus eventBus) {
     super(eventBus);
+    tableChooser = new TableChooser(true);
     this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
 
@@ -128,46 +137,46 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
 
-    .append(selectTypeStep, selectTypeHelp)//
-    .title(translations.editViewTypeStep())//
-    .onValidate(new ValidationHandler() {
+        .append(selectTypeStep, selectTypeHelp)//
+        .title(translations.editViewTypeStep())//
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return selectTypeValidator.validate();
-      }
-    })//
-    .onReset(new ResetHandler() {
+          @Override
+          public boolean validate() {
+            return selectTypeValidator.validate();
+          }
+        })//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        viewNameTextBox.setText("");
-        addingVariablesOneByOneRadioButton.setValue(true, true);
-      }
-    })//
+          @Override
+          public void onReset() {
+            viewNameTextBox.setText("");
+            addingVariablesOneByOneRadioButton.setValue(true, true);
+          }
+        })//
 
-    .append(tablesStep, tablesHelp)//
-    .title(translations.editViewTablesStep())//
-    .onReset(new ResetHandler() {
+        .append(tablesStep, tablesHelp)//
+        .title(translations.editViewTablesStep())//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        if(tableSelector != null) tableSelector.clear();
-      }
-    })//
+          @Override
+          public void onReset() {
+            tableChooser.clear();
+          }
+        })//
 
-    .append(conclusionStep)//
-    .conclusion()//
-    .onReset(new ResetHandler() {
+        .append(conclusionStep)//
+        .conclusion()//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        conclusionStep.setStepTitle(translations.addViewPending()); //
-        configureLink.setVisible(false);
-      }
-    })
+          @Override
+          public void onReset() {
+            conclusionStep.setStepTitle(translations.addViewPending()); //
+            configureLink.setVisible(false);
+          }
+        })
 
-    .onNext().onPrevious().onClose().build();
+        .onNext().onPrevious().onClose().build();
   }
 
   //
@@ -176,12 +185,6 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   @Override
   public void clear() {
     stepChain.reset();
-  }
-
-  @Override
-  public void setTableSelector(TableListPresenter.Display tableSelector) {
-    this.tableSelector = tableSelector;
-    tableSelectorPanel.add(tableSelector.asWidget());
   }
 
   @Override
@@ -239,6 +242,16 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   @Override
   public HandlerRegistration addConfigureHandler(ClickHandler handler) {
     return configureLink.addClickHandler(handler);
+  }
+
+  @Override
+  public void addTableSelections(JsArray<TableDto> tables) {
+    tableChooser.addTableSelections(tables);
+  }
+
+  @Override
+  public List<TableDto> getSelectedTables() {
+    return tableChooser.getSelectedTables();
   }
 
   @Override

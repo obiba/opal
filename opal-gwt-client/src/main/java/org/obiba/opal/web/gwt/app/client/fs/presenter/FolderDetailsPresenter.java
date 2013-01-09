@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
@@ -66,31 +67,33 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     super.getView().addFileSelectionHandler(new FileSelectionHandler() {
 
       public void onFileSelection(FileDto fileDto) {
-        if(!fileDto.getType().isFileType(FileType.FILE)) {
+        if(fileDto.getType().isFileType(FileType.FILE) == false && fileDto.getReadable()) {
           getEventBus().fireEvent(new FolderSelectionChangeEvent(fileDto));
           updateTable(fileDto.getPath());
         }
       }
     });
 
-    super.registerHandler(getView().getTableSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+    super.registerHandler(
+        getView().getTableSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        FileDto selectedFile = getView().getTableSelectionModel().getSelectedObject();
-        if(selectedFile != null) {
-          getEventBus().fireEvent(new FileSelectionChangeEvent(selectedFile));
-        }
-      }
+          @Override
+          public void onSelectionChange(SelectionChangeEvent event) {
+            FileDto selectedFile = getView().getTableSelectionModel().getSelectedObject();
+            if(selectedFile != null) {
+              getEventBus().fireEvent(new FileSelectionChangeEvent(selectedFile));
+            }
+          }
 
-    }));
+        }));
 
-    super.registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
+        new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
-      public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-        updateTable(event.getFolder().getPath());
-      }
-    }));
+          public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
+            updateTable(event.getFolder().getPath());
+          }
+        }));
 
     super.registerHandler(getEventBus().addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
 

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.NoSuchValueSetException;
+import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -70,12 +71,14 @@ public class ValueSetResource extends AbstractValueTableResource {
 
   /**
    * Get a chunk of value sets, optionally filters the variables and/or the entities.
+   *
    * @param select script for filtering the variables
    * @return
    */
   @GET
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public Response getValueSet(@Context final UriInfo uriInfo, @QueryParam("select") String select, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
+  public Response getValueSet(@Context final UriInfo uriInfo, @QueryParam("select") String select,
+      @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     if(vvs == null) {
       ValueSetsDto vs = getValueSetDto(uriInfo, filterVariables(select, 0, null), filterBinary);
       return TimestampedResponses.ok(getValueTable(), vs).build();
@@ -88,6 +91,7 @@ public class ValueSetResource extends AbstractValueTableResource {
 
   /**
    * Get a value, optionally providing the position (start at 0) of the value in the case of a value sequence.
+   *
    * @param pos
    * @return
    */
@@ -111,6 +115,7 @@ public class ValueSetResource extends AbstractValueTableResource {
 
   /**
    * The position in a sequence of the value is its occurrence.
+   *
    * @param pos the occurrence number (start at 0)
    * @return
    */
@@ -134,25 +139,30 @@ public class ValueSetResource extends AbstractValueTableResource {
     return builder.build();
   }
 
-  private ValueSetsDto getValueSetDto(final UriInfo uriInfo, final Iterable<Variable> variables, final boolean filterBinary) {
+  private ValueSetsDto getValueSetDto(final UriInfo uriInfo, final Iterable<Variable> variables,
+      final boolean filterBinary) {
     final ValueSet valueSet = getValueTable().getValueSet(entity);
 
-    return ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType()).addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
+    ValueSetsDto.ValueSetDto.Builder vsBuilder = Dtos.asDto(valueSet)
+        .addAllValues(Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
 
-      @Override
-      public String apply(Variable from) {
-        return from.getName();
-      }
+          @Override
+          public ValueSetsDto.ValueDto apply(Variable fromVariable) {
+            String link = uriInfo.getPath() + "/variable/" + fromVariable.getName() + "/value";
+            Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
+            return Dtos.asDto(link, value, filterBinary).build();
+          }
+        }));
 
-    })).addValueSets(ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(entity.getIdentifier()).addAllValues(Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
+    return ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType())
+        .addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
 
-      @Override
-      public ValueSetsDto.ValueDto apply(Variable fromVariable) {
-        String link = uriInfo.getPath() + "/variable/" + fromVariable.getName() + "/value";
-        Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
-        return Dtos.asDto(link, value, filterBinary).build();
-      }
-    })).build()).build();
+          @Override
+          public String apply(Variable from) {
+            return from.getName();
+          }
+
+        })).addValueSets(vsBuilder.build()).build();
   }
 
   private ValueSetsDto.ValueDto getValueDto(final UriInfo uriInfo, final boolean filterBinary) {
@@ -169,8 +179,7 @@ public class ValueSetResource extends AbstractValueTableResource {
 
   private Value getValueAt(Value value, Integer occurrence) {
     if(value.isSequence() && occurrence != null) return value.asSequence().get(occurrence);
-    else
-      return value;
+    else return value;
   }
 
   private ResponseBuilder getValueResponse(String identifier, Value value, Integer pos) {
@@ -178,7 +187,8 @@ public class ValueSetResource extends AbstractValueTableResource {
     if(variable.getValueType().equals(BinaryType.get())) {
       return getBinaryValueResponse(identifier, value, pos);
     }
-    return TimestampedResponses.ok(getValueTable(), value.toString()).type(value.isSequence() ? "text/csv" : MediaType.TEXT_PLAIN);
+    return TimestampedResponses.ok(getValueTable(), value.toString())
+        .type(value.isSequence() ? "text/csv" : MediaType.TEXT_PLAIN);
   }
 
   private ResponseBuilder getBinaryValueResponse(String identifier, Value value, Integer pos) {

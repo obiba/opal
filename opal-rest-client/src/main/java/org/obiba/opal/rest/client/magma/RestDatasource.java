@@ -33,7 +33,8 @@ public class RestDatasource extends AbstractDatasource {
 
   private final URI datasourceURI;
 
-  public RestDatasource(String name, String opalUri, String remoteDatasource, String username, String password) throws URISyntaxException {
+  public RestDatasource(String name, String opalUri, String remoteDatasource, String username,
+      String password) throws URISyntaxException {
     this(name, new OpalJavaClient(opalUri, username, password), remoteDatasource);
   }
 
@@ -93,7 +94,8 @@ public class RestDatasource extends AbstractDatasource {
     if(super.hasValueTable(tableName) == false) {
       URI tableUri = newReference("tables");
       try {
-        HttpResponse response = getOpalClient().post(tableUri, TableDto.newBuilder().setName(tableName).setEntityType(entityType).build());
+        HttpResponse response = getOpalClient()
+            .post(tableUri, TableDto.newBuilder().setName(tableName).setEntityType(entityType).build());
         if(response.getStatusLine().getStatusCode() != 201) {
           throw new RuntimeException("cannot create table " + response.getStatusLine().getReasonPhrase());
         }
@@ -110,17 +112,20 @@ public class RestDatasource extends AbstractDatasource {
 
   @Override
   protected ValueTable initialiseValueTable(final String tableName) {
-    return new RestValueTable(this, opalClient.getResource(TableDto.class, newReference("table", tableName), TableDto.newBuilder()));
+    return new RestValueTable(this, opalClient
+        .getResource(TableDto.class, newUri("table", tableName).query("counts", "false").build(),
+            TableDto.newBuilder()));
   }
 
   private void refresh() {
-    Set<String> cachedTableNames = ImmutableSet.copyOf(Iterables.transform(super.getValueTables(), new Function<ValueTable, String>() {
+    Set<String> cachedTableNames = ImmutableSet
+        .copyOf(Iterables.transform(super.getValueTables(), new Function<ValueTable, String>() {
 
-      @Override
-      public String apply(ValueTable input) {
-        return input.getName();
-      }
-    }));
+          @Override
+          public String apply(ValueTable input) {
+            return input.getName();
+          }
+        }));
     Set<String> currentTables = getValueTableNames();
 
     SetView<String> tablesToRemove = Sets.difference(cachedTableNames, currentTables);
@@ -146,6 +151,10 @@ public class RestDatasource extends AbstractDatasource {
 
   URI newReference(String... segments) {
     return uriBuilder().segment(segments).build();
+  }
+
+  UriBuilder newUri(String... segments) {
+    return uriBuilder().segment(segments);
   }
 
   URI buildURI(final URI root, String... segments) {

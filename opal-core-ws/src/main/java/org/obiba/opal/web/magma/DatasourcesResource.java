@@ -14,9 +14,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -104,6 +106,18 @@ public class DatasourcesResource {
     }
 
     return response.build();
+  }
+
+  @GET
+  @Path("/tables")
+  public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType) {
+    final List<Magma.TableDto> tables = Lists.newArrayList();
+
+    for(Datasource from : MagmaEngine.get().getDatasources()) {
+      tables.addAll(new TablesResource(from).getTables(false, entityType));
+    }
+
+    return tables;
   }
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {

@@ -101,9 +101,13 @@ public interface Translations extends Constants {
       "Copy", "Copy", //
       "Test", "Test", //
       "Download", "Download", //
+<<<<<<< HEAD
       "DownloadCertificate", "Download Certificate", //
       "Index now", "Index now", //
       "Clear", "Clear"})
+=======
+      "DownloadCertificate", "Download Certificate"})
+>>>>>>> upstream/master
   Map<String, String> actionMap();
 
   @Description("Permission map")
@@ -350,12 +354,23 @@ public interface Translations extends Constants {
       "DriverIsRequired", "A driver is required.",//
       "UrlIsRequired", "A url is required.",//
       "UsernameIsRequired", "A username is required.",//
+<<<<<<< HEAD
       "TableSelectionIsRequired", "At least one table must be selected.",//
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
       "IndexClearCompleted", "Index clear completed",//
       "ServiceSearchStartCompleted", "Search service started.", "ServiceSearchStopCompleted", "Search service stopped.", "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
       "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule."//
+=======
+      "PasswordIsRequired", "A password is required.",//
+      "OpalURLIsRequired", "Opal address is required.",//
+      "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
+      "TableSelectionIsRequired", "At least one table must be selected.",//
+      "IdentifiersImportationCompleted", "Identifiers importation completed.",//
+      "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
+      "DataWriteNotAuthorized", "You are not allowed to write in datasource: {0}.",//
+      "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}."//
+>>>>>>> upstream/master
   })
   Map<String, String> userMessageMap();
 
@@ -1318,6 +1333,7 @@ public interface Translations extends Constants {
       "Preview the count of identifiers that can be imported and select from which table identifiers will be extracted.")
   String identifiersSyncTableStep();
 
+<<<<<<< HEAD
   @Description("Table last update")
   @DefaultStringValue("Table last update")
   String tableLastUpdateLabel();
@@ -1393,5 +1409,19 @@ public interface Translations extends Constants {
   @Description("Saturday")
   @DefaultStringValue("Saturday")
   String saturdayLabel();
+=======
+  @Description("Select some Tables label")
+  @DefaultStringValue("Select some tables...")
+  String selectSomeTables();
+
+  @Description("File based datasources label")
+  @DefaultStringValue("Files")
+  String fileBasedDatasources();
+
+  @Description("Remote server based datasources label")
+  @DefaultStringValue("Servers")
+  String remoteServerBasedDatasources();
+
+>>>>>>> upstream/master
 
 }

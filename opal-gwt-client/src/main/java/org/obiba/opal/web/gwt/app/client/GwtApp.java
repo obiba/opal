@@ -7,7 +7,6 @@ import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.inject.OpalGinjector;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
@@ -53,7 +52,6 @@ public class GwtApp implements EntryPoint {
 
     DefaultResourceAuthorizationRequestBuilder.setup(authorizationCache);
 
-    initTableSelectorPresenter();
     initConfirmationPresenter();
     initViewWizards();
 
@@ -61,11 +59,6 @@ public class GwtApp implements EntryPoint {
     opalGinjector.getPlaceManager().revealCurrentPlace();
 
     registerHandlers();
-  }
-
-  private void initTableSelectorPresenter() {
-    TableSelectorPresenter tableSelectorPresenter = opalGinjector.getTableSelectorPresenter();
-    tableSelectorPresenter.bind();
   }
 
   private void initConfirmationPresenter() {
@@ -91,7 +84,8 @@ public class GwtApp implements EntryPoint {
     opalGinjector.getEventBus().addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
       @Override
       public void onUnhandledResponse(UnhandledResponseEvent e) {
-        RevealRootPopupContentEvent.fire(opalGinjector.getEventBus(), opalGinjector.getUnhandledResponseNotificationPresenter());
+        RevealRootPopupContentEvent
+            .fire(opalGinjector.getEventBus(), opalGinjector.getUnhandledResponseNotificationPresenter());
       }
     });
 
@@ -101,12 +95,13 @@ public class GwtApp implements EntryPoint {
         GWT.log("Request error: ", e.getException());
       }
     });
-    opalGinjector.getEventBus().addHandler(RequestCredentialsExpiredEvent.getType(), new RequestCredentialsExpiredEvent.Handler() {
-      @Override
-      public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
-        opalGinjector.getPlaceManager().revealDefaultPlace();
-      }
-    });
+    opalGinjector.getEventBus()
+        .addHandler(RequestCredentialsExpiredEvent.getType(), new RequestCredentialsExpiredEvent.Handler() {
+          @Override
+          public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
+            opalGinjector.getPlaceManager().revealDefaultPlace();
+          }
+        });
     opalGinjector.getEventBus().addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
       @Override
       public void onSessionCreated(SessionCreatedEvent event) {
@@ -121,7 +116,8 @@ public class GwtApp implements EntryPoint {
         RequestCredentials credentials = opalGinjector.getRequestCredentials();
         if(credentials != null && credentials.hasCredentials()) {
           // calling this makes the session expired event to be fired in return
-          ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials()).delete().send();
+          ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials())
+              .delete().send();
           credentials.invalidate();
         }
         opalGinjector.getPlaceManager().revealDefaultPlace();

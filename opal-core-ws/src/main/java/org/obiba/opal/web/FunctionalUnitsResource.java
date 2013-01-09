@@ -25,6 +25,7 @@ import java.util.TreeSet;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -123,6 +124,20 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     }
     sortByName(functionalUnits);
     return functionalUnits;
+  }
+
+  @GET
+  @Path("/unit/{name}")
+  public Opal.FunctionalUnitDto getFunctionalUnit(@PathParam("name") String unitName) {
+    return getFunctionalUnitDtoBuilder(getFunctionalUnitService().getFunctionalUnit(unitName)).build();
+  }
+
+  private FunctionalUnitDto.Builder getFunctionalUnitDtoBuilder(FunctionalUnit functionalUnit) {
+    Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName()).setKeyVariableName(functionalUnit.getKeyVariableName());
+    if(functionalUnit.getSelect() instanceof JavascriptClause) {
+      fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
+    }
+    return fuBuilder;
   }
 
   @POST

@@ -11,9 +11,11 @@ package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
@@ -32,7 +34,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
@@ -51,6 +52,7 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -76,8 +78,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
   }
 
-  private final TableListPresenter tableListPresenter;
-
   private final FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
@@ -91,10 +91,9 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   //
 
   @Inject
-  public CreateViewStepPresenter(final Display display, final EventBus eventBus, TableListPresenter tableListPresenter,
+  public CreateViewStepPresenter(final Display display, final EventBus eventBus,
       FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
-    this.tableListPresenter = tableListPresenter;
     this.fileSelectionPresenter = fileSelectionPresenter;
   }
 
@@ -105,9 +104,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   @Override
   protected void onBind() {
     super.onBind();
-    tableListPresenter.bind();
-    getView().setTableSelector(tableListPresenter.getDisplay());
-
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
     getView().setFileSelectionDisplay(fileSelectionPresenter.getDisplay());
@@ -118,7 +114,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    tableListPresenter.unbind();
     fileSelectionPresenter.unbind();
   }
 
@@ -132,8 +127,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   @Override
   public void onReveal() {
     super.onReveal();
-    tableListPresenter.getTables().clear();
-
     getView().clear();
   }
 
@@ -155,7 +148,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       if(event.getEventParameters()[0] instanceof String) {
         datasourceName = (String) event.getEventParameters()[0];
         UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-        ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get()
+        ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
             .withCallback(new ResourceCallback<DatasourceDto>() {
 
               @Override
@@ -169,6 +162,14 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     } else {
       throw new IllegalArgumentException("Datasource name is expected as first wizard argument.");
     }
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(
+        "/datasources/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<TableDto> resource) {
+        getView().addTableSelections(JsArrays.toSafeArray((JsArray<TableDto>) resource));
+      }
+
+    }).send();
   }
 
   private void createViewIfDoesNotExist() {
@@ -185,7 +186,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
   private ResourceRequestBuilder<ViewDto> getViewRequest(String datasourceName, String viewName) {
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "view", viewName);
-    return ResourceRequestBuilderFactory.<ViewDto> newBuilder().get().forResource(ub.build())
+    return ResourceRequestBuilderFactory.<ViewDto>newBuilder().get().forResource(ub.build())
         .accept("application/x-protobuf+json");
   }
 
@@ -198,8 +199,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     String viewName = getView().getViewName().getText();
 
     // Build the ViewDto for the request.
-    ViewDtoBuilder viewDtoBuilder =
-        ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
+    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName)
+        .fromTables(getView().getSelectedTables());
 
     // Create the resource request (the builder).
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "views");
@@ -244,8 +245,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     String viewName = getView().getViewName().getText();
 
     // Build the ViewDto for the request.
-    ViewDtoBuilder viewDtoBuilder =
-        ViewDtoBuilder.newBuilder().setName(viewName).fromTables(tableListPresenter.getTables());
+    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName)
+        .fromTables(getView().getSelectedTables());
 
     // Create the resource request (the builder).
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "view", viewName);
@@ -272,8 +273,6 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
     void clear();
 
-    void setTableSelector(TableListPresenter.Display tableSelector);
-
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
 
     HasText getViewName();
@@ -295,6 +294,10 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     void renderCompletedConclusion();
 
     HandlerRegistration addConfigureHandler(ClickHandler handler);
+
+    void addTableSelections(JsArray<TableDto> tables);
+
+    List<TableDto> getSelectedTables();
 
   }
 
@@ -352,15 +355,15 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
       validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired"));
-      validators.add(new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' },
-          "ViewNameDisallowedChars"));
-      validators.add(new RequiredOptionValidator(RequiredOptionValidator.asSet(getView()
-          .getAddVariablesOneByOneOption(), getView().getFileViewOption(), getView().getExcelFileOption()),
-          "VariableDefinitionMethodRequired"));
-      validators.add(new ConditionalValidator(getView().getFileViewOption(), new RequiredFileSelectionValidator(
-          "XMLFileRequired")));
-      validators.add(new ConditionalValidator(getView().getExcelFileOption(), new RequiredFileSelectionValidator(
-          "ExcelFileRequired")));
+      validators.add(
+          new DisallowedCharactersValidator(getView().getViewName(), new char[] {'.', ':'}, "ViewNameDisallowedChars"));
+      validators.add(new RequiredOptionValidator(RequiredOptionValidator
+          .asSet(getView().getAddVariablesOneByOneOption(), getView().getFileViewOption(),
+              getView().getExcelFileOption()), "VariableDefinitionMethodRequired"));
+      validators.add(new ConditionalValidator(getView().getFileViewOption(),
+          new RequiredFileSelectionValidator("XMLFileRequired")));
+      validators.add(new ConditionalValidator(getView().getExcelFileOption(),
+          new RequiredFileSelectionValidator("ExcelFileRequired")));
       return validators;
     }
   }
@@ -376,7 +379,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {
         public Collection<TableDto> getCollection() {
-          return tableListPresenter.getTables();
+          return getView().getSelectedTables();
         }
       };
       validators.add(new MinimumSizeCollectionValidator<TableDto>(tablesField, 1, "TableSelectionRequired"));

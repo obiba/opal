@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 /*
  * Copyright (c) 2012 OBiBa. All rights reserved.
+=======
+/*******************************************************************************
+ * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+>>>>>>> upstream/master
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -55,8 +60,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableListPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.TableSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
@@ -152,10 +155,6 @@ public interface OpalGinjector extends Ginjector {
   FileUploadDialogPresenter getFileUploadDialogPresenter();
 
   Provider<FileSelectorPresenter> getFileSelectorPresenter();
-
-  TableSelectorPresenter getTableSelectorPresenter();
-
-  TableListPresenter getTableListPresenter();
 
   FileSelectionPresenter getFileSectionPresenter();
 

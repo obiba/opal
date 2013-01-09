@@ -8,7 +8,7 @@
     <table class="full-width">
       <tr>
         <td colspan="2">
-          <g:TextArea ui:field="scriptArea" addStyleNames="code x-high full-width"/>
+          <g:TextArea ui:field="scriptArea" addStyleNames="code high full-width"/>
         </td>
       </tr>
       <tr>

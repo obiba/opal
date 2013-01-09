@@ -44,13 +44,15 @@ public class FileSystemResource {
 
   @GET
   public Opal.FileDto getFileSystem() throws FileSystemException {
+    FileObject root = opalRuntime.getFileSystem().getRoot();
 
     // Create a root FileDto representing the root of the FileSystem.
     Opal.FileDto.Builder fileBuilder = Opal.FileDto.newBuilder();
     fileBuilder.setName("root").setType(Opal.FileDto.FileType.FOLDER).setPath("/");
+    fileBuilder.setReadable(root.isReadable()).setWritable(root.isWriteable());
 
     // Create FileDtos for each file & folder in the FileSystem and add them to the root FileDto recursively.
-    addFiles(fileBuilder, opalRuntime.getFileSystem().getRoot());
+    addFiles(fileBuilder, root);
 
     return fileBuilder.build();
   }
@@ -76,9 +78,10 @@ public class FileSystemResource {
       fileBuilder = Opal.FileDto.newBuilder();
       fileBuilder.setName(child.getName().getBaseName()).setPath(child.getName().getPath());
       fileBuilder.setType(child.getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
+      fileBuilder.setReadable(child.isReadable()).setWritable(child.isWriteable());
 
       // If the current child is a folder, add its children recursively.
-      if(child.getType() == FileType.FOLDER) {
+      if(child.getType() == FileType.FOLDER && child.isReadable()) {
         addFiles(fileBuilder, child);
       }
 

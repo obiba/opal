@@ -40,7 +40,7 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.TimestampedResponses;
-import org.obiba.opal.web.magma.support.InvalidRequestException;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableDto.Builder;
