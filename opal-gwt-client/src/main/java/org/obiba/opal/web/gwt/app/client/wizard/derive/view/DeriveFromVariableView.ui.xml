@@ -11,17 +11,17 @@
 
         <g:FlowPanel styleName="input">
           <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
-          <g:ListBox ui:field="datasourceBox" />
+          <o:Chooser ui:field="datasourceBox" />
         </g:FlowPanel>
 
         <g:FlowPanel styleName="input">
           <g:Label addStyleNames="key"><ui:msg description="Table label">Table</ui:msg></g:Label>
-          <g:ListBox ui:field="tableBox" />
+          <o:Chooser ui:field="tableBox" />
         </g:FlowPanel>
 
         <g:FlowPanel styleName="input">
           <g:Label addStyleNames="key"><ui:msg description="Variable label">Variable</ui:msg></g:Label>
-          <g:ListBox ui:field="variableBox" />
+          <o:Chooser ui:field="variableBox" />
         </g:FlowPanel>
 
       </g:FlowPanel>

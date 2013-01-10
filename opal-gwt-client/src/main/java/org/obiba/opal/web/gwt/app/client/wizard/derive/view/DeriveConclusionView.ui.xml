@@ -17,7 +17,7 @@
 
         <g:FlowPanel styleName="input">
           <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
-          <g:ListBox ui:field="datasourceNameBox"/>
+          <o:Chooser ui:field="datasourceNameBox"/>
         </g:FlowPanel>
 
         <g:FlowPanel ui:field="viewNameInput" styleName="input">
