@@ -72,6 +72,7 @@ message RangeTermDto {
 
 message QueryResultDto {
   repeated FacetResultDto facets = 1;
+  required int32 total_hits = 2;
 }
 
 message FacetResultDto {
@@ -96,9 +97,8 @@ message FacetResultDto {
     }
 
     required string facet = 1;
-    required int32 total_hits = 2;
 
-    repeated TermFrequencyResultDto frequencies = 3;
-    optional StatisticalResultDto statistics = 4;
-    repeated FilterResultDto filters = 5;
+    repeated TermFrequencyResultDto frequencies = 2;
+    optional StatisticalResultDto statistics = 3;
+    repeated FilterResultDto filters = 4;
 }
