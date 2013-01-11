@@ -54,7 +54,7 @@ public class ValueTableFacetsResource {
   @POST
   @Path("/_search")
   public Response search(@Context HttpServletRequest servletRequest, Search.QueryTermsDto dtoQueries) {
-    Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().build();
+    Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);

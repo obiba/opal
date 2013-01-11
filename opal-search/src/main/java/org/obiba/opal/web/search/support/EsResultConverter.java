@@ -39,15 +39,13 @@ public class EsResultConverter {
 
     JSONObject jsonHits = json.getJSONObject("hits");
     JSONObject jsonFacets = json.getJSONObject("facets");
-    Search.QueryResultDto.Builder dtoResultsBuilder = Search.QueryResultDto.newBuilder();
+    Search.QueryResultDto.Builder dtoResultsBuilder =
+      Search.QueryResultDto.newBuilder().setTotalHits(jsonHits.getInt("total"));
 
     for (Iterator<String> iterator = jsonFacets.keys(); iterator.hasNext(); ) {
       String facet = iterator.next();
       JSONObject jsonFacet = jsonFacets.getJSONObject(facet);
-      Search.FacetResultDto.Builder dtoFacetResultBuilder =
-        Search.FacetResultDto.newBuilder()
-          .setFacet(facet)
-          .setTotalHits(jsonHits.getInt("total"));
+      Search.FacetResultDto.Builder dtoFacetResultBuilder = Search.FacetResultDto.newBuilder().setFacet(facet);
 
       if("terms".equals(jsonFacet.get("_type"))) {
         convertTerms(jsonFacet.getJSONArray("terms"), dtoFacetResultBuilder);
