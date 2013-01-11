@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -74,10 +74,16 @@ public class ValueTableIndexResource extends IndexResource {
       Opal.TableIndexStatusDto tableStatusDto = Opal.TableIndexStatusDto.newBuilder().setDatasource(datasource)
           .setTable(table).setSchedule(getScheduleDto(datasource, table))
           .setStatus(getTableIndexationStatus(datasource, table)).setProgress(getValueTableIndexationProgress(table))
-          .setLink(link.getPath())
-          .setIndexCreated(getValueTableIndex(datasource, table).getTimestamps().getCreated().toString())
-          .setIndexLastUpdate(getValueTableIndex(datasource, table).getTimestamps().getLastUpdate().toString())
-          .setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
+          .setLink(link.getPath()).setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
+
+      if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
+        tableStatusDto = tableStatusDto.toBuilder()
+            .setIndexCreated(indexManager.getIndex(valueTable).getTimestamps().getCreated().toString()).build();
+      }
+      if(!indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
+        tableStatusDto = tableStatusDto.toBuilder()
+            .setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
+      }
 
       return tableStatusDto;
     }

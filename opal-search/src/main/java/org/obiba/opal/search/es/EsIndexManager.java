@@ -81,6 +81,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   private final Set<EsValueTableIndex> indices = Sets.newHashSet();
 
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, ThreadFactory threadFactory, Version version) {
@@ -105,7 +106,17 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
   @Override
   public boolean isIndexable(ValueTable valueTable) {
     // Currently only based on the state of ElasticSearch
+
+    // is running
     return esConfig.getConfig().isEnabled() && indexConfig.getConfig().isIndexable(valueTable);
+  }
+
+  @Override
+  public boolean isReadyForIndexing(ValueTable valueTable) {
+    log.info(getIndex(valueTable).getName() + " : " + indexConfig.getConfig()
+        .isReadyForIndexing(valueTable, getIndex(valueTable)));
+    return esConfig.getConfig().isEnabled() && indexConfig.getConfig()
+        .isReadyForIndexing(valueTable, getIndex(valueTable));
   }
 
   @Override
@@ -138,6 +149,8 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
   }
 
   private IndexMetaData getIndexMetaData() {
+    if(esProvider.getClient() == null) return null;
+
     IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(esIndexName())
         .execute().actionGet().getState().getMetaData().index(esIndexName());
     return imd != null ? imd : createIndex();

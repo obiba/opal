@@ -1,16 +1,13 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+/*
+ * Copyright (c) 2012 OBiBa. All rights reserved.
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
-
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter.Display;
@@ -37,6 +34,9 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.gwtplatform.mvp.client.ViewImpl;
+
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
 
 public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdministrationPresenter.Display {
 
@@ -65,22 +65,23 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   @UiField
   Panel permissions;
 
-  ActionsColumn<JdbcDataSourceDto> actionsColumn = new ActionsColumn<JdbcDataSourceDto>(new ActionsProvider<JdbcDataSourceDto>() {
+  ActionsColumn<JdbcDataSourceDto> actionsColumn = new ActionsColumn<JdbcDataSourceDto>(
+      new ActionsProvider<JdbcDataSourceDto>() {
 
-    private final String[] all = new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
+        private final String[] all = new String[] {TEST_ACTION, EDIT_ACTION, DELETE_ACTION};
 
-    private final String[] immutable = new String[] { TEST_ACTION };
+        private final String[] immutable = new String[] {TEST_ACTION};
 
-    @Override
-    public String[] allActions() {
-      return all;
-    }
+        @Override
+        public String[] allActions() {
+          return all;
+        }
 
-    @Override
-    public String[] getActions(JdbcDataSourceDto value) {
-      return value.getEditable() ? allActions() : immutable;
-    }
-  });
+        @Override
+        public String[] getActions(JdbcDataSourceDto value) {
+          return value.getEditable() ? allActions() : immutable;
+        }
+      });
 
   public DatabaseAdministrationView() {
     super();

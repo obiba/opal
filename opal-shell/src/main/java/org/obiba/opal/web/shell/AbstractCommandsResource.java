@@ -10,13 +10,11 @@
 package org.obiba.opal.web.shell;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandJobService;
-
 
 public abstract class AbstractCommandsResource {
 

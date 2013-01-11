@@ -1,0 +1,83 @@
+<!--
+  ~ Copyright (c) 2012 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
+  <g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="panel">
+      <g:FlowPanel addStyleNames="title">
+        <g:InlineLabel>
+          <ui:msg description="Search service label">Search service</ui:msg>
+        </g:InlineLabel>
+        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
+          <g:HTMLPanel>
+            <g:Label addStyleNames="title">
+              <ui:msg description="Search service label">Search service</ui:msg>
+            </g:Label>
+            <p>
+              <ui:msg description="Search service information">
+                Search service administration.
+              </ui:msg>
+            </p>
+          </g:HTMLPanel>
+        </o:HelpImage>
+      </g:FlowPanel>
+      <g:HorizontalPanel addStyleNames="content">
+        <b:Button ui:field="startButton" size="MINI">
+          <ui:msg description="On">Start</ui:msg>
+        </b:Button>
+        <b:Button ui:field="stopButton" size="MINI">
+          <ui:msg description="Off">Stop</ui:msg>
+        </b:Button>
+      </g:HorizontalPanel>
+    </g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="panel">
+      <g:FlowPanel addStyleNames="title">
+        <g:InlineLabel>
+          <ui:msg description="Indices label">Table indices</ui:msg>
+        </g:InlineLabel>
+        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
+          <g:HTMLPanel>
+            <g:Label addStyleNames="title">
+              <ui:msg description="Indices label">Table indices</ui:msg>
+            </g:Label>
+            <p>
+              <ui:msg description="Table indices information">
+                A database index is a data structure that improves the speed of data retrieval operations on a database
+                table at the cost of slower writes and increased storage space.
+              </ui:msg>
+            </p>
+          </g:HTMLPanel>
+        </o:HelpImage>
+      </g:FlowPanel>
+      <g:HorizontalPanel addStyleNames="content">
+        <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync" size="MINI">
+          <ui:msg description="Refresh indices label">Refresh</ui:msg>
+        </b:Button>
+        <b:DropdownButton ui:field="actionsDropdown" text="Actions" size="MINI">
+          <b:NavLink>Schedule indexing</b:NavLink>
+          <b:NavLink>Clear</b:NavLink>
+        </b:DropdownButton>
+      </g:HorizontalPanel>
+      <g:VerticalPanel width="100%" addStyleNames="content">
+        <c:SimplePager ui:field="indexTablePager" location="CENTER" addStyleNames="right-aligned"/>
+        <o:Table width="100%" ui:field="indexTable" addStyleNames="gwt-CellTable"/>
+      </g:VerticalPanel>
+    </g:FlowPanel>
+
+  </g:FlowPanel>
+</ui:UiBinder>

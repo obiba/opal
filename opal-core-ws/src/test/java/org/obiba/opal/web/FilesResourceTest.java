@@ -1,20 +1,13 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+/*
+ * Copyright (c) 2012 OBiBa. All rights reserved.
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,8 +28,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import junit.framework.Assert;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.vfs2.FileContent;
@@ -53,6 +44,15 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.web.model.Opal.FileDto;
+
+import junit.framework.Assert;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 public class FilesResourceTest {
 
@@ -156,19 +156,22 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    checkGetFileDetailsResponse("/", new String[] { "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt", "folder11", "file11.txt", "file21.txt", "folder31", "folder41", "file41.txt", "file42.txt", "file43.txt", "file51.txt" });
-    checkGetFileDetailsResponse("/folder1/folder11", new String[] { "folder111", "file111.txt", "file1111.txt", "file1112.txt" });
-    checkGetFileDetailsResponse("/folder1/folder11/folder111", new String[] { "file1111.txt", "file1112.txt" });
-    checkGetFileDetailsResponse("/folder2", new String[] { "file21.txt" });
-    checkGetFileDetailsResponse("/folder3", new String[] { "folder31", "file311.txt" });
-    checkGetFileDetailsResponse("/folder4", new String[] { "folder41", "file41.txt", "file42.txt", "file43.txt" });
-    checkGetFileDetailsResponse("/folder5", new String[] { "file51.txt" });
+    checkGetFileDetailsResponse("/",
+        new String[] {"folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt", "folder11", "file11.txt", "file21.txt", "folder31", "folder41", "file41.txt", "file42.txt", "file43.txt", "file51.txt"});
+    checkGetFileDetailsResponse("/folder1/folder11",
+        new String[] {"folder111", "file111.txt", "file1111.txt", "file1112.txt"});
+    checkGetFileDetailsResponse("/folder1/folder11/folder111", new String[] {"file1111.txt", "file1112.txt"});
+    checkGetFileDetailsResponse("/folder2", new String[] {"file21.txt"});
+    checkGetFileDetailsResponse("/folder3", new String[] {"folder31", "file311.txt"});
+    checkGetFileDetailsResponse("/folder4", new String[] {"folder41", "file41.txt", "file42.txt", "file43.txt"});
+    checkGetFileDetailsResponse("/folder5", new String[] {"file51.txt"});
 
     verify(opalRuntimeMock);
 
   }
 
-  private void checkGetFileDetailsResponse(String path, String[] expectedFolderContentArray) throws FileSystemException {
+  private void checkGetFileDetailsResponse(String path,
+      String[] expectedFolderContentArray) throws FileSystemException {
 
     Set<String> expectedFolderContent = new HashSet<String>(Arrays.asList(expectedFolderContentArray));
     Response response = filesResource.getFileDetails(path);
@@ -203,12 +206,15 @@ public class FilesResourceTest {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
     replay(opalRuntimeMock);
 
-    checkCompressedFolder("/folder1", new String[] { "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111", "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt", "folder1/folder11/folder111/file1112.txt" });
-    checkCompressedFolder("/folder2", new String[] { "folder2", "folder2/file21.txt" });
-    checkCompressedFolder("/folder3", new String[] { "folder3", "folder3/folder31", "folder3/folder31/file311.txt" });
-    checkCompressedFolder("/folder4", new String[] { "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt", "folder4/file43.txt" });
-    checkCompressedFolder("/folder5", new String[] { "folder5", "folder5/file51.txt" });
-    checkCompressedFolder("/", new String[] { "/", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111", "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt", "folder1/folder11/folder111/file1112.txt", "folder2", "folder2/file21.txt", "folder3", "folder3/folder31", "folder3/folder31/file311.txt", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt", "folder4/file43.txt", "folder5", "folder5/file51.txt", "file2.txt" });
+    checkCompressedFolder("/folder1",
+        new String[] {"folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111", "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt", "folder1/folder11/folder111/file1112.txt"});
+    checkCompressedFolder("/folder2", new String[] {"folder2", "folder2/file21.txt"});
+    checkCompressedFolder("/folder3", new String[] {"folder3", "folder3/folder31", "folder3/folder31/file311.txt"});
+    checkCompressedFolder("/folder4",
+        new String[] {"folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt", "folder4/file43.txt"});
+    checkCompressedFolder("/folder5", new String[] {"folder5", "folder5/file51.txt"});
+    checkCompressedFolder("/",
+        new String[] {"/", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111", "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt", "folder1/folder11/folder111/file1112.txt", "folder2", "folder2/file21.txt", "folder3", "folder3/folder31", "folder3/folder31/file311.txt", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt", "folder4/file43.txt", "folder5", "folder5/file51.txt", "file2.txt"});
 
     verify(opalRuntimeMock);
 
@@ -284,7 +290,8 @@ public class FilesResourceTest {
   public void testUploadFileToFileSystem() throws FileUploadException, IOException, URISyntaxException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
     expect(fileItemMock.getName()).andReturn("fileToUpload.txt").atLeastOnce();
-    expect(fileItemMock.getInputStream()).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt")).once();
+    expect(fileItemMock.getInputStream()).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt"))
+        .once();
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {
@@ -445,7 +452,8 @@ public class FilesResourceTest {
   public void testCreateFolder_CannotCreateFolderPathAlreadyExist() throws FileSystemException, URISyntaxException {
     expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
-    expect(fileObjectMock.resolveFile("folder11")).andReturn(fileSystem.getRoot().resolveFile("/folder1/folder11")).atLeastOnce();
+    expect(fileObjectMock.resolveFile("folder11")).andReturn(fileSystem.getRoot().resolveFile("/folder1/folder11"))
+        .atLeastOnce();
 
     replay(fileObjectMock);
 
