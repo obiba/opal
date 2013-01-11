@@ -65,7 +65,7 @@
         </o:HelpImage>
       </g:FlowPanel>
       <g:HorizontalPanel addStyleNames="content">
-        <b:Button ui:field="refreshIndicesButton" styleName="btn" size="MINI">
+        <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync" size="MINI">
           <ui:msg description="Refresh indices label">Refresh</ui:msg>
         </b:Button>
         <b:DropdownButton ui:field="actionsDropdown" text="Actions" size="MINI">

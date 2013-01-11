@@ -81,6 +81,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   private final Set<EsValueTableIndex> indices = Sets.newHashSet();
 
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, ThreadFactory threadFactory, Version version) {
@@ -108,6 +109,14 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
     // is running
     return esConfig.getConfig().isEnabled() && indexConfig.getConfig().isIndexable(valueTable);
+  }
+
+  @Override
+  public boolean isReadyForIndexing(ValueTable valueTable) {
+    log.info(getIndex(valueTable).getName() + " : " + indexConfig.getConfig()
+        .isReadyForIndexing(valueTable, getIndex(valueTable)));
+    return esConfig.getConfig().isEnabled() && indexConfig.getConfig()
+        .isReadyForIndexing(valueTable, getIndex(valueTable));
   }
 
   @Override

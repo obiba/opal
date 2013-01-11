@@ -87,7 +87,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
       new ActionsProvider<TableIndexStatusDto>() {
 
-        private final String[] all = new String[] {CLEAR_ACTION};//{INDEX_ACTION, CLEAR_ACTION, CANCEL_ACTION};
+        private final String[] all = new String[] {CLEAR_ACTION, INDEX_ACTION}; //, CLEAR_ACTION, CANCEL_ACTION};
 
 //        private final String[] immutable = new String[] {TEST_ACTION};
 
@@ -149,10 +149,6 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   @Override
   public DropdownButton getActionsDropdown() {
     return actionsDropdown;
-  }
-
-  public void as() {
-
   }
 
   @Override

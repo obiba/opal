@@ -23,29 +23,34 @@
     <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="35em" width="40em">
       <g:center>
         <g:ScrollPanel>
-          <g:FlowPanel>
-            <g:HorizontalPanel addStyleNames="content">
+          <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
+
+            <g:FlowPanel styleName="input">
               <g:Label addStyleNames="key">
                 <ui:msg description="Schedule type label">Check index for update</ui:msg>
               </g:Label>
-            </g:HorizontalPanel>
-            <g:VerticalPanel addStyleNames="content">
               <b:ListBox name="type" ui:field="type"/>
-              <g:Label addStyleNames="key">
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key" ui:field="on">
                 <ui:msg description="on">on</ui:msg>
               </g:Label>
               <b:ListBox name="day" ui:field="day"/>
-              <g:Label addStyleNames="key">
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key" ui:field="at">
                 <ui:msg description="at">at</ui:msg>
               </g:Label>
-              <g:HorizontalPanel addStyleNames="content">
-                <b:ListBox name="hour" ui:field="hour"/>
-                <b:ListBox name="minutes" ui:field="minutes"/>
-              </g:HorizontalPanel>
-            </g:VerticalPanel>
+              <b:ListBox name="hour" ui:field="hour"/>
+              <b:ListBox name="minutes" ui:field="minutes"/>
+            </g:FlowPanel>
+
           </g:FlowPanel>
         </g:ScrollPanel>
       </g:center>
+
       <g:south size="4">
         <g:FlowPanel addStyleNames="footer">
           <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
@@ -57,8 +62,8 @@
           </g:Button>
         </g:FlowPanel>
       </g:south>
-    </g:DockLayoutPanel>
 
+    </g:DockLayoutPanel>
   </g:DialogBox>
 
 </ui:UiBinder>

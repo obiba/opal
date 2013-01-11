@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
+import java.util.ArrayList;
+
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
@@ -67,13 +69,13 @@ public class IndexAdministrationPresenter extends
 
   public interface Display extends View {
 
-    String TEST_ACTION = "Test";
+//    String TEST_ACTION = "Test";
 
-    String INDEX_ACTION = "Index now";
+//    String INDEX_ACTION = "Index now";
 
     String CLEAR_ACTION = "Clear";
 
-    String CANCEL_ACTION = "Cancel";
+//    String CANCEL_ACTION = "Cancel";
 
     String SCHEDULE = "Schedule indexing";
 
@@ -132,6 +134,7 @@ public class IndexAdministrationPresenter extends
 
   @Override
   protected void onReveal() {
+    getView().getIndexTable().setVisibleRange(0, 10);
     refresh();
     // set permissions
     // AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
@@ -162,21 +165,7 @@ public class IndexAdministrationPresenter extends
             }
           }
         }).send();
-
-//    registerHandler(getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.Handler() {
-//
-//      @Override
-//      public void onCreated(DatabaseCreatedEvent event) {
-//        refresh();
-//      }
-//    }));
-//    registerHandler(getEventBus().addHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.Handler() {
-//
-//      @Override
-//      public void onUpdated(DatabaseUpdatedEvent event) {
-//        refresh();
-//      }
-//    }));
+    ;
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
 
       @Override
@@ -216,14 +205,16 @@ public class IndexAdministrationPresenter extends
           }
         } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().SCHEDULE)) {
           if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+
+            ArrayList<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
             for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
-
-              IndexPresenter dialog = indexPresenter.get();
-              dialog.updateSchedule(object);
-              addToPopupSlot(dialog);
-
-              break;
+              objects.add(object);
             }
+
+            IndexPresenter dialog = indexPresenter.get();
+            dialog.updateSchedules(objects);
+            addToPopupSlot(dialog);
+
           } else {
             getEventBus()
                 .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
@@ -231,28 +222,11 @@ public class IndexAdministrationPresenter extends
         }
       }
     });
-//    getView().getSelectedIndices().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-//      @Override
-//      public void onSelectionChange(SelectionChangeEvent event) {
-//        refresh();
-//      }
-//    });
 
     getView().getActions().setActionHandler(new ActionHandler<TableIndexStatusDto>() {
 
       @Override
       public void doAction(final TableIndexStatusDto object, String actionName) {
-//        if(object.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
-//          getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(confirmedCommand = new Command() {
-//            @Override
-//            public void execute() {
-//              deleteDatabase(object);
-//            }
-//          }, "deleteDatabase", "confirmDeleteDatabase"));
-//        } else if(object.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
-//          DatabasePresenter dialog = jdbcDataSourcePresenter.get();
-//          dialog.updateSchedule(object);
-//          addToPopupSlot(dialog);
         if(actionName.equalsIgnoreCase(Display.CLEAR_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
 
@@ -275,6 +249,28 @@ public class IndexAdministrationPresenter extends
               .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
               .withCallback(200, callback).withCallback(503, callback).delete().send();
         }
+//        else if(actionName.equalsIgnoreCase(Display.INDEX_ACTION)) {
+//          ResponseCodeCallback callback = new ResponseCodeCallback() {
+//
+//            @Override
+//            public void onResponseCode(Request request, Response response) {
+//              if(response.getStatusCode() == 200) {
+//                refresh();
+//                getEventBus()
+//                    .fireEvent(NotificationEvent.Builder.newNotification().info("IndexNowCompleted").build());
+//              } else {
+//                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+//                getEventBus().fireEvent(
+//                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+//                        .build());
+//              }
+//            }
+//
+//          };
+//          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+//              .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
+//              .withCallback(200, callback).withCallback(503, callback).put().send();
+//        }
       }
 
     });
@@ -346,24 +342,12 @@ public class IndexAdministrationPresenter extends
             .withCallback(200, callback).withCallback(500, callback).put().send();
       }
     }));
-
-    //authorizationPresenter.setAclRequest("indices", new AclRequest(AclAction.TABLE_ALL, Resources.indices()));
   }
 
-//  private void deleteDatabase(TableIndexStatusDto database) {
-//    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>> newBuilder().forResource(Resources.index(
-//        database.getDatasource())).withCallback(200, new ResponseCodeCallback() {
-//
-//      @Override
-//      public void onResponseCode(Request request, Response response) {
-//        refresh();
-//      }
-//
-//    }).delete().send();
-//  }
-
   private void refresh() {
-    getView().getIndexTable().setVisibleRangeAndClearData(new Range(0, 10), true);
+    Range r = getView().getIndexTable().getVisibleRange();
+    getView().getIndexTable().setVisibleRangeAndClearData(r, true);
+    getView().getSelectedIndices().clear();
   }
 
   private final class ListIndicesAuthorization implements HasAuthorization {

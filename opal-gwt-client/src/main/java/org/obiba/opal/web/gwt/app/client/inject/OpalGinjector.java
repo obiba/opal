@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 /*
  * Copyright (c) 2012 OBiBa. All rights reserved.
-=======
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
->>>>>>> upstream/master
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.

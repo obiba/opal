@@ -19,8 +19,6 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.type.DateTimeType;
@@ -65,7 +63,7 @@ public class IndexSynchronizationManager {
     getSubject().execute(syncProducer);
     if(consumerStarted == false) {
       // start one IndexSynchronization consumer thread
-      new Thread(new SyncConsumer()).start();
+      new Thread(getSubject().associateWith(new SyncConsumer())).start();
       consumerStarted = true;
     }
   }
@@ -136,11 +134,12 @@ public class IndexSynchronizationManager {
 
     /**
      * Check if the index is not the current task, or in the queue before adding it to the indexation queue.
+     *
      * @param vt
      * @param index
      */
     private void submitTask(ValueTable vt, ValueTableIndex index) {
-      if (currentTask != null && currentTask.getValueTableIndex().getName().equals(index.getName())) return;
+      if(currentTask != null && currentTask.getValueTableIndex().getName().equals(index.getName())) return;
 
       boolean alreadyQueued = false;
       for(IndexSynchronization s : indexSyncQueue) {
@@ -175,7 +174,7 @@ public class IndexSynchronizationManager {
       currentTask = sync;
       try {
         // check if still indexable: indexation config could have changed
-        if(indexManager.isIndexable(sync.getValueTable())) {
+        if(indexManager.isReadyForIndexing(sync.getValueTable())) {
           getSubject().execute(sync);
         }
       } finally {

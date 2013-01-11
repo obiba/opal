@@ -9,18 +9,20 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
-import java.util.Set;
+import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.opal.Day;
 import org.obiba.opal.web.model.client.opal.ScheduleDto;
 import org.obiba.opal.web.model.client.opal.ScheduleType;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -36,11 +38,11 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
   private Mode dialogMode;
 
+  private List<TableIndexStatusDto> tableIndexStatusDtos;
+
   public enum Mode {
     UPDATE
   }
-
-  private MethodValidationHandler methodValidationHandler;
 
   @Inject
   public IndexPresenter(Display display, EventBus eventBus) {
@@ -58,8 +60,6 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
         getView().hideDialog();
       }
     }));
-
-    this.methodValidationHandler = new MethodValidationHandler(getEventBus());
   }
 
   private void setDialogMode(Mode dialogMode) {
@@ -79,81 +79,91 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
    *
    * @param dto method to update
    */
-  public void updateSchedule(TableIndexStatusDto dto) {
+  public void updateSchedules(List<TableIndexStatusDto> dtos) {
     setDialogMode(Mode.UPDATE);
-    displaySchedule(dto.getSchedule());
+    tableIndexStatusDtos = dtos;
+
+    if(dtos.size() == 1) {
+      displaySchedule(dtos.get(0).getSchedule());
+    }
   }
 
   private void displaySchedule(ScheduleDto dto) {
     getView().getType().setText(dto.getType().getName());
-//    getView().getDriver().setText(dto.getDriverClass());
-//    getView().getUrl().setText(dto.getUrl());
-//    getView().getUsername().setText(dto.getUsername());
-//    getView().getPassword().setText(dto.getPassword());
-//    getView().getProperties().setText(dto.getProperties());
+    getView().getDay().setText(dto.getDay().getName());
+    getView().getHours().setText(String.valueOf(dto.getHours()));
+    getView().getMinutes().setText(String.valueOf(dto.getMinutes()));
   }
 
-  private void updateDatabase() {
-    if(methodValidationHandler.validate()) {
-      putDatabase(getTableIndexStatusDto());
+  private void updateSchedule() {
+
+    ScheduleDto dto = getScheduleDto();
+
+    for(TableIndexStatusDto tableIndexStatusDto : tableIndexStatusDtos) {
+
+      putSchedule(tableIndexStatusDto.getDatasource(), tableIndexStatusDto.getTable(), dto);
     }
   }
 
-  private void postDatabase(TableIndexStatusDto dto) {
+  private void putSchedule(String datasource, String table, ScheduleDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-//    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()//
-//        .withResourceBody(JdbcDataSourceDto.stringify(dto))//
-//        .withCallback(Response.SC_OK, callbackHandler)//
-//        .withCallback(Response.SC_CREATED, callbackHandler)//
-//        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.index(datasource, table)).put()//
+        .withResourceBody(ScheduleDto.stringify(dto))//
+        .withCallback(Response.SC_OK, callbackHandler).send();
   }
 
-  private void putDatabase(TableIndexStatusDto dto) {
-    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-//    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.database(getView().getName().getText())).put()//
-//        .withResourceBody(JdbcDataSourceDto.stringify(dto))//
-//        .withCallback(Response.SC_OK, callbackHandler)//
-//        .withCallback(Response.SC_CREATED, callbackHandler)//
-//        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-  }
+  private ScheduleDto getScheduleDto() {
+    ScheduleDto dto = ScheduleDto.create();
 
-  private TableIndexStatusDto getTableIndexStatusDto() {
-    TableIndexStatusDto dto = TableIndexStatusDto.create();
-    //dto.setTable(getView().getTable().getText());
-//    dto.setUrl(getView().getUrl().getText());
-//    dto.setDriverClass(getView().getDriver().getText());
-//    dto.setUsername(getView().getUsername().getText());
-//    dto.setPassword(getView().getPassword().getText());
-//    dto.setProperties(getView().getProperties().getText());
+    if(getView().getType().getText().equals(ScheduleType.MINUTES_5.getName())) {
+      dto.setType(ScheduleType.MINUTES_5);
+      return dto;
+    } else if(getView().getType().getText().equals(ScheduleType.MINUTES_15.getName())) {
+      dto.setType(ScheduleType.MINUTES_15);
+      return dto;
+    } else if(getView().getType().getText().equals(ScheduleType.MINUTES_30.getName())) {
+      dto.setType(ScheduleType.MINUTES_30);
+      return dto;
+    } else if(getView().getType().getText().equals(ScheduleType.HOURLY.getName())) {
+      dto.setType(ScheduleType.HOURLY);
+      dto.setMinutes(Integer.parseInt(getView().getMinutes().getText()));
+      return dto;
+    } else if(getView().getType().getText().equals(ScheduleType.DAILY.getName())) {
+      dto.setType(ScheduleType.DAILY);
+      dto.setHours(Integer.parseInt(getView().getHours().getText()));
+      dto.setMinutes(Integer.parseInt(getView().getMinutes().getText()));
+      return dto;
+    } else if(getView().getType().getText().equals(ScheduleType.WEEKLY.getName())) {
+      dto.setType(ScheduleType.WEEKLY);
+      dto.setHours(Integer.parseInt(getView().getHours().getText()));
+      dto.setMinutes(Integer.parseInt(getView().getMinutes().getText()));
+
+      if(getView().getDay().getText().equals(Day.SUNDAY.getName())) {
+        dto.setDay(Day.SUNDAY);
+      } else if(getView().getDay().getText().equals(Day.MONDAY.getName())) {
+        dto.setDay(Day.MONDAY);
+      } else if(getView().getDay().getText().equals(Day.TUESDAY.getName())) {
+        dto.setDay(Day.TUESDAY);
+      } else if(getView().getDay().getText().equals(Day.WEDNESDAY.getName())) {
+        dto.setDay(Day.WEDNESDAY);
+      } else if(getView().getDay().getText().equals(Day.THURSDAY.getName())) {
+        dto.setDay(Day.THURSDAY);
+      } else if(getView().getDay().getText().equals(Day.FRIDAY.getName())) {
+        dto.setDay(Day.FRIDAY);
+      } else if(getView().getDay().getText().equals(Day.SATURDAY.getName())) {
+        dto.setDay(Day.SATURDAY);
+      }
+
+      return dto;
+    }
+
+    dto.setType(ScheduleType.NOT_SCHEDULED);
     return dto;
   }
 
   //
   // Inner classes and interfaces
   //
-
-  private class MethodValidationHandler extends AbstractValidationHandler {
-
-    public MethodValidationHandler(EventBus eventBus) {
-      super(eventBus);
-    }
-
-    private Set<FieldValidator> validators;
-
-    @Override
-    protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
-//        validators = new LinkedHashSet<FieldValidator>();
-//        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired"));
-//        validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired"));
-//        validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired"));
-//        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired"));
-      }
-      return validators;
-    }
-
-  }
-
   private class AlreadyExistMethodCallBack implements ResourceCallback<TableIndexStatusDto> {
 
     @Override
@@ -168,7 +178,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     @Override
     public void onClick(ClickEvent arg0) {
       if(dialogMode == Mode.UPDATE) {
-        updateDatabase();
+        updateSchedule();
       }
     }
 
@@ -176,22 +186,23 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
   private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
 
-    TableIndexStatusDto dto;
+    ScheduleDto dto;
 
-    public CreateOrUpdateMethodCallBack(TableIndexStatusDto dto) {
+    public CreateOrUpdateMethodCallBack(ScheduleDto dto) {
       this.dto = dto;
     }
 
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
-//      if(response.getStatusCode() == Response.SC_OK) {
-//        getEventBus().fireEvent(new DatabaseUpdatedEvent(dto));
-//      } else if(response.getStatusCode() == Response.SC_CREATED) {
-//        getEventBus().fireEvent(new DatabaseCreatedEvent(dto));
-//      } else {
-//        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-//      }
+      if(response.getStatusCode() == Response.SC_OK) {
+        getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("IndexScheduleCompleted").build());
+      } else {
+        ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+        getEventBus().fireEvent(
+            NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                .build());
+      }
     }
   }
 
@@ -209,6 +220,11 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
     HasText getType();
 
+    HasText getDay();
+
+    HasText getHours();
+
+    HasText getMinutes();
   }
 
 }
