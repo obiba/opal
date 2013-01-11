@@ -71,7 +71,7 @@ public class IndexAdministrationPresenter extends
 
 //    String TEST_ACTION = "Test";
 
-//    String INDEX_ACTION = "Index now";
+    String INDEX_ACTION = "Index now";
 
     String CLEAR_ACTION = "Clear";
 
