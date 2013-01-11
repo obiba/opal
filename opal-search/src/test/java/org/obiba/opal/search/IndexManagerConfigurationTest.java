@@ -274,6 +274,7 @@ public class IndexManagerConfigurationTest {
     // HOURLY
     Schedule schedule = new Schedule();
     schedule.setType(Opal.ScheduleType.HOURLY);
+    schedule.setMinutes(0);
     config.updateSchedule(vt, schedule);
     assertEquals(Opal.ScheduleType.HOURLY, config.getSchedule(vt).getType());
 

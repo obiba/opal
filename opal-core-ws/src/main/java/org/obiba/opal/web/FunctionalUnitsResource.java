@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+/*
+ * Copyright (c) 2012 OBiBa. All rights reserved.
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web;
 
 import java.io.ByteArrayOutputStream;
@@ -71,13 +71,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 @Component
 @Path("/functional-units")
@@ -98,7 +98,9 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   private final IdentifiersTableService identifiersTableService;
 
   @Autowired
-  public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableResolver) {
+  public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime,
+      UnitKeyStoreService unitKeyStoreService, ImportService importService,
+      DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableResolver) {
     super();
     this.functionalUnitService = functionalUnitService;
     this.opalRuntime = opalRuntime;
@@ -116,7 +118,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   public List<Opal.FunctionalUnitDto> getFunctionalUnits() {
     final List<Opal.FunctionalUnitDto> functionalUnits = Lists.newArrayList();
     for(FunctionalUnit functionalUnit : getFunctionalUnitService().getFunctionalUnits()) {
-      Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName()).setKeyVariableName(functionalUnit.getKeyVariableName());
+      Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName())
+          .setKeyVariableName(functionalUnit.getKeyVariableName());
       if(functionalUnit.getSelect() instanceof JavascriptClause) {
         fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
       }
@@ -133,7 +136,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   }
 
   private FunctionalUnitDto.Builder getFunctionalUnitDtoBuilder(FunctionalUnit functionalUnit) {
-    Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName()).setKeyVariableName(functionalUnit.getKeyVariableName());
+    Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName())
+        .setKeyVariableName(functionalUnit.getKeyVariableName());
     if(functionalUnit.getSelect() instanceof JavascriptClause) {
       fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
     }
@@ -143,7 +147,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @POST
   public Response createFunctionalUnit(Opal.FunctionalUnitDto unit) {
     if(getFunctionalUnitService().hasFunctionalUnit(unit.getName())) {
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitAlreadyExists").build()).build();
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitAlreadyExists").build()).build();
     }
 
     ResponseBuilder response = null;
@@ -162,11 +167,13 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
         response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).build(unit.getName()));
       } catch(IOException e) {
         getFunctionalUnitService().removeFunctionalUnit(unit.getName());
-        response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+        response = Response.status(Status.BAD_REQUEST)
+            .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
       }
 
     } catch(RuntimeException e) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+      response = Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
     }
 
     return response.build();
@@ -181,7 +188,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     // add unit key variable in identifiers table
     ValueTable keysTable = identifiersTableService.getValueTable();
     if(!keysTable.hasVariable(unit.getKeyVariableName())) {
-      Variable keyVariable = Variable.Builder.newVariable(unit.getKeyVariableName(), TextType.get(), keysTable.getEntityType()).build();
+      Variable keyVariable = Variable.Builder
+          .newVariable(unit.getKeyVariableName(), TextType.get(), keysTable.getEntityType()).build();
 
       ValueTableWriter writer = keysTable.getDatasource().createWriter(keysTable.getName(), keysTable.getEntityType());
       try {
@@ -226,7 +234,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       }
       writer.close();
 
-      return Response.ok(ids.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".csv\"").build();
+      return Response.ok(ids.toByteArray(), "text/csv")
+          .header("Content-Disposition", "attachment; filename=\"" + destinationName + ".csv\"").build();
     } catch(NoSuchFunctionalUnitException e) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -259,7 +268,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
           writer.append('\"').append(unitIdentifier.getOpalIdentifier()).append('\"');
           opalIdWritten = true;
         }
-        writer.append(',').append(unitIdentifier.hasUnitIdentifier() ? "\"" + unitIdentifier.getUnitIdentifier() + "\"" : "");
+        writer.append(',')
+            .append(unitIdentifier.hasUnitIdentifier() ? "\"" + unitIdentifier.getUnitIdentifier() + "\"" : "");
       }
       writer.append('\n');
     }
@@ -267,7 +277,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private void writeOpalIdentifiers(PrintWriter writer) {
     // no unit: list of opal ids
-    TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(identifiersTableService.getValueTable().getVariableEntities());
+    TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(
+        identifiersTableService.getValueTable().getVariableEntities());
     for(VariableEntity entity : opalEntities) {
       writer.append('\"').append(entity.getIdentifier()).append("\"\n");
     }
@@ -275,6 +286,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   /**
    * All identifiers from the transient datasource (given the datasource factory) will be imported.
+   *
    * @param datasourceFactoryDto
    * @return
    */
@@ -285,26 +297,30 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       importIdentifiersFromTransientDatasource(datasourceFactoryDto);
       return Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
-      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
-      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
     } catch(IOException ex) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(
+          ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build())
+          .build();
     }
   }
 
   /**
    * If a datasource name is provided, it will be used to import all identifiers from this datasource or just the
    * identifiers from the provided table name in the datasource. Else all datasources identifiers will be imported.
+   *
    * @param datasource
    * @param table
    * @return
    */
   @POST
   @Path("/entities/sync")
-  public Response importIdentifiers(@QueryParam("datasource")
-  String datasource, @QueryParam("table")
-  List<String> tableList) {
+  public Response importIdentifiers(@QueryParam("datasource") String datasource,
+      @QueryParam("table") List<String> tableList) {
     try {
       if(datasource != null) {
         Datasource ds = MagmaEngine.get().getDatasource(datasource);
@@ -320,30 +336,35 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       }
       return Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
-      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
-      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
     } catch(IOException ex) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(
+          ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build())
+          .build();
     }
   }
 
   @GET
   @Path("/entities/sync")
-  public List<TableIdentifiersSync> getIdentifiersToBeImported(@QueryParam("datasource")
-  String datasource, @QueryParam("table")
-  List<String> tableList) {
+  public List<TableIdentifiersSync> getIdentifiersToBeImported(@QueryParam("datasource") String datasource,
+      @QueryParam("table") List<String> tableList) {
     final Datasource ds = MagmaEngine.get().getDatasource(datasource);
 
     ImmutableList.Builder<TableIdentifiersSync> builder = ImmutableList.builder();
 
-    Iterable<ValueTable> tables = Iterables.filter((tableList == null || tableList.size() == 0) ? ds.getValueTables() : Iterables.transform(tableList, new Function<String, ValueTable>() {
+    Iterable<ValueTable> tables = Iterables.filter(
+        (tableList == null || tableList.size() == 0) ? ds.getValueTables() : Iterables
+            .transform(tableList, new Function<String, ValueTable>() {
 
-      @Override
-      public ValueTable apply(String input) {
-        return ds.getValueTable(input);
-      }
-    }), new Predicate<ValueTable>() {
+              @Override
+              public ValueTable apply(String input) {
+                return ds.getValueTable(input);
+              }
+            }), new Predicate<ValueTable>() {
 
       @Override
       public boolean apply(ValueTable input) {
@@ -363,7 +384,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     int count = 0;
     Set<VariableEntity> tableEntities = vt.getVariableEntities();
     TableIdentifiersSync.Builder builder = TableIdentifiersSync.newBuilder()//
-    .setDatasource(ds.getName()).setTable(vt.getName()).setTotal(tableEntities.size());
+        .setDatasource(ds.getName()).setTable(vt.getName()).setTotal(tableEntities.size());
 
     for(VariableEntity entity : tableEntities) {
       if(!entities.contains(entity)) {
@@ -377,8 +398,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @GET
   @Path("/entities/identifiers/map/units")
-  public List<FunctionalUnitDto> getUnitsFromIdentifiersMap(@QueryParam("path")
-  String path) throws IOException {
+  public List<FunctionalUnitDto> getUnitsFromIdentifiersMap(@QueryParam("path") String path) throws IOException {
     // check the headers
 
     File mapFile = resolveLocalFile(path);
@@ -388,8 +408,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     List<FunctionalUnitDto> unitDtos = new ArrayList<FunctionalUnitDto>();
     for(FunctionalUnit functionalUnit : getUnitsFromIdentifiersMap(reader)) {
       Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
-      setName(functionalUnit.getName()). //
-      setKeyVariableName(functionalUnit.getKeyVariableName());
+          setName(functionalUnit.getName()). //
+          setKeyVariableName(functionalUnit.getKeyVariableName());
       unitDtos.add(fuBuilder.build());
     }
 
@@ -400,7 +420,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   // Private methods
   //
 
-  private void importIdentifiersFromTransientDatasource(DatasourceFactoryDto datasourceFactoryDto) throws NoSuchValueTableException, IOException {
+  private void importIdentifiersFromTransientDatasource(
+      DatasourceFactoryDto datasourceFactoryDto) throws NoSuchValueTableException, IOException {
     Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
     try {
       importIdentifiersFromDatasource(sourceDatasource);

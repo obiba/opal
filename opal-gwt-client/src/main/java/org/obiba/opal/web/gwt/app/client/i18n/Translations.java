@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+/*
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.i18n;
 
 import java.util.Map;
@@ -101,7 +101,9 @@ public interface Translations extends Constants {
       "Copy", "Copy", //
       "Test", "Test", //
       "Download", "Download", //
-      "DownloadCertificate", "Download Certificate"})
+      "DownloadCertificate", "Download Certificate", //
+      "Index now", "Index now", //
+      "Clear", "Clear"})
   Map<String, String> actionMap();
 
   @Description("Permission map")
@@ -221,7 +223,8 @@ public interface Translations extends Constants {
   String attributeNameAlreadyExists();
 
   @Description("Attribute value required label")
-  @DefaultStringValue("Provide a value for the attribute (either localised, or not localised).")
+  @DefaultStringValue(
+      "Provide a value for the attribute (either localised, or not localised).")
   String attributeValueRequired();
 
   @Description("Category name already exists label")
@@ -349,6 +352,14 @@ public interface Translations extends Constants {
       "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
       "UrlIsRequired", "A url is required.",//
       "UsernameIsRequired", "A username is required.",//
+      "TableSelectionIsRequired", "At least one table must be selected.",//
+      "IdentifiersImportationCompleted", "Identifiers importation completed.",//
+      "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
+      "IndexClearCompleted", "Index clear completed",//
+      "ServiceSearchStartCompleted", "Search service started.", "ServiceSearchStopCompleted", "Search service stopped.", "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
+      "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",//
+      "IndexScheduleCompleted", "Index scheduling completed",//
+      "IndexNowCompleted", "Indexing completed", //
       "PasswordIsRequired", "A password is required.",//
       "OpalURLIsRequired", "Opal address is required.",//
       "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
@@ -561,11 +572,13 @@ public interface Translations extends Constants {
   String dataExportUnit();
 
   @Description("Data import instructions")
-  @DefaultStringValue("Select the file to be imported and the destination datasource.")
+  @DefaultStringValue(
+      "Select the file to be imported and the destination datasource.")
   String dataImportInstructions();
 
   @Description("Data import Compared Datasources Report instructions")
-  @DefaultStringValue("Review the data dictionary that will be imported.")
+  @DefaultStringValue(
+      "Review the data dictionary that will be imported.")
   String dataImportComparedDatasourcesReportStep();
 
   @Description("Data import Values instructions")
@@ -581,7 +594,8 @@ public interface Translations extends Constants {
   String identifiersMapFileStep();
 
   @Description("Identifiers Map Unit Step")
-  @DefaultStringValue("Select which unit is to be used for retrieving the participants to be mapped.")
+  @DefaultStringValue(
+      "Select which unit is to be used for retrieving the participants to be mapped.")
   String identifiersMapUnitStep();
 
   @Description("Identifier map pending conclusion")
@@ -589,7 +603,8 @@ public interface Translations extends Constants {
   String identifierMapPendingConclusion();
 
   @Description("Identifier map completed conclusion")
-  @DefaultStringValue("Identifier mapping job completed successfully.")
+  @DefaultStringValue(
+      "Identifier mapping job completed successfully.")
   String identifierMapCompletedConclusion();
 
   @Description("Identifier map update count")
@@ -609,7 +624,8 @@ public interface Translations extends Constants {
   String identifierImportPendingConclusion();
 
   @Description("Identifier import completed conclusion")
-  @DefaultStringValue("Identifier import job completed successfully.")
+  @DefaultStringValue(
+      "Identifier import job completed successfully.")
   String identifierImportCompletedConclusion();
 
   @Description("Identifier import failed conclusion")
@@ -826,7 +842,8 @@ public interface Translations extends Constants {
   String datasourceOptionsLabel();
 
   @Description("Create Datasource Process summary")
-  @DefaultStringValue("The datasource is in the process of being created.")
+  @DefaultStringValue(
+      "The datasource is in the process of being created.")
   String createDatasourceProcessSummary();
 
   @Description("Edit View Type Step")
@@ -882,15 +899,18 @@ public interface Translations extends Constants {
   String aliasLabel();
 
   @Description("Select Key Type Step label")
-  @DefaultStringValue("Provide a name and a type for the cyrptographic key to add to this Unit.")
+  @DefaultStringValue(
+      "Provide a name and a type for the cyrptographic key to add to this Unit.")
   String keyTypeStep();
 
   @Description("Import Certificate label")
-  @DefaultStringValue("Provide the Public Certificate by pasting it here (PEM format).")
+  @DefaultStringValue(
+      "Provide the Public Certificate by pasting it here (PEM format).")
   String importCertificateStep();
 
   @Description("Private Key Step label")
-  @DefaultStringValue("Select how to add the private key of the key pair (create a new one or import an existing one)")
+  @DefaultStringValue(
+      "Select how to add the private key of the key pair (create a new one or import an existing one)")
   String privateKeyStep();
 
   @Description("Public Key Step label")
@@ -946,7 +966,8 @@ public interface Translations extends Constants {
   String copyData();
 
   @Description("Variables Import File Selection Step")
-  @DefaultStringValue("Select the variables file for batch edition of tables and variables.")
+  @DefaultStringValue(
+      "Select the variables file for batch edition of tables and variables.")
   String variablesImportFileSelectionStep();
 
   @Description("Variables Import Compare Step")
@@ -970,7 +991,8 @@ public interface Translations extends Constants {
   String addViewFailed();
 
   @Description("No format options step")
-  @DefaultStringValue("No format options are available for the selected file format")
+  @DefaultStringValue(
+      "No format options are available for the selected file format")
   String noFormatOptionsStep();
 
   @Description("CSV format options step")
@@ -1083,19 +1105,23 @@ public interface Translations extends Constants {
   String destinationViewNameRequired();
 
   @Description("Add Derived Variable To View Only label")
-  @DefaultStringValue("A derived variable can only be added to a view.")
+  @DefaultStringValue(
+      "A derived variable can only be added to a view.")
   String addDerivedVariableToViewOnly();
 
   @Description("Derived Variable Evaluation label")
-  @DefaultStringValue("Review the summary and the values of the derived variable.")
+  @DefaultStringValue(
+      "Review the summary and the values of the derived variable.")
   String derivedVariableEvaluation();
 
   @Description("Save Derived Variable label")
-  @DefaultStringValue("Name the derived variable and select the view in which it will appear.")
+  @DefaultStringValue(
+      "Name the derived variable and select the view in which it will appear.")
   String saveDerivedVariable();
 
   @Description("Recode Categorie Step title")
-  @DefaultStringValue("Recode categories and observed distinct values to new values.")
+  @DefaultStringValue(
+      "Recode categories and observed distinct values to new values.")
   String recodeCategoriesStepTitle();
 
   @Description("Recode Boolean Step title")
@@ -1103,7 +1129,8 @@ public interface Translations extends Constants {
   String recodeBooleanStepTitle();
 
   @Description("Derive From Variable Step title")
-  @DefaultStringValue("Select from which variable derivation should be performed")
+  @DefaultStringValue(
+      "Select from which variable derivation should be performed")
   String deriveFromVariableStepTitle();
 
   @Description("Empty Value label")
@@ -1123,7 +1150,8 @@ public interface Translations extends Constants {
   String falseLabel();
 
   @Description("Recode Temporal Method Step title")
-  @DefaultStringValue("Dates and times can be grouped together using the following methods:")
+  @DefaultStringValue(
+      "Dates and times can be grouped together using the following methods:")
   String recodeTemporalMethodStepTitle();
 
   @Description("Recode Temporal Map Step title")
@@ -1131,7 +1159,8 @@ public interface Translations extends Constants {
   String recodeTemporalMapStepTitle();
 
   @Description("Recode Numerical Method Step title")
-  @DefaultStringValue("Numerical values can be grouped together using the following methods:")
+  @DefaultStringValue(
+      "Numerical values can be grouped together using the following methods:")
   String recodeNumericalMethodStepTitle();
 
   @Description("Recode Numerical Map Step title")
@@ -1139,7 +1168,8 @@ public interface Translations extends Constants {
   String recodeNumericalMapStepTitle();
 
   @Description("Recode Open Textual Method Step Title")
-  @DefaultStringValue("Group the values using the following method.")
+  @DefaultStringValue(
+      "Group the values using the following method.")
   String recodeOpenTextualMethodStepTitle();
 
   @Description("Recode Open Textual Map Step Title")
@@ -1226,7 +1256,8 @@ public interface Translations extends Constants {
   String upperValueLimitRequired();
 
   @Description("Lower Limit Greater Than Upper Limit label")
-  @DefaultStringValue("Lower value limit cannot be greater than upper value limit.")
+  @DefaultStringValue(
+      "Lower value limit cannot be greater than upper value limit.")
   String lowerLimitGreaterThanUpperLimit();
 
   @Description("Ranges Length Required label")
@@ -1258,7 +1289,8 @@ public interface Translations extends Constants {
   String createCodingView();
 
   @Description("Script Evaluation Failed Label")
-  @DefaultStringValue("Script evaluation failed: check if value type is correct.")
+  @DefaultStringValue(
+      "Script evaluation failed: check if value type is correct.")
   String scriptEvaluationFailed();
 
   @Description("Property label")
@@ -1323,6 +1355,82 @@ public interface Translations extends Constants {
       "Preview the count of identifiers that can be imported and select from which table identifiers will be extracted.")
   String identifiersSyncTableStep();
 
+  @Description("Table last update")
+  @DefaultStringValue("Table last update")
+  String tableLastUpdateLabel();
+
+  @Description("Index last update")
+  @DefaultStringValue("Index last update")
+  String indexLastUpdateLabel();
+
+  @Description("Schedule")
+  @DefaultStringValue("Schedule")
+  String scheduleLabel();
+
+  @Description("All")
+  @DefaultStringValue("All")
+  String allLabel();
+
+  @Description("Manually")
+  @DefaultStringValue("Manually")
+  String manuallyLabel();
+
+  @Description("Every 5 minutes")
+  @DefaultStringValue("Every 5 minutes")
+  String minutes5Label();
+
+  @Description("Every 15 minutes")
+  @DefaultStringValue("Every 15 minutes")
+  String minutes15Label();
+
+  @Description("Every 30 minutes")
+  @DefaultStringValue("Every 30 minutes")
+  String minutes30Label();
+
+  @Description("Every hour")
+  @DefaultStringValue("Every hour")
+  String hourlyLabel();
+
+  @Description("Every day")
+  @DefaultStringValue("Every day")
+  String dailyLabel();
+
+  @Description("Every week")
+  @DefaultStringValue("Every week")
+  String weeklyLabel();
+
+  @Description("Edit schedule")
+  @DefaultStringValue("Edit schedule")
+  String editScheduleLabel();
+
+  @Description("Sunday")
+  @DefaultStringValue("Sunday")
+  String sundayLabel();
+
+  @Description("Monday")
+  @DefaultStringValue("Monday")
+  String mondayLabel();
+
+  @Description("Tuesday")
+  @DefaultStringValue("Tuesday")
+  String tuesdayLabel();
+
+  @Description("Wednesday")
+  @DefaultStringValue("Wednesday")
+  String wednesdayLabel();
+
+  @Description("Thursday")
+  @DefaultStringValue("Thursday")
+  String thursdayLabel();
+
+  @Description("Friday")
+  @DefaultStringValue("Friday")
+  String fridayLabel();
+
+  @Description("Saturday")
+  @DefaultStringValue("Saturday")
+  String saturdayLabel();
+
   @Description("Select some Tables label")
   @DefaultStringValue("Select some tables...")
   String selectSomeTables();
@@ -1334,6 +1442,5 @@ public interface Translations extends Constants {
   @Description("Remote server based datasources label")
   @DefaultStringValue("Servers")
   String remoteServerBasedDatasources();
-
 
 }

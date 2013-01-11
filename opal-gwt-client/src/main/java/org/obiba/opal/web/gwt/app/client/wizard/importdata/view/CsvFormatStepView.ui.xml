@@ -1,23 +1,57 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<!--
+  ~ Copyright (c) 2012 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
-<!--  <ui:msg description="Csv format summary">Enter additional information for the importation of data in the CSV format</ui:msg>-->
-    <g:FlowPanel>
-      <w:CsvOptionsView ui:field="csvOptions" />
-          
-      <g:HTMLPanel ui:field="help">
-        <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
-        <p><ui:msg description="Csv data file information">The CSV file to use must be on the server. Use the file explorer to upload it if it's not already there.</ui:msg></p>    
-        <g:Label addStyleNames="title"><ui:msg description="Csv options label">CSV Options</ui:msg></g:Label>
-        <p><ui:msg description="Csv options information">You can select the row from where Opal should start reading the file. Note that that this first row must contain the name of each column. You can also select the character that separates each value in the file (usually a comma) and the character used to quote values (usually used around free-text values).<p/>Note that the first column values are expected to be the participant identifiers.</ui:msg></p><p/>
-        <g:Label addStyleNames="title"><ui:msg description="Selecting character set label">Selecting a Character Set</ui:msg></g:Label>
-        <p><ui:msg description="Csv character set information">CSV is a text-based file (as opposed to a binary file) and does not contain all the information necessary to read it properly. Opal cannot know what types of characters it contains (latin, cyrillic, arabic, asian, etc.). In order to properly interpret the characters in the file, Opal must know the character set beforehand.<p/>When Opal is installed, a default value is specified. This should have been set to a character set that is common for your region, so is usually a safe choice. Otherwise, selecting ISO-8859-1 is usually safe for most "Western European" languages.</ui:msg></p>    
-      </g:HTMLPanel>
-      
-   </g:FlowPanel>    
-  
+  <!--  <ui:msg description="Csv format summary">Enter additional information for the importation of data in the CSV format</ui:msg>-->
+  <g:FlowPanel>
+    <w:CsvOptionsView ui:field="csvOptions"/>
+
+    <g:HTMLPanel ui:field="help">
+      <g:Label addStyleNames="title">
+        <ui:msg description="Data File label">Data File</ui:msg>
+      </g:Label>
+      <p>
+        <ui:msg description="Csv data file information">The CSV file to use must be on the server. Use the file explorer
+          to upload it if it's not already there.
+        </ui:msg>
+      </p>
+      <g:Label addStyleNames="title">
+        <ui:msg description="Csv options label">CSV Options</ui:msg>
+      </g:Label>
+      <p>
+        <ui:msg description="Csv options information">You can select the row from where Opal should start reading the
+          file. Note that that this first row must contain the name of each column. You can also select the character
+          that separates each value in the file (usually a comma) and the character used to quote values (usually used
+          around free-text values).<p/>Note that the first column values are expected to be the participant identifiers.
+        </ui:msg>
+      </p>
+      <p/>
+      <g:Label addStyleNames="title">
+        <ui:msg description="Selecting character set label">Selecting a Character Set</ui:msg>
+      </g:Label>
+      <p>
+        <ui:msg description="Csv character set information">CSV is a text-based file (as opposed to a binary file) and
+          does not contain all the information necessary to read it properly. Opal cannot know what types of characters
+          it contains (latin, cyrillic, arabic, asian, etc.). In order to properly interpret the characters in the file,
+          Opal must know the character set beforehand.<p/>When Opal is installed, a default value is specified. This
+          should have been set to a character set that is common for your region, so is usually a safe choice.
+          Otherwise, selecting ISO-8859-1 is usually safe for most "Western European" languages.
+        </ui:msg>
+      </p>
+    </g:HTMLPanel>
+
+  </g:FlowPanel>
+
 </ui:UiBinder>

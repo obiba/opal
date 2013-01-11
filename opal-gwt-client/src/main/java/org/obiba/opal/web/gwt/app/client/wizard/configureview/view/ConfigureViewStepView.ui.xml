@@ -1,74 +1,101 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.configureview.view"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
-  
-   <ui:style>
-    .content-margin { margin: 0.5em; }
+<!--
+  ~ Copyright (c) 2012 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
+  <ui:style>
+    .content-margin {
+      margin: 0.5em;
+    }
   </ui:style>
-  
+
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
-    <g:caption><ui:msg description="Configure View title">Configure View</ui:msg></g:caption>
-	 <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="50em" width="60em">
-    <g:center>
-		<g:ScrollPanel>
-			<g:FlowPanel addStyleNames="{style.content-margin}">
-			    <o:HorizontalTabLayout ui:field="viewTabs"  addStyleNames="small-top-margin">
-			        <g:Anchor><ui:msg description="Data label">Data</ui:msg></g:Anchor>
-			        <g:SimplePanel ui:field="dataTabPanel" />
-			        <g:Anchor><ui:msg description="Variables label">Variables</ui:msg></g:Anchor>
-			        <g:SimplePanel ui:field="variablesTabPanel" />
-			    </o:HorizontalTabLayout> 
-			    
-			    <g:DeckPanel ui:field="helpPanelDecks">
-			      <g:FlowPanel>
-			        <g:HTMLPanel>
-			          <g:Label addStyleNames="title"><ui:msg description="Data label">Data</ui:msg></g:Label>
-			          <p>
-			            <ui:msg description="Data information for view creation">
-			              The view is always built on top of one or several tables. The view can define a subset of their entities, a subset of their variables or variables derived from their variables.
-			            </ui:msg>
-			          </p>
-			        </g:HTMLPanel>
-			      </g:FlowPanel>
-			      <g:FlowPanel>
-			        <g:HTMLPanel>
-			          <g:Label addStyleNames="title"><ui:msg description="Variable filter label">Variable Filter</ui:msg></g:Label>
-			        </g:HTMLPanel>
-			      </g:FlowPanel>     
-			      <g:FlowPanel>
-			        <g:HTMLPanel>
-			          <g:Label addStyleNames="title"><ui:msg description="Entity filter label">Entity Filter</ui:msg></g:Label>
-			          <p>
-			            <ui:msg description="Entity filter information for view creation">
-			              Some tables are defined for this view (see <em>Data</em> tab). The entities of these tables can be filtered to define the entities view.
-			            </ui:msg>
-			          <ul>
-			            <li>
-			              <ui:msg description="All filter information">
-			                all: no filter is applied. This allows to define a simple join of tables.
-			              </ui:msg>
-			            </li>
-			            <li>
-			              <ui:msg description="Entity script filter information">
-			                script: the filter can be defined by a script which will be applied on each entity of the tables. This script must return a boolean (i.e. true/false) value. If true is returned, the entity on which the script is executed is part of the entities view.
-			              </ui:msg>
-			            </li>
-			          </ul>
-			          </p>
-			        </g:HTMLPanel>
-			      </g:FlowPanel>     
-			    </g:DeckPanel>
-		    </g:FlowPanel>
-	    </g:ScrollPanel>
-	          
-    </g:center>
-    <g:south size="4">
-      <g:FlowPanel addStyleNames="footer">
-        
+    <g:caption>
+      <ui:msg description="Configure View title">Configure View</ui:msg>
+    </g:caption>
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="50em" width="60em">
+      <g:center>
+        <g:ScrollPanel>
+          <g:FlowPanel addStyleNames="{style.content-margin}">
+            <o:HorizontalTabLayout ui:field="viewTabs" addStyleNames="small-top-margin">
+              <g:Anchor>
+                <ui:msg description="Data label">Data</ui:msg>
+              </g:Anchor>
+              <g:SimplePanel ui:field="dataTabPanel"/>
+              <g:Anchor>
+                <ui:msg description="Variables label">Variables</ui:msg>
+              </g:Anchor>
+              <g:SimplePanel ui:field="variablesTabPanel"/>
+            </o:HorizontalTabLayout>
+
+            <g:DeckPanel ui:field="helpPanelDecks">
+              <g:FlowPanel>
+                <g:HTMLPanel>
+                  <g:Label addStyleNames="title">
+                    <ui:msg description="Data label">Data</ui:msg>
+                  </g:Label>
+                  <p>
+                    <ui:msg description="Data information for view creation">
+                      The view is always built on top of one or several tables. The view can define a subset of their
+                      entities, a subset of their variables or variables derived from their variables.
+                    </ui:msg>
+                  </p>
+                </g:HTMLPanel>
+              </g:FlowPanel>
+              <g:FlowPanel>
+                <g:HTMLPanel>
+                  <g:Label addStyleNames="title">
+                    <ui:msg description="Variable filter label">Variable Filter</ui:msg>
+                  </g:Label>
+                </g:HTMLPanel>
+              </g:FlowPanel>
+              <g:FlowPanel>
+                <g:HTMLPanel>
+                  <g:Label addStyleNames="title">
+                    <ui:msg description="Entity filter label">Entity Filter</ui:msg>
+                  </g:Label>
+                  <p>
+                    <ui:msg description="Entity filter information for view creation">
+                      Some tables are defined for this view (see
+                      <em>Data</em>
+                      tab). The entities of these tables can be filtered to define the entities view.
+                    </ui:msg>
+                    <ul>
+                      <li>
+                        <ui:msg description="All filter information">
+                          all: no filter is applied. This allows to define a simple join of tables.
+                        </ui:msg>
+                      </li>
+                      <li>
+                        <ui:msg description="Entity script filter information">
+                          script: the filter can be defined by a script which will be applied on each entity of the
+                          tables. This script must return a boolean (i.e. true/false) value. If true is returned, the
+                          entity on which the script is executed is part of the entities view.
+                        </ui:msg>
+                      </li>
+                    </ul>
+                  </p>
+                </g:HTMLPanel>
+              </g:FlowPanel>
+            </g:DeckPanel>
+          </g:FlowPanel>
+        </g:ScrollPanel>
+
+      </g:center>
+      <g:south size="4">
+        <g:FlowPanel addStyleNames="footer">
+
           <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
           <g:Button ui:field="close" styleName="btn right-aligned top-margin">
             <ui:msg description="Close label">Close</ui:msg>
@@ -76,10 +103,10 @@
           <g:Button ui:field="help" styleName="btn left-aligned top-margin small-indent">
             <ui:msg description="Help label">Help</ui:msg>
           </g:Button>
-      </g:FlowPanel>
-    </g:south> 
-  </g:DockLayoutPanel>
-    
+        </g:FlowPanel>
+      </g:south>
+    </g:DockLayoutPanel>
+
   </g:DialogBox>
 
 </ui:UiBinder>

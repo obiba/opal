@@ -68,7 +68,8 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
         return now.get(Calendar.MINUTE) % 30 <= 1;
 
       case HOURLY:
-        return now.get(Calendar.MINUTE) <= 1;
+        return now.get(Calendar.MINUTE) == schedule.getMinutes() || now.get(Calendar.MINUTE) - 1 == schedule
+            .getMinutes();
 
       case DAILY:
         // must be the exact time of the day (+ 1 min).

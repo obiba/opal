@@ -1,25 +1,50 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<!--
+  ~ Copyright (c) 2012 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel>
-      <g:InlineLabel ui:field="noUnitLabel"><ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will be used as-is (no unit is defined).</ui:msg></g:InlineLabel>
+      <g:InlineLabel ui:field="noUnitLabel">
+        <ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will be
+          used as-is (no unit is defined).
+        </ui:msg>
+      </g:InlineLabel>
       <g:FlowPanel ui:field="unitPanel">
-        <g:InlineLabel><ui:msg description="Participant identifier in files label">The participant identifiers in the file(s) should:</ui:msg></g:InlineLabel>
+        <g:InlineLabel>
+          <ui:msg description="Participant identifier in files label">The participant identifiers in the file(s)
+            should:
+          </ui:msg>
+        </g:InlineLabel>
         <g:FlowPanel styleName="input">
-          <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true" addStyleNames="small-indent"><ui:msg description="Leave identifier as-is label">be used as-is</ui:msg></g:RadioButton>
+          <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true" addStyleNames="small-indent">
+            <ui:msg description="Leave identifier as-is label">be used as-is</ui:msg>
+          </g:RadioButton>
         </g:FlowPanel>
         <g:FlowPanel styleName="input">
-          <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent"><ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg></g:RadioButton>
+          <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent">
+            <ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg>
+          </g:RadioButton>
           <o:Chooser ui:field="units" enabled="false"/>
-          <g:Label styleName="help-block large-indent"><ui:msg description="Share identifier with unit help label">Participant's identifiers must have been imported first through the selected unit, otherwise data import will fail</ui:msg></g:Label>
+          <g:Label styleName="help-block large-indent">
+            <ui:msg description="Share identifier with unit help label">Participant's identifiers must have been
+              imported first through the selected unit, otherwise data import will fail
+            </ui:msg>
+          </g:Label>
         </g:FlowPanel>
       </g:FlowPanel>
     </g:FlowPanel>
-  </g:FlowPanel>    
-  
+  </g:FlowPanel>
+
 </ui:UiBinder>
