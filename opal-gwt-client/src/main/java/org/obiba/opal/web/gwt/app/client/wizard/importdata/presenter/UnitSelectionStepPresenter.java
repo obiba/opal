@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -39,14 +39,14 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getView().addIdentifierAsIsClickHandler(new ClickHandler() {
+    registerHandler(getView().addIdentifierAsIsClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
         getView().setUnitEnabled(false);
       }
     }));
-    super.registerHandler(getView().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
+    registerHandler(getView().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
@@ -66,12 +66,13 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
   }
 
   public void initUnits() {
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-        getView().setUnits(units);
-      }
-    }).send();
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units").get()
+        .withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
+            getView().setUnits(units);
+          }
+        }).send();
   }
 
   public interface Display extends View {
@@ -96,7 +97,9 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
 
     void setUnitEnabled(boolean enabled);
 
-    /** Allows the identity (unit) section of the form to be enabled and disabled. */
+    /**
+     * Allows the identity (unit) section of the form to be enabled and disabled.
+     */
     void setIdentityEnabled(boolean enabled);
 
   }

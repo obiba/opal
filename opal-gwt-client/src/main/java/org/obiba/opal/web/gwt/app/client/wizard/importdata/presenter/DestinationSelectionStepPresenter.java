@@ -9,13 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -25,6 +18,13 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 public class DestinationSelectionStepPresenter extends PresenterWidget<DestinationSelectionStepPresenter.Display> {
 
@@ -83,7 +83,8 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
           .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
             @Override
             public void onResource(Response response, JsArray<DatasourceDto> resource) {
-              refreshDatasources(JsArrays.toSafeArray(resource));
+              datasources = JsArrays.toSafeArray(resource);
+              refreshDatasources(datasources);
             }
           }).send();
     }
@@ -101,12 +102,13 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   public boolean validate() {
     if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
+      String selectedTable = getView().getSelectedTable();
       // table cannot be empty and cannot be a view
-      if(getView().getSelectedTable().trim().isEmpty()) {
+      if(selectedTable.trim().isEmpty()) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
         return false;
       }
-      if(getView().getSelectedTable().contains(".") || getView().getSelectedTable().contains(":")) {
+      if(selectedTable.contains(".") || selectedTable.contains(":")) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableNameInvalid").build());
         return false;
       }

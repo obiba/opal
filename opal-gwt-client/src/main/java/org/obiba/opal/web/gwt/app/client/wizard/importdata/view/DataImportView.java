@@ -261,19 +261,19 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public void setFormatStepDisplay(WizardStepDisplay display) {
-    this.formatStepDisplay = display;
+    formatStepDisplay = display;
     formatStep.removeStepContent();
     formatStep.add(display.asWidget());
   }
 
   @Override
   public void setImportDataInputsHandler(ImportDataInputsHandler handler) {
-    this.importDataInputsHandler = handler;
+    importDataInputsHandler = handler;
   }
 
   @Override
   public void setComparedDatasourcesReportStepInHandler(StepInHandler handler) {
-    this.comparedDatasourcesReportStepInHandler = handler;
+    comparedDatasourcesReportStepInHandler = handler;
   }
 
   @Override

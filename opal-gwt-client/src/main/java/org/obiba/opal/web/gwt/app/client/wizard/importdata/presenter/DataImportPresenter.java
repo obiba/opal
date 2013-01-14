@@ -121,7 +121,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getView().addFormatChangeHandler(new ChangeHandler() {
+    registerHandler(getView().addFormatChangeHandler(new ChangeHandler() {
 
       @Override
       public void onChange(ChangeEvent evt) {
@@ -133,18 +133,18 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   public interface ImportDataInputsHandler {
-    public boolean validateFormat();
+    boolean validateFormat();
 
-    public boolean validateDestination();
+    boolean validateDestination();
 
-    public boolean validateComparedDatasourcesReport();
+    boolean validateComparedDatasourcesReport();
   }
 
   @Override
   protected void onFinish() {
-    ImportData importData = transientDatasourceHandler.getImportData();
-    archiveStepPresenter.updateImportData(importData);
-    launchImport(importData);
+    ImportData dataToImport = transientDatasourceHandler.getImportData();
+    archiveStepPresenter.updateImportData(dataToImport);
+    launchImport(dataToImport);
   }
 
   @Override
@@ -191,19 +191,19 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
     if(getView().getImportFormat().equals(ImportFormat.CSV)) {
       csvFormatStepPresenter.clear();
-      this.formatStepPresenter = csvFormatStepPresenter;
+      formatStepPresenter = csvFormatStepPresenter;
       getView().setFormatStepDisplay(csvFormatStepPresenter.getDisplay());
     } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
-      this.formatStepPresenter = xmlFormatStepPresenter;
+      formatStepPresenter = xmlFormatStepPresenter;
       getView().setFormatStepDisplay(xmlFormatStepPresenter.getDisplay());
     } else if(getView().getImportFormat() == ImportFormat.LIMESURVEY) {
-      this.formatStepPresenter = limesurveyStepPresenter;
+      formatStepPresenter = limesurveyStepPresenter;
       getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
     } else if(getView().getImportFormat() == ImportFormat.REST) {
-      this.formatStepPresenter = restStepPresenter;
+      formatStepPresenter = restStepPresenter;
       getView().setFormatStepDisplay(restStepPresenter.getView());
     } else {
-      this.formatStepPresenter = null;
+      formatStepPresenter = null;
       throw new IllegalStateException("Unknown format: " + getView().getImportFormat());
     }
   }
@@ -304,7 +304,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     @Override
     public boolean validateComparedDatasourcesReport() {
-      if(comparedDatasourcesReportPresenter.getSelectedTables().size() == 0) {
+      if(comparedDatasourcesReportPresenter.getSelectedTables().isEmpty()) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
         return false;
       }
@@ -385,6 +385,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
       ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
+        @Override
         public void onResponseCode(Request request, Response response) {
           transientRequest = null;
           if(response.getStatusCode() == 201) {
@@ -458,14 +459,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
      *
      * @return
      */
-    public ImportData getImportData();
+    ImportData getImportData();
 
     /**
      * Validate the import data were correctly provided, and send notification error messages if any.
      *
      * @return
      */
-    public boolean validate();
+    boolean validate();
 
   }
 
