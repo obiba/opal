@@ -303,15 +303,6 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
     return cancelButton;
   }
 
-  @Override
-  public void setAvailableType(JsArray<ScheduleType> resource) {
-    availableTypes = resource;
-    for(ScheduleType type : JsArrays.toIterable(resource)) {
-      this.type.addItem(type.getName(), type.getName());
-    }
-    updateTypeSelection();
-  }
-
   private ScheduleType getType(String typeName) {
     for(ScheduleType type : JsArrays.toIterable(availableTypes)) {
       if(type.getName().equals(typeName)) {

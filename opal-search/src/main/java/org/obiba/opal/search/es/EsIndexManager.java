@@ -105,10 +105,11 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   @Override
   public boolean isIndexable(ValueTable valueTable) {
-    // Currently only based on the state of ElasticSearch
+    // Currently only based on the state of ElasticSearch because a index that is NOT_SCHEDULED can still be indexable
+    // when launched from the "Index Now" action.
 
     // is running
-    return esConfig.getConfig().isEnabled() && indexConfig.getConfig().isIndexable(valueTable);
+    return esConfig.getConfig().isEnabled(); //&& indexConfig.getConfig().isIndexable(valueTable);
   }
 
   @Override

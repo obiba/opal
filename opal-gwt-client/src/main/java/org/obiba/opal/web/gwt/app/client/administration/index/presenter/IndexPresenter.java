@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.Day;
@@ -21,7 +20,6 @@ import org.obiba.opal.web.model.client.opal.ScheduleType;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -98,7 +96,6 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   private void updateSchedule() {
 
     ScheduleDto dto = getScheduleDto();
-
     for(TableIndexStatusDto tableIndexStatusDto : tableIndexStatusDtos) {
 
       putSchedule(tableIndexStatusDto.getDatasource(), tableIndexStatusDto.getTable(), dto);
@@ -107,7 +104,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
   private void putSchedule(String datasource, String table, ScheduleDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.index(datasource, table)).put()//
+    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.updateSchedule(datasource, table)).put()//
         .withResourceBody(ScheduleDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler).send();
   }
@@ -164,15 +161,6 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   //
   // Inner classes and interfaces
   //
-  private class AlreadyExistMethodCallBack implements ResourceCallback<TableIndexStatusDto> {
-
-    @Override
-    public void onResource(Response response, TableIndexStatusDto resource) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatabaseAlreadyExists").build());
-    }
-
-  }
-
   public class CreateOrUpdateMethodClickHandler implements ClickHandler {
 
     @Override
@@ -209,8 +197,6 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   public interface Display extends PopupView {
 
     void hideDialog();
-
-    void setAvailableType(JsArray<ScheduleType> resource);
 
     void setDialogMode(Mode dialogMode);
 

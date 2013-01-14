@@ -248,29 +248,27 @@ public class IndexAdministrationPresenter extends
           ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
               .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
               .withCallback(200, callback).withCallback(503, callback).delete().send();
+        } else if(actionName.equalsIgnoreCase(Display.INDEX_ACTION)) {
+          ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == 200) {
+                refresh();
+                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("IndexNowCompleted").build());
+              } else {
+                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+                getEventBus().fireEvent(
+                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                        .build());
+              }
+            }
+
+          };
+          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+              .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
+              .withCallback(200, callback).withCallback(503, callback).put().send();
         }
-//        else if(actionName.equalsIgnoreCase(Display.INDEX_ACTION)) {
-//          ResponseCodeCallback callback = new ResponseCodeCallback() {
-//
-//            @Override
-//            public void onResponseCode(Request request, Response response) {
-//              if(response.getStatusCode() == 200) {
-//                refresh();
-//                getEventBus()
-//                    .fireEvent(NotificationEvent.Builder.newNotification().info("IndexNowCompleted").build());
-//              } else {
-//                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-//                getEventBus().fireEvent(
-//                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-//                        .build());
-//              }
-//            }
-//
-//          };
-//          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-//              .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-//              .withCallback(200, callback).withCallback(503, callback).put().send();
-//        }
       }
 
     });
