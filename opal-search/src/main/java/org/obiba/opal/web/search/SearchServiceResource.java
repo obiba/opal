@@ -48,7 +48,7 @@ public class SearchServiceResource extends IndexResource {
     List<Opal.TableIndexStatusDto> tableStatusDtos = Lists.newArrayList();
 
     // isrunning
-    if(esProvider.isEnabled() && esProvider.getClient() == null) return tableStatusDtos;
+    if(!esProvider.isEnabled() && esProvider.getClient() == null) return tableStatusDtos;
 
     Set<Datasource> datasources = MagmaEngine.get().getDatasources();
     for(Datasource datasource : datasources) {
