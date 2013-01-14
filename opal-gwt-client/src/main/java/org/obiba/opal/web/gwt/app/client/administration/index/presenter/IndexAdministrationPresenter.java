@@ -134,6 +134,23 @@ public class IndexAdministrationPresenter extends
 
   @Override
   protected void onReveal() {
+    /* stop start search service */
+    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(Resources.searchService()).get()
+        .withCallback(new ResourceCallback<ServiceDto>() {
+          @Override
+          public void onResource(Response response, ServiceDto resource) {
+            if(response.getStatusCode() == 200) {
+              if(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)) {
+                getView().getStartButton().setVisible(false);
+                getView().getStopButton().setVisible(true);
+              } else {
+                getView().getStartButton().setVisible(true);
+                getView().getStopButton().setVisible(false);
+              }
+            }
+          }
+        }).send();
+
     getView().getIndexTable().setVisibleRange(0, 10);
     refresh();
     // set permissions
@@ -148,24 +165,6 @@ public class IndexAdministrationPresenter extends
 
   @Override
   protected void onBind() {
-    /* stop start search service */
-    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(Resources.searchService()).get()
-        .withCallback(new ResourceCallback<ServiceDto>() {
-          @Override
-          public void onResource(Response response, ServiceDto resource) {
-            //GWT.log("RES: "+resource.getStatus());
-            if(response.getStatusCode() == 200) {
-              if(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)) {
-                getView().getStartButton().setVisible(false);
-                getView().getStopButton().setVisible(true);
-              } else {
-                getView().getStartButton().setVisible(true);
-                getView().getStopButton().setVisible(false);
-              }
-            }
-          }
-        }).send();
-    ;
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
 
       @Override
@@ -306,8 +305,9 @@ public class IndexAdministrationPresenter extends
           }
 
         };
+        // Stop service
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(Resources.searchService()).accept("application/json")//
+            .forResource(Resources.searchServiceEnabled()).accept("application/json")//
             .withCallback(200, callback).withCallback(500, callback).delete().send();
       }
     }));
@@ -336,7 +336,7 @@ public class IndexAdministrationPresenter extends
 
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(Resources.searchService()).accept("application/json")//
+            .forResource(Resources.searchServiceEnabled()).accept("application/json")//
             .withCallback(200, callback).withCallback(500, callback).put().send();
       }
     }));
