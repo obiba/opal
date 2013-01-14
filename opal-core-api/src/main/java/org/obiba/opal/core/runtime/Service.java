@@ -17,16 +17,16 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
  */
 public interface Service {
 
-  public boolean isRunning();
+  boolean isRunning();
 
-  public void start();
+  void start();
 
-  public void stop();
+  void stop();
 
   /**
    * Service unique name.
    */
-  public String getName();
+  String getName();
 
-  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException;
+  OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException;
 }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -60,7 +60,9 @@ public class JdbcDataSourceResource {
       return Response.status(Status.BAD_REQUEST).build();
     }
     if(dto.getName().equals(jdbcDataSource.getName()) == false) {
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode()).setStatus("InvalidName").build()).build();
+      return Response.status(Status.BAD_REQUEST).entity(
+          ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode()).setStatus("InvalidName").build())
+          .build();
     }
     jdbcDataSourceRegistry.update(Dtos.JdbcDataSourceDtos.fromDto.apply(dto));
     return Response.ok().build();
@@ -69,7 +71,8 @@ public class JdbcDataSourceResource {
   @POST
   @Path("/connections")
   public Response testConnection() {
-    ClientErrorDto error = ClientErrorDtos.getErrorMessage(Status.SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", "").build();
+    ClientErrorDto error = ClientErrorDtos.getErrorMessage(Status.SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", "")
+        .build();
     try {
       JdbcTemplate t = new JdbcTemplate(jdbcDataSourceRegistry.getDataSource(jdbcDataSource.getName(), null));
       Boolean result = t.execute(new ConnectionCallback<Boolean>() {

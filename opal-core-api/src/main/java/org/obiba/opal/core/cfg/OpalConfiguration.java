@@ -1,14 +1,15 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,6 +22,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+@SuppressWarnings("UnusedDeclaration")
 public class OpalConfiguration {
 
   private String secretKey;
@@ -29,11 +31,11 @@ public class OpalConfiguration {
 
   private MagmaEngineFactory magmaEngineFactory;
 
-  private Set<FunctionalUnit> functionalUnits;
+  private final Set<FunctionalUnit> functionalUnits;
 
-  private Set<ReportTemplate> reportTemplates;
+  private final Set<ReportTemplate> reportTemplates;
 
-  private List<OpalConfigurationExtension> extensions;
+  private final List<OpalConfigurationExtension> extensions;
 
   public OpalConfiguration() {
     functionalUnits = Sets.newLinkedHashSet();
@@ -91,7 +93,7 @@ public class OpalConfiguration {
     return Collections.unmodifiableSet(reportTemplates);
   }
 
-  public void setReportTemplates(Set<ReportTemplate> reportTemplates) {
+  public void setReportTemplates(Collection<ReportTemplate> reportTemplates) {
     this.reportTemplates.clear();
     if(reportTemplates != null) {
       this.reportTemplates.addAll(reportTemplates);

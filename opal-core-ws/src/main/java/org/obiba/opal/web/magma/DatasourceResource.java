@@ -1,19 +1,19 @@
-/*
- * Copyright (c) 2011 OBiBa. All rights reserved.
+/*******************************************************************************
+ * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ ******************************************************************************/
 package org.obiba.opal.web.magma;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -84,7 +84,6 @@ public class DatasourceResource {
   @Autowired
   public DatasourceResource(OpalConfigurationService configService, ImportService importService,
       ViewManager viewManager, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
-    super();
 
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
@@ -108,8 +107,8 @@ public class DatasourceResource {
     this.viewManager = viewManager;
     this.viewDtos = viewDtos;
     this.name = name;
-    this.tableListeners = new HashSet<ValueTableUpdateListener>();
-    this.importService = null;
+    tableListeners = new HashSet<ValueTableUpdateListener>();
+    importService = null;
   }
 
   @PreDestroy
@@ -188,7 +187,7 @@ public class DatasourceResource {
 
   @POST
   @Path("/views")
-  public Response createView(final ViewDto viewDto, @Context UriInfo uriInfo) {
+  public Response createView(ViewDto viewDto, @Context UriInfo uriInfo) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
 
     if(datasourceHasTable(viewDto.getName())) {
@@ -214,11 +213,10 @@ public class DatasourceResource {
   @Path("/locales")
   @NoAuthorization
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
-    List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
+    Collection<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
     for(Locale locale : getLocales()) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
     }
-
     return localeDtos;
   }
 

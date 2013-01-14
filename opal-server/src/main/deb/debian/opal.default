@@ -29,4 +29,4 @@ OPAL_HOME=/var/lib/opal
 OPAL_LOG=/var/log/opal
 
 # arguments to pass to opal.
-OPAL_ARGS="--upgrade"
+OPAL_ARGS=""

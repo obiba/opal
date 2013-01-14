@@ -1,14 +1,14 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
   <!-- Property configurer -->
   <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="properties">
       <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="locations" value="classpath*:/META-INF/defaults.properties" />
+        <property name="locations" value="classpath*:/META-INF/defaults.properties"/>
       </bean>
     </property>
-    <property name="location" value="file:${OPAL_HOME}/conf/opal-config.properties" />
+    <property name="location" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
   </bean>
 
 </beans>
