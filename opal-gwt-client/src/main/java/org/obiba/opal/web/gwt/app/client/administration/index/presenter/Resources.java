@@ -28,4 +28,8 @@ final class Resources {
   static String searchService() {
     return "/service/search";
   }
+
+  static String searchServiceEnabled() {
+    return "/service/search/cfg/enabled";
+  }
 }
