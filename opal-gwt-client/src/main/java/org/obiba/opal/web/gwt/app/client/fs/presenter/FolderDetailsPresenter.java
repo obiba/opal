@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
@@ -56,9 +57,12 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
    */
   private FileDto currentFolder;
 
+  private final RequestCredentials credentials;
+
   @Inject
-  public FolderDetailsPresenter(Display display, EventBus eventBus) {
+  public FolderDetailsPresenter(Display display, EventBus eventBus, RequestCredentials credentials) {
     super(eventBus, display);
+    this.credentials = credentials;
   }
 
   @Override
@@ -117,13 +121,21 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     if(currentFolder != null) {
       updateTable(currentFolder.getPath());
     } else {
-      updateTable("/");
+      updateTable(getDefaultPath());
     }
   }
 
   @Override
   public void onReset() {
-    updateTable("/");
+    updateTable(getDefaultPath());
+  }
+
+  private String getDefaultPath() {
+    if (credentials.getUsername() != null) {
+      return "/home/" + credentials.getUsername();
+    } else {
+      return "/";
+    }
   }
 
   public FileDto getCurrentFolder() {

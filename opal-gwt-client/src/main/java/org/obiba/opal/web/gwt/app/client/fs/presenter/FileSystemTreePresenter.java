@@ -14,7 +14,9 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -56,9 +58,12 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
 
   }
 
+  private final RequestCredentials credentials;
+
   @Inject
-  public FileSystemTreePresenter(Display display, EventBus eventBus) {
+  public FileSystemTreePresenter(Display display, EventBus eventBus, RequestCredentials credentials) {
     super(eventBus, display);
+    this.credentials = credentials;
   }
 
   @Override
@@ -74,8 +79,26 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
           public void onResource(Response response, FileDto root) {
             getView().initTree(root);
             getView().selectFile(root, false);
+            FileDto home = getChildFromName(root, "home");
+            if(home != null) {
+              FileDto userHome = getChildFromName(home, credentials.getUsername());
+              if(userHome != null) {
+                getView().selectFile(userHome, false);
+              }
+            }
           }
         }).send();
+  }
+
+  private FileDto getChildFromName(FileDto directory, String name) {
+    if(directory.getChildrenCount() == 0) return null;
+
+    for(FileDto child : JsArrays.toIterable(directory.getChildrenArray())) {
+      if(child.getName().equals(name)) {
+        return child;
+      }
+    }
+    return null;
   }
 
   private void addTreeItemSelectionHandler() {
