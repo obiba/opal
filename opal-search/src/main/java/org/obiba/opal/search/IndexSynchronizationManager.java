@@ -68,6 +68,10 @@ public class IndexSynchronizationManager {
     }
   }
 
+  public void synchronizeIndex(ValueTable vt) {
+    syncProducer.index(vt);
+  }
+
   public boolean hasTask() {
     return currentTask != null;
   }
@@ -110,7 +114,7 @@ public class IndexSynchronizationManager {
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
           log.debug("Check index for table: {}.{}", ds.getName(), vt.getName());
-          if(indexManager.isIndexable(vt)) {
+          if(indexManager.isIndexable(vt) && indexManager.isReadyForIndexing(vt)) {
             maybeUpdateIndex(vt);
           }
         }
@@ -122,13 +126,17 @@ public class IndexSynchronizationManager {
 
       // Check that the index is older than the ValueTable
       if(index.requiresUpgrade() || !index.isUpToDate()) {
-        // The index needs to be updated
-        Value value = vt.getTimestamps().getLastUpdate();
-        // Check that the last modification to the ValueTable is older than the gracePeriod
-        // If we don't know (null value), reindex
-        if(value.isNull() || value.compareTo(gracePeriod()) < 0) {
-          submitTask(vt, index);
-        }
+        index(vt);
+      }
+    }
+
+    private void index(ValueTable vt) {
+      // The index needs to be updated
+      Value value = vt.getTimestamps().getLastUpdate();
+      // Check that the last modification to the ValueTable is older than the gracePeriod
+      // If we don't know (null value), reindex
+      if(value.isNull() || value.compareTo(gracePeriod()) < 0) {
+        submitTask(vt, indexManager.getIndex(vt));
       }
     }
 
@@ -174,7 +182,7 @@ public class IndexSynchronizationManager {
       currentTask = sync;
       try {
         // check if still indexable: indexation config could have changed
-        if(indexManager.isReadyForIndexing(sync.getValueTable())) {
+        if(indexManager.isIndexable(sync.getValueTable())) {
           getSubject().execute(sync);
         }
       } finally {

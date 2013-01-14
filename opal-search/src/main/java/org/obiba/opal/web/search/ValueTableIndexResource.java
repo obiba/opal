@@ -92,20 +92,14 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @PUT
-  public Response updateIndex(Opal.ScheduleDto dto) {
+  public Response updateIndex() {
     if(esProvider.isEnabled()) {
 
       ValueTable valueTable = getValueTable(datasource, table);
 
       if(!isInProgress(table)) {
 
-        Schedule schedule = new Schedule();
-        schedule.setType(dto.getType());
-        schedule.setDay(dto.getDay());
-        schedule.setHours(dto.getHours());
-        schedule.setMinutes(dto.getMinutes());
-
-        configService.update(valueTable, schedule);
+        synchroManager.synchronizeIndex(valueTable);
       }
 
       return Response.ok().build();

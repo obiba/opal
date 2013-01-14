@@ -21,6 +21,10 @@ final class Resources {
     return UriBuilder.create().segment("datasource", datasource, "table", table, "index").build();
   }
 
+  static String updateSchedule(String datasource, String table) {
+    return UriBuilder.create().segment("datasource", datasource, "table", table, "index", "schedule").build();
+  }
+
   static String searchService() {
     return "/service/search";
   }
