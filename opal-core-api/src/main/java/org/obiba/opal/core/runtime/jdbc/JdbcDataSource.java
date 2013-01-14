@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.Properties;
 
 import com.google.common.base.Strings;
 
+@SuppressWarnings("UnusedDeclaration")
 public class JdbcDataSource {
 
   private String name;
@@ -34,7 +35,8 @@ public class JdbcDataSource {
   public JdbcDataSource() {
   }
 
-  public JdbcDataSource(String name, String url, String driverClass, String username, String password, String properties) {
+  public JdbcDataSource(String name, String url, String driverClass, String username, String password,
+      String properties) {
     this.name = name;
     this.url = url;
     this.driverClass = driverClass;
@@ -88,15 +90,15 @@ public class JdbcDataSource {
   }
 
   public Properties readProperties() {
-    Properties properties = new Properties();
+    Properties prop = new Properties();
     try {
       if(Strings.isNullOrEmpty(getProperties()) == false) {
-        properties.load(new ByteArrayInputStream(getProperties().getBytes()));
+        prop.load(new ByteArrayInputStream(getProperties().getBytes()));
       }
     } catch(IOException e) {
       // can't really happen
     }
-    return properties;
+    return prop;
   }
 
   public void setProperties(String properties) {
@@ -108,12 +110,12 @@ public class JdbcDataSource {
   }
 
   public JdbcDataSource immutable() {
-    this.editable = false;
+    editable = false;
     return this;
   }
 
   public JdbcDataSource mutable() {
-    this.editable = true;
+    editable = true;
     return this;
   }
 
@@ -122,7 +124,7 @@ public class JdbcDataSource {
     if(obj == null) return false;
     if(this == obj) return true;
     if(obj instanceof JdbcDataSource) {
-      return ((JdbcDataSource) obj).name.equals(this.name);
+      return ((JdbcDataSource) obj).name.equals(name);
     }
     return super.equals(obj);
   }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -37,6 +37,7 @@ import de.schlichtherle.io.FileInputStream;
 
 public abstract class AbstractConfigurationAlteringStep {
 
+  @SuppressWarnings("FieldMayBeFinal")
   @Value("${OPAL_HOME}/conf/opal-config.xml")
   private String opalConfigFile;
 
@@ -56,8 +57,10 @@ public abstract class AbstractConfigurationAlteringStep {
 
   /**
    * Create an install step that transforms the opal config using a transformer (probably XSLT).
+   *
    * @param transformSource
    */
+  @SuppressWarnings("UnusedDeclaration")
   protected AbstractConfigurationAlteringStep(Source transformSource) {
     TransformerFactory tFactory = TransformerFactory.newInstance();
     try {

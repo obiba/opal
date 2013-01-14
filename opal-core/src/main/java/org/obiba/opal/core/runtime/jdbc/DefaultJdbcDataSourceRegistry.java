@@ -50,8 +50,18 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   public static class JdbcDataSourcesConfig implements OpalConfigurationExtension {
 
-    private List<JdbcDataSource> datasources = Lists.newArrayList();
+    private final List<JdbcDataSource> datasources = Lists.newArrayList();
 
+    /**
+     * Used only by upgrade steps.
+     * Should not be called but rather <code>org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry#listDataSources()</code>
+     *
+     * @return
+     * @see DefaultJdbcDataSourceRegistry#listDataSources()
+     */
+    public List<JdbcDataSource> getDatasources() {
+      return datasources;
+    }
   }
 
   private static final String DEFAULT_NAME = "<default>";
@@ -73,7 +83,8 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
         public void onRemoval(RemovalNotification<String, BasicDataSource> notification) {
           try {
             log.info("Destroying DataSource {}", notification.getKey());
-            notification.getValue().close();
+            BasicDataSource value = notification.getValue();
+            if(value != null) value.close();
           } catch(SQLException e) {
             log.warn("Ignoring exception during shutdown: ", e);
           }
@@ -115,10 +126,10 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
       OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
     this.dataSourceFactory = dataSourceFactory;
     this.sessionFactoryFactory = sessionFactoryFactory;
-    this.configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService,
+    configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService,
         JdbcDataSourcesConfig.class);
     this.opalDataSource = opalDataSource;
-    this.defaultDatasource = buildDefaultDataSource(opalDataSource);
+    defaultDatasource = buildDefaultDataSource(opalDataSource);
 
   }
 
@@ -200,7 +211,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   @Override
   public void update(final JdbcDataSource jdbcDataSource) {
     if(getJdbcDataSource(jdbcDataSource.getName()).isEditable() == false) return;
-    configSupplier.modify(new ExtensionConfigModificationTask<DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig>() {
+    configSupplier.modify(new ExtensionConfigModificationTask<JdbcDataSourcesConfig>() {
 
       @Override
       public void doWithConfig(JdbcDataSourcesConfig config) {
@@ -216,7 +227,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   @Override
   public void remove(final JdbcDataSource jdbcDataSource) {
     if(getJdbcDataSource(jdbcDataSource.getName()).isEditable() == false) return;
-    configSupplier.modify(new ExtensionConfigModificationTask<DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig>() {
+    configSupplier.modify(new ExtensionConfigModificationTask<JdbcDataSourcesConfig>() {
 
       @Override
       public void doWithConfig(JdbcDataSourcesConfig config) {
@@ -229,7 +240,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   @Override
   public void registerDataSource(final JdbcDataSource jdbcDataSource) {
     if(jdbcDataSource.getName().equals(DEFAULT_NAME)) return;
-    configSupplier.modify(new ExtensionConfigModificationTask<DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig>() {
+    configSupplier.modify(new ExtensionConfigModificationTask<JdbcDataSourcesConfig>() {
 
       @Override
       public void doWithConfig(JdbcDataSourcesConfig config) {
@@ -245,8 +256,8 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
     return configSupplier.get();
   }
 
-  private JdbcDataSource buildDefaultDataSource(DataSource opalDataSource) {
-    BasicDataSource bds = (BasicDataSource) opalDataSource;
+  private JdbcDataSource buildDefaultDataSource(DataSource dataSource) {
+    BasicDataSource bds = (BasicDataSource) dataSource;
     return new JdbcDataSource(DEFAULT_NAME, bds.getUrl(), bds.getDriverClassName(), bds.getUsername(),
         bds.getPassword(), null).immutable();
   }
