@@ -131,7 +131,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
   }
 
   private String getDefaultPath() {
-    if (credentials.getUsername() != null) {
+    if(credentials.getUsername() != null) {
       return "/home/" + credentials.getUsername();
     } else {
       return "/";
