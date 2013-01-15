@@ -34,12 +34,12 @@ public class DroppableTableResource extends TableResource {
 
   @DELETE
   public Response drop() {
-    getDatasource().dropTable(this.getValueTable().getName());
-    if(tableListeners != null && tableListeners.isEmpty()) {
+    if(tableListeners != null && !tableListeners.isEmpty()) {
       for(ValueTableUpdateListener listener : tableListeners) {
-        listener.onDelete(this.getValueTable());
+        listener.onDelete(getValueTable());
       }
     }
+    getDatasource().dropTable(getValueTable().getName());
 
     return Response.ok().build();
   }

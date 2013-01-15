@@ -45,9 +45,7 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
   }
 
   public void removeSchedule(ValueTable vt) {
-    Schedule schedule = indexConfigurations.get(getFullyQualifiedName(vt));
-    schedule.setType(Opal.ScheduleType.NOT_SCHEDULED);
-    indexConfigurations.put(vt.getName(), schedule);
+    indexConfigurations.remove(getFullyQualifiedName(vt));
   }
 
   public Schedule getSchedule(ValueTable vt) {
