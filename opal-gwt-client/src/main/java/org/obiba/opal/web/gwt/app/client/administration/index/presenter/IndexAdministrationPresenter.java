@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
 import java.util.ArrayList;
 
+import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
@@ -69,23 +70,25 @@ public class IndexAdministrationPresenter extends
 
   public interface Display extends View {
 
-//    String TEST_ACTION = "Test";
-
     String INDEX_ACTION = "Index now";
 
     String CLEAR_ACTION = "Clear";
 
-//    String CANCEL_ACTION = "Cancel";
-
     String SCHEDULE = "Schedule indexing";
+
+    void serviceStartable();
+
+    void serviceStoppable();
+
+    void serviceExecutionPending();
 
     enum Slots {
       Drivers, Permissions
     }
 
-    Button getStartButton();
+    HasClickHandlers getStartButton();
 
-    Button getStopButton();
+    HasClickHandlers getStopButton();
 
     HasClickHandlers getRefreshButton();
 
@@ -134,18 +137,16 @@ public class IndexAdministrationPresenter extends
 
   @Override
   protected void onReveal() {
-    /* stop start search service */
+    // stop start search service
     ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(Resources.searchService()).get()
         .withCallback(new ResourceCallback<ServiceDto>() {
           @Override
           public void onResource(Response response, ServiceDto resource) {
-            if(response.getStatusCode() == 200) {
+            if(response.getStatusCode() == Response.SC_OK) {
               if(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)) {
-                getView().getStartButton().setVisible(false);
-                getView().getStopButton().setVisible(true);
+                getView().serviceStoppable();
               } else {
-                getView().getStartButton().setVisible(true);
-                getView().getStopButton().setVisible(false);
+                getView().serviceStartable();
               }
             }
           }
@@ -153,8 +154,6 @@ public class IndexAdministrationPresenter extends
 
     getView().getIndexTable().setVisibleRange(0, 10);
     refresh();
-    // set permissions
-    // AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   @Override
@@ -179,45 +178,53 @@ public class IndexAdministrationPresenter extends
     getView().getActionsDropdown().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        GWT.log(getView().getActionsDropdown().getLastSelectedNavLink().getText());
         if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().CLEAR_ACTION)) {
-          if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
-
-            for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
-              ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-                @Override
-                public void onResponseCode(Request request, Response response) {
-                  refresh();
-                }
-
-              };
-              ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-                  .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-                  .withCallback(200, callback).withCallback(503, callback).delete().send();
-
-              getView().getSelectedIndices().setSelected(object, false);
-            }
-          } else {
-            getEventBus()
-                .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
-          }
+          doClear();
         } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().SCHEDULE)) {
-          if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+          doSchedule();
+        }
+      }
 
-            ArrayList<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
-            for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
-              objects.add(object);
-            }
+      private void doClear() {
+        if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
 
-            IndexPresenter dialog = indexPresenter.get();
-            dialog.updateSchedules(objects);
-            addToPopupSlot(dialog);
+          for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
+            ResponseCodeCallback callback = new ResponseCodeCallback() {
 
-          } else {
-            getEventBus()
-                .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                refresh();
+              }
+
+            };
+            ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+                .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
+                .withCallback(Response.SC_OK, callback)//
+                .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
+
+            getView().getSelectedIndices().setSelected(object, false);
           }
+        } else {
+          getEventBus()
+              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
+        }
+      }
+
+      private void doSchedule() {
+        if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+
+          ArrayList<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
+          for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
+            objects.add(object);
+          }
+
+          IndexPresenter dialog = indexPresenter.get();
+          dialog.updateSchedules(objects);
+          addToPopupSlot(dialog);
+
+        } else {
+          getEventBus()
+              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
         }
       }
     });
@@ -231,10 +238,8 @@ public class IndexAdministrationPresenter extends
 
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == 200) {
+              if(response.getStatusCode() == Response.SC_OK) {
                 refresh();
-                getEventBus()
-                    .fireEvent(NotificationEvent.Builder.newNotification().info("IndexClearCompleted").build());
               } else {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
                 getEventBus().fireEvent(
@@ -246,15 +251,15 @@ public class IndexAdministrationPresenter extends
           };
           ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
               .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-              .withCallback(200, callback).withCallback(503, callback).delete().send();
+              .withCallback(Response.SC_OK, callback)//
+              .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
         } else if(actionName.equalsIgnoreCase(Display.INDEX_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
 
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == 200) {
+              if(response.getStatusCode() == Response.SC_OK) {
                 refresh();
-                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("IndexNowCompleted").build());
               } else {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
                 getEventBus().fireEvent(
@@ -266,7 +271,8 @@ public class IndexAdministrationPresenter extends
           };
           ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
               .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-              .withCallback(200, callback).withCallback(503, callback).put().send();
+              .withCallback(Response.SC_OK, callback) //
+              .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).put().send();
         }
       }
 
@@ -281,6 +287,13 @@ public class IndexAdministrationPresenter extends
       }
     }));
 
+    registerHandler(getEventBus().addHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.Handler() {
+      @Override
+      public void onRefresh(TableIndicesRefreshEvent event) {
+        refresh();
+      }
+    }));
+
     // STOP
     registerHandler(getView().getStopButton().addClickHandler(new ClickHandler() {
 
@@ -290,13 +303,11 @@ public class IndexAdministrationPresenter extends
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == 200) {
-              getView().getStopButton().setVisible(false);
-              getView().getStartButton().setVisible(true);
+            if(response.getStatusCode() == Response.SC_OK) {
+              getView().serviceStartable();
               refresh();
-              getEventBus()
-                  .fireEvent(NotificationEvent.Builder.newNotification().info("ServiceSearchStopCompleted").build());
             } else {
+              getView().serviceStoppable();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
@@ -305,12 +316,16 @@ public class IndexAdministrationPresenter extends
           }
 
         };
+
         // Stop service
+        getView().serviceExecutionPending();
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
             .forResource(Resources.searchServiceEnabled()).accept("application/json")//
-            .withCallback(200, callback).withCallback(500, callback).delete().send();
+            .withCallback(Response.SC_OK, callback)//
+            .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback).delete().send();
       }
     }));
+
     // START
     registerHandler(getView().getStartButton().addClickHandler(new ClickHandler() {
 
@@ -320,13 +335,11 @@ public class IndexAdministrationPresenter extends
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == 200) {
-              getView().getStopButton().setVisible(true);
-              getView().getStartButton().setVisible(false);
+            if(response.getStatusCode() == Response.SC_OK) {
+              getView().serviceStoppable();
               refresh();
-              getEventBus()
-                  .fireEvent(NotificationEvent.Builder.newNotification().info("ServiceSearchStartCompleted").build());
             } else {
+              getView().serviceStartable();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
@@ -335,9 +348,13 @@ public class IndexAdministrationPresenter extends
           }
 
         };
+
+        // Start service
+        getView().serviceExecutionPending();
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
             .forResource(Resources.searchServiceEnabled()).accept("application/json")//
-            .withCallback(200, callback).withCallback(500, callback).put().send();
+            .withCallback(Response.SC_OK, callback).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback).put()
+            .send();
       }
     }));
   }
@@ -366,23 +383,6 @@ public class IndexAdministrationPresenter extends
     public void unauthorized() {
     }
 
-  }
-
-  private final class PermissionsUpdate implements HasAuthorization {
-    @Override
-    public void unauthorized() {
-      clearSlot(Display.Slots.Permissions);
-    }
-
-    @Override
-    public void beforeAuthorization() {
-
-    }
-
-    @Override
-    public void authorized() {
-      setInSlot(Display.Slots.Permissions, authorizationPresenter);
-    }
   }
 
 }

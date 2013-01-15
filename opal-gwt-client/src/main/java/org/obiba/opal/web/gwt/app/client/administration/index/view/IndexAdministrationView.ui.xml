@@ -65,10 +65,12 @@
         </o:HelpImage>
       </g:FlowPanel>
       <g:HorizontalPanel addStyleNames="content">
+        <g:FlowPanel>
         <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync" size="MINI">
           <ui:msg description="Refresh indices label">Refresh</ui:msg>
         </b:Button>
-        <b:DropdownButton ui:field="actionsDropdown" text="Actions" size="MINI">
+        </g:FlowPanel>
+        <b:DropdownButton ui:field="actionsDropdown" text="Actions" size="MINI" addStyleNames="small-indent">
           <b:NavLink>Schedule indexing</b:NavLink>
           <b:NavLink>Clear</b:NavLink>
         </b:DropdownButton>

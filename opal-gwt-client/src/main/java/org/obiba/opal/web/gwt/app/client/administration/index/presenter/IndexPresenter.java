@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -65,13 +66,6 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     getView().setDialogMode(dialogMode);
   }
 
-//  /**
-//   * Setup the dialog for creating a method
-//   */
-//  public void createNewDatabase() {
-//    setDialogMode(Mode.CREATE);
-//  }
-
   /**
    * Setup the dialog for updating an existing method
    *
@@ -88,39 +82,6 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
   private void displaySchedule(ScheduleDto dto) {
     getView().setSchedule(dto);
-  }
-
-  private void updateSchedule() {
-    ScheduleDto dto = getScheduleDto();
-    for(TableIndexStatusDto tableIndexStatusDto : tableIndexStatusDtos) {
-      putSchedule(tableIndexStatusDto.getDatasource(), tableIndexStatusDto.getTable(), dto);
-    }
-  }
-
-  private void putSchedule(String datasource, String table, ScheduleDto dto) {
-    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.updateSchedule(datasource, table)).put()//
-        .withResourceBody(ScheduleDto.stringify(dto))//
-        .withCallback(Response.SC_OK, callbackHandler).send();
-  }
-
-  private ScheduleDto getScheduleDto() {
-    ScheduleDto dto = ScheduleDto.create();
-    ScheduleType type = getScheduleTypeFromName(getView().getSelectedType());
-    dto.setType(type);
-
-    if(type.equals(ScheduleType.HOURLY)) {
-      dto.setMinutes(getView().getSelectedMinutes());
-    } else if(type.equals(ScheduleType.DAILY)) {
-      dto.setHours(getView().getSelectedHours());
-      dto.setMinutes(getView().getSelectedMinutes());
-    } else if(type.equals(ScheduleType.WEEKLY)) {
-      dto.setHours(getView().getSelectedHours());
-      dto.setMinutes(getView().getSelectedMinutes());
-      dto.setDay(getDayFromName(getView().getSelectedDay()));
-    }
-
-    return dto;
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
@@ -174,6 +135,39 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
       }
     }
 
+    private void updateSchedule() {
+      ScheduleDto dto = getScheduleDto();
+      for(TableIndexStatusDto tableIndexStatusDto : tableIndexStatusDtos) {
+        putSchedule(tableIndexStatusDto.getDatasource(), tableIndexStatusDto.getTable(), dto);
+      }
+    }
+
+    private ScheduleDto getScheduleDto() {
+      ScheduleDto dto = ScheduleDto.create();
+      ScheduleType type = getScheduleTypeFromName(getView().getSelectedType());
+      dto.setType(type);
+
+      if(type.equals(ScheduleType.HOURLY)) {
+        dto.setMinutes(getView().getSelectedMinutes());
+      } else if(type.equals(ScheduleType.DAILY)) {
+        dto.setHours(getView().getSelectedHours());
+        dto.setMinutes(getView().getSelectedMinutes());
+      } else if(type.equals(ScheduleType.WEEKLY)) {
+        dto.setHours(getView().getSelectedHours());
+        dto.setMinutes(getView().getSelectedMinutes());
+        dto.setDay(getDayFromName(getView().getSelectedDay()));
+      }
+
+      return dto;
+    }
+
+    private void putSchedule(String datasource, String table, ScheduleDto dto) {
+      CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+      ResourceRequestBuilderFactory.newBuilder().forResource(Resources.updateSchedule(datasource, table)).put()//
+          .withResourceBody(ScheduleDto.stringify(dto))//
+          .withCallback(Response.SC_OK, callbackHandler).send();
+    }
+
   }
 
   private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
@@ -188,7 +182,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
-        getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("IndexScheduleCompleted").build());
+        getEventBus().fireEvent(new TableIndicesRefreshEvent());
       } else {
         ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
         getEventBus().fireEvent(

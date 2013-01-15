@@ -58,6 +58,7 @@ table {
 
 th {
   font-weight: bold;
+  text-align: left;
 }
 
 textarea {

@@ -171,13 +171,13 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   }
 
   private void initDayWidget() {
-    day.addItem(translations.mondayLabel(), Day.MONDAY.getName());
-    day.addItem(translations.tuesdayLabel(), Day.TUESDAY.getName());
-    day.addItem(translations.wednesdayLabel(), Day.WEDNESDAY.getName());
-    day.addItem(translations.thursdayLabel(), Day.THURSDAY.getName());
-    day.addItem(translations.fridayLabel(), Day.FRIDAY.getName());
-    day.addItem(translations.saturdayLabel(), Day.SATURDAY.getName());
-    day.addItem(translations.sundayLabel(), Day.SUNDAY.getName());
+    day.addItem(translations.timeMap().get(Day.MONDAY.getName()), Day.MONDAY.getName());
+    day.addItem(translations.timeMap().get(Day.TUESDAY.getName()), Day.TUESDAY.getName());
+    day.addItem(translations.timeMap().get(Day.WEDNESDAY.getName()), Day.WEDNESDAY.getName());
+    day.addItem(translations.timeMap().get(Day.THURSDAY.getName()), Day.THURSDAY.getName());
+    day.addItem(translations.timeMap().get(Day.FRIDAY.getName()), Day.FRIDAY.getName());
+    day.addItem(translations.timeMap().get(Day.SATURDAY.getName()), Day.SATURDAY.getName());
+    day.addItem(translations.timeMap().get(Day.SUNDAY.getName()), Day.SUNDAY.getName());
   }
 
   private void initHourWidget() {
@@ -195,10 +195,13 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   }
 
   private void initMinutesWidget() {
-    minutes.addItem("00 " + translations.minutesLabel(), "0");
-    minutes.addItem("15 " + translations.minutesLabel(), "15");
-    minutes.addItem("30 " + translations.minutesLabel(), "30");
-    minutes.addItem("45 " + translations.minutesLabel(), "45");
+    for(int i = 0; i < 60; i=i+5) {
+      String m = "";
+      if(i < 10) {
+        m += "0";
+      }
+      minutes.addItem(m + i + " " + translations.minutesLabel(), Integer.toString(i));
+    }
     minutes.setWidth("120px");
   }
 

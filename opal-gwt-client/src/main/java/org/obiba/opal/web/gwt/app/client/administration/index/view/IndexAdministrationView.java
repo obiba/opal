@@ -14,9 +14,11 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ImageCell;
@@ -52,23 +54,23 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   interface ViewUiBinder extends UiBinder<Widget, IndexAdministrationView> {
   }
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget uiWidget;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.Button startButton;
+  Button startButton;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.Button stopButton;
+  Button stopButton;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.Button refreshIndicesButton;
+  Button refreshIndicesButton;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.DropdownButton actionsDropdown;
+  DropdownButton actionsDropdown;
 
   @UiField
   SimplePager indexTablePager;
@@ -80,16 +82,14 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
       new ProvidesKey<TableIndexStatusDto>() {
         @Override
         public Object getKey(TableIndexStatusDto item) {
-          return item == null ? null : item.getTable();
+          return item == null ? null : item.getDatasource() + "." + item.getTable();
         }
       });
 
   ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
       new ActionsProvider<TableIndexStatusDto>() {
 
-        private final String[] all = new String[] {CLEAR_ACTION, INDEX_ACTION}; //, CLEAR_ACTION, CANCEL_ACTION};
-
-//        private final String[] immutable = new String[] {TEST_ACTION};
+        private final String[] all = new String[] {CLEAR_ACTION, INDEX_ACTION};
 
         @Override
         public String[] allActions() {
@@ -98,20 +98,18 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
 
         @Override
         public String[] getActions(TableIndexStatusDto value) {
-//          return value.getEditable() ? allActions() : immutable;
           return allActions();
         }
       });
 
   public IndexAdministrationView() {
-    super();
     uiWidget = uiBinder.createAndBindUi(this);
     indexTablePager.setDisplay(indexTable);
 
     indexTable
         .setSelectionModel(selectedIndices, DefaultSelectionEventManager.<TableIndexStatusDto>createCheckboxManager());
 
-    indexTable.addColumn(Columns.select, ""); //translations.allLabel()
+    indexTable.addColumn(Columns.select, "");
     indexTable.addColumn(Columns.datasource, translations.datasourceLabel());
     indexTable.addColumn(Columns.table, translations.tableLabel());
     indexTable.addColumn(Columns.tableLastUpdate, translations.tableLastUpdateLabel());
@@ -122,22 +120,38 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
   }
 
-  private boolean createCheckboxManager() {
-    return false;
-  }
-
   @Override
   public Widget asWidget() {
     return uiWidget;
   }
 
   @Override
-  public com.github.gwtbootstrap.client.ui.Button getStartButton() {
+  public void serviceStartable() {
+    stopButton.setVisible(false);
+    startButton.setVisible(true);
+    startButton.setEnabled(true);
+  }
+
+  @Override
+  public void serviceStoppable() {
+    startButton.setVisible(false);
+    stopButton.setVisible(true);
+    stopButton.setEnabled(true);
+  }
+
+  @Override
+  public void serviceExecutionPending() {
+    stopButton.setEnabled(!stopButton.isVisible());
+    startButton.setEnabled(!startButton.isVisible());
+  }
+
+  @Override
+  public HasClickHandlers getStartButton() {
     return startButton;
   }
 
   @Override
-  public com.github.gwtbootstrap.client.ui.Button getStopButton() {
+  public HasClickHandlers getStopButton() {
     return stopButton;
   }
 
@@ -168,7 +182,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
 
   private static final class Columns {
 
-    static Column<TableIndexStatusDto, Boolean> select = new Column<TableIndexStatusDto, Boolean>(
+    static final Column<TableIndexStatusDto, Boolean> select = new Column<TableIndexStatusDto, Boolean>(
         new CheckboxCell(true, false)) {
       @Override
       public Boolean getValue(TableIndexStatusDto object) {
@@ -176,7 +190,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
       }
     };
 
-    static Column<TableIndexStatusDto, String> datasource = new TextColumn<TableIndexStatusDto>() {
+    static final Column<TableIndexStatusDto, String> datasource = new TextColumn<TableIndexStatusDto>() {
 
       @Override
       public String getValue(TableIndexStatusDto object) {
@@ -184,7 +198,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
       }
     };
 
-    static Column<TableIndexStatusDto, String> table = new TextColumn<TableIndexStatusDto>() {
+    static final Column<TableIndexStatusDto, String> table = new TextColumn<TableIndexStatusDto>() {
 
       @Override
       public String getValue(TableIndexStatusDto object) {
@@ -192,56 +206,59 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
       }
     };
 
-    static Column<TableIndexStatusDto, String> tableLastUpdate = new TextColumn<TableIndexStatusDto>() {
+    static final Column<TableIndexStatusDto, String> tableLastUpdate = new TextColumn<TableIndexStatusDto>() {
 
       @Override
       public String getValue(TableIndexStatusDto object) {
-        return object.getTableLastUpdate();
+        return ValueRenderer.DATETIME.render(object.getTableLastUpdate());
       }
     };
 
-    static Column<TableIndexStatusDto, String> indexLastUpdate = new TextColumn<TableIndexStatusDto>() {
+    static final Column<TableIndexStatusDto, String> indexLastUpdate = new TextColumn<TableIndexStatusDto>() {
 
       @Override
       public String getValue(TableIndexStatusDto object) {
-        return object.getIndexLastUpdate().isEmpty() ? "-" : object.getIndexLastUpdate();
+        return object.getIndexLastUpdate().isEmpty() ? "-" : ValueRenderer.DATETIME.render(object.getIndexLastUpdate());
       }
     };
 
-    static Column<TableIndexStatusDto, String> scheduleType = new TextColumn<TableIndexStatusDto>() {
+    static final Column<TableIndexStatusDto, String> scheduleType = new TextColumn<TableIndexStatusDto>() {
 
       @Override
       public String getValue(TableIndexStatusDto object) {
         if(object.getSchedule().getType().getName().equals(NOT_SCHEDULED.getName())) {
-          return "Manual";
+          return translations.manuallyLabel();
         }
         if(object.getSchedule().getType().getName().equals(MINUTES_5.getName())) {
-          return "Every 5 minutes";
+          return translations.minutes5Label();
         }
         if(object.getSchedule().getType().getName().equals(MINUTES_15.getName())) {
-          return "Every 15 minutes";
+          return translations.minutes15Label();
         }
         if(object.getSchedule().getType().getName().equals(MINUTES_30.getName())) {
-          return "Every 30 minutes";
+          return translations.minutes30Label();
         }
         String minutes = object.getSchedule().getMinutes() < 10 ? "0" + object.getSchedule().getMinutes() : String
             .valueOf(object.getSchedule().getMinutes());
         if(object.getSchedule().getType().getName().equals(HOURLY.getName())) {
-          return "Every hour at " + minutes + " minutes";
+          return translations.hourlyAtLabel().replace("{0}", minutes);
         }
         if(object.getSchedule().getType().getName().equals(DAILY.getName())) {
-          return "Every day at " + object.getSchedule().getHours() + ":" + minutes;
+          return translations.dailyAtLabel().replace("{0}", Integer.toString(object.getSchedule().getHours()))
+              .replace("{1}", minutes);
         }
         if(object.getSchedule().getType().getName().equals(WEEKLY.getName())) {
-          return "Every week on " + object.getSchedule().getDay().getName().toLowerCase() + " at " + object
-              .getSchedule().getHours() + ":" + minutes;
+          return translations.weeklyAtLabel()
+              .replace("{0}", translations.timeMap().get(object.getSchedule().getDay().getName()))
+              .replace("{1}", Integer.toString(object.getSchedule().getHours())).replace("{2}", minutes);
         }
 
         return object.getSchedule().getType().toString();
       }
     };
 
-    static Column<TableIndexStatusDto, String> status = new Column<TableIndexStatusDto, String>(new ImageCell()) {
+    static final Column<TableIndexStatusDto, String> status = new Column<TableIndexStatusDto,
+        String>(new ImageCell()) {
 
       @Override
       public String getValue(TableIndexStatusDto tableIndexStatusDto) {
@@ -269,14 +286,4 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
       }
     };
   }
-
-  /**
-   * The key provider that provides the unique ID of a contact.
-   */
-//  public static final ProvidesKey<TableIndexStatusDto> KEY_PROVIDER =
-
-//  @Override
-//  public HasAuthorization getPermissionsAuthorizer() {
-//    return new WidgetAuthorizer(permissionsPanel);
-//  }
 }
