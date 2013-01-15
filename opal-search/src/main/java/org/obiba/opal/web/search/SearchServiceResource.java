@@ -10,6 +10,8 @@
 package org.obiba.opal.web.search;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -24,6 +26,7 @@ import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -55,8 +58,23 @@ public class SearchServiceResource extends IndexResource {
         tableStatusDtos.add(getTableStatusDto(datasource, valueTable));
       }
     }
+    sortByName(tableStatusDtos);
 
     return tableStatusDtos;
+  }
+
+  private void sortByName(List<Opal.TableIndexStatusDto> tableStatusDtos) {
+    // sort alphabetically
+    Collections.sort(tableStatusDtos, new Comparator<Opal.TableIndexStatusDto>() {
+
+      @Override
+      public int compare(Opal.TableIndexStatusDto s1, Opal.TableIndexStatusDto s2) {
+        String d1 = s1.getDatasource() + "." + s1.getTable();
+        String d2 = s2.getDatasource() + "." + s2.getTable();
+        return d1.compareTo(d2);
+      }
+
+    });
   }
 
   private Opal.TableIndexStatusDto getTableStatusDto(Datasource datasource, ValueTable valueTable) {
