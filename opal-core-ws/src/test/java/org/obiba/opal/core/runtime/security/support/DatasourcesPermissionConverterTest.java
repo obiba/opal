@@ -62,10 +62,7 @@ public class DatasourcesPermissionConverterTest extends
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/variables:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/facet:GET:GET/GET",//
-        "magma:/datasource/patate/table/pwel/facets:POST:GET",//
-        "magma:/datasource/patate/table/pwel/index/_search:GET",//
-        "magma:/datasource/patate/table/pwel/index/_search:POST",//
-        "magma:/datasource/patate/table/pwel/index/_schema:GET",//
+        "magma:/datasource/patate/table/pwel/facets:POST:GET/*",//
         "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST");
   }
 
@@ -77,10 +74,7 @@ public class DatasourcesPermissionConverterTest extends
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/variables:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/facet:GET:GET/GET",//
-        "magma:/datasource/patate/table/pwel/facets:POST:GET",//
-        "magma:/datasource/patate/table/pwel/index/_search:GET",//
-        "magma:/datasource/patate/table/pwel/index/_search:POST",//
-        "magma:/datasource/patate/table/pwel/index/_schema:GET",//
+        "magma:/datasource/patate/table/pwel/facets:POST:GET/*",//
         "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST");
   }
 
@@ -91,8 +85,12 @@ public class DatasourcesPermissionConverterTest extends
         "magma:/datasource/patate/table/pwel/entities:GET", //
         "magma:/datasource/patate/table/pwel/variables:GET", //
         "magma:/datasource/patate/table/pwel/index:GET:GET/GET", //
+        "magma:/datasource/patate/table/pwel/index/_search:GET",//
+        "magma:/datasource/patate/table/pwel/index/_search:POST",//
+        "magma:/datasource/patate/table/pwel/index/_schema:GET",//
+
         "magma:/datasource/patate/table/pwel/facet:GET:GET/GET",//
-        "magma:/datasource/patate/table/pwel/facets:POST:GET");
+        "magma:/datasource/patate/table/pwel/facets:POST:GET/*");
   }
 
   @Test
