@@ -82,12 +82,12 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "GET:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/variable", "GET:GET/GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/variables", "GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/variables", "GET:GET/GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/facet", "GET:GET/GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/facets", "POST:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/index/_search", "GET:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/index/_search", "POST:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/index/_schema", "GET:GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/index/_search", "GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/index/_search", "POST", args),//
+            magmaConvert("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/variable/_transient/summary", "POST", args));
       }
 
@@ -98,7 +98,10 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/entities", "GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET/GET", args));
+            magmaConvert("/datasource/{0}/table/{1}/variables", "GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET/GET", args),
+            magmaConvert("/datasource/{0}/table/{1}/facet", "GET:GET/GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}/facets", "POST:GET", args));
       }
 
     },
