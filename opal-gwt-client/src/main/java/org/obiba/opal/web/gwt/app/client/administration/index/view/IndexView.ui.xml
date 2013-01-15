@@ -29,22 +29,16 @@
               <g:Label addStyleNames="key">
                 <ui:msg description="Schedule type label">Check index for update</ui:msg>
               </g:Label>
-              <b:ListBox name="type" ui:field="type"/>
-            </g:FlowPanel>
-
-            <g:FlowPanel styleName="input">
+              <o:Chooser name="type" ui:field="type"/>
               <g:Label addStyleNames="key" ui:field="on">
                 <ui:msg description="on">on</ui:msg>
               </g:Label>
-              <b:ListBox name="day" ui:field="day"/>
-            </g:FlowPanel>
-
-            <g:FlowPanel styleName="input">
+              <o:Chooser name="day" ui:field="day"/>
               <g:Label addStyleNames="key" ui:field="at">
                 <ui:msg description="at">at</ui:msg>
               </g:Label>
-              <b:ListBox name="hour" ui:field="hour"/>
-              <b:ListBox name="minutes" ui:field="minutes"/>
+              <o:Chooser name="hour" ui:field="hour"/>
+              <o:Chooser name="minutes" ui:field="minutes"/>
             </g:FlowPanel>
 
           </g:FlowPanel>

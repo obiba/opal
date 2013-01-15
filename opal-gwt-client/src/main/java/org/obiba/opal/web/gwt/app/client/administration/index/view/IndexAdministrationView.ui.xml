@@ -36,10 +36,10 @@
         </o:HelpImage>
       </g:FlowPanel>
       <g:HorizontalPanel addStyleNames="content">
-        <b:Button ui:field="startButton" size="MINI">
+        <b:Button ui:field="startButton">
           <ui:msg description="On">Start</ui:msg>
         </b:Button>
-        <b:Button ui:field="stopButton" size="MINI">
+        <b:Button ui:field="stopButton">
           <ui:msg description="Off">Stop</ui:msg>
         </b:Button>
       </g:HorizontalPanel>

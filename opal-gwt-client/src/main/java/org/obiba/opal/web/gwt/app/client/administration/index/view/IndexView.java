@@ -12,8 +12,10 @@ package org.obiba.opal.web.gwt.app.client.administration.index.view;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.model.client.opal.Day;
+import org.obiba.opal.web.model.client.opal.ScheduleDto;
 import org.obiba.opal.web.model.client.opal.ScheduleType;
 
 import com.google.gwt.core.client.GWT;
@@ -66,16 +68,16 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   Button cancelButton;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.ListBox type;
+  Chooser type;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.ListBox day;
+  Chooser day;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.ListBox hour;
+  Chooser hour;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.ListBox minutes;
+  Chooser minutes;
 
   @UiField
   Label on;
@@ -83,34 +85,45 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   @UiField
   Label at;
 
-  HasText typeListBox;
-
-  HasText dayListBox;
-
-  HasText hoursListBox;
-
-  HasText minutesListBox;
-
   JsArray<ScheduleType> availableTypes;
 
   @Override
-  public HasText getType() {
-    return typeListBox;
+  public String getSelectedType() {
+    return type.getSelectedValue();
   }
 
   @Override
-  public HasText getMinutes() {
-    return minutesListBox;
+  public String getSelectedDay() {
+    return day.getSelectedValue();
   }
 
   @Override
-  public HasText getHours() {
-    return hoursListBox;
+  public int getSelectedHours() {
+    return Integer.parseInt(hour.getSelectedValue().split(":")[0]);
   }
 
   @Override
-  public HasText getDay() {
-    return dayListBox;
+  public int getSelectedMinutes() {
+    if(type.getSelectedValue().equals(ScheduleType.HOURLY.getName())) {
+      return Integer.parseInt(minutes.getSelectedValue());
+    } else {
+      return Integer.parseInt(hour.getSelectedValue().split(":")[1]);
+    }
+  }
+
+  @Override
+  public void setSchedule(ScheduleDto dto) {
+    type.setSelectedValue(dto.getType().getName());
+    setDefaults();
+    if(dto.hasDay()) {
+      day.setSelectedValue(dto.getDay().getName());
+    }
+    if(dto.hasHours() && dto.hasMinutes()) {
+      hour.setSelectedValue(dto.getHours() + ":" + dto.getMinutes());
+    }
+    if(dto.hasMinutes()) {
+      minutes.setSelectedValue(String.valueOf(dto.getMinutes()));
+    }
   }
 
   @Inject
@@ -118,111 +131,16 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
     initWidgets();
-
-    typeListBox = new HasText() {
-
-      @Override
-      public String getText() {
-        return type.getValue(type.getSelectedIndex());
-      }
-
-      @Override
-      public void setText(String text) {
-        type.setSelectedValue(text);
-        setDefaults();
-      }
-    };
-
-    dayListBox = new HasText() {
-
-      @Override
-      public String getText() {
-        return day.getValue(day.getSelectedIndex());
-      }
-
-      @Override
-      public void setText(String text) {
-        day.setSelectedValue(text);
-      }
-    };
-
-    hoursListBox = new HasText() {
-
-      @Override
-      public String getText() {
-        return hour.getValue(hour.getSelectedIndex());
-      }
-
-      @Override
-      public void setText(String text) {
-        hour.setSelectedValue(text);
-      }
-    };
-
-    minutesListBox = new HasText() {
-
-      @Override
-      public String getText() {
-        return minutes.getValue(minutes.getSelectedIndex());
-      }
-
-      @Override
-      public void setText(String text) {
-        minutes.setSelectedValue(text);
-      }
-    };
   }
 
   private void initWidgets() {
     dialog.hide();
-    //properties.getElement().setAttribute("placeholder", translations.keyValueLabel());
     resizeHandle.makeResizable(contentLayout);
 
-    type.setEnabled(true);
-    type.addItem(translations.manuallyLabel(), ScheduleType.NOT_SCHEDULED.getName());
-    type.addItem(translations.minutes5Label(), ScheduleType.MINUTES_5.getName());
-    type.addItem(translations.minutes15Label(), ScheduleType.MINUTES_15.getName());
-    type.addItem(translations.minutes30Label(), ScheduleType.MINUTES_30.getName());
-    type.addItem(translations.hourlyLabel(), ScheduleType.HOURLY.getName());
-    type.addItem(translations.dailyLabel(), ScheduleType.DAILY.getName());
-    type.addItem(translations.weeklyLabel(), ScheduleType.WEEKLY.getName());
-
-    type.addChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        setDefaults();
-      }
-    });
-
-    //if (!type.getValue(type.getSelectedIndex()).equals(ScheduleType.NOT_SCHEDULED.getName())){
-    day.addItem(translations.sundayLabel(), Day.SUNDAY.getName());
-    day.addItem(translations.mondayLabel(), Day.MONDAY.getName());
-    day.addItem(translations.tuesdayLabel(), Day.TUESDAY.getName());
-    day.addItem(translations.wednesdayLabel(), Day.WEDNESDAY.getName());
-    day.addItem(translations.thursdayLabel(), Day.THURSDAY.getName());
-    day.addItem(translations.fridayLabel(), Day.FRIDAY.getName());
-    day.addItem(translations.saturdayLabel(), Day.SATURDAY.getName());
-
-    for(int i = 0; i < 24; i++) {
-      String h = "";
-      if(i < 10) {
-        h += "0";
-      }
-      hour.addItem(h + i);
-    }
-
-    for(int i = 0; i < 60; i++) {
-      String h = "";
-      if(i < 10) {
-        h += "0";
-      }
-      minutes.addItem(h + i);
-    }
-//    minutes.addItem("00", "0");
-//    minutes.addItem("15", "15");
-//    minutes.addItem("30", "30");
-//    minutes.addItem("45", "45");
+    initTypeWidget();
+    initDayWidget();
+    initHourWidget();
+    initMinutesWidget();
 
     // default to 15 minutes
     type.setSelectedValue(ScheduleType.MINUTES_15.getName());
@@ -233,37 +151,67 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
     minutes.setVisible(false);
   }
 
-  private void setDefaults() {
-    int index = type.getSelectedIndex();
+  private void initTypeWidget() {
+    type.setEnabled(true);
+    type.addItem(translations.manuallyLabel(), ScheduleType.NOT_SCHEDULED.getName());
+    type.addItem(translations.minutes5Label(), ScheduleType.MINUTES_5.getName());
+    type.addItem(translations.minutes15Label(), ScheduleType.MINUTES_15.getName());
+    type.addItem(translations.minutes30Label(), ScheduleType.MINUTES_30.getName());
+    type.addItem(translations.hourlyLabel(), ScheduleType.HOURLY.getName());
+    type.addItem(translations.dailyLabel(), ScheduleType.DAILY.getName());
+    type.addItem(translations.weeklyLabel(), ScheduleType.WEEKLY.getName());
+    type.addChangeHandler(new ChangeHandler() {
 
-    if(type.getValue(index).equals(ScheduleType.NOT_SCHEDULED.getName()) || type.getValue(index)
-        .equals(ScheduleType.MINUTES_5.getName()) ||
-        type.getValue(index).equals(ScheduleType.MINUTES_15.getName()) || type.getValue(index)
-        .equals(ScheduleType.MINUTES_30.getName())) {
-      on.setVisible(false);
-      day.setVisible(false);
-      at.setVisible(false);
-      hour.setVisible(false);
-      minutes.setVisible(false);
-    } else if(type.getValue(index).equals(ScheduleType.HOURLY.getName())) {
-      on.setVisible(false);
-      day.setVisible(false);
-      at.setVisible(true);
-      hour.setVisible(false);
-      minutes.setVisible(true);
-    } else if(type.getValue(index).equals(ScheduleType.DAILY.getName())) {
-      on.setVisible(false);
-      day.setVisible(false);
-      at.setVisible(true);
-      hour.setVisible(true);
-      minutes.setVisible(true);
-    } else if(type.getValue(index).equals(ScheduleType.WEEKLY.getName())) {
-      on.setVisible(true);
-      day.setVisible(true);
-      at.setVisible(true);
-      hour.setVisible(true);
-      minutes.setVisible(true);
+      @Override
+      public void onChange(ChangeEvent event) {
+        setDefaults();
+      }
+    });
+    //if (!type.getValue(type.getSelectedIndex()).equals(ScheduleType.NOT_SCHEDULED.getName())){
+  }
+
+  private void initDayWidget() {
+    day.addItem(translations.mondayLabel(), Day.MONDAY.getName());
+    day.addItem(translations.tuesdayLabel(), Day.TUESDAY.getName());
+    day.addItem(translations.wednesdayLabel(), Day.WEDNESDAY.getName());
+    day.addItem(translations.thursdayLabel(), Day.THURSDAY.getName());
+    day.addItem(translations.fridayLabel(), Day.FRIDAY.getName());
+    day.addItem(translations.saturdayLabel(), Day.SATURDAY.getName());
+    day.addItem(translations.sundayLabel(), Day.SUNDAY.getName());
+  }
+
+  private void initHourWidget() {
+    for(int i = 0; i < 24; i++) {
+      String h = "";
+      if(i < 10) {
+        h += "0";
+      }
+      hour.addItem(h + i + ":00", i +":0");
+      hour.addItem(h + i + ":15", i +":15");
+      hour.addItem(h + i + ":30", i +":30");
+      hour.addItem(h + i + ":45", i +":45");
     }
+    hour.setWidth("80px");
+  }
+
+  private void initMinutesWidget() {
+    minutes.addItem("00 " + translations.minutesLabel(), "0");
+    minutes.addItem("15 " + translations.minutesLabel(), "15");
+    minutes.addItem("30 " + translations.minutesLabel(), "30");
+    minutes.addItem("45 " + translations.minutesLabel(), "45");
+    minutes.setWidth("120px");
+  }
+
+  @SuppressWarnings("PMD.NcssMethodCount")
+  private void setDefaults() {
+    String typeValue = type.getSelectedValue();
+    on.setVisible(typeValue.equals(ScheduleType.WEEKLY.getName()));
+    day.setVisible(on.isVisible());
+    at.setVisible(typeValue.equals(ScheduleType.HOURLY.getName()) || typeValue.equals(ScheduleType.DAILY.getName())
+        || typeValue.equals(ScheduleType.WEEKLY.getName()));
+    hour.setVisible(at.isVisible() && (typeValue.equals(ScheduleType.DAILY.getName())
+        || typeValue.equals(ScheduleType.WEEKLY.getName())));
+    minutes.setVisible(at.isVisible() && typeValue.equals(ScheduleType.HOURLY.getName()));
   }
 
   @Override
@@ -303,21 +251,4 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
     return cancelButton;
   }
 
-  private ScheduleType getType(String typeName) {
-    for(ScheduleType type : JsArrays.toIterable(availableTypes)) {
-      if(type.getName().equals(typeName)) {
-        return type;
-      }
-    }
-    return null;
-  }
-
-  private void updateTypeSelection() {
-    for(int i = 0; i < type.getItemCount(); i++) {
-      if(type.getValue(i).equals(typeListBox)) {
-        type.setSelectedIndex(i);
-        break;
-      }
-    }
-  }
 }

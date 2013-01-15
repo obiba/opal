@@ -149,9 +149,15 @@ public class ValueTableIndexResource extends IndexResource {
 
     Schedule schedule = new Schedule();
     schedule.setType(scheduleDto.getType());
-    schedule.setDay(scheduleDto.getDay());
-    schedule.setHours(scheduleDto.getHours());
-    schedule.setMinutes(scheduleDto.getMinutes());
+    if(scheduleDto.hasDay()) {
+      schedule.setDay(scheduleDto.getDay());
+    }
+    if(scheduleDto.hasHours()) {
+      schedule.setHours(scheduleDto.getHours());
+    }
+    if(scheduleDto.hasMinutes()) {
+      schedule.setMinutes(scheduleDto.getMinutes());
+    }
 
     configService.update(getValueTable(datasource, table), schedule);
 

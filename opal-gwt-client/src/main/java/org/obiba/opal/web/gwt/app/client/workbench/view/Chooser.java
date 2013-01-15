@@ -87,4 +87,13 @@ public class Chooser extends ChosenListBox {
   public String getSelectedValue() {
     return getValue(getSelectedIndex());
   }
+
+  public void setSelectedValue(String value) {
+    for(int i = 0; i < getItemCount(); i++) {
+      if(getValue(i).equals(value)) {
+        super.setItemSelected(i, true);
+      }
+    }
+    update();
+  }
 }

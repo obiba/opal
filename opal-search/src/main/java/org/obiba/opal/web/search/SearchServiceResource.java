@@ -44,45 +44,45 @@ public class SearchServiceResource extends IndexResource {
   }
 
   @GET
-  public List<Opal.TableIndexStatusDto> indices() {
+  public List<Opal.TableIndexStatusDto> getIndices() {
     List<Opal.TableIndexStatusDto> tableStatusDtos = Lists.newArrayList();
 
-    // isrunning
-    if(!esProvider.isEnabled() && esProvider.getClient() == null) return tableStatusDtos;
+    // ES is available
+    if(!esProvider.isEnabled() || esProvider.getClient() == null) return tableStatusDtos;
 
-    Set<Datasource> datasources = MagmaEngine.get().getDatasources();
-    for(Datasource datasource : datasources) {
-
-      Set<ValueTable> valueTables = MagmaEngine.get().getDatasource(datasource.getName()).getValueTables();
-      for(ValueTable valueTable : valueTables) {
-        ValueTable table = MagmaEngine.get().getDatasource(datasource.getName()).getValueTable(valueTable.getName());
-
-        float progress = 0f;
-        if(synchroManager.getCurrentTask() != null && synchroManager.getCurrentTask().getValueTable().getName()
-            .equals(table.getName())) {
-          progress = synchroManager.getCurrentTask().getProgress();
-        }
-
-        URI link = UriBuilder.fromPath("/").path(ValueTableIndexResource.class)
-            .build(datasource.getName(), table.getName());
-        Opal.TableIndexStatusDto tableStatusDto = Opal.TableIndexStatusDto.newBuilder()
-            .setDatasource(datasource.getName()).setTable(table.getName())
-            .setSchedule(getScheduleDto(datasource.getName(), table.getName()))
-            .setStatus(getTableIndexationStatus(datasource.getName(), table.getName())).setProgress(progress)
-            .setLink(link.getPath()).setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
-
-        if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
-          tableStatusDto = tableStatusDto.toBuilder()
-              .setIndexCreated(indexManager.getIndex(valueTable).getTimestamps().getCreated().toString()).build();
-        }
-        if(!indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
-          tableStatusDto = tableStatusDto.toBuilder()
-              .setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
-        }
-        tableStatusDtos.add(tableStatusDto);
+    for(Datasource datasource : MagmaEngine.get().getDatasources()) {
+      for(ValueTable valueTable : datasource.getValueTables()) {
+        tableStatusDtos.add(getTableStatusDto(datasource, valueTable));
       }
     }
 
     return tableStatusDtos;
   }
+
+  private Opal.TableIndexStatusDto getTableStatusDto(Datasource datasource, ValueTable valueTable) {
+    float progress = 0f;
+    if(synchroManager.getCurrentTask() != null && synchroManager.getCurrentTask().getValueTable().getName()
+        .equals(valueTable.getName())) {
+      progress = synchroManager.getCurrentTask().getProgress();
+    }
+
+    URI link = UriBuilder.fromPath("/").path(ValueTableIndexResource.class)
+        .build(datasource.getName(), valueTable.getName());
+    Opal.TableIndexStatusDto tableStatusDto = Opal.TableIndexStatusDto.newBuilder().setDatasource(datasource.getName())
+        .setTable(valueTable.getName()).setSchedule(getScheduleDto(datasource.getName(), valueTable.getName()))
+        .setStatus(getTableIndexationStatus(datasource.getName(), valueTable.getName())).setProgress(progress)
+        .setLink(link.getPath()).setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
+
+    if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
+      tableStatusDto = tableStatusDto.toBuilder()
+          .setIndexCreated(indexManager.getIndex(valueTable).getTimestamps().getCreated().toString()).build();
+    }
+    if(!indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
+      tableStatusDto = tableStatusDto.toBuilder()
+          .setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
+    }
+
+    return tableStatusDto;
+  }
+
 }

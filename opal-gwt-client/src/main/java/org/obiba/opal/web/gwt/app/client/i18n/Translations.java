@@ -1431,6 +1431,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Saturday")
   String saturdayLabel();
 
+  @Description("minutes")
+  @DefaultStringValue("minutes")
+  String minutesLabel();
+
   @Description("Select some Tables label")
   @DefaultStringValue("Select some tables...")
   String selectSomeTables();

@@ -87,17 +87,12 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   }
 
   private void displaySchedule(ScheduleDto dto) {
-    getView().getType().setText(dto.getType().getName());
-    getView().getDay().setText(dto.getDay().getName());
-    getView().getHours().setText(String.valueOf(dto.getHours()));
-    getView().getMinutes().setText(String.valueOf(dto.getMinutes()));
+    getView().setSchedule(dto);
   }
 
   private void updateSchedule() {
-
     ScheduleDto dto = getScheduleDto();
     for(TableIndexStatusDto tableIndexStatusDto : tableIndexStatusDtos) {
-
       putSchedule(tableIndexStatusDto.getDatasource(), tableIndexStatusDto.getTable(), dto);
     }
   }
@@ -111,51 +106,60 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
   private ScheduleDto getScheduleDto() {
     ScheduleDto dto = ScheduleDto.create();
+    ScheduleType type = getScheduleTypeFromName(getView().getSelectedType());
+    dto.setType(type);
 
-    if(getView().getType().getText().equals(ScheduleType.MINUTES_5.getName())) {
-      dto.setType(ScheduleType.MINUTES_5);
-      return dto;
-    } else if(getView().getType().getText().equals(ScheduleType.MINUTES_15.getName())) {
-      dto.setType(ScheduleType.MINUTES_15);
-      return dto;
-    } else if(getView().getType().getText().equals(ScheduleType.MINUTES_30.getName())) {
-      dto.setType(ScheduleType.MINUTES_30);
-      return dto;
-    } else if(getView().getType().getText().equals(ScheduleType.HOURLY.getName())) {
-      dto.setType(ScheduleType.HOURLY);
-      dto.setMinutes(Integer.parseInt(getView().getMinutes().getText()));
-      return dto;
-    } else if(getView().getType().getText().equals(ScheduleType.DAILY.getName())) {
-      dto.setType(ScheduleType.DAILY);
-      dto.setHours(Integer.parseInt(getView().getHours().getText()));
-      dto.setMinutes(Integer.parseInt(getView().getMinutes().getText()));
-      return dto;
-    } else if(getView().getType().getText().equals(ScheduleType.WEEKLY.getName())) {
-      dto.setType(ScheduleType.WEEKLY);
-      dto.setHours(Integer.parseInt(getView().getHours().getText()));
-      dto.setMinutes(Integer.parseInt(getView().getMinutes().getText()));
-
-      if(getView().getDay().getText().equals(Day.SUNDAY.getName())) {
-        dto.setDay(Day.SUNDAY);
-      } else if(getView().getDay().getText().equals(Day.MONDAY.getName())) {
-        dto.setDay(Day.MONDAY);
-      } else if(getView().getDay().getText().equals(Day.TUESDAY.getName())) {
-        dto.setDay(Day.TUESDAY);
-      } else if(getView().getDay().getText().equals(Day.WEDNESDAY.getName())) {
-        dto.setDay(Day.WEDNESDAY);
-      } else if(getView().getDay().getText().equals(Day.THURSDAY.getName())) {
-        dto.setDay(Day.THURSDAY);
-      } else if(getView().getDay().getText().equals(Day.FRIDAY.getName())) {
-        dto.setDay(Day.FRIDAY);
-      } else if(getView().getDay().getText().equals(Day.SATURDAY.getName())) {
-        dto.setDay(Day.SATURDAY);
-      }
-
-      return dto;
+    if(type.equals(ScheduleType.HOURLY)) {
+      dto.setMinutes(getView().getSelectedMinutes());
+    } else if(type.equals(ScheduleType.DAILY)) {
+      dto.setHours(getView().getSelectedHours());
+      dto.setMinutes(getView().getSelectedMinutes());
+    } else if(type.equals(ScheduleType.WEEKLY)) {
+      dto.setHours(getView().getSelectedHours());
+      dto.setMinutes(getView().getSelectedMinutes());
+      dto.setDay(getDayFromName(getView().getSelectedDay()));
     }
 
-    dto.setType(ScheduleType.NOT_SCHEDULED);
     return dto;
+  }
+
+  @SuppressWarnings("PMD.NcssMethodCount")
+  private ScheduleType getScheduleTypeFromName(String type) {
+    if(type.equals(ScheduleType.MINUTES_5.getName())) {
+      return ScheduleType.MINUTES_5;
+    } else if(type.equals(ScheduleType.MINUTES_15.getName())) {
+      return ScheduleType.MINUTES_15;
+    } else if(type.equals(ScheduleType.MINUTES_30.getName())) {
+      return ScheduleType.MINUTES_30;
+    } else if(type.equals(ScheduleType.HOURLY.getName())) {
+      return ScheduleType.HOURLY;
+    } else if(type.equals(ScheduleType.DAILY.getName())) {
+      return ScheduleType.DAILY;
+    } else if(type.equals(ScheduleType.WEEKLY.getName())) {
+      return ScheduleType.WEEKLY;
+    } else {
+      return ScheduleType.NOT_SCHEDULED;
+    }
+  }
+
+  @SuppressWarnings("PMD.NcssMethodCount")
+  private Day getDayFromName(String day) {
+    if(day.equals(Day.SUNDAY.getName())) {
+      return Day.SUNDAY;
+    } else if(day.equals(Day.MONDAY.getName())) {
+      return Day.MONDAY;
+    } else if(day.equals(Day.TUESDAY.getName())) {
+      return Day.TUESDAY;
+    } else if(day.equals(Day.WEDNESDAY.getName())) {
+      return Day.WEDNESDAY;
+    } else if(day.equals(Day.THURSDAY.getName())) {
+      return Day.THURSDAY;
+    } else if(day.equals(Day.FRIDAY.getName())) {
+      return Day.FRIDAY;
+    } else if(day.equals(Day.SATURDAY.getName())) {
+      return Day.SATURDAY;
+    }
+    return Day.MONDAY;
   }
 
   //
@@ -204,13 +208,15 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
     HasClickHandlers getCancelButton();
 
-    HasText getType();
+    String getSelectedType();
 
-    HasText getDay();
+    String getSelectedDay();
 
-    HasText getHours();
+    int getSelectedHours();
 
-    HasText getMinutes();
+    int getSelectedMinutes();
+
+    void setSchedule(ScheduleDto dto);
   }
 
 }
