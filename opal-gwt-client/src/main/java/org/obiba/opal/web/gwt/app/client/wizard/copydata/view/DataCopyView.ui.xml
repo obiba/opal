@@ -22,7 +22,7 @@
             <g:Label addStyleNames="key">
               <ui:msg description="Destination field">Destination</ui:msg>
             </g:Label>
-            <g:ListBox ui:field="datasources"/>
+            <o:Chooser ui:field="datasources"/>
           </g:FlowPanel>
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key">

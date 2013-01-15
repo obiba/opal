@@ -1,13 +1,14 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
   <ui:style>
-    .progress { margin: 5px; }
+    .progress {
+      margin: 5px;
+    }
   </ui:style>
 
 
@@ -19,10 +20,10 @@
       <g:FlowPanel addStyleNames="navigationPanel">
         <g:SuggestBox ui:field="variableNameSuggestBox" addStyleNames="small-indent"/>
         <g:Anchor ui:field="previous">
-          <img src="image/16/previous.png" alt="" />
+          <img src="image/16/previous.png" alt=""/>
         </g:Anchor>
         <g:Anchor ui:field="next">
-          <img src="image/16/next.png" alt="" />
+          <img src="image/16/next.png" alt=""/>
         </g:Anchor>
         <g:Button ui:field="addButton" styleName="btn small-indent">
           <ui:msg description="Add button label">Add</ui:msg>
@@ -35,26 +36,46 @@
         <ui:msg description="Save changes button label">Save Changes</ui:msg>
       </g:Button>
       <g:Image ui:field="inProgressImg" url="image/in-progress.gif" visible="false"
-               addStyleNames="right-aligned small-indent {style.progress}" />
+               addStyleNames="right-aligned small-indent {style.progress}"/>
     </g:FlowPanel>
-    
+
     <g:FlowPanel addStyleNames="form">
       <g:FlowPanel addStyleNames="input inline-block">
-        <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+        <g:Label addStyleNames="key">
+          <ui:msg description="Name label">Name</ui:msg>
+        </g:Label>
         <g:TextBox ui:field="variableName" width="15em" enabled="false"/>
       </g:FlowPanel>
       <g:FlowPanel addStyleNames="input inline-block indent">
-        <g:Label addStyleNames="key"><ui:msg description="Value Type label">Value Type</ui:msg></g:Label>
-        <g:ListBox ui:field="valueType">
-          <g:item value="text"><ui:msg description="Text label">text</ui:msg></g:item>
-          <g:item value="decimal"><ui:msg description="Decimal label">decimal</ui:msg></g:item>            
-          <g:item value="integer"><ui:msg description="Integer label">integer</ui:msg></g:item>            
-          <g:item value="binary"><ui:msg description="Binary label">binary</ui:msg></g:item>            
-          <g:item value="boolean"><ui:msg description="Boolean label">boolean</ui:msg></g:item>
-          <g:item value="datetime"><ui:msg description="Datetime label">datetime</ui:msg></g:item>            
-          <g:item value="date"><ui:msg description="Date label">date</ui:msg></g:item>            
-          <g:item value="locale"><ui:msg description="Locale label">locale</ui:msg></g:item>            
-        </g:ListBox>
+        <g:Label addStyleNames="key">
+          <ui:msg description="Value Type label">Value Type</ui:msg>
+        </g:Label>
+        <o:Chooser ui:field="valueType">
+          <g:item value="text">
+            <ui:msg description="Text label">text</ui:msg>
+          </g:item>
+          <g:item value="decimal">
+            <ui:msg description="Decimal label">decimal</ui:msg>
+          </g:item>
+          <g:item value="integer">
+            <ui:msg description="Integer label">integer</ui:msg>
+          </g:item>
+          <g:item value="binary">
+            <ui:msg description="Binary label">binary</ui:msg>
+          </g:item>
+          <g:item value="boolean">
+            <ui:msg description="Boolean label">boolean</ui:msg>
+          </g:item>
+          <g:item value="datetime">
+            <ui:msg description="Datetime label">datetime</ui:msg>
+          </g:item>
+          <g:item value="date">
+            <ui:msg description="Date label">date</ui:msg>
+          </g:item>
+          <g:item value="locale">
+            <ui:msg description="Locale label">locale</ui:msg>
+          </g:item>
+        </o:Chooser>
       </g:FlowPanel>
       <g:FlowPanel addStyleNames="input inline-block indent">
         <g:CheckBox ui:field="repeatableCheckbox" addStyleNames="key">
@@ -62,36 +83,52 @@
         </g:CheckBox>
       </g:FlowPanel>
     </g:FlowPanel>
-    
+
     <o:HorizontalTabLayout ui:field="variableDetailTabs" addStyleNames="top-margin">
-        <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
-        <g:SimplePanel ui:field="scriptWidgetPanel" addStyleNames="small-top-margin"/>
-    
-        <g:Anchor><ui:msg description="Categories label">Categories</ui:msg></g:Anchor>
-        <g:FlowPanel ui:field="categories" />
+      <g:Anchor>
+        <ui:msg description="Script label">Script</ui:msg>
+      </g:Anchor>
+      <g:SimplePanel ui:field="scriptWidgetPanel" addStyleNames="small-top-margin"/>
 
-        <g:Anchor><ui:msg description="Attributes label">Attributes</ui:msg></g:Anchor>
-        <g:FlowPanel ui:field="attributes" />
+      <g:Anchor>
+        <ui:msg description="Categories label">Categories</ui:msg>
+      </g:Anchor>
+      <g:FlowPanel ui:field="categories"/>
 
-        <g:Anchor><ui:msg description="Options label">Options</ui:msg></g:Anchor>
-        <g:FlowPanel>
-          <g:FlowPanel addStyleNames="input">
-            <g:Label addStyleNames="key"><ui:msg description="Occurrence group label">Occurrence Group</ui:msg></g:Label>
-            <g:TextBox  enabled="false" ui:field="occurrenceGroup"/>
-          </g:FlowPanel>
-          <g:FlowPanel addStyleNames="input">
-            <g:Label addStyleNames="key"><ui:msg description="Unit label">Unit</ui:msg></g:Label>
-            <g:TextBox ui:field="unit"/>
-          </g:FlowPanel>
-          <g:FlowPanel addStyleNames="input">
-            <g:Label addStyleNames="key"><ui:msg description="Mime type label">Mime-Type</ui:msg></g:Label>
-            <g:TextBox ui:field="mimeType"/>
-          </g:FlowPanel>
+      <g:Anchor>
+        <ui:msg description="Attributes label">Attributes</ui:msg>
+      </g:Anchor>
+      <g:FlowPanel ui:field="attributes"/>
+
+      <g:Anchor>
+        <ui:msg description="Options label">Options</ui:msg>
+      </g:Anchor>
+      <g:FlowPanel>
+        <g:FlowPanel addStyleNames="input">
+          <g:Label addStyleNames="key">
+            <ui:msg description="Occurrence group label">Occurrence Group</ui:msg>
+          </g:Label>
+          <g:TextBox enabled="false" ui:field="occurrenceGroup"/>
         </g:FlowPanel>
-  
-        <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>
-        <g:SimplePanel ui:field="summaryTabPanel" width="100%" />
-        
+        <g:FlowPanel addStyleNames="input">
+          <g:Label addStyleNames="key">
+            <ui:msg description="Unit label">Unit</ui:msg>
+          </g:Label>
+          <g:TextBox ui:field="unit"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="input">
+          <g:Label addStyleNames="key">
+            <ui:msg description="Mime type label">Mime-Type</ui:msg>
+          </g:Label>
+          <g:TextBox ui:field="mimeType"/>
+        </g:FlowPanel>
+      </g:FlowPanel>
+
+      <g:Anchor>
+        <ui:msg description="Summary tab title">Summary</ui:msg>
+      </g:Anchor>
+      <g:SimplePanel ui:field="summaryTabPanel" width="100%"/>
+
     </o:HorizontalTabLayout>
   </g:FlowPanel>
 </ui:UiBinder>

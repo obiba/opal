@@ -1,11 +1,12 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
+    .optionsPanelMsg td {
+      margin: 0.5em 0.5em 0.5em 0.5em;
+    }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
@@ -14,41 +15,55 @@
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Name label">Name</ui:msg>
+              </g:Label>
               <g:TextBox name="name" ui:field="name"/>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Driver label">Driver</ui:msg></g:Label>
-              <g:ListBox name="driver" ui:field="driver"/>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Driver label">Driver</ui:msg>
+              </g:Label>
+              <o:Chooser name="driver" ui:field="driver"/>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Url label">Url</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Url label">Url</ui:msg>
+              </g:Label>
               <g:TextBox name="url" ui:field="url" addStyleNames="span4"/>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Username label">Username</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Username label">Username</ui:msg>
+              </g:Label>
               <g:TextBox name="username" ui:field="username"/>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Password label">Password</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Password label">Password</ui:msg>
+              </g:Label>
               <g:PasswordTextBox name="password" ui:field="password"/>
             </g:FlowPanel>
 
             <g:DisclosurePanel>
               <g:customHeader>
-                <g:Label><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:Label>
+                <g:Label>
+                  <ui:msg description="Advanced Options label">Advanced Options</ui:msg>
+                </g:Label>
               </g:customHeader>
               <g:FlowPanel>
                 <g:FlowPanel styleName="input">
-                  <g:Label addStyleNames="key"><ui:msg description="Properties">Properties</ui:msg></g:Label>
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="Properties">Properties</ui:msg>
+                  </g:Label>
                   <g:TextArea ui:field="properties"/>
                 </g:FlowPanel>
               </g:FlowPanel>
-            </g:DisclosurePanel>    
+            </g:DisclosurePanel>
           </g:FlowPanel>
         </g:ScrollPanel>
       </g:center>

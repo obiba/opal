@@ -17,7 +17,7 @@
           <g:Button ui:field="downloadExcelTemplateButton" styleName="btn btn-info small-indent"><ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template</ui:msg></g:Button>
           <g:FlowPanel styleName="input">
             <g:Label ui:field="destinationLabel" addStyleNames="key" visible="false"><ui:msg description="Destination Datasource label">Destination Datasource</ui:msg></g:Label>
-            <g:ListBox ui:field="datasources" name="datasources" visible="false"/>
+            <o:Chooser ui:field="datasources" name="datasources" visible="false"/>
           </g:FlowPanel> 
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Variables File label">Variables File</ui:msg></g:Label>

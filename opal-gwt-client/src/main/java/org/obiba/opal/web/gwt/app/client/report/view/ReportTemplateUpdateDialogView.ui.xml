@@ -1,16 +1,23 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"  
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
   <ui:style>
-    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
-    .right-aligned { float: right; }
+    .optionsPanelMsg td {
+      margin: 0.5em 0.5em 0.5em 0.5em;
+    }
+
+    .right-aligned {
+      float: right;
+    }
+
     .top-margin {
-    margin-top: 0.5em; }
+      margin-top: 0.5em;
+    }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
@@ -22,27 +29,37 @@
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main">
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Name label">Name</ui:msg>
+              </g:Label>
               <g:TextBox name="reportTemplateName" ui:field="reportTemplateName"/>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="BIRT Design File label">BIRT Design File</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="BIRT Design File label">BIRT Design File</ui:msg>
+              </g:Label>
               <g:SimplePanel ui:field="designFilePanel"/>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Format label">Format</ui:msg></g:Label>
-              <g:ListBox ui:field="format">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Format label">Format</ui:msg>
+              </g:Label>
+              <o:Chooser ui:field="format">
                 <g:item value="pdf">PDF</g:item>
                 <g:item value="html">Html</g:item>
                 <g:item value="excel">Excel</g:item>
-              </g:ListBox>
+              </o:Chooser>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Parameters label">Parameters</ui:msg></g:Label>
-              <g:SimplePanel addStyleNames="widget" ui:field="reportParametersPanel"/>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Parameters label">Parameters</ui:msg>
+              </g:Label>
+              <g:SimplePanel ui:field="reportParametersPanel"/>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Scheduling label">Scheduling</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Scheduling label">Scheduling</ui:msg>
+              </g:Label>
               <g:RadioButton name="schedule" ui:field="runManuallyRadio" checked="true" addStyleNames="block">
                 <ui:msg description="Run manually label">Run manually</ui:msg>
               </g:RadioButton>
@@ -52,105 +69,122 @@
                 </g:RadioButton>
                 <g:TextBox addStyleNames="text" name="schedule" ui:field="schedule"/>
                 <o:HelpImage imageSize="16" tooltipWidth="400px" addStyleNames="xsmall-indent">
-                    <g:HTMLPanel>
-                      <g:Label addStyleNames="title"><ui:msg description="Schedule Expression label">Schedule Expression</ui:msg></g:Label>
-                      <p>
-                        <ui:msg description="Schedule Expression information">
-                        A schedule expression is a string comprised of 6 or 7 fields separated by white space. Fields can contain any of the allowed values, along with various combinations of the allowed special characters for that field.
-                        </ui:msg>
-                      </p>
-                      <p>
-                        Full documentation is available as a <g:Anchor ui:field="cronLink">Quartz Scheduler Tutorial</g:Anchor>.
-                      </p>
-                      <table class="table table-bordered table-striped" cellspacing="1" cellpadding="3">
-					    <tbody>
-					        <tr>
-					            <th>Field Name</th>
-					            <th>Mandatory</th>
-					            <th>Allowed Values</th>
-					            <th>Allowed Special Characters</th>
-					        </tr>
-					        <tr>
-					            <td>Seconds</td>
-					            <td>YES</td>
-					            <td>0-59</td>
-					            <td>, - * /</td>
-					        </tr>
-					        <tr>
-					            <td>Minutes</td>
-					            <td>YES</td>
-					            <td>0-59</td>
-					            <td>, - * /</td>
-					        </tr>
-					        <tr>
-					            <td>Hours</td>
-					            <td>YES</td>
-					            <td>0-23</td>
-					            <td>, - * /</td>
-					        </tr>
-					        <tr>
-					            <td>Day of month</td>
-					            <td>YES</td>
-					            <td>1-31</td>
-					            <td>, - * ? / L W</td>
-					        </tr>
-					        <tr>
-					            <td>Month</td>
-					            <td>YES</td>
-					            <td>1-12 or JAN-DEC</td>
-					            <td>, - * /</td>
-					        </tr>
-					        <tr>
-					            <td>Day of week</td>
-					            <td>YES</td>
-					            <td>1-7 or SUN-SAT</td>
-					            <td>, - * ? / L #</td>
-					        </tr>
-					        <tr>
-					            <td>Year</td>
-					            <td>NO</td>
-					            <td>empty, 1970-2099</td>
-					            <td>, - * /</td>
-					        </tr>
-					    </tbody>
-					  </table>
-			            <p>
-			              Common schedule expressions examples:
-			            </p>
-			            <table class="table table-bordered table-striped" cellspacing="1" cellpadding="3">
-						    <tbody>
-						        <tr>
-						            <th>Expression</th>
-						            <th>Meaning</th>
-						        </tr>
-						        <tr>
-						            <td class="nowrap"><tt>0 15 10 ? * *</tt></td>
-						            <td>Fire at 10:15am every day</td>
-						        </tr>
-						        <tr>
-						            <td class="nowrap"><tt>0 15 10 ? * MON-FRI</tt></td>
-						            <td>Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday</td>
-						        </tr>
-						        <tr>
-						            <td class="nowrap"><tt>0 15 10 15 * ?</tt></td>
-						            <td>Fire at 10:15am on the 15th day of every month</td>
-						        </tr>
-						        <tr>
-						            <td class="nowrap"><tt>0 10,44 14 ? 3 WED</tt></td>
-						            <td>Fire at 2:10pm and at 2:44pm every Wednesday in the month of March.</td>
-						        </tr>
-						        <tr>
-						            <td class="nowrap"><tt>0 15 10 ? * 6#3</tt></td>
-						            <td>Fire at 10:15am on the third Friday of every month</td>
-						        </tr>
-						    </tbody>
-						</table>
-                    </g:HTMLPanel>
-                  </o:HelpImage>
+                  <g:HTMLPanel>
+                    <g:Label addStyleNames="title">
+                      <ui:msg description="Schedule Expression label">Schedule Expression</ui:msg>
+                    </g:Label>
+                    <p>
+                      <ui:msg description="Schedule Expression information">
+                        A schedule expression is a string comprised of 6 or 7 fields separated by white space. Fields
+                        can contain any of the allowed values, along with various combinations of the allowed special
+                        characters for that field.
+                      </ui:msg>
+                    </p>
+                    <p>
+                      Full documentation is available as a<g:Anchor ui:field="cronLink">Quartz Scheduler
+                      Tutorial</g:Anchor>.
+                    </p>
+                    <table class="table table-bordered table-striped" cellspacing="1" cellpadding="3">
+                      <tbody>
+                        <tr>
+                          <th>Field Name</th>
+                          <th>Mandatory</th>
+                          <th>Allowed Values</th>
+                          <th>Allowed Special Characters</th>
+                        </tr>
+                        <tr>
+                          <td>Seconds</td>
+                          <td>YES</td>
+                          <td>0-59</td>
+                          <td>, - * /</td>
+                        </tr>
+                        <tr>
+                          <td>Minutes</td>
+                          <td>YES</td>
+                          <td>0-59</td>
+                          <td>, - * /</td>
+                        </tr>
+                        <tr>
+                          <td>Hours</td>
+                          <td>YES</td>
+                          <td>0-23</td>
+                          <td>, - * /</td>
+                        </tr>
+                        <tr>
+                          <td>Day of month</td>
+                          <td>YES</td>
+                          <td>1-31</td>
+                          <td>, - * ? / L W</td>
+                        </tr>
+                        <tr>
+                          <td>Month</td>
+                          <td>YES</td>
+                          <td>1-12 or JAN-DEC</td>
+                          <td>, - * /</td>
+                        </tr>
+                        <tr>
+                          <td>Day of week</td>
+                          <td>YES</td>
+                          <td>1-7 or SUN-SAT</td>
+                          <td>, - * ? / L #</td>
+                        </tr>
+                        <tr>
+                          <td>Year</td>
+                          <td>NO</td>
+                          <td>empty, 1970-2099</td>
+                          <td>, - * /</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <p>
+                      Common schedule expressions examples:
+                    </p>
+                    <table class="table table-bordered table-striped" cellspacing="1" cellpadding="3">
+                      <tbody>
+                        <tr>
+                          <th>Expression</th>
+                          <th>Meaning</th>
+                        </tr>
+                        <tr>
+                          <td class="nowrap">
+                            <tt>0 15 10 ? * *</tt>
+                          </td>
+                          <td>Fire at 10:15am every day</td>
+                        </tr>
+                        <tr>
+                          <td class="nowrap">
+                            <tt>0 15 10 ? * MON-FRI</tt>
+                          </td>
+                          <td>Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday</td>
+                        </tr>
+                        <tr>
+                          <td class="nowrap">
+                            <tt>0 15 10 15 * ?</tt>
+                          </td>
+                          <td>Fire at 10:15am on the 15th day of every month</td>
+                        </tr>
+                        <tr>
+                          <td class="nowrap">
+                            <tt>0 10,44 14 ? 3 WED</tt>
+                          </td>
+                          <td>Fire at 2:10pm and at 2:44pm every Wednesday in the month of March.</td>
+                        </tr>
+                        <tr>
+                          <td class="nowrap">
+                            <tt>0 15 10 ? * 6#3</tt>
+                          </td>
+                          <td>Fire at 10:15am on the third Friday of every month</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </g:HTMLPanel>
+                </o:HelpImage>
               </g:FlowPanel>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Notification Emails label">Notification Emails</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Notification Emails label">Notification Emails</ui:msg>
+              </g:Label>
               <g:SimplePanel ui:field="notificationEmailsPanel"/>
             </g:FlowPanel>
           </g:FlowPanel>

@@ -1,39 +1,54 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"  
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
-  
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
   <g:FlowPanel>
     <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="Database label">Database</ui:msg></g:Label>
-      <g:ListBox ui:field="database" visibleItemCount="1"/>
+      <g:Label addStyleNames="key">
+        <ui:msg description="Database label">Database</ui:msg>
+      </g:Label>
+      <o:Chooser ui:field="database"/>
     </g:FlowPanel>
-    
+
     <g:DisclosurePanel>
       <g:customHeader>
-        <g:Label><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Advanced Options label">Advanced Options</ui:msg>
+        </g:Label>
       </g:customHeader>
       <g:FlowPanel>
         <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg></g:Label>
+          <g:Label addStyleNames="key">
+            <ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg>
+          </g:Label>
           <g:TextBox ui:field="defaultCreatedTimestampColumnName"/>
         </g:FlowPanel>
         <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg></g:Label>
+          <g:Label addStyleNames="key">
+            <ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg>
+          </g:Label>
           <g:TextBox ui:field="defaultUpdatedTimestampColumnName"/>
         </g:FlowPanel>
         <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Include meta-data tables label">Include meta-data tables</ui:msg></g:Label>
-          <g:RadioButton name="includeMetaDataTablesGroup" ui:field="useMetadataTablesOption" addStyleNames="top-margin"><ui:msg description="Yes label">Yes</ui:msg></g:RadioButton>
-          <g:RadioButton name="includeMetaDataTablesGroup" ui:field="doNotUseMetadataTablesOption" addStyleNames="top-margin"><ui:msg description="No label">No</ui:msg></g:RadioButton>
+          <g:Label addStyleNames="key">
+            <ui:msg description="Include meta-data tables label">Include meta-data tables</ui:msg>
+          </g:Label>
+          <g:RadioButton name="includeMetaDataTablesGroup" ui:field="useMetadataTablesOption"
+                         addStyleNames="top-margin">
+            <ui:msg description="Yes label">Yes</ui:msg>
+          </g:RadioButton>
+          <g:RadioButton name="includeMetaDataTablesGroup" ui:field="doNotUseMetadataTablesOption"
+                         addStyleNames="top-margin">
+            <ui:msg description="No label">No</ui:msg>
+          </g:RadioButton>
         </g:FlowPanel>
       </g:FlowPanel>
-    </g:DisclosurePanel>    
-    
+    </g:DisclosurePanel>
+
   </g:FlowPanel>
-  
 
 
-  
 </ui:UiBinder>

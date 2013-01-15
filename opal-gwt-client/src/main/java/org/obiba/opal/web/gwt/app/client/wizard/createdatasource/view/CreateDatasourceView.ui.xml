@@ -1,10 +1,10 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
-  
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
   <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="42em">
     <g:caption>
       <ui:msg description="Create Datasource title">Create Datasource</ui:msg>
@@ -13,18 +13,19 @@
       <o:WizardStep ui:field="selectTypeStep">
         <g:FlowPanel>
           <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Name label">Name</ui:msg>
+            </g:Label>
             <g:TextBox ui:field="datasourceName"/>
           </g:FlowPanel>
           <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key"><ui:msg description="Type label">Type</ui:msg></g:Label>
-            <g:ListBox ui:field="datasourceType" visibleItemCount="1">
-	          <g:item value="hibernate"></g:item>
-	          <g:item value="jdbc"></g:item>
-<!--	      <g:item value="jdbc"></g:item>-->
-<!--	      <g:item value="csv"></g:item>-->
-<!--	      <g:item value="excel"></g:item>-->
-	        </g:ListBox>
+            <g:Label addStyleNames="key">
+              <ui:msg description="Type label">Type</ui:msg>
+            </g:Label>
+            <o:Chooser ui:field="datasourceType">
+              <g:item value="hibernate"></g:item>
+              <g:item value="jdbc"></g:item>
+            </o:Chooser>
           </g:FlowPanel>
         </g:FlowPanel>
       </o:WizardStep>
@@ -34,47 +35,61 @@
       </o:WizardStep>
       <!-- Help panel TODO -->
       <g:HTMLPanel ui:field="helpPanel">
-          <g:Label addStyleNames="title"><ui:msg description="Opal Native Datasource creation label">Opal Native</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Opal Native Datasource creation information">
+        <g:Label addStyleNames="title">
+          <ui:msg description="Opal Native Datasource creation label">Opal Native</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Opal Native Datasource creation information">
             Opal built-in datasource type: row-oriented SQL database that can store any kind of data.
-            </ui:msg>
-          </p>
-          
-          <g:Label addStyleNames="title"><ui:msg description="Excel Datasource creation label">Excel</ui:msg></g:Label>
-          <p>
-            <ui:msg description="Excel Datasource creation information">
-            With Excel datasources, you can use Opal interfaces and tools to work with data and meta-data contained in an Excel file without any data importation.
-            </ui:msg>
-          </p>
-          
-          <g:Label addStyleNames="title"><ui:msg description="CSV Datasource creation label">CSV</ui:msg></g:Label>
-          <p>
-            <ui:msg description="CSV Datasource creation information">
-            With CSV datasources, you can use Opal interfaces and tools to work on data and meta-data contained in a csv file without importing any data.
-            </ui:msg>
-          </p>
-          
-          <g:Label addStyleNames="title"><ui:msg description="SQL Datasource creation label">SQL</ui:msg></g:Label>
-          <p>
-            <ui:msg description="SQL Datasource creation information">
-            SQL datasources are suitable for datasets with a small number of fields. Data copied into SQL datasource are stored in classical SQL tables, i.e one row per entity and one field per column.
-Provide database connection parameters for the database you want to create the SQL tables in.
-Comprehensive meta-data for each column field can be optionaly stored in two separated tables.
-Opal is able to increment copies into SQL datasources if timestamp column are given.
-            </ui:msg>
-          </p>
-          
-          <g:Label addStyleNames="title"><ui:msg description="XML Datasource creation label">XML</ui:msg></g:Label>
-          <p>
-            <ui:msg description="XML Datasource creation information">
-            With XML datasources, you can use Opal interfaces and tools to work with data and meta-data files obtained from the OBiBa Onyx sofware without importing any data.
-            </ui:msg>
-          </p>
-          
-        </g:HTMLPanel>
-      
-    </g:FlowPanel>     
+          </ui:msg>
+        </p>
+
+        <g:Label addStyleNames="title">
+          <ui:msg description="Excel Datasource creation label">Excel</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="Excel Datasource creation information">
+            With Excel datasources, you can use Opal interfaces and tools to work with data and meta-data contained in
+            an Excel file without any data importation.
+          </ui:msg>
+        </p>
+
+        <g:Label addStyleNames="title">
+          <ui:msg description="CSV Datasource creation label">CSV</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="CSV Datasource creation information">
+            With CSV datasources, you can use Opal interfaces and tools to work on data and meta-data contained in a csv
+            file without importing any data.
+          </ui:msg>
+        </p>
+
+        <g:Label addStyleNames="title">
+          <ui:msg description="SQL Datasource creation label">SQL</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="SQL Datasource creation information">
+            SQL datasources are suitable for datasets with a small number of fields. Data copied into SQL datasource are
+            stored in classical SQL tables, i.e one row per entity and one field per column.
+            Provide database connection parameters for the database you want to create the SQL tables in.
+            Comprehensive meta-data for each column field can be optionaly stored in two separated tables.
+            Opal is able to increment copies into SQL datasources if timestamp column are given.
+          </ui:msg>
+        </p>
+
+        <g:Label addStyleNames="title">
+          <ui:msg description="XML Datasource creation label">XML</ui:msg>
+        </g:Label>
+        <p>
+          <ui:msg description="XML Datasource creation information">
+            With XML datasources, you can use Opal interfaces and tools to work with data and meta-data files obtained
+            from the OBiBa Onyx sofware without importing any data.
+          </ui:msg>
+        </p>
+
+      </g:HTMLPanel>
+
+    </g:FlowPanel>
   </o:WizardDialogBox>
 
 </ui:UiBinder>

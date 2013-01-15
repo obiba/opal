@@ -1,9 +1,12 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .top-margin { margin-top: 0.5em; }
+    .top-margin {
+      margin-top: 0.5em;
+    }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
@@ -14,19 +17,34 @@
       <g:center>
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main">
-          	<g:Label><ui:msg description="Coding View title">Categorical variables will be automatically recoded with numbers. Other variables can be optionally duplicated.</ui:msg></g:Label>
+            <g:Label>
+              <ui:msg description="Coding View title">Categorical variables will be automatically recoded with numbers.
+                Other variables can be optionally duplicated.
+              </ui:msg>
+            </g:Label>
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
-              <g:ListBox ui:field="datasourceNameBox"></g:ListBox>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Datasource label">Datasource</ui:msg>
+              </g:Label>
+              <o:Chooser ui:field="datasourceNameBox"/>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="View label">View</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="View label">View</ui:msg>
+              </g:Label>
               <g:TextBox ui:field="viewNameBox"/>
-              <g:Label styleName="help-block"><ui:msg description="Coding View Name Help label">Name of the view that will be created with the derived variables</ui:msg></g:Label>
+              <g:Label styleName="help-block">
+                <ui:msg description="Coding View Name Help label">Name of the view that will be created with the derived
+                  variables
+                </ui:msg>
+              </g:Label>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-          	  <g:CheckBox ui:field="duplicateCheck"><ui:msg description="Duplicate non-categorical Variables label">Duplicate non-categorical variables</ui:msg></g:CheckBox>
-          	</g:FlowPanel>
+              <g:CheckBox ui:field="duplicateCheck">
+                <ui:msg description="Duplicate non-categorical Variables label">Duplicate non-categorical variables
+                </ui:msg>
+              </g:CheckBox>
+            </g:FlowPanel>
           </g:FlowPanel>
         </g:ScrollPanel>
       </g:center>
