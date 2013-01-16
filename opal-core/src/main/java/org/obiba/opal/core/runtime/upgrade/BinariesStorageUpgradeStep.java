@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -72,7 +72,6 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
     OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration();
     JdbcDataSourcesConfig dataSourcesConfig = configuration.getExtension(JdbcDataSourcesConfig.class);
     for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
-      log.debug("Found datasource {}", jdbcDataSource.getUrl());
       dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
     }
 
@@ -85,7 +84,6 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
 
       log.debug("Process dataSource {}", dataSource);
       if(hasHibernateDatasource(dataSource)) {
-        log.debug("Process Hibernate Datasource for {}", dataSource);
         upgradeSchema(currentVersion, dataSource, dataSourceName);
         moveBinary(dataSource, dataSourceName);
       }
@@ -126,73 +124,123 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
 
     try {
 
-      final JdbcTemplate template = new JdbcTemplate(dataSource);
+      JdbcTemplate template = new JdbcTemplate(dataSource);
+
+      int count = template.queryForInt("SELECT COUNT(id) FROM value_set_value WHERE value_type = ?", "binary");
+      log.info("Database {}: {} binaries to move", name, count);
+
       template.query("SELECT id, created, updated, is_sequence FROM value_set_value WHERE value_type = ?",
-          new Object[] { "binary" }, new RowCallbackHandler() {
-
-        @Override
-        public void processRow(ResultSet rs) throws SQLException {
-          int valueSetValueId = rs.getInt("id");
-          log.debug("Process value_set_id {}", valueSetValueId);
-
-          String stringValue = template
-              .queryForObject("SELECT value FROM value_set_value WHERE id = ?", new Object[] { valueSetValueId },
-                  String.class);
-          Value newValue = null;
-          if(rs.getBoolean("is_sequence")) {
-            ValueSequence valueSequence = BinaryType.get().sequenceOf(stringValue);
-            if(valueSequence.isNull()) {
-              newValue = TextType.get().nullSequence();
-            } else {
-              List<Value> sequenceValues = Lists.newArrayList();
-              int occurrence = 0;
-              for(Value value : valueSequence.getValue()) {
-                sequenceValues.add(writeBinaries(valueSetValueId, occurrence++, value, template));
-              }
-              newValue = TextType.get().sequenceOf(sequenceValues);
-            }
-          } else {
-            Value value = BinaryType.get().valueOf(stringValue);
-            newValue = writeBinaries(valueSetValueId, 0, value, template);
-          }
-
-          log.debug("Set JSON value {} for {}", newValue.getValue(), valueSetValueId);
-
-          template.update("UPDATE value_set_value SET value = ? WHERE id = ?", newValue.toString(), valueSetValueId);
-        }
-
-        private Value writeBinaries(int valueSetValueId, int occurrence, Value value, JdbcTemplate template) {
-          Value newValue;
-          if(value.isNull()) {
-            newValue = TextType.get().nullValue();
-          } else {
-            byte[] binary = (byte[]) value.getValue();
-            int size = binary.length;
-            newValue = getBinaryMetadata(size);
-            log.debug("Write {} bytes for {}", size, valueSetValueId);
-            template.update(
-                "INSERT INTO value_set_binary_value(occurrence, size, value, value_set_value_id) VALUES (?, ?, ?, ?)",
-                occurrence, size, binary, valueSetValueId);
-          }
-          return newValue;
-        }
-
-        private Value getBinaryMetadata(int size) {
-          try {
-            JSONObject properties = new JSONObject();
-            properties.put("size", size);
-            return TextType.get().valueOf(properties.toString());
-          } catch(JSONException e) {
-            throw new MagmaRuntimeException(e);
-          }
-        }
-      });
+          new Object[] { "binary" }, new MoveBinaryCallbackHandler(template, name, count));
 
     } finally {
       MagmaEngine.get().shutdown();
     }
 
     log.info("Database {}: binary moved in {}", name, timedExecution.end().formatExecutionTime());
+  }
+
+  @SuppressWarnings("MagicNumber")
+  private class MoveBinaryCallbackHandler implements RowCallbackHandler {
+
+    private final JdbcTemplate template;
+
+    private final String name;
+
+    private final int count;
+
+    private int processed;
+
+    private int bytesProcessed;
+
+    private MoveBinaryCallbackHandler(JdbcTemplate template, String name, int count) {
+      this.template = template;
+      this.name = name;
+      this.count = count;
+    }
+
+    @Override
+    public void processRow(ResultSet rs) throws SQLException {
+      TimedExecution timedExecution = new TimedExecution().start();
+
+      int valueSetValueId = rs.getInt("id");
+
+      bytesProcessed = 0;
+      Value newValue = getNewValue(rs, valueSetValueId);
+
+      log.trace("Set JSON value {} for {}", newValue.getValue(), valueSetValueId);
+
+      template.update("UPDATE value_set_value SET VALUE = ? WHERE id = ?", newValue.toString(), valueSetValueId);
+
+      processed++;
+      if(processed % 50 == 0) {
+        double percent = (double) processed / (double) count * 100d;
+        log.info("Database {}: {}% processed ({}/{})", name, String.format("%.1f", percent), processed, count);
+      }
+
+      log.debug("Database {}: processed row {} {} in {}", name, valueSetValueId, formatBytes(bytesProcessed),
+          timedExecution.end().formatExecutionTime());
+    }
+
+    private Value getNewValue(ResultSet rs, int valueSetValueId) throws SQLException {
+
+      String stringValue = template
+          .queryForObject("SELECT VALUE FROM value_set_value WHERE id = ?", new Object[] { valueSetValueId },
+              String.class);
+
+      Value newValue;
+      if(rs.getBoolean("is_sequence")) {
+        ValueSequence valueSequence = BinaryType.get().sequenceOf(stringValue);
+        if(valueSequence.isNull()) {
+          newValue = TextType.get().nullSequence();
+        } else {
+          List<Value> sequenceValues = Lists.newArrayList();
+          int occurrence = 0;
+          for(Value value : valueSequence.getValue()) {
+            sequenceValues.add(writeBinaries(valueSetValueId, occurrence++, value));
+          }
+          newValue = TextType.get().sequenceOf(sequenceValues);
+        }
+      } else {
+        Value value = BinaryType.get().valueOf(stringValue);
+        newValue = writeBinaries(valueSetValueId, 0, value);
+      }
+      return newValue;
+    }
+
+    private Value writeBinaries(int valueSetValueId, int occurrence, Value value) {
+      Value newValue;
+      if(value.isNull()) {
+        newValue = TextType.get().nullValue();
+      } else {
+        byte[] binary = (byte[]) value.getValue();
+        int size = binary.length;
+        bytesProcessed += size;
+        newValue = getBinaryMetadata(size);
+        log.trace("Write {} bytes for {}", size, valueSetValueId);
+        template.update(
+            "INSERT INTO value_set_binary_value(occurrence, SIZE, VALUE, value_set_value_id) VALUES (?, ?, ?, ?)",
+            occurrence, size, binary, valueSetValueId);
+      }
+      return newValue;
+    }
+
+    private Value getBinaryMetadata(int size) {
+      try {
+        JSONObject properties = new JSONObject();
+        properties.put("size", size);
+        return TextType.get().valueOf(properties.toString());
+      } catch(JSONException e) {
+        throw new MagmaRuntimeException(e);
+      }
+    }
+
+    private String formatBytes(long bytes) {
+      int unit = 1024;
+      if(bytes < unit) return bytes + " B";
+      int exp = (int) (Math.log(bytes) / Math.log(unit));
+      String pre = "KMGTPE".charAt(exp - 1) + "i";
+      return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
   }
 
   public void setOpalDataSource(DataSource opalDataSource) {
@@ -214,4 +262,5 @@ public class BinariesStorageUpgradeStep extends AbstractUpgradeStep {
   public void setKeyDataSource(DataSource keyDataSource) {
     this.keyDataSource = keyDataSource;
   }
+
 }

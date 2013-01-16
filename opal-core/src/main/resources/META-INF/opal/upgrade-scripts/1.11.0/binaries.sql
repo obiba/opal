@@ -15,5 +15,3 @@ CREATE TABLE `value_set_binary_value` (
   KEY `FKB3B8597E3B500505` (`value_set_value_id`),
   CONSTRAINT `FKB3B8597E3B500505` FOREIGN KEY (`value_set_value_id`) REFERENCES `value_set_value` (`id`)
 );
-
-
