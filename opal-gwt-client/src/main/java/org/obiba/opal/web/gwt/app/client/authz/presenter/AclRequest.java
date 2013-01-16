@@ -19,8 +19,10 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 
 /**
  *
@@ -91,8 +93,9 @@ public class AclRequest {
   }
 
   public boolean hasPermission(Acls acls) {
+    String decodedResource = URL.decodePathSegment(resource);
     for(Acl acl : JsArrays.toIterable(acls.getAclsArray())) {
-      if(acl.getResource().equals(resource) && hasAction(acl)) return true;
+      if(acl.getResource().equals(decodedResource) && hasAction(acl)) return true;
     }
     return false;
   }
