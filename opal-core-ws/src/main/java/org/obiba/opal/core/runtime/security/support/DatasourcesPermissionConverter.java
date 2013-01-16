@@ -44,7 +44,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert (String node){
         String[] args = args(node, "/datasource/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}", "*:GET/*", args),//
-            magmaConvert("/shell/command", "*:GET/*"), //
+            magmaConvert("/datasource/{0}/commands", "*:GET/*", args), //
             magmaConvert("/functional-units/unit", "GET:GET/GET"),  //
             magmaConvert("/functional-units/entities/table", "GET"));
       }

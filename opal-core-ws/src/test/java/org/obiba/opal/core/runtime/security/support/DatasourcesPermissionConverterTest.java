@@ -33,7 +33,7 @@ public class DatasourcesPermissionConverterTest extends
   public void testDatasourceAll() {
     testConversion("/datasource/patate", DatasourcesPermissionConverter.Permission.DATASOURCE_ALL, //
         "magma:/datasource/patate:*:GET/*", //
-        "magma:/shell/command:*:GET/*", //
+        "magma:/datasource/patate/commands:*:GET/*", //
         "magma:/functional-units/unit:GET:GET/GET", //
         "magma:/functional-units/entities/table:GET");
   }
