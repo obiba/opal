@@ -56,7 +56,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
     ElasticSearchConfiguration esConfig = configService.getConfig();
     if(!isRunning() && esConfig.isEnabled()) {
       esNode = NodeBuilder.nodeBuilder().client(true).settings(
-          ImmutableSettings.settingsBuilder().loadFromSource(esConfig.getEsSettings()).put("http.enabled", true))
+          ImmutableSettings.settingsBuilder().put("http.enabled", false).loadFromSource(esConfig.getEsSettings()))
           .clusterName(esConfig.getClusterName()).client(esConfig.isDataNode() == false).node();
       client = esNode.client();
     }
