@@ -225,6 +225,13 @@
           <property name="appliesTo" value="1.11.0"/>
         </bean>
 
+        <!-- 1.11.0 / creates custom-context.xml -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.CreateMissingCustomContextXml">
+          <property name="description" value="Create missing ${OPAL_HOME}/conf/custom-context.xml"/>
+          <property name="filePath" value="${OPAL_HOME}/conf/custom-context.xml"/>
+          <property name="appliesTo" value="1.11.0"/>
+        </bean>
+
       </list>
     </property>
 
