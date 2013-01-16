@@ -19,6 +19,7 @@ import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
 import org.obiba.opal.web.model.client.opal.Subject.SubjectType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
@@ -128,19 +129,15 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
 
     @Override
     public void onGet(JsArray<Acls> resource) {
-      subjectPermissions = JsArrays.toSafeArray(resource);
-      List<String> principals = new ArrayList<String>();
-      for(int i = 0; i < subjectPermissions.length(); i++) {
-        Acls acls = subjectPermissions.get(i);
-        Subject subject = acls.getSubject();
-        principals.add(subject.getPrincipal());
-      }
-      for(int i = 0; i < subjects.length(); i++) {
-        Acls acls = subjects.get(i);
-        Subject subject = acls.getSubject();
-        if(principals.contains(subject.getPrincipal()) == false) {
-          subjectPermissions.push(acls);
-        }
+      subjectPermissions = JsArrays.create();
+      JsArrays.pushAll(subjectPermissions,subjects);
+      for (Acls acls : JsArrays.toIterable(resource)) {
+         for (int i=0; i<subjectPermissions.length(); i++) {
+           if (subjectPermissions.get(i).getSubject().getPrincipal().equals(acls.getSubject().getPrincipal())) {
+             subjectPermissions.set(i,acls);
+             break;
+           }
+         }
       }
       getView().renderPermissions(subjectPermissions);
     }
