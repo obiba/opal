@@ -81,15 +81,19 @@ public class DatasourcesPermissionConverterTest extends
   @Test
   public void testViewValues() {
     testConversion("/datasource/patate/view/pwel", DatasourcesPermissionConverter.Permission.VIEW_VALUES, //
+        "magma:/datasource/patate/view/pwel/xml:GET:GET", //
         "magma:/datasource/patate/table/pwel/valueSet:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/entities:GET", //
-        "magma:/datasource/patate/table/pwel/variables:GET", //
         "magma:/datasource/patate/table/pwel/index:GET:GET/GET", //
-        "magma:/datasource/patate/table/pwel/index/_search:GET",//
-        "magma:/datasource/patate/table/pwel/index/_search:POST",//
-        "magma:/datasource/patate/table/pwel/index/_schema:GET",//
-        "magma:/datasource/patate/table/pwel/facet:GET:GET/GET",//
-        "magma:/datasource/patate/table/pwel/facets/_search:POST:GET");
+        "magma:/datasource/patate/table/pwel/index/_search:GET", //
+        "magma:/datasource/patate/table/pwel/index/_search:POST", //
+        "magma:/datasource/patate/table/pwel/index/_schema:GET", //
+        "magma:/datasource/patate/table/pwel:GET:GET", //
+        "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
+        "magma:/datasource/patate/table/pwel/variables:GET:GET/GET", //
+        "magma:/datasource/patate/table/pwel/facet:GET:GET/GET", //
+        "magma:/datasource/patate/table/pwel/facets/_search:POST:GET", //
+        "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST");
   }
 
   @Test
