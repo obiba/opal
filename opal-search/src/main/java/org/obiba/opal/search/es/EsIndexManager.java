@@ -114,8 +114,6 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   @Override
   public boolean isReadyForIndexing(ValueTable valueTable) {
-    log.info(getIndex(valueTable).getName() + " : " + indexConfig.getConfig()
-        .isReadyForIndexing(valueTable, getIndex(valueTable)));
     return esConfig.getConfig().isEnabled() && indexConfig.getConfig()
         .isReadyForIndexing(valueTable, getIndex(valueTable));
   }
