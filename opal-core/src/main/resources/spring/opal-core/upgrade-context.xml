@@ -199,9 +199,9 @@
           <property name="appliesTo" value="1.10.1"/>
         </bean>
 
-        <!-- 1.11.0 / binaries storage -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.BinariesStorageUpgradeStep">
-          <property name="description" value="Update Magma hibernate datasource binaries storage."/>
+        <!-- 1.11.0 / alter schema binaries storage -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.SqlBinariesStorageUpgradeStep">
+          <property name="description" value="Add new table for binaries storage."/>
           <property name="opalConfigurationProvider" ref="opalConfigurationProvider"/>
           <property name="opalDataSource" ref="opalDataSource"/>
           <property name="keyDataSource" ref="keyDataSource"/>

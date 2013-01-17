@@ -95,7 +95,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
     this.esConfig = esConfig;
     this.indexConfig = indexConfig;
     this.threadFactory = threadFactory;
-    this.runtimeVersion = version;
+    runtimeVersion = version;
   }
 
   @Override
@@ -215,7 +215,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
         private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
-        private Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
+        private final Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
 
         @Override
         public void onBegin(List<VariableEntity> entitiesToCopy, Variable[] variables) {
