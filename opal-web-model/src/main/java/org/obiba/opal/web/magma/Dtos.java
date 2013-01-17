@@ -39,6 +39,7 @@ import org.obiba.opal.web.model.Opal.LocaleDto;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -266,13 +267,14 @@ public final class Dtos {
         return type.nullSequence();
       }
       return type
-          .sequenceOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
+          .sequenceOf(ImmutableList.copyOf(Iterables.transform(valueDto.getValuesList(),
+              new Function<ValueSetsDto.ValueDto, Value>() {
 
-            @Override
-            public Value apply(ValueSetsDto.ValueDto input) {
-              return fromDto(input, type, false);
-            }
-          }));
+                @Override
+                public Value apply(ValueSetsDto.ValueDto input) {
+                  return fromDto(input, type, false);
+                }
+              })));
     } else {
       if(valueDto.hasValue()) {
         return type.valueOf(valueDto.getValue());
