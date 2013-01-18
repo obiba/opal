@@ -21,6 +21,7 @@ import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -29,6 +30,7 @@ import de.schlichtherle.io.FileInputStream;
 /**
  *
  */
+@Component
 public class OpalConfigurationProvider {
 
   private static final Charset CHARSET = Charset.availableCharsets().get("UTF-8");
@@ -36,8 +38,10 @@ public class OpalConfigurationProvider {
   @Value("${OPAL_HOME}/conf/opal-config.xml")
   private File configFile;
 
-  public OpalConfiguration readOpalConfiguration() {
-    new MagmaEngine().extend(new MagmaJsExtension()).extend(new MagmaXStreamExtension());
+  public OpalConfiguration readOpalConfiguration(boolean initMagma) {
+    if(initMagma) {
+      new MagmaEngine().extend(new MagmaJsExtension()).extend(new MagmaXStreamExtension());
+    }
     Reader reader = null;
     try {
       reader = new InputStreamReader(new FileInputStream(configFile), CHARSET);
@@ -47,7 +51,9 @@ public class OpalConfigurationProvider {
       throw new RuntimeException("Could not read Opal configuration file.", e);
     } finally {
       StreamUtil.silentSafeClose(reader);
-      MagmaEngine.get().shutdown();
+      if(initMagma) {
+        MagmaEngine.get().shutdown();
+      }
     }
   }
 }

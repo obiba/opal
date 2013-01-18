@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.runtime.upgrade;
+package org.obiba.opal.core.runtime.upgrade.binary;
 
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
@@ -56,7 +56,7 @@ public class SqlBinariesStorageUpgradeStep extends AbstractUpgradeStep {
     dataSourceNames.put(opalDataSource, "Default");
     dataSourceNames.put(keyDataSource, "Key");
 
-    OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration();
+    OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration(true);
     JdbcDataSourcesConfig dataSourcesConfig = configuration.getExtension(JdbcDataSourcesConfig.class);
     for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
       dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());

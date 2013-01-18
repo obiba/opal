@@ -200,7 +200,7 @@
         </bean>
 
         <!-- 1.11.0 / alter schema binaries storage -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.SqlBinariesStorageUpgradeStep">
+        <bean class="org.obiba.opal.core.runtime.upgrade.binary.SqlBinariesStorageUpgradeStep">
           <property name="description" value="Add new table for binaries storage."/>
           <property name="opalConfigurationProvider" ref="opalConfigurationProvider"/>
           <property name="opalDataSource" ref="opalDataSource"/>
