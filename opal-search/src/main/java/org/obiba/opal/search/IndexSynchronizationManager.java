@@ -63,7 +63,9 @@ public class IndexSynchronizationManager {
     getSubject().execute(syncProducer);
     if(consumerStarted == false) {
       // start one IndexSynchronization consumer thread
-      new Thread(getSubject().associateWith(new SyncConsumer())).start();
+      Thread consumer = new Thread(getSubject().associateWith(new SyncConsumer()));
+      consumer.setPriority(Thread.MIN_PRIORITY);
+      consumer.start();
       consumerStarted = true;
     }
   }
