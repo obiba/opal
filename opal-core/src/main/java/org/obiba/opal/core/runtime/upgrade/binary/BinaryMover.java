@@ -35,7 +35,7 @@ public class BinaryMover {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
-  @SuppressWarnings({ "MagicNumber", "OverlyNestedMethod" })
+  @SuppressWarnings({ "MagicNumber", "PMD.NcssMethodCount" })
   public void move(BinaryToMove binary) {
 
     TimedExecution timedExecution = new TimedExecution().start();
@@ -48,16 +48,14 @@ public class BinaryMover {
     Value value = table.getValue(variable, valueSet);
     int size = 0;
     int nbOccurrences = 0;
-    if(log.isDebugEnabled()) {
-      if(!value.isNull()) {
-        if(value.isSequence()) {
-          for(Value val : value.asSequence().getValue()) {
-            nbOccurrences++;
-            if(!val.isNull()) size += ((byte[]) val.getValue()).length;
-          }
-        } else {
-          size = ((byte[]) value.getValue()).length;
+    if(log.isDebugEnabled() && !value.isNull()) {
+      if(value.isSequence()) {
+        for(Value val : value.asSequence().getValue()) {
+          nbOccurrences++;
+          size += val.isNull() ? 0 : ((byte[]) val.getValue()).length;
         }
+      } else {
+        size = ((byte[]) value.getValue()).length;
       }
     }
     writeValue(datasource, table, variable, entity, value);
