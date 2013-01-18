@@ -35,7 +35,7 @@ public class BinaryMover {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
-  @SuppressWarnings({ "MagicNumber", "PMD.NcssMethodCount" })
+  @SuppressWarnings("MagicNumber")
   public void move(BinaryToMove binary) {
 
     TimedExecution timedExecution = new TimedExecution().start();
