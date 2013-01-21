@@ -147,8 +147,8 @@
                   <arg line="-Isrc/main/protobuf" />
                 </exec>
                 <!-- PHP -->
-                <copy file="${basedir}/tools/protobuf-php/template/wrapper.proto" todir="${basedir}/src/main/protobuf"/>
-                <replace file="${basedir}/src/main/protobuf/wrapper.proto" token="__PROTO_FILE__" value="Search"/>
+                <copy file="${basedir}/tools/protobuf-php/template/wrapper.proto" todir="${basedir}/src/main/protobuf" />
+                <replace file="${basedir}/src/main/protobuf/wrapper.proto" token="__PROTO_FILE__" value="Search" />
                 <mkdir dir="target/generated-sources/protobuf-php" />
                 <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
                   <arg value="--php_out=target/generated-sources/protobuf-php" />
