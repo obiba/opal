@@ -15,13 +15,13 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.11-SNAPSHOT</version>
+    <version>1.12-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.obiba.opal</groupId>
     <artifactId>opal-php-client</artifactId>
-  <version>1.11-SNAPSHOT</version>
+  <version>1.12-SNAPSHOT</version>
 
   <name>opal-php-client</name>
   <description>Opal PHP Client Module</description>
