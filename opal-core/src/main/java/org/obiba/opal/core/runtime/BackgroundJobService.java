@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -9,8 +9,6 @@
  */
 package org.obiba.opal.core.runtime;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
