@@ -181,6 +181,8 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
     private int done = 0;
 
+    private boolean stop = false;
+
     private Indexer(ValueTable table, EsValueTableIndex index) {
       valueTable = table;
       this.index = index;
@@ -226,6 +228,11 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
         @Override
         public void onValues(VariableEntity entity, Variable[] variables, Value[] values) {
+          if (stop){
+            index.delete();
+            return;
+          }
+
           bulkRequest.add(
               esProvider.getClient().prepareIndex(esIndexName(), valueTable.getEntityType(), entity.getIdentifier())
                   .setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
@@ -311,6 +318,10 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
     @Override
     public float getProgress() {
       return done / (float) total;
+    }
+
+    public void stop() {
+      stop = true;
     }
   }
 
