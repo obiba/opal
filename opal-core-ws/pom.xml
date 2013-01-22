@@ -38,11 +38,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-search</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-xstream</artifactId>
     </dependency>
