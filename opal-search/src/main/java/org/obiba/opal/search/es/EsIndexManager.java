@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -228,8 +228,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
         @Override
         public void onValues(VariableEntity entity, Variable[] variables, Value[] values) {
-          if (stop){
-            index.delete();
+          if(stop) {
             return;
           }
 
@@ -261,8 +260,12 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
         @Override
         public void onComplete() {
-          sendAndCheck();
-          index.updateTimestamps();
+          if(stop) {
+            index.delete();
+          } else {
+            sendAndCheck();
+            index.updateTimestamps();
+          }
         }
 
         /**
