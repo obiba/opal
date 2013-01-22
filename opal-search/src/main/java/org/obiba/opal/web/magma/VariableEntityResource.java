@@ -21,7 +21,6 @@ import org.obiba.opal.web.finder.AbstractElasticSearchFinder;
 import org.obiba.opal.web.finder.AbstractFinder;
 import org.obiba.opal.web.finder.AbstractFinderQuery;
 import org.obiba.opal.web.finder.AbstractMagmaFinder;
-import org.obiba.opal.web.finder.AccessFilterTablesFinder;
 import org.obiba.opal.web.finder.FinderResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -76,40 +75,55 @@ public class VariableEntityResource {
     }
   }
 
+  public static class EntityTablesFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
+      AbstractFinder<TQuery, TResult> {
+
+    @Override
+    public void find(TQuery query, TResult result) {
+      // TODO find all tables with this entity and add them to tableFilter
+//    query.getTableFilter().addAll(entityTables);
+      next(query, result);
+    }
+
+  }
+
   public class VariableEntityTablesFinder extends
       AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> {
 
     @Override
     public void find(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result) {
-      nextFinder(new AccessFilterTablesFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>()) //
-          .nextFinder(new AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>(
-              opalSearchService) {
 
-            @Override
-            public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result,
-                String... indexes) {
-              // http://www.elasticsearch.org/guide/reference/query-dsl/ids-filter.html
-              // {
-              //  "ids" : {
-              //    "type" : [ " + indexedTables + " ],
-              //    "values" : ["1", "4", "100"]
-              //   }
-              // }
-              // SearchResponse response = opalSearchService.getClient()
-              //   .prepareSearch(indexedTables.toArray(new String[indexedTables.size()]))
-              // [...]
-            }
-          }) //
-          .nextFinder(new AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>() {
-            @Override
-            public void executeQuery(ValueTable valueTable, VariableEntityTablesQuery query,
-                FinderResult<List<ValueTable>> result) {
-              if(valueTable.hasValueSet(query.getEntity())) {
-                result.getValue().add(valueTable);
-              }
-            }
-          });
+      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> entityTablesFinder = new EntityTablesFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>();
+      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> elasticSearchFinder = new AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>(
+          opalSearchService) {
 
+        @Override
+        public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result,
+            String... indexes) {
+          // TODO elastic search query
+          // http://www.elasticsearch.org/guide/reference/query-dsl/ids-filter.html
+          // {
+          //  "ids" : {
+          //    "type" : [ " + indexedTables + " ],
+          //    "values" : ["1", "4", "100"]
+          //   }
+          // }
+          // SearchResponse response = opalSearchService.getClient()
+          //   .prepareSearch(indexedTables.toArray(new String[indexedTables.size()]))
+          // [...]
+        }
+      };
+      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> magmaFinder = new AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>() {
+        @Override
+        public void executeQuery(ValueTable valueTable, VariableEntityTablesQuery query,
+            FinderResult<List<ValueTable>> result) {
+          if(valueTable.hasValueSet(query.getEntity())) {
+            result.getValue().add(valueTable);
+          }
+        }
+      };
+
+      nextFinder(entityTablesFinder).nextFinder(elasticSearchFinder).nextFinder(magmaFinder);
       next(query, result);
     }
   }
