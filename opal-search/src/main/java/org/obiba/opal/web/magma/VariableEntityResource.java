@@ -113,6 +113,7 @@ public class VariableEntityResource {
 
   }
 
+  @SuppressWarnings("ClassTooDeepInInheritanceTree")
   public static class EntityTablesMagmaFinder extends
       AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> {
     @Override
