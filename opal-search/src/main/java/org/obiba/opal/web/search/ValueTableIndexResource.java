@@ -117,9 +117,8 @@ public class ValueTableIndexResource extends IndexResource {
           synchroManager.getCurrentTask().getValueTable().getName().equals(table) &&
           synchroManager.getCurrentTask().getValueTable().getDatasource().getName().equals(datasource)) {
         // Stop task
+        synchroManager.stopTask();
       }
-
-      getValueTableIndex(datasource, table).delete();
 
       return Response.ok().build();
     }
