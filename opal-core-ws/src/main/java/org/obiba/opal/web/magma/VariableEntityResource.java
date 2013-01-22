@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2011 OBiBa. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.finder.AbstractElasticSearchFinder;
 import org.obiba.opal.web.finder.AbstractFinder;
 import org.obiba.opal.web.finder.AbstractFinderQuery;
-import org.obiba.opal.web.finder.FinderResult;
 import org.obiba.opal.web.finder.AbstractMagmaFinder;
 import org.obiba.opal.web.finder.AccessFilterTablesFinder;
+import org.obiba.opal.web.finder.FinderResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

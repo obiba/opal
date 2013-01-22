@@ -17,7 +17,6 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.BooleanType;
-import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.finder.AbstractMagmaFinder;
 import org.obiba.opal.web.finder.FinderResult;
 import org.obiba.opal.web.model.Math;
