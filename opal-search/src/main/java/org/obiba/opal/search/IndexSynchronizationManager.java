@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -40,21 +40,23 @@ public class IndexSynchronizationManager {
 
   private static final Logger log = LoggerFactory.getLogger(IndexSynchronizationManager.class);
 
+  // Grace period before reindexing (in seconds)
+  private static final int GRACE_PERIOD = 300;
+
   @Autowired
   private IndexManager indexManager;
 
-  // Grace period before reindexing (in seconds)
-  private final int GRACE_PERIOD = 300;
-
   private final SyncProducer syncProducer = new SyncProducer();
 
-  private boolean consumerStarted = false;
+  private boolean consumerStarted;
 
   private IndexSynchronization currentTask;
 
-  private BlockingQueue<IndexSynchronization> indexSyncQueue = new LinkedBlockingQueue<IndexSynchronization>();
+  private BlockingQueue<IndexSynchronization> indexSyncQueue;
 
   public IndexSynchronizationManager() {
+    consumerStarted = false;
+    indexSyncQueue = new LinkedBlockingQueue<IndexSynchronization>();
   }
 
   // Every minute
@@ -80,6 +82,10 @@ public class IndexSynchronizationManager {
 
   public IndexSynchronization getCurrentTask() {
     return currentTask;
+  }
+
+  public void stopTask(){
+    currentTask.stop();
   }
 
   private Subject getSubject() {
@@ -172,10 +178,11 @@ public class IndexSynchronizationManager {
     public void run() {
       log.debug("Starting indexing consumer");
       try {
+        //noinspection InfiniteLoopStatement
         while(true) {
           consume(indexSyncQueue.take());
         }
-      } catch(InterruptedException ex) {
+      } catch(InterruptedException ignored) {
       }
     }
 
