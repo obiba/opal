@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,15 +19,17 @@ public interface DatasourceFactoryDtoParser {
 
   /**
    * Parses the provided {@code dto} instance and builds a corresponding {@code DatasourceFactory} instance.
+   *
    * @param dto
    * @return the factory
    */
-  public DatasourceFactory parse(DatasourceFactoryDto dto);
+  DatasourceFactory parse(DatasourceFactoryDto dto);
 
   /**
    * Returns true when this instance is capable of parsing {@code dto} and convert it into a {@code DatasourceFactory}
+   *
    * @param dto
    * @return
    */
-  public boolean canParse(DatasourceFactoryDto dto);
+  boolean canParse(DatasourceFactoryDto dto);
 }

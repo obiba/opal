@@ -106,6 +106,15 @@ message RestDatasourceFactoryDto {
   }
 }
 
+message IncrementalDatasourceFactoryDto {
+  required DatasourceFactoryDto datasourceFactoryDto = 1;
+  required bool isIncremental = 2 [default = true];
+  required TableDto destinationTable = 3;
+  extend DatasourceFactoryDto {
+    optional IncrementalDatasourceFactoryDto params = 1008;
+  }
+}
+
 message DatasourceParsingErrorDto {
   required string defaultMessage = 1;
   required string key = 2;
