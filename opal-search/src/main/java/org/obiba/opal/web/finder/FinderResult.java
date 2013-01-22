@@ -9,11 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.finder;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.obiba.magma.ValueTable;
-
 /**
  *
  */
