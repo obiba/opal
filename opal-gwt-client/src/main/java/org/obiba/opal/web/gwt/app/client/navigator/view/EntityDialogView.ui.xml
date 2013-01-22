@@ -1,0 +1,57 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
+    <g:caption>
+      <ui:msg description="Entity Details title">Entity Details</ui:msg>
+    </g:caption>
+    <g:DockLayoutPanel unit="EM" height="30em" width="40em">
+      <g:center>
+        <g:ScrollPanel>
+          <g:FlowPanel>
+
+            <o:PropertiesTable condensed="true" borderedCell="false" zebra="true"
+                addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
+              <g:FlowPanel>
+                <g:Label>
+                  <ui:msg description="Entity type label">Entity Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="entityType"/>
+              </g:FlowPanel>
+              <g:FlowPanel>
+                <g:Label>
+                  <ui:msg description="Entity type label">Entity ID</ui:msg>
+                </g:Label>
+                <g:Label ui:field="entityId"/>
+              </g:FlowPanel>
+            </o:PropertiesTable>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Datasource label">Datasource</ui:msg>
+              </g:Label>
+              <o:Chooser ui:field="datasourceBox"/>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Table label">Table</ui:msg>
+              </g:Label>
+              <o:Chooser ui:field="tableBox"/>
+            </g:FlowPanel>
+
+            <g:Anchor>
+              <ui:msg description="Values label">Values</ui:msg>
+            </g:Anchor>
+            <!--<g:SimplePanel ui:field="values"/>-->
+
+          </g:FlowPanel>
+        </g:ScrollPanel>
+      </g:center>
+    </g:DockLayoutPanel>
+
+  </g:DialogBox>
+
+</ui:UiBinder>

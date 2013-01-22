@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
@@ -67,7 +68,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {
   }
 
-  private static ValuesTableViewUiBinder uiBinder = GWT.create(ValuesTableViewUiBinder.class);
+  private static final ValuesTableViewUiBinder uiBinder = GWT.create(ValuesTableViewUiBinder.class);
 
   private final Widget widget;
 
@@ -105,7 +106,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private List<VariableDto> listVariable;
 
-  private List<VariableDto> visibleListVariable;
+  private final List<VariableDto> visibleListVariable;
 
   private List<String> listValueSetVariable;
 
@@ -138,8 +139,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
       @Override
       public void onClick(ClickEvent event) {
-        if(lastFilter.equals(filter.getText()) == false
-            || maxVisibleColumns != visibleColumns.getNumberValue().intValue()) {
+        if(!lastFilter.equals(filter.getText()) || maxVisibleColumns != visibleColumns.getNumberValue().intValue()) {
           // variables list has changed so update all
           lastFilter = filter.getText();
           maxVisibleColumns = visibleColumns.getNumberValue().intValue();
@@ -218,8 +218,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     dataProvider.addDataDisplay(valuesTable);
   }
 
-  private String escape(String filter) {
-    return filter.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
+  private String escape(String string) {
+    return string.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
   }
 
   @Override
@@ -229,7 +229,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void setValueSetsFetcher(DataFetcher provider) {
-    this.fetcher = provider;
+    fetcher = provider;
   }
 
   //
@@ -242,7 +242,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private void setRefreshing(boolean refresh) {
     refreshPending.setVisible(refresh);
-    refreshButton.setEnabled(refresh == false);
+    refreshButton.setEnabled(!refresh);
   }
 
   private String getColumnLabel(int i) {
@@ -274,7 +274,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
     firstVisibleIndex = 0;
 
-    TextColumn<ValueSetDto> entityColumn = new TextColumn<ValueSetDto>() {
+    ClickableColumn<ValueSetDto> entityColumn = new ClickableColumn<ValueSetDto>() {
 
       @Override
       public String getValue(ValueSetDto value) {
@@ -324,7 +324,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return refreshPending.isVisible() == false && firstVisibleIndex > 0;
+      return !refreshPending.isVisible() && firstVisibleIndex > 0;
     }
 
   }
@@ -337,7 +337,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return refreshPending.isVisible() == false && (listVariable.size() - firstVisibleIndex > getMaxVisibleColumns());
+      return !refreshPending.isVisible() && listVariable.size() - firstVisibleIndex > getMaxVisibleColumns();
     }
 
   }
@@ -416,7 +416,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       MenuBar menuBar = new MenuBar(true);
       int currentIdx = firstVisibleIndex + getMaxVisibleColumns();
       for(int i = currentIdx; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()); i++) {
-        final int increment = i - currentIdx + 1;
+        int increment = i - currentIdx + 1;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(increment)));
       }
       if(Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()) < listVariable.size()) {
@@ -432,8 +432,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(2);
         int idx = firstVisibleIndex++ + getMaxVisibleColumns();
-        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)),
-            getColumnLabel(idx));
+        valuesTable
+            .insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
       }
       valuesTable.redrawHeaders();
     }
@@ -454,7 +454,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       MenuBar menuBar = new MenuBar(true);
       int currentIdx = firstVisibleIndex;
       for(int i = currentIdx - 1; i >= Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0); i--) {
-        final int decrement = currentIdx - i;
+        int decrement = currentIdx - i;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(decrement)));
       }
       if(Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0) > 0) {
@@ -483,9 +483,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
       // Get the new range.
-      final Range range = display.getVisibleRange();
+      Range range = display.getVisibleRange();
 
-      // query the valuesets
+      // query the valueSets
       int start = range.getStart();
 
       if(start > table.getValueSetCount()) return;
