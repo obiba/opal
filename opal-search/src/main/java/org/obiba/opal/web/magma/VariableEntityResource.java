@@ -75,11 +75,11 @@ public class VariableEntityResource {
     }
   }
 
-  public static class EntityTablesFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
-      AbstractFinder<TQuery, TResult> {
+  public static class EntityTablesFinder extends
+      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> {
 
     @Override
-    public void find(TQuery query, TResult result) {
+    public void find(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result) {
       // TODO find all tables with this entity and add them to tableFilter
 //    query.getTableFilter().addAll(entityTables);
       next(query, result);
@@ -87,43 +87,51 @@ public class VariableEntityResource {
 
   }
 
+  @SuppressWarnings("ClassTooDeepInInheritanceTree")
+  public static class EntityTablesElasticSearchFinder extends
+      AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> {
+
+    public EntityTablesElasticSearchFinder(OpalSearchService opalSearchService) {
+      super(opalSearchService);
+    }
+
+    @Override
+    public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result,
+        String... indexes) {
+      // TODO elastic search query
+      // http://www.elasticsearch.org/guide/reference/query-dsl/ids-filter.html
+      // {
+      //  "ids" : {
+      //    "type" : [ " + indexedTables + " ],
+      //    "values" : ["1", "4", "100"]
+      //   }
+      // }
+      // SearchResponse response = opalSearchService.getClient()
+      //   .prepareSearch(indexedTables.toArray(new String[indexedTables.size()]))
+      // [...]
+    }
+
+  }
+
+  public static class EntityTablesMagmaFinder extends
+      AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> {
+    @Override
+    public void executeQuery(ValueTable valueTable, VariableEntityTablesQuery query,
+        FinderResult<List<ValueTable>> result) {
+      if(valueTable.hasValueSet(query.getEntity())) {
+        result.getValue().add(valueTable);
+      }
+    }
+  }
+
   public class VariableEntityTablesFinder extends
       AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> {
 
     @Override
     public void find(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result) {
-
-      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> entityTablesFinder = new EntityTablesFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>();
-      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> elasticSearchFinder = new AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>(
-          opalSearchService) {
-
-        @Override
-        public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<ValueTable>> result,
-            String... indexes) {
-          // TODO elastic search query
-          // http://www.elasticsearch.org/guide/reference/query-dsl/ids-filter.html
-          // {
-          //  "ids" : {
-          //    "type" : [ " + indexedTables + " ],
-          //    "values" : ["1", "4", "100"]
-          //   }
-          // }
-          // SearchResponse response = opalSearchService.getClient()
-          //   .prepareSearch(indexedTables.toArray(new String[indexedTables.size()]))
-          // [...]
-        }
-      };
-      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>> magmaFinder = new AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<ValueTable>>>() {
-        @Override
-        public void executeQuery(ValueTable valueTable, VariableEntityTablesQuery query,
-            FinderResult<List<ValueTable>> result) {
-          if(valueTable.hasValueSet(query.getEntity())) {
-            result.getValue().add(valueTable);
-          }
-        }
-      };
-
-      nextFinder(entityTablesFinder).nextFinder(elasticSearchFinder).nextFinder(magmaFinder);
+      nextFinder(new EntityTablesFinder()) //
+          .nextFinder(new EntityTablesElasticSearchFinder(opalSearchService)) //
+          .nextFinder(new EntityTablesMagmaFinder());
       next(query, result);
     }
   }
