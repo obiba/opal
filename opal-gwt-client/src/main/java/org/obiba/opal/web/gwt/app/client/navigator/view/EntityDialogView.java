@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogViewPresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
@@ -23,7 +23,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 /**
  *
  */
-public class EntityDialogView extends PopupViewImpl implements EntityDialogViewPresenter.Display {
+public class EntityDialogView extends PopupViewImpl implements EntityDialogPresenter.Display {
 
   @UiTemplate("EntityDialogView.ui.xml")
   interface EntityViewUiBinder extends UiBinder<DialogBox, EntityDialogView> {
@@ -56,14 +56,19 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogViewP
   }
 
   @Override
-  public void showDialog() {
+  public void show() {
     dialog.center();
-    dialog.show();
+    super.show();
   }
 
   @Override
-  public void hideDialog() {
-    dialog.hide();
+  public void setEntityType(String entityType) {
+    this.entityType.setText(entityType);
+  }
+
+  @Override
+  public void setEntityId(String entityId) {
+    this.entityId.setText(entityId);
   }
 
   @Override

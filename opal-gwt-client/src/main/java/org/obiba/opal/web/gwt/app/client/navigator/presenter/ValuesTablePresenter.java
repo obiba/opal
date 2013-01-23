@@ -41,11 +41,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private final ValueSequencePopupPresenter valueSequencePopupPresenter;
 
+  private final EntityDialogPresenter entityDialogPresenter;
+
   @Inject
   public ValuesTablePresenter(Display display, EventBus eventBus,
-      ValueSequencePopupPresenter valueSequencePopupPresenter) {
+      ValueSequencePopupPresenter valueSequencePopupPresenter, EntityDialogPresenter entityDialogPresenter) {
     super(eventBus, display);
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
+    this.entityDialogPresenter = entityDialogPresenter;
   }
 
   public void setTable(TableDto table) {
@@ -53,7 +56,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, VariableDto variable) {
-    hideValueSequencePopup(table);
+    hidePopups(table);
     this.table = table;
 
     getView().setTable(table);
@@ -63,7 +66,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, String select) {
-    hideValueSequencePopup(table);
+    hidePopups(table);
     this.table = table;
 
     getView().setTable(table);
@@ -76,22 +79,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
   }
 
-  //
-  // Private methods
-  //
-
   /**
-   * Hide value sequence popup if table is about to be changed.
+   * Hide entity details & value sequence popup if table is about to be changed.
    */
-  private void hideValueSequencePopup(TableDto newTable) {
+  private void hidePopups(TableDto newTable) {
     if(table != null && !table.getName().equals(newTable.getName())) {
       valueSequencePopupPresenter.getView().hide();
+      entityDialogPresenter.getView().hide();
     }
   }
-
-  //
-  // Inner classes and interfaces
-  //
 
   private class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
@@ -134,7 +130,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private class BadRequestCallback implements ResponseCodeCallback {
 
-    static final int CODE = 400;
+    static final int HTTP_CODE = 400;
 
     @Override
     public void onResponseCode(Request request, Response response) {
@@ -202,7 +198,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
       valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link).get()//
           .withCallback(new ValueSetsResourceCallback(offset, table))
-          .withCallback(BadRequestCallback.CODE, new BadRequestCallback()).send();
+          .withCallback(BadRequestCallback.HTTP_CODE, new BadRequestCallback()).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
@@ -225,6 +221,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
+    public void requestEntityDialog(String entityType, String entityId) {
+      entityDialogPresenter.initialize(table, entityType, entityId);
+      addToPopupSlot(entityDialogPresenter);
+    }
+
+    @Override
     public void updateVariables(String select) {
       String link = table.getLink() + "/variables";
       if(select != null && !select.isEmpty()) {
@@ -236,7 +238,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
           .withCallback(new VariablesResourceCallback(table))
-          .withCallback(BadRequestCallback.CODE, new BadRequestCallback() {
+          .withCallback(BadRequestCallback.HTTP_CODE, new BadRequestCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               notifyError(response);
@@ -265,11 +267,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void requestValueSequence(VariableDto variable, String entityIdentifier);
 
+    void requestEntityDialog(String entityType, String entityId);
+
     void updateVariables(String select);
   }
 
   public interface ValueSetsProvider {
     void populateValues(int offset, ValueSetsDto valueSets);
+  }
+
+  public interface EntitySelectionHandler {
+
+    void onEntitySelection(String entityType, String entityId);
+
   }
 
 }

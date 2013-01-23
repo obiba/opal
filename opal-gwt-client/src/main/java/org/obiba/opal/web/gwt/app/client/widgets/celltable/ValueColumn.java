@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -26,12 +26,13 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   private int pos = 0;
 
-  private VariableDto variable;
+  private final VariableDto variable;
 
-  private ValueRenderer valueRenderer;
+  private final ValueRenderer valueRenderer;
 
   /**
    * Value column, with only one value expected in the value set.
+   *
    * @param variable
    */
   public ValueColumn(VariableDto variable) {
@@ -40,6 +41,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   /**
    * Value column with expected position of the value in the value set.
+   *
    * @param pos
    * @param variable
    */
@@ -47,14 +49,14 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     this(pos, variable, createCell(variable));
   }
 
-  private static Cell<String> createCell(final VariableDto variable) {
+  private static Cell<String> createCell(VariableDto variable) {
     if(variable.getIsRepeatable()) {
       return new ClickableTextCell(new ClickableIconRenderer("i-list"));
-    } else if(variable.getValueType().equalsIgnoreCase("binary")) {
-      return new ClickableTextCell(new ClickableIconRenderer("i-down"));
-    } else {
-      return new TextCell();
     }
+    if("binary".equalsIgnoreCase(variable.getValueType())) {
+      return new ClickableTextCell(new ClickableIconRenderer("i-down"));
+    }
+    return new TextCell();
   }
 
   private ValueColumn(int pos, VariableDto variable, Cell<String> cell) {
@@ -62,9 +64,9 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
     this.pos = pos;
     this.variable = variable;
-    this.valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
+    valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
 
-    if(variable.getIsRepeatable() || variable.getValueType().equalsIgnoreCase("binary")) {
+    if(variable.getIsRepeatable() || "binary".equalsIgnoreCase(variable.getValueType())) {
       setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
 
         @Override
@@ -94,6 +96,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   /**
    * Get the position of the variable's value in the value set
+   *
    * @return
    */
   protected int getPosition() {
@@ -102,9 +105,10 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   public interface ValueSelectionHandler {
 
-    void onBinaryValueSelection(VariableDto variable, int row, int column, ValueSetsDto.ValueSetDto valueSet);
+    void onBinaryValueSelection(VariableDto variableDto, int row, int column, ValueSetsDto.ValueSetDto valueSet);
 
-    void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetsDto.ValueSetDto valueSet);
+    void onValueSequenceSelection(VariableDto variableDto, int row, int column, ValueSetsDto.ValueSetDto valueSet);
+
   }
 
 }

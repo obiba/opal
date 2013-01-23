@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
@@ -29,6 +30,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
@@ -115,6 +117,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private DataFetcher fetcher;
 
   private VariableValueSelectionHandler variableValueSelectionHandler;
+
+  private EntitySelectionHandler entitySelectionHandler;
 
   private int firstVisibleIndex = 0;
 
@@ -280,7 +284,18 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       public String getValue(ValueSetDto value) {
         return value.getIdentifier();
       }
+
     };
+    if(entitySelectionHandler == null) {
+      entitySelectionHandler = new EntitySelectionHandlerImpl();
+    }
+
+    entityColumn.setFieldUpdater(new FieldUpdater<ValueSetDto, String>() {
+      @Override
+      public void update(int index, ValueSetDto valueSetDto, String value) {
+        entitySelectionHandler.onEntitySelection(table.getEntityType(), valueSetDto.getIdentifier());
+      }
+    });
     setMinimumWidth(entityColumn);
 
     valuesTable.addColumn(entityColumn, table.getEntityType());
@@ -477,8 +492,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   }
 
-  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements
-      ValuesTablePresenter.ValueSetsProvider {
+  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto>
+      implements ValuesTablePresenter.ValueSetsProvider {
 
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
@@ -516,6 +531,14 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
       fetcher.requestValueSequence(variable, valueSet.getIdentifier());
+    }
+  }
+
+  private final class EntitySelectionHandlerImpl implements ValuesTablePresenter.EntitySelectionHandler {
+
+    @Override
+    public void onEntitySelection(String entityType, String entityId) {
+      fetcher.requestEntityDialog(entityType, entityId);
     }
   }
 
