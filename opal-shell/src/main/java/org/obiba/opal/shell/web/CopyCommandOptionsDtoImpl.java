@@ -165,6 +165,8 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
           modifiedPath = outputFilePath + ".csv";
         } else if(outputFileFormat.equals("excel") && !outputFilePath.endsWith(".xls") && !outputFilePath.endsWith(".xlsx")) {
           modifiedPath = outputFilePath + ".xlsx"; // prefer .xlsx over .xls
+        } else if(outputFileFormat.equals("xml") && !outputFilePath.endsWith(".zip")) {
+          modifiedPath = outputFilePath + ".zip";
         }
       } else if (file.getType().equals(FileType.IMAGINARY)) {
         if(outputFileFormat.equals("xml") && !outputFilePath.endsWith(".zip")) {
