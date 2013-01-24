@@ -261,7 +261,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     }
     suffix += "export-" + username + "-" + dateFormat.format(date);
 
-    if (getFileFormat().equalsIgnoreCase("zip")) {
+    if (getFileFormat().equalsIgnoreCase("xml")) {
       return fileSelection.getFile() + suffix + ".zip";
     }
 
