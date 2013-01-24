@@ -320,7 +320,6 @@ public interface Translations extends Constants {
       "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
       "DestinationFileIsMissing", "Destination File is required.", //
       "ExportDataMissingTables", "At least one table is required.",//
-      "ExportDataDuplicateTableNames", "Two tables have the name {0}. All table names must be unique to export.",//
       "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
       "NoIdentifiersGenerated", "No Identifiers generated.",//
       "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
@@ -344,7 +343,7 @@ public interface Translations extends Constants {
       "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
       "DestinationTableCannotBeView", "The destination table cannot be a view.",//
       "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
-      "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}",//
+      "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}",//
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
