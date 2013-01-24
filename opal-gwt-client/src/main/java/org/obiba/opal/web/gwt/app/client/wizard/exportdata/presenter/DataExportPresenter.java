@@ -1,15 +1,17 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -22,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -46,6 +49,8 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
   public static final WizardType WizardType = new WizardType();
 
+  private final RequestCredentials credentials;
+
   public static class Wizard extends WizardProxy<DataExportPresenter> {
 
     @Inject
@@ -64,9 +69,10 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   protected String identifierEntityType;
 
   @Inject
-  public DataExportPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
+  public DataExportPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter, RequestCredentials credentials) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
+    this.credentials = credentials;
   }
 
   @Override
@@ -85,11 +91,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   }
 
   private void initFileSelectionType() {
-    if(getView().getFileFormat().equalsIgnoreCase("csv")) {
-      fileSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
-    } else {
-      fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
-    }
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
   }
 
   @Override
@@ -103,6 +105,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   @Override
   public void onReveal() {
     initUnits();
+    getView().setUsername(credentials.getUsername());
   }
 
   private void initUnits() {
@@ -176,12 +179,12 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
       uriBuilder.segment("datasource", datasourceName, "commands", "_copy");
     }
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
-        .withResourceBody(CopyCommandOptionsDto.stringify(createCopycommandOptions())) //
+        .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions())) //
         .withCallback(400, new ClientFailureResponseCodeCallBack()) //
         .withCallback(201, new SuccessResponseCodeCallBack()).send();
   }
 
-  private CopyCommandOptionsDto createCopycommandOptions() {
+  private CopyCommandOptionsDto createCopyCommandOptions() {
     CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
 
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
@@ -225,11 +228,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
       String filename = getView().getOutFile();
       if(filename == null || filename.equals("")) {
         result.add("DestinationFileIsMissing");
-      } else if(getView().getFileFormat().equalsIgnoreCase("excel") && !filename.endsWith(".xls") && !filename
-          .endsWith(".xlsx")) {
-        result.add("ExcelFileSuffixInvalid");
-      } else if(getView().getFileFormat().equalsIgnoreCase("xml") && !filename.endsWith(".zip")) {
-        result.add("ZipFileSuffixInvalid");
       }
       return result;
     }
@@ -241,16 +239,25 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
       if(getView().getSelectedTables().size() == 0) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
         return false;
-      } else {
-        boolean identifierEntityTable = false;
-        for(TableDto dto : getView().getSelectedTables()) {
-          if(dto.getEntityType().equals(identifierEntityType)) {
-            identifierEntityTable = true;
-            break;
-          }
-        }
-        getView().renderUnitSelection(identifierEntityTable);
       }
+      // Check for duplicate table names
+      Collection<String> namesMemento = new HashSet();
+      for(TableDto dto : getView().getSelectedTables()) {
+        if (namesMemento.contains(dto.getName())){
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExportDataDuplicateTableNames").args(dto.getName()).build());
+          return false;
+        }
+        namesMemento.add(dto.getName());
+      }
+
+      boolean identifierEntityTable = false;
+      for(TableDto dto : getView().getSelectedTables()) {
+        if(dto.getEntityType().equals(identifierEntityType)) {
+          identifierEntityTable = true;
+          break;
+        }
+      }
+      getView().renderUnitSelection(identifierEntityTable);
       return true;
     }
   }
@@ -275,8 +282,9 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     public void onResponseCode(Request request, Response response) {
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
+      String destination = getView().getOutFile();
       getEventBus()
-          .fireEvent(NotificationEvent.newBuilder().info("DataExportationProcessLaunched").args(jobId).build());
+          .fireEvent(NotificationEvent.newBuilder().info("DataExportationProcessLaunched").args(jobId, destination).build());
     }
   }
 
@@ -322,6 +330,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
 
+    void setUsername(String username);
   }
 
 }
