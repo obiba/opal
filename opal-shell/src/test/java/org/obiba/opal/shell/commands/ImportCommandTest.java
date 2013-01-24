@@ -182,6 +182,7 @@ public class ImportCommandTest {
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
     expect(mockOptions.isTables()).andReturn(false).atLeastOnce();
+    expect(mockOptions.isIncremental()).andReturn(false).atLeastOnce();
 
     return mockOptions;
   }
@@ -244,6 +245,7 @@ public class ImportCommandTest {
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
     expect(mockOptions.isTables()).andReturn(false).atLeastOnce();
+    expect(mockOptions.isIncremental()).andReturn(false).atLeastOnce();
 
     return mockOptions;
   }
