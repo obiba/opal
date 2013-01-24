@@ -169,9 +169,10 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
           modifiedPath = outputFilePath + ".zip";
         }
       }
-      else{
-        if (file.getType().equals(FileType.IMAGINARY) && outputFileFormat.equals("csv")) file.createFolder();
+      else if (file.getType().equals(FileType.IMAGINARY) && outputFileFormat.equals("csv")) {
+        file.createFolder();
       }
+
 
     } catch(FileSystemException ex) {
       log.error("Unexpected file system exception in addFileExtensionIfMissing", ex);
