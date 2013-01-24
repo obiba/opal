@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -20,9 +20,11 @@ import org.obiba.opal.shell.commands.options.ShowCommandOptions;
 /**
  * Displays on the standard output the fully qualified name of elements that are available in Opal.
  */
-@CommandUsage(description = "Displays the fully qualified name of each data element currently available in Opal.", syntax = "Syntax: show [--datasources] [--tables] [--units]")
+@CommandUsage(description = "Displays the fully qualified name of each data element currently available in Opal.",
+    syntax = "Syntax: show [--datasources] [--tables] [--units]")
 public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommandOptions> {
 
+  @Override
   public int execute() {
     // If no options specified, show everything (datasources, tables and units).
     boolean showAll = !options.getDatasources() && !options.getTables() && !options.getUnits();
@@ -51,12 +53,13 @@ public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommand
 
   private void showUnits(boolean displayUnits) {
     if(displayUnits) {
-      if(!getFunctionalUnitService().getFunctionalUnits().isEmpty()) {
-        for(FunctionalUnit unit : getFunctionalUnitService().getFunctionalUnits()) {
-          getShell().printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
-        }
-      } else {
+      if(getFunctionalUnitService().getFunctionalUnits().isEmpty()) {
         getShell().printf("No functional units\n");
+      } else {
+        for(FunctionalUnit unit : getFunctionalUnitService().getFunctionalUnits()) {
+          getShell()
+              .printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
+        }
       }
     }
   }

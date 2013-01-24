@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -25,9 +26,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.obiba.magma.Datasource;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -45,30 +46,33 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.web.TimestampedResponses;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
+import org.obiba.opal.web.support.InvalidRequestException;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 public class TableResource extends AbstractValueTableResource {
 
   private final ImportService importService;
 
   public TableResource(ValueTable valueTable) {
-    this(valueTable, Collections.<Locale> emptySet(), null);
+    this(valueTable, Collections.<Locale>emptySet(), null);
   }
 
   public TableResource(ValueTable valueTable, Set<Locale> locales) {
     this(valueTable, locales, null);
   }
 
-  public TableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService) {
+  public TableResource(ValueTable valueTable, Set<Locale> locales, @Nullable ImportService importService) {
     super(valueTable, locales);
     this.importService = importService;
   }
@@ -91,7 +95,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get the entities, optionally filtered by a script.
-   * 
+   *
    * @param script script for filtering the entities
    * @return
    */
@@ -110,7 +114,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get the value set from the given entity identifier, for the variables filtered by the optional 'select' script.
-   * 
+   *
    * @param identifier
    * @param select script for filtering the variables
    * @return
@@ -120,19 +124,20 @@ public class TableResource extends AbstractValueTableResource {
       @QueryParam("select") String select, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     // TODO timestamp is a composite of value set timestamp that fall backs to value table timestamps
     TimestampedResponses.evaluate(request, getValueTable());
-    return new ValueSetResource(getValueTable(),
-        new VariableEntityBean(getValueTable().getEntityType(), identifier));
+    return new ValueSetResource(getValueTable(), new VariableEntityBean(getValueTable().getEntityType(), identifier));
   }
 
   /**
    * Get timestamps of a value set.
+   *
    * @param request
    * @param identifier
    * @return
    */
   @GET
   @Path("/valueSet/{identifier}/timestamps")
-  public Magma.TimestampsDto getValueSetTimestamps(@Context Request request, @PathParam("identifier") String identifier) {
+  public Magma.TimestampsDto getValueSetTimestamps(@Context Request request,
+      @PathParam("identifier") String identifier) {
     TimestampedResponses.evaluate(request, getValueTable());
     ValueSet vs = getValueTable().getValueSet(new VariableEntityBean(getValueTable().getEntityType(), identifier));
     return Dtos.asDto(vs.getTimestamps()).build();
@@ -152,7 +157,7 @@ public class TableResource extends AbstractValueTableResource {
       @PathParam("variable") String variable, @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     TimestampedResponses.evaluate(request, getValueTable());
     return new ValueSetResource(getValueTable(), getValueTable().getVariableValueSource(variable),
-        new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
+        new VariableEntityBean(getValueTable().getEntityType(), identifier));
   }
 
   /**
@@ -169,34 +174,34 @@ public class TableResource extends AbstractValueTableResource {
   // This should be /valueSets, but its POST is already implemented in ValueSetsResource due to GET not allowing a body
   @POST
   @Path("/valueSet")
-  public Response updateValueSet(ValueSetsDto valueSetsDto, @QueryParam("unit") String unitName,
-      @QueryParam("generateIds") @DefaultValue("false") boolean generateIds,
-      @QueryParam("ignoreUnknownIds") @DefaultValue(
-          "false") boolean ignoreUnknownIds) throws IOException, InterruptedException {
+  public Response updateValueSet(ValueSetsDto valueSetsDto, //
+      @QueryParam("unit") String unitName, //
+      @QueryParam("generateIds") @DefaultValue("false") boolean generateIds, //
+      @QueryParam("ignoreUnknownIds") @DefaultValue("false") boolean ignoreUnknownIds, //
+      @QueryParam("incremental") @DefaultValue("true") boolean incremental) throws IOException, InterruptedException {
     ValueTable vt = getValueTable();
     if(vt.getDatasource() == null) {
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos
-          .getErrorMessage(Status.BAD_REQUEST, "DatasourceCopierIOException",
-              "Cannot write to a table without datasource").build()).build();
+      return Response.status(BAD_REQUEST).entity(ClientErrorDtos
+          .getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", "Cannot write to a table without datasource")
+          .build()).build();
     }
     try {
       if(importService == null) {
         writeValueSets(vt.getDatasource().createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
       } else {
-        StaticDatasource ds = new StaticDatasource("import");
+        Datasource ds = new StaticDatasource("import");
         // static writers will add entities and variables while writing values
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
         importService
-            .importData(unitName, ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
+            .importData(unitName, ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds,
+                incremental);
       }
     } catch(NoSuchFunctionalUnitException ex) {
-      return Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "NoSuchFunctionalUnit", unitName).build())
-          .build();
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "NoSuchFunctionalUnit", unitName).build()).build();
     } catch(RuntimeException ex) {
-      return Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCopierIOException", ex).build())
-          .build();
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", ex).build()).build();
     }
     return Response.ok().build();
   }
@@ -215,6 +220,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get value sets resource for provided variable.
+   *
    * @param request
    * @param name
    * @return
@@ -227,6 +233,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get variable resource.
+   *
    * @param request
    * @param name
    * @return
@@ -239,6 +246,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get transient derived variable.
+   *
    * @param valueTypeName
    * @param repeatable
    * @param scriptQP
@@ -252,13 +260,14 @@ public class TableResource extends AbstractValueTableResource {
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
-        categoriesQP, scriptFP, categoriesFP);
+    JavascriptVariableValueSource jvvs =
+        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
     return getVariableResource(jvvs);
   }
 
   /**
    * Compile a derived variable script.
+   *
    * @param valueTypeName
    * @param repeatable
    * @param scriptQP
@@ -280,6 +289,7 @@ public class TableResource extends AbstractValueTableResource {
 
   /**
    * Get value sets resource for the transient derived variable.
+   *
    * @param valueTypeName
    * @param repeatable
    * @param scriptQP
@@ -294,13 +304,14 @@ public class TableResource extends AbstractValueTableResource {
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
-        categoriesQP, scriptFP, categoriesFP);
+    JavascriptVariableValueSource jvvs =
+        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
     return new ValueSetsResource(getValueTable(), jvvs);
   }
 
   /**
    * Get value set resource for the transient derived variable and entity.
+   *
    * @param request
    * @param identifier
    * @param filterBinary
@@ -313,18 +324,21 @@ public class TableResource extends AbstractValueTableResource {
    * @return
    */
   @Path("/valueSet/{identifier}/variable/_transient")
-  @SuppressWarnings({"unchecked", "PMD.ExcessiveParameterList"})
-  public ValueSetResource getTransientVariableValueSet(@Context Request request,
-      @PathParam("identifier") String identifier,
-      @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary,
-      @QueryParam("valueType") @DefaultValue("text") String valueTypeName,
-      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
-      @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
+  @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList", "MethodWithTooManyParameters" })
+  public ValueSetResource getTransientVariableValueSet( //
+      @Context Request request, //
+      @PathParam("identifier") String identifier, //
+      @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary, //
+      @QueryParam("valueType") @DefaultValue("text") String valueTypeName, //
+      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, //
+      @QueryParam("script") String scriptQP, //
+      @QueryParam("category") List<String> categoriesQP, //
+      @FormParam("script") String scriptFP, //
       @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
-        categoriesQP, scriptFP, categoriesFP);
+    JavascriptVariableValueSource jvvs =
+        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
     return new ValueSetResource(getValueTable(), jvvs,
-        new VariableEntityBean(this.getValueTable().getEntityType(), identifier));
+        new VariableEntityBean(getValueTable().getEntityType(), identifier));
   }
 
   @Path("/compare")
@@ -332,6 +346,7 @@ public class TableResource extends AbstractValueTableResource {
     return new CompareResource(getValueTable());
   }
 
+  @Override
   @Path("/locales")
   public LocalesResource getLocalesResource() {
     return super.getLocalesResource();
@@ -341,6 +356,7 @@ public class TableResource extends AbstractValueTableResource {
   // private methods
   //
 
+  @SuppressWarnings("OverlyNestedMethod")
   private void writeValueSets(ValueTableWriter tableWriter, ValueSetsDto valueSetsDto) {
     try {
       for(ValueSetsDto.ValueSetDto valueSetDto : valueSetsDto.getValueSetsList()) {
@@ -362,27 +378,25 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   private ValueType resolveValueType(String valueTypeName) {
-    ValueType valueType = null;
     try {
-      valueType = ValueType.Factory.forName(valueTypeName);
+      return ValueType.Factory.forName(valueTypeName);
     } catch(IllegalArgumentException ex) {
       throw new InvalidRequestException("IllegalParameterValue", "valueType", valueTypeName);
     }
-    return valueType;
   }
 
   private VariableResource getVariableResource(VariableValueSource source) {
-    return new VariableResource(this.getValueTable(), source);
+    return new VariableResource(getValueTable(), source);
   }
 
   private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
       String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
-    if(script == null || script.equals("")) {
+    if(Strings.isNullOrEmpty(script)) {
       script = scriptFP;
     }
-    if(script == null || script.equals("")) {
+    if(Strings.isNullOrEmpty(script)) {
       script = "null";
     }
     if(categories == null || categories.isEmpty()) {
@@ -403,7 +417,7 @@ public class TableResource extends AbstractValueTableResource {
     if(repeatable) {
       builder.repeatable();
     }
-    builder.addCategories(categories.toArray(new String[] {}));
+    builder.addCategories(categories.toArray(new String[categories.size()]));
 
     return builder.build();
   }

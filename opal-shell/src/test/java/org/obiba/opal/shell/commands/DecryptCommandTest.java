@@ -1,18 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +25,11 @@ import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.DecryptCommandOptions;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 /**
  * Unit tests for {@link DecryptCommand}.
@@ -135,7 +135,8 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     DecryptService mockDecryptService = createMock(DecryptService.class);
     mockDecryptService.decryptData(unitName, DecryptCommand.DECRYPT_DATASOURCE_NAME, inputFile);
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockUnitDir, mockRuntime, mockShell, mockDecryptService, mockUnitService);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockUnitDir, mockRuntime, mockShell, mockDecryptService,
+        mockUnitService);
 
     DecryptCommand decryptCommand = createDecryptCommand(mockRuntime, mockUnitService);
     decryptCommand.setDecryptService(mockDecryptService);
@@ -143,7 +144,8 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     decryptCommand.setShell(mockShell);
     decryptCommand.execute();
 
-    verify(mockOptions, mockFileSystemRoot, mockFileSystem, mockUnitDir, mockRuntime, mockShell, mockDecryptService, mockUnitService);
+    verify(mockOptions, mockFileSystemRoot, mockFileSystem, mockUnitDir, mockRuntime, mockShell, mockDecryptService,
+        mockUnitService);
   }
 
   //
@@ -169,7 +171,8 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     };
   }
 
-  private DecryptCommandOptions createMockOptionsForInvalidOutputDirectory(String unitName, String invalidOutputDirPath) {
+  private DecryptCommandOptions createMockOptionsForInvalidOutputDirectory(String unitName,
+      String invalidOutputDirPath) {
     DecryptCommandOptions mockOptions = createMock(DecryptCommandOptions.class);
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();

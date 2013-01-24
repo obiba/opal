@@ -1,4 +1,5 @@
 import "Ws.proto";
+
 package Opal;
 
 option java_package = "org.obiba.opal.web.model";
@@ -37,6 +38,7 @@ message ImportCommandOptionsDto {
   optional bool force = 6 [default = false];
   repeated string tables = 7;
   optional bool ignore = 8 [default = false];
+  optional bool incremental = 9 [default = true];
 }
 
 message CopyCommandOptionsDto {

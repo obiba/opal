@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -17,15 +17,15 @@ import org.obiba.magma.VariableEntity;
  */
 public interface PrivateVariableEntityMap {
 
-  public VariableEntity publicEntity(VariableEntity privateEntity);
+  VariableEntity publicEntity(VariableEntity privateEntity);
 
-  public boolean hasPublicEntity(VariableEntity publicEntity);
+  boolean hasPublicEntity(VariableEntity publicEntity);
 
-  public VariableEntity privateEntity(VariableEntity publicEntity);
+  VariableEntity privateEntity(VariableEntity publicEntity);
 
-  public boolean hasPrivateEntity(VariableEntity privateEntity);
+  boolean hasPrivateEntity(VariableEntity privateEntity);
 
-  public VariableEntity createPublicEntity(VariableEntity privateEntity);
+  VariableEntity createPublicEntity(VariableEntity privateEntity);
 
-  public VariableEntity createPrivateEntity(VariableEntity publicEntity);
+  VariableEntity createPrivateEntity(VariableEntity publicEntity);
 }

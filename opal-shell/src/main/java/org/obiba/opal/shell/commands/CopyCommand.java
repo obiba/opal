@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -12,8 +12,9 @@ package org.obiba.opal.shell.commands;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -45,7 +46,10 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Provides ability to copy Magma tables to an existing datasource or a file based datasource.
  */
-@CommandUsage(description = "Copy tables to an existing destination datasource or to a specified file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.", syntax = "Syntax: copy [--unit UNIT] [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [TABLE_NAME...]")
+@SuppressWarnings("ClassTooDeepInInheritanceTree")
+@CommandUsage(
+    description = "Copy tables to an existing destination datasource or to a specified file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.",
+    syntax = "Syntax: copy [--unit UNIT] [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   @Autowired
@@ -60,15 +64,14 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   public CopyCommand() {
-    super();
-
-    this.fileDatasourceFactory = new MultipleFileCsvDatasourceFactory();
+    fileDatasourceFactory = new MultipleFileCsvDatasourceFactory();
     fileDatasourceFactory.setNext(new SingleFileCsvDatasourceFactory())//
-    .setNext(new ExcelDatasourceFactory())//
-    .setNext(new FsDatasourceFactory()) //
-    .setNext(new NullDatasourceFactory());
+        .setNext(new ExcelDatasourceFactory())//
+        .setNext(new FsDatasourceFactory()) //
+        .setNext(new NullDatasourceFactory());
   }
 
+  @Override
   public int execute() {
     int errorCode = 1; // initialize as non-zero (error)
 
@@ -79,11 +82,14 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         destinationDatasource = getDestinationDatasource();
         Set<ValueTable> tables = getValueTables();
         getShell().printf("Copying %d tables to %s.\n", tables.size(), destinationDatasource.getName());
-        exportService.exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource, buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
+        exportService
+            .exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource,
+                buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
         getShell().printf("Successfully copied all tables.\n");
         errorCode = 0; // success!
       } catch(Exception e) {
         getShell().printf("%s\n", e.getMessage());
+        //noinspection UseOfSystemOutOrSystemErr
         e.printStackTrace(System.err);
       } finally {
         if(options.isOut() && destinationDatasource != null) {
@@ -119,12 +125,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private DatasourceCopier.Builder buildDatasourceCopier(Datasource destinationDatasource) {
     // build a datasource copier according to options
     DatasourceCopier.Builder builder;
-    if(options.getNoValues()) {
-      builder = DatasourceCopier.Builder.newCopier().dontCopyValues();
-    } else {
-      // get a builder with logging facilities
-      builder = exportService.newCopier(destinationDatasource);
-    }
+    builder = options.getNoValues()
+        ? DatasourceCopier.Builder.newCopier().dontCopyValues()
+        : exportService.newCopier(destinationDatasource);
 
     if(options.getNoVariables()) {
       builder.dontCopyMetadata();
@@ -179,11 +182,12 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateOptions() {
-    return validateUnit() && validateSourceOrTables() && validateSource() && validateDestination() && validateTables() && validateSwitches();
+    return validateUnit() && validateSourceOrTables() && validateSource() && validateDestination() &&
+        validateTables() && validateSwitches();
   }
 
   private boolean validateUnit() {
-    if(options.isUnit() && getFunctionalUnitService().hasFunctionalUnit(options.getUnit()) == false) {
+    if(options.isUnit() && !getFunctionalUnitService().hasFunctionalUnit(options.getUnit())) {
       getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
       return false;
     }
@@ -216,7 +220,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           getShell().printf("'%s' refers to an unknown datasource: '%s'.\n", tableName, resolver.getDatasourceName());
           return false;
         } catch(NoSuchValueTableException e) {
-          getShell().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(), resolver.getDatasourceName());
+          getShell().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(),
+              resolver.getDatasourceName());
           return false;
         }
       }
@@ -258,7 +263,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   /**
    * Get the output file to which the metadata will be exported to.
-   * 
+   *
    * @return The output file.
    * @throws FileSystemException
    */
@@ -274,17 +279,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   /**
    * Resolves the output file based on the command parameter. Creates the necessary parent folders (when required).
-   * 
-   * @return A FileObject representing the ouput file.
+   *
+   * @return A FileObject representing the output file.
    * @throws FileSystemException
    */
   private FileObject resolveOutputFileAndCreateParentFolders() throws FileSystemException {
     FileObject outputFile;
-    if(options.isUnit() && isRelativeFilePath(options.getOut())) {
-      outputFile = getFileInUnitDirectory(options.getOut());
-    } else {
-      outputFile = getFile(options.getOut());
-    }
+    outputFile = options.isUnit() && isRelativeFilePath(options.getOut())
+        ? getFileInUnitDirectory(options.getOut())
+        : getFile(options.getOut());
 
     // Create the parent directory, if it doesn't already exist.
     FileObject directory = outputFile.getParent();
@@ -292,8 +295,11 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       directory.createFolder();
     }
 
-    if(outputFile.getName().getExtension().equals("xls")) {
-      getShell().printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format which supports 16K columns.\n");
+    if("xls".equals(outputFile.getName().getExtension())) {
+      getShell()
+          .printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows " +
+              "which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format " +
+              "which supports 16K columns.\n");
     }
     return outputFile;
   }
@@ -323,7 +329,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
   }
 
-  private void appendUnparsedList(StringBuffer sb, List<String> unparsedList) {
+  private void appendUnparsedList(StringBuffer sb, Iterable<String> unparsedList) {
     for(String unparsed : unparsedList) {
       sb.append(' ');
       sb.append(unparsed);
@@ -337,18 +343,20 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   abstract class FileDatasourceFactory {
     protected FileDatasourceFactory next;
 
-    public FileDatasourceFactory setNext(FileDatasourceFactory next) {
+    public FileDatasourceFactory setNext(@SuppressWarnings("ParameterHidesMemberVariable") FileDatasourceFactory next) {
       this.next = next;
       return next;
     }
 
     /**
      * Create a datasource and if null, ask to the next factory in the chain to do it.
+     *
      * @param outputFile
      * @return null if no datasource could be created along the chain from this factory.
      * @throws IOException
      */
-    public Datasource createDatasource(final FileObject outputFile) throws IOException {
+    @Nullable
+    public Datasource createDatasource(FileObject outputFile) throws IOException {
       Datasource ds = internalCreateDatasource(outputFile);
       if(ds == null && next != null) {
         ds = next.createDatasource(outputFile);
@@ -358,16 +366,19 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     /**
      * Create a datasource if applicable or return null.
+     *
      * @param outputFile
      * @return null if parameters are not applicable.
      * @throws IOException
      */
-    abstract protected Datasource internalCreateDatasource(final FileObject outputFile) throws IOException;
+    @Nullable
+    abstract protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException;
   }
 
   abstract class CsvDatasourceFactory extends FileDatasourceFactory {
 
-    protected void addCsvValueTable(CsvDatasource ds, ValueTable table, File variablesFile, File dataFile) {
+    protected void addCsvValueTable(CsvDatasource ds, ValueTable table, @Nullable File variablesFile,
+        @Nullable File dataFile) {
       ds.addValueTable(table.getName(), variablesFile, dataFile);
       ds.setVariablesHeader(table.getName(), CsvUtil.getCsvVariableHeader(table));
     }
@@ -382,15 +393,16 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   class MultipleFileCsvDatasourceFactory extends CsvDatasourceFactory {
 
+    @Nullable
     @Override
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
-      if(outputFile.getType().equals(FileType.FOLDER)) {
+      if(outputFile.getType() == FileType.FOLDER) {
         return getMultipleFileCsvDatasource(getLocalFile(outputFile));
       }
       return null;
     }
 
-    private CsvDatasource getMultipleFileCsvDatasource(final File directory) throws IOException {
+    private Datasource getMultipleFileCsvDatasource(File directory) throws IOException {
       CsvDatasource ds = new CsvDatasource(directory.getName());
       for(ValueTable table : getValueTables()) {
         File tableDir = new File(directory, table.getName());
@@ -422,18 +434,21 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       return null;
     }
 
-    private CsvDatasource getSingleFileCsvDatasource(String name, final File csvFile) throws IOException {
+    private Datasource getSingleFileCsvDatasource(String name, File csvFile) throws IOException {
       CsvDatasource ds = new CsvDatasource(name);
 
       // one table only
       Set<ValueTable> tables = getValueTables();
       if(tables.size() > 1) {
-        throw new IllegalArgumentException("Only one table expected when writting to a CSV file. Provide a directory instead for copying several tables.");
+        throw new IllegalArgumentException(
+            "Only one table expected when writing to a CSV file. Provide a directory instead for copying several tables.");
       }
 
       if(!options.getNoVariables() && !options.getNoValues()) {
-        throw new IllegalArgumentException("Writting both variables and values in the same CSV file is not supported. Provide a directory instead.");
-      } else if(!options.getNoVariables()) {
+        throw new IllegalArgumentException(
+            "Writing both variables and values in the same CSV file is not supported. Provide a directory instead.");
+      }
+      if(!options.getNoVariables()) {
         createFileIfNotExists(csvFile);
         addCsvValueTable(ds, tables.iterator().next(), csvFile, null);
       } else if(!options.getNoValues()) {
@@ -448,7 +463,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   class ExcelDatasourceFactory extends FileDatasourceFactory {
     @Override
-    public Datasource internalCreateDatasource(final FileObject outputFile) {
+    public Datasource internalCreateDatasource(FileObject outputFile) {
       if(outputFile.getName().getExtension().startsWith("xls")) {
         return new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
       }
@@ -458,7 +473,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   class FsDatasourceFactory extends FileDatasourceFactory {
     @Override
-    public Datasource internalCreateDatasource(final FileObject outputFile) {
+    public Datasource internalCreateDatasource(FileObject outputFile) {
       if(outputFile.getName().getExtension().startsWith("zip")) {
         return new FsDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
       }
@@ -468,8 +483,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   class NullDatasourceFactory extends FileDatasourceFactory {
     @Override
-    public Datasource internalCreateDatasource(final FileObject outputFile) {
-      if(outputFile.getName().getPath().equals("/dev/null")) {
+    public Datasource internalCreateDatasource(FileObject outputFile) {
+      if("/dev/null".equals(outputFile.getName().getPath())) {
         return new NullDatasource("/dev/null");
       }
       return null;

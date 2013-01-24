@@ -1,13 +1,15 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.core.magma;
+
+import javax.annotation.Nullable;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -21,7 +23,7 @@ import org.obiba.opal.core.unit.FunctionalUnit;
 /**
  * When an Opal table is exported to some functional unit, entities must be exported with the identifiers understood by
  * that unit. The "public" Opal identifiers must be replaced by the "private" identifiers for the unit in question.
- * 
+ * <p/>
  * For a given Opal table and functional unit, this class provides a {@link View} of that table with identifiers
  * appropriate to that unit.
  */
@@ -59,7 +61,7 @@ public class FunctionalUnitView extends View {
 
   /**
    * Constructor.
-   * 
+   *
    * @param unit functional unit
    * @param policy the policy of which identifier to make public (opal identifier or unit identifier)
    * @param opalTable opal value table
@@ -67,7 +69,8 @@ public class FunctionalUnitView extends View {
    * @param identifierGenerator strategy for generating missing identifiers. can be null, in which case, identifiers
    * will not be generated
    */
-  public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable, IParticipantIdentifier identifierGenerator, boolean ignoreUnknownIdentifier) {
+  public FunctionalUnitView(@Nullable FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable,
+      @Nullable IParticipantIdentifier identifierGenerator, boolean ignoreUnknownIdentifier) {
     // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
     super(dataTable == null ? null : dataTable.getName(), dataTable);
     if(unit == null) throw new IllegalArgumentException("unit cannot be null");
@@ -95,14 +98,14 @@ public class FunctionalUnitView extends View {
     this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, identifierGeneratorOrDefault);
 
     switch(policy) {
-    case UNIT_IDENTIFIERS_ARE_PUBLIC:
-      this.mappingFunction = new UnitIdentifiersArePublic();
-      break;
-    case UNIT_IDENTIFIERS_ARE_PRIVATE:
-      this.mappingFunction = new UnitIdentifiersArePrivate();
-      break;
-    default:
-      throw new IllegalArgumentException("unknown policy '" + policy + "'");
+      case UNIT_IDENTIFIERS_ARE_PUBLIC:
+        this.mappingFunction = new UnitIdentifiersArePublic();
+        break;
+      case UNIT_IDENTIFIERS_ARE_PRIVATE:
+        this.mappingFunction = new UnitIdentifiersArePrivate();
+        break;
+      default:
+        throw new IllegalArgumentException("unknown policy '" + policy + "'");
     }
   }
 
@@ -117,7 +120,7 @@ public class FunctionalUnitView extends View {
 
   /**
    * Given an opal identifier, the apply() method will return the corresponding unit identifier.
-   * 
+   * <p/>
    * <pre>
    * apply: publicEntity --> privateEntity
    * unapply: privateEntity --> publicEntity
@@ -127,7 +130,9 @@ public class FunctionalUnitView extends View {
     public VariableEntity apply(VariableEntity from) {
       VariableEntity privateEntity = entityMap.privateEntity(from);
       if(privateEntity == null && ignoreUnknownIdentifier == false) {
-        throw new RuntimeException("Functional unit '" + unit.getName() + "' does not have an identifier for entity '" + from.getIdentifier() + "'");
+        throw new RuntimeException(
+            "Functional unit '" + unit.getName() + "' does not have an identifier for entity '" + from.getIdentifier() +
+                "'");
       }
       return privateEntity;
     }
@@ -142,7 +147,7 @@ public class FunctionalUnitView extends View {
    * Given a unit identifier, the apply() method will return the corresponding opal identifier. If
    * {@code allowIdentifierGeneration} is true, the apply method will generate opal identifiers when one does not
    * already exist.
-   * 
+   * <p/>
    * <pre>
    * apply: privateEntity --> publicEntity
    * unapply: publicEntity --> privateEntity
@@ -155,7 +160,9 @@ public class FunctionalUnitView extends View {
         if(allowIdentifierGeneration) {
           publicEntity = entityMap.createPublicEntity(from);
         } else if(ignoreUnknownIdentifier == false) {
-          throw new RuntimeException("Functional unit '" + unit.getName() + "' has an unknown entity with identifier '" + from.getIdentifier() + "'");
+          throw new RuntimeException(
+              "Functional unit '" + unit.getName() + "' has an unknown entity with identifier '" +
+                  from.getIdentifier() + "'");
         }
       }
       return publicEntity;

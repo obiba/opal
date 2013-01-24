@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -63,24 +64,27 @@ public class DatasourceResource {
   @PathParam("name")
   private String name;
 
+  @Nonnull
   private final OpalConfigurationService configService;
 
   private final ImportService importService;
 
+  @Nonnull
   private final ViewManager viewManager;
 
+  @Nonnull
   private final ViewDtos viewDtos;
 
   private Datasource transientDatasourceInstance;
 
   private final Set<ValueTableUpdateListener> tableListeners;
 
-  @Autowired
   @Value("${org.obiba.opal.languages}")
   private String localesProperty;
 
   private Set<Locale> locales;
 
+  @SuppressWarnings("NullableProblems")
   @Autowired
   public DatasourceResource(OpalConfigurationService configService, ImportService importService,
       ViewManager viewManager, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
@@ -97,12 +101,14 @@ public class DatasourceResource {
   }
 
   // Used for testing
+  @SuppressWarnings("ConstantConditions")
   DatasourceResource(String name) {
     this(null, null, null, name);
   }
 
   // Used for testing
-  DatasourceResource(OpalConfigurationService configService, ViewManager viewManager, ViewDtos viewDtos, String name) {
+  DatasourceResource(@Nonnull OpalConfigurationService configService, @Nonnull ViewManager viewManager,
+      @Nonnull ViewDtos viewDtos, String name) {
     this.configService = configService;
     this.viewManager = viewManager;
     this.viewDtos = viewDtos;
@@ -127,13 +133,12 @@ public class DatasourceResource {
   // @Cache(isPrivate = true, mustRevalidate = true, maxAge = 10)
   public Magma.DatasourceDto get() {
     Datasource ds = getDatasource();
-
     return Dtos.asDto(ds).build();
   }
 
   @DELETE
   public Response removeDatasource() {
-    ResponseBuilder response = null;
+    ResponseBuilder response;
     if(MagmaEngine.get().hasTransientDatasource(name)) {
       MagmaEngine.get().removeTransientDatasource(name);
       response = Response.ok();
@@ -199,7 +204,7 @@ public class DatasourceResource {
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());
 
-    return Response.created(viewUri)//
+    return Response.created(viewUri)
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.VIEW_ALL)).build();
   }
 
@@ -221,7 +226,7 @@ public class DatasourceResource {
   }
 
   Datasource getDatasource() {
-    Datasource ds = null;
+    Datasource ds;
     if(MagmaEngine.get().hasDatasource(name)) {
       ds = MagmaEngine.get().getDatasource(name);
     } else {

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.util.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
@@ -25,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportP
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -43,6 +46,14 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_CREATED;
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
+
+@SuppressWarnings("OverlyCoupledClass")
 public class DataImportPresenter extends WizardPresenterWidget<DataImportPresenter.Display> {
 
   public static final WizardType WizardType = new WizardType();
@@ -72,8 +83,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private ImportData importData;
 
   @Inject
-  @SuppressWarnings("PMD.ExcessiveParameterList")
-  public DataImportPresenter(final Display display, final EventBus eventBus, //
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
+  public DataImportPresenter(Display display, EventBus eventBus, //
       CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
       LimesurveyStepPresenter limesurveyStepPresenter,//
       RestStepPresenter restStepPresenter,//
@@ -186,51 +197,57 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
+  @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateFormatStepDisplay() {
     destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
-    if(getView().getImportFormat().equals(ImportFormat.CSV)) {
-      csvFormatStepPresenter.clear();
-      formatStepPresenter = csvFormatStepPresenter;
-      getView().setFormatStepDisplay(csvFormatStepPresenter.getDisplay());
-    } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
-      formatStepPresenter = xmlFormatStepPresenter;
-      getView().setFormatStepDisplay(xmlFormatStepPresenter.getDisplay());
-    } else if(getView().getImportFormat() == ImportFormat.LIMESURVEY) {
-      formatStepPresenter = limesurveyStepPresenter;
-      getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
-    } else if(getView().getImportFormat() == ImportFormat.REST) {
-      formatStepPresenter = restStepPresenter;
-      getView().setFormatStepDisplay(restStepPresenter.getView());
-    } else {
-      formatStepPresenter = null;
-      throw new IllegalStateException("Unknown format: " + getView().getImportFormat());
+    switch(getView().getImportFormat()) {
+      case CSV:
+        csvFormatStepPresenter.clear();
+        formatStepPresenter = csvFormatStepPresenter;
+        getView().setFormatStepDisplay(csvFormatStepPresenter.getDisplay());
+        break;
+      case XML:
+        formatStepPresenter = xmlFormatStepPresenter;
+        getView().setFormatStepDisplay(xmlFormatStepPresenter.getDisplay());
+        break;
+      case LIMESURVEY:
+        formatStepPresenter = limesurveyStepPresenter;
+        getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
+        break;
+      case REST:
+        formatStepPresenter = restStepPresenter;
+        getView().setFormatStepDisplay(restStepPresenter.getView());
+        break;
+      default:
+        formatStepPresenter = null;
+        throw new IllegalStateException("Unknown format: " + getView().getImportFormat());
     }
   }
 
-  private void launchImport(ImportData importData) {
+  private void launchImport(@SuppressWarnings("ParameterHidesMemberVariable") ImportData importData) {
     this.importData = importData;
-
-    if(importData.getImportFormat().equals(ImportFormat.XML)) {
-      submitJob(createImportCommandOptionsDto(importData.getXmlFile()));
-    } else if(importData.getImportFormat().equals(ImportFormat.CSV)) {
-      submitJob(createImportCommandOptionsDto(importData.getCsvFile()));
-    } else if(importData.getImportFormat().equals(ImportFormat.LIMESURVEY)) {
-      submitJob(createLimesurveyImportCommandOptionsDto());
-    } else if(importData.getImportFormat().equals(ImportFormat.REST)) {
-      submitJob(createRestImportCommandOptionsDto());
+    switch(importData.getImportFormat()) {
+      case XML:
+        submitJob(createImportCommandOptionsDto(importData.getXmlFile()));
+        break;
+      case CSV:
+        submitJob(createImportCommandOptionsDto(importData.getCsvFile()));
+        break;
+      case LIMESURVEY:
+        submitJob(createLimesurveyImportCommandOptionsDto());
+        break;
+      case REST:
+        submitJob(createRestImportCommandOptionsDto());
+        break;
     }
   }
 
   private void submitJob(ImportCommandOptionsDto dto) {
-
-    ResponseCodeCallback callback = new SubmitJobResponseCodeCallBack();
-
-    UriBuilder uriBuilder = UriBuilder.create();
-    uriBuilder.segment("datasource", dto.getDestination(), "commands", "_import");
+    UriBuilder uriBuilder = UriBuilder.create().segment("datasource", dto.getDestination(), "commands", "_import");
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
         .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
-        .withCallback(201, callback).withCallback(400, callback).withCallback(500, callback).send();
+        .withCallback(new SubmitJobResponseCodeCallBack(), SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
+        .send();
   }
 
   private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
@@ -241,7 +258,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     return createImportCommandOptionsDto(null);
   }
 
-  private ImportCommandOptionsDto createImportCommandOptionsDto(String selectedFile) {
+  private ImportCommandOptionsDto createImportCommandOptionsDto(@Nullable String selectedFile) {
     ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
     dto.setDestination(importData.getDestinationDatasourceName());
     if(importData.isArchiveMove()) {
@@ -270,7 +287,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private final class SubmitJobResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == 201) {
+      if(response.getStatusCode() == SC_CREATED) {
         String location = response.getHeader("Location");
         String jobId = location.substring(location.lastIndexOf('/') + 1);
         getEventBus()
@@ -285,7 +302,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     @Override
     public boolean validateFormat() {
       if(formatStepPresenter.validate()) {
-        if(getView().getImportFormat().equals(ImportFormat.CSV)) {
+        if(getView().getImportFormat() == ImportFormat.CSV) {
           String name = csvFormatStepPresenter.getSelectedFile();
           name = name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
           destinationSelectionStepPresenter.getView().setTable(name);
@@ -364,18 +381,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     private void deleteTransientDatasource() {
       if(importData.getTransientDatasourceName() == null) return;
 
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          // ignore
-        }
-      };
-      // TODO use uribuilder
-      ResourceRequestBuilderFactory.newBuilder().forResource("/datasource/" + importData.getTransientDatasourceName())
-          .delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-          .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+      UriBuilder ub = UriBuilder.create().segment("datasource", importData.getTransientDatasourceName());
+      ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()) //
+          .delete() //
+          .withCallback(ResponseCodeCallbacks.NO_OP, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
+          .send();
     }
 
     private void createTransientDatasource() {
@@ -383,12 +393,12 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
       final DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importData);
 
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+      ResponseCodeCallback callback = new ResponseCodeCallback() {
 
         @Override
         public void onResponseCode(Request request, Response response) {
           transientRequest = null;
-          if(response.getStatusCode() == 201) {
+          if(response.getStatusCode() == SC_CREATED) {
             DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
             importData.setTransientDatasourceName(datasourceDto.getName());
             datasourceDiff(factory, datasourceDto);
@@ -396,34 +406,35 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
             getView().showDatasourceCreationError((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
           }
         }
-      };
 
-      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
-          .forResource("/transient-datasources").post()
-              //
-          .withResourceBody(DatasourceFactoryDto.stringify(factory))
-              //
-          .withCallback(201, callbackHandler).withCallback(400, callbackHandler).withCallback(500, callbackHandler)
-          .send();
-    }
+        private void datasourceDiff(DatasourceFactoryDto factory, DatasourceDto datasourceDto) {
+          DatasourceCreatedCallback datasourceCreatedCallback = new DatasourceCreatedCallback() {
 
-    private void datasourceDiff(final DatasourceFactoryDto factory, final DatasourceDto datasourceDto) {
-      diffRequest = comparedDatasourcesReportPresenter.compare(importData.getTransientDatasourceName(), //
-          importData.getDestinationDatasourceName(), new DatasourceCreatedCallback() {
+            @Override
+            public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
+              getView().showDatasourceCreationSuccess();
+            }
 
-        @Override
-        public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
+            @Override
+            public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
+              getView().showDatasourceCreationError(error);
+            }
+          };
+          diffRequest = comparedDatasourcesReportPresenter
+              .compare(importData.getTransientDatasourceName(), importData.getDestinationDatasourceName(),
+                  datasourceCreatedCallback, factory, datasourceDto);
           getView().showDatasourceCreationSuccess();
         }
+      };
 
-        @Override
-        public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
-          getView().showDatasourceCreationError(error);
-        }
-      },//
-          factory, datasourceDto);
-      getView().showDatasourceCreationSuccess();
+      transientRequest =
+          ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource("/transient-datasources")
+              .post() //
+              .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
+              .withCallback(callback, SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
+              .send();
     }
+
   }
 
   public interface Display extends WizardView {
@@ -442,7 +453,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     void showDatasourceCreationError(ClientErrorDto errorDto);
 
-    public void setComparedDatasourcesReportStepInHandler(StepInHandler handler);
+    void setComparedDatasourcesReportStepInHandler(StepInHandler handler);
 
     void setComparedDatasourcesReportDisplay(WizardStepDisplay display);
 

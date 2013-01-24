@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -22,7 +22,7 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
   // Instance Variables
   //
 
-  private ImportCommandOptionsDto dto;
+  private final ImportCommandOptionsDto dto;
 
   //
   // Constructors
@@ -36,10 +36,12 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
   // ImportCommandOptions Methods
   //
 
+  @Override
   public boolean isHelp() {
     return false;
   }
 
+  @Override
   public String getUnit() {
     return dto.getUnit();
   }
@@ -49,22 +51,27 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
     return dto.hasUnit();
   }
 
+  @Override
   public String getDestination() {
     return dto.getDestination();
   }
 
+  @Override
   public boolean isArchive() {
     return dto.hasArchive();
   }
 
+  @Override
   public String getArchive() {
     return dto.getArchive();
   }
 
+  @Override
   public boolean isFiles() {
     return dto.getFilesCount() != 0;
   }
 
+  @Override
   public List<String> getFiles() {
     return dto.getFilesList();
   }
@@ -97,5 +104,10 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
   @Override
   public boolean isIgnore() {
     return dto.getIgnore();
+  }
+
+  @Override
+  public boolean isIncremental() {
+    return dto.getIncremental();
   }
 }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -22,7 +22,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -46,6 +45,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 @Component
 @Path("/datasources")
 public class DatasourcesResource {
@@ -58,8 +59,10 @@ public class DatasourcesResource {
   private final OpalConfigurationService configService;
 
   @Autowired
-  public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry, OpalConfigurationService configService) {
-    if(datasourceFactoryRegistry == null) throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
+  public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry,
+      OpalConfigurationService configService) {
+    if(datasourceFactoryRegistry == null)
+      throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
 
     this.configService = configService;
@@ -68,11 +71,11 @@ public class DatasourcesResource {
 
   @GET
   public List<Magma.DatasourceDto> getDatasources() {
-    final List<Magma.DatasourceDto> datasources = Lists.newArrayList();
+    List<Magma.DatasourceDto> datasources = Lists.newArrayList();
 
     for(Datasource from : MagmaEngine.get().getDatasources()) {
-      URI dslink = UriBuilder.fromPath("/").path(DatasourceResource.class).build(from.getName());
-      Magma.DatasourceDto.Builder ds = Dtos.asDto(from).setLink(dslink.toString());
+      URI dsLink = UriBuilder.fromPath("/").path(DatasourceResource.class).build(from.getName());
+      Magma.DatasourceDto.Builder ds = Dtos.asDto(from).setLink(dsLink.toString());
       datasources.add(ds.build());
     }
     sortByName(datasources);
@@ -81,8 +84,8 @@ public class DatasourcesResource {
   }
 
   @POST
-  public Response createDatasource(@Context final UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
-    ResponseBuilder response = null;
+  public Response createDatasource(@Context UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
+    ResponseBuilder response;
     try {
       final DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
       Datasource ds = MagmaEngine.get().addDatasource(factory);
@@ -96,22 +99,25 @@ public class DatasourcesResource {
       UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(ds.getName());
       response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
     } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
     } catch(DuplicateDatasourceNameException duplicateDsNameEx) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build());
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateDatasourceName").build());
     } catch(DatasourceParsingException dsParsingEx) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx).build());
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx).build());
     } catch(MagmaRuntimeException dsCreationFailedEx) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
     }
-
     return response.build();
   }
 
   @GET
   @Path("/tables")
   public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType) {
-    final List<Magma.TableDto> tables = Lists.newArrayList();
+    List<Magma.TableDto> tables = Lists.newArrayList();
 
     for(Datasource from : MagmaEngine.get().getDatasources()) {
       tables.addAll(new TablesResource(from).getTables(false, entityType));

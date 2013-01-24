@@ -1,19 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
-
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,6 +25,12 @@ import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 /**
  * Unit tests for {@link ImportCommand}.
@@ -84,7 +84,7 @@ public class ImportCommandTest {
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     OpalShell mockShell = createMockShellForRelativePathImport("my-unit", "test.zip");
     ImportService mockImportService = createMock(ImportService.class);
-    mockImportService.importData("my-unit", mockFile, "opal-data", true, false);
+    mockImportService.importData("my-unit", mockFile, "opal-data", true, false, false);
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
 
     test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir, mockFile);
@@ -104,13 +104,14 @@ public class ImportCommandTest {
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
     ImportService mockImportService = createMock(ImportService.class);
     for(FileObject mockFile : mockFilesInUnitDir) {
-      mockImportService.importData("my-unit", mockFile, "opal-data", true, false);
+      mockImportService.importData("my-unit", mockFile, "opal-data", true, false, false);
     }
 
     test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir);
   }
 
-  private void test(ImportCommandOptions mockOptions, OpalShell mockShell, OpalRuntime mockRuntime, FunctionalUnitService mockUnitService, ImportService mockImportService, Object... otherMocks) {
+  private void test(ImportCommandOptions mockOptions, OpalShell mockShell, OpalRuntime mockRuntime,
+      FunctionalUnitService mockUnitService, ImportService mockImportService, Object... otherMocks) {
 
     replay(mockOptions, mockShell, mockRuntime, mockUnitService);
     if(mockImportService != null) replay(mockImportService);
@@ -167,7 +168,8 @@ public class ImportCommandTest {
     return mockShell;
   }
 
-  private ImportCommandOptions createMockOptionsForRelativePathImport(String unitName, String destination, String relativeFilePath) {
+  private ImportCommandOptions createMockOptionsForRelativePathImport(String unitName, String destination,
+      String relativeFilePath) {
     ImportCommandOptions mockOptions = createMock(ImportCommandOptions.class);
 
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
@@ -184,7 +186,8 @@ public class ImportCommandTest {
     return mockOptions;
   }
 
-  private FunctionalUnitService createMockUnitService(FileObject mockUnitDir, String unitName) throws FileSystemException {
+  private FunctionalUnitService createMockUnitService(FileObject mockUnitDir, String unitName)
+      throws FileSystemException {
     FunctionalUnitService mockService = createMock(FunctionalUnitService.class);
     expect(mockService.hasFunctionalUnit(unitName)).andReturn(true).atLeastOnce();
     expect(mockService.getFunctionalUnit(unitName)).andReturn(new FunctionalUnit(unitName, null)).anyTimes();
@@ -213,7 +216,8 @@ public class ImportCommandTest {
     return mockFile;
   }
 
-  private FileObject createMockUnitDirectoryForRelativePathImport(FileObject mockFile, String relativeFilePath) throws IOException {
+  private FileObject createMockUnitDirectoryForRelativePathImport(FileObject mockFile, String relativeFilePath)
+      throws IOException {
     FileObject mockUnitDir = createMock(FileObject.class);
     expect(mockUnitDir.resolveFile(relativeFilePath)).andReturn(mockFile);
 

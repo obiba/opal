@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.FileSelector;
@@ -37,8 +39,13 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import static org.obiba.opal.shell.commands.CommandResultCode.CRITICAL_ERROR;
+import static org.obiba.opal.shell.commands.CommandResultCode.NON_CRITICAL_ERROR;
+import static org.obiba.opal.shell.commands.CommandResultCode.SUCCESS;
+
+@SuppressWarnings("ClassTooDeepInInheritanceTree")
 @CommandUsage(description = "Imports one or more Onyx data files into a datasource.",
-    syntax = "Syntax: import [--unit NAME] [--force] [--source NAME] [--tables NAMES] --destination NAME [--archive FILE] [FILES]")
+    syntax = "Syntax: import [--unit NAME] [--incremental] [--force] [--source NAME] [--tables NAMES] --destination NAME [--archive FILE] [FILES]")
 public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCommandOptions> {
 
   //
@@ -52,11 +59,11 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   @Override
   public int execute() {
-    int errorCode = 0;
+    int errorCode;
 
-    if(options.isUnit() && getFunctionalUnitService().hasFunctionalUnit(options.getUnit()) == false) {
+    if(options.isUnit() && !getFunctionalUnitService().hasFunctionalUnit(options.getUnit())) {
       getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
-      return 1; // error!
+      return CRITICAL_ERROR;
     }
 
     TimedExecution timedExecution = new TimedExecution().start();
@@ -64,11 +71,11 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     List<FileObject> filesToImport = getFilesToImport();
     errorCode = executeImports(filesToImport);
 
-    if(options.isSource() == false & options.isTables() == false & filesToImport.isEmpty()) {
+    if(!options.isSource() & !options.isTables() & filesToImport.isEmpty()) {
       // TODO: Should this be considered success or an error? Will treat as an error for now.
       getShell().printf("No file, source or tables provided. Import canceled.\n");
-      errorCode = 1;
-    } else if(errorCode != 0) {
+      errorCode = CRITICAL_ERROR;
+    } else if(errorCode != SUCCESS) {
       getShell().printf("Import failed.\n");
       log.info("Import failed in {}", timedExecution.end().formatExecutionTime());
     } else {
@@ -79,17 +86,16 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   private int executeImports(List<FileObject> filesToImport) {
-    int errorCode = 0;
-
     if(options.isSource()) {
-      errorCode = importFromDatasource(filesToImport.isEmpty() ? null : filesToImport.get(0));
-    } else if(options.isTables()) {
-      errorCode = importFromTables(filesToImport.isEmpty() ? null : filesToImport.get(0));
-    } else if(!filesToImport.isEmpty()) {
-      errorCode = importFiles(filesToImport);
+      return importFromDatasource(filesToImport.isEmpty() ? null : filesToImport.get(0));
     }
-
-    return errorCode;
+    if(options.isTables()) {
+      return importFromTables(filesToImport.isEmpty() ? null : filesToImport.get(0));
+    }
+    if(!filesToImport.isEmpty()) {
+      return importFiles(filesToImport);
+    }
+    return SUCCESS;
   }
 
   //
@@ -105,25 +111,20 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     sb.append("import");
     if(options.isUnit()) {
-      sb.append(" --unit ");
-      sb.append(options.getUnit());
+      sb.append(" --unit ").append(options.getUnit());
     }
     if(options.isSource()) {
-      sb.append(" --source ");
-      sb.append(options.getSource());
+      sb.append(" --source ").append(options.getSource());
     }
-    sb.append(" --destination ");
-    sb.append(options.getDestination());
+    sb.append(" --destination ").append(options.getDestination());
 
     if(options.isArchive()) {
-      sb.append(" --archive ");
-      sb.append(options.getArchive());
+      sb.append(" --archive ").append(options.getArchive());
     }
 
     if(options.isFiles()) {
       for(String file : options.getFiles()) {
-        sb.append(' ');
-        sb.append(file);
+        sb.append(' ').append(file);
       }
     }
 
@@ -131,22 +132,22 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   private int importFiles(Collection<FileObject> filesToImport) {
-    int errorCode = 0;
+    int errorCode = SUCCESS;
 
     getShell().printf("Importing %d file%s :\n", filesToImport.size(), filesToImport.size() > 1 ? "s" : "");
     for(FileObject file : filesToImport) {
       if(Thread.interrupted()) {
-        errorCode = 1;
+        errorCode = CRITICAL_ERROR;
         break;
       }
 
       // If lastErrorCode == 0 (success), do NOT update errorCode since it might have
       // been equal to 2 (non-critical error). We want to remember that there was an earlier error.
       int lastErrorCode = importFile(file);
-      if(lastErrorCode == 1) {
+      if(lastErrorCode == CRITICAL_ERROR) {
         errorCode = lastErrorCode;
         break;
-      } else if(lastErrorCode == 2) {
+      } else if(lastErrorCode == NON_CRITICAL_ERROR) {
         errorCode = lastErrorCode;
       }
     }
@@ -163,12 +164,13 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
    */
   @SuppressWarnings("PMD.NcssMethodCount")
   private int importFile(FileObject file) {
-    int errorCode = 1; // critical error (or interruption)!
+    int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing file: %s ...\n", file.getName().getPath());
     try {
-      importService.importData(getUnitName(), file, options.getDestination(), options.isForce(), options.isIgnore());
+      importService.importData(getUnitName(), file, options.getDestination(), options.isForce(), options.isIgnore(),
+          options.isIncremental());
       archive(file);
-      errorCode = 0; // success!
+      errorCode = SUCCESS;
     } catch(NoSuchFunctionalUnitException ex) {
       getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
     } catch(NoSuchDatasourceException ex) {
@@ -178,7 +180,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     } catch(IOException ex) {
       // Report an error and continue with the next file.
       getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
-      errorCode = 2; // non-critical error!
+      errorCode = NON_CRITICAL_ERROR;
     } catch(InterruptedException ex) {
       // Report the interrupted and continue; the test for interruption will detect this condition.
       getShell().printf("Thread interrupted");
@@ -190,14 +192,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
-  private int importFromDatasource(FileObject file) {
-    int errorCode = 1; // critical error (or interruption)!
+  private int importFromDatasource(@Nullable FileObject file) {
+    int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing datasource: %s ...\n", options.getSource());
     try {
       importService.importData(getUnitName(), options.getSource(), options.getDestination(), options.isForce(),
-          options.isIgnore());
+          options.isIgnore(), options.isIncremental());
       if(file != null) archive(file);
-      errorCode = 0; // success!
+      errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {
       getShell().printf("Datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
     } catch(KeyProviderException ex) {
@@ -205,7 +207,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     } catch(IOException ex) {
       // Report an error and continue with the next file.
       getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
-      errorCode = 2; // non-critical error!
+      errorCode = NON_CRITICAL_ERROR;
     } catch(InterruptedException ex) {
       // Report the interrupted and continue; the test for interruption will detect this condition.
       getShell().printf("Thread interrupted");
@@ -216,14 +218,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
-  private int importFromTables(FileObject file) {
-    int errorCode = 1; // critical error (or interruption)!
+  private int importFromTables(@Nullable FileObject file) {
+    int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing tables: %s ...\n", getTableNames());
     try {
       importService.importData(getUnitName(), options.getTables(), options.getDestination(), options.isForce(),
-          options.isIgnore());
+          options.isIgnore(), options.isIncremental());
       if(file != null) archive(file);
-      errorCode = 0; // success!
+      errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {
       getShell().printf("'%s'. Cannot import.\n", ex.getMessage());
     } catch(NoSuchValueTableException ex) {
@@ -233,7 +235,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     } catch(IOException ex) {
       // Report an error and continue with the next file.
       getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
-      errorCode = 2; // non-critical error!
+      errorCode = NON_CRITICAL_ERROR;
     } catch(InterruptedException ex) {
       // Report the interrupted and continue; the test for interruption will detect this condition.
       getShell().printf("Thread interrupted");
@@ -243,6 +245,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     return errorCode;
   }
 
+  @Nullable
   private String getUnitName() {
     String unitName = options.isUnit() ? options.getUnit() : null;
     printUnitOptions();
@@ -253,7 +256,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     if(options.isUnit()) {
       getShell().printf("  Importing in unit: %s\n", options.getUnit());
       getShell().printf("  Allow identifier generation: %s\n", options.isForce());
-      if(options.isForce() == false) {
+      if(!options.isForce()) {
         getShell().printf("  Ignore participants with unknown identifier: %s\n", options.isIgnore());
       }
     }
@@ -298,12 +301,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     }
 
     try {
-      FileObject archiveDir;
-      archiveDir = isRelativeFilePath(options.getArchive()) //
-          ? getFileInUnitDirectory(options.getArchive()) //
+      FileObject archiveDir = isRelativeFilePath(options.getArchive())
+          ? getFileInUnitDirectory(options.getArchive())
           : getFile(options.getArchive());
       archiveDir.createFolder();
-
       FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
       file.moveTo(archiveFile);
     } catch(FileSystemException ex) {
@@ -346,7 +347,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     for(String filePath : filePaths) {
       try {
         file = getFileToImport(filePath);
-        if(file == null || file.exists() == false) {
+        if(file == null || !file.exists()) {
           getShell().printf("'%s' does not exist\n", filePath);
           continue;
         }
@@ -359,6 +360,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     return files;
   }
 
+  @Nullable
   private FileObject getFileToImport(String filePath) throws FileSystemException {
     return isRelativeFilePath(filePath) ? getFileInUnitDirectory(filePath) : getFile(filePath);
   }
@@ -381,13 +383,14 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
       @Override
       public boolean includeFile(FileSelectInfo file) throws Exception {
-        return file.getFile().getType() == FileType.FILE && "zip"
-            .equals(file.getFile().getName().getExtension().toLowerCase());
+        return file.getFile().getType() == FileType.FILE &&
+            "zip".equals(file.getFile().getName().getExtension().toLowerCase());
       }
     });
     return Arrays.asList(filesInDir);
   }
 
+  @Nullable
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
     if(options.isUnit()) {
       FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());

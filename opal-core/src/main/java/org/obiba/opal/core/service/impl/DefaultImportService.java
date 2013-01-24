@@ -16,6 +16,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.Datasource;
@@ -68,6 +71,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -76,10 +81,8 @@ import com.google.common.collect.Sets;
  * Default implementation of {@link ImportService}.
  */
 public class DefaultImportService implements ImportService {
-  //
-  // Constants
-  //
 
+  @SuppressWarnings("UnusedDeclaration")
   public static final String STAGE_ATTRIBUTE_NAME = "stage";
 
   @SuppressWarnings("unused")
@@ -120,12 +123,12 @@ public class DefaultImportService implements ImportService {
 
   @Override
   public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException,
-      NoSuchDatasourceException, IllegalArgumentException, IOException, InterruptedException {
-    // If unitName is the empty string, coerce it to null.
-    String nonEmptyUnitName = "".equals(unitName) ? null : unitName;
-
-    if(nonEmptyUnitName != null) Assert.isTrue(!nonEmptyUnitName.equals(FunctionalUnit.OPAL_INSTANCE),
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException,
+      InterruptedException {
+    // If unitName is the empty string, coerce it to null
+    String nonEmptyUnitName = Strings.emptyToNull(unitName);
+    Assert.isTrue(!Objects.equal(nonEmptyUnitName, FunctionalUnit.OPAL_INSTANCE),
         "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(destinationDatasourceName, "datasourceName is null or empty");
     Assert.notNull(sourceFile, "file is null");
@@ -134,51 +137,50 @@ public class DefaultImportService implements ImportService {
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
 
-    FunctionalUnit unit = null;
-    if(nonEmptyUnitName != null) {
-      unit = functionalUnitService.getFunctionalUnit(nonEmptyUnitName);
-      if(unit == null) {
-        throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
-      }
+    FunctionalUnit unit = nonEmptyUnitName == null ? null : functionalUnitService.getFunctionalUnit(nonEmptyUnitName);
+    if(unit == null) {
+      throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
     }
 
     copyToDestinationDatasource(sourceFile, destinationDatasource, unit, allowIdentifierGeneration,
-        ignoreUnknownIdentifier);
+        ignoreUnknownIdentifier, incremental);
   }
 
   @Override
   public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException,
-      NoSuchDatasourceException, NoSuchValueTableException, IOException, InterruptedException {
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException,
+      InterruptedException {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
 
     try {
       importData(unitName, sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration,
-          ignoreUnknownIdentifier);
+          ignoreUnknownIdentifier, incremental);
     } finally {
       silentlyDisposeTransientDatasource(sourceDatasource);
     }
   }
 
+  @SuppressWarnings("ConstantConditions")
   @Override
   public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException,
-      NoSuchDatasourceException, NoSuchValueTableException, NonExistentVariableEntitiesException, IOException,
-      InterruptedException {
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException,
+      NonExistentVariableEntitiesException, IOException, InterruptedException {
     Assert.isTrue(sourceTableNames != null, "sourceTableNames is null");
     Assert.isTrue(sourceTableNames.size() > 0, "sourceTableNames is empty");
 
-    ImmutableSet.Builder<ValueTable> builder = ImmutableSet.<ValueTable>builder();
+    ImmutableSet.Builder<ValueTable> builder = ImmutableSet.builder();
     for(String tableName : sourceTableNames) {
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
       Datasource ds = getDatasourceOrTransientDatasource(resolver.getDatasourceName());
       builder.add(ds.getValueTable(resolver.getTableName()));
     }
     Set<ValueTable> sourceTables = builder.build();
-
     try {
-      importData(unitName, sourceTables, destinationDatasourceName, allowIdentifierGeneration, ignoreUnknownIdentifier);
+      importData(unitName, sourceTables, destinationDatasourceName, allowIdentifierGeneration, ignoreUnknownIdentifier,
+          incremental);
     } finally {
       for(ValueTable table : sourceTables) {
         silentlyDisposeTransientDatasource(table.getDatasource());
@@ -188,32 +190,27 @@ public class DefaultImportService implements ImportService {
 
   @Override
   public void importData(String unitName, Set<ValueTable> sourceTables, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws NoSuchFunctionalUnitException,
-      NonExistentVariableEntitiesException, IOException, InterruptedException {
-    // If unitName is the empty string, coerce it to null.
-    String nonEmptyUnitName = (unitName != null && unitName.equals("")) ? null : unitName;
-
-    if(nonEmptyUnitName != null) {
-      Assert.isTrue(!nonEmptyUnitName.equals(FunctionalUnit.OPAL_INSTANCE),
-          "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
-    }
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
+    // If unitName is the empty string, coerce it to null
+    String nonEmptyUnitName = Strings.emptyToNull(unitName);
+    Assert.isTrue(!Objects.equal(nonEmptyUnitName, FunctionalUnit.OPAL_INSTANCE),
+        "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
+
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
-
-    FunctionalUnit unit = null;
-    if(nonEmptyUnitName != null) {
-      unit = functionalUnitService.getFunctionalUnit(nonEmptyUnitName);
-      if(unit == null) {
-        throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
-      }
+    FunctionalUnit unit = nonEmptyUnitName == null ? null : functionalUnitService.getFunctionalUnit(nonEmptyUnitName);
+    if(unit == null) {
+      throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
     }
-
-    copyValueTables(sourceTables, destinationDatasource, unit, allowIdentifierGeneration, ignoreUnknownIdentifier);
+    copyValueTables(sourceTables, destinationDatasource, unit, allowIdentifierGeneration, ignoreUnknownIdentifier,
+        incremental);
   }
 
+  @Override
   public int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier) {
     Assert.hasText(unitName, "unitName is null or empty");
-    IParticipantIdentifier participantIdentifier = pIdentifier != null ? pIdentifier : this.participantIdentifier;
+    IParticipantIdentifier localParticipantIdentifier = pIdentifier == null ? participantIdentifier : pIdentifier;
 
     FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
     if(unit == null) {
@@ -223,19 +220,20 @@ public class DefaultImportService implements ImportService {
     int count = 0;
 
     ValueTable keysTable = getIdentifiersValueTable();
-    if(keysTable.hasVariable(unit.getKeyVariableName()) == false) {
+    if(!keysTable.hasVariable(unit.getKeyVariableName())) {
       try {
         prepareKeysTable(null, unit.getKeyVariableName());
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
     }
-    PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(keysTable,
-        keysTable.getVariable(unit.getKeyVariableName()), participantIdentifier);
+    PrivateVariableEntityMap entityMap =
+        new OpalPrivateVariableEntityMap(keysTable, keysTable.getVariable(unit.getKeyVariableName()),
+            localParticipantIdentifier);
 
     for(UnitIdentifier unitId : new FunctionalUnitIdentifiers(keysTable, unit)) {
       // Create a private entity for each missing unitIdentifier
-      if(unitId.hasUnitIdentifier() == false) {
+      if(!unitId.hasUnitIdentifier()) {
         entityMap.createPrivateEntity(unitId.getOpalEntity());
         count++;
       }
@@ -258,6 +256,7 @@ public class DefaultImportService implements ImportService {
     importIdentifiers(unit, sourceDatasource, select);
   }
 
+  @SuppressWarnings("OverlyNestedMethod")
   @Override
   public void importIdentifiers(FunctionalUnit unit, Datasource sourceDatasource, String select) throws IOException {
 
@@ -266,15 +265,14 @@ public class DefaultImportService implements ImportService {
         if(vt.getEntityType().equals(identifiersTableService.getEntityType())) {
           ValueTable sourceKeysTable = createPrivateView(vt, unit, select);
           Variable unitKeyVariable = prepareKeysTable(sourceKeysTable, unit.getKeyVariableName());
-          PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(getIdentifiersValueTable(),
-              unitKeyVariable, participantIdentifier);
+          PrivateVariableEntityMap entityMap =
+              new OpalPrivateVariableEntityMap(getIdentifiersValueTable(), unitKeyVariable, participantIdentifier);
           for(VariableEntity privateEntity : sourceKeysTable.getVariableEntities()) {
-            VariableEntity publicEntity = entityMap.publicEntity(privateEntity);
-            if(publicEntity == null) {
-              publicEntity = entityMap.createPublicEntity(privateEntity);
+            if(entityMap.publicEntity(privateEntity) == null) {
+              entityMap.createPublicEntity(privateEntity);
             }
-            copyParticipantIdentifiers(entityMap.publicEntity(privateEntity), sourceKeysTable, unitKeyVariable,
-                writeToKeysTable(), entityMap);
+            copyParticipantIdentifiers(entityMap.publicEntity(privateEntity), sourceKeysTable, writeToKeysTable(),
+                entityMap);
           }
         }
       }
@@ -293,12 +291,13 @@ public class DefaultImportService implements ImportService {
   @Override
   public void importIdentifiers(Datasource sourceDatasource) throws IOException {
     try {
-      if(sourceDatasource.getValueTables().size() == 0) {
+      if(sourceDatasource.getValueTables().isEmpty()) {
         throw new IllegalArgumentException("source identifiers datasource is empty (no tables)");
       }
       String idTableName = getIdentifiersValueTable().getName();
-      ValueTable sourceKeysTable = sourceDatasource.hasValueTable(idTableName) ? sourceDatasource
-          .getValueTable(idTableName) : sourceDatasource.getValueTables().iterator().next();
+      ValueTable sourceKeysTable = sourceDatasource.hasValueTable(idTableName)
+          ? sourceDatasource.getValueTable(idTableName)
+          : sourceDatasource.getValueTables().iterator().next();
 
       importIdentifiers(sourceKeysTable);
 
@@ -309,14 +308,15 @@ public class DefaultImportService implements ImportService {
 
   @Override
   public void importIdentifiers(ValueTable sourceKeysTable) throws IOException {
-    if(sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType()) == false) {
-      throw new IllegalArgumentException("source identifiers table has unexpected entity type '" + sourceKeysTable
-          .getEntityType() + "' (expected '" + identifiersTableService.getEntityType() + "')");
+    if(!sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType())) {
+      throw new IllegalArgumentException(
+          "source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" +
+              identifiersTableService.getEntityType() + "')");
     }
 
     ValueTable sourceKeysTableCopy = sourceKeysTable;
     String idTableName = getIdentifiersValueTable().getName();
-    if(sourceKeysTable.getName().equals(idTableName) == false) {
+    if(!sourceKeysTable.getName().equals(idTableName)) {
       ImmutableSet.Builder<String> builder = ImmutableSet.builder();
       builder.addAll(Iterables.transform(sourceKeysTable.getVariableEntities(), new Function<VariableEntity, String>() {
 
@@ -335,11 +335,9 @@ public class DefaultImportService implements ImportService {
   }
 
   private Datasource getDatasourceOrTransientDatasource(String datasourceName) throws NoSuchDatasourceException {
-    if(MagmaEngine.get().hasDatasource(datasourceName)) {
-      return MagmaEngine.get().getDatasource(datasourceName);
-    } else {
-      return MagmaEngine.get().getTransientDatasourceInstance(datasourceName);
-    }
+    return MagmaEngine.get().hasDatasource(datasourceName)
+        ? MagmaEngine.get().getDatasource(datasourceName)
+        : MagmaEngine.get().getTransientDatasourceInstance(datasourceName);
   }
 
   private void silentlyDisposeTransientDatasource(Datasource datasource) {
@@ -348,8 +346,9 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  private void copyToDestinationDatasource(FileObject file, Datasource destinationDatasource, FunctionalUnit unit,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws IOException, InterruptedException {
+  private void copyToDestinationDatasource(FileObject file, Datasource destinationDatasource,
+      @Nullable FunctionalUnit unit, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+      boolean incremental) throws IOException, InterruptedException {
     DatasourceEncryptionStrategy datasourceEncryptionStrategy = null;
     if(unit != null) datasourceEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
     // always wrap fs datasources in onyx datasource to support old onyx data dictionary (from 1.0 to 1.6 version)
@@ -360,7 +359,7 @@ public class DefaultImportService implements ImportService {
     try {
       sourceDatasource.initialise();
       copyValueTables(sourceDatasource.getValueTables(), destinationDatasource, unit, allowIdentifierGeneration,
-          ignoreUnknownIdentifier);
+          ignoreUnknownIdentifier, incremental);
     } finally {
       sourceDatasource.dispose();
     }
@@ -373,162 +372,25 @@ public class DefaultImportService implements ImportService {
    * @param destination
    * @param unit
    * @param allowIdentifierGeneration
+   * @param incremental
    * @throws IOException
    * @throws InterruptedException
    */
-  private void copyValueTables(final Set<ValueTable> sourceTables, final Datasource destination,
-      final FunctionalUnit unit, final boolean allowIdentifierGeneration, final boolean ignoreUnknownIdentifier) throws
-      IOException, InterruptedException {
+  private void copyValueTables(Set<ValueTable> sourceTables, Datasource destination, @Nullable FunctionalUnit unit,
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      throws IOException, InterruptedException {
     try {
-      new LockingActionTemplate() {
-
-        @Override
-        protected Set<String> getLockNames() {
-          return getTablesToLock(sourceTables);
-        }
-
-        @Override
-        protected TransactionTemplate getTransactionTemplate() {
-          return txTemplate;
-        }
-
-        @Override
-        protected Action getAction() {
-          return new Action() {
-            public void execute() throws Exception {
-              for(ValueTable valueTable : sourceTables) {
-                if(Thread.interrupted()) {
-                  throw new InterruptedException("Thread interrupted");
-                }
-
-                if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
-                  if(unit != null) {
-                    copyParticipants(valueTable, destination, unit, allowIdentifierGeneration, ignoreUnknownIdentifier);
-                  } else {
-                    addMissingEntitiesToKeysTable(valueTable);
-                    MultithreadedDatasourceCopier.Builder.newCopier().withThreads(new ThreadFactory() {
-                      @Override
-                      public Thread newThread(Runnable r) {
-                        return new TransactionalThread(r);
-                      }
-                    }).withCopier(newCopierForParticipants(valueTable)).from(valueTable).to(destination).build().copy();
-                  }
-                } else {
-                  DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build()
-                      .copy(valueTable, destination);
-                }
-              }
-            }
-          };
-        }
-      }.execute();
+      new CopyValueTablesLockingAction(sourceTables, unit, destination, allowIdentifierGeneration,
+          ignoreUnknownIdentifier, incremental).execute();
     } catch(InvocationTargetException ex) {
       if(ex.getCause() instanceof IOException) {
-        throw (IOException) (ex.getCause());
-      } else if(ex.getCause() instanceof InterruptedException) {
-        throw (InterruptedException) (ex.getCause());
-      } else {
-        throw new RuntimeException(ex.getCause());
+        throw (IOException) ex.getCause();
       }
-    }
-  }
-
-  private Set<VariableEntity> addMissingEntitiesToKeysTable(ValueTable valueTable) {
-    Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
-
-    if(identifiersTableService.hasValueTable()) {
-      // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
-      Set<VariableEntity> entitiesInKeysTable = getIdentifiersValueTable().getVariableEntities();
-      nonExistentVariableEntities.removeAll(entitiesInKeysTable);
-    }
-
-    if(nonExistentVariableEntities.size() > 0) {
-      ValueTableWriter keysTableWriter = writeToKeysTable();
-      try {
-        for(VariableEntity ve : nonExistentVariableEntities) {
-          keysTableWriter.writeValueSet(ve).close();
-        }
-      } catch(IOException e) {
-        throw new RuntimeException(e);
-      } finally {
-        Closeables.closeQuietly(keysTableWriter);
+      if(ex.getCause() instanceof InterruptedException) {
+        throw (InterruptedException) ex.getCause();
       }
+      throw new RuntimeException(ex.getCause());
     }
-
-    return nonExistentVariableEntities;
-  }
-
-  private Set<String> getTablesToLock(Set<ValueTable> sourceTables) {
-    Set<String> tablesToLock = new TreeSet<String>();
-
-    boolean needToLockKeysTable = false;
-
-    for(ValueTable valueTable : sourceTables) {
-      tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
-      if(valueTable.getEntityType().equals(identifiersTableService.getEntityType())) {
-        needToLockKeysTable = true;
-      }
-    }
-
-    if(needToLockKeysTable) {
-      tablesToLock.add(identifiersTableService.getTableReference());
-    }
-
-    return tablesToLock;
-  }
-
-  private void copyParticipants(ValueTable participantTable, Datasource destination, FunctionalUnit unit,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws IOException {
-    final String keyVariableName = unit.getKeyVariableName();
-    final View privateView = createPrivateView(participantTable, unit, null);
-    final Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
-
-    final FunctionalUnitView publicView = createPublicView(participantTable, unit, allowIdentifierGeneration,
-        ignoreUnknownIdentifier);
-    final PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
-
-    // prepare for copying participant data
-    final ValueTableWriter keysTableWriter = writeToKeysTable();
-
-    try {
-      copyPublicViewToDestinationDatasource(destination, publicView,
-          createKeysListener(privateView, keyVariable, entityMap, keysTableWriter));
-    } finally {
-      keysTableWriter.close();
-    }
-  }
-
-  /**
-   * This listener will insert all participant identifiers in the keys datasource prior to copying the valueset to the
-   * data datasource. It will also generate the public variable entity if it does not exist yet. As such, it must be
-   * executed before the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
-   */
-  private DatasourceCopyValueSetEventListener createKeysListener(final View privateView, final Variable keyVariable,
-      final PrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
-    DatasourceCopyValueSetEventListener createKeysListener = new DatasourceCopyValueSetEventListener() {
-
-      public void onValueSetCopied(ValueTable source, ValueSet valueSet, String... destination) {
-      }
-
-      public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
-        copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, keyVariable, keysTableWriter, entityMap);
-      }
-
-    };
-    return createKeysListener;
-  }
-
-  private DatasourceCopier.Builder newCopierForParticipants(final ValueTable sourceTable) {
-    return DatasourceCopier.Builder.newCopier() //
-        .withLoggingListener().withThroughtputListener();
-  }
-
-  private void copyPublicViewToDestinationDatasource(Datasource destination, FunctionalUnitView publicView,
-      DatasourceCopyValueSetEventListener createKeysListener) throws IOException {
-    newCopierForParticipants(publicView) //
-        .withListener(createKeysListener).build()
-        // Copy participant's non-identifiable variables and data
-        .copy(publicView, destination);
   }
 
   /**
@@ -538,51 +400,28 @@ public class DefaultImportService implements ImportService {
    * @param participantTable
    * @return
    */
-  private View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit, String select) {
+  private View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit,
+      @Nullable String select) {
     if(select != null) {
-      final View privateView = View.Builder.newView(viewName, participantTable).select(new JavascriptClause(select))
-          .build();
+      View privateView = View.Builder.newView(viewName, participantTable).select(new JavascriptClause(select)).build();
       privateView.initialise();
-      return privateView;
-    } else if(unit.getSelect() != null) {
-      final View privateView = View.Builder.newView(viewName, participantTable).select(unit.getSelect()).build();
-      privateView.initialise();
-      return privateView;
-    } else {
-      final View privateView = View.Builder.newView(viewName, participantTable).select(new SelectClause() {
-        public boolean select(Variable variable) {
-          return isIdentifierVariable(variable);
-        }
-      }).build();
       return privateView;
     }
-  }
-
-  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit, String select) {
-    return createPrivateView(participantTable.getName(), participantTable, unit, select);
-  }
-
-  /**
-   * Wraps the participant table in a {@link View} that exposes public entities and non-identifier variables.
-   *
-   * @param participantTable
-   * @param unit
-   * @param allowIdentifierGeneration
-   * @return
-   */
-  private FunctionalUnitView createPublicView(ValueTable participantTable, final FunctionalUnit unit,
-      final boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) {
-    FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable,
-        getIdentifiersValueTable(), allowIdentifierGeneration ? participantIdentifier : null, ignoreUnknownIdentifier);
-    publicTable.setSelectClause(new SelectClause() {
-
+    if(unit.getSelect() != null) {
+      View privateView = View.Builder.newView(viewName, participantTable).select(unit.getSelect()).build();
+      privateView.initialise();
+      return privateView;
+    }
+    return View.Builder.newView(viewName, participantTable).select(new SelectClause() {
+      @Override
       public boolean select(Variable variable) {
-        return isIdentifierVariable(variable) == false && isIdentifierVariableForUnit(variable, unit) == false;
+        return isIdentifierVariable(variable);
       }
+    }).build();
+  }
 
-    });
-    publicTable.initialise();
-    return publicTable;
+  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit, @Nullable String select) {
+    return createPrivateView(participantTable.getName(), participantTable, unit, select);
   }
 
   /**
@@ -593,10 +432,10 @@ public class DefaultImportService implements ImportService {
    * @return
    * @throws IOException
    */
-  private Variable prepareKeysTable(ValueTable privateView, String keyVariableName) throws IOException {
+  private Variable prepareKeysTable(@Nullable ValueTable privateView, String keyVariableName) throws IOException {
 
-    Variable keyVariable = Variable.Builder
-        .newVariable(keyVariableName, TextType.get(), identifiersTableService.getEntityType()).build();
+    Variable keyVariable =
+        Variable.Builder.newVariable(keyVariableName, TextType.get(), identifiersTableService.getEntityType()).build();
 
     ValueTableWriter writer = writeToKeysTable();
     try {
@@ -621,7 +460,7 @@ public class DefaultImportService implements ImportService {
    * Write the key variable and the identifier variables values; update the participant key private/public map.
    */
   private VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
-      Variable keyVariable, ValueTableWriter writer, PrivateVariableEntityMap entityMap) {
+      ValueTableWriter writer, PrivateVariableEntityMap entityMap) {
     VariableEntity privateEntity = entityMap.privateEntity(publicEntity);
 
     ValueSetWriter vsw = writer.writeValueSet(publicEntity);
@@ -633,6 +472,7 @@ public class DefaultImportService implements ImportService {
       try {
         vsw.close();
       } catch(IOException e) {
+        //noinspection ThrowFromFinallyBlock
         throw new MagmaRuntimeException(e);
       }
     }
@@ -647,24 +487,21 @@ public class DefaultImportService implements ImportService {
     return identifiersTableService.createValueTableWriter();
   }
 
-  private boolean isIdentifierVariable(Variable variable) {
-    return variable.hasAttribute("identifier") && (variable.getAttribute("identifier").getValue()
-        .equals(BooleanType.get().trueValue()) || variable.getAttribute("identifier").getValue().toString()
-        .toLowerCase().equals("true"));
-  }
-
-  private boolean isIdentifierVariableForUnit(Variable variable, FunctionalUnit unit) {
-    return (unit.getSelect() != null && unit.getSelect().select(variable));
+  private boolean isIdentifierVariable(@SuppressWarnings("TypeMayBeWeakened") Variable variable) {
+    return variable.hasAttribute("identifier") &&
+        (variable.getAttribute("identifier").getValue().equals(BooleanType.get().trueValue()) ||
+            "true".equals(variable.getAttribute("identifier").getValue().toString().toLowerCase()));
   }
 
   class TransactionalThread extends Thread {
 
     private Runnable runnable;
 
-    public TransactionalThread(Runnable runnable) {
+    TransactionalThread(Runnable runnable) {
       this.runnable = runnable;
     }
 
+    @Override
     public void run() {
       txTemplate.execute(new TransactionCallbackWithoutResult() {
         @Override
@@ -675,4 +512,210 @@ public class DefaultImportService implements ImportService {
     }
   }
 
+  private class CopyValueTablesLockingAction extends LockingActionTemplate {
+
+    private final Set<ValueTable> sourceTables;
+
+    @Nullable
+    private final FunctionalUnit unit;
+
+    private final Datasource destination;
+
+    private final boolean allowIdentifierGeneration;
+
+    private final boolean ignoreUnknownIdentifier;
+
+    private final boolean incremental;
+
+    private CopyValueTablesLockingAction(Set<ValueTable> sourceTables, @Nullable FunctionalUnit unit,
+        Datasource destination, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+        boolean incremental) {
+      this.sourceTables = sourceTables;
+      this.unit = unit;
+      this.destination = destination;
+      this.allowIdentifierGeneration = allowIdentifierGeneration;
+      this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
+      this.incremental = incremental;
+    }
+
+    @Override
+    protected Set<String> getLockNames() {
+      return getTablesToLock();
+    }
+
+    private Set<String> getTablesToLock() {
+      Set<String> tablesToLock = new TreeSet<String>();
+
+      boolean needToLockKeysTable = false;
+
+      for(ValueTable valueTable : sourceTables) {
+        tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
+        if(valueTable.getEntityType().equals(identifiersTableService.getEntityType())) {
+          needToLockKeysTable = true;
+        }
+      }
+
+      if(needToLockKeysTable) {
+        tablesToLock.add(identifiersTableService.getTableReference());
+      }
+
+      return tablesToLock;
+    }
+
+    @Override
+    protected TransactionTemplate getTransactionTemplate() {
+      return txTemplate;
+    }
+
+    @Override
+    protected Action getAction() {
+      return new CopyAction();
+    }
+
+    private class CopyAction implements Action {
+      @Override
+      public void execute() throws Exception {
+        for(ValueTable valueTable : sourceTables) {
+          if(Thread.interrupted()) {
+            throw new InterruptedException("Thread interrupted");
+          }
+
+          if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
+            if(unit == null) {
+              addMissingEntitiesToKeysTable(valueTable);
+              MultithreadedDatasourceCopier.Builder.newCopier() //
+                  .withThreads(new ThreadFactory() {
+                    @Nonnull
+                    @Override
+                    public Thread newThread(@Nonnull Runnable r) {
+                      return new TransactionalThread(r);
+                    }
+                  }) //
+                  .withCopier(newCopierForParticipants()) //
+                  .from(valueTable) //
+                  .to(destination).build() //
+                  .copy();
+            } else {
+              copyParticipants(valueTable);
+            }
+          } else {
+            DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build()
+                .copy(valueTable, destination);
+          }
+        }
+      }
+
+      private Set<VariableEntity> addMissingEntitiesToKeysTable(ValueTable valueTable) {
+        Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
+
+        if(identifiersTableService.hasValueTable()) {
+          // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
+          Set<VariableEntity> entitiesInKeysTable = getIdentifiersValueTable().getVariableEntities();
+          nonExistentVariableEntities.removeAll(entitiesInKeysTable);
+        }
+
+        if(nonExistentVariableEntities.size() > 0) {
+          ValueTableWriter keysTableWriter = writeToKeysTable();
+          try {
+            for(VariableEntity ve : nonExistentVariableEntities) {
+              keysTableWriter.writeValueSet(ve).close();
+            }
+          } catch(IOException e) {
+            throw new RuntimeException(e);
+          } finally {
+            Closeables.closeQuietly(keysTableWriter);
+          }
+        }
+
+        return nonExistentVariableEntities;
+      }
+
+      @SuppressWarnings("ConstantConditions")
+      private void copyParticipants(ValueTable participantTable) throws IOException {
+        String keyVariableName = unit.getKeyVariableName();
+        View privateView = createPrivateView(participantTable, unit, null);
+        Variable keyVariable = prepareKeysTable(privateView, keyVariableName);
+
+        FunctionalUnitView publicView = createPublicView(participantTable);
+        PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
+
+        // prepare for copying participant data
+        ValueTableWriter keysTableWriter = writeToKeysTable();
+
+        try {
+          copyPublicViewToDestinationDatasource(publicView,
+              createKeysListener(privateView, entityMap, keysTableWriter));
+        } finally {
+          keysTableWriter.close();
+        }
+      }
+
+      /**
+       * This listener will insert all participant identifiers in the keys datasource prior to copying the valueSet to the
+       * data datasource. It will also generate the public variable entity if it does not exist yet. As such, it must be
+       * executed before the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
+       */
+      private DatasourceCopier.DatasourceCopyEventListener createKeysListener(final ValueTable privateView,
+          final PrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
+        return new DatasourceCopyValueSetEventListener() {
+
+          @Override
+          public void onValueSetCopied(ValueTable source, ValueSet valueSet, @SuppressWarnings(
+              "ParameterHidesMemberVariable") String... destination) {
+          }
+
+          @Override
+          public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
+            copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, keysTableWriter, entityMap);
+          }
+
+        };
+      }
+
+      private void copyPublicViewToDestinationDatasource(ValueTable publicView,
+          DatasourceCopier.DatasourceCopyEventListener createKeysListener) throws IOException {
+        newCopierForParticipants() //
+            .withListener(createKeysListener).build()
+            // Copy participant's non-identifiable variables and data
+            .copy(publicView, destination);
+      }
+
+      private DatasourceCopier.Builder newCopierForParticipants() {
+        return DatasourceCopier.Builder.newCopier() //
+            .incremental(incremental) //
+            .withLoggingListener() //
+            .withThroughtputListener();
+      }
+
+      /**
+       * Wraps the participant table in a {@link View} that exposes public entities and non-identifier variables.
+       *
+       * @param participantTable
+       * @param unit
+       * @param allowIdentifierGeneration
+       * @return
+       */
+      private FunctionalUnitView createPublicView(ValueTable participantTable) {
+        FunctionalUnitView publicTable =
+            new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable,
+                getIdentifiersValueTable(), allowIdentifierGeneration ? participantIdentifier : null,
+                ignoreUnknownIdentifier);
+        publicTable.setSelectClause(new SelectClause() {
+
+          @Override
+          public boolean select(Variable variable) {
+            return !isIdentifierVariable(variable) && !isIdentifierVariableForUnit(variable);
+          }
+
+          private boolean isIdentifierVariableForUnit(Variable variable) {
+            return unit != null && unit.getSelect() != null && unit.getSelect().select(variable);
+          }
+
+        });
+        publicTable.initialise();
+        return publicTable;
+      }
+
+    }
+  }
 }

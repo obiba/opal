@@ -32,7 +32,8 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresenter<AddDerivedVariableDialogPresenter.Display> {
+public class AddDerivedVariableDialogPresenter
+    extends ValidatableWidgetPresenter<AddDerivedVariableDialogPresenter.Display> {
 
   public interface Display extends PopupView {
 
@@ -71,13 +72,12 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
         getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
   }
 
-
   void refreshVariableNameSuggestions(ViewDto viewDto) {
     getView().clearVariableSuggestions();
 
     // Add the derived variables to the suggestions.
-    VariableListViewDto variableListDto = (VariableListViewDto) viewDto
-        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    VariableListViewDto variableListDto =
+        (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
     for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
       getView().addVariableSuggestion(variable.getName());
     }
@@ -87,13 +87,14 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     String[] tableNameParts;
     for(int i = 0; i < viewDto.getFromArray().length(); i++) {
       tableNameParts = viewDto.getFromArray().get(i).split("\\.");
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", tableNameParts[0], "table", tableNameParts[1], "variables");
+      UriBuilder ub =
+          UriBuilder.create().segment("datasource", tableNameParts[0], "table", tableNameParts[1], "variables");
       ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()//
           .forResource(ub.build())//
           .get()//
-          .withCallback(Response.SC_NOT_FOUND, ResponseCodeCallbacks.noOp())//
-          .withCallback(variablesDtoCallBack).send();
+          .withCallback(Response.SC_NOT_FOUND, ResponseCodeCallbacks.NO_OP)//
+          .withCallback(variablesDtoCallBack) //
+          .send();
     }
   }
 
@@ -113,8 +114,8 @@ public class AddDerivedVariableDialogPresenter extends ValidatableWidgetPresente
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
       ViewDto viewDto = event.getView();
       viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
-      VariableListViewDto variableListDto = (VariableListViewDto) viewDto
-          .getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      VariableListViewDto variableListDto =
+          (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
       variableListDto.setVariablesArray(JsArrays.toSafeArray(variableListDto.getVariablesArray()));
 
       refreshVariableNameSuggestions(event.getView());

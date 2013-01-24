@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
@@ -35,7 +37,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   private String destination;
 
   @Inject
-  public DestinationSelectionStepPresenter(final EventBus eventBus, final Display display) {
+  public DestinationSelectionStepPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
   }
 
@@ -90,7 +92,8 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     }
   }
 
-  private void refreshDatasources(JsArray<DatasourceDto> datasources) {
+  private void refreshDatasources(
+      @SuppressWarnings("ParameterHidesMemberVariable") JsArray<DatasourceDto> datasources) {
     for(int i = 0; i < datasources.length(); i++) {
       DatasourceDto d = datasources.get(i);
       d.setTableArray(JsArrays.toSafeArray(d.getTableArray()));
@@ -121,6 +124,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     return true;
   }
 
+  @SuppressWarnings("OverlyNestedMethod")
   private boolean validateDestinationTableIsNotView() {
     String dsName = getView().getSelectedDatasource();
     String tableName = getView().getSelectedTable();
@@ -155,7 +159,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     }
   }
 
-  public void setDestination(String datasourceName) {
+  public void setDestination(@Nullable String datasourceName) {
     destination = datasourceName;
   }
 
@@ -184,6 +188,6 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   }
 
   public interface TableSelectionHandler {
-    public void onTableSelected(String datasource, String table);
+    void onTableSelected(String datasource, String table);
   }
 }

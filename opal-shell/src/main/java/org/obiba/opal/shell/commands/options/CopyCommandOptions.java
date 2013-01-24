@@ -17,52 +17,55 @@ public interface CopyCommandOptions extends HelpOption {
   // 
 
   @Option(shortName = "u", description = "The functional unit.")
-  public String getUnit();
+  String getUnit();
 
-  public boolean isUnit();
+  boolean isUnit();
 
   @Option(shortName = "s", description = "Copy all tables from this datasource.")
-  public String getSource();
+  String getSource();
 
-  public boolean isSource();
+  boolean isSource();
 
   @Option(shortName = "d", description = "Copy to this existing datasource.")
-  public String getDestination();
+  String getDestination();
 
-  public boolean isDestination();
+  boolean isDestination();
 
-  @Option(shortName = "o", description = "Copy to file: CSV if file is a directory or file has suffix csv, Excel if file has suffix xls or xlsx, XML if file has suffix zip.")
-  public String getOut();
+  @Option(shortName = "o",
+      description = "Copy to file: CSV if file is a directory or file has suffix csv, Excel if file has suffix xls or xlsx, XML if file has suffix zip.")
+  String getOut();
 
-  public boolean isOut();
+  boolean isOut();
 
   //
   // Values
   // 
 
-  @Option(longName = "non-incremental", shortName = "i", description = "Non-incremental copy (i.e., copy all data not just updates).")
-  public boolean getNonIncremental();
+  @Option(longName = "non-incremental", shortName = "i",
+      description = "Non-incremental copy (i.e., copy all data not just updates).")
+  boolean getNonIncremental();
 
   @Option(longName = "no-values", shortName = "l", description = "Do not copy the values.")
-  public boolean getNoValues();
+  boolean getNoValues();
 
   @Option(longName = "no-variables", shortName = "v", description = "Do not copy the variables.")
-  public boolean getNoVariables();
+  boolean getNoVariables();
 
   //
   // Variable transformations
   //
 
-  @Option(shortName = "m", description = "Dispatch the variables and values to a table which name is provided by the javascript.")
-  public String getMultiplex();
+  @Option(shortName = "m",
+      description = "Dispatch the variables and values to a table which name is provided by the javascript.")
+  String getMultiplex();
 
-  public boolean isMultiplex();
+  boolean isMultiplex();
 
   @Option(shortName = "t", description = "Rename each variable with the name provided by the javascript.")
-  public String getTransform();
+  String getTransform();
 
-  public boolean isTransform();
+  boolean isTransform();
 
   @Unparsed(name = "TABLE_NAME")
-  public List<String> getTables();
+  List<String> getTables();
 }

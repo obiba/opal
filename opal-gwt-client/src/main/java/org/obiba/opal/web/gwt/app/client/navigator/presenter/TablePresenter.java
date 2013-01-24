@@ -63,6 +63,11 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
   private JsArray<VariableDto> variables;
@@ -106,7 +111,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   // This makes this presenter reveal itself whenever a TableSelectionChangeEvent occurs (anywhere for any reason).
   @ProxyEvent
   public void onTableSelectionChanged(TableSelectionChangeEvent e) {
-    if(isVisible() == false) {
+    if(!isVisible()) {
       forceReveal();
       updateDisplay(e.getSelection(), e.getPrevious(), e.getNext());
     }
@@ -121,11 +126,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void addEventHandlers() {
-    super.registerHandler(
-        getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
-    super.registerHandler(
+    registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
+    registerHandler(
         getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
     getView().setCreateCodingViewCommand(new CreateCodingViewCommand());
     getView().setExcelDownloadCommand(new ExcelDownloadCommand());
     getView().setExportDataCommand(new ExportDataCommand());
@@ -136,13 +140,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().setValuesTabCommand(new ValuesCommand());
 
     VariableNameFieldUpdater updater = new VariableNameFieldUpdater();
-    super.getView().setVariableNameFieldUpdater(updater);
-    super.getView().setVariableIndexFieldUpdater(updater);
-    super.registerHandler(getView().addVariableSuggestionHandler(new VariableSuggestionHandler()));
-    super.registerHandler(getView().addVariableSortHandler(new VariableSortHandler()));
+    getView().setVariableNameFieldUpdater(updater);
+    getView().setVariableIndexFieldUpdater(updater);
+    registerHandler(getView().addVariableSuggestionHandler(new VariableSuggestionHandler()));
+    registerHandler(getView().addVariableSortHandler(new VariableSortHandler()));
 
     // OPAL-975
-    super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+    registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
   }
 
   @Override
@@ -157,14 +161,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
         .authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() +"/commands/_copy").post()//
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()//
         .authorize(CascadingAuthorizer.newBuilder()//
             .and("/functional-units", HttpMethod.GET)//
             .and("/functional-units/entities/table", HttpMethod.GET)//
             .authorize(getView().getExportDataAuthorizer()).build())//
         .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() +"/commands/_copy").post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()
         .authorize(getView().getCopyDataAuthorizer()).send();
     if(table.hasViewLink()) {
       // download view
@@ -192,7 +196,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
-    this.table = tableDto;
+    table = tableDto;
     this.previous = previous;
     this.next = next;
 
@@ -220,16 +224,16 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private void updateVariables() {
     String sortColumnName = getView().getClickableColumnName(sortColumn);
-    String sortColumArg = (sortColumnName != null ? ("?sortField=" + sortColumnName) : "");
-    String sortDirArg = (sortAscending != null ? (sortAscending ? "&sortDir=ASC" : "&sortDir=DESC") : "");
-    // TODO use uribuilder
+    String sortColumnArg = sortColumnName == null ? "" : "?sortField=" + sortColumnName;
+    String sortDirArg = sortAscending == null ? "" : sortAscending ? "&sortDir=ASC" : "&sortDir=DESC";
+    // TODO use uriBuilder
     ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
-        .forResource(table.getLink() + "/variables" + sortColumArg + sortDirArg).get()
+        .forResource(table.getLink() + "/variables" + sortColumnArg + sortDirArg).get()
         .withCallback(new VariablesResourceCallback(table)).send();
   }
 
   private void downloadMetadata() {
-    String downloadUrl = new StringBuilder(this.table.getLink()).append("/variables/excel").toString();
+    String downloadUrl = new StringBuilder(table.getLink()).append("/variables/excel").toString();
     getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
@@ -255,19 +259,18 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() != Response.SC_OK) {
-          String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-        } else {
+        if(response.getStatusCode() == SC_OK) {
           getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+        } else {
+          String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
         }
       }
     };
 
     ResourceRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete()
-        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+        .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
+        .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
   }
 
   private void removeTable(String viewName) {
@@ -276,19 +279,18 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() != Response.SC_OK) {
-          String errorMessage = response.getText().length() != 0 ? response.getText() : "UnknownError";
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-        } else {
+        if(response.getStatusCode() == SC_OK) {
           getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+        } else {
+          String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
         }
       }
     };
 
     ResourceRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
-        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+        .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
+        .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
   }
 
   private boolean tableIsView() {
@@ -502,7 +504,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
-      if(this.table.getLink().equals(TablePresenter.this.table.getLink())) {
+      if(table.getLink().equals(TablePresenter.this.table.getLink())) {
         variables = JsArrays.toSafeArray(resource);
         getView().renderRows(variables);
         for(int i = 0; i < variables.length(); i++) {

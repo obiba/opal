@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.util;
 
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -29,16 +28,17 @@ public class DatasourceDtos {
   }
 
   public static DatasourceFactoryDto createDatasourceFactoryDto(ImportData importData) {
-    if(importData.getImportFormat() == ImportFormat.CSV) {
-      return createCSVDatasourceFactoryDto(importData);
-    } else if(importData.getImportFormat() == ImportFormat.XML) {
-      return createXMLDatasourceFactoryDto(importData);
-    } else if(importData.getImportFormat() == ImportFormat.LIMESURVEY) {
-      return createLimesurveyDatasourceFactoryDto(importData);
-    } else if(importData.getImportFormat() == ImportFormat.REST) {
-      return createRestDatasourceFactoryDto(importData);
-    } else {
-      throw new IllegalArgumentException("Import data format not supported: " + importData.getImportFormat());
+    switch(importData.getImportFormat()) {
+      case CSV:
+        return createCSVDatasourceFactoryDto(importData);
+      case XML:
+        return createXMLDatasourceFactoryDto(importData);
+      case LIMESURVEY:
+        return createLimesurveyDatasourceFactoryDto(importData);
+      case REST:
+        return createRestDatasourceFactoryDto(importData);
+      default:
+        throw new IllegalArgumentException("Import data format not supported: " + importData.getImportFormat());
     }
   }
 

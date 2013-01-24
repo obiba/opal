@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -40,7 +40,8 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     JdbcDatasourceFactoryDto jdbcDto = dto.getExtension(JdbcDatasourceFactoryDto.params);
-    return new DatabaseJdbcDatasourceFactory(dto.getName(), jdbcDto.getDatabase(), parseSettings(jdbcDto.getSettings()), jdbcDataSourceRegistry);
+    return new DatabaseJdbcDatasourceFactory(dto.getName(), jdbcDto.getDatabase(), parseSettings(jdbcDto.getSettings()),
+        jdbcDataSourceRegistry);
   }
 
   private JdbcDatasourceSettings parseSettings(JdbcDatasourceSettingsDto dto) {
@@ -49,7 +50,7 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
       settings.setDefaultEntityType(dto.getDefaultEntityType());
     }
     settings.setUseMetadataTables(dto.getUseMetadataTables());
-    ImmutableSet<String> mappedTables = (new ImmutableSet.Builder<String>()).addAll(dto.getMappedTablesList()).build();
+    ImmutableSet<String> mappedTables = new ImmutableSet.Builder<String>().addAll(dto.getMappedTablesList()).build();
     settings.setMappedTables(mappedTables);
     ImmutableSet.Builder<JdbcValueTableSettings> tableSettings = new ImmutableSet.Builder<JdbcValueTableSettings>();
     for(JdbcValueTableSettingsDto tableDto : dto.getTableSettingsList()) {

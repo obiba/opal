@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,7 +19,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
@@ -38,6 +37,8 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
 
 @NoAuthorization
 public class CompareResource {
@@ -87,13 +88,13 @@ public class CompareResource {
       Datasource withDatasource = getDatasource(with);
       DatasourceCompareDto dto = createDatasourceCompareDto(comparedDatasource, withDatasource);
       return Response.ok().entity(dto).build();
-    } else if(comparedTable != null) {
+    }
+    if(comparedTable != null) {
       ValueTable withTable = getValueTable(with);
       TableCompareDto dto = createTableCompareDto(comparedTable, withTable);
       return Response.ok().entity(dto).build();
-    } else {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
+    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
   }
 
   @VisibleForTesting
@@ -105,9 +106,7 @@ public class CompareResource {
   ValueTable getValueTable(String fqTableName) {
     String datasourceName = MagmaEngineTableResolver.valueOf(fqTableName).getDatasourceName();
     String tableName = MagmaEngineTableResolver.valueOf(fqTableName).getTableName();
-    ValueTable withTable = MagmaEngine.get().getDatasource(datasourceName).getValueTable(tableName);
-
-    return withTable;
+    return MagmaEngine.get().getDatasource(datasourceName).getValueTable(tableName);
   }
 
   private DatasourceCompareDto createDatasourceCompareDto(Datasource compared, Datasource with) {
@@ -116,12 +115,9 @@ public class CompareResource {
     dtoBuilder.setWithDatasource(Dtos.asDto(with));
 
     for(ValueTable vt : compared.getValueTables()) {
-      TableCompareDto tableCompareDto = null;
-      if(with.hasValueTable(vt.getName())) {
-        tableCompareDto = createTableCompareDto(vt, with.getValueTable(vt.getName()));
-      } else {
-        tableCompareDto = createTableCompareDtoWhereSecondTableDoesNotExist(vt);
-      }
+      TableCompareDto tableCompareDto = with.hasValueTable(vt.getName()) //
+          ? createTableCompareDto(vt, with.getValueTable(vt.getName())) //
+          : createTableCompareDtoWhereSecondTableDoesNotExist(vt);
       dtoBuilder.addTableComparisons(tableCompareDto);
     }
 
@@ -153,7 +149,8 @@ public class CompareResource {
     return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
   }
 
-  private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables, Set<Variable> missingVariables, Set<Variable> existingVariables) {
+  private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables,
+      Set<Variable> missingVariables, Set<Variable> existingVariables) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared));
 
@@ -178,7 +175,8 @@ public class CompareResource {
     return addTableCompareDtoModifications(dtoBuilder, compared, with, existingVariables, conflicts).build();
   }
 
-  private TableCompareDto.Builder addTableCompareDtoModifications(TableCompareDto.Builder dtoBuilder, ValueTable compared, ValueTable with, Set<Variable> existingVariables, Set<ConflictDto> conflicts) {
+  private TableCompareDto.Builder addTableCompareDtoModifications(TableCompareDto.Builder dtoBuilder,
+      ValueTable compared, ValueTable with, Set<Variable> existingVariables, Set<ConflictDto> conflicts) {
     Set<Variable> unconflictingExistingVariables = getUnconflicting(existingVariables, conflicts);
     Set<Variable> unmodifiedVariables = unconflictingExistingVariables;
     if(with != null) {
@@ -199,13 +197,15 @@ public class CompareResource {
     Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
     if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
       for(Variable missingVariable : ((CsvValueTable) compared).getMissingVariables()) {
-        conflicts.add(createConflictDto(Dtos.asDto(missingVariable).setIsNewVariable(true).build(), CSV_VARIABLE_MISSING));
+        conflicts
+            .add(createConflictDto(Dtos.asDto(missingVariable).setIsNewVariable(true).build(), CSV_VARIABLE_MISSING));
       }
     }
     return conflicts;
   }
 
-  private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables, boolean newVariable) {
+  private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables,
+      boolean newVariable) {
     Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
 
     String entityType = null;
@@ -221,13 +221,17 @@ public class CompareResource {
       if(with != null) {
         Variable variableInCompared = compared.getVariable(name);
         if(variableInCompared.getEntityType().equals(with.getEntityType()) == false) {
-          conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE, variableInCompared.getEntityType(), with.getEntityType()));
+          conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE,
+              variableInCompared.getEntityType(), with.getEntityType()));
         }
 
         try {
           Variable variableInWith = with.getVariable(name);
-          if(variableInCompared.getValueType().equals(variableInWith.getValueType()) == false && with.isView() == false) {
-            conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE, variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
+          if(variableInCompared.getValueType().equals(variableInWith.getValueType()) == false &&
+              with.isView() == false) {
+            conflicts.add(
+                createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE,
+                    variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
           }
         } catch(NoSuchVariableException variableDoesNotExist) {
           // Case where the variable does not exist in Opal but its destination table already exist.
@@ -236,7 +240,9 @@ public class CompareResource {
         // Target (with) will be created
       } else {
         if(entityType.equals(v.getEntityType()) == false) {
-          conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(true).build(), INCOMPATIBLE_ENTITY_TYPE, entityType, v.getEntityType()));
+          conflicts.add(
+              createConflictDto(Dtos.asDto(v).setIsNewVariable(true).build(), INCOMPATIBLE_ENTITY_TYPE, entityType,
+                  v.getEntityType()));
         }
       }
     }
@@ -351,7 +357,8 @@ public class CompareResource {
 
   private boolean isSameAttribute(Attribute compared, Attribute with) {
     if(compared.getName().equals(with.getName()) == false) return false;
-    if((compared.getLocale() == null || compared.getLocale().toString().isEmpty()) && (with.getLocale() == null || with.getLocale().toString().isEmpty())) return true;
+    if((compared.getLocale() == null || compared.getLocale().toString().isEmpty()) &&
+        (with.getLocale() == null || with.getLocale().toString().isEmpty())) return true;
     if(compared.getLocale() != null) {
       return compared.getLocale().equals(with.getLocale());
     } else if(with.getLocale() != null) {

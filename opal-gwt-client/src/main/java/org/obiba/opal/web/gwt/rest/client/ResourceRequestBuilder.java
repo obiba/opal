@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,42 +15,44 @@ import com.google.gwt.http.client.RequestBuilder;
 
 public interface ResourceRequestBuilder<T extends JavaScriptObject> {
 
-  public ResourceRequestBuilder<T> forResource(String resource);
+  ResourceRequestBuilder<T> forResource(String resource);
 
-  public ResourceRequestBuilder<T> withCallback(ResourceCallback<T> callback);
+  ResourceRequestBuilder<T> withCallback(ResourceCallback<T> callback);
 
-  public ResourceRequestBuilder<T> withCallback(int code, ResponseCodeCallback callback);
+  ResourceRequestBuilder<T> withCallback(int code, ResponseCodeCallback callback);
 
-  public ResourceRequestBuilder<T> withAuthorizationCallback(AuthorizationCallback callback);
+  ResourceRequestBuilder<T> withCallback(ResponseCodeCallback callback, int... codes);
 
-  public ResourceRequestBuilder<T> accept(String acceptHeader);
+  ResourceRequestBuilder<T> withAuthorizationCallback(AuthorizationCallback callback);
 
-  public ResourceRequestBuilder<T> withBody(String contentType, String body);
+  ResourceRequestBuilder<T> accept(String acceptHeader);
 
-  public ResourceRequestBuilder<T> withResourceBody(/* T.stringify() */String dto);
+  ResourceRequestBuilder<T> withBody(String contentType, String body);
 
-  public ResourceRequestBuilder<T> withFormBody(String... keyValues);
+  ResourceRequestBuilder<T> withResourceBody(/* T.stringify() */String dto);
 
-  public ResourceRequestBuilder<T> get();
+  ResourceRequestBuilder<T> withFormBody(String... keyValues);
 
-  public ResourceRequestBuilder<T> head();
+  ResourceRequestBuilder<T> get();
 
-  public ResourceRequestBuilder<T> post();
+  ResourceRequestBuilder<T> head();
 
-  public ResourceRequestBuilder<T> put();
+  ResourceRequestBuilder<T> post();
 
-  public ResourceRequestBuilder<T> delete();
+  ResourceRequestBuilder<T> put();
 
-  public ResourceRequestBuilder<T> options();
+  ResourceRequestBuilder<T> delete();
 
-  public RequestBuilder build();
+  ResourceRequestBuilder<T> options();
 
-  public Request send();
+  RequestBuilder build();
 
-  public String getVersion();
+  Request send();
 
-  public String getUri();
+  String getVersion();
 
-  public String getResource();
+  String getUri();
+
+  String getResource();
 
 }

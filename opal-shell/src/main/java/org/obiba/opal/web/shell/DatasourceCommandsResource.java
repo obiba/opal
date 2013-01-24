@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 @Path("/datasource/{name}/commands")
 public class DatasourceCommandsResource extends AbstractCommandsResource {
 
+  @SuppressWarnings("UnusedDeclaration")
   private static final Logger log = LoggerFactory.getLogger(DatasourceCommandsResource.class);
 
   @PathParam("name")
@@ -57,8 +58,9 @@ public class DatasourceCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_import")
   public Response importData(Commands.ImportCommandOptionsDto options) {
-    if(name.equals(options.getDestination()) == false)
+    if(!name.equals(options.getDestination())) {
       throw new InvalidRequestException("DataCanOnlyBeImportedInCurrentDatasource", name);
+    }
 
     // TODO check file access
 
@@ -71,14 +73,14 @@ public class DatasourceCommandsResource extends AbstractCommandsResource {
 
   @POST
   @Path("/_copy")
-  public Response copyData(final Commands.CopyCommandOptionsDto options) {
+  public Response copyData(Commands.CopyCommandOptionsDto options) {
     for(String table : options.getTablesList()) {
       ensureTableValuesAccess(table);
     }
 
     if(options.hasDestination()) {
       ensureDatasourceWriteAccess(options.getDestination());
-    } else if (options.hasOut()) {
+    } else if(options.hasOut()) {
       ensureFileWriteAccess(options.getOut());
     }
 
@@ -91,20 +93,20 @@ public class DatasourceCommandsResource extends AbstractCommandsResource {
 
   private void ensureTableValuesAccess(String table) {
     MagmaEngineReferenceResolver resolver = MagmaEngineTableResolver.valueOf(table);
-    if(SecurityUtils.getSubject().isPermitted("magma:/datasource/" + resolver.getDatasourceName() + "/table/" +
-        resolver.getTableName() + "/valueSet:GET:GET/GET") == false) {
+    if(!SecurityUtils.getSubject().isPermitted("magma:/datasource/" + resolver.getDatasourceName() + "/table/" +
+        resolver.getTableName() + "/valueSet:GET:GET/GET")) {
       throw new InvalidRequestException("AccessDeniedToTableValues", table);
     }
   }
 
   private void ensureDatasourceWriteAccess(String datasource) {
-    if(SecurityUtils.getSubject().isPermitted("magma:/datasource/" + datasource + "/commands/_import:POST") == false) {
+    if(!SecurityUtils.getSubject().isPermitted("magma:/datasource/" + datasource + "/commands/_import:POST")) {
       throw new InvalidRequestException("DataWriteNotAuthorized", datasource);
     }
   }
 
   private void ensureFileWriteAccess(String path) {
-    if(SecurityUtils.getSubject().isPermitted("magma:/file" + path + ":POST") == false) {
+    if(!SecurityUtils.getSubject().isPermitted("magma:/file" + path + ":POST")) {
       throw new InvalidRequestException("FileWriteNotAuthorized", path);
     }
   }

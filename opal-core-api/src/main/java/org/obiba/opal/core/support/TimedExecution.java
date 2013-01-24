@@ -36,7 +36,6 @@ public class TimedExecution {
     return this;
   }
 
-  //TODO configure which field to output
   public String formatExecutionTime() {
     long hours = MILLISECONDS.toHours(executionTime);
     long minutes = MILLISECONDS.toMinutes(executionTime) - HOURS.toMinutes(hours);

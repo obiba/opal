@@ -1,14 +1,15 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -29,6 +30,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 
+@SuppressWarnings("StaticNonFinalField")
 public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implements ResourceRequestBuilder<T> {
 
   private final static String OPAL_WS_ROOT = "/ws";
@@ -51,13 +53,13 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   private String body;
 
-  private Set<String> accept = new HashSet<String>();
+  private Collection<String> accept = new HashSet<String>();
 
   private HashMultimap<String, String> form = HashMultimap.create();
 
   private ResourceCallback<T> resourceCallback;
 
-  // An array of handlers for HTTP status codes: the index of the array is the HTTP code. This will be 99% empty. This
+  // An array of handlers for HTTP status responseCodes: the index of the array is the HTTP code. This will be 99% empty. This
   // may not be appropriate, depends on how the browser handles this...
   // TODO: determine the implications for this
   private ResponseCodeCallback[] codes;
@@ -71,56 +73,79 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   public DefaultResourceRequestBuilder() {
   }
 
-  public static void setup(RequestEventBus requestEventBus, RequestCredentials credentials, ResourceAuthorizationCache authorizationCache) {
-    DefaultResourceRequestBuilder.eventBus = requestEventBus;
+  public static void setup(RequestEventBus requestEventBus, RequestCredentials credentials,
+      ResourceAuthorizationCache authorizationCache) {
+    eventBus = requestEventBus;
     DefaultResourceRequestBuilder.credentials = credentials;
     DefaultResourceRequestBuilder.authorizationCache = authorizationCache;
   }
 
-  public DefaultResourceRequestBuilder<T> forResource(String resource) {
+  @Override
+  public DefaultResourceRequestBuilder<T> forResource(
+      @SuppressWarnings("ParameterHidesMemberVariable") String resource) {
     if(resource == null) throw new IllegalArgumentException("path cannot be null");
     this.resource = resource.replaceAll("//", "/");
-    this.uri = resource.startsWith("http") ? this.resource : OPAL_WS_ROOT + this.resource;
+    uri = resource.startsWith("http") ? this.resource : OPAL_WS_ROOT + this.resource;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> withCallback(ResourceCallback<T> callback) {
     accept(RESOURCE_MEDIA_TYPE);
-    this.resourceCallback = callback;
+    resourceCallback = callback;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> withCallback(int code, ResponseCodeCallback callback) {
     if(codes == null) {
-      codes = new ResponseCodeCallback[505];
+      codes = new ResponseCodeCallback[Response.SC_HTTP_VERSION_NOT_SUPPORTED];
     }
     codes[code] = callback;
     return this;
   }
 
   @Override
+  public ResourceRequestBuilder<T> withCallback(ResponseCodeCallback callback, int... responseCodes) {
+    if(codes == null) {
+      codes = new ResponseCodeCallback[Response.SC_HTTP_VERSION_NOT_SUPPORTED];
+    }
+    if(responseCodes != null) {
+      for(int code : responseCodes) {
+        codes[code] = callback;
+      }
+    }
+    return this;
+  }
+
+  @Override
   public ResourceRequestBuilder<T> withAuthorizationCallback(AuthorizationCallback callback) {
-    this.authorizationCallback = callback;
+    authorizationCallback = callback;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> accept(String acceptHeader) {
-    this.accept.add(acceptHeader);
+    accept.add(acceptHeader);
     return this;
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
+  @Override
   public DefaultResourceRequestBuilder<T> withBody(String contentType, String body) {
     this.contentType = contentType;
     this.body = body;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> withResourceBody(/* T.stringify() */String dto) {
     // In this case, the response should be of the same type. Tell the server we accept the type we posted.
     accept(RESOURCE_MEDIA_TYPE);
     return withBody(RESOURCE_MEDIA_TYPE, dto);
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> withFormBody(String... keyValues) {
     for(int i = 0; i < keyValues.length; i += 2) {
       form.put(keyValues[i], URL.encodeQueryString(keyValues[i + 1]));
@@ -128,40 +153,47 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> get() {
     method = HttpMethod.GET;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> head() {
     method = HttpMethod.HEAD;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> post() {
     method = HttpMethod.POST;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> put() {
     method = HttpMethod.PUT;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> delete() {
     method = HttpMethod.DELETE;
     return this;
   }
 
+  @Override
   public DefaultResourceRequestBuilder<T> options() {
     method = HttpMethod.OPTIONS;
     return this;
   }
 
+  @Override
   public RequestBuilder build() {
     builder = new InnerRequestBuilder(method, uri);
     builder.setCallback(new InnerCallback());
-    if(this.accept.size() > 0) {
+    if(accept.size() > 0) {
       builder.setHeader("Accept", buildAcceptHeader());
     }
     if(body != null) {
@@ -173,6 +205,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     return builder;
   }
 
+  @Override
   public Request send() {
     try {
       return build().send();
@@ -185,9 +218,9 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   private String buildAcceptHeader() {
     StringBuilder sb = new StringBuilder();
     boolean first = true;
-    for(String accept : this.accept) {
-      if(first != true) sb.append(", ");
-      sb.append(accept);
+    for(String s : accept) {
+      if(!first) sb.append(", ");
+      sb.append(s);
       first = false;
     }
     return sb.toString();
@@ -197,8 +230,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
     boolean needSeparator = false;
     StringBuilder sb = new StringBuilder();
-    for(String key : this.form.keySet()) {
-      for(String value : this.form.get(key)) {
+    for(String key : form.keySet()) {
+      for(String value : form.get(key)) {
         if(needSeparator) sb.append('&');
         sb.append(key).append('=').append(value);
         needSeparator = true;
@@ -218,13 +251,14 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     public void onResponseReceived(Request request, Response response) {
       int code = response.getStatusCode();
       if(code == 0) {
-        GWT.log("Invalid status code. Status text was '" + response.getStatusText() + "'. Interrupting response handling.");
+        GWT.log(
+            "Invalid status code. Status text was '" + response.getStatusText() + "'. Interrupting response handling.");
         throw new IllegalStateException("Invalid status code.");
       }
 
       setOpalVersion(response);
 
-      if(credentials.hasExpired(builder) || code == 401) {
+      if(credentials.hasExpired(builder) || code == Response.SC_UNAUTHORIZED) {
         // this is fired even after a request for deleting the session
         eventBus.fireEvent(new RequestCredentialsExpiredEvent());
       } else {
@@ -233,6 +267,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
     }
 
+    @SuppressWarnings("unchecked")
     private void processResponse(Request request, Response response) {
       int code = response.getStatusCode();
 
@@ -249,10 +284,9 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
         codes[code].onResponseCode(request, response);
       }
 
-      if(resourceCallback != null && code < 400) {
+      if(resourceCallback != null && code < Response.SC_BAD_REQUEST) {
         handled = true;
-        final T resource = (T) JsonUtils.unsafeEval(response.getText());
-        resourceCallback.onResource(response, resource);
+        resourceCallback.onResource(response, (T) JsonUtils.unsafeEval(response.getText()));
       }
 
       if(!handled) {
@@ -282,13 +316,14 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     private void setOpalVersion(Response response) {
       String header = response.getHeader("X-Opal-Version");
       if(header != null && header.length() > 0) {
+        //noinspection AssignmentToStaticFieldFromInstanceMethod
         version = header;
       }
     }
 
   }
 
-  private class InnerRequestBuilder extends RequestBuilder {
+  private static class InnerRequestBuilder extends RequestBuilder {
 
     /**
      * @param httpMethod
@@ -305,10 +340,12 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     return version;
   }
 
+  @Override
   public String getUri() {
     return uri;
   }
 
+  @Override
   public String getResource() {
     return resource;
   }
