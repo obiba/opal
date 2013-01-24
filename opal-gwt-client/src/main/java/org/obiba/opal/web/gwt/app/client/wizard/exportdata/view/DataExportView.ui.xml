@@ -75,7 +75,7 @@
               <g:RadioButton name="idGroup" ui:field="unitId">
                 <ui:msg description="Unit id dropdown label">use Unit ID:</ui:msg>
               </g:RadioButton>
-              <g:ListBox ui:field="units" addStyleNames="small-indent"/>
+              <o:Chooser ui:field="units" addStyleNames="small-indent"/>
             </g:FlowPanel>
           </g:FlowPanel>
         </g:FlowPanel>
