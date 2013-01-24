@@ -1,14 +1,15 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.wizard.exportdata.view;
 
+import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -30,6 +31,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -53,11 +55,13 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   private static final Translations translations = GWT.create(Translations.class);
 
+  private String username;
+
   @UiTemplate("DataExportView.ui.xml")
   interface DataExportUiBinder extends UiBinder<DialogBox, DataExportView> {
   }
 
-  private static DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
+  private static final DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
 
   private final Widget widget;
 
@@ -121,7 +125,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   public DataExportView(EventBus eventBus) {
     super(eventBus);
     tableChooser = new TableChooser(true);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
   }
@@ -202,7 +206,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   @Override
   public String getSelectedUnit() {
-    return this.units.getValue(this.units.getSelectedIndex());
+    return units.getValue(units.getSelectedIndex());
   }
 
   @Override
@@ -248,7 +252,16 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   @Override
   public String getOutFile() {
-    return fileSelection.getFile();
+    Date date = new Date();
+    DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyyMMddHHmmss");
+
+
+    String prefix = "/export-" + username + "-" + dateFormat.format(date);
+    if (getFileFormat().equalsIgnoreCase("zip")) {
+      return fileSelection.getFile() + prefix + ".zip";
+    }
+
+    return fileSelection.getFile() + prefix;
   }
 
   @Override
@@ -286,6 +299,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     fileFormat.setEnabled(true);
   }
 
+  @Override
   public HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler) {
     return fileFormat.addChangeHandler(handler);
   }
@@ -296,12 +310,14 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     super.show();
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void clearTablesStep() {
     tablesStep.setVisible(true);
     dialog.setHelpEnabled(false);
     tableChooser.clear();
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void clearDestinationStep() {
     fileFormat.setEnabled(true);
     if(fileSelection != null) {
@@ -310,6 +326,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     }
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void clearUnitStep() {
     opalId.setValue(true);
     unitId.setValue(false);
@@ -328,12 +345,12 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
 
   @Override
   public void setTablesValidator(ValidationHandler handler) {
-    this.tablesValidator = handler;
+    tablesValidator = handler;
   }
 
   @Override
   public void setDestinationValidator(ValidationHandler handler) {
-    this.destinationValidator = handler;
+    destinationValidator = handler;
   }
 
   @Override
@@ -343,4 +360,8 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     noUnitLabel.setVisible(identifierEntityTable && units.getItemCount() == 0);
   }
 
+  @Override
+  public void setUsername(String username) {
+    this.username = username;
+  }
 }
