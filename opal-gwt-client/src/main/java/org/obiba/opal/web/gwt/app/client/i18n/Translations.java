@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -320,6 +320,7 @@ public interface Translations extends Constants {
       "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
       "DestinationFileIsMissing", "Destination File is required.", //
       "ExportDataMissingTables", "At least one table is required.",//
+      "ExportDataDuplicateTableNames", "At least two tables have the name '{0}'. Export can not be completed.",//
       "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
       "NoIdentifiersGenerated", "No Identifiers generated.",//
       "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
@@ -343,7 +344,7 @@ public interface Translations extends Constants {
       "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
       "DestinationTableCannotBeView", "The destination table cannot be a view.",//
       "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
-      "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}",//
+      "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}",//
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
