@@ -356,8 +356,11 @@ public interface Translations extends Constants {
       "TableSelectionIsRequired", "At least one table must be selected.",//
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
-      "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
+      "IndexClearCompleted", "Index clear completed",//
+      "ServiceSearchStartCompleted", "Search service started.", "ServiceSearchStopCompleted", "Search service stopped.", "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
       "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",//
+      "IndexScheduleCompleted", "Index scheduling completed",//
+      "IndexNowCompleted", "Indexing completed", //
       "PasswordIsRequired", "A password is required.",//
       "OpalURLIsRequired", "Opal address is required.",//
       "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
@@ -1188,13 +1191,6 @@ public interface Translations extends Constants {
       "Friday", "Friday", //
       "Saturday", "Saturday", //
       "Sunday", "Sunday", //
-      "MONDAY", "Monday", //
-      "TUESDAY", "Tuesday", //
-      "WEDNESDAY", "Wednesday", //
-      "THURSDAY", "Thursday", //
-      "FRIDAY", "Friday", //
-      "SATURDAY", "Saturday", //
-      "SUNDAY", "Sunday", //
       "January", "January", //
       "February", "February", //
       "March", "March", //
@@ -1372,6 +1368,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Schedule")
   String scheduleLabel();
 
+  @Description("All")
+  @DefaultStringValue("All")
+  String allLabel();
+
   @Description("Manually")
   @DefaultStringValue("Manually")
   String manuallyLabel();
@@ -1392,29 +1392,45 @@ public interface Translations extends Constants {
   @DefaultStringValue("Every hour")
   String hourlyLabel();
 
-  @Description("Every hour at")
-  @DefaultStringValue("Every hour at {0} minutes")
-  String hourlyAtLabel();
-
   @Description("Every day")
   @DefaultStringValue("Every day")
   String dailyLabel();
-
-  @Description("Every day at")
-  @DefaultStringValue("Every day at {0}:{1}")
-  String dailyAtLabel();
 
   @Description("Every week")
   @DefaultStringValue("Every week")
   String weeklyLabel();
 
-  @Description("Every week at")
-  @DefaultStringValue("Every week on {0} at {1}:{2}")
-  String weeklyAtLabel();
-
   @Description("Edit schedule")
   @DefaultStringValue("Edit schedule")
   String editScheduleLabel();
+
+  @Description("Sunday")
+  @DefaultStringValue("Sunday")
+  String sundayLabel();
+
+  @Description("Monday")
+  @DefaultStringValue("Monday")
+  String mondayLabel();
+
+  @Description("Tuesday")
+  @DefaultStringValue("Tuesday")
+  String tuesdayLabel();
+
+  @Description("Wednesday")
+  @DefaultStringValue("Wednesday")
+  String wednesdayLabel();
+
+  @Description("Thursday")
+  @DefaultStringValue("Thursday")
+  String thursdayLabel();
+
+  @Description("Friday")
+  @DefaultStringValue("Friday")
+  String fridayLabel();
+
+  @Description("Saturday")
+  @DefaultStringValue("Saturday")
+  String saturdayLabel();
 
   @Description("minutes")
   @DefaultStringValue("minutes")
