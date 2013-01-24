@@ -56,7 +56,7 @@ public class ValueTableFacetsResource {
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 
     try {
-      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
+      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager).setDatasource(datasource).setTable(table);
       dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoQueries);
 
     } catch(UnsupportedOperationException e) {

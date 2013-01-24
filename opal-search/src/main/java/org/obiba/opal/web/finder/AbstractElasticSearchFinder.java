@@ -23,17 +23,16 @@ public abstract class AbstractElasticSearchFinder<TQuery extends AbstractFinderQ
     this.opalSearchService = opalSearchService;
   }
 
-  public abstract void executeQuery(TQuery query, TResult result, String... indexes);
+  public abstract Boolean executeQuery(TQuery query, TResult result, String... indexes);
 
   @Override
   public void find(TQuery query, TResult result) {
+
     if(isSearchEnabled()) {
-      // iterate on query.getTableFilter() and check if table is indexed
-
-      executeQuery(query, result, "indexed_table_1", "indexed_table_2");
-
-      // remove indexed tables from query.getTableFilter()
-      // query.getTableFilter().removeAll(indexedTables);
+      if (executeQuery(query, result, "indexed_table_1", "indexed_table_2")) {
+        // No need to go further, the query succeeded!
+        return;
+      }
     }
 
     next(query, result);

@@ -17,13 +17,11 @@ import org.obiba.magma.ValueTable;
 public abstract class AbstractMagmaFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
     AbstractFinder<TQuery, TResult> {
 
-  public abstract void executeQuery(ValueTable valueTable, TQuery query, TResult result);
+  public abstract Boolean executeQuery(TQuery query, TResult result);
 
   @Override
   public void find(TQuery query, TResult result) {
-    for(ValueTable valueTable : query.getTableFilter()) {
-      executeQuery(valueTable, query, result);
-    }
+    executeQuery(query, result);
     next(query, result);
   }
 

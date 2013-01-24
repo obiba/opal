@@ -63,7 +63,7 @@ public class ValueTableFacetResource {
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 
     try {
-      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
+      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager).setDatasource(datasource).setTable(table);
       QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable);
 
       dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoBuilder.build());

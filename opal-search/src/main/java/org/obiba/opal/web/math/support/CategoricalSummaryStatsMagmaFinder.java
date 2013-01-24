@@ -36,7 +36,7 @@ public class CategoricalSummaryStatsMagmaFinder extends
   private static final String NULL_NAME = "N/A";
 
   @Override
-  public void executeQuery(ValueTable valueTable, CategoricalSummaryStatsQuery query,
+  public Boolean executeQuery(CategoricalSummaryStatsQuery query,
       FinderResult<Math.CategoricalSummaryDto> result) {
 
     Frequency freq = computeFrequencyDistribution(query);
@@ -66,6 +66,8 @@ public class CategoricalSummaryStatsMagmaFinder extends
     }
     builder.setMode(mode).setN(freq.getSumFreq());
     result.setValue(builder.build());
+
+    return true;
   }
 
   private Frequency computeFrequencyDistribution(CategoricalSummaryStatsQuery query) {
