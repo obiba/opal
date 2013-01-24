@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -320,6 +320,7 @@ public interface Translations extends Constants {
       "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
       "DestinationFileIsMissing", "Destination File is required.", //
       "ExportDataMissingTables", "At least one table is required.",//
+      "ExportDataDuplicateTableNames", "Two tables have the name {0}. All table names must be unique to export.",//
       "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
       "NoIdentifiersGenerated", "No Identifiers generated.",//
       "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
@@ -343,7 +344,7 @@ public interface Translations extends Constants {
       "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
       "DestinationTableCannotBeView", "The destination table cannot be a view.",//
       "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
-      "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}",//
+      "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}",//
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
@@ -355,11 +356,8 @@ public interface Translations extends Constants {
       "TableSelectionIsRequired", "At least one table must be selected.",//
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
-      "IndexClearCompleted", "Index clear completed",//
-      "ServiceSearchStartCompleted", "Search service started.", "ServiceSearchStopCompleted", "Search service stopped.", "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
+      "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
       "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",//
-      "IndexScheduleCompleted", "Index scheduling completed",//
-      "IndexNowCompleted", "Indexing completed", //
       "PasswordIsRequired", "A password is required.",//
       "OpalURLIsRequired", "Opal address is required.",//
       "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
@@ -1190,6 +1188,13 @@ public interface Translations extends Constants {
       "Friday", "Friday", //
       "Saturday", "Saturday", //
       "Sunday", "Sunday", //
+      "MONDAY", "Monday", //
+      "TUESDAY", "Tuesday", //
+      "WEDNESDAY", "Wednesday", //
+      "THURSDAY", "Thursday", //
+      "FRIDAY", "Friday", //
+      "SATURDAY", "Saturday", //
+      "SUNDAY", "Sunday", //
       "January", "January", //
       "February", "February", //
       "March", "March", //
@@ -1367,10 +1372,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Schedule")
   String scheduleLabel();
 
-  @Description("All")
-  @DefaultStringValue("All")
-  String allLabel();
-
   @Description("Manually")
   @DefaultStringValue("Manually")
   String manuallyLabel();
@@ -1391,45 +1392,29 @@ public interface Translations extends Constants {
   @DefaultStringValue("Every hour")
   String hourlyLabel();
 
+  @Description("Every hour at")
+  @DefaultStringValue("Every hour at {0} minutes")
+  String hourlyAtLabel();
+
   @Description("Every day")
   @DefaultStringValue("Every day")
   String dailyLabel();
+
+  @Description("Every day at")
+  @DefaultStringValue("Every day at {0}:{1}")
+  String dailyAtLabel();
 
   @Description("Every week")
   @DefaultStringValue("Every week")
   String weeklyLabel();
 
+  @Description("Every week at")
+  @DefaultStringValue("Every week on {0} at {1}:{2}")
+  String weeklyAtLabel();
+
   @Description("Edit schedule")
   @DefaultStringValue("Edit schedule")
   String editScheduleLabel();
-
-  @Description("Sunday")
-  @DefaultStringValue("Sunday")
-  String sundayLabel();
-
-  @Description("Monday")
-  @DefaultStringValue("Monday")
-  String mondayLabel();
-
-  @Description("Tuesday")
-  @DefaultStringValue("Tuesday")
-  String tuesdayLabel();
-
-  @Description("Wednesday")
-  @DefaultStringValue("Wednesday")
-  String wednesdayLabel();
-
-  @Description("Thursday")
-  @DefaultStringValue("Thursday")
-  String thursdayLabel();
-
-  @Description("Friday")
-  @DefaultStringValue("Friday")
-  String fridayLabel();
-
-  @Description("Saturday")
-  @DefaultStringValue("Saturday")
-  String saturdayLabel();
 
   @Description("minutes")
   @DefaultStringValue("minutes")
