@@ -169,8 +169,13 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
           modifiedPath = outputFilePath + ".zip";
         }
       } else if (file.getType().equals(FileType.IMAGINARY)) {
-        // Create the directory
-        file.createFolder();
+        if(outputFileFormat.equals("xml") && !outputFilePath.endsWith(".zip")) {
+          modifiedPath = outputFilePath + ".zip";
+        }
+        else if (outputFileFormat.equals("csv")){
+          // Create the directory
+          file.createFolder();
+        }
       }
 
     } catch(FileSystemException ex) {
