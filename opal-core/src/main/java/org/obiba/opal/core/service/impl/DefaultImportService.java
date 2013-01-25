@@ -137,13 +137,19 @@ public class DefaultImportService implements ImportService {
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
 
-    FunctionalUnit unit = nonEmptyUnitName == null ? null : functionalUnitService.getFunctionalUnit(nonEmptyUnitName);
-    if(unit == null) {
-      throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
-    }
+    FunctionalUnit unit = getFunctionalUnit(nonEmptyUnitName);
 
     copyToDestinationDatasource(sourceFile, destinationDatasource, unit, allowIdentifierGeneration,
         ignoreUnknownIdentifier, incremental);
+  }
+
+  @Nullable
+  private FunctionalUnit getFunctionalUnit(@Nullable String unitName) {
+    FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
+    if(unitName != null && unit == null) {
+      throw new NoSuchFunctionalUnitException(unitName);
+    }
+    return unit;
   }
 
   @Override
@@ -199,10 +205,7 @@ public class DefaultImportService implements ImportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
 
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
-    FunctionalUnit unit = nonEmptyUnitName == null ? null : functionalUnitService.getFunctionalUnit(nonEmptyUnitName);
-    if(unit == null) {
-      throw new NoSuchFunctionalUnitException(nonEmptyUnitName);
-    }
+    FunctionalUnit unit = getFunctionalUnit(nonEmptyUnitName);
     copyValueTables(sourceTables, destinationDatasource, unit, allowIdentifierGeneration, ignoreUnknownIdentifier,
         incremental);
   }
@@ -437,21 +440,20 @@ public class DefaultImportService implements ImportService {
     Variable keyVariable =
         Variable.Builder.newVariable(keyVariableName, TextType.get(), identifiersTableService.getEntityType()).build();
 
-    ValueTableWriter writer = writeToKeysTable();
+    ValueTableWriter tableWriter = writeToKeysTable();
     try {
-      VariableWriter vw = writer.writeVariables();
+      VariableWriter variableWriter = tableWriter.writeVariables();
       try {
         // Create private variables
-        vw.writeVariable(keyVariable);
+        variableWriter.writeVariable(keyVariable);
         if(privateView != null) {
-          DatasourceCopier.Builder.newCopier().dontCopyValues().build()
-              .copy(privateView, getIdentifiersValueTable().getName(), vw);
+          DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(privateView, variableWriter);
         }
       } finally {
-        vw.close();
+        variableWriter.close();
       }
     } finally {
-      writer.close();
+      tableWriter.close();
     }
     return keyVariable;
   }
@@ -460,17 +462,18 @@ public class DefaultImportService implements ImportService {
    * Write the key variable and the identifier variables values; update the participant key private/public map.
    */
   private VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
-      ValueTableWriter writer, PrivateVariableEntityMap entityMap) {
+      ValueTableWriter tableWriter, PrivateVariableEntityMap entityMap) {
     VariableEntity privateEntity = entityMap.privateEntity(publicEntity);
 
-    ValueSetWriter vsw = writer.writeValueSet(publicEntity);
+    ValueSetWriter valueSetWriter = tableWriter.writeValueSet(publicEntity);
     try {
       // Copy all other private variable values
       DatasourceCopier.Builder.newCopier().dontCopyMetadata().build()
-          .copy(privateView, privateView.getValueSet(privateEntity), getIdentifiersValueTable().getName(), vsw);
+          .copyValues(privateView, privateView.getValueSet(privateEntity), getIdentifiersValueTable().getName(),
+              valueSetWriter);
     } finally {
       try {
-        vsw.close();
+        valueSetWriter.close();
       } catch(IOException e) {
         //noinspection ThrowFromFinallyBlock
         throw new MagmaRuntimeException(e);

@@ -152,10 +152,10 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
         nextDestination();
         for(ValueTable source : inputDatasource.getValueTables()) {
           prepareDestination(source);
-          for(ValueSet vs : source.getValueSets()) {
-            ValueSetWriter vsw = writer.writeValueSet(vs.getVariableEntity());
-            dataCopier.copy(source, vs, source.getName(), vsw);
-            close(vsw);
+          for(ValueSet valueSet : source.getValueSets()) {
+            ValueSetWriter valueSetWriter = writer.writeValueSet(valueSet.getVariableEntity());
+            dataCopier.copyValues(source, valueSet, source.getName(), valueSetWriter);
+            close(valueSetWriter);
             checkSplitBoundary(source);
           }
         }
@@ -186,7 +186,7 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
      */
     private void prepareDestination(ValueTable source) throws IOException {
       writer = dataCopier.createValueTableWriter(source, source.getName(), destination);
-      DatasourceCopier.Builder.newCopier().dontCopyValues().build().copy(source, source.getName(), writer);
+      DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(source, source.getName(), writer);
     }
 
     /**

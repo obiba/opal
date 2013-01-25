@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -11,6 +11,8 @@ package org.obiba.opal.core.unit;
 
 import java.util.Collections;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -22,6 +24,8 @@ import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Objects;
 
 @Component
 /**
@@ -39,10 +43,12 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
     this.applicationContext = applicationContext;
   }
 
+  @Override
   public boolean hasFunctionalUnit(String unitName) {
     return getFunctionalUnit(unitName) != null;
   }
 
+  @Override
   public void removeFunctionalUnit(final String unitName) {
     configService.modifyConfiguration(new ConfigModificationTask() {
 
@@ -56,19 +62,23 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
     });
   }
 
-  public FunctionalUnit getFunctionalUnit(String unitName) {
+  @Override
+  @Nullable
+  public FunctionalUnit getFunctionalUnit(@Nullable String unitName) {
     for(FunctionalUnit unit : getConfiguredFunctionalUnits()) {
-      if(unit.getName().equals(unitName)) {
+      if(Objects.equal(unit.getName(), unitName)) {
         return unit;
       }
     }
     return null;
   }
 
+  @Override
   public Set<FunctionalUnit> getFunctionalUnits() {
     return Collections.unmodifiableSet(getConfiguredFunctionalUnits());
   }
 
+  @Override
   public void addOrReplaceFunctionalUnit(final FunctionalUnit functionalUnit) {
     configService.modifyConfiguration(new ConfigModificationTask() {
 
