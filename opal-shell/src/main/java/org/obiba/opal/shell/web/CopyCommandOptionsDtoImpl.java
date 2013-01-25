@@ -36,7 +36,7 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
 
   protected CopyCommandOptionsDto dto;
 
-  private OpalRuntime opalRuntime;
+  private final OpalRuntime opalRuntime;
 
   private String pathWithExtension;
 
@@ -160,17 +160,22 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
       // Add the extension if the file object is an existing file (FileType.FILE)
       // or a new file (FileType.IMAGINARY). We assume here that any "imaginary" file object
       // is a non-existent folder.
-      if(file.getType().equals(FileType.FILE)) {
-        if(outputFileFormat.equals("csv") && !outputFilePath.endsWith(".csv")) {
+      if(file.getType() == FileType.FILE) {
+        if("csv".equals(outputFileFormat) && !outputFilePath.endsWith(".csv")) {
           modifiedPath = outputFilePath + ".csv";
-        } else if(outputFileFormat.equals("excel") && !outputFilePath.endsWith(".xls") && !outputFilePath.endsWith(".xlsx")) {
+        } else if("excel".equals(outputFileFormat) && !outputFilePath.endsWith(".xls") &&
+            !outputFilePath.endsWith(".xlsx")) {
           modifiedPath = outputFilePath + ".xlsx"; // prefer .xlsx over .xls
-        } else if(outputFileFormat.equals("xml") && !outputFilePath.endsWith(".zip")) {
+        } else if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
           modifiedPath = outputFilePath + ".zip";
         }
-      } else if (file.getType().equals(FileType.IMAGINARY)) {
-        // Create the directory
-        file.createFolder();
+      } else if(file.getType() == FileType.IMAGINARY) {
+        if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
+          modifiedPath = outputFilePath + ".zip";
+        } else if("csv".equals(outputFileFormat)) {
+          // Create the directory
+          file.createFolder();
+        }
       }
 
     } catch(FileSystemException ex) {

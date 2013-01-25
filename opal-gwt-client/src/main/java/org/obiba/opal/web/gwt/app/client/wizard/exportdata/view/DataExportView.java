@@ -256,12 +256,12 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyyMMddHHmmss");
 
     String suffix = "";
-    if (!fileSelection.getFile().endsWith("/")){
+    if(!fileSelection.getFile().endsWith("/")) {
       suffix += "/";
     }
     suffix += "export-" + username + "-" + dateFormat.format(date);
 
-    if (getFileFormat().equalsIgnoreCase("zip")) {
+    if(getFileFormat().equalsIgnoreCase("xml")) {
       return fileSelection.getFile() + suffix + ".zip";
     }
 
