@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.sql.DataSource;
 
@@ -70,10 +71,14 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
     dataSourceNames.put(keyDataSource, "Key");
 
     OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration(false);
-    DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig dataSourcesConfig = configuration
-        .getExtension(DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig.class);
-    for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
-      dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
+    try {
+      DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig dataSourcesConfig = configuration
+          .getExtension(DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig.class);
+      for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
+        dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
+      }
+    } catch(NoSuchElementException e) {
+      // ignore
     }
 
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
@@ -136,7 +141,7 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
             "AND vt.datasource_id = d.id " + //
             "AND v.id = vsv.variable_id " + //
             "AND v.value_table_id = vt.id " + //
-            "AND vsv.value_type = ?", new Object[] { "binary" }, new RowCallbackHandler() {
+            "AND vsv.value_type = ?", new Object[] {"binary"}, new RowCallbackHandler() {
 
       @Override
       public void processRow(ResultSet rs) throws SQLException, NoSuchValueTableException {
