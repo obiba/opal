@@ -1,21 +1,32 @@
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
+import org.obiba.opal.web.gwt.app.client.support.VariableValueRow;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -31,12 +42,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
   private String entityId;
 
-  private String preSelectedDatasource;
-
-  private String preSelectedTable;
-
-  // TODO use a sorted list table names
-  private final Multimap<String, String> tablesByDatasource = ArrayListMultimap.create();
+  private TableDto selectedTable;
 
   @Inject
   public EntityDialogPresenter(EventBus eventBus, Display display) {
@@ -45,8 +51,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
   @SuppressWarnings("ParameterHidesMemberVariable")
   public void initialize(TableDto table, String entityType, String entityId) {
-    preSelectedDatasource = table.getDatasourceName();
-    preSelectedTable = table.getName();
+    selectedTable = table;
     this.entityType = entityType;
     this.entityId = entityId;
   }
@@ -54,26 +59,29 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
   @Override
   protected void onBind() {
     addChangeHandlers();
+    addCloseHandler();
   }
 
   private void addChangeHandlers() {
-    getView().getDatasourceList().addChangeHandler(new ChangeHandler() {
+    getView().getTableChooser().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        updateTables(getView().getSelectedDatasource());
-      }
-    });
-    getView().getTableList().addChangeHandler(new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        loadValueSets();
+        TableDto table = getView().getSelectedTable();
+        if(table != null) {
+          loadValueSets(table);
+        }
       }
     });
   }
 
-  private void updateTables(String datasource) {
-    getView().setTables((List<String>) tablesByDatasource.get(datasource), preSelectedTable);
-    loadValueSets();
+  private void addCloseHandler() {
+    registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        getView().hide();
+      }
+    }));
   }
 
   @Override
@@ -87,45 +95,43 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
    * find all table where this entity appears
    */
   private void loadTables() {
-
-    UriBuilder uriBuilder = UriBuilder.create().segment("datasource", preSelectedDatasource, "tables");
+    UriBuilder uriBuilder = UriBuilder.create().segment("entity", entityId, "type", entityType, "tables");
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
-            tablesByDatasource.clear();
-            if(resource != null) {
-              for(int i = 0; i < resource.length(); i++) {
-                TableDto tableDto = resource.get(i);
-                tablesByDatasource.put(tableDto.getDatasourceName(), tableDto.getName());
-              }
-            }
-            getView().setDatasources(Lists.newArrayList(tablesByDatasource.keys()), preSelectedDatasource);
-            updateTables(preSelectedDatasource);
+            getView().setTables(resource, selectedTable);
+            loadValueSets(selectedTable);
           }
         }).send();
-
-//TODO uncomment this and delete previous REST request that was used for testing widget
-//    UriBuilder uriBuilder = UriBuilder.create().segment("entity", entityId, "type", entityType);
-//    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
-//        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-//          @Override
-//          public void onResource(Response response, JsArray<TableDto> resource) {
-//            tablesByDatasource.clear();
-//            if(resource != null) {
-//              for(int i = 0; i < resource.length(); i++) {
-//                TableDto tableDto = resource.get(i);
-//                tablesByDatasource.put(tableDto.getDatasourceName(), tableDto.getName());
-//              }
-//            }
-//            getView().setDatasources(Lists.newArrayList(tablesByDatasource.values()), preSelectedDatasource);
-//            updateTables(preSelectedDatasource);
-//          }
-//        }).send();
   }
 
-  private void loadValueSets() {
-    // TODO load ValueSet for selected datasource, table and entityDto.
+  private void loadValueSets(TableDto table) {
+    UriBuilder uriBuilder = UriBuilder.create()
+        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "valueSet", entityId);
+
+    ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(uriBuilder.build()).get()
+        .withCallback(new ResourceCallback<ValueSetsDto>() {
+          @Override
+          public void onResource(Response response, ValueSetsDto resource) {
+            populateRows(resource);
+          }
+        }).send();
+  }
+
+  private void populateRows(ValueSetsDto valueSets) {
+    JsArrayString variables = valueSets.getVariablesArray();
+    JsArray<ValueSetsDto.ValueSetDto> valueSetList = valueSets.getValueSetsArray();
+    JsArray<ValueSetsDto.ValueDto> values = valueSetList.get(0).getValuesArray();
+
+    List<VariableValueRow> rows = new ArrayList<VariableValueRow>();
+    int variableCount = variables.length();
+
+    for(int i = 0; i < variableCount; i++) {
+      rows.add(new VariableValueRow(variables.get(i), values.get(i)));
+    }
+
+    getView().renderRows(rows);
   }
 
   public interface Display extends PopupView {
@@ -134,17 +140,15 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
     void setEntityId(String entityId);
 
-    void setDatasources(List<String> datasources, @Nullable String selectedDatasource);
+    void setTables(JsArray<TableDto> tables, TableDto selectedTable);
 
-    String getSelectedDatasource();
+    void renderRows(List<VariableValueRow> rows);
 
-    void setTables(List<String> tables, @Nullable String selectedTable);
+    HasClickHandlers getButton();
 
-    String getSelectedTable();
+    TableDto getSelectedTable();
 
-    HasChangeHandlers getTableList();
-
-    HasChangeHandlers getDatasourceList();
+    HasChangeHandlers getTableChooser();
   }
 
 }
