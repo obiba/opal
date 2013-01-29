@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.sql.DataSource;
 
@@ -57,9 +58,13 @@ public class SqlBinariesStorageUpgradeStep extends AbstractUpgradeStep {
     dataSourceNames.put(keyDataSource, "Key");
 
     OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration(true);
-    JdbcDataSourcesConfig dataSourcesConfig = configuration.getExtension(JdbcDataSourcesConfig.class);
-    for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
-      dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
+    try {
+      JdbcDataSourcesConfig dataSourcesConfig = configuration.getExtension(JdbcDataSourcesConfig.class);
+      for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
+        dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
+      }
+    } catch(NoSuchElementException e) {
+      // ignore
     }
 
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
@@ -88,7 +93,7 @@ public class SqlBinariesStorageUpgradeStep extends AbstractUpgradeStep {
   static boolean hasHibernateDatasource(DataSource dataSource) {
     try {
       DatabaseMetaData meta = dataSource.getConnection().getMetaData();
-      ResultSet res = meta.getTables(null, null, null, new String[] { "TABLE" });
+      ResultSet res = meta.getTables(null, null, null, new String[] {"TABLE"});
       while(res.next()) {
         if("value_set_value".equalsIgnoreCase(res.getString("TABLE_NAME"))) return true;
       }
