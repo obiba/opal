@@ -4,6 +4,7 @@ import opal.rest
 import opal.dictionary
 import opal.data
 import opal.file
+import opal.entity
 import argparse
 
 def add_opal_arguments(parser):
@@ -34,6 +35,7 @@ add_subcommand('dict', 'Query Opal data dictionary.', opal.dictionary.add_argume
 add_subcommand('data', 'Query Opal data.', opal.data.add_arguments,opal.data.do_command)
 add_subcommand('file', 'Query Opal file system.', opal.file.add_arguments,opal.file.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,opal.rest.do_command)
+add_subcommand('entity', 'as', opal.entity.add_arguments,opal.entity.do_command)
 
 # Execute selected command
 args = parser.parse_args()
