@@ -288,7 +288,7 @@ public interface Translations extends Constants {
       "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables.",//
       "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
       "ScriptIsRequired", "A script is required.",//
-      "JavascriptError" , "Error in script: {0} {1} ({2}:{3})",//
+      "JavascriptError" , "Error in script '{0}': {1} ({2}:{3})",//
       "CopyFromVariableNameIsRequired", "You must enter the name of a variable from which the new variable will be created from.",//
       "cannotSwitchTabBecauseOfUnsavedChanges", "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
       "UrlRequired", "You must provide the database's URL.",//
