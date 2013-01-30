@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.support.VariableValueRow;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
@@ -33,10 +31,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
-import com.sun.org.apache.xerces.internal.xs.StringList;
 
 /**
  *
@@ -62,7 +58,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   Label entityId;
 
   @UiField
-  CellTable<VariableValueRow> table;
+  CellTable<EntityDialogPresenter.VariableValueRow> table;
 
   @UiField
   SimplePager pager;
@@ -84,7 +80,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   private Translations translations = GWT.create(Translations.class);
 
-  private ListDataProvider<VariableValueRow> dataProvider = new ListDataProvider<VariableValueRow>();
+  private ListDataProvider<EntityDialogPresenter.VariableValueRow> dataProvider = new ListDataProvider<EntityDialogPresenter.VariableValueRow>();
 
   @Inject
   public EntityDialogView(EventBus eventBus) {
@@ -147,7 +143,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   }
 
   @Override
-  public void renderRows(final List<VariableValueRow> rows) {
+  public void renderRows(final List<EntityDialogPresenter.VariableValueRow> rows) {
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
@@ -155,16 +151,16 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   private void addTableColumns() {
 
-    table.addColumn(new TextColumn<VariableValueRow>() {
+    table.addColumn(new TextColumn<EntityDialogPresenter.VariableValueRow>() {
       @Override
-      public String getValue(VariableValueRow object) {
+      public String getValue(EntityDialogPresenter.VariableValueRow object) {
         return object.getVariable();
       }
     }, translations.variableLabel());
 
-    table.addColumn(new ClickableColumn<VariableValueRow>() {
+    table.addColumn(new ClickableColumn<EntityDialogPresenter.VariableValueRow>() {
       @Override
-      public String getValue(VariableValueRow object) {
+      public String getValue(EntityDialogPresenter.VariableValueRow object) {
         // TODO needs more sophisticated rendering, for now we merely print everything as string
         // need to take care of binary and repeated values
 

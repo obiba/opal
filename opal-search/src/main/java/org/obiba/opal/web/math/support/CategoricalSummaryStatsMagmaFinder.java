@@ -14,7 +14,6 @@ import java.util.Iterator;
 import org.apache.commons.math.stat.Frequency;
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.web.finder.AbstractMagmaFinder;
@@ -36,7 +35,7 @@ public class CategoricalSummaryStatsMagmaFinder extends
   private static final String NULL_NAME = "N/A";
 
   @Override
-  public Boolean executeQuery(CategoricalSummaryStatsQuery query,
+  public void executeQuery(CategoricalSummaryStatsQuery query,
       FinderResult<Math.CategoricalSummaryDto> result) {
 
     Frequency freq = computeFrequencyDistribution(query);
@@ -66,8 +65,6 @@ public class CategoricalSummaryStatsMagmaFinder extends
     }
     builder.setMode(mode).setN(freq.getSumFreq());
     result.setValue(builder.build());
-
-    return true;
   }
 
   private Frequency computeFrequencyDistribution(CategoricalSummaryStatsQuery query) {

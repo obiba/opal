@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.support.VariableValueRow;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -150,5 +149,26 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
     HasChangeHandlers getTableChooser();
   }
+
+  public static class VariableValueRow {
+
+    private final String variable;
+    private final ValueSetsDto.ValueDto valueDto;
+
+    public VariableValueRow(String variable, ValueSetsDto.ValueDto value) {
+      this.variable = variable;
+      this.valueDto = value;
+    }
+
+    public String getVariable() {
+      return variable;
+    }
+
+    public ValueSetsDto.ValueDto getValueDto() {
+      return valueDto;
+    }
+
+  }
+
 
 }

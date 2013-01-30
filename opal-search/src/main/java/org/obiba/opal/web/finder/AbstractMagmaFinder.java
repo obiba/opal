@@ -9,15 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.finder;
 
-import org.obiba.magma.ValueTable;
-
 /**
  *
  */
 public abstract class AbstractMagmaFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
     AbstractFinder<TQuery, TResult> {
 
-  public abstract Boolean executeQuery(TQuery query, TResult result);
+  public abstract void executeQuery(TQuery query, TResult result);
 
   @Override
   public void find(TQuery query, TResult result) {

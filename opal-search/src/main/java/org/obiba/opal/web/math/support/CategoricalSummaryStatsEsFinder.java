@@ -25,11 +25,10 @@ public class CategoricalSummaryStatsEsFinder extends
   }
 
   @Override
-  public Boolean executeQuery(CategoricalSummaryStatsQuery query, FinderResult<Math.CategoricalSummaryDto> result,
+  public void executeQuery(CategoricalSummaryStatsQuery query, FinderResult<Math.CategoricalSummaryDto> result,
       String... indexes) {
 
     // TODO build CategoricalSummaryDto with Elastic Search query
-    return true;
   }
 
 }

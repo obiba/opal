@@ -130,8 +130,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private class BadRequestCallback implements ResponseCodeCallback {
 
-    static final int HTTP_CODE = 400;
-
     @Override
     public void onResponseCode(Request request, Response response) {
       notifyError(response);
@@ -198,7 +196,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
       valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link).get()//
           .withCallback(new ValueSetsResourceCallback(offset, table))
-          .withCallback(BadRequestCallback.HTTP_CODE, new BadRequestCallback()).send();
+          .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback()).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
@@ -238,7 +236,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
           .withCallback(new VariablesResourceCallback(table))
-          .withCallback(BadRequestCallback.HTTP_CODE, new BadRequestCallback() {
+          .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               notifyError(response);

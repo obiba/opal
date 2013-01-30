@@ -9,24 +9,23 @@
  */
 package org.obiba.opal.web.search.support;
 
-import com.google.common.base.Joiner;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import com.google.common.base.Joiner;
+
 public class QueryTermJsonBuilder {
 
-  private static final Logger log = LoggerFactory.getLogger(QueryTermJsonBuilder.class);
+  private static final int DEFAULT_MAX_FIELDS = 9999;
 
   private List<String> fieldNames = new ArrayList<String>();
   private String termFieldName;
   private String termFieldValue;
-  private int size = 9999;
+  private int size = DEFAULT_MAX_FIELDS;
   private JSONObject termFilters;
 
 
@@ -60,14 +59,7 @@ public class QueryTermJsonBuilder {
     JSONObject jsonQuery = new JSONObject().put("query", jsonTerm);
 
     jsonQuery.put("size", Integer.toString(size));
-
-    if (fieldNames.isEmpty()) {
-      jsonQuery.put("fields", new JSONArray());
-    }
-    else {
-      jsonQuery.put("fields", Joiner.on(",").join(fieldNames));
-    }
-
+    jsonQuery.put("fields", fieldNames.isEmpty() ? new JSONArray() : Joiner.on(",").join(fieldNames));
     jsonQuery.put("filter", termFilters);
 
     return jsonQuery;
