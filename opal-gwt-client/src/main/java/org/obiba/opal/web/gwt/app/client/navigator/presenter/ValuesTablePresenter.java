@@ -210,10 +210,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         valuesRequest.cancel();
         valuesRequest = null;
       }
-      //noinspection MagicNumber
+
       valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link).get()//
-          .withCallback(new ValueSetsResourceCallback(offset, table)).withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback())
-          .send();
+          .withCallback(new ValueSetsResourceCallback(offset, table))
+          .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback()).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
