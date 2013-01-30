@@ -165,8 +165,8 @@ public class DatasourceResource {
   }
 
   @Path("/tables")
-  public TablesResource getTables() {
-    return new TablesResource(getDatasource());
+  public DatasourceTablesResource getTables() {
+    return new DatasourceTablesResource(getDatasource());
   }
 
   public TableResource getTableResource(ValueTable table) {

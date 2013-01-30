@@ -1,71 +1,55 @@
 /*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ * Copyright (c) 2011 OBiBa. All rights reserved.
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.math;
+package org.obiba.opal.web.math.support;
 
 import java.util.Iterator;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.math.stat.Frequency;
-import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VectorSource;
 import org.obiba.magma.type.BooleanType;
-import org.obiba.opal.web.TimestampedResponses;
-import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
-import org.obiba.opal.web.model.Math.FrequencyDto;
-import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
+import org.obiba.opal.web.finder.AbstractMagmaFinder;
+import org.obiba.opal.web.finder.FinderResult;
+import org.obiba.opal.web.model.Math;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 
 /**
  *
  */
-public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatisticsResource {
+public class CategoricalSummaryStatsMagmaFinder extends
+    AbstractMagmaFinder<CategoricalSummaryStatsQuery, FinderResult<Math.CategoricalSummaryDto>> {
 
-  final static String NULL_NAME = "N/A";
+  private static final String NULL_NAME = "N/A";
 
-  /**
-   * @param valueTable
-   * @param variable
-   * @param vectorSource
-   */
-  public CategoricalSummaryStatisticsResource(ValueTable valueTable, Variable variable, VectorSource vectorSource) {
-    super(valueTable, variable, vectorSource);
-  }
+  @Override
+  public void executeQuery(CategoricalSummaryStatsQuery query,
+      FinderResult<Math.CategoricalSummaryDto> result) {
 
-  @GET
-  @POST
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public Response compute(@QueryParam("distinct") boolean distinct) {
-    Frequency freq = computeFrequencyDistribution();
-    CategoricalSummaryDto.Builder builder = CategoricalSummaryDto.newBuilder();
+    Frequency freq = computeFrequencyDistribution(query);
+    Math.CategoricalSummaryDto.Builder builder = Math.CategoricalSummaryDto.newBuilder();
     long max = 0;
     // Mode is the most frequent value
     String mode = NULL_NAME;
     Iterator<String> concat;
-    if(distinct) {
+    if(query.isDistinct()) {
       // category names, null values and distinct values
       concat = freqNames(freq);
     } else {
       // category names and null values
-      concat = Iterators.concat(categoryNames(), ImmutableList.of(NULL_NAME).iterator());
+      concat = Iterators.concat(categoryNames(query.getVariable()), ImmutableList.of(NULL_NAME).iterator());
     }
     // Iterate over all category names including or not distinct values. The loop will also determine the mode
     // of the distribution (most frequent value)
@@ -76,18 +60,23 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
         max = count;
         mode = value;
       }
-      builder.addFrequencies(FrequencyDto.newBuilder().setValue(value).setFreq(freq.getCount(value)).setPct(freq.getPct(value)));
+      builder.addFrequencies(
+          Math.FrequencyDto.newBuilder().setValue(value).setFreq(freq.getCount(value)).setPct(freq.getPct(value)));
     }
     builder.setMode(mode).setN(freq.getSumFreq());
-    return TimestampedResponses.ok(getValueTable(), SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).setExtension(CategoricalSummaryDto.categorical, builder.build()).build()).build();
+    result.setValue(builder.build());
   }
 
-  private Frequency computeFrequencyDistribution() {
+  private Frequency computeFrequencyDistribution(CategoricalSummaryStatsQuery query) {
     Frequency freq = new Frequency();
-    for(Value value : getValues()) {
+    for(Value value : getValues(query)) {
       addValue(freq, value);
     }
     return freq;
+  }
+
+  private Iterable<Value> getValues(CategoricalSummaryStatsQuery query) {
+    return query.getVectorSource().getValues(Sets.newTreeSet(query.getValueTable().getVariableEntities()));
   }
 
   private void addValue(Frequency freq, Value value) {
@@ -111,14 +100,14 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
   /**
    * Returns an iterator of category names
    */
-  private Iterator<String> categoryNames() {
-    if(getVariable().getValueType().equals(BooleanType.get())) {
-      return ImmutableList.<String> builder()//
-      .add(BooleanType.get().trueValue().toString())//
-      .add(BooleanType.get().falseValue().toString()).build().iterator();
+  private Iterator<String> categoryNames(Variable variable) {
+    if(variable.getValueType().equals(BooleanType.get())) {
+      return ImmutableList.<String>builder()//
+          .add(BooleanType.get().trueValue().toString())//
+          .add(BooleanType.get().falseValue().toString()).build().iterator();
     }
 
-    return Iterables.transform(getVariable().getCategories(), new Function<Category, String>() {
+    return Iterables.transform(variable.getCategories(), new Function<Category, String>() {
 
       @Override
       public String apply(Category from) {
@@ -140,5 +129,5 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
       }
     });
   }
-
 }
+

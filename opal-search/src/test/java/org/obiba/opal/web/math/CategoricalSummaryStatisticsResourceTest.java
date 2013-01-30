@@ -1,21 +1,13 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.math;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -38,6 +30,14 @@ import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 
 import com.google.common.collect.ImmutableList;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 /**
  *
  */
@@ -55,36 +55,46 @@ public class CategoricalSummaryStatisticsResourceTest {
 
   @Test
   public void test_compute_withTextType() {
-    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("YES", "NO", "DNK", "PNA").build();
-    CategoricalSummaryDto categoricalDto = compute(mockVariable, Values.asValues(TextType.get(), "YES", "NO", "YES", "PNA", "DNK"));
+    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock")
+        .addCategories("YES", "NO", "DNK", "PNA").build();
+    CategoricalSummaryDto categoricalDto = compute(mockVariable,
+        Values.asValues(TextType.get(), "YES", "NO", "YES", "PNA", "DNK"));
     assertThat(categoricalDto.getMode(), is("YES"));
   }
 
   @Test
   public void test_compute_withNullValue() {
-    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("YES", "NO", "DNK", "PNA").build();
-    CategoricalSummaryDto categoricalDto = compute(mockVariable, Values.asValues(TextType.get(), "YES", "NO", null, null));
+    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock")
+        .addCategories("YES", "NO", "DNK", "PNA").build();
+    CategoricalSummaryDto categoricalDto = compute(mockVariable,
+        Values.asValues(TextType.get(), "YES", "NO", null, null));
     assertThat(categoricalDto.getMode(), is(CategoricalSummaryStatisticsResource.NULL_NAME));
   }
 
   @Test
   public void test_compute_withSequence() {
-    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2").build();
-    CategoricalSummaryDto categoricalDto = compute(mockVariable, ImmutableList.of(Values.asSequence(TextType.get(), "CAT1", "CAT2"), Values.asSequence(TextType.get(), "CAT1")));
+    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2")
+        .build();
+    CategoricalSummaryDto categoricalDto = compute(mockVariable,
+        ImmutableList.of(Values.asSequence(TextType.get(), "CAT1", "CAT2"), Values.asSequence(TextType.get(), "CAT1")));
     assertThat(categoricalDto.getMode(), is("CAT1"));
   }
 
   @Test
   public void test_compute_withSequenceThatContainsNullValue() {
-    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2").build();
-    CategoricalSummaryDto categoricalDto = compute(mockVariable, ImmutableList.of(Values.asSequence(TextType.get(), "CAT1", "CAT2"), Values.asSequence(TextType.get(), "CAT1", null)));
+    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2")
+        .build();
+    CategoricalSummaryDto categoricalDto = compute(mockVariable, ImmutableList
+        .of(Values.asSequence(TextType.get(), "CAT1", "CAT2"), Values.asSequence(TextType.get(), "CAT1", null)));
     assertThat(categoricalDto.getMode(), is("CAT1"));
   }
 
   @Test
   public void test_compute_withNullSequence() {
-    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2").build();
-    CategoricalSummaryDto categoricalDto = compute(mockVariable, ImmutableList.of(TextType.get().nullSequence(), Values.asSequence(TextType.get(), "CAT1")));
+    Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2")
+        .build();
+    CategoricalSummaryDto categoricalDto = compute(mockVariable,
+        ImmutableList.of(TextType.get().nullSequence(), Values.asSequence(TextType.get(), "CAT1")));
     assertThat(categoricalDto.getMode(), is("CAT1"));
   }
 
@@ -97,7 +107,8 @@ public class CategoricalSummaryStatisticsResourceTest {
     expect(mockSource.getValues((SortedSet<VariableEntity>) EasyMock.anyObject())).andReturn(values);
 
     replay(mockTable, mockSource);
-    CategoricalSummaryStatisticsResource resource = new CategoricalSummaryStatisticsResource(mockTable, variable, mockSource);
+    CategoricalSummaryStatisticsResource resource = new CategoricalSummaryStatisticsResource(mockTable, variable,
+        mockSource);
     SummaryStatisticsDto dto = (SummaryStatisticsDto) resource.compute(false).getEntity();
     verify(mockTable, mockSource);
 

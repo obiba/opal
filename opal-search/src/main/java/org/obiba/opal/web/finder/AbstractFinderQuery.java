@@ -1,23 +1,31 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.search.es;
+package org.obiba.opal.web.finder;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.rest.RestController;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface ElasticSearchProvider {
+import org.obiba.magma.ValueTable;
 
-  boolean isEnabled();
+/**
+ *
+ */
+public abstract class AbstractFinderQuery {
 
-  Client getClient();
+  /**
+   * Tables to search within
+   */
+  private final List<ValueTable> tableFilter = new ArrayList<ValueTable>();
 
-  RestController getRest();
+  public List<ValueTable> getTableFilter() {
+    return tableFilter;
+  }
 
 }

@@ -1,0 +1,63 @@
+/*******************************************************************************
+ * Copyright (c) 2011 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+package org.obiba.opal.web.magma;
+
+import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.search.IndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
+/**
+ *
+ */
+@Component
+@Scope("request")
+@Path("/entity/{id}/type/{type}")
+public class VariableEntityResource {
+
+  @PathParam("id")
+  private String entityId;
+
+  @PathParam("type")
+  private String entityType;
+
+  @Autowired
+  private OpalSearchService opalSearchService;
+
+  @Autowired
+  private IndexManager indexManager;
+
+  @Autowired
+  private ElasticSearchProvider esProvider;
+
+
+  @Path("/tables")
+  public VariableEntityTablesResource getTables() {
+    return new VariableEntityTablesResource(getVariableEntity(), opalSearchService, indexManager, esProvider);
+  }
+
+  private VariableEntityBean getVariableEntity() {
+    return new VariableEntityBean(entityType, entityId);
+  }
+//
+//  VariableEntity getEntity() {
+//    // TODO...
+//    return null;
+//  }
+
+
+
+}

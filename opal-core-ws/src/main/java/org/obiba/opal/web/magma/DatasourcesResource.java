@@ -114,7 +114,7 @@ public class DatasourcesResource {
     final List<Magma.TableDto> tables = Lists.newArrayList();
 
     for(Datasource from : MagmaEngine.get().getDatasources()) {
-      tables.addAll(new TablesResource(from).getTables(false, entityType));
+      tables.addAll(new DatasourceTablesResource(from).getTables(false, entityType));
     }
 
     return tables;
