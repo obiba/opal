@@ -410,7 +410,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
       try {
         esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute()
             .actionGet();
-      } catch(TypeMissingException e) {
+      } catch(Exception e) {
         // ignored
       }
     }
