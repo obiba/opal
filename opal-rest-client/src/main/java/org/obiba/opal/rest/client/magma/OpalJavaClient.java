@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.obiba.opal.rest.client.magma;
 
 import java.io.ByteArrayOutputStream;
@@ -9,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,12 +30,12 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.HttpMessage;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.auth.params.AuthParams;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -70,13 +80,14 @@ public class OpalJavaClient {
 
   public static final int DEFAULT_MAX_ATTEMPT = 5;
 
+  // 5MB
+  private static final int MAX_OBJECT_SIZE_BYTES = 1024 * 1024 * 5;
+
   private final URI opalURI;
 
   private final Credentials credentials;
 
   private int soTimeout = DEFAULT_SO_TIMEOUT;
-
-  private int maxAttempts = DEFAULT_MAX_ATTEMPT;
 
   private HttpClient client;
 
@@ -89,8 +100,8 @@ public class OpalJavaClient {
     if(username == null) throw new IllegalArgumentException("username cannot be null");
     if(password == null) throw new IllegalArgumentException("password cannot be null");
 
-    this.opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
-    this.credentials = new UsernamePasswordCredentials(username, password);
+    opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
+    credentials = new UsernamePasswordCredentials(username, password);
   }
 
   /**
@@ -102,20 +113,21 @@ public class OpalJavaClient {
 
   private HttpClient getClient() {
     if(client == null) {
-      createClient(soTimeout);
+      createClient();
     }
     return client;
   }
 
-  private void createClient(int soTimeout) {
+  private void createClient() {
     log.info("Connecting to Opal: {}", opalURI);
     DefaultHttpClient httpClient = new DefaultHttpClient();
     httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
     httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
     httpClient.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuthScheme.NAME));
-    httpClient.getParams().setParameter(ClientPNames.CONNECTION_MANAGER_FACTORY_CLASS_NAME, OpalClientConnectionManagerFactory.class.getName());
+    httpClient.getParams().setParameter(ClientPNames.CONNECTION_MANAGER_FACTORY_CLASS_NAME,
+        OpalClientConnectionManagerFactory.class.getName());
     httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, soTimeout);
-    httpClient.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(maxAttempts, false));
+    httpClient.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(DEFAULT_MAX_ATTEMPT, false));
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
 
     try {
@@ -126,23 +138,23 @@ public class OpalJavaClient {
       throw new RuntimeException(e);
 
     }
-    this.client = enableCaching(httpClient);
+    client = enableCaching(httpClient);
 
-    this.ctx = new BasicHttpContext();
-    this.ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
+    ctx = new BasicHttpContext();
+    ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
   }
 
   private SchemeSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException {
     // Accepts any SSL certificate
-    X509TrustManager tm = new X509TrustManager() {
+    TrustManager tm = new X509TrustManager() {
 
       @Override
-      public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+      public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
 
       }
 
       @Override
-      public void checkServerTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+      public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
 
       }
 
@@ -151,10 +163,10 @@ public class OpalJavaClient {
         return null;
       }
     };
-    SSLContext ctx = SSLContext.getInstance("TLS");
-    ctx.init(null, new TrustManager[] { tm }, null);
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    sslContext.init(null, new TrustManager[] { tm }, null);
 
-    return new SSLSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    return new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
   }
 
   public void close() {
@@ -164,14 +176,16 @@ public class OpalJavaClient {
   }
 
   public UriBuilder newUri() {
-    return new UriBuilder(this.opalURI);
+    return new UriBuilder(opalURI);
   }
 
   public UriBuilder newUri(URI root) {
     String rootPath = root.getPath();
-    if(rootPath.endsWith("/") == false) {
+    if(!rootPath.endsWith("/")) {
       try {
-        return new UriBuilder(new URI(root.getScheme(), root.getHost() + ":" + root.getPort(), rootPath + "/", root.getQuery(), root.getFragment()));
+        return new UriBuilder(
+            new URI(root.getScheme(), root.getHost() + ":" + root.getPort(), rootPath + "/", root.getQuery(),
+                root.getFragment()));
       } catch(URISyntaxException e) {
         throw new RuntimeException(e);
       }
@@ -181,13 +195,13 @@ public class OpalJavaClient {
 
   @SuppressWarnings("unchecked")
   public <T extends Message> List<T> getResources(Class<T> messageType, URI uri, Message.Builder builder) {
-    ArrayList<T> resources = new ArrayList<T>();
+    List<T> resources = new ArrayList<T>();
     InputStream is = null;
     Message.Builder messageBuilder = builder;
 
     try {
       HttpResponse response = get(uri);
-      if(response.getStatusLine().getStatusCode() >= 400) {
+      if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
         EntityUtils.consume(response.getEntity());
         throw new RuntimeException(response.getStatusLine().getReasonPhrase());
       }
@@ -211,7 +225,7 @@ public class OpalJavaClient {
     InputStream is = null;
     try {
       HttpResponse response = get(uri);
-      if(response.getStatusLine().getStatusCode() >= 400) {
+      if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
         EntityUtils.consume(response.getEntity());
         throw new RuntimeException(response.getStatusLine().getReasonPhrase());
       }
@@ -225,13 +239,13 @@ public class OpalJavaClient {
     }
   }
 
-  public HttpResponse put(URI uri, Message msg) throws ClientProtocolException, IOException {
+  public HttpResponse put(URI uri, Message msg) throws IOException {
     HttpPut put = new HttpPut(uri);
     put.setEntity(new ByteArrayEntity(asByteArray(msg)));
     return execute(put);
   }
 
-  public HttpResponse post(URI uri, Message msg) throws ClientProtocolException, IOException {
+  public HttpResponse post(URI uri, Message msg) throws IOException {
     HttpPost post = new HttpPost(uri);
     ByteArrayEntity e = new ByteArrayEntity(asByteArray(msg));
     e.setContentType("application/x-protobuf");
@@ -239,7 +253,7 @@ public class OpalJavaClient {
     return execute(post);
   }
 
-  public HttpResponse post(URI uri, Iterable<? extends Message> msg) throws ClientProtocolException, IOException {
+  public HttpResponse post(URI uri, Iterable<? extends Message> msg) throws IOException {
     HttpPost post = new HttpPost(uri);
     ByteArrayEntity e = new ByteArrayEntity(asByteArray(msg));
     e.setContentType("application/x-protobuf");
@@ -247,13 +261,13 @@ public class OpalJavaClient {
     return execute(post);
   }
 
-  public HttpResponse post(URI uri, String entity) throws ClientProtocolException, IOException {
+  public HttpResponse post(URI uri, String entity) throws IOException {
     HttpPost post = new HttpPost(uri);
     post.setEntity(new StringEntity(entity));
     return execute(post);
   }
 
-  public HttpResponse post(URI uri, File file) throws ClientProtocolException, IOException {
+  public HttpResponse post(URI uri, File file) throws IOException {
     HttpPost post = new HttpPost(uri);
     MultipartEntity me = new MultipartEntity();
     me.addPart("fileToUpload", new FileBody(file));
@@ -261,15 +275,15 @@ public class OpalJavaClient {
     return execute(post);
   }
 
-  public HttpResponse get(URI uri) throws ClientProtocolException, IOException {
+  public HttpResponse get(URI uri) throws IOException {
     return execute(new HttpGet(uri));
   }
 
-  public HttpResponse delete(URI uri) throws ClientProtocolException, IOException {
+  public HttpResponse delete(URI uri) throws IOException {
     return execute(new HttpDelete(uri));
   }
 
-  private HttpResponse execute(HttpUriRequest msg) throws ClientProtocolException, IOException {
+  private HttpResponse execute(HttpUriRequest msg) throws IOException {
     msg.addHeader("Accept", "application/x-protobuf, text/html");
     authenticate(msg);
     log.info("{} {}", msg.getMethod(), msg.getURI());
@@ -290,7 +304,7 @@ public class OpalJavaClient {
     if(closable == null) return;
     try {
       closable.close();
-    } catch(Throwable t) {
+    } catch(Throwable ignored) {
     }
   }
 
@@ -320,12 +334,12 @@ public class OpalJavaClient {
     }
   }
 
-  private HttpClient enableCaching(HttpClient client) {
+  private HttpClient enableCaching(HttpClient httpClient) {
     CacheConfig config = new CacheConfig();
     config.setSharedCache(false);
-    // 5 MB
-    config.setMaxObjectSizeBytes(1024 * 1024 * 5);
-    return new CachingHttpClient(client, new FileResourceFactory(Files.createTempDir()), cacheStorage = new ManagedHttpCacheStorage(config), config);
+    config.setMaxObjectSizeBytes(MAX_OBJECT_SIZE_BYTES);
+    return new CachingHttpClient(httpClient, new FileResourceFactory(Files.createTempDir()),
+        cacheStorage = new ManagedHttpCacheStorage(config), config);
   }
 
   private void cleanupCache() {

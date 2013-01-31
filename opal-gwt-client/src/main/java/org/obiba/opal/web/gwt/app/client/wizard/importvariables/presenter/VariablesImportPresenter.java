@@ -46,15 +46,19 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_CREATED;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+
 public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display> {
 
-  public static final WizardType WizardType = new WizardType();
+  public static final WizardType WIZARD_TYPE = new WizardType();
 
   public static class Wizard extends WizardProxy<VariablesImportPresenter> {
 
     @Inject
     protected Wizard(EventBus eventBus, Provider<VariablesImportPresenter> wizardProvider) {
-      super(eventBus, WizardType, wizardProvider);
+      super(eventBus, WIZARD_TYPE, wizardProvider);
     }
 
   }
@@ -71,7 +75,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public VariablesImportPresenter(final Display display, final EventBus eventBus,
+  public VariablesImportPresenter(Display display, EventBus eventBus,
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
       ConclusionStepPresenter conclusionPresenter, FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
@@ -104,7 +108,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
         .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {
@@ -117,8 +121,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getView().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
-    super.registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
+    registerHandler(getView().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
+    registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
     getView().setFileSelectionValidator(new FileSelectionValidator());
     getView().setImportableValidator(new ImportableValidator());
 
@@ -141,11 +145,12 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private final class ImportableValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(comparedDatasourcesReportPresenter.getSelectedTables().size() == 0) {
+      if(comparedDatasourcesReportPresenter.getSelectedTables().isEmpty()) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
         return false;
-      } else if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("NotIgnoredConlicts").build());
+      }
+      if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("NotIgnoredConflicts").build());
         return false;
       }
 
@@ -163,9 +168,9 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private final class FileSelectionValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(getView().getSelectedFile().length() > 0
-          && (getView().getSelectedFile().endsWith(".xls") || getView().getSelectedFile().endsWith(".xlsx") || getView()
-              .getSelectedFile().endsWith(".xml"))) {
+      if(getView().getSelectedFile().length() > 0 &&
+          (getView().getSelectedFile().endsWith(".xls") || getView().getSelectedFile().endsWith(".xlsx") ||
+              getView().getSelectedFile().endsWith(".xml"))) {
         return true;
       } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExcelFileRequired").build());
@@ -206,9 +211,9 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   class DownloadExcelTemplateClickHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
-      String url = new StringBuilder("/templates").append(EXCEL_TEMPLATE).toString();
-      getEventBus().fireEvent(new FileDownloadEvent(url));
+      getEventBus().fireEvent(new FileDownloadEvent("/templates" + EXCEL_TEMPLATE));
     }
   }
 
@@ -222,18 +227,20 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
       ResourceCallback<DatasourceDto> callback = new ResourceCallback<DatasourceDto>() {
 
+        @Override
         public void onResource(Response response, DatasourceDto resource) {
-          if(response.getStatusCode() == 201) {
-            comparedDatasourcesReportPresenter.compare(((DatasourceDto) resource).getName(), getView()
-                .getSelectedDatasource(), getView().getDatasourceCreatedCallback(), factory, resource);
+          if(response.getStatusCode() == SC_CREATED) {
+            comparedDatasourcesReportPresenter.compare(resource.getName(), getView().getSelectedDatasource(),
+                getView().getDatasourceCreatedCallback(), factory, resource);
           }
         }
       };
 
       ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
 
+        @Override
         public void onResponseCode(Request request, Response response) {
-          final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
 
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) == null) {
             getEventBus().fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
@@ -242,18 +249,19 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
         }
       };
 
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder()//
-          .forResource("/transient-datasources").post().withResourceBody(DatasourceFactoryDto.stringify(factory))//
-          .withCallback(callback)//
-          .withCallback(400, errorCallback).withCallback(500, errorCallback).send();
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
+          .forResource("/transient-datasources") //
+          .post() //
+          .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
+          .withCallback(callback) //
+          .withCallback(SC_BAD_REQUEST, errorCallback) //
+          .withCallback(SC_INTERNAL_SERVER_ERROR, errorCallback).send();
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
-      if(tmpFilePath.endsWith(".xls") || tmpFilePath.endsWith(".xlsx")) {
-        return createExcelDatasourceFactoryDto(tmpFilePath);
-      } else {
-        return createStaticDatasourceFactoryDto(tmpFilePath);
-      }
+      return tmpFilePath.endsWith(".xls") || tmpFilePath.endsWith(".xlsx") //
+          ? createExcelDatasourceFactoryDto(tmpFilePath) //
+          : createStaticDatasourceFactoryDto(tmpFilePath);
     }
 
     private DatasourceFactoryDto createExcelDatasourceFactoryDto(String tmpFilePath) {

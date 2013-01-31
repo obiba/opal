@@ -1,15 +1,18 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
-   <g:FlowPanel>
-     <g:Label ui:field="validationLabel" visible="false"><ui:msg description="Validation Report Step summary">Some formatting errors have been detected. You should fix them before importing variables.</ui:msg></g:Label>
-     <o:Table width="100%" ui:field="validationTable" visible="false"/>
-     <o:DatasourceParsingErrorPanel width="100%" ui:field="parsingErrors" visible="false"/>
-   </g:FlowPanel> 
+  <g:FlowPanel>
+    <g:Label ui:field="validationLabel" visible="false">
+      <ui:msg description="Validation Report Step summary">Some formatting errors have been detected. You should fix
+        them before importing variables.
+      </ui:msg>
+    </g:Label>
+    <o:Table width="100%" ui:field="validationTable" visible="false"/>
+    <o:DatasourceParsingErrorPanel width="100%" ui:field="parsingErrors" visible="false"/>
+  </g:FlowPanel>
 
 </ui:UiBinder>

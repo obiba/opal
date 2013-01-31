@@ -36,6 +36,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -44,11 +45,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class DataImportView extends PopupViewImpl implements DataImportPresenter.Display {
 
   @UiTemplate("DataImportView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DataImportView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, DataImportView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -103,6 +104,9 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @UiField
   Chooser formatChooser;
+
+  @UiField
+  CheckBox incremental;
 
   private final EventBus eventBus;
 
@@ -203,6 +207,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
+    incremental.setValue(true);
   }
 
   @Override
@@ -217,24 +222,35 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    if(slot == Slots.Destination) {
-      destinationSelectionStep.removeStepContent();
-      destinationSelectionStep.add(content);
-    } else if(slot == Slots.Unit) {
-      unitSelectionStep.removeStepContent();
-      unitSelectionStep.add(content);
-    } else if(slot == Slots.Values) {
-      valuesStep.removeStepContent();
-      valuesStep.add(content);
-    } else if(slot == Slots.Archive) {
-      archiveStep.removeStepContent();
-      archiveStep.add(content);
+    if(!(slot instanceof Slots)) return;
+    switch((Slots) slot) {
+      case Destination:
+        destinationSelectionStep.removeStepContent();
+        destinationSelectionStep.add(content);
+        break;
+      case Unit:
+        unitSelectionStep.removeStepContent();
+        unitSelectionStep.add(content);
+        break;
+      case Values:
+        valuesStep.removeStepContent();
+        valuesStep.add(content);
+        break;
+      case Archive:
+        archiveStep.removeStepContent();
+        archiveStep.add(content);
+        break;
     }
   }
 
   @Override
   public ImportFormat getImportFormat() {
     return ImportFormat.valueOf(formatChooser.getSelectedValue());
+  }
+
+  @Override
+  public boolean isIncremental() {
+    return incremental.getValue();
   }
 
   @Override

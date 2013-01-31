@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.rest.client;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
@@ -31,6 +32,7 @@ public class UriBuilder {
    * @param segments
    * @return
    */
+  @SuppressWarnings("ConstantConditions")
   public UriBuilder segment(String... segments) {
     Preconditions.checkArgument(segments != null);
     for(String segment : segments) {
@@ -50,6 +52,7 @@ public class UriBuilder {
    * @param queryItems
    * @return
    */
+  @SuppressWarnings("ConstantConditions")
   public UriBuilder query(String... queryItems) {
     Preconditions.checkArgument(queryItems != null);
     Preconditions.checkArgument(queryItems.length % 2 == 0);
@@ -86,7 +89,7 @@ public class UriBuilder {
     return sb.toString();
   }
 
-  private void append(List<String> list, String... strings) {
+  private void append(Collection<String> list, String... strings) {
     for(String pathItem : strings) {
       list.add(URL.encodePathSegment(pathItem));
     }

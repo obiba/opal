@@ -32,16 +32,16 @@ public class OpalAuthScheme extends BasicScheme {
 
   /**
    * Produces basic authorization header for the given set of {@link Credentials}.
-   * 
+   *
    * @param credentials The set of credentials to be used for authentication
    * @param request The request being authenticated
+   * @return a basic authorization string
    * @throws InvalidCredentialsException if authentication credentials are not valid or not applicable for this
    * authentication scheme
    * @throws AuthenticationException if authorization string cannot be generated due to an authentication failure
-   * 
-   * @return a basic authorization string
    */
-  public Header authenticate(final Credentials credentials, final HttpRequest request) throws AuthenticationException {
+  @Override
+  public Header authenticate(Credentials credentials, HttpRequest request) throws AuthenticationException {
     if(credentials == null) throw new IllegalArgumentException("credentials may not be null");
     if(request == null) throw new IllegalArgumentException("request may not be null");
 
@@ -51,20 +51,19 @@ public class OpalAuthScheme extends BasicScheme {
 
   /**
    * Returns a basic <tt>Authorization</tt> header value for the given {@link Credentials} and charset.
-   * 
+   *
    * @param credentials The credentials to encode.
    * @param charset The charset to use for encoding the credentials
-   * 
    * @return a basic authorization header
    */
-  public static Header authenticate(final Credentials credentials, final String charset, boolean proxy) {
+  public static Header authenticate(Credentials credentials, String charset, boolean proxy) {
     if(credentials == null) throw new IllegalArgumentException("credentials may not be null");
     if(charset == null) throw new IllegalArgumentException("charset may not be null");
 
     StringBuilder tmp = new StringBuilder()//
-    .append(credentials.getUserPrincipal().getName())//
-    .append(":")//
-    .append((credentials.getPassword() == null) ? "null" : credentials.getPassword());
+        .append(credentials.getUserPrincipal().getName())//
+        .append(":")//
+        .append(credentials.getPassword() == null ? "null" : credentials.getPassword());
 
     byte[] base64password = Base64.encodeBase64(EncodingUtils.getBytes(tmp.toString(), charset));
 

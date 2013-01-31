@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.magma.datasource.jdbc.JdbcValueTableSettings;
@@ -37,6 +39,7 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
     return dto.hasExtension(JdbcDatasourceFactoryDto.params);
   }
 
+  @Nonnull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     JdbcDatasourceFactoryDto jdbcDto = dto.getExtension(JdbcDatasourceFactoryDto.params);

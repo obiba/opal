@@ -17,6 +17,8 @@ public class ImportData {
 
   private ImportFormat importFormat;
 
+  private boolean incremental;
+
   private String xmlFile;
 
   private String destinationDatasourceName;
@@ -57,6 +59,7 @@ public class ImportData {
 
   public void clear() {
     importFormat = null;
+    incremental = false;
     xmlFile = null;
     destinationDatasourceName = null;
     destinationTableName = null;
@@ -84,32 +87,32 @@ public class ImportData {
     return importFormat;
   }
 
-  public void setXmlFile(String selectedFile) {
-    this.xmlFile = selectedFile;
+  public void setXmlFile(String xmlFile) {
+    this.xmlFile = xmlFile;
   }
 
   public String getXmlFile() {
     return xmlFile;
   }
 
-  public void setDestinationDatasourceName(String selectedDatasource) {
-    this.destinationDatasourceName = selectedDatasource;
+  public void setDestinationDatasourceName(String destinationDatasourceName) {
+    this.destinationDatasourceName = destinationDatasourceName;
   }
 
   public String getDestinationDatasourceName() {
     return destinationDatasourceName;
   }
 
-  public void setDestinationTableName(String selectedTable) {
-    this.destinationTableName = selectedTable;
+  public void setDestinationTableName(String destinationTableName) {
+    this.destinationTableName = destinationTableName;
   }
 
   public String getDestinationTableName() {
     return destinationTableName;
   }
 
-  public void setCharacterSet(String selectedCharacterSet) {
-    this.characterSet = selectedCharacterSet;
+  public void setCharacterSet(String characterSet) {
+    this.characterSet = characterSet;
   }
 
   public String getCharacterSet() {
@@ -230,6 +233,14 @@ public class ImportData {
 
   public void setTablePrefix(String tablePrefix) {
     this.tablePrefix = tablePrefix;
+  }
+
+  public boolean isIncremental() {
+    return incremental;
+  }
+
+  public void setIncremental(boolean incremental) {
+    this.incremental = incremental;
   }
 
   private Map<String, Object> getProperties() {

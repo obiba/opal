@@ -200,6 +200,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateFormatStepDisplay() {
     destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
+    destinationSelectionStepPresenter.setIncremental(getView().isIncremental());
     switch(getView().getImportFormat()) {
       case CSV:
         csvFormatStepPresenter.clear();
@@ -243,8 +244,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   private void submitJob(ImportCommandOptionsDto dto) {
-    UriBuilder uriBuilder = UriBuilder.create().segment("datasource", dto.getDestination(), "commands", "_import");
-    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilder.create().segment("datasource", dto.getDestination(), "commands", "_import").build()) //
+        .post() //
         .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
         .withCallback(new SubmitJobResponseCodeCallBack(), SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
         .send();
@@ -325,9 +327,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
         return false;
       }
-      datasourceValuesStepPresenter
-          .setDatasource(transientDatasourceHandler.getImportData().getTransientDatasourceName(),
-              comparedDatasourcesReportPresenter.getSelectedTables());
+      ImportData localImportData = transientDatasourceHandler.getImportData();
+      datasourceValuesStepPresenter.setDatasource(localImportData.getTransientDatasourceName(),
+          comparedDatasourcesReportPresenter.getSelectedTables(), localImportData.isIncremental(),
+          localImportData.getDestinationDatasourceName());
+
       return comparedDatasourcesReportPresenter.canBeSubmitted();
     }
   }
@@ -381,8 +385,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     private void deleteTransientDatasource() {
       if(importData.getTransientDatasourceName() == null) return;
 
-      UriBuilder ub = UriBuilder.create().segment("datasource", importData.getTransientDatasourceName());
-      ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()) //
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilder.create().segment("datasource", importData.getTransientDatasourceName()).build()) //
           .delete() //
           .withCallback(ResponseCodeCallbacks.NO_OP, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
           .send();
@@ -427,12 +431,12 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         }
       };
 
-      transientRequest =
-          ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource("/transient-datasources")
-              .post() //
-              .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
-              .withCallback(callback, SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
-              .send();
+      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
+          .forResource("/transient-datasources") //
+          .post() //
+          .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
+          .withCallback(callback, SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
+          .send();
     }
 
   }
@@ -444,6 +448,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     ImportFormat getImportFormat();
+
+    boolean isIncremental();
 
     void setImportDataInputsHandler(ImportDataInputsHandler handler);
 

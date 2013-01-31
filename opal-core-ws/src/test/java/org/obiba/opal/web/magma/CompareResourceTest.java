@@ -1,19 +1,15 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +33,11 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.Magma.TableCompareDto;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Unit tests for {@link CompareResource}.
  */
@@ -45,7 +46,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   // Instance Variables
   //
 
-  private Set<Datasource> datasourcesToRemoveAfterTest = new HashSet<Datasource>();
+  private final Collection<Datasource> datasourcesToRemoveAfterTest = new HashSet<Datasource>();
 
   //
   // Fixture Methods (setUp / tearDown)
@@ -65,8 +66,10 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testCompare_ReportsNoDifferencesOrConflictsForIdenticalTables() {
     // Setup
-    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant", createVariable("v1", TextType.get(), "Participant"));
-    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant", createVariable("v1", TextType.get(), "Participant"));
+    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
+    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
@@ -75,7 +78,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof TableCompareDto);
-    TableCompareDto dto = (TableCompareDto) (response.getEntity());
+    TableCompareDto dto = (TableCompareDto) response.getEntity();
     assertEquals(1, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
     assertEquals(0, dto.getModifiedVariablesCount()); // no variable
     assertEquals("v1", dto.getUnmodifiedVariables(0).getName());
@@ -87,8 +90,10 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testCompare_ReportsCategoriesModifiedForIdenticalTables() {
     // Setup
-    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant", createVariable("v1", TextType.get(), "Participant"));
-    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant", createVariable("v1", TextType.get(), "Participant", "A", "B", "C"));
+    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
+    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant",
+        createVariable("v1", TextType.get(), "Participant", "A", "B", "C"));
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
@@ -97,7 +102,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof TableCompareDto);
-    TableCompareDto dto = (TableCompareDto) (response.getEntity());
+    TableCompareDto dto = (TableCompareDto) response.getEntity();
     assertEquals(0, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
     assertEquals(1, dto.getModifiedVariablesCount()); // one variable ("v1")
     assertEquals("v1", dto.getModifiedVariables(0).getName());
@@ -109,8 +114,10 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testCompare_ReportsAttributesModifiedForIdenticalTables() {
     // Setup
-    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant", createVariableBuilder("v1", TextType.get(), "Participant").addAttribute("patate", "pourrie").build());
-    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant", createVariableBuilder("v1", TextType.get(), "Participant").addAttribute("patate", "pwel").build());
+    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant",
+        createVariableBuilder("v1", TextType.get(), "Participant").addAttribute("patate", "pourrie").build());
+    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant",
+        createVariableBuilder("v1", TextType.get(), "Participant").addAttribute("patate", "pwel").build());
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
@@ -119,7 +126,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof TableCompareDto);
-    TableCompareDto dto = (TableCompareDto) (response.getEntity());
+    TableCompareDto dto = (TableCompareDto) response.getEntity();
     assertEquals(0, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
     assertEquals(1, dto.getModifiedVariablesCount()); // one variable ("v1")
     assertEquals("v1", dto.getModifiedVariables(0).getName());
@@ -131,8 +138,10 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testCompare_ReportsNewVariables() {
     // Setup
-    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant", createVariable("v1", TextType.get(), "Participant"), createVariable("v2", TextType.get(), "Participant"));
-    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant", createVariable("v1", TextType.get(), "Participant"));
+    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant",
+        createVariable("v1", TextType.get(), "Participant"), createVariable("v2", TextType.get(), "Participant"));
+    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
@@ -141,7 +150,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof TableCompareDto);
-    TableCompareDto dto = (TableCompareDto) (response.getEntity());
+    TableCompareDto dto = (TableCompareDto) response.getEntity();
     assertEquals(1, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
     assertEquals(0, dto.getModifiedVariablesCount()); // no variable
     assertEquals("v1", dto.getUnmodifiedVariables(0).getName());
@@ -154,8 +163,10 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testCompare_ReportsMissingVariables() {
     // Setup
-    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant", createVariable("v1", TextType.get(), "Participant"));
-    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant", createVariable("v1", TextType.get(), "Participant"), createVariable("v2", TextType.get(), "Participant"));
+    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
+    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant",
+        createVariable("v1", TextType.get(), "Participant"), createVariable("v2", TextType.get(), "Participant"));
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
@@ -164,7 +175,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof TableCompareDto);
-    TableCompareDto dto = (TableCompareDto) (response.getEntity());
+    TableCompareDto dto = (TableCompareDto) response.getEntity();
     assertEquals(1, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
     assertEquals(0, dto.getModifiedVariablesCount()); // no variable
     assertEquals("v1", dto.getUnmodifiedVariables(0).getName());
@@ -177,12 +188,10 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testCompare_ReportsConflictingEntityTypes() {
     // Setup
-    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant", createVariable("v1", TextType.get(), "Participant"));
-    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Instrument", createVariable("v1", TextType.get(), "Instrument"));
-
-    // for(Variable v : with.getVariables()) {
-    // System.out.println("name: " + v.getName() + ", entity type: [" + v.getEntityType() + "]");
-    // }
+    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
+    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Instrument",
+        createVariable("v1", TextType.get(), "Instrument"));
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
@@ -191,7 +200,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof TableCompareDto);
-    TableCompareDto dto = (TableCompareDto) (response.getEntity());
+    TableCompareDto dto = (TableCompareDto) response.getEntity();
     assertEquals(0, dto.getUnmodifiedVariablesCount()); // no existing (non-conflicting) variables
     assertEquals(0, dto.getNewVariablesCount()); // no new variables
     assertEquals(0, dto.getMissingVariablesCount()); // no missing variables
@@ -205,8 +214,10 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testCompare_ReportsConflictingValueTypes() {
     // Setup
-    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant", createVariable("v1", TextType.get(), "Participant"));
-    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant", createVariable("v1", BooleanType.get(), "Participant"));
+    ValueTable compared = createTable(new NullDatasource("dsCompared"), "compared", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
+    ValueTable with = createTable(new NullDatasource("dsWith"), "with", "Participant",
+        createVariable("v1", BooleanType.get(), "Participant"));
 
     // Exercise
     CompareResource sut = createCompareResource(compared, with);
@@ -215,7 +226,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof TableCompareDto);
-    TableCompareDto dto = (TableCompareDto) (response.getEntity());
+    TableCompareDto dto = (TableCompareDto) response.getEntity();
     assertEquals(0, dto.getUnmodifiedVariablesCount()); // no existing (non-conflicting) variables
     assertEquals(0, dto.getNewVariablesCount()); // no new variables
     assertEquals(0, dto.getMissingVariablesCount()); // no missing variables
@@ -231,25 +242,28 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   // Test Methods (for datasource comparisons)
   //
 
+  @SuppressWarnings("OverlyLongMethod")
   @Test
   public void testCompare_ReportsNoDifferencesForIdenticalDatasources() {
     // Setup
-    ValueTable vtCompared = createTable(new NullDatasource("dummy"), "vt1", "Participant", createVariable("v1", TextType.get(), "Participant"));
+    ValueTable vtCompared = createTable(new NullDatasource("dummy"), "vt1", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
     Datasource compared = new StaticDatasource("compared", vtCompared);
     addDatasource(compared);
 
-    ValueTable vtWith = createTable(new NullDatasource("dummy"), "vt1", "Participant", createVariable("v1", TextType.get(), "Participant"));
+    ValueTable vtWith = createTable(new NullDatasource("dummy"), "vt1", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
     Datasource with = new StaticDatasource("with", vtWith);
     addDatasource(with);
 
     // Exercise
-    CompareResource sut = createCompareResource(compared, with);
+    CompareResource sut = createCompareResource(compared);
     Response response = sut.compare("with");
 
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof DatasourceCompareDto);
-    DatasourceCompareDto dto = (DatasourceCompareDto) (response.getEntity());
+    DatasourceCompareDto dto = (DatasourceCompareDto) response.getEntity();
     assertEquals("compared", dto.getCompared().getName());
     assertEquals("with", dto.getWithDatasource().getName());
     assertEquals(1, dto.getTableComparisonsCount());
@@ -265,7 +279,8 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testCompare_HandlesCaseWhereTableDoesNotExistInTheSecondDatasource() { // i.e., the "with" datasource
     // Setup
-    ValueTable vtCompared = createTable(new NullDatasource("dummy"), "vt1", "Participant", createVariable("v1", TextType.get(), "Participant"));
+    ValueTable vtCompared = createTable(new NullDatasource("dummy"), "vt1", "Participant",
+        createVariable("v1", TextType.get(), "Participant"));
     Datasource compared = new StaticDatasource("compared", vtCompared);
     addDatasource(compared);
 
@@ -273,13 +288,13 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     addDatasource(with);
 
     // Exercise
-    CompareResource sut = createCompareResource(compared, with);
+    CompareResource sut = createCompareResource(compared);
     Response response = sut.compare("with");
 
     // Verify
     assertNotNull(response);
     assertTrue(response.getEntity() instanceof DatasourceCompareDto);
-    DatasourceCompareDto dto = (DatasourceCompareDto) (response.getEntity());
+    DatasourceCompareDto dto = (DatasourceCompareDto) response.getEntity();
     assertEquals("compared", dto.getCompared().getName());
     assertEquals("with", dto.getWithDatasource().getName());
     assertEquals(1, dto.getTableComparisonsCount());
@@ -296,13 +311,14 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   // Helper Methods
   //
 
-  private CompareResource createCompareResource(final Datasource compared, final Datasource with) {
+  private CompareResource createCompareResource(Datasource compared) {
     return new CompareResource(compared);
   }
 
   private CompareResource createCompareResource(final ValueTable compared, final ValueTable with) {
     return new CompareResource(compared) {
 
+      @Override
       ValueTable getValueTable(String fqTableName) {
         return with;
       }
@@ -343,9 +359,9 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
 
   private static class StaticDatasource extends AbstractDatasource {
 
-    private Map<String, ValueTable> tableMap;
+    private final Map<String, ValueTable> tableMap;
 
-    public StaticDatasource(String name, ValueTable... tablePrototypes) {
+    private StaticDatasource(String name, ValueTable... tablePrototypes) {
       super(name, "static");
 
       tableMap = new HashMap<String, ValueTable>();

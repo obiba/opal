@@ -62,6 +62,7 @@ public class DatasourceTablesResource extends AbstractTablesResource {
 
   /**
    * Get the tables of the datasource.
+   *
    * @param counts Set the count of entities and of variables (default is true).
    * @param entityType Filter the tables with provided entity type (default is no filter).
    * @return
@@ -69,7 +70,7 @@ public class DatasourceTablesResource extends AbstractTablesResource {
   @GET
   public List<Magma.TableDto> getTables(@QueryParam("counts") @DefaultValue("true") Boolean counts,
       @Nullable @QueryParam("entityType") String entityType) {
-    final List<Magma.TableDto> tables = Lists.newArrayList();
+    List<Magma.TableDto> tables = Lists.newArrayList();
     UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
         .path(DatasourceResource.class, "getTable");
     UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
@@ -97,8 +98,7 @@ public class DatasourceTablesResource extends AbstractTablesResource {
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
     String destinationName = datasource.getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
-    ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
-
+    Datasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
     destinationDatasource.initialise();
     try {
       DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();

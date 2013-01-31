@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -34,7 +34,7 @@ public class ViewResource extends AbstractValueTableResource {
 
   private final ViewManager viewManager;
 
-  private ViewDtos viewDtos;
+  private final ViewDtos viewDtos;
 
   public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos, Set<Locale> locales) {
     super(view, locales);
@@ -43,7 +43,7 @@ public class ViewResource extends AbstractValueTableResource {
   }
 
   public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos) {
-    this(viewManager, view, viewDtos, Collections.<Locale> emptySet());
+    this(viewManager, view, viewDtos, Collections.<Locale>emptySet());
   }
 
   @GET
@@ -62,15 +62,13 @@ public class ViewResource extends AbstractValueTableResource {
   }
 
   @Path("/variables")
-  public VariablesViewResource getVariables(@Context
-  Request request) {
+  public VariablesViewResource getVariables(@Context Request request) {
     return new VariablesViewResource(viewManager, viewDtos, getValueTable(), getLocales());
   }
 
   @DELETE
   public Response removeView() {
     viewManager.removeView(getDatasource().getName(), getValueTable().getName());
-
     return Response.ok().build();
   }
 
@@ -78,7 +76,8 @@ public class ViewResource extends AbstractValueTableResource {
   @Path("/xml")
   @Produces("application/xml")
   public Response downloadViewDefinition() {
-    return Response.ok(asView(), "application/xml").header("Content-Disposition", "attachment; filename=\"" + getValueTable().getName() + ".xml\"").build();
+    return Response.ok(asView(), "application/xml")
+        .header("Content-Disposition", "attachment; filename=\"" + getValueTable().getName() + ".xml\"").build();
   }
 
   @Path("/from")
@@ -88,6 +87,7 @@ public class ViewResource extends AbstractValueTableResource {
     return new TableResource(asView().getWrappedValueTable(), getLocales());
   }
 
+  @Override
   @Path("/locales")
   public LocalesResource getLocalesResource() {
     return super.getLocalesResource();

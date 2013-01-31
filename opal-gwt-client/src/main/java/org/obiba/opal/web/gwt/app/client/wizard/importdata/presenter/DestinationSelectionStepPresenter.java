@@ -36,14 +36,11 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   private String destination;
 
+  private boolean incremental;
+
   @Inject
   public DestinationSelectionStepPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
-  }
-
-  public void setImportFormat(ImportFormat importFormat) {
-    this.importFormat = importFormat;
-    refreshDisplay();
   }
 
   @Override
@@ -69,7 +66,16 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   }
 
   private void refreshDatasources() {
-    if(destination != null) {
+    if(destination == null) {
+      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+          .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<DatasourceDto> resource) {
+              datasources = JsArrays.toSafeArray(resource);
+              refreshDatasources(datasources);
+            }
+          }).send();
+    } else {
       UriBuilder ub = UriBuilder.create().segment("datasource", destination);
       ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<DatasourceDto>() {
@@ -77,15 +83,6 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
             public void onResource(Response response, DatasourceDto resource) {
               datasources = JsArrays.create();
               datasources.push(resource);
-              refreshDatasources(datasources);
-            }
-          }).send();
-    } else {
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
-          .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<DatasourceDto> resource) {
-              datasources = JsArrays.toSafeArray(resource);
               refreshDatasources(datasources);
             }
           }).send();
@@ -151,6 +148,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   public void updateImportData(ImportData importData) {
     importData.setDestinationDatasourceName(getView().getSelectedDatasource());
+    importData.setIncremental(incremental);
     if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
       importData.setDestinationTableName(getView().getSelectedTable());
       importData.setDestinationEntityType(getView().getSelectedEntityType());
@@ -159,8 +157,17 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     }
   }
 
-  public void setDestination(@Nullable String datasourceName) {
-    destination = datasourceName;
+  public void setImportFormat(ImportFormat importFormat) {
+    this.importFormat = importFormat;
+    refreshDisplay();
+  }
+
+  public void setDestination(@Nullable String destination) {
+    this.destination = destination;
+  }
+
+  public void setIncremental(boolean incremental) {
+    this.incremental = incremental;
   }
 
   //
@@ -184,7 +191,6 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     void showTables(boolean visible);
 
     void setTableSelectionHandler(TableSelectionHandler handler);
-
   }
 
   public interface TableSelectionHandler {

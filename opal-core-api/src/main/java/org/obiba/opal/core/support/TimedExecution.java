@@ -45,18 +45,18 @@ public class TimedExecution {
     Collection<Object> args = new ArrayList<Object>();
     StringBuilder format = new StringBuilder();
     if(hours > 0) {
-      format.append("%d hours ");
+      format.append("%dhours ");
       args.add(hours);
     }
     if(minutes > 0) {
-      format.append("%d min ");
+      format.append("%dmin ");
       args.add(minutes);
     }
     if(seconds > 0) {
-      format.append("%d sec ");
+      format.append("%dsec ");
       args.add(seconds);
     }
-    format.append("%d ms");
+    format.append("%dms");
     args.add(millis);
     return String.format(format.toString(), args.toArray(new Object[args.size()]));
   }

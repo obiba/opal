@@ -1,8 +1,18 @@
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.obiba.opal.rest.client.magma;
 
 import java.net.URI;
 import java.util.Set;
 
+import org.obiba.magma.Datasource;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.NoSuchVariableException;
@@ -16,7 +26,6 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.support.AbstractValueTable;
-import org.obiba.magma.support.NullTimestamps;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableEntityProvider;
@@ -27,16 +36,15 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
+@SuppressWarnings("OverlyCoupledClass")
 class RestValueTable extends AbstractValueTable {
 
-  private static final Logger log = LoggerFactory.getLogger(RestValueTable.class);
+//  private static final Logger log = LoggerFactory.getLogger(RestValueTable.class);
 
   private final TableDto tableDto;
 
@@ -44,7 +52,7 @@ class RestValueTable extends AbstractValueTable {
 
   private Timestamps tableTimestamps;
 
-  RestValueTable(RestDatasource datasource, TableDto dto) {
+  RestValueTable(Datasource datasource, TableDto dto) {
     super(datasource, dto.getName());
     tableDto = dto;
     tableReference = getDatasource().newReference("table", dto.getName());
@@ -95,7 +103,7 @@ class RestValueTable extends AbstractValueTable {
 
   @Override
   public ValueSet getValueSet(VariableEntity entity) throws NoSuchValueSetException {
-    if(hasValueSet(entity) == false) {
+    if(!hasValueSet(entity)) {
       throw new NoSuchValueSetException(this, entity);
     }
     return new LazyValueSet(this, entity);
@@ -201,31 +209,31 @@ class RestValueTable extends AbstractValueTable {
       return valueSet;
     }
 
-  }
+    private class ValueSetTimestamps implements Timestamps {
 
-  private class ValueSetTimestamps implements Timestamps {
+      private final Magma.TimestampsDto tsDto;
 
-    private final Magma.TimestampsDto tsDto;
-
-    private ValueSetTimestamps(Magma.TimestampsDto tsDto) {
-      this.tsDto = tsDto;
-    }
-
-    @Override
-    public Value getLastUpdate() {
-      if(tsDto.hasLastUpdate()) {
-        return DateTimeType.get().valueOf(tsDto.getLastUpdate());
+      private ValueSetTimestamps(Magma.TimestampsDto tsDto) {
+        this.tsDto = tsDto;
       }
-      return getTimestamps().getLastUpdate();
+
+      @Override
+      public Value getLastUpdate() {
+        if(tsDto.hasLastUpdate()) {
+          return DateTimeType.get().valueOf(tsDto.getLastUpdate());
+        }
+        return getTimestamps().getLastUpdate();
+      }
+
+      @Override
+      public Value getCreated() {
+        if(tsDto.hasCreated()) {
+          return DateTimeType.get().valueOf(tsDto.getCreated());
+        }
+        return getTimestamps().getCreated();
+      }
     }
 
-    @Override
-    public Value getCreated() {
-      if(tsDto.hasCreated()) {
-        return DateTimeType.get().valueOf(tsDto.getCreated());
-      }
-      return getTimestamps().getCreated();
-    }
   }
 
   @Override

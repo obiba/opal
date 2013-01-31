@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -29,11 +29,11 @@ import com.gwtplatform.mvp.client.ViewImpl;
  *
  */
 public class DatasourceValuesStepView extends ViewImpl implements Display {
-  @UiTemplate("DatasourceValuesStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DatasourceValuesStepView> {
-  }
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  @UiTemplate("DatasourceValuesStepView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, DatasourceValuesStepView> {}
+
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 
@@ -86,7 +86,7 @@ public class DatasourceValuesStepView extends ViewImpl implements Display {
   }
 
   @Override
-  public void setTableSelectionHandler(TableSelectionHandler handler) {
-    this.tableSelectionHandler = handler;
+  public void setTableSelectionHandler(TableSelectionHandler tableSelectionHandler) {
+    this.tableSelectionHandler = tableSelectionHandler;
   }
 }

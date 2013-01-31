@@ -11,9 +11,12 @@ package org.obiba.opal.web.magma.support;
 
 import java.io.File;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.support.IncrementalDatasourceFactory;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.unit.FunctionalUnitService;
@@ -31,14 +34,17 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
   @Override
   public DatasourceFactory parse(DatasourceFactoryDto dto) {
     DatasourceFactory factory = internalParse(dto);
-    if(factory != null) {
-      Initialisables.initialise(factory);
+    if(dto.getIncremental() && dto.hasIncrementalDestinationName()) {
+      factory = new IncrementalDatasourceFactory(factory, dto.getIncrementalDestinationName());
     }
+    Initialisables.initialise(factory);
     return factory;
   }
 
+  @Nonnull
   protected abstract DatasourceFactory internalParse(DatasourceFactoryDto dto);
 
+  @SuppressWarnings("UnusedDeclaration")
   protected OpalRuntime getOpalRuntime() {
     return opalRuntime;
   }

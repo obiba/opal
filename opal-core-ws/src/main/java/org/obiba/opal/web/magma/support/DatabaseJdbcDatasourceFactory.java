@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
@@ -46,6 +48,7 @@ public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory imp
     this.dataSourceRegistry = dataSourceRegistry;
   }
 
+  @Nonnull
   @Override
   protected Datasource internalCreate() {
     return new JdbcDatasource(getName(), dataSourceRegistry.getDataSource(databaseName, getName()), settings);

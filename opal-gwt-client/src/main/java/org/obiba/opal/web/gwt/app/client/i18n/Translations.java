@@ -303,7 +303,7 @@ public interface Translations extends Constants {
       "CharsetNotAvailable", "The character set you have specified is not available.",//
       "FieldSeparatorRequired", "The field separator is required.",//
       "QuoteSeparatorRequired", "The quote separator is required.",//
-      "NotIgnoredConlicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
+      "NotIgnoredConflicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
       "NoVariablesToBeImported", "No variables are to be imported.",//
       "DataImportFailed", "The data importation has failed: {0}",//
       "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//

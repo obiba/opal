@@ -83,7 +83,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   @ProxyEvent
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent e) {
-    if(isVisible() == false) {
+    if(!isVisible()) {
       forceReveal();
       displayDatasource(e.getSelection());
     }
@@ -107,11 +107,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     getView().setImportDataCommand(new ImportDataCommand());
     getView().setNextCommand(new NextCommand());
     getView().setPreviousCommand(new PreviousCommand());
-    registerHandler(
-        getEventBus().addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
+    registerHandler(getEventBus().addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
     getView().setTableNameFieldUpdater(new TableNameFieldUpdater());
-    registerHandler(
-        getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
+    registerHandler(getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEventHandler()));
 
     // OPAL-975
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
@@ -387,8 +385,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(removeDatasourceConfirmation != null && event.getSource().equals(removeDatasourceConfirmation) && event
-          .isConfirmed()) {
+      if(removeDatasourceConfirmation != null && event.getSource().equals(removeDatasourceConfirmation) &&
+          event.isConfirmed()) {
         removeDatasourceConfirmation.run();
         removeDatasourceConfirmation = null;
       }
@@ -426,7 +424,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   final class AddUpdateTablesCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(VariablesImportPresenter.WizardType, datasourceName));
+      getEventBus().fireEvent(new WizardRequiredEvent(VariablesImportPresenter.WIZARD_TYPE, datasourceName));
     }
   }
 
@@ -473,7 +471,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     @Override
     public void onTableSelectionChanged(final TableSelectionChangeEvent event) {
-      if(!event.getSelection().getDatasourceName().equals(datasourceName)) {
+      if(event.getSelection().getDatasourceName().equals(datasourceName)) {
+        selectTable(event.getSelection().getName());
+      } else {
         UriBuilder ub = UriBuilder.create().segment("datasource", event.getSelection().getDatasourceName());
         ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
             .withCallback(new ResourceCallback<DatasourceDto>() {
@@ -482,8 +482,6 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
                 displayDatasource(resource, event.getSelection());
               }
             }).send();
-      } else {
-        selectTable(event.getSelection().getName());
       }
     }
   }
@@ -497,10 +495,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       // Having an position of the current variable would be more efficient.
       int siblingIndex = 0;
       int currentTableIndex = getTableIndex(event.getCurrentSelection().getName());
-      if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.NEXT) && currentTableIndex < tables
-          .length() - 1) {
+      if(event.getDirection() == SiblingTableSelectionEvent.Direction.NEXT && currentTableIndex < tables.length() - 1) {
         siblingIndex = currentTableIndex + 1;
-      } else if(event.getDirection().equals(SiblingTableSelectionEvent.Direction.PREVIOUS) && currentTableIndex != 0) {
+      } else if(event.getDirection() == SiblingTableSelectionEvent.Direction.PREVIOUS && currentTableIndex != 0) {
         siblingIndex = currentTableIndex - 1;
       } else {
         siblingIndex = currentTableIndex;
@@ -579,8 +576,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   }
 
   @ProxyStandard
-  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<DatasourcePresenter> {
-  }
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<DatasourcePresenter> {}
 
   public interface Display extends View {
 

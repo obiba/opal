@@ -1,13 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.rest.client.magma;
+
+import javax.annotation.Nonnull;
 
 import org.apache.http.params.CoreConnectionPNames;
 import org.obiba.magma.AbstractDatasourceFactory;
@@ -30,7 +32,6 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
   private Integer soTimeout;
 
   public RestDatasourceFactory(String name, String url, String username, String password, String remoteDatasource) {
-    super();
     setName(name);
     this.url = url;
     this.username = username;
@@ -41,6 +42,7 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
   /**
    * @see CoreConnectionPNames#SO_TIMEOUT
    */
+  @SuppressWarnings("UnusedDeclaration")
   public void setSoTimeout(int soTimeout) {
     this.soTimeout = soTimeout;
   }
@@ -49,7 +51,7 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     if(url == null || url.isEmpty()) throw new IllegalStateException("Opal url cannot be empty.");
 
     String opalUrl = url;
-    if(url.endsWith("/ws") == false || url.endsWith("/ws/") == false) {
+    if(!url.endsWith("/ws") || !url.endsWith("/ws/")) {
       opalUrl = url + "/ws";
     }
     OpalJavaClient client = new OpalJavaClient(opalUrl, username, password);
@@ -59,6 +61,7 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     return client;
   }
 
+  @Nonnull
   @Override
   protected Datasource internalCreate() {
     try {

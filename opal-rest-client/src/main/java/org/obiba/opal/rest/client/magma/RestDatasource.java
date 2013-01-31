@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.obiba.opal.rest.client.magma;
 
 import java.io.IOException;
@@ -7,6 +16,7 @@ import java.net.URISyntaxException;
 import java.util.Set;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.obiba.magma.MagmaRuntimeException;
@@ -33,15 +43,15 @@ public class RestDatasource extends AbstractDatasource {
 
   private final URI datasourceURI;
 
-  public RestDatasource(String name, String opalUri, String remoteDatasource, String username,
-      String password) throws URISyntaxException {
+  public RestDatasource(String name, String opalUri, String remoteDatasource, String username, String password)
+      throws URISyntaxException {
     this(name, new OpalJavaClient(opalUri, username, password), remoteDatasource);
   }
 
   public RestDatasource(String name, OpalJavaClient opalClient, String remoteDatasource) {
     super(name, "rest");
     this.opalClient = opalClient;
-    this.datasourceURI = opalClient.newUri().segment("datasource", remoteDatasource).build();
+    datasourceURI = opalClient.newUri().segment("datasource", remoteDatasource).build();
   }
 
   @Override
@@ -85,18 +95,18 @@ public class RestDatasource extends AbstractDatasource {
 
   @Override
   protected Set<String> getValueTableNames() {
-    DatasourceDto d = opalClient.getResource(DatasourceDto.class, this.datasourceURI, DatasourceDto.newBuilder());
+    DatasourceDto d = opalClient.getResource(DatasourceDto.class, datasourceURI, DatasourceDto.newBuilder());
     return ImmutableSet.copyOf(d.getTableList());
   }
 
   @Override
   public ValueTableWriter createWriter(String tableName, String entityType) {
-    if(super.hasValueTable(tableName) == false) {
+    if(!hasValueTable(tableName)) {
       URI tableUri = newReference("tables");
       try {
         HttpResponse response = getOpalClient()
             .post(tableUri, TableDto.newBuilder().setName(tableName).setEntityType(entityType).build());
-        if(response.getStatusLine().getStatusCode() != 201) {
+        if(response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
           throw new RuntimeException("cannot create table " + response.getStatusLine().getReasonPhrase());
         }
         addValueTable(tableName);
@@ -107,11 +117,11 @@ public class RestDatasource extends AbstractDatasource {
         throw new RuntimeException(e);
       }
     }
-    return new RestValueTableWriter((RestValueTable) super.getValueTable(tableName));
+    return new RestValueTableWriter((RestValueTable) getValueTable(tableName));
   }
 
   @Override
-  protected ValueTable initialiseValueTable(final String tableName) {
+  protected ValueTable initialiseValueTable(String tableName) {
     return new RestValueTable(this, opalClient
         .getResource(TableDto.class, newUri("table", tableName).query("counts", "false").build(),
             TableDto.newBuilder()));
@@ -132,7 +142,7 @@ public class RestDatasource extends AbstractDatasource {
     SetView<String> tablesToAdd = Sets.difference(currentTables, cachedTableNames);
 
     for(String table : tablesToRemove) {
-      super.removeValueTable(table);
+      removeValueTable(table);
     }
     for(String table : tablesToAdd) {
       addValueTable(table);
@@ -142,7 +152,7 @@ public class RestDatasource extends AbstractDatasource {
   private void addValueTable(String table) {
     ValueTable vt = initialiseValueTable(table);
     Initialisables.initialise(vt);
-    super.addValueTable(vt);
+    addValueTable(vt);
   }
 
   OpalJavaClient getOpalClient() {
@@ -157,15 +167,15 @@ public class RestDatasource extends AbstractDatasource {
     return uriBuilder().segment(segments);
   }
 
-  URI buildURI(final URI root, String... segments) {
+  URI buildURI(URI root, String... segments) {
     return uriBuilder(root).segment(segments).build();
   }
 
   UriBuilder uriBuilder() {
-    return uriBuilder(this.datasourceURI);
+    return uriBuilder(datasourceURI);
   }
 
-  UriBuilder uriBuilder(final URI root) {
+  UriBuilder uriBuilder(URI root) {
     return opalClient.newUri(root);
   }
 

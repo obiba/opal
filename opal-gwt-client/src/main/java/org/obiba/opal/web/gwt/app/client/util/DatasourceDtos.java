@@ -46,9 +46,18 @@ public class DatasourceDtos {
     LimesurveyDatasourceFactoryDto factoryDto = LimesurveyDatasourceFactoryDto.create();
     factoryDto.setDatabase(importData.getDatabase());
     factoryDto.setTablePrefix(importData.getTablePrefix());
+
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    configureIncremental(importData, dto);
     dto.setExtension(LimesurveyDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
     return dto;
+  }
+
+  private static void configureIncremental(ImportData importData, DatasourceFactoryDto dto) {
+    if(importData.isIncremental()) {
+      dto.setIncremental(true);
+      dto.setIncrementalDestinationName(importData.getDestinationDatasourceName());
+    }
   }
 
   private static DatasourceFactoryDto createRestDatasourceFactoryDto(ImportData importData) {
@@ -57,7 +66,9 @@ public class DatasourceDtos {
     factoryDto.setUsername(importData.getString("username"));
     factoryDto.setPassword(importData.getString("password"));
     factoryDto.setRemoteDatasource(importData.getString("remoteDatasource"));
+
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    configureIncremental(importData, dto);
     dto.setExtension(RestDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
     return dto;
   }
@@ -84,6 +95,7 @@ public class DatasourceDtos {
     factoryDto.setTablesArray(tables);
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    configureIncremental(importData, dto);
     dto.setExtension(CsvDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
 
     return dto;
@@ -97,6 +109,7 @@ public class DatasourceDtos {
     factoryDto.setOnyxWrapper(true);
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    configureIncremental(importData, dto);
     dto.setExtension(FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
 
     return dto;

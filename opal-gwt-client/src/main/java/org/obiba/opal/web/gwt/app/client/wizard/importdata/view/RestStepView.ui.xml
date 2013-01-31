@@ -1,8 +1,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
   <g:FlowPanel>
 
     <g:HTMLPanel ui:field="help">
@@ -18,7 +18,7 @@
       <g:Label addStyleNames="key">
         <ui:msg description="Opal URL label">Opal address</ui:msg>
       </g:Label>
-      <g:TextBox ui:field="url"></g:TextBox>
+      <g:TextBox ui:field="url"/>
       <g:Label
           styleName="help-block">
         <ui:msg description="Opal URL Description label">Opal address starts with
@@ -31,7 +31,7 @@
       <g:Label addStyleNames="key">
         <ui:msg description="Username label">User</ui:msg>
       </g:Label>
-      <g:TextBox ui:field="username"></g:TextBox>
+      <g:TextBox ui:field="username"/>
       <g:Label
           styleName="help-block">
         <ui:msg description="Username Description label">Name of the user valid for the
@@ -44,18 +44,19 @@
       <g:Label addStyleNames="key">
         <ui:msg description="Password label">Password</ui:msg>
       </g:Label>
-      <g:PasswordTextBox ui:field="password"></g:PasswordTextBox>
+      <g:PasswordTextBox ui:field="password"/>
     </g:FlowPanel>
 
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
         <ui:msg description="Remote Datasource label">Remote datasource</ui:msg>
       </g:Label>
-      <g:TextBox ui:field="remoteDatasource"></g:TextBox>
+      <g:TextBox ui:field="remoteDatasource"/>
       <g:Label
           styleName="help-block">
         <ui:msg description="Remote Datasource Description label">Name of the datasource from which data will
-          be imported.</ui:msg>
+          be imported.
+        </ui:msg>
       </g:Label>
     </g:FlowPanel>
 

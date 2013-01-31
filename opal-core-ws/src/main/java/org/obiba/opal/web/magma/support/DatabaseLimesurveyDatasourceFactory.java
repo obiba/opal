@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
@@ -52,6 +54,7 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
     this.dataSourceRegistry = dataSourceRegistry;
   }
 
+  @Nonnull
   @Override
   protected Datasource internalCreate() {
     return new LimesurveyDatasource(getName(), dataSourceRegistry.getDataSource(databaseName, getName()), tablePrefix);

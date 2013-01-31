@@ -9,69 +9,64 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import java.util.List;
+import java.util.Collection;
+
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display.Slots;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display.Slots;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
 
 /**
  *
  */
-public class DatasourceValuesStepPresenter extends PresenterWidget<Display> {
+public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceValuesStepPresenter.Display> {
 
   private final ValuesTablePresenter valuesTablePresenter;
 
   private JsArray<TableDto> tables;
 
   @Inject
-  public DatasourceValuesStepPresenter(Display display, final EventBus eventBus,
-      ValuesTablePresenter valuesTablePresenter) {
+  public DatasourceValuesStepPresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
   }
 
-  public void setDatasource(DatasourceDto datasource) {
-    setDatasource(datasource.getName());
-  }
+  public void setDatasource(String datasource, final Collection<String> tableNames, boolean incremental,
+      String destinationDatasource) {
 
-  public void setDatasource(String datasource) {
-    setDatasource(datasource, null);
-  }
+    // TODO: support incremental
 
-  public void setDatasource(String datasource, final List<String> tableNames) {
-    UriBuilder ub = UriBuilder.create().segment("datasource", datasource, "tables");
-    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build())
-        .get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
+        .forResource(UriBuilder.create().segment("datasource", datasource, "tables").build()) //
+        .get() //
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<TableDto> resource) {
-        tables = JsArrays.toSafeArray(resource);
-        if(tableNames == null) {
-          getView().setTables(tables);
-        } else {
-          JsArray<TableDto> filteredTables = JsArrays.create();
-          for(TableDto table : JsArrays.toIterable(tables)) {
-            if(tableNames.contains(table.getName())) {
-              filteredTables.push(table);
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            tables = JsArrays.toSafeArray(resource);
+            if(tableNames == null || tableNames.isEmpty()) {
+              getView().setTables(tables);
+            } else {
+              JsArray<TableDto> filteredTables = JsArrays.create();
+              for(TableDto table : JsArrays.toIterable(tables)) {
+                if(tableNames.contains(table.getName())) {
+                  filteredTables.push(table);
+                }
+              }
+              getView().setTables(filteredTables);
             }
           }
-          getView().setTables(filteredTables);
-        }
-      }
 
-    }).send();
+        }).send();
   }
 
   //
@@ -97,7 +92,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<Display> {
   public interface Display extends com.gwtplatform.mvp.client.View {
 
     enum Slots {
-      Values;
+      Values
     }
 
     void setTables(JsArray<TableDto> resource);
@@ -108,7 +103,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<Display> {
 
   public interface TableSelectionHandler {
 
-    public void onTableSelection(TableDto table);
+    void onTableSelection(TableDto table);
 
   }
 

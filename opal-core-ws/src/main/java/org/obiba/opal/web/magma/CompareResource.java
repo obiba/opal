@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -42,10 +42,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 @NoAuthorization
 public class CompareResource {
-  //
-  // Constants
-  //
-  @SuppressWarnings("unused")
+
   private static final Logger log = LoggerFactory.getLogger(CompareResource.class);
 
   private static final String INCOMPATIBLE_ENTITY_TYPE = "IncompatibleEntityType";
@@ -54,18 +51,13 @@ public class CompareResource {
 
   private static final String CSV_VARIABLE_MISSING = "CsvVariableMissing";
 
-  //
-  // Instance Variables
-  //
+  private static final int INITIAL_CAPACITY = 5000;
 
-  Datasource comparedDatasource;
+  private Datasource comparedDatasource;
 
-  ValueTable comparedTable;
+  private ValueTable comparedTable;
 
-  //
-  // Constructors
-  //
-
+  @SuppressWarnings("UnusedDeclaration")
   public CompareResource() {
   }
 
@@ -94,6 +86,7 @@ public class CompareResource {
       TableCompareDto dto = createTableCompareDto(comparedTable, withTable);
       return Response.ok().entity(dto).build();
     }
+    log.error("Cannot compare because comparedDatasource and comparedTable are both null.");
     return Response.status(Status.INTERNAL_SERVER_ERROR).build();
   }
 
@@ -110,9 +103,9 @@ public class CompareResource {
   }
 
   private DatasourceCompareDto createDatasourceCompareDto(Datasource compared, Datasource with) {
-    DatasourceCompareDto.Builder dtoBuilder = DatasourceCompareDto.newBuilder();
-    dtoBuilder.setCompared(Dtos.asDto(compared));
-    dtoBuilder.setWithDatasource(Dtos.asDto(with));
+    DatasourceCompareDto.Builder dtoBuilder = DatasourceCompareDto.newBuilder() //
+        .setCompared(Dtos.asDto(compared)) //
+        .setWithDatasource(Dtos.asDto(with));
 
     for(ValueTable vt : compared.getValueTables()) {
       TableCompareDto tableCompareDto = with.hasValueTable(vt.getName()) //
@@ -128,13 +121,13 @@ public class CompareResource {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
     Set<Variable> variablesInWith = asSet(with.getVariables());
 
-    Set<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
+    Collection<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
     newVariables.removeAll(variablesInWith);
 
-    Set<Variable> missingVariables = new LinkedHashSet<Variable>(variablesInWith);
+    Collection<Variable> missingVariables = new LinkedHashSet<Variable>(variablesInWith);
     missingVariables.removeAll(variablesInCompared);
 
-    Set<Variable> existingVariables = new LinkedHashSet<Variable>(variablesInCompared);
+    Collection<Variable> existingVariables = new LinkedHashSet<Variable>(variablesInCompared);
     existingVariables.retainAll(variablesInWith);
 
     return createTableCompareDto(compared, with, newVariables, missingVariables, existingVariables);
@@ -142,15 +135,15 @@ public class CompareResource {
 
   private TableCompareDto createTableCompareDtoWhereSecondTableDoesNotExist(ValueTable compared) {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
-    Set<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
-    Set<Variable> missingVariables = new LinkedHashSet<Variable>(5000);
-    Set<Variable> existingVariables = new LinkedHashSet<Variable>(5000);
+    Iterable<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
+    Iterable<Variable> missingVariables = new LinkedHashSet<Variable>(INITIAL_CAPACITY);
+    Iterable<Variable> existingVariables = new LinkedHashSet<Variable>(INITIAL_CAPACITY);
 
     return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
   }
 
-  private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Set<Variable> newVariables,
-      Set<Variable> missingVariables, Set<Variable> existingVariables) {
+  private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Iterable<Variable> newVariables,
+      Iterable<Variable> missingVariables, Iterable<Variable> existingVariables) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared));
 
@@ -158,7 +151,7 @@ public class CompareResource {
       dtoBuilder.setWithTable(Dtos.asDto(with));
     }
 
-    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
+    Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);
     conflicts.addAll(getMissingCsvVariableConflicts(compared));
 
     conflicts.addAll(getConflicts(compared, with, existingVariables, false));
@@ -172,15 +165,15 @@ public class CompareResource {
       dtoBuilder.addMissingVariables(Dtos.asDto(v));
     }
 
-    return addTableCompareDtoModifications(dtoBuilder, compared, with, existingVariables, conflicts).build();
+    return addTableCompareDtoModifications(dtoBuilder, with, existingVariables, conflicts).build();
   }
 
-  private TableCompareDto.Builder addTableCompareDtoModifications(TableCompareDto.Builder dtoBuilder,
-      ValueTable compared, ValueTable with, Set<Variable> existingVariables, Set<ConflictDto> conflicts) {
+  private TableCompareDto.Builder addTableCompareDtoModifications(TableCompareDto.Builder dtoBuilder, ValueTable with,
+      Iterable<Variable> existingVariables, Iterable<ConflictDto> conflicts) {
     Set<Variable> unconflictingExistingVariables = getUnconflicting(existingVariables, conflicts);
     Set<Variable> unmodifiedVariables = unconflictingExistingVariables;
     if(with != null) {
-      Set<Variable> modifiedVariables = getUnconflictingModified(compared, with, unconflictingExistingVariables);
+      Set<Variable> modifiedVariables = getUnconflictingModified(with, unconflictingExistingVariables);
       for(Variable v : modifiedVariables) {
         dtoBuilder.addModifiedVariables(Dtos.asDto(v));
       }
@@ -193,8 +186,8 @@ public class CompareResource {
     return dtoBuilder;
   }
 
-  private Set<ConflictDto> getMissingCsvVariableConflicts(ValueTable compared) {
-    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
+  private Collection<ConflictDto> getMissingCsvVariableConflicts(ValueTable compared) {
+    Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);
     if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
       for(Variable missingVariable : ((CsvValueTable) compared).getMissingVariables()) {
         conflicts
@@ -204,9 +197,9 @@ public class CompareResource {
     return conflicts;
   }
 
-  private Set<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Set<Variable> variables,
+  private Collection<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Iterable<Variable> variables,
       boolean newVariable) {
-    Set<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(5000);
+    Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);
 
     String entityType = null;
     for(Variable v : variables) {
@@ -220,15 +213,14 @@ public class CompareResource {
       // Target (with) table already exist
       if(with != null) {
         Variable variableInCompared = compared.getVariable(name);
-        if(variableInCompared.getEntityType().equals(with.getEntityType()) == false) {
+        if(!variableInCompared.getEntityType().equals(with.getEntityType())) {
           conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE,
               variableInCompared.getEntityType(), with.getEntityType()));
         }
 
         try {
           Variable variableInWith = with.getVariable(name);
-          if(variableInCompared.getValueType().equals(variableInWith.getValueType()) == false &&
-              with.isView() == false) {
+          if(!variableInCompared.getValueType().equals(variableInWith.getValueType()) && !with.isView()) {
             conflicts.add(
                 createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE,
                     variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
@@ -239,7 +231,7 @@ public class CompareResource {
 
         // Target (with) will be created
       } else {
-        if(entityType.equals(v.getEntityType()) == false) {
+        if(!entityType.equals(v.getEntityType())) {
           conflicts.add(
               createConflictDto(Dtos.asDto(v).setIsNewVariable(true).build(), INCOMPATIBLE_ENTITY_TYPE, entityType,
                   v.getEntityType()));
@@ -250,10 +242,10 @@ public class CompareResource {
     return conflicts;
   }
 
-  private Set<Variable> getUnconflicting(Set<Variable> variables, Set<ConflictDto> conflicts) {
-    Set<Variable> unconflicting = new LinkedHashSet<Variable>(5000);
+  private Set<Variable> getUnconflicting(Iterable<Variable> variables, Iterable<ConflictDto> conflicts) {
+    Set<Variable> unconflicting = new LinkedHashSet<Variable>(INITIAL_CAPACITY);
 
-    Set<String> conflicting = new LinkedHashSet<String>(5000);
+    Collection<String> conflicting = new LinkedHashSet<String>(INITIAL_CAPACITY);
     for(ConflictDto dto : conflicts) {
       conflicting.add(dto.getVariable().getName());
     }
@@ -267,8 +259,8 @@ public class CompareResource {
     return unconflicting;
   }
 
-  private Set<Variable> getUnconflictingModified(ValueTable compared, ValueTable with, Set<Variable> variables) {
-    Set<Variable> modified = new LinkedHashSet<Variable>(5000);
+  private Set<Variable> getUnconflictingModified(ValueTable with, Iterable<Variable> variables) {
+    Set<Variable> modified = new LinkedHashSet<Variable>(INITIAL_CAPACITY);
 
     for(Variable v : variables) {
       Variable withVar = with.getVariable(v.getName());
@@ -281,28 +273,26 @@ public class CompareResource {
   }
 
   private boolean isModified(Variable compared, Variable with) {
-    if(isModified(compared.getMimeType(), with.getMimeType())) return true;
-    if(isModified(compared.getOccurrenceGroup(), with.getOccurrenceGroup())) return true;
-    if(isModified(compared.getReferencedEntityType(), with.getReferencedEntityType())) return true;
-    if(isModified(compared.getUnit(), with.getUnit())) return true;
-    if(isModified(compared.getCategories(), with.getCategories())) return true;
-    if(isModified(compared.getAttributes(), with.getAttributes())) return true;
-
-    return false;
+    return isModified(compared.getMimeType(), with.getMimeType()) ||
+        isModified(compared.getOccurrenceGroup(), with.getOccurrenceGroup()) ||
+        isModified(compared.getReferencedEntityType(), with.getReferencedEntityType()) ||
+        isModified(compared.getUnit(), with.getUnit()) ||
+        areCategoriesModified(compared.getCategories(), with.getCategories()) ||
+        areAttributesModified(compared.getAttributes(), with.getAttributes());
   }
 
+  @SuppressWarnings("SimplifiableIfStatement")
   private boolean isModified(String compared, String with) {
     if(compared == null && with == null) return false;
     if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
-    if(compared != null && compared.equals(with)) return false;
-    return true;
+    return !(compared != null && compared.equals(with));
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
-  private boolean isModified(Set<Category> compared, Set<Category> with) {
+  @SuppressWarnings({ "PMD.NcssMethodCount", "ConstantConditions" })
+  private boolean areCategoriesModified(Collection<Category> compared, Collection<Category> with) {
     if(compared == null && with == null) return false;
-    if((compared == null || compared.size() == 0) && (with == null || with.size() == 0)) return false;
-    if((compared == null && with != null) || (compared != null && with == null)) return true;
+    if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
+    if(compared == null && with != null || compared != null && with == null) return true;
     if(compared != null && with != null && compared.size() != with.size()) return true;
 
     if(compared != null && with != null) {
@@ -314,7 +304,7 @@ public class CompareResource {
             found = true;
           }
         }
-        if(found == false) return true;
+        if(!found) return true;
       }
     }
 
@@ -322,14 +312,13 @@ public class CompareResource {
   }
 
   private boolean isModified(Category compared, Category with) {
-    if(compared.isMissing() != with.isMissing()) return true;
-    if(isModified(compared.getAttributes(), with.getAttributes())) return true;
-    return false;
+    return compared.isMissing() != with.isMissing() ||
+        areAttributesModified(compared.getAttributes(), with.getAttributes());
   }
 
-  private boolean isModified(List<Attribute> compared, List<Attribute> with) {
+  private boolean areAttributesModified(Collection<Attribute> compared, Collection<Attribute> with) {
     if(compared == null && with == null) return false;
-    if((compared == null || compared.size() == 0) && (with == null || with.size() == 0)) return false;
+    if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
     if(compared == null || with == null) return true;
     if(compared.size() != with.size()) return true;
 
@@ -341,7 +330,7 @@ public class CompareResource {
           found = true;
         }
       }
-      if(found == false) return true;
+      if(!found) return true;
     }
 
     return false;
@@ -355,17 +344,15 @@ public class CompareResource {
     return isModified(comparedStr, withStr);
   }
 
+  @SuppressWarnings("ConstantConditions")
   private boolean isSameAttribute(Attribute compared, Attribute with) {
-    if(compared.getName().equals(with.getName()) == false) return false;
+    if(!compared.getName().equals(with.getName())) return false;
     if((compared.getLocale() == null || compared.getLocale().toString().isEmpty()) &&
         (with.getLocale() == null || with.getLocale().toString().isEmpty())) return true;
     if(compared.getLocale() != null) {
       return compared.getLocale().equals(with.getLocale());
-    } else if(with.getLocale() != null) {
-      return with.getLocale().equals(compared.getLocale());
     }
-
-    return false;
+    return with.getLocale() != null && with.getLocale().equals(compared.getLocale());
   }
 
   private ConflictDto createConflictDto(VariableDto variableDto, String code, String... args) {
@@ -382,7 +369,7 @@ public class CompareResource {
   }
 
   private <T> Set<T> asSet(Iterable<T> iterable) {
-    Set<T> set = new LinkedHashSet<T>(5000);
+    Set<T> set = new LinkedHashSet<T>(INITIAL_CAPACITY);
 
     for(T elem : iterable) {
       set.add(elem);

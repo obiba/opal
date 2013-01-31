@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTableWriter;
@@ -51,13 +52,14 @@ class RestValueTableWriter implements ValueTableWriter {
       @Override
       public void close() throws IOException {
         URI variablesResource = restValueTable.newReference("variables");
-        Iterable<VariableDto> variableDtos = Iterables.transform(variables, Functions.compose(new Function<VariableDto.Builder, VariableDto>() {
+        Iterable<VariableDto> variableDtos = Iterables
+            .transform(variables, Functions.compose(new Function<VariableDto.Builder, VariableDto>() {
 
-          @Override
-          public VariableDto apply(Builder input) {
-            return input.build();
-          }
-        }, Dtos.asDtoFunc(null)));
+              @Override
+              public VariableDto apply(Builder input) {
+                return input.build();
+              }
+            }, Dtos.asDtoFunc(null)));
 
         checkResponse(restValueTable.getOpalClient().post(variablesResource, variableDtos));
         restValueTable.refresh();
@@ -76,9 +78,11 @@ class RestValueTableWriter implements ValueTableWriter {
 
     return new ValueSetWriter() {
 
-      private ValueSetsDto.Builder valueSetsDtoBuilder = ValueSetsDto.newBuilder().setEntityType(entity.getType());
+      private final ValueSetsDto.Builder valueSetsDtoBuilder = ValueSetsDto.newBuilder()
+          .setEntityType(entity.getType());
 
-      private ValueSetsDto.ValueSetDto.Builder valueSetDtoBuilder = ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(entity.getIdentifier());
+      private final ValueSetsDto.ValueSetDto.Builder valueSetDtoBuilder = ValueSetsDto.ValueSetDto.newBuilder()
+          .setIdentifier(entity.getIdentifier());
 
       @Override
       public void close() throws IOException {
@@ -97,7 +101,7 @@ class RestValueTableWriter implements ValueTableWriter {
 
   private void checkResponse(HttpResponse response) throws IOException {
     EntityUtils.consume(response.getEntity());
-    if(response.getStatusLine().getStatusCode() >= 400) {
+    if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
       throw new IOException(response.getStatusLine().getReasonPhrase());
     }
   }
