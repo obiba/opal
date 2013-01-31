@@ -43,20 +43,19 @@ import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
-import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-public class TablesResource {
+public class DatasourceTablesResource extends AbstractTablesResource {
 
   @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(TablesResource.class);
+  private static final Logger log = LoggerFactory.getLogger(DatasourceTablesResource.class);
 
   private final Datasource datasource;
 
-  public TablesResource(Datasource datasource) {
+  public DatasourceTablesResource(Datasource datasource) {
     if(datasource == null) throw new IllegalArgumentException("datasource cannot be null");
     this.datasource = datasource;
   }

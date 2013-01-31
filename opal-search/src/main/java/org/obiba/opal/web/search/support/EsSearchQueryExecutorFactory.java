@@ -19,13 +19,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class EsSearchQueryExecutorFactory implements SearchQueryExecutorFactory {
 
-
-  private final ElasticSearchProvider esProvider;
-
   @Autowired
-  public EsSearchQueryExecutorFactory(ElasticSearchProvider esProvider) {
-    this.esProvider = esProvider;
-  }
+  private ElasticSearchProvider esProvider;
 
   @Override
   public SearchQueryExecutor create() {

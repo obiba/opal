@@ -1,12 +1,12 @@
-/*
- * Copyright (c) 2013 OBiBa. All rights reserved.
+/*******************************************************************************
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.List;
@@ -39,13 +39,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private DataFetcher fetcher;
 
-  private ValueSequencePopupPresenter valueSequencePopupPresenter;
+  private final ValueSequencePopupPresenter valueSequencePopupPresenter;
+
+  private final EntityDialogPresenter entityDialogPresenter;
 
   @Inject
-  public ValuesTablePresenter(Display display, final EventBus eventBus,
-      ValueSequencePopupPresenter valueSequencePopupPresenter) {
+  public ValuesTablePresenter(Display display, EventBus eventBus,
+      ValueSequencePopupPresenter valueSequencePopupPresenter, EntityDialogPresenter entityDialogPresenter) {
     super(eventBus, display);
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
+    this.entityDialogPresenter = entityDialogPresenter;
   }
 
   public void setTable(TableDto table) {
@@ -53,7 +56,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, VariableDto variable) {
-    hideValueSequencePopup(table);
+    hidePopups(table);
     this.table = table;
 
     getView().setTable(table);
@@ -63,7 +66,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, String select) {
-    hideValueSequencePopup(table);
+    hidePopups(table);
     this.table = table;
 
     getView().setTable(table);
@@ -76,40 +79,29 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
   }
 
-  //
-  // Private methods
-  //
-
   /**
-   * Hide value sequence popup if table is about to be changed.
+   * Hide entity details & value sequence popup if table is about to be changed.
    */
-  private void hideValueSequencePopup(TableDto newTable) {
-    if(table != null && table.getName().equals(newTable.getName()) == false) {
+  private void hidePopups(TableDto newTable) {
+    if(table != null && !table.getName().equals(newTable.getName())) {
       valueSequencePopupPresenter.getView().hide();
+      entityDialogPresenter.getView().hide();
     }
   }
 
-  private String cleanFilter(String filter) {
-    return filter.replaceAll("/", "\\\\/");
-  }
-
-  //
-  // Inner classes and interfaces
-  //
-
   private class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
-    private TableDto table;
+    private final TableDto table;
 
-    VariablesResourceCallback(TableDto table) {
+    private VariablesResourceCallback(TableDto table) {
       this.table = table;
     }
 
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        JsArray<VariableDto> variables = resource != null ? resource : JsArray.createArray()
-            .<JsArray<VariableDto>>cast();
+        JsArray<VariableDto> variables = resource == null ? JsArray.createArray()
+            .<JsArray<VariableDto>>cast() : resource;
         getView().setVariables(variables);
       }
     }
@@ -117,11 +109,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private class ValueSetsResourceCallback implements ResourceCallback<ValueSetsDto> {
 
-    private int offset;
+    private final int offset;
 
-    private TableDto table;
+    private final TableDto table;
 
-    ValueSetsResourceCallback(int offset, TableDto table) {
+    private ValueSetsResourceCallback(int offset, TableDto table) {
       this.offset = offset;
       this.table = table;
     }
@@ -146,23 +138,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @SuppressWarnings("unchecked")
     protected void notifyError(Response response) {
       ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-
-      if(error.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
-        JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error
-            .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
-
-        NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error("JavascriptError")
-            .args(errors.get(0).getSourceName(), //
-                errors.get(0).getMessage(), //
-                String.valueOf(errors.get(0).getLineNumber()),//
-                String.valueOf(errors.get(0).getColumnNumber())).build();
-
-        getEventBus().fireEvent(notificationEvent);
-      } else {
-        getEventBus().fireEvent(
-            NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                .build());
-      }
+      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error
+          .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+      String firstError = errors.get(0).getMessage();
+      NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error(firstError).build();
+      getEventBus().fireEvent(notificationEvent);
     }
   }
 
@@ -194,11 +174,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void request(String filter, int offset, int limit) {
       StringBuilder link = getLinkBuilder(offset, limit);
-      if(filter != null && filter.isEmpty() == false) {
+      if(filter != null && !filter.isEmpty()) {
         link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
       }
 
       doRequest(offset, link.toString());
+    }
+
+    private String cleanFilter(String filter) {
+      return filter.replaceAll("/", "\\\\/");
     }
 
     private String escape(String filter) {
@@ -210,7 +194,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         valuesRequest.cancel();
         valuesRequest = null;
       }
-
       valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link).get()//
           .withCallback(new ValueSetsResourceCallback(offset, table))
           .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback()).send();
@@ -236,18 +219,24 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
+    public void requestEntityDialog(String entityType, String entityId) {
+      entityDialogPresenter.initialize(table, entityType, entityId);
+      addToPopupSlot(entityDialogPresenter);
+    }
+
+    @Override
     public void updateVariables(String select) {
       String link = table.getLink() + "/variables";
-      if(select != null && select.isEmpty() == false) {
+      if(select != null && !select.isEmpty()) {
         link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(select) + "/)");
       }
       if(variablesRequest != null) {
         variablesRequest.cancel();
         variablesRequest = null;
       }
-      //noinspection MagicNumber
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
-          .withCallback(new VariablesResourceCallback(table)).withCallback(400, new BadRequestCallback() {
+          .withCallback(new VariablesResourceCallback(table))
+          .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               notifyError(response);
@@ -276,11 +265,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void requestValueSequence(VariableDto variable, String entityIdentifier);
 
+    void requestEntityDialog(String entityType, String entityId);
+
     void updateVariables(String select);
   }
 
   public interface ValueSetsProvider {
     void populateValues(int offset, ValueSetsDto valueSets);
+  }
+
+  public interface EntitySelectionHandler {
+
+    void onEntitySelection(String entityType, String entityId);
+
   }
 
 }

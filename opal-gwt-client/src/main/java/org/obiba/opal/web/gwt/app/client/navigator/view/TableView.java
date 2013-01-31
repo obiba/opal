@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -62,7 +62,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   interface TableViewUiBinder extends UiBinder<Widget, TableView> {
   }
 
-  private static TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
+  private static final TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
 
   private static final Integer VALUES_TAB_INDEX = 1;
 
@@ -73,7 +73,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   FlowPanel toolbarPanel;
 
-  private NavigatorMenuBar toolbar;
+  private final NavigatorMenuBar toolbar;
 
   @UiField
   Label tableName;
@@ -108,13 +108,13 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   Panel permissions;
 
-  private ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
+  private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private VariableClickableColumn variableNameColumn;
 
   private VariableClickableColumn variableIndexColumn;
 
-  private Translations translations = GWT.create(Translations.class);
+  private final Translations translations = GWT.create(Translations.class);
 
   private MenuItem removeItem;
 
@@ -330,11 +330,11 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     toolbar.setEditCommand(cmd);
   }
 
-  private abstract class VariableClickableColumn extends ClickableColumn<VariableDto> {
+  private abstract static class VariableClickableColumn extends ClickableColumn<VariableDto> {
 
-    private String name;
+    private final String name;
 
-    public VariableClickableColumn(String name) {
+    private VariableClickableColumn(String name) {
       this.name = name;
     }
 
