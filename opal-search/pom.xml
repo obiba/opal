@@ -13,7 +13,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.11.1</version>
+    <version>1.11-SNAPSHOT</version>
   </parent>
 
   <artifactId>opal-search</artifactId>
