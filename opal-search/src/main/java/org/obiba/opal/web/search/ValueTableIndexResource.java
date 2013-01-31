@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 OBiBa. All rights reserved.
+ * Copyright (c) 2012 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -118,6 +118,9 @@ public class ValueTableIndexResource extends IndexResource {
           synchroManager.getCurrentTask().getValueTable().getDatasource().getName().equals(datasource)) {
         // Stop task
         synchroManager.stopTask();
+      }
+      else{
+        getValueTableIndex(datasource, table).delete();
       }
 
       return Response.ok().build();
