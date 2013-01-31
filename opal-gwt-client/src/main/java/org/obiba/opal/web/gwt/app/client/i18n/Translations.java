@@ -288,7 +288,7 @@ public interface Translations extends Constants {
       "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables.",//
       "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
       "ScriptIsRequired", "A script is required.",//
-      "JavascriptError" , "Error in script '{0}': {1} ({2}:{3})",//
+      "JavascriptError", "Error in script '{0}': {1} ({2}:{3})",//
       "CopyFromVariableNameIsRequired", "You must enter the name of a variable from which the new variable will be created from.",//
       "cannotSwitchTabBecauseOfUnsavedChanges", "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
       "UrlRequired", "You must provide the database's URL.",//
@@ -305,6 +305,7 @@ public interface Translations extends Constants {
       "QuoteSeparatorRequired", "The quote separator is required.",//
       "NotIgnoredConlicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
       "NoVariablesToBeImported", "No variables are to be imported.",//
+      "DataImportFailed", "The data importation has failed: {0}",//
       "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//
       "FunctionalUnitNameIsRequired", "Unit name is required.",//
       "DuplicateFunctionalUnitNames", "Duplicate Unit names.",//
