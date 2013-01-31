@@ -364,7 +364,10 @@ public interface Translations extends Constants {
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
       "DataWriteNotAuthorized", "You are not allowed to write in datasource: {0}.",//
-      "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}."//
+      "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}.",//
+      "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}",//
+      "NoVariablesFound", "Failed to retrieve the list of variables",//
+      "NoVariableValuesFound", "Failed to retrieve the list of variable values"//
   })
   Map<String, String> userMessageMap();
 
