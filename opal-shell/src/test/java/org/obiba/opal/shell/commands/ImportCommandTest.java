@@ -84,7 +84,7 @@ public class ImportCommandTest {
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     OpalShell mockShell = createMockShellForRelativePathImport("my-unit", "test.zip");
     ImportService mockImportService = createMock(ImportService.class);
-    mockImportService.importData("my-unit", mockFile, "opal-data", true, false, false);
+    mockImportService.importData("my-unit", mockFile, "opal-data", true, false);
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
 
     test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir, mockFile);
@@ -104,7 +104,7 @@ public class ImportCommandTest {
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
     ImportService mockImportService = createMock(ImportService.class);
     for(FileObject mockFile : mockFilesInUnitDir) {
-      mockImportService.importData("my-unit", mockFile, "opal-data", true, false, false);
+      mockImportService.importData("my-unit", mockFile, "opal-data", true, false);
     }
 
     test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir);
@@ -182,7 +182,6 @@ public class ImportCommandTest {
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
     expect(mockOptions.isTables()).andReturn(false).atLeastOnce();
-    expect(mockOptions.isIncremental()).andReturn(false).atLeastOnce();
 
     return mockOptions;
   }
@@ -245,7 +244,6 @@ public class ImportCommandTest {
     expect(mockOptions.isArchive()).andReturn(false).atLeastOnce();
     expect(mockOptions.isSource()).andReturn(false).atLeastOnce();
     expect(mockOptions.isTables()).andReturn(false).atLeastOnce();
-    expect(mockOptions.isIncremental()).andReturn(false).atLeastOnce();
 
     return mockOptions;
   }
@@ -267,7 +265,7 @@ public class ImportCommandTest {
     return mockShell;
   }
 
-  private FileObject createMockUnitDirectoryForImportWithNoFile(FileObject[] filesInUnitDir) throws IOException {
+  private FileObject createMockUnitDirectoryForImportWithNoFile(FileObject... filesInUnitDir) throws IOException {
     FileObject mockUnitDir = createMock(FileObject.class);
     expect(mockUnitDir.findFiles((FileSelector) anyObject())).andReturn(filesInUnitDir);
 

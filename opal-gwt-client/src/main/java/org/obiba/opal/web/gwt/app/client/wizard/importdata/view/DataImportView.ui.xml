@@ -29,7 +29,7 @@
         </g:FlowPanel>
         <g:FlowPanel styleName="input">
           <g:CheckBox ui:field="incremental" addStyleNames="key">
-            <ui:msg description="Incremental import (if supported)">Incremental import (if supported)</ui:msg>
+            <ui:msg description="Incremental import">Incremental import</ui:msg>
           </g:CheckBox>
         </g:FlowPanel>
       </o:WizardStep>

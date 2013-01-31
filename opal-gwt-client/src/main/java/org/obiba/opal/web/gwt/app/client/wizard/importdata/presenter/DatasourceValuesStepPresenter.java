@@ -40,8 +40,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
     this.valuesTablePresenter = valuesTablePresenter;
   }
 
-  public void setDatasource(String datasource, final Collection<String> tableNames, boolean incremental,
-      String destinationDatasource) {
+  public void setDatasource(String datasource, final Collection<String> tableNames) {
 
     // TODO: support incremental
 

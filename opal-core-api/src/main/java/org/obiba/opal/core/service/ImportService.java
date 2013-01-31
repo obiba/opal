@@ -36,14 +36,13 @@ public interface ImportService {
    * @param destinationDatasourceName name of the destination datasource
    * @param allowIdentifierGeneration unknown participant will be created at importation time
    * @param ignoreUnknownIdentifier
-   * @param incremental
    * @throws NoSuchDatasourceException if the specified datasource does not exist
    * @throws IllegalArgumentException if the specified file does not exist or is not a normal file
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
   void importData(@Nullable String unitName, FileObject sourceFile, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException, InterruptedException;
 
   /**
@@ -63,7 +62,7 @@ public interface ImportService {
    * @throws InterruptedException if the current thread was interrupted
    */
   void importData(@Nullable String unitName, String sourceDatasourceName, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
 
@@ -81,7 +80,7 @@ public interface ImportService {
    * @throws InterruptedException
    */
   void importData(@Nullable String unitName, List<String> sourceTableNames, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
 
@@ -95,7 +94,7 @@ public interface ImportService {
    * @param ignoreUnknownIdentifier
    */
   void importData(String unitName, Set<ValueTable> sourceValueTables, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, boolean incremental)
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
   /**

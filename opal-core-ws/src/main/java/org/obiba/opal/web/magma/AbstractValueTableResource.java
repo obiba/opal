@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.annotation.Nonnull;
+
 import org.mozilla.javascript.Scriptable;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Value;
@@ -23,6 +25,7 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.type.BooleanType;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -33,7 +36,7 @@ abstract class AbstractValueTableResource {
 
   private final Set<Locale> locales;
 
-  public AbstractValueTableResource(ValueTable valueTable, Set<Locale> locales) {
+  AbstractValueTableResource(ValueTable valueTable, Set<Locale> locales) {
     this.valueTable = valueTable;
     this.locales = new LinkedHashSet<Locale>(locales);
   }
@@ -71,8 +74,10 @@ abstract class AbstractValueTableResource {
       filteredVariables = Lists.newArrayList(getValueTable().getVariables());
     }
 
-    int fromIndex = (offset < filteredVariables.size()) ? offset : filteredVariables.size();
-    int toIndex = (limit != null && limit >= 0) ? Math.min(fromIndex + limit, filteredVariables.size()) : filteredVariables.size();
+    int fromIndex = offset < filteredVariables.size() ? offset : filteredVariables.size();
+    int toIndex = limit != null && limit >= 0 //
+        ? Math.min(fromIndex + limit, filteredVariables.size()) //
+        : filteredVariables.size();
 
     return filteredVariables.subList(fromIndex, toIndex);
   }
@@ -82,13 +87,8 @@ abstract class AbstractValueTableResource {
   }
 
   protected Iterable<VariableEntity> filterEntities(String script, Integer offset, Integer limit) {
-    ValueTable valueTable = getValueTable();
     Iterable<VariableEntity> entities;
-    if(script == null) {
-      entities = valueTable.getVariableEntities();
-    } else {
-      entities = getFilteredEntities(valueTable, script);
-    }
+    entities = script == null ? valueTable.getVariableEntities() : getFilteredEntities(script);
     // Apply offset then limit (in that order)
     if(offset != null) {
       entities = Iterables.skip(entities, offset);
@@ -99,14 +99,13 @@ abstract class AbstractValueTableResource {
     return entities;
   }
 
-  private Iterable<VariableEntity> getFilteredEntities(ValueTable valueTable, String script) {
-    if(script == null) {
-      throw new IllegalArgumentException("Entities filter script cannot be null.");
-    }
+  private Iterable<VariableEntity> getFilteredEntities(@Nonnull String script) {
+    //noinspection ConstantConditions
+    Preconditions.checkArgument(script != null, "Entities filter script cannot be null.");
 
     JavascriptValueSource jvs = newJavaScriptValueSource(BooleanType.get(), script);
 
-    final SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
+    SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
     final Iterator<Value> values = jvs.asVectorSource().getValues(entities).iterator();
 
     return Iterables.filter(entities, new Predicate<VariableEntity>() {

@@ -46,17 +46,18 @@ import com.google.common.collect.Lists;
 /**
  * Utilities for manipulating Magma Dto instances
  */
+@SuppressWarnings("OverlyCoupledClass")
 public final class Dtos {
 
-  public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc =
-      new Function<VariableEntity, VariableEntityDto>() {
+  public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc
+      = new Function<VariableEntity, VariableEntityDto>() {
 
-        @Override
-        public VariableEntityDto apply(VariableEntity from) {
-          return asDto(from).build();
-        }
+    @Override
+    public VariableEntityDto apply(VariableEntity from) {
+      return asDto(from).build();
+    }
 
-      };
+  };
 
   public static final Function<VariableDto, Variable> variableFromDtoFunc = new Function<VariableDto, Variable>() {
 
@@ -66,6 +67,8 @@ public final class Dtos {
     }
 
   };
+
+  private Dtos() {}
 
   public static Function<Variable, VariableDto.Builder> asDtoFunc(final LinkDto tableLink) {
     return new Function<Variable, VariableDto.Builder>() {
@@ -318,8 +321,8 @@ public final class Dtos {
   }
 
   public static ValueSetsDto.ValueSetDto.Builder asDto(ValueSet valueSet) {
-    ValueSetsDto.ValueSetDto.Builder vsBuilder =
-        ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(valueSet.getVariableEntity().getIdentifier());
+    ValueSetsDto.ValueSetDto.Builder vsBuilder = ValueSetsDto.ValueSetDto.newBuilder()
+        .setIdentifier(valueSet.getVariableEntity().getIdentifier());
 
     // add timestamps
     Magma.TimestampsDto.Builder tsBuilder = asDto(valueSet.getTimestamps());

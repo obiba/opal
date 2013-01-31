@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -18,8 +18,6 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MultiplexingDatasource;
 import org.obiba.magma.support.MultiplexingDatasource.VariableAttributeMultiplexer;
 import org.obiba.magma.support.MultiplexingDatasource.VariableNameTransformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Fs Datasource wrapper that tries to detect old Onyx data dictionary, and in that case applies multiplexes the
@@ -27,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OnyxDatasource extends AbstractDatasourceWrapper {
 
-  private static final Logger log = LoggerFactory.getLogger(OnyxDatasource.class);
+//  private static final Logger log = LoggerFactory.getLogger(OnyxDatasource.class);
 
   private final FsDatasource fsDatasource;
 
@@ -45,25 +43,22 @@ public class OnyxDatasource extends AbstractDatasourceWrapper {
 
   @Override
   public void initialise() {
-    MultiplexingDatasource mxDatasource = new MultiplexingDatasource(fsDatasource, new VariableAttributeMultiplexer("stage"), new VariableNameTransformer() {
+    Datasource mxDatasource = new MultiplexingDatasource(fsDatasource, new VariableAttributeMultiplexer("stage"),
+        new VariableNameTransformer() {
 
-      @Override
-      protected String transformName(Variable variable) {
-        if(variable.hasAttribute("stage")) {
-          return variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue("stage") + "\\.", "");
-        }
-        return variable.getName();
-      }
+          @Override
+          protected String transformName(Variable variable) {
+            if(variable.hasAttribute("stage")) {
+              return variable.getName().replaceFirst("^.*\\.?" + variable.getAttributeStringValue("stage") + "\\.", "");
+            }
+            return variable.getName();
+          }
 
-    });
+        });
     try {
       // this will initialise the fs datasource
       Initialisables.initialise(mxDatasource);
-      if(isToBeMultiplexed()) {
-        wrapped = mxDatasource;
-      } else {
-        wrapped = fsDatasource;
-      }
+      wrapped = isToBeMultiplexed() ? mxDatasource : fsDatasource;
     } catch(UnsupportedOperationException ex) {
       wrapped = fsDatasource;
     }
@@ -72,20 +67,21 @@ public class OnyxDatasource extends AbstractDatasourceWrapper {
   /**
    * Fs datasource has to have one participants table with name Participants and have a variable that provides onyx
    * version: this identifies old onyx data dictionary.
+   *
    * @return
    */
   private boolean isToBeMultiplexed() {
     boolean isOnyx = false;
     int participantTablesCount = 0;
     for(ValueTable table : fsDatasource.getValueTables()) {
-      if(table.getEntityType().equals("Participant")) {
+      if("Participant".equals(table.getEntityType())) {
         participantTablesCount++;
-        if(table.getName().equals("Participants")) {
+        if("Participants".equals(table.getName())) {
           isOnyx = table.hasVariable("Admin.onyxVersion");
         }
       }
     }
-    return (isOnyx && participantTablesCount == 1);
+    return isOnyx && participantTablesCount == 1;
   }
 
 }

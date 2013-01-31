@@ -167,8 +167,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing file: %s ...\n", file.getName().getPath());
     try {
-      importService.importData(getUnitName(), file, options.getDestination(), options.isForce(), options.isIgnore(),
-          options.isIncremental());
+      importService.importData(getUnitName(), file, options.getDestination(), options.isForce(), options.isIgnore());
       archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchFunctionalUnitException ex) {
@@ -197,7 +196,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     getShell().printf("  Importing datasource: %s ...\n", options.getSource());
     try {
       importService.importData(getUnitName(), options.getSource(), options.getDestination(), options.isForce(),
-          options.isIgnore(), options.isIncremental());
+          options.isIgnore());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {
@@ -223,7 +222,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     getShell().printf("  Importing tables: %s ...\n", getTableNames());
     try {
       importService.importData(getUnitName(), options.getTables(), options.getDestination(), options.isForce(),
-          options.isIgnore(), options.isIncremental());
+          options.isIgnore());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {
@@ -304,6 +303,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       FileObject archiveDir = isRelativeFilePath(options.getArchive())
           ? getFileInUnitDirectory(options.getArchive())
           : getFile(options.getArchive());
+      //TODO are we sure that archiveDir won't be null?
       archiveDir.createFolder();
       FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
       file.moveTo(archiveFile);

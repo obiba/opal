@@ -230,7 +230,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         variablesRequest.cancel();
         variablesRequest = null;
       }
-      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
+      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get() //
           .withCallback(new VariablesResourceCallback(table)).withCallback(SC_BAD_REQUEST, new BadRequestCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {

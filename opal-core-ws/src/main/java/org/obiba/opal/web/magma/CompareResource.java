@@ -30,6 +30,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.csv.CsvValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.opal.web.model.Magma.ConflictDto;
 import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.Magma.TableCompareDto;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 
+@SuppressWarnings("OverlyCoupledClass")
 @NoAuthorization
 public class CompareResource {
 
@@ -189,7 +191,11 @@ public class CompareResource {
   private Collection<ConflictDto> getMissingCsvVariableConflicts(ValueTable compared) {
     Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);
     if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
-      for(Variable missingVariable : ((CsvValueTable) compared).getMissingVariables()) {
+      // support IncrementalView wrapping compared table
+      CsvValueTable csvValueTable = (CsvValueTable) (compared.isView() //
+          ? ((ValueTableWrapper) compared).getWrappedValueTable() //
+          : compared);
+      for(Variable missingVariable : csvValueTable.getMissingVariables()) {
         conflicts
             .add(createConflictDto(Dtos.asDto(missingVariable).setIsNewVariable(true).build(), CSV_VARIABLE_MISSING));
       }
@@ -357,24 +363,19 @@ public class CompareResource {
 
   private ConflictDto createConflictDto(VariableDto variableDto, String code, String... args) {
     ConflictDto.Builder dtoBuilder = ConflictDto.newBuilder();
-
     dtoBuilder.setVariable(variableDto);
     dtoBuilder.setCode(code);
-
     for(String arg : args) {
       dtoBuilder.addArguments(arg);
     }
-
     return dtoBuilder.build();
   }
 
   private <T> Set<T> asSet(Iterable<T> iterable) {
     Set<T> set = new LinkedHashSet<T>(INITIAL_CAPACITY);
-
     for(T elem : iterable) {
       set.add(elem);
     }
-
     return set;
   }
 }

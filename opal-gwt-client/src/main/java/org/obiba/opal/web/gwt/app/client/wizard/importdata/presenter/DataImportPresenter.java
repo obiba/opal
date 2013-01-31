@@ -329,8 +329,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       }
       ImportData localImportData = transientDatasourceHandler.getImportData();
       datasourceValuesStepPresenter.setDatasource(localImportData.getTransientDatasourceName(),
-          comparedDatasourcesReportPresenter.getSelectedTables(), localImportData.isIncremental(),
-          localImportData.getDestinationDatasourceName());
+          comparedDatasourcesReportPresenter.getSelectedTables());
 
       return comparedDatasourcesReportPresenter.canBeSubmitted();
     }

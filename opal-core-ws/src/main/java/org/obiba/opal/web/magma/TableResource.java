@@ -60,8 +60,10 @@ import com.google.common.collect.Iterables;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class TableResource extends AbstractValueTableResource {
 
+  @Nullable
   private final ImportService importService;
 
   public TableResource(ValueTable valueTable) {
@@ -177,8 +179,8 @@ public class TableResource extends AbstractValueTableResource {
   public Response updateValueSet(ValueSetsDto valueSetsDto, //
       @QueryParam("unit") String unitName, //
       @QueryParam("generateIds") @DefaultValue("false") boolean generateIds, //
-      @QueryParam("ignoreUnknownIds") @DefaultValue("false") boolean ignoreUnknownIds, //
-      @QueryParam("incremental") @DefaultValue("true") boolean incremental) throws IOException, InterruptedException {
+      @QueryParam("ignoreUnknownIds") @DefaultValue("false") boolean ignoreUnknownIds)
+      throws IOException, InterruptedException {
     ValueTable vt = getValueTable();
     if(vt.getDatasource() == null) {
       return Response.status(BAD_REQUEST).entity(ClientErrorDtos
@@ -193,8 +195,7 @@ public class TableResource extends AbstractValueTableResource {
         // static writers will add entities and variables while writing values
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
         importService
-            .importData(unitName, ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds,
-                incremental);
+            .importData(unitName, ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
       }
     } catch(NoSuchFunctionalUnitException ex) {
       return Response.status(BAD_REQUEST)
@@ -260,8 +261,8 @@ public class TableResource extends AbstractValueTableResource {
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs =
-        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
+    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
+        categoriesQP, scriptFP, categoriesFP);
     return getVariableResource(jvvs);
   }
 
@@ -304,8 +305,8 @@ public class TableResource extends AbstractValueTableResource {
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs =
-        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
+    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
+        categoriesQP, scriptFP, categoriesFP);
     return new ValueSetsResource(getValueTable(), jvvs);
   }
 
@@ -335,8 +336,8 @@ public class TableResource extends AbstractValueTableResource {
       @QueryParam("category") List<String> categoriesQP, //
       @FormParam("script") String scriptFP, //
       @FormParam("category") List<String> categoriesFP) {
-    JavascriptVariableValueSource jvvs =
-        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
+    JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
+        categoriesQP, scriptFP, categoriesFP);
     return new ValueSetResource(getValueTable(), jvvs,
         new VariableEntityBean(getValueTable().getEntityType(), identifier));
   }
