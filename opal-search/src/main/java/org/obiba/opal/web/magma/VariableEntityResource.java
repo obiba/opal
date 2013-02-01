@@ -9,6 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
@@ -16,9 +21,6 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 
 /**
  *
@@ -43,10 +45,21 @@ public class VariableEntityResource {
   @Autowired
   private ElasticSearchProvider esProvider;
 
-
   @Path("/tables")
   public VariableEntityTablesResource getTables() {
     return new VariableEntityTablesResource(getVariableEntity(), opalSearchService, indexManager, esProvider);
+  }
+
+  @GET()
+  public Response exists() {
+    VariableEntityTablesResource var = new VariableEntityTablesResource(getVariableEntity(), opalSearchService,
+        indexManager, esProvider);
+
+    if(var.getTables().size() > 0) {
+      return Response.ok().build();
+    }
+
+    return Response.status(Response.Status.NOT_FOUND).build();
   }
 
   private VariableEntityBean getVariableEntity() {
@@ -57,7 +70,5 @@ public class VariableEntityResource {
 //    // TODO...
 //    return null;
 //  }
-
-
 
 }
