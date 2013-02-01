@@ -12,6 +12,7 @@ def add_arguments(parser):
   parser.add_argument('id', help='Id of the entity.')
   parser.add_argument('--type', '-ty', required=False, help='Type of entity. Default type is Participant')
   parser.add_argument('--tables', '-ta', action='store_true', help='Get the list of tables in which the entity with given id exists.')
+  parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 def do_ws(args):
     """
@@ -48,7 +49,7 @@ def do_command(args):
 
         # format response
         res = response.content
-        if args.tables:
+        if args.tables and args.json:
             res = response.pretty_json()
 
         # output to stdout
