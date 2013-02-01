@@ -1,7 +1,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+  xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
@@ -9,15 +10,22 @@
   <g:FlowPanel ui:field="valuesPanel">
      <g:InlineLabel ui:field="noValues"><ui:msg description="No Values label">No Values</ui:msg></g:InlineLabel>
      <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"></g:PopupPanel>
-     
-     <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
+
+    <g:FlowPanel>
+      <b:InputAddOn prependIcon="SEARCH">
+        <b:TextBox ui:field="searchBox" searchQuery="true" placeholder="search our site..." />
+      </b:InputAddOn>
+
+    </g:FlowPanel>
+
+    <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
        <g:customHeader>
          <g:FlowPanel>
            <g:InlineLabel><ui:msg description="Display Options label">Display options</ui:msg></g:InlineLabel> 
            <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
-         </g:FlowPanel> 
+         </g:FlowPanel>
        </g:customHeader>
-       
+
        <g:Grid>
          <g:row>
            <g:customCell styleName="top-aligned">

@@ -370,7 +370,8 @@ public interface Translations extends Constants {
       "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}.",//
       "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}",//
       "NoVariablesFound", "Failed to retrieve the list of variables",//
-      "NoVariableValuesFound", "Failed to retrieve the list of variable values"//
+      "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
+      "EntityIdentifierNotFound", "Entity identifier {0} is invalid"//
   })
   Map<String, String> userMessageMap();
 

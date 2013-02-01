@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPre
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -77,6 +78,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   protected void onBind() {
     super.onBind();
     getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+    getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
   }
 
   /**
@@ -146,11 +148,37 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
+  public interface EntitySearchHandler {
+    void onSearch(String identifier);
+  }
+
+  private class EntitySearchHandlerImpl implements EntitySearchHandler {
+
+    @Override
+    public void onSearch(final String identifier) {
+      UriBuilder uriBuilder = UriBuilder.create().segment("entity", identifier, "type", table.getEntityType());
+      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
+          .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().error("EntityIdentifierNotFound").args(identifier)
+                      .build());
+            }
+          }).withCallback(Response.SC_OK, new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          fetcher.requestEntityDialog(table.getEntityType(), identifier);
+        }
+      }).send();
+    }
+  }
+
   private class DataFetcherImpl implements DataFetcher {
 
-    private Request variablesRequest = null;
+    private Request variablesRequest;
 
-    private Request valuesRequest = null;
+    private Request valuesRequest;
 
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
@@ -254,6 +282,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     ValueSetsProvider getValueSetsProvider();
 
     void setValueSetsFetcher(DataFetcher fetcher);
+
+    void addEntitySearchHandler(EntitySearchHandler handler);
   }
 
   public interface DataFetcher {
