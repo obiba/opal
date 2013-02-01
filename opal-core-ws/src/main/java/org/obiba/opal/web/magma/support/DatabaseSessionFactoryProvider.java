@@ -1,6 +1,6 @@
 package org.obiba.opal.web.magma.support;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Disposable;
@@ -27,8 +27,9 @@ public class DatabaseSessionFactoryProvider implements SessionFactoryProvider, D
 
   }
 
-  public DatabaseSessionFactoryProvider(@Nullable String datasourceName,
-      @Nullable JdbcDataSourceRegistry jdbcDataSourceRegistry, @Nullable String databaseName) {
+  @SuppressWarnings("ConstantConditions")
+  public DatabaseSessionFactoryProvider(@Nonnull String datasourceName,
+      @Nonnull JdbcDataSourceRegistry jdbcDataSourceRegistry, @Nonnull String databaseName) {
     Preconditions.checkArgument(datasourceName != null);
     Preconditions.checkArgument(jdbcDataSourceRegistry != null);
     Preconditions.checkArgument(databaseName != null);

@@ -52,7 +52,7 @@ public class IndexSynchronizationManager {
 
   private IndexSynchronization currentTask;
 
-  private BlockingQueue<IndexSynchronization> indexSyncQueue;
+  private final BlockingQueue<IndexSynchronization> indexSyncQueue;
 
   public IndexSynchronizationManager() {
     consumerStarted = false;
@@ -63,7 +63,7 @@ public class IndexSynchronizationManager {
   @Scheduled(fixedDelay = 60 * 1000)
   public void synchronizeIndices() {
     getSubject().execute(syncProducer);
-    if(consumerStarted == false) {
+    if(!consumerStarted) {
       // start one IndexSynchronization consumer thread
       Thread consumer = new Thread(getSubject().associateWith(new SyncConsumer()));
       consumer.setPriority(Thread.MIN_PRIORITY);
@@ -84,7 +84,7 @@ public class IndexSynchronizationManager {
     return currentTask;
   }
 
-  public void stopTask(){
+  public void stopTask() {
     currentTask.stop();
   }
 
@@ -98,20 +98,6 @@ public class IndexSynchronizationManager {
       log.warn("Failed to obtain system user credentials: {}", e.getMessage());
       throw new RuntimeException(e);
     }
-  }
-
-  /**
-   * Returns a {@code Value} with the date and time at which things are reindexed.
-   *
-   * @return value
-   */
-  private Value gracePeriod() {
-    // Now
-    Calendar gracePeriod = Calendar.getInstance();
-    // Move back in time by GRACE_PERIOD seconds
-    gracePeriod.add(Calendar.SECOND, -GRACE_PERIOD);
-    // Things modified before this value can be reindexed
-    return DateTimeType.get().valueOf(gracePeriod);
   }
 
   private class SyncProducer implements Runnable {
@@ -149,6 +135,20 @@ public class IndexSynchronizationManager {
     }
 
     /**
+     * Returns a {@code Value} with the date and time at which things are reindexed.
+     *
+     * @return value
+     */
+    private Value gracePeriod() {
+      // Now
+      Calendar gracePeriod = Calendar.getInstance();
+      // Move back in time by GRACE_PERIOD seconds
+      gracePeriod.add(Calendar.SECOND, -GRACE_PERIOD);
+      // Things modified before this value can be reindexed
+      return DateTimeType.get().valueOf(gracePeriod);
+    }
+
+    /**
      * Check if the index is not the current task, or in the queue before adding it to the indexation queue.
      *
      * @param vt
@@ -164,7 +164,7 @@ public class IndexSynchronizationManager {
           break;
         }
       }
-      if(alreadyQueued == false) {
+      if(!alreadyQueued) {
         log.trace("Queueing for indexing {}", index.getName());
         IndexSynchronization sync = indexManager.createSyncTask(vt, index);
         indexSyncQueue.offer(sync);

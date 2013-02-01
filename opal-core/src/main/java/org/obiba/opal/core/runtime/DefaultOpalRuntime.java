@@ -58,7 +58,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private OpalFileSystem opalFileSystem;
 
-  private Object syncFs = new Object();
+  private final Object syncFs = new Object();
 
   private Throwable NoSuchServiceException;
 
@@ -154,6 +154,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private void initMagmaEngine() {
     try {
       Runnable magmaEngineInit = new Runnable() {
+        @Override
         public void run() {
           // This needs to be added BEFORE otherwise bad things happen. That really sucks.
           MagmaEngine.get().addDecorator(viewManager);
@@ -216,15 +217,16 @@ public class DefaultOpalRuntime implements OpalRuntime {
   //
 
   static class TransactionalThread extends Thread {
-    private PlatformTransactionManager txManager;
+    private final PlatformTransactionManager txManager;
 
-    private Runnable runnable;
+    private final Runnable runnable;
 
-    public TransactionalThread(PlatformTransactionManager txManager, Runnable runnable) {
+    TransactionalThread(PlatformTransactionManager txManager, Runnable runnable) {
       this.txManager = txManager;
       this.runnable = runnable;
     }
 
+    @Override
     public void run() {
       new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
         @Override
