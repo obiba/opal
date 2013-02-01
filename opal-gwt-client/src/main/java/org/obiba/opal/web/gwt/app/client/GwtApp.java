@@ -84,8 +84,8 @@ public class GwtApp implements EntryPoint {
     opalGinjector.getEventBus().addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
       @Override
       public void onUnhandledResponse(UnhandledResponseEvent e) {
-        RevealRootPopupContentEvent
-            .fire(opalGinjector.getEventBus(), opalGinjector.getUnhandledResponseNotificationPresenter());
+        RevealRootPopupContentEvent.fire(opalGinjector.getEventBus(),
+            opalGinjector.getUnhandledResponseNotificationPresenter().withResponseEvent(e));
       }
     });
 
