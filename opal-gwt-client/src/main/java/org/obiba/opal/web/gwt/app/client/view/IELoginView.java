@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class IELoginView extends LoginView {
 
-  private static IELoginViewUiBinder uiBinder = GWT.create(IELoginViewUiBinder.class);
+  private static final IELoginViewUiBinder uiBinder = GWT.create(IELoginViewUiBinder.class);
 
   private final Widget panel;
 
@@ -29,13 +29,12 @@ public class IELoginView extends LoginView {
 
       @Override
       public void fireEvent(GwtEvent<?> event) {
-        // TODO Auto-generated method stub
 
       }
 
       @Override
       public HandlerRegistration addClickHandler(ClickHandler handler) {
-        // TODO Auto-generated method stub
+
         return null;
       }
     };
@@ -83,31 +82,28 @@ public class IELoginView extends LoginView {
   private static final class DummyHasValue implements HasValue<String> {
     @Override
     public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-      // TODO Auto-generated method stub
+
       return null;
     }
 
     @Override
     public void fireEvent(GwtEvent<?> event) {
-      // TODO Auto-generated method stub
 
     }
 
     @Override
     public String getValue() {
-      // TODO Auto-generated method stub
+
       return null;
     }
 
     @Override
     public void setValue(String value) {
-      // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setValue(String value, boolean fireEvents) {
-      // TODO Auto-generated method stub
 
     }
   }
@@ -115,19 +111,17 @@ public class IELoginView extends LoginView {
   private static final class DummyHasKeyUpHandlers implements HasKeyUpHandlers {
     @Override
     public void fireEvent(GwtEvent<?> event) {
-      // TODO Auto-generated method stub
 
     }
 
     @Override
     public HandlerRegistration addKeyUpHandler(KeyUpHandler handler) {
-      // TODO Auto-generated method stub
+
       return null;
     }
   }
 
   @UiTemplate("IELoginView.ui.xml")
-  interface IELoginViewUiBinder extends UiBinder<Widget, IELoginView> {
-  }
+  interface IELoginViewUiBinder extends UiBinder<Widget, IELoginView> {}
 
 }

@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.PreDestroy;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -56,6 +55,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+@SuppressWarnings("OverlyCoupledClass")
 @Component
 @Scope("request")
 @Path("/datasource/{name}")
@@ -74,8 +74,6 @@ public class DatasourceResource {
 
   @Nonnull
   private final ViewDtos viewDtos;
-
-  private Datasource transientDatasourceInstance;
 
   private final Set<ValueTableUpdateListener> tableListeners;
 
@@ -117,14 +115,6 @@ public class DatasourceResource {
     importService = null;
   }
 
-  @PreDestroy
-  public void destroy() {
-    if(transientDatasourceInstance != null) {
-      Disposables.silentlyDispose(transientDatasourceInstance);
-      transientDatasourceInstance = null;
-    }
-  }
-
   public void setLocalesProperty(String localesProperty) {
     this.localesProperty = localesProperty;
   }
@@ -132,8 +122,7 @@ public class DatasourceResource {
   @GET
   // @Cache(isPrivate = true, mustRevalidate = true, maxAge = 10)
   public Magma.DatasourceDto get() {
-    Datasource ds = getDatasource();
-    return Dtos.asDto(ds).build();
+    return Dtos.asDto(getDatasource()).build();
   }
 
   @DELETE
@@ -175,10 +164,9 @@ public class DatasourceResource {
   }
 
   public TableResource getTableResource(ValueTable table) {
-    if(getDatasource().canDropTable(table.getName())) {
-      return new DroppableTableResource(table, getLocales(), importService, tableListeners);
-    }
-    return new TableResource(table, getLocales(), importService);
+    return getDatasource().canDropTable(table.getName()) //
+        ? new DroppableTableResource(table, getLocales(), importService, tableListeners) //
+        : new TableResource(table, getLocales(), importService);
   }
 
   public ViewResource getViewResource(View view) {
@@ -226,14 +214,9 @@ public class DatasourceResource {
   }
 
   Datasource getDatasource() {
-    Datasource ds;
-    if(MagmaEngine.get().hasDatasource(name)) {
-      ds = MagmaEngine.get().getDatasource(name);
-    } else {
-      ds = MagmaEngine.get().getTransientDatasourceInstance(name);
-      transientDatasourceInstance = ds;
-    }
-    return ds;
+    return MagmaEngine.get().hasDatasource(name)
+        ? MagmaEngine.get().getDatasource(name)
+        : MagmaEngine.get().getTransientDatasourceInstance(name);
   }
 
   private boolean datasourceHasTable(String viewName) {

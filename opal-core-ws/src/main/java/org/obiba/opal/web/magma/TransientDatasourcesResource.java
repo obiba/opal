@@ -22,7 +22,6 @@ import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
-import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
@@ -62,27 +61,20 @@ public class TransientDatasourcesResource {
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
       response = Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(uid))
           .entity(Dtos.asDto(ds).build());
-      Disposables.silentlyDispose(ds);
     } catch(NoSuchDatasourceFactoryException e) {
       response = Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
     } catch(DatasourceParsingException pe) {
-      removeTransientDatasource(uid);
+      MagmaEngine.get().removeTransientDatasource(uid);
       response = Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", pe).build());
     } catch(MagmaRuntimeException e) {
-      removeTransientDatasource(uid);
+      MagmaEngine.get().removeTransientDatasource(uid);
       response = Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", e).build());
     }
 
     return response.build();
-  }
-
-  private void removeTransientDatasource(String uid) {
-    if(uid != null) {
-      MagmaEngine.get().removeTransientDatasource(uid);
-    }
   }
 
 }

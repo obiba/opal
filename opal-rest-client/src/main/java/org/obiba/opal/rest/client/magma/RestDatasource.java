@@ -59,7 +59,7 @@ public class RestDatasource extends AbstractDatasource {
     try {
       refresh();
     } catch(RuntimeException e) {
-      if(e.getCause() != null && e.getCause() instanceof ConnectException) {
+      if(e.getCause() instanceof ConnectException) {
         log.error("Failed connecting to Opal: {}", e.getCause().getMessage());
       } else {
         log.error("Unexpected error while communicating with Opal", e);
@@ -74,7 +74,7 @@ public class RestDatasource extends AbstractDatasource {
     try {
       super.initialise();
     } catch(RuntimeException e) {
-      if(e.getCause() != null && e.getCause() instanceof ConnectException) {
+      if(e.getCause() instanceof ConnectException) {
         log.error("Failed connecting to Opal: {}", e.getCause().getMessage());
       } else {
         log.error("Unexpected error while communicating with Opal", e);

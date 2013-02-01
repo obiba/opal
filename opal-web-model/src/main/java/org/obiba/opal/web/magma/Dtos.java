@@ -229,11 +229,11 @@ public final class Dtos {
 
   public static Magma.TimestampsDto.Builder asDto(Timestamps ts) {
     Magma.TimestampsDto.Builder tsBuilder = null;
-    if(ts.getCreated().isNull() == false) {
+    if(!ts.getCreated().isNull()) {
       tsBuilder = Magma.TimestampsDto.newBuilder();
       tsBuilder.setCreated(ts.getCreated().toString());
     }
-    if(ts.getLastUpdate().isNull() == false) {
+    if(!ts.getLastUpdate().isNull()) {
       if(tsBuilder == null) {
         tsBuilder = Magma.TimestampsDto.newBuilder();
       }
@@ -248,8 +248,8 @@ public final class Dtos {
         .setName(datasource.getName())//
         .setType(datasource.getType());
 
-    final List<String> tableNames = Lists.newArrayList();
-    final List<String> viewNames = Lists.newArrayList();
+    List<String> tableNames = Lists.newArrayList();
+    List<String> viewNames = Lists.newArrayList();
     for(ValueTable table : datasource.getValueTables()) {
       tableNames.add(table.getName());
       if(table.isView()) {
@@ -298,14 +298,14 @@ public final class Dtos {
     Function<Object, String> toString = filterBinary ? filteredToString() : Functions.toStringFunction();
 
     ValueSetsDto.ValueDto.Builder valueDto = ValueSetsDto.ValueDto.newBuilder();
-    if(value.isNull() == false && value.isSequence() == false) {
+    if(!value.isNull() && !value.isSequence()) {
       if(filterBinary && value.getValueType() == BinaryType.get()) {
         valueDto.setLink(link);
       }
       valueDto.setValue(toString.apply(value));
     }
 
-    if(value.isNull() == false && value.isSequence()) {
+    if(!value.isNull() && value.isSequence()) {
       int i = 0;
       for(Value v : value.asSequence().getValue()) {
         valueDto.addValues(Dtos.asDto(link + "?pos=" + i, v, filterBinary));

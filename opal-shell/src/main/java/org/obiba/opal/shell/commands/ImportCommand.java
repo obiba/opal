@@ -275,8 +275,9 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     log.error("Runtime error while importing data", ex);
     if(ex.getCause() != null && ex.getCause() instanceof NonExistentVariableEntitiesException) {
       getShell().printf(
-          "Datasource '%s' cannot be imported 'as-is'. It contains the following entity ids which are not present as public identifiers in the keys database. %s\n",
-          options.getSource(), ((NonExistentVariableEntitiesException) ex.getCause()).getNonExistentIdentifiers());
+          "Datasource '%s' cannot be imported 'as-is'. It contains the following entity ids which are not present " +
+              "as public identifiers in the keys database. %s\n", options.getSource(),
+          ((NonExistentVariableEntitiesException) ex.getCause()).getNonExistentIdentifiers());
     } else {
       printThrowable(ex, false);
     }

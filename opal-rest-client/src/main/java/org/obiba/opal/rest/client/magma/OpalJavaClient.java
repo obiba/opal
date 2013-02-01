@@ -28,6 +28,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.http.Header;
 import org.apache.http.HttpMessage;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -83,6 +84,8 @@ public class OpalJavaClient {
   // 5MB
   private static final int MAX_OBJECT_SIZE_BYTES = 1024 * 1024 * 5;
 
+  private static final int HTTPS_PORT = 443;
+
   private final URI opalURI;
 
   private final Credentials credentials;
@@ -131,7 +134,8 @@ public class OpalJavaClient {
     httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
 
     try {
-      httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", 443, getSocketFactory()));
+      httpClient.getConnectionManager().getSchemeRegistry()
+          .register(new Scheme("https", HTTPS_PORT, getSocketFactory()));
     } catch(NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     } catch(KeyManagementException e) {
@@ -171,6 +175,8 @@ public class OpalJavaClient {
 
   public void close() {
     if(client != null) {
+      log.info("Disconnecting from Opal: {}", opalURI);
+      log.debug("", new Exception());
       getClient().getConnectionManager().shutdown();
     }
   }
@@ -232,6 +238,7 @@ public class OpalJavaClient {
       is = response.getEntity().getContent();
       return (T) builder.mergeFrom(is).build();
     } catch(IOException e) {
+      //noinspection CallToPrintStackTrace
       e.printStackTrace();
       throw new RuntimeException(e);
     } finally {
@@ -287,6 +294,11 @@ public class OpalJavaClient {
     msg.addHeader("Accept", "application/x-protobuf, text/html");
     authenticate(msg);
     log.info("{} {}", msg.getMethod(), msg.getURI());
+    if(log.isTraceEnabled()) {
+      for(Header allHeader : msg.getAllHeaders()) {
+        log.trace("  {} {}", allHeader.getName(), allHeader.getValue());
+      }
+    }
     try {
       return getClient().execute(msg, ctx);
     } finally {
@@ -308,7 +320,7 @@ public class OpalJavaClient {
     }
   }
 
-  private byte[] asByteArray(Message msg) {
+  private byte[] asByteArray(@SuppressWarnings("TypeMayBeWeakened") Message msg) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       msg.writeTo(baos);

@@ -39,7 +39,6 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
-import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.support.StaticValueTable;
@@ -165,7 +164,7 @@ public class DefaultImportService implements ImportService {
       importData(unitName, sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration,
           ignoreUnknownIdentifier);
     } finally {
-      silentlyDisposeTransientDatasource(sourceDatasource);
+      MagmaEngine.get().removeTransientDatasource(sourceDatasource.getName());
     }
   }
 
@@ -189,7 +188,7 @@ public class DefaultImportService implements ImportService {
       importData(unitName, sourceTables, destinationDatasourceName, allowIdentifierGeneration, ignoreUnknownIdentifier);
     } finally {
       for(ValueTable table : sourceTables) {
-        silentlyDisposeTransientDatasource(table.getDatasource());
+        MagmaEngine.get().removeTransientDatasource(table.getDatasource().getName());
       }
     }
   }
@@ -278,7 +277,7 @@ public class DefaultImportService implements ImportService {
         }
       }
     } finally {
-      silentlyDisposeTransientDatasource(sourceDatasource);
+      MagmaEngine.get().removeTransientDatasource(sourceDatasource.getName());
     }
   }
 
@@ -303,7 +302,7 @@ public class DefaultImportService implements ImportService {
       importIdentifiers(sourceKeysTable);
 
     } finally {
-      silentlyDisposeTransientDatasource(sourceDatasource);
+      MagmaEngine.get().removeTransientDatasource(sourceDatasource.getName());
     }
   }
 
@@ -339,12 +338,6 @@ public class DefaultImportService implements ImportService {
     return MagmaEngine.get().hasDatasource(datasourceName)
         ? MagmaEngine.get().getDatasource(datasourceName)
         : MagmaEngine.get().getTransientDatasourceInstance(datasourceName);
-  }
-
-  private void silentlyDisposeTransientDatasource(Datasource datasource) {
-    if(MagmaEngine.get().hasTransientDatasource(datasource.getName())) {
-      Disposables.silentlyDispose(datasource);
-    }
   }
 
   private void copyToDestinationDatasource(FileObject file, Datasource destinationDatasource,
