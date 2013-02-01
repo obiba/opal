@@ -24,7 +24,7 @@
         <td/>
         <td>
           <g:Label ui:field="more" addStyleNames="iconb i-fold">more</g:Label>
-          <g:Label ui:field="errorMessage" addStyleNames="message"></g:Label>
+          <g:Label ui:field="errorMessage" addStyleNames="message detailedErrorMessage"></g:Label>
         </td>
       </tr>
 
