@@ -15,12 +15,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class UnhandledResponseNotificationView extends PopupViewImpl implements UnhandledResponseNotificationPresenter.Display {
+public class UnhandledResponseNotificationView extends PopupViewImpl implements
+    UnhandledResponseNotificationPresenter.Display {
   @UiTemplate("UnhandledResponseNotificationView.ui.xml")
   interface UnhandledResponseNotificationViewUiBinder extends UiBinder<Widget, UnhandledResponseNotificationView> {
   }
 
-  private static UnhandledResponseNotificationViewUiBinder uiBinder = GWT.create(UnhandledResponseNotificationViewUiBinder.class);
+  private static UnhandledResponseNotificationViewUiBinder uiBinder = GWT
+      .create(UnhandledResponseNotificationViewUiBinder.class);
 
   private PopupPanel popup = new PopupPanel(false, true);
 
@@ -29,6 +31,12 @@ public class UnhandledResponseNotificationView extends PopupViewImpl implements 
 
   @UiField
   Label detailMessage;
+
+  @UiField
+  Label errorMessage;
+
+  @UiField
+  Label more;
 
   @UiField
   Button okay;
@@ -44,6 +52,16 @@ public class UnhandledResponseNotificationView extends PopupViewImpl implements 
   @Override
   public HasClickHandlers getOkay() {
     return okay;
+  }
+
+  @Override
+  public Label getMore() {
+    return more;
+  }
+
+  @Override
+  public Label getErrorMessage() {
+    return errorMessage;
   }
 
   @Override
