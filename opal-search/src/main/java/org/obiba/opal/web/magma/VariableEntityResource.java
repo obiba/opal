@@ -50,8 +50,9 @@ public class VariableEntityResource {
     return new VariableEntityTablesResource(getVariableEntity(), opalSearchService, indexManager, esProvider);
   }
 
-  @GET()
+  @GET
   public Response exists() {
+
     VariableEntityTablesResource var = new VariableEntityTablesResource(getVariableEntity(), opalSearchService,
         indexManager, esProvider);
 
@@ -65,10 +66,6 @@ public class VariableEntityResource {
   private VariableEntityBean getVariableEntity() {
     return new VariableEntityBean(entityType, entityId);
   }
-//
-//  VariableEntity getEntity() {
-//    // TODO...
-//    return null;
-//  }
+
 
 }
