@@ -74,9 +74,6 @@ public class ComparedDatasourcesReportStepPresenter
   protected void onBind() {
   }
 
-  public Request compare(String sourceDatasourceName, @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
-       DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
-      DatasourceDto datasourceResource) {
   public Request compare(String sourceDatasourceName,
       @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
       DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
@@ -84,12 +81,13 @@ public class ComparedDatasourcesReportStepPresenter
     this.targetDatasourceName = targetDatasourceName;
     getDisplay().clearDisplay();
     authorizedComparedTables = JsArrays.create();
-    UriBuilder ub = UriBuilder.create().segment("datasource", sourceDatasourceName, "compare", targetDatasourceName);
-    return ResourceRequestBuilderFactory.<DatasourceCompareDto>newBuilder().forResource(ub.build()).get()//
-        .withCallback(new DatasourceCompareResourceCallack(datasourceCreatedCallback, factory, datasourceResource))
-        .withCallback(SC_INTERNAL_SERVER_ERROR, new CompareErrorRequestCallback()).send();
-    return ResourceRequestBuilderFactory.<DatasourceCompareDto>newBuilder().forResource(ub.build()).get()//
-        .withCallback(new DatasourceCompareResourceCallback(datasourceCreatedCallback, factory, datasourceResource))
+    String resourceUri = UriBuilder.create()
+        .segment("datasource", sourceDatasourceName, "compare", targetDatasourceName).build();
+    return ResourceRequestBuilderFactory.<DatasourceCompareDto>newBuilder() //
+        .forResource(resourceUri) //
+        .get() //
+        .withCallback(new DatasourceCompareResourceCallback(datasourceCreatedCallback, factory, datasourceResource)) //
+        .withCallback(SC_INTERNAL_SERVER_ERROR, new CompareErrorRequestCallback()) //
         .send();
   }
 
@@ -123,8 +121,8 @@ public class ComparedDatasourcesReportStepPresenter
 
   public void addUpdateVariablesResourceRequests(ConclusionStepPresenter conclusionStepPresenter) {
     final List<String> selectedTableNames = getDisplay().getSelectedTables();
-    Iterable<TableCompareDto> filteredTables =
-        Iterables.filter(JsArrays.toIterable(authorizedComparedTables), new Predicate<TableCompareDto>() {
+    Iterable<TableCompareDto> filteredTables = Iterables
+        .filter(JsArrays.toIterable(authorizedComparedTables), new Predicate<TableCompareDto>() {
 
           @Override
           public boolean apply(TableCompareDto input) {
@@ -170,13 +168,13 @@ public class ComparedDatasourcesReportStepPresenter
           .withResourceBody(stringify(newTableDto));
     }
     if(tableCompareDto.getWithTable().hasViewLink()) {
-      UriBuilder ub =
-          UriBuilder.create().segment("datasource", targetDatasourceName, "view", compared.getName(), "variables");
+      UriBuilder ub = UriBuilder.create()
+          .segment("datasource", targetDatasourceName, "view", compared.getName(), "variables");
       return ResourceRequestBuilderFactory.newBuilder().post().forResource(ub.build())
           .withResourceBody(stringify(variables));
     }
-    UriBuilder ub =
-        UriBuilder.create().segment("datasource", targetDatasourceName, "table", compared.getName(), "variables");
+    UriBuilder ub = UriBuilder.create()
+        .segment("datasource", targetDatasourceName, "table", compared.getName(), "variables");
     return ResourceRequestBuilderFactory.newBuilder().post().forResource(ub.build())
         .withResourceBody(stringify(variables));
   }
@@ -198,7 +196,6 @@ public class ComparedDatasourcesReportStepPresenter
     }
   }
 
-  private final class DatasourceCompareResourceCallack implements ResourceCallback<DatasourceCompareDto> {
   private final class DatasourceCompareResourceCallback implements ResourceCallback<DatasourceCompareDto> {
 
     private final DatasourceCreatedCallback datasourceCreatedCallback;
@@ -216,8 +213,8 @@ public class ComparedDatasourcesReportStepPresenter
 
     @Override
     public void onResource(Response response, DatasourceCompareDto resource) {
-      Set<TableCompareDto> comparedTables =
-          sortComparedTables(JsArrays.toSafeArray(resource.getTableComparisonsArray()));
+      Set<TableCompareDto> comparedTables = sortComparedTables(
+          JsArrays.toSafeArray(resource.getTableComparisonsArray()));
       conflictsExist = false;
       for(TableCompareDto tableComparison : comparedTables) {
         ComparisonResult comparisonResult = getTableComparisonResult(tableComparison);

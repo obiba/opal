@@ -102,8 +102,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        JsArray<VariableDto> variables = resource == null ? JsArray.createArray()
-            .<JsArray<VariableDto>>cast() : resource;
+        JsArray<VariableDto> variables = resource == null
+            ? JsArray.createArray().<JsArray<VariableDto>>cast()
+            : resource;
         getView().setVariables(variables);
       }
     }
