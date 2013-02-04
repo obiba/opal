@@ -55,7 +55,7 @@ public class VariableEntityResource {
     VariableEntityTablesResource var = new VariableEntityTablesResource(getVariableEntity(), opalSearchService,
         indexManager, esProvider);
 
-    if(var.getTables().size() > 0) {
+    if(var.getTables(1).size() > 0) {
       return Response.ok().build();
     }
 

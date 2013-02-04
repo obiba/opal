@@ -45,14 +45,15 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   private static final Logger log = LoggerFactory.getLogger(VariableEntityTablesResource.class);
 
   private final OpalSearchService opalSearchService;
+
   private final VariableEntityBean variableEntity;
+
   private final IndexManager indexManager;
+
   private final ElasticSearchProvider esProvider;
 
-  public VariableEntityTablesResource(VariableEntityBean variableEntity,
-                                      OpalSearchService opalSearchService,
-                                      IndexManager indexManager,
-                                      ElasticSearchProvider esProvider) {
+  public VariableEntityTablesResource(VariableEntityBean variableEntity, OpalSearchService opalSearchService,
+      IndexManager indexManager, ElasticSearchProvider esProvider) {
     this.variableEntity = variableEntity;
     this.opalSearchService = opalSearchService;
     this.indexManager = indexManager;
@@ -62,13 +63,23 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   @GET
   public List<Magma.TableDto> getTables() {
 
-    FinderResult<List<Magma.TableDto>> results = new FinderResult<List<Magma.TableDto>>(new ArrayList<Magma.TableDto>());
+    FinderResult<List<Magma.TableDto>> results = new FinderResult<List<Magma.TableDto>>(
+        new ArrayList<Magma.TableDto>());
     VariableEntityTablesFinder finder = new VariableEntityTablesFinder();
     finder.find(new VariableEntityTablesQuery(variableEntity), results);
 
     return results.getValue();
   }
 
+  public List<Magma.TableDto> getTables(int limit) {
+
+    FinderResult<List<Magma.TableDto>> results = new FinderResult<List<Magma.TableDto>>(
+        new ArrayList<Magma.TableDto>());
+    VariableEntityTablesFinder finder = new VariableEntityTablesFinder().withLimit(limit);
+    finder.find(new VariableEntityTablesQuery(variableEntity), results);
+
+    return results.getValue();
+  }
 
   public static class VariableEntityTablesQuery extends AbstractFinderQuery {
 
@@ -84,15 +95,15 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   }
 
   public static class EntityTablesFinder extends
-    AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
     @Override
     public void find(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
 
-      for (Datasource datasource : MagmaEngine.get().getDatasources()) {
-        for (ValueTable valueTable : datasource.getValueTables()) {
+      for(Datasource datasource : MagmaEngine.get().getDatasources()) {
+        for(ValueTable valueTable : datasource.getValueTables()) {
 
-          if (valueTable.getEntityType().equals(query.getEntity().getType())) {
+          if(valueTable.getEntityType().equals(query.getEntity().getType())) {
             query.getTableFilter().add(valueTable);
           }
         }
@@ -105,93 +116,92 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
 
   @SuppressWarnings("ClassTooDeepInInheritanceTree")
   public static class EntityTablesElasticSearchFinder extends
-    AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+      AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
     private final IndexManager indexManager;
+
     private final ElasticSearchProvider esProvider;
 
-    public EntityTablesElasticSearchFinder(OpalSearchService opalSearchService,
-                                           IndexManager indexManager,
-                                           ElasticSearchProvider esProvider) {
+    /**
+     * Size of the resultset to return, 0 to return all
+     */
+    private int limit = 0;
+
+    public EntityTablesElasticSearchFinder(OpalSearchService opalSearchService, IndexManager indexManager,
+        ElasticSearchProvider esProvider) {
       super(opalSearchService);
       this.indexManager = indexManager;
       this.esProvider = esProvider;
     }
 
     @Override
-    public void executeQuery(VariableEntityTablesQuery query,
-                             FinderResult<List<Magma.TableDto>> result,
-                             String... indexes) {
+    public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result,
+        String... indexes) {
 
       Map<String, ValueTable> map = buildIndexValueTableMap(query, new IndexManagerHelper(indexManager));
 
-      if (map.isEmpty()) {
+      if(map.isEmpty()) {
         return;
       }
 
       try {
-        JSONObject jsonResponse =  executeEsQuery(query.getEntity().getIdentifier(), new ArrayList<String>(map.keySet()));
+        JSONObject jsonResponse = executeEsQuery(query.getEntity().getIdentifier(), new ArrayList<String>(map.keySet()),
+            limit);
         // parse the jsonResponse and by using the map, create the required TableDtos
         log.debug("JSON ES Response {}", jsonResponse);
         JSONObject jsonHitsInfo = jsonResponse.getJSONObject("hits");
 
-        if (jsonHitsInfo.getInt("total")> 0) {
+        if(jsonHitsInfo.getInt("total") > 0) {
           JSONArray jsonHits = jsonHitsInfo.getJSONArray("hits");
           int hitCount = jsonHits.length();
 
-          for (int i = 0; i < hitCount; ++i) {
+          for(int i = 0; i < hitCount; ++i) {
             String indexName = jsonHits.getJSONObject(i).getString("_type");
             ValueTable valueTable = map.get(indexName);
 
-            if (valueTable != null) {
-              Magma.TableDto tableDto =
-                Magma.TableDto.newBuilder()
-                  .setDatasourceName(valueTable.getDatasource().getName())
-                  .setName(valueTable.getName())
-                  .setEntityType(valueTable.getEntityType())
-                  .build();
+            if(valueTable != null) {
+              Magma.TableDto tableDto = Magma.TableDto.newBuilder()
+                  .setDatasourceName(valueTable.getDatasource().getName()).setName(valueTable.getName())
+                  .setEntityType(valueTable.getEntityType()).build();
 
               result.getValue().add(tableDto);
             }
           }
         }
 
-      } catch (JSONException e) {
+      } catch(JSONException e) {
         // ??? log error or throw RuntimeException
       }
 
     }
 
-    private JSONObject executeEsQuery(String identifier, List<String> tableIndexNames) throws JSONException {
-      QueryTermJsonBuilder.QueryTermsFiltersBuilder filtersBuilder =
-        new QueryTermJsonBuilder.QueryTermsFiltersBuilder()
-          .setFieldName("_type")
-          .addFilterValues(tableIndexNames);
+    private JSONObject executeEsQuery(String identifier, List<String> tableIndexNames, int limit) throws JSONException {
+      QueryTermJsonBuilder.QueryTermsFiltersBuilder filtersBuilder = new QueryTermJsonBuilder.QueryTermsFiltersBuilder()
+          .setFieldName("_type").addFilterValues(tableIndexNames);
 
-      QueryTermJsonBuilder queryBuilder =
-        new QueryTermJsonBuilder()
-          .setTermFieldName("_id")
-          .setTermFieldValue(identifier)
-          .setTermFilters(filtersBuilder.build());
+      QueryTermJsonBuilder queryBuilder = new QueryTermJsonBuilder().setTermFieldName("_id")
+          .setTermFieldValue(identifier).setTermFilters(filtersBuilder.build());
+
+      if(limit > 0) {
+        queryBuilder.setSize(limit).build();
+      }
 
       EsQueryExecutor queryExecutor = new EsQueryExecutor(esProvider);
 
       return queryExecutor.execute(queryBuilder.build());
     }
 
-    private Map<String, ValueTable> buildIndexValueTableMap(VariableEntityTablesQuery query, IndexManagerHelper indexManagerHelper) {
-      Map<String,ValueTable> map = new HashMap<String, ValueTable>();
+    private Map<String, ValueTable> buildIndexValueTableMap(VariableEntityTablesQuery query,
+        IndexManagerHelper indexManagerHelper) {
+      Map<String, ValueTable> map = new HashMap<String, ValueTable>();
       Iterator<ValueTable> iterator = query.getTableFilter().iterator();
 
-      while (iterator.hasNext()) {
+      while(iterator.hasNext()) {
         ValueTable valueTable = iterator.next();
 
-        if (indexManager.isIndexable(valueTable) && indexManager.getIndex(valueTable).isUpToDate()) {
-          String tableIndexName =
-            indexManagerHelper
-              .setDatasource(valueTable.getDatasource().getName())
-              .setTable(valueTable.getName())
-              .getIndexName();
+        if(indexManager.isIndexable(valueTable) && indexManager.getIndex(valueTable).isUpToDate()) {
+          String tableIndexName = indexManagerHelper.setDatasource(valueTable.getDatasource().getName())
+              .setTable(valueTable.getName()).getIndexName();
 
           map.put(tableIndexName, valueTable);
 
@@ -203,41 +213,61 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
       return map;
     }
 
+    private EntityTablesElasticSearchFinder withLimit(int limit) {
+      this.limit = limit;
+      return this;
+    }
+
   }
 
   @SuppressWarnings("ClassTooDeepInInheritanceTree")
   public static class EntityTablesMagmaFinder extends
-    AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+      AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+
+    private int limit = 0;
+
     @Override
-    public void executeQuery(VariableEntityTablesQuery query,
-                             FinderResult<List<Magma.TableDto>> result) {
+    public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
 
-      for (ValueTable valueTable : query.getTableFilter()) {
+      for(ValueTable valueTable : query.getTableFilter()) {
 
-        if (valueTable.hasValueSet(query.getEntity())) {
-          Magma.TableDto tableDto =
-            Magma.TableDto.newBuilder()
-              .setDatasourceName(valueTable.getDatasource().getName())
-              .setName(valueTable.getName())
-              .setEntityType(valueTable.getEntityType())
-              .build();
+        if(valueTable.hasValueSet(query.getEntity())) {
+          Magma.TableDto tableDto = Magma.TableDto.newBuilder().setDatasourceName(valueTable.getDatasource().getName())
+              .setName(valueTable.getName()).setEntityType(valueTable.getEntityType()).build();
 
           result.getValue().add(tableDto);
+
+          if(limit > 0 && result.getValue().size() == limit) {
+            break;
+          }
         }
       }
-
     }
+
+    public EntityTablesMagmaFinder withLimit(int limit) {
+      this.limit = limit;
+      return this;
+    }
+
   }
 
   public class VariableEntityTablesFinder extends
-    AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+
+    private int limit = 0;
 
     @Override
     public void find(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
       nextFinder(new EntityTablesFinder()) //
-        .nextFinder(new EntityTablesElasticSearchFinder(opalSearchService, indexManager, esProvider)) //
-        .nextFinder(new EntityTablesMagmaFinder());
+          .nextFinder(
+              new EntityTablesElasticSearchFinder(opalSearchService, indexManager, esProvider).withLimit(limit)) //
+          .nextFinder(new EntityTablesMagmaFinder().withLimit(limit));
       next(query, result);
+    }
+
+    public VariableEntityTablesFinder withLimit(int limit) {
+      this.limit = limit;
+      return this;
     }
   }
 
