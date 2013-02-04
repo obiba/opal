@@ -37,6 +37,9 @@ import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -100,6 +103,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @UiField
   Image refreshPending;
+
+  @UiField
+  com.github.gwtbootstrap.client.ui.TextBox searchBox;
 
   @UiField
   NumericTextBox visibleColumns;
@@ -170,6 +176,18 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         return Math.min(maxVisibleColumns, listVariable.size() - firstVisibleIndex);
       }
     };
+  }
+
+  @Override
+  public void addEntitySearchHandler(final ValuesTablePresenter.EntitySearchHandler handler) {
+    searchBox.addKeyDownHandler(new KeyDownHandler() {
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          handler.onSearch(searchBox.getText());
+        }
+      }
+    });
   }
 
   @Override
