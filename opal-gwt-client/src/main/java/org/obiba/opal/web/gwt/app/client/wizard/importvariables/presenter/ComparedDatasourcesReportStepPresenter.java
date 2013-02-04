@@ -20,6 +20,7 @@ import net.customware.gwt.presenter.client.place.PlaceRequest;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
@@ -28,6 +29,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
@@ -44,6 +46,8 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
 public class ComparedDatasourcesReportStepPresenter
     extends WidgetPresenter<ComparedDatasourcesReportStepPresenter.Display> {
@@ -70,6 +74,9 @@ public class ComparedDatasourcesReportStepPresenter
   protected void onBind() {
   }
 
+  public Request compare(String sourceDatasourceName, @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
+       DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
+      DatasourceDto datasourceResource) {
   public Request compare(String sourceDatasourceName,
       @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
       DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
@@ -78,6 +85,9 @@ public class ComparedDatasourcesReportStepPresenter
     getDisplay().clearDisplay();
     authorizedComparedTables = JsArrays.create();
     UriBuilder ub = UriBuilder.create().segment("datasource", sourceDatasourceName, "compare", targetDatasourceName);
+    return ResourceRequestBuilderFactory.<DatasourceCompareDto>newBuilder().forResource(ub.build()).get()//
+        .withCallback(new DatasourceCompareResourceCallack(datasourceCreatedCallback, factory, datasourceResource))
+        .withCallback(SC_INTERNAL_SERVER_ERROR, new CompareErrorRequestCallback()).send();
     return ResourceRequestBuilderFactory.<DatasourceCompareDto>newBuilder().forResource(ub.build()).get()//
         .withCallback(new DatasourceCompareResourceCallback(datasourceCreatedCallback, factory, datasourceResource))
         .send();
@@ -180,6 +190,15 @@ public class ComparedDatasourcesReportStepPresenter
   // Inner classes
   //
 
+  private final class CompareErrorRequestCallback implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("DataImportFailed").args(response.getText()).build());
+    }
+  }
+
+  private final class DatasourceCompareResourceCallack implements ResourceCallback<DatasourceCompareDto> {
   private final class DatasourceCompareResourceCallback implements ResourceCallback<DatasourceCompareDto> {
 
     private final DatasourceCreatedCallback datasourceCreatedCallback;

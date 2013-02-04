@@ -31,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
@@ -80,8 +81,12 @@ import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.annotations.DefaultGatekeeper;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
+@SuppressWarnings("UnusedDeclaration")
 @GinModules(
-    {OpalGinModule.class, AuthorizationModule.class, AdministrationModule.class, DashboardModule.class, NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class, ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class, ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class})
+    { OpalGinModule.class, AuthorizationModule.class, AdministrationModule.class, DashboardModule.class,
+        NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class,
+        ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class,
+        ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
 public interface OpalGinjector extends Ginjector {
 
   EventBus getOldEventBus();
@@ -136,6 +141,8 @@ public interface OpalGinjector extends Ginjector {
   Provider<DatasourcePresenter> getDatasourcePresenter();
 
   Provider<TablePresenter> getTablePresenter();
+
+  Provider<EntityDialogPresenter> getEntityDialogPresenter();
 
   Provider<FunctionalUnitListPresenter> getFunctionalUnitListPresenter();
 

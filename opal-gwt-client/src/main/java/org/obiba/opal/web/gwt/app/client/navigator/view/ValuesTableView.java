@@ -15,7 +15,9 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
@@ -28,12 +30,16 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -67,7 +73,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {
   }
 
-  private static ValuesTableViewUiBinder uiBinder = GWT.create(ValuesTableViewUiBinder.class);
+  private static final ValuesTableViewUiBinder uiBinder = GWT.create(ValuesTableViewUiBinder.class);
 
   private final Widget widget;
 
@@ -99,13 +105,16 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   Image refreshPending;
 
   @UiField
+  com.github.gwtbootstrap.client.ui.TextBox searchBox;
+
+  @UiField
   NumericTextBox visibleColumns;
 
   private ValueSetsDataProvider dataProvider;
 
   private List<VariableDto> listVariable;
 
-  private List<VariableDto> visibleListVariable;
+  private final List<VariableDto> visibleListVariable;
 
   private List<String> listValueSetVariable;
 
@@ -114,6 +123,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private DataFetcher fetcher;
 
   private VariableValueSelectionHandler variableValueSelectionHandler;
+
+  private EntitySelectionHandler entitySelectionHandler;
 
   private int firstVisibleIndex = 0;
 
@@ -138,8 +149,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
       @Override
       public void onClick(ClickEvent event) {
-        if(lastFilter.equals(filter.getText()) == false
-            || maxVisibleColumns != visibleColumns.getNumberValue().intValue()) {
+        if(!lastFilter.equals(filter.getText()) || maxVisibleColumns != visibleColumns.getNumberValue().intValue()) {
           // variables list has changed so update all
           lastFilter = filter.getText();
           maxVisibleColumns = visibleColumns.getNumberValue().intValue();
@@ -166,6 +176,18 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         return Math.min(maxVisibleColumns, listVariable.size() - firstVisibleIndex);
       }
     };
+  }
+
+  @Override
+  public void addEntitySearchHandler(final ValuesTablePresenter.EntitySearchHandler handler) {
+    searchBox.addKeyDownHandler(new KeyDownHandler() {
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          handler.onSearch(searchBox.getText());
+        }
+      }
+    });
   }
 
   @Override
@@ -218,8 +240,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     dataProvider.addDataDisplay(valuesTable);
   }
 
-  private String escape(String filter) {
-    return filter.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
+  private String escape(String string) {
+    return string.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
   }
 
   @Override
@@ -229,7 +251,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void setValueSetsFetcher(DataFetcher provider) {
-    this.fetcher = provider;
+    fetcher = provider;
   }
 
   //
@@ -242,7 +264,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private void setRefreshing(boolean refresh) {
     refreshPending.setVisible(refresh);
-    refreshButton.setEnabled(refresh == false);
+    refreshButton.setEnabled(!refresh);
   }
 
   private String getColumnLabel(int i) {
@@ -274,13 +296,24 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
     firstVisibleIndex = 0;
 
-    TextColumn<ValueSetDto> entityColumn = new TextColumn<ValueSetDto>() {
+    ClickableColumn<ValueSetDto> entityColumn = new ClickableColumn<ValueSetDto>() {
 
       @Override
       public String getValue(ValueSetDto value) {
         return value.getIdentifier();
       }
+
     };
+    if(entitySelectionHandler == null) {
+      entitySelectionHandler = new EntitySelectionHandlerImpl();
+    }
+
+    entityColumn.setFieldUpdater(new FieldUpdater<ValueSetDto, String>() {
+      @Override
+      public void update(int index, ValueSetDto valueSetDto, String value) {
+        entitySelectionHandler.onEntitySelection(table.getEntityType(), valueSetDto.getIdentifier());
+      }
+    });
     setMinimumWidth(entityColumn);
 
     valuesTable.addColumn(entityColumn, table.getEntityType());
@@ -324,7 +357,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return refreshPending.isVisible() == false && firstVisibleIndex > 0;
+      return !refreshPending.isVisible() && firstVisibleIndex > 0;
     }
 
   }
@@ -337,7 +370,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public boolean isEnabled() {
-      return refreshPending.isVisible() == false && (listVariable.size() - firstVisibleIndex > getMaxVisibleColumns());
+      return !refreshPending.isVisible() && listVariable.size() - firstVisibleIndex > getMaxVisibleColumns();
     }
 
   }
@@ -416,7 +449,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       MenuBar menuBar = new MenuBar(true);
       int currentIdx = firstVisibleIndex + getMaxVisibleColumns();
       for(int i = currentIdx; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()); i++) {
-        final int increment = i - currentIdx + 1;
+        int increment = i - currentIdx + 1;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(increment)));
       }
       if(Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()) < listVariable.size()) {
@@ -432,8 +465,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(2);
         int idx = firstVisibleIndex++ + getMaxVisibleColumns();
-        valuesTable.insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)),
-            getColumnLabel(idx));
+        valuesTable
+            .insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
       }
       valuesTable.redrawHeaders();
     }
@@ -454,7 +487,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       MenuBar menuBar = new MenuBar(true);
       int currentIdx = firstVisibleIndex;
       for(int i = currentIdx - 1; i >= Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0); i--) {
-        final int decrement = currentIdx - i;
+        int decrement = currentIdx - i;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(decrement)));
       }
       if(Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0) > 0) {
@@ -477,15 +510,15 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   }
 
-  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements
-      ValuesTablePresenter.ValueSetsProvider {
+  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto>
+      implements ValuesTablePresenter.ValueSetsProvider {
 
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
       // Get the new range.
-      final Range range = display.getVisibleRange();
+      Range range = display.getVisibleRange();
 
-      // query the valuesets
+      // query the valueSets
       int start = range.getStart();
 
       if(start > table.getValueSetCount()) return;
@@ -516,6 +549,14 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
       fetcher.requestValueSequence(variable, valueSet.getIdentifier());
+    }
+  }
+
+  private final class EntitySelectionHandlerImpl implements ValuesTablePresenter.EntitySelectionHandler {
+
+    @Override
+    public void onEntitySelection(String entityType, String entityId) {
+      fetcher.requestEntityDialog(entityType, entityId);
     }
   }
 

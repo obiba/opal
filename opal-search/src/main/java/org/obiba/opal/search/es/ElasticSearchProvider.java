@@ -14,10 +14,10 @@ import org.elasticsearch.rest.RestController;
 
 public interface ElasticSearchProvider {
 
-  public boolean isEnabled();
+  boolean isEnabled();
 
-  public Client getClient();
+  Client getClient();
 
-  public RestController getRest();
+  RestController getRest();
 
 }

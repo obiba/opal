@@ -24,14 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Component
-@Scope("request")
-@Path("/datasource/{ds}/table/{table}/facet")
-
 /**
  * Elastic Search API resource that provides a secure mechanism of performing queries on the indexes without exposing
  * individual data,
  */
+@Component
+@Scope("request")
+@Path("/datasource/{ds}/table/{table}/facet")
 public class ValueTableFacetResource {
 
   private final IndexManager indexManager;
@@ -64,7 +63,7 @@ public class ValueTableFacetResource {
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 
     try {
-      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager, datasource, table);
+      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager).setDatasource(datasource).setTable(table);
       QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable);
 
       dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoBuilder.build());

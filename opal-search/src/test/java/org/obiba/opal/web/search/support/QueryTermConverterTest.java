@@ -101,7 +101,7 @@ public class QueryTermConverterTest {
 
     IndexManager indexManager = setupMockObjects(datasource, table, indexName, variableName, variable);
 
-    return new IndexManagerHelper(indexManager, datasource, table);
+    return new IndexManagerHelper(indexManager).setDatasource(datasource).setTable(table);
   }
 
   private IndexManager setupMockObjects(String dsName, String table, String indexName, String variableName,

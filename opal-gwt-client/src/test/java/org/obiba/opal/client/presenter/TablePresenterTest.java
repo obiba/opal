@@ -1,18 +1,14 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.client.presenter;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.easymock.EasyMock;
@@ -25,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPre
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -42,6 +39,11 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Provider;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 public class TablePresenterTest extends AbstractGwtTestSetup {
 
@@ -61,37 +63,36 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     eventBusMock = createMock(EventBus.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
-    ValueSequencePopupPresenter.Display valueSequenceDisplayMock =
-        createMock(ValueSequencePopupPresenter.Display.class);
+    ValueSequencePopupPresenter.Display valueSequenceDisplayMock = createMock(
+        ValueSequencePopupPresenter.Display.class);
+    EntityDialogPresenter.Display entityDialogDisplayMock = createMock(EntityDialogPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
-    ValuesTablePresenter values =
-        new ValuesTablePresenter(null, null, new ValueSequencePopupPresenter(null, valueSequenceDisplayMock));
+    ValuesTablePresenter values = new ValuesTablePresenter(null, null,
+        new ValueSequencePopupPresenter(null, valueSequenceDisplayMock),
+        new EntityDialogPresenter(null, entityDialogDisplayMock));
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "OverlyLongMethod" })
   @Test
   @Ignore
   public void testOnBind_RegistersHandlersAndBindsDependencies() {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
-    expect(
-        eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
-            (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(
-        eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(),
-            (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(
-        eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
-            (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(
-        eventBusMock.addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(),
-            (ViewSavedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
+        (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(),
+        (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
+        (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock
+        .addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(), (ViewSavedEvent.Handler) EasyMock.anyObject()))
+        .andReturn(handlerRegistrationMock).once();
 
-    expect(displayMock.addVariableSuggestionHandler((SelectionHandler<Suggestion>) EasyMock.anyObject())).andReturn(
-        handlerRegistrationMock).once();
-    expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject())).andReturn(
-        handlerRegistrationMock).once();
+    expect(displayMock.addVariableSuggestionHandler((SelectionHandler<Suggestion>) EasyMock.anyObject()))
+        .andReturn(handlerRegistrationMock).once();
+    expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject()))
+        .andReturn(handlerRegistrationMock).once();
     displayMock.setNextCommand((Command) EasyMock.anyObject());
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setParentCommand((Command) EasyMock.anyObject());

@@ -210,7 +210,7 @@
           <property name="sqlScriptUpgradeStep">
             <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
               <property name="description" value="Update schema for Magma hibernate datasource binaries storage."/>
-              <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.11.0/"/>
+              <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.11.x/"/>
               <property name="scriptBasename" value="binaries"/>
               <property name="dataSource" ref="opalDataSource"/>
               <property name="appliesTo" value="1.11.0"/>

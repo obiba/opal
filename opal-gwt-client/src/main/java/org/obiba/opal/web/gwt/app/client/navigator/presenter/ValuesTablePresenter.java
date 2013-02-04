@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPre
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -39,12 +40,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private DataFetcher fetcher;
 
-  private ValueSequencePopupPresenter valueSequencePopupPresenter;
+  private final ValueSequencePopupPresenter valueSequencePopupPresenter;
+
+  private final EntityDialogPresenter entityDialogPresenter;
 
   @Inject
-  public ValuesTablePresenter(Display display, final EventBus eventBus, ValueSequencePopupPresenter valueSequencePopupPresenter) {
+  public ValuesTablePresenter(Display display, EventBus eventBus,
+      ValueSequencePopupPresenter valueSequencePopupPresenter, EntityDialogPresenter entityDialogPresenter) {
     super(eventBus, display);
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
+    this.entityDialogPresenter = entityDialogPresenter;
   }
 
   public void setTable(TableDto table) {
@@ -52,17 +57,17 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, VariableDto variable) {
-    hideValueSequencePopup(table);
+    hidePopups(table);
     this.table = table;
 
     getView().setTable(table);
-    JsArray<VariableDto> variables = JsArray.createArray().<JsArray<VariableDto>> cast();
+    JsArray<VariableDto> variables = JsArray.createArray().cast();
     variables.push(variable);
     getView().setVariables(variables);
   }
 
   public void setTable(TableDto table, String select) {
-    hideValueSequencePopup(table);
+    hidePopups(table);
     this.table = table;
 
     getView().setTable(table);
@@ -73,42 +78,32 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   protected void onBind() {
     super.onBind();
     getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+    getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
   }
 
-  //
-  // Private methods
-  //
-
   /**
-   * Hide value sequence popup if table is about to be changed.
+   * Hide entity details & value sequence popup if table is about to be changed.
    */
-  private void hideValueSequencePopup(TableDto newTable) {
-    if(this.table != null && this.table.getName().equals(newTable.getName()) == false) {
+  private void hidePopups(TableDto newTable) {
+    if(table != null && !table.getName().equals(newTable.getName())) {
       valueSequencePopupPresenter.getView().hide();
+      entityDialogPresenter.getView().hide();
     }
   }
 
-  private String cleanFilter(String filter) {
-    return filter.replaceAll("/", "\\\\/");
-  }
-
-  //
-  // Inner classes and interfaces
-  //
-
   private class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
-    private TableDto table;
+    private final TableDto table;
 
-    public VariablesResourceCallback(TableDto table) {
-      super();
+    private VariablesResourceCallback(TableDto table) {
       this.table = table;
     }
 
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
-      if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        JsArray<VariableDto> variables = (resource != null) ? resource : JsArray.createArray().<JsArray<VariableDto>> cast();
+      if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
+        JsArray<VariableDto> variables = resource == null ? JsArray.createArray()
+            .<JsArray<VariableDto>>cast() : resource;
         getView().setVariables(variables);
       }
     }
@@ -116,19 +111,18 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private class ValueSetsResourceCallback implements ResourceCallback<ValueSetsDto> {
 
-    private int offset;
+    private final int offset;
 
-    private TableDto table;
+    private final TableDto table;
 
-    public ValueSetsResourceCallback(int offset, TableDto table) {
-      super();
+    private ValueSetsResourceCallback(int offset, TableDto table) {
       this.offset = offset;
       this.table = table;
     }
 
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
-      if(this.table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
+      if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
         if(getView().getValueSetsProvider() != null) {
           getView().getValueSetsProvider().populateValues(offset, resource);
         }
@@ -137,25 +131,53 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   private class BadRequestCallback implements ResponseCodeCallback {
+
     @Override
     public void onResponseCode(Request request, Response response) {
       notifyError(response);
     }
 
+    @SuppressWarnings("unchecked")
     protected void notifyError(Response response) {
       ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error
+          .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
       String firstError = errors.get(0).getMessage();
       NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error(firstError).build();
       getEventBus().fireEvent(notificationEvent);
     }
   }
 
+  public interface EntitySearchHandler {
+    void onSearch(String identifier);
+  }
+
+  private class EntitySearchHandlerImpl implements EntitySearchHandler {
+
+    @Override
+    public void onSearch(final String identifier) {
+      UriBuilder uriBuilder = UriBuilder.create().segment("entity", identifier, "type", table.getEntityType());
+      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
+          .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("EntityIdentifierNotFound")
+                  .args(table.getEntityType(), identifier, table.getName()).build());
+            }
+          }).withCallback(Response.SC_OK, new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          fetcher.requestEntityDialog(table.getEntityType(), identifier);
+        }
+      }).send();
+    }
+  }
+
   private class DataFetcherImpl implements DataFetcher {
 
-    private Request variablesRequest = null;
+    private Request variablesRequest;
 
-    private Request valuesRequest = null;
+    private Request valuesRequest;
 
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
@@ -179,11 +201,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void request(String filter, int offset, int limit) {
       StringBuilder link = getLinkBuilder(offset, limit);
-      if(filter != null && filter.isEmpty() == false) {
+      if(filter != null && !filter.isEmpty()) {
         link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
       }
 
       doRequest(offset, link.toString());
+    }
+
+    private String cleanFilter(String filter) {
+      return filter.replaceAll("/", "\\\\/");
     }
 
     private String escape(String filter) {
@@ -195,18 +221,21 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         valuesRequest.cancel();
         valuesRequest = null;
       }
-      valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link).get()//
-      .withCallback(new ValueSetsResourceCallback(offset, table)).withCallback(400, new BadRequestCallback()).send();
+      valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link).get()//
+          .withCallback(new ValueSetsResourceCallback(offset, table))
+          .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback()).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
-      return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=").append(limit);
+      return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=")
+          .append(limit);
     }
 
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier) {
       StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName()).append("/value");
+      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName())
+          .append("/value");
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
 
@@ -217,23 +246,30 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
+    public void requestEntityDialog(String entityType, String entityId) {
+      entityDialogPresenter.initialize(table, entityType, entityId);
+      addToPopupSlot(entityDialogPresenter);
+    }
+
+    @Override
     public void updateVariables(String select) {
       String link = table.getLink() + "/variables";
-      if(select != null && select.isEmpty() == false) {
+      if(select != null && !select.isEmpty()) {
         link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(select) + "/)");
       }
       if(variablesRequest != null) {
         variablesRequest.cancel();
         variablesRequest = null;
       }
-      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link).get()//
-      .withCallback(new VariablesResourceCallback(table)).withCallback(400, new BadRequestCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          notifyError(response);
-          setTable(table);
-        }
-      }).send();
+      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
+          .withCallback(new VariablesResourceCallback(table))
+          .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              notifyError(response);
+              setTable(table);
+            }
+          }).send();
     }
   }
 
@@ -245,6 +281,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     ValueSetsProvider getValueSetsProvider();
 
     void setValueSetsFetcher(DataFetcher fetcher);
+
+    void addEntitySearchHandler(EntitySearchHandler handler);
   }
 
   public interface DataFetcher {
@@ -256,11 +294,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void requestValueSequence(VariableDto variable, String entityIdentifier);
 
+    void requestEntityDialog(String entityType, String entityId);
+
     void updateVariables(String select);
   }
 
   public interface ValueSetsProvider {
     void populateValues(int offset, ValueSetsDto valueSets);
+  }
+
+  public interface EntitySelectionHandler {
+
+    void onEntitySelection(String entityType, String entityId);
+
   }
 
 }

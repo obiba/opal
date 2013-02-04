@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -16,19 +16,21 @@ import org.obiba.opal.core.domain.VariableNature;
 
 public class SummaryStatisticsResourceFactory {
 
-  public AbstractSummaryStatisticsResource getResource(ValueTable valueTable, VariableValueSource vvs, String natureStr) {
+  public AbstractSummaryStatisticsResource getResource(ValueTable valueTable, VariableValueSource vvs,
+      String natureStr) {
     VectorSource vectorSource = vvs.asVectorSource();
 
     if(vectorSource != null) {
-      VariableNature nature = (natureStr != null ? VariableNature.valueOf(natureStr.toUpperCase()) : VariableNature.getNature(vvs.getVariable()));
+      VariableNature nature = natureStr == null ? VariableNature.getNature(vvs.getVariable()) : VariableNature
+          .valueOf(natureStr.toUpperCase());
       switch(nature) {
-      case CATEGORICAL:
-        return new CategoricalSummaryStatisticsResource(valueTable, vvs.getVariable(), vectorSource);
-      case CONTINUOUS:
-        return new ContinuousSummaryStatisticsResource(valueTable, vvs.getVariable(), vectorSource);
-      case TEMPORAL:
-      case UNDETERMINED:
-        // fall-through
+        case CATEGORICAL:
+          return new CategoricalSummaryStatisticsResource(valueTable, vvs.getVariable(), vectorSource);
+        case CONTINUOUS:
+          return new ContinuousSummaryStatisticsResource(valueTable, vvs.getVariable(), vectorSource);
+        case TEMPORAL:
+        case UNDETERMINED:
+          // fall-through
       }
     }
     return new DefaultSummaryStatisticsResource(valueTable, vvs.getVariable(), vectorSource);

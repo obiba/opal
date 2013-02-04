@@ -22,14 +22,22 @@ import org.obiba.opal.search.ValueTableIndex;
 public class IndexManagerHelper {
   private final IndexManager indexManager;
 
-  private final String datasource;
+  private String datasource;
 
-  private final String table;
+  private String table;
 
-  public IndexManagerHelper(IndexManager indexManager, String datasource, String table) {
+  public IndexManagerHelper(IndexManager indexManager) {
     this.indexManager = indexManager;
+  }
+
+  public IndexManagerHelper setDatasource(String datasource) {
     this.datasource = datasource;
+    return this;
+  }
+
+  public IndexManagerHelper setTable(String table) {
     this.table = table;
+    return this;
   }
 
   public VariableNature getVariableNature(String variableName) {

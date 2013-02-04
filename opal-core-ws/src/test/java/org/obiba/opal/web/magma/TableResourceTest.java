@@ -68,7 +68,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testTablesGET() {
-    TablesResource resource = new TablesResource(MagmaEngine.get().getDatasource(DATASOURCE2));
+    DatasourceTablesResource resource = new DatasourceTablesResource(MagmaEngine.get().getDatasource(DATASOURCE2));
 
     List<Magma.TableDto> dtos = resource.getTables(true, null);
     // alphabetical order
