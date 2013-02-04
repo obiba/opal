@@ -162,7 +162,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             @Override
             public void onResponseCode(Request request, Response response) {
               getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("EntityIdentifierNotFound")
-                  .args(identifier, table.getName()).build());
+                  .args(table.getEntityType(), identifier, table.getName()).build());
             }
           }).withCallback(Response.SC_OK, new ResponseCodeCallback() {
         @Override
