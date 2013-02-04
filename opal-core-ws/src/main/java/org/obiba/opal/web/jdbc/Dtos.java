@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -23,14 +23,14 @@ final class Dtos {
       @Override
       public JdbcDataSourceDto apply(JdbcDataSource input) {
         return JdbcDataSourceDto.newBuilder()//
-        .setName(input.getName())//
-        .setDriverClass(input.getDriverClass())//
-        .setUrl(input.getUrl())//
-        .setUsername(input.getUsername())//
-        // Do not send password.
-        // .setPassword(Strings.nullToEmpty(input.getPassword()))//
-        .setEditable(input.isEditable()) //
-        .setProperties(Strings.nullToEmpty(input.getProperties())).build();
+            .setName(input.getName())//
+            .setDriverClass(input.getDriverClass())//
+            .setUrl(input.getUrl())//
+            .setUsername(input.getUsername())//
+                // Do not send password.
+                // .setPassword(Strings.nullToEmpty(input.getPassword()))//
+            .setEditable(input.isEditable()) //
+            .setProperties(Strings.nullToEmpty(input.getProperties())).build();
       }
 
     };
@@ -39,10 +39,12 @@ final class Dtos {
 
       @Override
       public JdbcDataSource apply(JdbcDataSourceDto dto) {
-        return new JdbcDataSource(dto.getName(), dto.getUrl(), dto.getDriverClass(), dto.getUsername(), dto.getPassword(), dto.getProperties());
+        return new JdbcDataSource(dto.getName(), dto.getUrl(), dto.getDriverClass(), dto.getUsername(),
+            dto.getPassword(), dto.getProperties());
       }
 
     };
+
   }
 
 }

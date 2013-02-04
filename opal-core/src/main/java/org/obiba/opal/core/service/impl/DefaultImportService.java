@@ -158,8 +158,8 @@ public class DefaultImportService implements ImportService {
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException,
       InterruptedException {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
-    Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
 
+    Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
     try {
       importData(unitName, sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration,
           ignoreUnknownIdentifier);

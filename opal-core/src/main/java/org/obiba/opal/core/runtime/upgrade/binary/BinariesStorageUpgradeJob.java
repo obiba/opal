@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BinariesStorageUpgradeJob implements BackgroundJob {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(BinariesStorageUpgradeJob.class);
 
   private String progressStatus;
 
@@ -123,8 +123,8 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
   private void logProgress(String name, int nbBinaries) {
     if(progress % 10 == 0) {
       double percent = (double) progress / (double) nbBinaries * 100d;
-      progressStatus = "Datasource " + name + ": " + String
-          .format("%.1f", percent) + "% processed (" + progress + "/" + nbBinaries + ")";
+      progressStatus = "Datasource " + name + ": " + String.format("%.1f", percent) + "% processed (" + progress + "/" +
+          nbBinaries + ")";
       log.info(progressStatus);
     }
   }
@@ -134,14 +134,15 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
     final Collection<BinaryToMove> binaries = new ArrayList<BinaryToMove>();
     template.query( //
         "SELECT d.name AS datasourceName, vt.name AS tableName, v.name AS variableName, ve.identifier AS entityId " + //
-            "FROM value_set_value vsv, value_set vs, variable_entity ve, value_table vt, datasource d, variable v  " + //
+            "FROM value_set_value vsv, value_set vs, variable_entity ve, value_table vt, datasource d, variable v  " +
+            //
             "WHERE vsv.value_set_id = vs.id " + //
             "AND vs.variable_entity_id = ve.id " + //
             "AND vs.value_table_id = vt.id " + //
             "AND vt.datasource_id = d.id " + //
             "AND v.id = vsv.variable_id " + //
             "AND v.value_table_id = vt.id " + //
-            "AND vsv.value_type = ?", new Object[] {"binary"}, new RowCallbackHandler() {
+            "AND vsv.value_type = ?", new Object[] { "binary" }, new RowCallbackHandler() {
 
       @Override
       public void processRow(ResultSet rs) throws SQLException, NoSuchValueTableException {
