@@ -21,8 +21,9 @@ public class SummaryStatisticsResourceFactory {
     VectorSource vectorSource = vvs.asVectorSource();
 
     if(vectorSource != null) {
-      VariableNature nature = natureStr == null ? VariableNature.getNature(vvs.getVariable()) : VariableNature
-          .valueOf(natureStr.toUpperCase());
+      VariableNature nature = natureStr == null
+          ? VariableNature.getNature(vvs.getVariable())
+          : VariableNature.valueOf(natureStr.toUpperCase());
       switch(nature) {
         case CATEGORICAL:
           return new CategoricalSummaryStatisticsResource(valueTable, vvs.getVariable(), vectorSource);

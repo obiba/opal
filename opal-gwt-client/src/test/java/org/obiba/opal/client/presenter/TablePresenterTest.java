@@ -70,7 +70,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null,
         new ValueSequencePopupPresenter(null, valueSequenceDisplayMock),
-        new EntityDialogPresenter(null, entityDialogDisplayMock));
+        new EntityDialogPresenter(null, entityDialogDisplayMock, createMock(ValueSequencePopupPresenter.class)));
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider);
   }
 
