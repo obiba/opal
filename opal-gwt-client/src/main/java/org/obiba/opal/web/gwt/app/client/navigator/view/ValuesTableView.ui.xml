@@ -13,7 +13,7 @@
 
     <g:FlowPanel>
       <b:InputAddOn prependIcon="SEARCH">
-        <b:TextBox ui:field="searchBox" searchQuery="true" placeholder="search our site..." />
+        <b:TextBox ui:field="searchBox" searchQuery="true" placeholder="search an entity..." />
       </b:InputAddOn>
 
     </g:FlowPanel>

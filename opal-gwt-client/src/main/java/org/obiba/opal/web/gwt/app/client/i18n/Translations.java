@@ -371,7 +371,7 @@ public interface Translations extends Constants {
       "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}",//
       "NoVariablesFound", "Failed to retrieve the list of variables",//
       "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
-      "EntityIdentifierNotFound", "Entity identifier {0} is invalid"//
+      "EntityIdentifierNotFound", "Entity identifier {0} could not be found in table {1}"//
   })
   Map<String, String> userMessageMap();
 
