@@ -36,7 +36,7 @@ public class TimedExecution {
     return this;
   }
 
-  //TODO configure which field to output
+  //TODO use Joda PeriodFormatter
   public String formatExecutionTime() {
     long hours = MILLISECONDS.toHours(executionTime);
     long minutes = MILLISECONDS.toMinutes(executionTime) - HOURS.toMinutes(hours);
