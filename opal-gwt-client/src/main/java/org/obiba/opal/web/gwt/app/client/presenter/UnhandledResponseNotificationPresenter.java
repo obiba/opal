@@ -26,11 +26,11 @@ public class UnhandledResponseNotificationPresenter extends
 
   public interface Display extends PopupView {
 
-    public HasClickHandlers getOkay();
+    HasClickHandlers getOkay();
 
-    public Label getMore();
+    Label getMore();
 
-    public Label getErrorMessage();
+    Label getErrorMessage();
 
   }
 
@@ -59,6 +59,7 @@ public class UnhandledResponseNotificationPresenter extends
     });
 
     getView().getOkay().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hide();
       }
@@ -69,9 +70,14 @@ public class UnhandledResponseNotificationPresenter extends
 
   public UnhandledResponseNotificationPresenter withResponseEvent(UnhandledResponseEvent event) {
 
-    getView().getErrorMessage().setText(
-        event.getResponse().getStatusText() + " (" + event.getResponse().getStatusCode() + "): " + event.getResponse()
-            .getText());
+    String message = event.getResponse().getStatusText() + " (" + event.getResponse().getStatusCode() + ")";
+
+    if(!event.getResponse().getText().isEmpty()) {
+      message += ": " + event.getResponse().getText();
+    }
+
+    getView().getErrorMessage().setText(message);
+
     return this;
   }
 
