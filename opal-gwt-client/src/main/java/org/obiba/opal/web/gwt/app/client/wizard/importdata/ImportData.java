@@ -57,6 +57,7 @@ public class ImportData {
 
   private Map<String, Object> properties;
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   public void clear() {
     importFormat = null;
     incremental = false;

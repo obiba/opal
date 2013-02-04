@@ -187,7 +187,11 @@ public class DefaultExportServiceImpl implements ExportService {
 
     @Override
     protected Set<String> getLockNames() {
-      return getTablesToLock(sourceTables, destinationDatasource);
+      Set<String> tablesToLock = new TreeSet<String>();
+      for(ValueTable valueTable : sourceTables) {
+        tablesToLock.add(destinationDatasource.getName() + "." + valueTable.getName());
+      }
+      return tablesToLock;
     }
 
     @Override
@@ -197,69 +201,54 @@ public class DefaultExportServiceImpl implements ExportService {
 
     @Override
     protected Action getAction() {
-      return new Action() {
-        @Override
-        public void execute() throws Exception {
-          try {
-            for(ValueTable table : sourceTables) {
-              exportTableToDatasource(destinationDatasource, datasourceCopier, incremental, unit, table);
-            }
-          } catch(IOException ex) {
-            // When implementing the ExcelDatasource:
-            // Determine if this the ExcelDatasource. If yes then display the filename.
-            throw new ExportException(
-                "An error was encountered while exporting to datasource '" + destinationDatasource + "'.", ex);
+      return new ExportAction();
+    }
+
+    private class ExportAction implements Action {
+      @Override
+      public void execute() throws Exception {
+        try {
+          for(ValueTable table : sourceTables) {
+            exportTableToDatasource(table);
           }
+        } catch(IOException ex) {
+          // When implementing the ExcelDatasource:
+          // Determine if this the ExcelDatasource. If yes then display the filename.
+          throw new ExportException(
+              "An error was encountered while exporting to datasource '" + destinationDatasource + "'.", ex);
+        }
+      }
+
+      private void exportTableToDatasource(ValueTable table) throws InterruptedException, IOException {
+        if(Thread.interrupted()) {
+          throw new InterruptedException("Thread interrupted");
         }
 
-        private void exportTableToDatasource(Datasource destinationDatasource,
-            DatasourceCopier.Builder datasourceCopier, boolean incremental, FunctionalUnit unit, ValueTable table)
-            throws InterruptedException, IOException {
-          if(Thread.interrupted()) {
-            throw new InterruptedException("Thread interrupted");
-          }
+        // If the incremental option was specified, create an incremental view of the table (leaving out what has
+        // already been exported).
+        ValueTable tableToCopy = incremental ? getIncrementalView(table, destinationDatasource) : table;
 
-          // If the incremental option was specified, create an incremental view of the table (leaving out what has
-          // already been exported).
-          ValueTable tableToCopy = incremental ? getIncrementalView(table, destinationDatasource) : table;
-
-          // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
-          // public identifiers with private, unit-specific identifiers).
-          if(unit != null && tableToCopy.isForEntityType(identifiersTableService.getEntityType())) {
-            tableToCopy = getUnitView(unit, tableToCopy);
-          }
-
-          // Go ahead and copy the result to the destination datasource.
-          MultithreadedDatasourceCopier.Builder.newCopier().from(tableToCopy).to(destinationDatasource)
-              .withCopier(datasourceCopier).withReaders(4).withThreads(threadFactory).build().copy();
-        }
-
-        private ValueTable getUnitView(FunctionalUnit unit, ValueTable valueTable) {
+        // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
+        // public identifiers with private, unit-specific identifiers).
+        if(unit != null && tableToCopy.isForEntityType(identifiersTableService.getEntityType())) {
           // Make a view that converts opal identifiers to unit identifiers
-          return new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, valueTable,
+          tableToCopy = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, tableToCopy,
               getIdentifiersValueTable());
         }
 
-        private ValueTable getIdentifiersValueTable() {
-          return identifiersTableService.getValueTable();
-        }
-
-        private ValueTable getIncrementalView(ValueTable valueTable, Datasource destination) {
-          WhereClause whereClause = new IncrementalWhereClause(destination.getName() + "." + valueTable.getName());
-          return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).build();
-        }
-      };
-    }
-
-    private Set<String> getTablesToLock(Iterable<ValueTable> sourceTables, Datasource destination) {
-      Set<String> tablesToLock = new TreeSet<String>();
-
-      for(ValueTable valueTable : sourceTables) {
-        tablesToLock.add(destination.getName() + "." + valueTable.getName());
+        // Go ahead and copy the result to the destination datasource.
+        MultithreadedDatasourceCopier.Builder.newCopier().from(tableToCopy).to(destinationDatasource)
+            .withCopier(datasourceCopier).withReaders(4).withThreads(threadFactory).build().copy();
       }
 
-      return tablesToLock;
-    }
+      private ValueTable getIdentifiersValueTable() {
+        return identifiersTableService.getValueTable();
+      }
 
+      private ValueTable getIncrementalView(ValueTable valueTable, Datasource destination) {
+        WhereClause whereClause = new IncrementalWhereClause(destination.getName() + "." + valueTable.getName());
+        return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).build();
+      }
+    }
   }
 }

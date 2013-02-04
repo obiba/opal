@@ -394,48 +394,58 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     private void createTransientDatasource() {
       getView().prepareDatasourceCreation();
 
-      final DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importData);
-
-      ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          transientRequest = null;
-          if(response.getStatusCode() == SC_CREATED) {
-            DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
-            importData.setTransientDatasourceName(datasourceDto.getName());
-            datasourceDiff(factory, datasourceDto);
-          } else {
-            getView().showDatasourceCreationError((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
-          }
-        }
-
-        private void datasourceDiff(DatasourceFactoryDto factory, DatasourceDto datasourceDto) {
-          DatasourceCreatedCallback datasourceCreatedCallback = new DatasourceCreatedCallback() {
-
-            @Override
-            public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
-              getView().showDatasourceCreationSuccess();
-            }
-
-            @Override
-            public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
-              getView().showDatasourceCreationError(error);
-            }
-          };
-          diffRequest = comparedDatasourcesReportPresenter
-              .compare(importData.getTransientDatasourceName(), importData.getDestinationDatasourceName(),
-                  datasourceCreatedCallback, factory, datasourceDto);
-          getView().showDatasourceCreationSuccess();
-        }
-      };
+      DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importData);
 
       transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
           .forResource("/transient-datasources") //
           .post() //
           .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
-          .withCallback(callback, SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
+          .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
+              SC_INTERNAL_SERVER_ERROR) //
           .send();
+    }
+
+    private class CreateTransientDatasourceCallback implements ResponseCodeCallback {
+
+      private final DatasourceFactoryDto factory;
+
+      private CreateTransientDatasourceCallback(DatasourceFactoryDto factory) {
+        this.factory = factory;
+      }
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        transientRequest = null;
+        if(response.getStatusCode() == SC_CREATED) {
+          DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
+          importData.setTransientDatasourceName(datasourceDto.getName());
+          datasourceDiff(datasourceDto);
+        } else {
+          getView().showDatasourceCreationError((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
+        }
+      }
+
+      private void datasourceDiff(DatasourceDto datasourceDto) {
+
+        DatasourceCreatedCallback datasourceCreatedCallback = new DatasourceCreatedCallback() {
+
+          @Override
+          public void onSuccess(@SuppressWarnings("ParameterHidesMemberVariable") DatasourceFactoryDto factory,
+              DatasourceDto datasource) {
+            getView().showDatasourceCreationSuccess();
+          }
+
+          @Override
+          public void onFailure(@SuppressWarnings("ParameterHidesMemberVariable") DatasourceFactoryDto factory,
+              ClientErrorDto error) {
+            getView().showDatasourceCreationError(error);
+          }
+        };
+        diffRequest = comparedDatasourcesReportPresenter
+            .compare(importData.getTransientDatasourceName(), importData.getDestinationDatasourceName(),
+                datasourceCreatedCallback, factory, datasourceDto);
+        getView().showDatasourceCreationSuccess();
+      }
     }
 
   }

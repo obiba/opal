@@ -221,6 +221,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   public void setInSlot(Object slot, Widget content) {
     if(!(slot instanceof Slots)) return;
     switch((Slots) slot) {
