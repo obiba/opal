@@ -570,17 +570,16 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
           if(response.getStatusCode() == Response.SC_OK) {
             // Refresh the variable
             UriBuilder ub = UriBuilder.create()
-                .segment("datasource", view.getDatasourceName(), "view", view.getName(), "variable",
+                .segment("datasource", view.getDatasourceName(), "table", view.getName(), "variable",
                     variable.getName());
             ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(ub.build()).get()
                 .withCallback(new ResourceCallback<VariableDto>() {
                   @Override
                   public void onResource(Response response, VariableDto variableDto) {
                     variable = variableDto;
+                    close(view, derived);
                   }
                 }).send();
-
-            close(view, derived);
           } else {
             getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
           }
