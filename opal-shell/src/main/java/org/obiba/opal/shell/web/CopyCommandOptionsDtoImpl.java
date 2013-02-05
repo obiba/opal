@@ -161,17 +161,11 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
       // or a new file (FileType.IMAGINARY). We assume here that any "imaginary" file object
       // is a non-existent folder.
       if(file.getType() == FileType.FILE) {
-        if("csv".equals(outputFileFormat) && !outputFilePath.endsWith(".csv")) {
-          modifiedPath = outputFilePath + ".csv";
-        } else if("excel".equals(outputFileFormat) && !outputFilePath.endsWith(".xls") &&
-            !outputFilePath.endsWith(".xlsx")) {
-          modifiedPath = outputFilePath + ".xlsx"; // prefer .xlsx over .xls
-        } else if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
-          modifiedPath = outputFilePath + ".zip";
-        }
+        modifiedPath = addExtension(outputFileFormat, outputFilePath);
+
       } else if(file.getType() == FileType.IMAGINARY) {
         if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
-          modifiedPath = outputFilePath + ".zip";
+          modifiedPath = addExtension(outputFileFormat, outputFilePath);
         } else if("csv".equals(outputFileFormat)) {
           // Create the directory
           file.createFolder();
@@ -183,5 +177,18 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
     }
 
     return modifiedPath;
+  }
+
+  private String addExtension(String outputFileFormat, String outputFilePath) {
+    if("csv".equals(outputFileFormat) && !outputFilePath.endsWith(".csv")) {
+      return outputFilePath + ".csv";
+    } else if("excel".equals(outputFileFormat) && !outputFilePath.endsWith(".xls") &&
+        !outputFilePath.endsWith(".xlsx")) {
+      return outputFilePath + ".xlsx"; // prefer .xlsx over .xls
+    } else if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
+      return outputFilePath + ".zip";
+    }
+
+    return outputFilePath;
   }
 }
