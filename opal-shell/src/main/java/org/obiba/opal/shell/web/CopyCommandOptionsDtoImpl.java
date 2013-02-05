@@ -170,8 +170,12 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
           modifiedPath = outputFilePath + ".zip";
         }
       } else if(file.getType() == FileType.IMAGINARY) {
-        // Create the directory
-        file.createFolder();
+        if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
+          modifiedPath = outputFilePath + ".zip";
+        } else if("csv".equals(outputFileFormat)) {
+          // Create the directory
+          file.createFolder();
+        }
       }
 
     } catch(FileSystemException ex) {
