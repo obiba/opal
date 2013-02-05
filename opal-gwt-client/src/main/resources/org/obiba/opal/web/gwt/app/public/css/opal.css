@@ -743,6 +743,8 @@ td.row-actions span {
   margin-top: 5px;
   color: #333333;
   max-width: 400px;
+  max-height: 150px;
+  overflow:auto;
 }
 
 /* Top */
