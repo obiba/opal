@@ -12,15 +12,18 @@ import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBui
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
+import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
@@ -56,7 +59,25 @@ public class GwtApp implements EntryPoint {
     initViewWizards();
 
     DelayedBindRegistry.bind(opalGinjector);
-    opalGinjector.getPlaceManager().revealCurrentPlace();
+
+    ResourceRequestBuilderFactory.<Subject>newBuilder()
+        .forResource("/auth/session/" + opalGinjector.getRequestCredentials().extractCredentials() + "/username").get()
+        .withCallback(new ResourceCallback<Subject>() {
+          @Override
+          public void onResource(Response response, Subject subject) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              opalGinjector.getRequestCredentials().setUsername(subject.getPrincipal());
+              opalGinjector.getPlaceManager().revealCurrentPlace();
+            } else {
+              // Force logout/login
+              ResourceRequestBuilderFactory.newBuilder()
+                  .forResource("/auth/session/" + opalGinjector.getRequestCredentials().extractCredentials()).delete()
+                  .send();
+              opalGinjector.getRequestCredentials().invalidate();
+              opalGinjector.getPlaceManager().revealDefaultPlace();
+            }
+          }
+        }).send();
 
     registerHandlers();
   }
