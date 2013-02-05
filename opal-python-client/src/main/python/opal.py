@@ -31,11 +31,11 @@ parser = argparse.ArgumentParser(description='Opal command line.')
 subparsers = parser.add_subparsers(title='sub-commands', help='Available sub-commands. Use --help option on the sub-command for more details.')
 
 # Add subcommands
-add_subcommand('dict', 'Query Opal data dictionary.', opal.dictionary.add_arguments,opal.dictionary.do_command)
-add_subcommand('data', 'Query Opal data.', opal.data.add_arguments,opal.data.do_command)
-add_subcommand('file', 'Query Opal file system.', opal.file.add_arguments,opal.file.do_command)
+add_subcommand('dict', 'Query for data dictionary.', opal.dictionary.add_arguments,opal.dictionary.do_command)
+add_subcommand('data', 'Query for data.', opal.data.add_arguments,opal.data.do_command)
+add_subcommand('entity', 'Query for entities (Participant, etc.).', opal.entity.add_arguments,opal.entity.do_command)
+add_subcommand('file', 'Manage Opal file system.', opal.file.add_arguments,opal.file.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,opal.rest.do_command)
-add_subcommand('entity', 'as', opal.entity.add_arguments,opal.entity.do_command)
 
 # Execute selected command
 args = parser.parse_args()
