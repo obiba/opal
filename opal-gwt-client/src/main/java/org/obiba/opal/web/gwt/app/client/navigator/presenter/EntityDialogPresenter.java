@@ -34,9 +34,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Event;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -97,6 +100,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
         getView().hide();
       }
     }));
+    setEscapeKeyUpHandler();
   }
 
   @Override
@@ -104,6 +108,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
     getView().setEntityType(entityType);
     getView().setEntityId(entityId);
     getView().setValueViewHandler(new ValueSequenceHandlerImpl());
+    getView().setVariablesFilterHandler(new VariablesFilterHandlerImpl());
 
     loadTables();
   }
@@ -126,61 +131,97 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
         }).send();
   }
 
-  private void loadVariables(final TableDto table) {
+  private void loadVariables(TableDto table) {
+    loadVariables(table, "");
+  }
+
+  private void loadVariables(final TableDto table, final String select) {
     UriBuilder uriBuilder = UriBuilder.create()
         .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables");
 
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
+    StringBuilder link = new StringBuilder(uriBuilder.build());
+
+    if(!select.isEmpty()) {
+      link.append("?script=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(select) + "/)"));
+    }
+
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link.toString()).get()
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseErrorCallback(getEventBus(), "InternalError"))
         .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariablesFound"))
         .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
           @Override
           public void onResource(Response response, JsArray<VariableDto> resource) {
             buildVariableMap(resource);
-            loadValueSets(table);
+            loadValueSets(table, select);
+          }
+
+          private void buildVariableMap(JsArray<VariableDto> variables) {
+            variablesMap = new HashMap<String, VariableDto>();
+
+            for(int i = 0; i < variables.length(); i++) {
+              VariableDto variable = variables.get(i);
+              variablesMap.put(variable.getName(), variable);
+            }
+          }
+
+          private void loadValueSets(TableDto table, String filter) {
+            UriBuilder uriBuilder = UriBuilder.create()
+                .segment("datasource", table.getDatasourceName(), "table", table.getName(), "valueSet", entityId);
+
+            StringBuilder link = new StringBuilder(uriBuilder.build());
+
+            if(!filter.isEmpty()) {
+              link.append("?select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
+            }
+
+            ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link.toString()).get()
+                .withCallback(Response.SC_INTERNAL_SERVER_ERROR,
+                    new ResponseErrorCallback(getEventBus(), "InternalError"))
+                .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariableValuesFound"))
+                .withCallback(new ResourceCallback<ValueSetsDto>() {
+                  @Override
+                  public void onResource(Response response, ValueSetsDto resource) {
+                    populateRows(resource);
+                  }
+
+                  private void populateRows(ValueSetsDto valueSets) {
+                    JsArrayString variables = valueSets.getVariablesArray();
+                    JsArray<ValueSetsDto.ValueSetDto> valueSetList = valueSets.getValueSetsArray();
+                    JsArray<ValueSetsDto.ValueDto> values = valueSetList.get(0).getValuesArray();
+
+                    List<VariableValueRow> rows = new ArrayList<VariableValueRow>();
+                    int variableCount = variables.length();
+
+                    for(int i = 0; i < variableCount; i++) {
+                      String variableName = variables.get(i);
+                      rows.add(new VariableValueRow(variableName, values.get(i), variablesMap.get(variableName)));
+                    }
+
+                    getView().renderRows(rows);
+                  }
+                }).send();
           }
         }).send();
   }
 
-  @SuppressWarnings("anonymous")
-  private void loadValueSets(TableDto table) {
-    UriBuilder uriBuilder = UriBuilder.create()
-        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "valueSet", entityId);
+  private String cleanFilter(String filter) {
+    return filter.replaceAll("/", "\\\\/");
+  }
 
-    ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(uriBuilder.build()).get()
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseErrorCallback(getEventBus(), "InternalError"))
-        .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariableValuesFound"))
-        .withCallback(new ResourceCallback<ValueSetsDto>() {
-          @Override
-          public void onResource(Response response, ValueSetsDto resource) {
-            populateRows(resource);
+  // TODO Generalized this function so other Presenters can use it
+  private void setEscapeKeyUpHandler() {
+    Event.addNativePreviewHandler(new Event.NativePreviewHandler() {
+      @Override
+      public void onPreviewNativeEvent(Event.NativePreviewEvent event) {
+        Event nativeEvent = Event.as(event.getNativeEvent());
+        if(nativeEvent.getTypeInt() == Event.ONKEYUP) {
+          if(KeyCodes.KEY_ESCAPE == nativeEvent.getKeyCode())
+          {
+            getView().hide();
           }
-        }).send();
-  }
-
-  private void buildVariableMap(JsArray<VariableDto> variables) {
-    variablesMap = new HashMap<String, VariableDto>();
-
-    for(int i = 0; i < variables.length(); i++) {
-      VariableDto variable = variables.get(i);
-      variablesMap.put(variable.getName(), variable);
-    }
-  }
-
-  private void populateRows(ValueSetsDto valueSets) {
-    JsArrayString variables = valueSets.getVariablesArray();
-    JsArray<ValueSetsDto.ValueSetDto> valueSetList = valueSets.getValueSetsArray();
-    JsArray<ValueSetsDto.ValueDto> values = valueSetList.get(0).getValuesArray();
-
-    List<VariableValueRow> rows = new ArrayList<VariableValueRow>();
-    int variableCount = variables.length();
-
-    for(int i = 0; i < variableCount; i++) {
-      String variableName = variables.get(i);
-      rows.add(new VariableValueRow(variableName, values.get(i), variablesMap.get(variableName)));
-    }
-
-    getView().renderRows(rows);
+        }
+      }
+    });
   }
 
   private static class ResponseErrorCallback implements ResponseCodeCallback {
@@ -220,6 +261,8 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
     void setTables(JsArray<TableDto> tables, TableDto selectedTable);
 
     void setValueViewHandler(ValueViewHandler handler);
+
+    void setVariablesFilterHandler(VariablesFilterHandler handler);
 
     void renderRows(List<VariableValueRow> rows);
 
@@ -286,6 +329,18 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
       StringBuilder link = new StringBuilder(selectedTable.getLink());
       link.append("/valueSet/").append(entityId).append("/variable/").append(variableDto.getName()).append("/value");
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
+    }
+  }
+
+  public interface VariablesFilterHandler {
+    void filterVariables(String filter);
+  }
+
+  private class VariablesFilterHandlerImpl implements VariablesFilterHandler {
+
+    @Override
+    public void filterVariables(String filter) {
+      loadVariables(selectedTable, filter);
     }
   }
 

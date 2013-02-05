@@ -38,6 +38,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   public DatasourceValuesStepPresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
+    valuesTablePresenter.setViewMode(ValuesTablePresenter.ViewMode.SIMPLE_MODE);
   }
 
   public void setDatasource(String datasource, final Collection<String> tableNames) {
