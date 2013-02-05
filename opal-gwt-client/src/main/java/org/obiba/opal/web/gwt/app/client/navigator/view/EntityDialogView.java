@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.List;
@@ -17,6 +26,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
@@ -35,18 +46,19 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-/**
- *
- */
 public class EntityDialogView extends PopupViewImpl implements EntityDialogPresenter.Display {
+
+  private static final int PAGE_SIZE = 20;
 
   @UiTemplate("EntityDialogView.ui.xml")
   interface EntityViewUiBinder extends UiBinder<DialogBox, EntityDialogView> {
@@ -79,6 +91,15 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   TableChooser tableChooser;
 
   @UiField
+  TextBox filter;
+
+  @UiField
+  Image refreshPending;
+
+  @UiField
+  Button refreshButton;
+
+  @UiField
   Button closeButton;
 
   @UiField
@@ -92,7 +113,11 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   private ValueSelectionHandlerImpl valueSelectionHandler;
 
+  private EntityDialogPresenter.VariablesFilterHandler variablesFilterHandler;
+
   private EntityDialogPresenter.ValueViewHandler valueViewHandler;
+
+  private String lastFilter = "";
 
   @Inject
   public EntityDialogView(EventBus eventBus) {
@@ -102,7 +127,24 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
     resizeHandle.makeResizable(content);
     valueSelectionHandler = new ValueSelectionHandlerImpl();
     initializeTable();
+    initializeDisplayOptions();
     dialog.hide();
+  }
+
+  private void initializeDisplayOptions() {
+    refreshButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        if(!lastFilter.equals(filter.getText())) {
+          // variables list has changed so update all
+          lastFilter = filter.getText();
+          setRefreshing(true);
+          variablesFilterHandler.filterVariables(filter.getText());
+        }
+      }
+    });
+
   }
 
   @Override
@@ -134,6 +176,11 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   }
 
   @Override
+  public void setVariablesFilterHandler(EntityDialogPresenter.VariablesFilterHandler handler) {
+    variablesFilterHandler = handler;
+  }
+
+  @Override
   public TableDto getSelectedTable() {
     List<TableDto> tables = tableChooser.getSelectedTables();
     // there is only one table since the chooser is not multi select
@@ -162,9 +209,11 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   @Override
   public void renderRows(List<EntityDialogPresenter.VariableValueRow> rows) {
+    clearFilter();
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
+    setRefreshing(false);
   }
 
   private void clear() {
@@ -174,7 +223,13 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
       table.removeColumn(0);
     }
 
+    clearFilter();
     addTableColumns();
+  }
+
+  private void clearFilter() {
+    filter.setText("");
+    lastFilter = "";
   }
 
   private void addTableColumns() {
@@ -204,9 +259,14 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   private void initializeTable() {
     dataProvider.addDataDisplay(table);
-    table.setPageSize(NavigatorView.PAGE_SIZE);
+    table.setPageSize(PAGE_SIZE);
     table.setEmptyTableWidget(noTables);
     pager.setDisplay(table);
+  }
+
+  private void setRefreshing(boolean refresh) {
+    refreshPending.setVisible(refresh);
+    refreshButton.setEnabled(!refresh);
   }
 
   /**

@@ -31,6 +31,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
@@ -105,6 +106,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   Image refreshPending;
 
   @UiField
+  FlowPanel searchPanel;
+
+  @UiField
   com.github.gwtbootstrap.client.ui.TextBox searchBox;
 
   @UiField
@@ -131,6 +135,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private String lastFilter = "";
 
   private int maxVisibleColumns = DEFAULT_MAX_VISIBLE_COLUMNS;
+
+  private ValuesTablePresenter.ViewMode viewMode = ValuesTablePresenter.ViewMode.DETAILED_MODE;
 
   public ValuesTableView() {
     widget = uiBinder.createAndBindUi(this);
@@ -206,6 +212,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       dataProvider = null;
     }
 
+    searchBox.setText("");
+    filter.setText("");
     lastFilter = "";
     filter.setValue(lastFilter, false);
     setRefreshing(false);
@@ -213,32 +221,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
-    initValuesTable();
-
-    listVariable = JsArrays.toList(variables);
-    int visible = listVariable.size() < getMaxVisibleColumns() ? listVariable.size() : getMaxVisibleColumns();
-    for(int i = 0; i < visible; i++) {
-      valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnLabel(i));
-    }
-
-    if(listVariable.size() > getMaxVisibleColumns() + 1) {
-      valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
-      valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
-    }
-
-    if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getText().isEmpty()) {
-      lastFilter = "^" + escape(listVariable.get(0).getName()) + "$";
-      filter.setValue(lastFilter, false);
-    }
-
-    if(dataProvider != null) {
-      dataProvider.removeDataDisplay(valuesTable);
-      dataProvider = null;
-    }
-    valuesTable.setPageSize(pageSize.getNumberValue().intValue());
-    dataProvider = new ValueSetsDataProvider();
-    dataProvider.addDataDisplay(valuesTable);
+    setVariables(JsArrays.toList(variables));
   }
+
 
   private String escape(String string) {
     return string.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
@@ -252,6 +237,17 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @Override
   public void setValueSetsFetcher(DataFetcher provider) {
     fetcher = provider;
+  }
+
+  @Override
+  public void setViewMode(ValuesTablePresenter.ViewMode mode) {
+    viewMode = mode;
+    searchPanel.setVisible(viewMode == ValuesTablePresenter.ViewMode.DETAILED_MODE);
+
+    if (listVariable != null && !listVariable.isEmpty()) {
+      setTable(table);
+      setVariables(listVariable);
+    }
   }
 
   //
@@ -290,12 +286,48 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     return col;
   }
 
+  private void setVariables(List<VariableDto> variables) {
+    initValuesTable();
+
+    listVariable = variables;
+    int visible = listVariable.size() < getMaxVisibleColumns() ? listVariable.size() : getMaxVisibleColumns();
+    for(int i = 0; i < visible; i++) {
+      valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnLabel(i));
+    }
+
+    if(listVariable.size() > getMaxVisibleColumns() + 1) {
+      valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
+      valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
+    }
+
+    if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getText().isEmpty()) {
+      lastFilter = "^" + escape(listVariable.get(0).getName()) + "$";
+      filter.setValue(lastFilter, false);
+    }
+
+    if(dataProvider != null) {
+      dataProvider.removeDataDisplay(valuesTable);
+      dataProvider = null;
+    }
+    valuesTable.setPageSize(pageSize.getNumberValue().intValue());
+    dataProvider = new ValueSetsDataProvider();
+    dataProvider.addDataDisplay(valuesTable);
+  }
+
   private void initValuesTable() {
     while(valuesTable.getColumnCount() > 0) {
       valuesTable.removeColumn(0);
     }
     firstVisibleIndex = 0;
 
+    Column<ValueSetDto, ?> entityColumn = viewMode == ValuesTablePresenter.ViewMode.SIMPLE_MODE ? createTextEntityColumn() : createClickableEntityColumn();
+
+    setMinimumWidth(entityColumn);
+
+    valuesTable.addColumn(entityColumn, table.getEntityType());
+  }
+
+  private Column<ValueSetDto, ?> createClickableEntityColumn() {
     ClickableColumn<ValueSetDto> entityColumn = new ClickableColumn<ValueSetDto>() {
 
       @Override
@@ -304,6 +336,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       }
 
     };
+
     if(entitySelectionHandler == null) {
       entitySelectionHandler = new EntitySelectionHandlerImpl();
     }
@@ -314,9 +347,18 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         entitySelectionHandler.onEntitySelection(table.getEntityType(), valueSetDto.getIdentifier());
       }
     });
-    setMinimumWidth(entityColumn);
 
-    valuesTable.addColumn(entityColumn, table.getEntityType());
+    return entityColumn;
+  }
+
+  private Column<ValueSetDto, ?> createTextEntityColumn() {
+    return new TextColumn<ValueSetDto>() {
+
+      @Override
+      public String getValue(ValueSetDto value) {
+        return value.getIdentifier();
+      }
+    };
   }
 
   private Header<String> createHeader(AbstractCell<String> cell) {
@@ -510,8 +552,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   }
 
-  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto>
-      implements ValuesTablePresenter.ValueSetsProvider {
+  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements
+      ValuesTablePresenter.ValueSetsProvider {
 
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
