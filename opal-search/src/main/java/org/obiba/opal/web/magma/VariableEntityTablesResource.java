@@ -160,10 +160,7 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
             ValueTable valueTable = map.get(indexName);
 
             if(valueTable != null) {
-              Magma.TableDto tableDto = Magma.TableDto.newBuilder()
-                  .setDatasourceName(valueTable.getDatasource().getName()).setName(valueTable.getName())
-                  .setEntityType(valueTable.getEntityType()).build();
-
+              Magma.TableDto tableDto = Dtos.asDto(valueTable, false).build();
               result.getValue().add(tableDto);
             }
           }
@@ -232,9 +229,7 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
       for(ValueTable valueTable : query.getTableFilter()) {
 
         if(valueTable.hasValueSet(query.getEntity())) {
-          Magma.TableDto tableDto = Magma.TableDto.newBuilder().setDatasourceName(valueTable.getDatasource().getName())
-              .setName(valueTable.getName()).setEntityType(valueTable.getEntityType()).build();
-
+          Magma.TableDto tableDto = Dtos.asDto(valueTable, false).build();
           result.getValue().add(tableDto);
 
           if(limit > 0 && result.getValue().size() == limit) {

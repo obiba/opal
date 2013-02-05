@@ -11,7 +11,7 @@
      <g:InlineLabel ui:field="noValues"><ui:msg description="No Values label">No Values</ui:msg></g:InlineLabel>
      <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"></g:PopupPanel>
 
-    <g:FlowPanel>
+    <g:FlowPanel ui:field="searchPanel">
       <b:InputAddOn prependIcon="SEARCH">
         <b:TextBox ui:field="searchBox" searchQuery="true" placeholder="search an entity..." />
       </b:InputAddOn>

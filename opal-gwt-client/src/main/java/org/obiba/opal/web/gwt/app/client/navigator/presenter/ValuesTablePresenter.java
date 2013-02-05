@@ -93,6 +93,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
+  public void setViewMode(ViewMode mode) {
+    getView().setViewMode(mode);
+  }
+
   private class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
     private final TableDto table;
@@ -285,7 +289,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void setValueSetsFetcher(DataFetcher fetcher);
 
     void addEntitySearchHandler(EntitySearchHandler handler);
+
+    void setViewMode(ViewMode mode);
   }
+
+  public enum ViewMode {
+    DETAILED_MODE,
+    SIMPLE_MODE;
+  };
 
   public interface DataFetcher {
     void request(List<VariableDto> variables, int offset, int limit);
