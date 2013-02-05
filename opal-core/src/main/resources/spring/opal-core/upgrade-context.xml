@@ -232,6 +232,25 @@
           <property name="appliesTo" value="1.11.0"/>
         </bean>
 
+        <!-- 1.11.2 / alter binaries table engine -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.binary.SqlBinariesTableEngineUpgradeStep">
+          <property name="description" value="Change binary value table engine to InnoDB."/>
+          <property name="opalConfigurationProvider" ref="opalConfigurationProvider"/>
+          <property name="opalDataSource" ref="opalDataSource"/>
+          <property name="keyDataSource" ref="keyDataSource"/>
+          <property name="dataSourceFactory" ref="dataSourceFactory"/>
+          <property name="appliesTo" value="1.11.2"/>
+          <property name="sqlScriptUpgradeStep">
+            <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+              <property name="description" value="Change binary value table engine to InnoDB."/>
+              <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.11.x/"/>
+              <property name="scriptBasename" value="fix_binary_value_engine"/>
+              <property name="dataSource" ref="opalDataSource"/>
+              <property name="appliesTo" value="1.11.2"/>
+            </bean>
+          </property>
+        </bean>
+
       </list>
     </property>
 
