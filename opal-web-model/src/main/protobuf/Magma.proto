@@ -8,6 +8,9 @@ message DatasourceFactoryDto {
   optional string name = 1;
   optional bool incremental = 2 [default = false];
   optional string incrementalDestinationName = 3;
+  optional string unit = 4;
+  optional bool unitAllowIdentifierGeneration = 5 [default = false];
+  optional bool unitIgnoreUnknownIdentifier = 6 [default = false];
   extensions 1000 to max;
 }
 
@@ -41,8 +44,7 @@ message CsvDatasourceTableBundleDto {
 
 message FsDatasourceFactoryDto {
   required string file = 1;
-  optional string unit = 2;
-  optional bool onyxWrapper = 3 [default = true]; // required to read correctly old onyx versions are until 1.6 included 
+  optional bool onyxWrapper = 3 [default = true]; // required to read correctly old onyx versions are until 1.6 included
   extend DatasourceFactoryDto {
     optional FsDatasourceFactoryDto params = 1002;
   }

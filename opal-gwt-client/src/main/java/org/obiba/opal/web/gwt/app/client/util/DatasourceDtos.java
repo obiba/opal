@@ -17,6 +17,8 @@ import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.LimesurveyDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.RestDatasourceFactoryDto;
 
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
 /**
@@ -46,18 +48,8 @@ public class DatasourceDtos {
     LimesurveyDatasourceFactoryDto factoryDto = LimesurveyDatasourceFactoryDto.create();
     factoryDto.setDatabase(importData.getDatabase());
     factoryDto.setTablePrefix(importData.getTablePrefix());
-
-    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    configureIncremental(importData, dto);
-    dto.setExtension(LimesurveyDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
-    return dto;
-  }
-
-  private static void configureIncremental(ImportData importData, DatasourceFactoryDto dto) {
-    if(importData.isIncremental()) {
-      dto.setIncremental(true);
-      dto.setIncrementalDestinationName(importData.getDestinationDatasourceName());
-    }
+    return createAndConfigureDatasourceFactoryDto(importData,
+        LimesurveyDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createRestDatasourceFactoryDto(ImportData importData) {
@@ -67,10 +59,8 @@ public class DatasourceDtos {
     factoryDto.setPassword(importData.getString("password"));
     factoryDto.setRemoteDatasource(importData.getString("remoteDatasource"));
 
-    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    configureIncremental(importData, dto);
-    dto.setExtension(RestDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
-    return dto;
+    return createAndConfigureDatasourceFactoryDto(importData,
+        RestDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createCSVDatasourceFactoryDto(ImportData importData) {
@@ -94,24 +84,40 @@ public class DatasourceDtos {
     factoryDto.setSeparator(importData.getField());
     factoryDto.setTablesArray(tables);
 
-    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    configureIncremental(importData, dto);
-    dto.setExtension(CsvDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
-
-    return dto;
+    return createAndConfigureDatasourceFactoryDto(importData,
+        CsvDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createXMLDatasourceFactoryDto(ImportData importData) {
 
     FsDatasourceFactoryDto factoryDto = FsDatasourceFactoryDto.create();
     factoryDto.setFile(importData.getXmlFile());
-    factoryDto.setUnit(importData.getUnit());
     factoryDto.setOnyxWrapper(true);
+    return createAndConfigureDatasourceFactoryDto(importData,
+        FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
+  }
 
+  private static DatasourceFactoryDto createAndConfigureDatasourceFactoryDto(ImportData importData,
+      String extensionName, JavaScriptObject extension) {
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    configureUnit(importData, dto);
     configureIncremental(importData, dto);
-    dto.setExtension(FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
-
+    dto.setExtension(extensionName, extension);
     return dto;
+  }
+
+  private static void configureIncremental(ImportData importData, DatasourceFactoryDto dto) {
+    if(importData.isIncremental()) {
+      dto.setIncremental(true);
+      dto.setIncrementalDestinationName(importData.getDestinationDatasourceName());
+    }
+  }
+
+  private static void configureUnit(ImportData importData, DatasourceFactoryDto dto) {
+    if(!Strings.isNullOrEmpty(importData.getUnit())) {
+      dto.setUnit(importData.getUnit());
+      dto.setUnitAllowIdentifierGeneration(importData.isAllowIdentifierGeneration());
+      dto.setUnitIgnoreUnknownIdentifier(importData.isIgnoreUnknownIdentifier());
+    }
   }
 }

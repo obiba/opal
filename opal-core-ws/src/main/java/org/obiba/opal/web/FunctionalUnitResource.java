@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -81,11 +81,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 @Component
 @Scope("request")
@@ -110,7 +110,9 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   private String unit;
 
   @Autowired
-  public FunctionalUnitResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime, UnitKeyStoreService unitKeyStoreService, ImportService importService, DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableService) {
+  public FunctionalUnitResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime,
+      UnitKeyStoreService unitKeyStoreService, ImportService importService,
+      DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableService) {
     this.functionalUnitService = functionalUnitService;
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
@@ -128,8 +130,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     FunctionalUnit functionalUnit = resolveFunctionalUnit(unit);
 
     Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
-    setName(functionalUnit.getName()). //
-    setKeyVariableName(functionalUnit.getKeyVariableName());
+        setName(functionalUnit.getName()). //
+        setKeyVariableName(functionalUnit.getKeyVariableName());
     if(functionalUnit.getSelect() != null && functionalUnit.getSelect() instanceof JavascriptClause) {
       fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
     }
@@ -138,10 +140,10 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   }
 
   @PUT
-  public Response createOrUpdateFunctionalUnit(@Context
-  UriInfo uri, Opal.FunctionalUnitDto unitDto) {
+  public Response createOrUpdateFunctionalUnit(@Context UriInfo uri, Opal.FunctionalUnitDto unitDto) {
     if(!unit.equals(unitDto.getName())) {
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "WrongFunctionalUnitArgument").build()).build();
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "WrongFunctionalUnitArgument").build()).build();
     }
 
     ResponseBuilder response = null;
@@ -161,7 +163,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       getFunctionalUnitService().addOrReplaceFunctionalUnit(functionalUnit);
 
     } catch(RuntimeException e) {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+      response = Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
     }
 
     return response.build();
@@ -213,7 +216,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     });
 
     writer.close();
-    return Response.ok(ids.toByteArray(), MediaType.TEXT_PLAIN).header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.txt\"").build();
+    return Response.ok(ids.toByteArray(), MediaType.TEXT_PLAIN)
+        .header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.txt\"").build();
   }
 
   @GET
@@ -230,20 +234,21 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       public void onValue(UnitIdentifier unitIdentifier) {
         if(unitIdentifier.hasUnitIdentifier()) {
           writer.append("\"").append(unitIdentifier.getOpalIdentifier()).append("\",")//
-          .append(unitIdentifier.hasUnitIdentifier() ? "\"" + unitIdentifier.getUnitIdentifier() + "\"" : "").append("\n");
+              .append(unitIdentifier.hasUnitIdentifier() ? "\"" + unitIdentifier.getUnitIdentifier() + "\"" : "")
+              .append("\n");
         }
       }
 
     });
 
     writer.close();
-    return Response.ok(ids.toByteArray(), "text/csv").header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.csv\"").build();
+    return Response.ok(ids.toByteArray(), "text/csv")
+        .header("Content-Disposition", "attachment; filename=\"" + unit + "-identifiers.csv\"").build();
   }
 
   @POST
   @Path("/entities")
-  public Response importIdentifiers(DatasourceFactoryDto datasourceFactoryDto, @QueryParam("select")
-  String select) {
+  public Response importIdentifiers(DatasourceFactoryDto datasourceFactoryDto, @QueryParam("select") String select) {
     Response response = null;
 
     Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
@@ -252,11 +257,15 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       importService.importIdentifiers(unit, sourceDatasource.getName(), select);
       response = Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+      response = Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
-      response = Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+      response = Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
     } catch(IOException ex) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build()).build();
+      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(
+          ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build())
+          .build();
     } finally {
       Disposables.silentlyDispose(sourceDatasource);
     }
@@ -266,10 +275,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @POST
   @Path("/entities/identifiers")
-  public Response importIdentifiers(@QueryParam("size")
-  Integer size, @QueryParam("zeros")
-  Boolean zeros, @QueryParam("prefix")
-  String prefix) {
+  public Response importIdentifiers(@QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros,
+      @QueryParam("prefix") String prefix) {
     try {
       DefaultParticipantIdentifierImpl pId = new DefaultParticipantIdentifierImpl();
       if(size != null) pId.setKeySize(size);
@@ -278,20 +285,22 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       int count = importService.importIdentifiers(unit, pId);
       return Response.ok().entity(Integer.toString(count)).build();
     } catch(NoSuchDatasourceException ex) {
-      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
     } catch(NoSuchValueTableException ex) {
-      return Response.status(Status.NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+      return Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
     } catch(MagmaRuntimeException ex) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex).build()).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex).build())
+          .build();
     }
   }
 
   @PUT
   @Path("/entities/identifiers/map")
-  public Response mapIdentifiers(@QueryParam("path")
-  String path, @QueryParam("create")
-  @DefaultValue("false")
-  boolean create) {
+  public Response mapIdentifiers(@QueryParam("path") String path,
+      @QueryParam("create") @DefaultValue("false") boolean create) {
     try {
       // the file is expected to be of CSV format
       File mapFile = resolveLocalFile(path);
@@ -309,11 +318,13 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       return Response.ok().entity(Integer.toString(doMapIdentifiers(drivingUnit, units, rows, unitIdx))).build();
     } catch(Exception e) {
       log.error("Mapping failed", e);
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
     }
   }
 
-  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, List<String[]> rows, int unitIdx) throws NoSuchValueTableException, IOException {
+  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, List<String[]> rows, int unitIdx)
+      throws NoSuchValueTableException, IOException {
     ImmutableSet.Builder<String> ids = ImmutableSet.builder();
     for(String[] map : rows) {
       if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
@@ -323,8 +334,10 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     importIdentifiers(drivingUnit, ids.build());
   }
 
-  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, List<String[]> rows, int unitIdx) throws IOException {
-    FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
+  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, List<String[]> rows, int unitIdx)
+      throws IOException {
+    FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(),
+        drivingUnit, units);
     int count = 0;
     for(String[] map : rows) {
       if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
@@ -337,10 +350,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @PUT
   @Path("/entities/identifiers/map/functional-unit/{toUnit}")
-  public Response mapIdentifiers(List<EntryDto> identifiers, @PathParam("toUnit")
-  String toUnit, @QueryParam("create")
-  @DefaultValue("false")
-  boolean create) {
+  public Response mapIdentifiers(List<EntryDto> identifiers, @PathParam("toUnit") String toUnit,
+      @QueryParam("create") @DefaultValue("false") boolean create) {
     try {
       List<FunctionalUnit> units = getUnitsFromName(unit, toUnit);
       FunctionalUnit drivingUnit = determineDrivingUnit(units);
@@ -353,11 +364,13 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       return Response.ok().entity(Integer.toString(doMapIdentifiers(drivingUnit, units, identifiers))).build();
     } catch(Exception e) {
       log.error("Mapping failed", e);
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
     }
   }
 
-  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, List<EntryDto> identifiers) throws NoSuchValueTableException, IOException {
+  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, List<EntryDto> identifiers)
+      throws NoSuchValueTableException, IOException {
     ImmutableSet.Builder<String> ids = ImmutableSet.builder();
     for(EntryDto entry : identifiers) {
       ids.add(entry.getKey());
@@ -365,11 +378,13 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     importIdentifiers(drivingUnit, ids.build());
   }
 
-  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, List<EntryDto> identifiers) throws IOException {
-    FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(), drivingUnit, units);
+  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, List<EntryDto> identifiers)
+      throws IOException {
+    FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(),
+        drivingUnit, units);
     int count = 0;
     for(EntryDto entry : identifiers) {
-      count += mapper.associate(entry.getKey(), units, new String[] { entry.getKey(), entry.getValue() });
+      count += mapper.associate(entry.getKey(), units, entry.getKey(), entry.getValue());
     }
     mapper.write();
     return count;
@@ -404,7 +419,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @Path("/keys")
   public Response createFunctionalUnitKeyPair(Opal.KeyForm kpForm) {
     if(unitKeyStoreService.aliasExists(unit, kpForm.getAlias())) {
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "KeyPairAlreadyExists").build()).build();
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "KeyPairAlreadyExists").build()).build();
     }
 
     ResponseBuilder response = null;
@@ -415,10 +431,12 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
         response = doImportCertificate(kpForm);
       }
       if(response == null) {
-        response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).path("/key/" + kpForm.getAlias()).build(unit));
+        response = Response.created(
+            UriBuilder.fromPath("/").path(FunctionalUnitResource.class).path("/key/" + kpForm.getAlias()).build(unit));
       }
     } catch(Exception e) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e).build());
+      response = Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e).build());
     }
 
     return response.build();
@@ -426,8 +444,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @DELETE
   @Path("/key/{alias}")
-  public Response deleteFunctionalUnitKeyPair(@PathParam("alias")
-  String alias) {
+  public Response deleteFunctionalUnitKeyPair(@PathParam("alias") String alias) {
     if(!unitKeyStoreService.aliasExists(unit, alias)) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -437,7 +454,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       unitKeyStoreService.deleteKey(unit, alias);
       response = Response.ok();
     } catch(RuntimeException e) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DeleteKeyPairFailed", e).build());
+      response = Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DeleteKeyPairFailed", e).build());
     }
 
     return response.build();
@@ -446,20 +464,23 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @GET
   @Path("/key/{alias}/certificate")
   @AuthenticatedByCookie
-  public Response getFunctionalUnitKeyPairCertificate(@PathParam("alias")
-  String alias) throws KeyStoreException, IOException {
+  public Response getFunctionalUnitKeyPairCertificate(@PathParam("alias") String alias)
+      throws KeyStoreException, IOException {
     UnitKeyStore keystore = unitKeyStoreService.getUnitKeyStore(unit);
 
-    return Response.ok(getPEMCertificate(keystore, alias), MediaType.TEXT_PLAIN_TYPE).header("Content-disposition", "attachment; filename=\"" + unit + "-" + alias + "-certificate.pem\"").build();
+    return Response.ok(getPEMCertificate(keystore, alias), MediaType.TEXT_PLAIN_TYPE)
+        .header("Content-disposition", "attachment; filename=\"" + unit + "-" + alias + "-certificate.pem\"").build();
   }
 
   //
   // Private methods
   //
 
-  private void importIdentifiers(FunctionalUnit drivingUnit, Set<String> ids) throws NoSuchValueTableException, IOException {
+  private void importIdentifiers(FunctionalUnit drivingUnit, Set<String> ids)
+      throws NoSuchValueTableException, IOException {
     StaticDatasource ds = new StaticDatasource("ids-import");
-    StaticValueTable vt = new StaticValueTable(ds, identifiersTableService.getTableName(), ids, identifiersTableService.getEntityType());
+    StaticValueTable vt = new StaticValueTable(ds, identifiersTableService.getTableName(), ids,
+        identifiersTableService.getEntityType());
     ds.addValueTable(vt);
     if(drivingUnit.getName().equals(FunctionalUnit.OPAL_INSTANCE)) {
       importService.importIdentifiers(ds);
@@ -470,9 +491,11 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   private ResponseBuilder doImportCertificate(Opal.KeyForm kpForm) {
     try {
-      unitKeyStoreService.importCertificate(this.unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+      unitKeyStoreService.importCertificate(this.unit, kpForm.getAlias(),
+          new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
     } catch(MagmaCryptRuntimeException e) {
-      return Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "InvalidCertificate").build());
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "InvalidCertificate").build());
     }
     return null;
   }
@@ -480,11 +503,13 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;
     if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
-      unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(), kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
+      unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(),
+          kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
     } else if(kpForm.hasPrivateImport()) {
       response = doImportKeyPair(kpForm);
     } else {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
+      response = Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
     }
     return response;
   }
@@ -492,11 +517,16 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   private ResponseBuilder doImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;
     if(kpForm.hasPublicForm()) {
-      unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), getCertificateInfo(kpForm.getPublicForm()));
+      unitKeyStoreService
+          .importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()),
+              getCertificateInfo(kpForm.getPublicForm()));
     } else if(kpForm.hasPublicImport()) {
-      unitKeyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+      unitKeyStoreService
+          .importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()),
+              new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
     } else {
-      response = Response.status(Status.BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPublicKeyArgument").build());
+      response = Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPublicKeyArgument").build());
     }
     return response;
   }
@@ -509,7 +539,9 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   }
 
   private Iterable<VariableEntityDto> getUnitEntities() {
-    return Iterables.transform(new FunctionalUnitIdentifiers(identifiersTableService.getValueTable(), resolveFunctionalUnit(unit)).getUnitEntities(), Dtos.variableEntityAsDtoFunc);
+    return Iterables.transform(
+        new FunctionalUnitIdentifiers(identifiersTableService.getValueTable(), resolveFunctionalUnit(unit))
+            .getUnitEntities(), Dtos.variableEntityAsDtoFunc);
   }
 
   private String getPEMCertificate(UnitKeyStore keystore, String alias) throws KeyStoreException, IOException {
@@ -524,7 +556,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   }
 
   private String getCertificateInfo(Opal.PublicKeyForm pkForm) {
-    return "CN=" + pkForm.getName() + ", OU=" + pkForm.getOrganizationalUnit() + ", O=" + pkForm.getOrganization() + ", L=" + pkForm.getLocality() + ", ST=" + pkForm.getState() + ", C=" + pkForm.getCountry();
+    return "CN=" + pkForm.getName() + ", OU=" + pkForm.getOrganizationalUnit() + ", O=" + pkForm.getOrganization() +
+        ", L=" + pkForm.getLocality() + ", ST=" + pkForm.getState() + ", C=" + pkForm.getCountry();
   }
 
   private void sortByName(List<Opal.KeyDto> units) {

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -17,18 +17,12 @@ import org.obiba.opal.core.service.UnitKeyStoreService;
 /**
  * Represents an organization that fulfils the role of a "functional unit" of a Biobank.
  */
+@SuppressWarnings("UnusedDeclaration")
 public class FunctionalUnit {
-  //
-  // Constants
-  //
 
   public static final String OPAL_INSTANCE = "OpalInstance";
 
   public static final FunctionalUnit OPAL = new FunctionalUnit(OPAL_INSTANCE, OPAL_INSTANCE);
-
-  //
-  // Instance Variables
-  //
 
   private String name;
 
@@ -38,14 +32,10 @@ public class FunctionalUnit {
 
   private SelectClause select;
 
+  @SuppressWarnings("TransientFieldInNonSerializableClass")
   private transient UnitKeyStoreService unitKeyStoreService;
 
-  //
-  // Constructors
-  //
-
   public FunctionalUnit() {
-    super();
   }
 
   public FunctionalUnit(String name, String keyVariableName) {
@@ -56,10 +46,6 @@ public class FunctionalUnit {
   boolean isOpal() {
     return getName().equals(OPAL_INSTANCE);
   }
-
-  //
-  // Methods
-  //
 
   public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
     this.unitKeyStoreService = unitKeyStoreService;
@@ -98,11 +84,9 @@ public class FunctionalUnit {
   }
 
   public UnitKeyStore getKeyStore(boolean create) {
-    if(create) {
-      return unitKeyStoreService.getOrCreateUnitKeyStore(getName());
-    } else {
-      return unitKeyStoreService.getUnitKeyStore(getName());
-    }
+    return create
+        ? unitKeyStoreService.getOrCreateUnitKeyStore(getName())
+        : unitKeyStoreService.getUnitKeyStore(getName());
   }
 
   public SelectClause getSelect() {

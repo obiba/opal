@@ -1,16 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.core.magma;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.Set;
 
@@ -33,6 +30,9 @@ import org.obiba.opal.core.unit.FunctionalUnit;
 
 import com.google.common.collect.ImmutableSet;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 /**
  *
  */
@@ -54,7 +54,8 @@ public class FunctionalUnitViewTest {
     // 2,2,2
     // 3,3,3
     // 4,4,4
-    opalDataTable = new StaticValueTable(EasyMock.createMock(Datasource.class), "opal-table", ImmutableSet.of("1", "2", "3", "4"));
+    opalDataTable = new StaticValueTable(EasyMock.createMock(Datasource.class), "opal-table",
+        ImmutableSet.of("1", "2", "3", "4"));
     opalDataTable.addVariables(IntegerType.get(), "Var1", "Var2");
     for(int i = 1; i < 5; i++) {
       opalDataTable.addValues("" + i, "Var1", i, "Var2", i);
@@ -66,7 +67,8 @@ public class FunctionalUnitViewTest {
     // private-1,2,2
     // private-1,3,3
     // private-1,4,4
-    unitDataTable = new StaticValueTable(EasyMock.createMock(Datasource.class), "unit-table", ImmutableSet.of("private-1", "private-2", "private-3", "private-4"));
+    unitDataTable = new StaticValueTable(EasyMock.createMock(Datasource.class), "unit-table",
+        ImmutableSet.of("private-1", "private-2", "private-3", "private-4"));
     unitDataTable.addVariables(IntegerType.get(), "Var1", "Var2");
     for(int i = 1; i < 5; i++) {
       unitDataTable.addValues("private-" + i, "Var1", i, "Var2", i);
@@ -78,7 +80,8 @@ public class FunctionalUnitViewTest {
     // 2,private-2
     // 3,private-3
     // 4,private-4
-    keysTable = new StaticValueTable(EasyMock.createMock(Datasource.class), "keys-table", ImmutableSet.of("1", "2", "3", "4"));
+    keysTable = new StaticValueTable(EasyMock.createMock(Datasource.class), "keys-table",
+        ImmutableSet.of("1", "2", "3", "4"));
     keysTable.addVariables(TextType.get(), "keys-variable");
     for(int i = 1; i < 5; i++) {
       keysTable.addValues("" + i, "keys-variable", "private-" + i);
@@ -173,7 +176,7 @@ public class FunctionalUnitViewTest {
     FunctionalUnitView fuv = createViewOnOpalDataTable();
     for(int i = 1; i < 5; i++) {
       try {
-        ValueSet vs = fuv.getValueSet(new VariableEntityBean("", "" + i));
+        fuv.getValueSet(new VariableEntityBean("", "" + i));
         // Must not reach this point
         assertThat(true, is(false));
       } catch(NoSuchValueSetException e) {
@@ -188,7 +191,7 @@ public class FunctionalUnitViewTest {
     FunctionalUnitView fuv = createViewOnUnitDataTable();
     for(int i = 1; i < 5; i++) {
       try {
-        ValueSet vs = fuv.getValueSet(new VariableEntityBean("", "private-" + i));
+        fuv.getValueSet(new VariableEntityBean("", "private-" + i));
         // Must not reach this point
         assertThat(true, is(false));
       } catch(NoSuchValueSetException e) {
@@ -198,11 +201,13 @@ public class FunctionalUnitViewTest {
   }
 
   private FunctionalUnitView createViewOnOpalDataTable() {
-    return new FunctionalUnitView(new FunctionalUnit("myUnit", "keys-variable"), Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, opalDataTable, keysTable);
+    return new FunctionalUnitView(new FunctionalUnit("myUnit", "keys-variable"), Policy.UNIT_IDENTIFIERS_ARE_PUBLIC,
+        opalDataTable, keysTable);
   }
 
   private FunctionalUnitView createViewOnUnitDataTable() {
-    return new FunctionalUnitView(new FunctionalUnit("myUnit", "keys-variable"), Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, unitDataTable, keysTable);
+    return new FunctionalUnitView(new FunctionalUnit("myUnit", "keys-variable"), Policy.UNIT_IDENTIFIERS_ARE_PRIVATE,
+        unitDataTable, keysTable);
   }
 
 }

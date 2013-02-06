@@ -31,8 +31,6 @@ public class ImportData {
 
   private boolean identifierSharedWithUnit;
 
-  private String unit;
-
   private boolean archiveLeave;
 
   private boolean archiveMove;
@@ -57,6 +55,12 @@ public class ImportData {
 
   private Map<String, Object> properties;
 
+  private String unit;
+
+  private boolean allowIdentifierGeneration;
+
+  private boolean ignoreUnknownIdentifier;
+
   @SuppressWarnings("PMD.NcssMethodCount")
   public void clear() {
     importFormat = null;
@@ -78,6 +82,8 @@ public class ImportData {
     transientDatasourceName = null;
     database = null;
     tablePrefix = null;
+    allowIdentifierGeneration = false;
+    ignoreUnknownIdentifier = false;
   }
 
   public void setFormat(ImportFormat importFormat) {
@@ -263,5 +269,21 @@ public class ImportData {
   public String getString(String key) {
     Object value = getProperties().get(key);
     return value == null ? null : value.toString();
+  }
+
+  public boolean isAllowIdentifierGeneration() {
+    return allowIdentifierGeneration;
+  }
+
+  public void setAllowIdentifierGeneration(boolean allowIdentifierGeneration) {
+    this.allowIdentifierGeneration = allowIdentifierGeneration;
+  }
+
+  public boolean isIgnoreUnknownIdentifier() {
+    return ignoreUnknownIdentifier;
+  }
+
+  public void setIgnoreUnknownIdentifier(boolean ignoreUnknownIdentifier) {
+    this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
   }
 }

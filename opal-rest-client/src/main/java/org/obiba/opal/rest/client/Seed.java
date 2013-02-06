@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,9 +31,16 @@ import org.obiba.opal.web.model.Opal.FileDto;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class Seed {
 
-  private final Seeder[] seeders = new Seeder[] { new FileSystemSeeder(), new FunctionalUnitsSeeder(), new ReportsSeeder(), new DatasourcesSeeder(), new OpalXmlImportSeeder(), new CsvImportSeeder(), new ViewsSeeder() };
+  private final Seeder[] seeders = new Seeder[] { new FileSystemSeeder(), new FunctionalUnitsSeeder(),
+      new ReportsSeeder(), new DatasourcesSeeder(), new OpalXmlImportSeeder(), new CsvImportSeeder(),
+      new ViewsSeeder() };
 
   private final OpalJavaClient opalClient;
 
@@ -42,14 +48,15 @@ public class Seed {
 
   private final JSONObject seed;
 
-  public Seed(File seedFile, String uri, String username, String password) throws URISyntaxException, IOException, JSONException {
+  public Seed(File seedFile, String uri, String username, String password)
+      throws URISyntaxException, IOException, JSONException {
     this.seedFile = seedFile;
-    String seedStr = readFully(seedFile);
-    this.seed = new JSONObject(seedStr);
-    this.opalClient = new OpalJavaClient(uri + "/ws", username, password);
+    String seedStr = readFully();
+    seed = new JSONObject(seedStr);
+    opalClient = new OpalJavaClient(uri + "/ws", username, password);
   }
 
-  private String readFully(File seedFile) throws IOException {
+  private String readFully() throws IOException {
     StringBuilder builder = new StringBuilder();
     BufferedReader br = new BufferedReader(new FileReader(seedFile));
     try {
@@ -67,7 +74,7 @@ public class Seed {
   public void seed() {
     for(Seeder s : seeders) {
       try {
-        s.seed(this.seed);
+        s.seed(seed);
       } catch(JSONException e) {
         System.err.println("Error seeding Opal instance: " + e.getMessage());
         break;
@@ -79,19 +86,20 @@ public class Seed {
     System.out.println("All done.");
   }
 
-  private DatasourceDto createTransientDatasource(DatasourceFactoryDto dto) throws IOException {
+  private DatasourceDto createTransientDatasource(@SuppressWarnings("TypeMayBeWeakened") DatasourceFactoryDto dto)
+      throws IOException {
     HttpResponse r = opalClient.post(opalClient.newUri().segment("transient-datasources").build(), dto);
-    if(r.getStatusLine().getStatusCode() != 201) {
+    if(r.getStatusLine().getStatusCode() != SC_CREATED) {
       throw new IOException("Could not create datasource: " + r.getStatusLine().getReasonPhrase());
     }
     return DatasourceDto.newBuilder().mergeFrom(r.getEntity().getContent()).build();
   }
 
   private interface Seeder {
-    public void seed(JSONObject seed) throws JSONException, IOException;
+    void seed(JSONObject seed) throws JSONException, IOException;
   }
 
-  private abstract class ArraySeeder implements Seeder {
+  private abstract static class ArraySeeder implements Seeder {
 
     protected abstract String getKey();
 
@@ -117,9 +125,11 @@ public class Seed {
         HttpResponse r = opalClient.get(opalClient.newUri().segment("datasource", name).build());
         r.getEntity().consumeContent();
 
-        if(r.getStatusLine().getStatusCode() == 404) {
+        if(r.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
           System.out.println("Creating datasource " + name);
-          ignore(opalClient.post(opalClient.newUri().segment("datasources").build(), DatasourceFactoryDto.newBuilder().setName(name).setExtension(HibernateDatasourceFactoryDto.params, HibernateDatasourceFactoryDto.newBuilder().setKey(false).build()).build()));
+          ignore(opalClient.post(opalClient.newUri().segment("datasources").build(),
+              DatasourceFactoryDto.newBuilder().setName(name).setExtension(HibernateDatasourceFactoryDto.params,
+                  HibernateDatasourceFactoryDto.newBuilder().setKey(false).build()).build()));
         }
 
       }
@@ -142,9 +152,10 @@ public class Seed {
         String name = jsonDs.getString("name");
         HttpResponse r = opalClient.get(opalClient.newUri().segment("functional-unit", name).build());
         r.getEntity().consumeContent();
-        if(r.getStatusLine().getStatusCode() == 404) {
+        if(r.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
           System.out.println("Creating unit " + name);
-          ignore(opalClient.post(opalClient.newUri().segment("functional-units").build(), FunctionalUnitDto.newBuilder().setName(name).setKeyVariableName(name).build()));
+          ignore(opalClient.post(opalClient.newUri().segment("functional-units").build(),
+              FunctionalUnitDto.newBuilder().setName(name).setKeyVariableName(name).build()));
         }
       }
     }
@@ -165,9 +176,14 @@ public class Seed {
         String name = json.getString("name");
         HttpResponse r = opalClient.get(opalClient.newUri().segment("report-template", name).build());
         r.getEntity().consumeContent();
-        if(r.getStatusLine().getStatusCode() == 404) {
+        if(r.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
           System.out.println("Creating report " + name);
-          ignore(opalClient.post(opalClient.newUri().segment("report-templates").build(), ReportTemplateDto.newBuilder().setName(name).setFormat(json.optString("format", "PDF")).setDesign(json.optString("design", "/report designs/" + name + ".rptdesign")).addAllEmailNotification(json.optJSONArray("emails") == null ? Collections.<String> emptyList() : new JSONArrayIterable<String>(json.optJSONArray("emails"))).build()));
+          ignore(opalClient.post(opalClient.newUri().segment("report-templates").build(),
+              ReportTemplateDto.newBuilder().setName(name).setFormat(json.optString("format", "PDF"))
+                  .setDesign(json.optString("design", "/report designs/" + name + ".rptdesign"))
+                  .addAllEmailNotification(json.optJSONArray("emails") == null
+                      ? Collections.<String>emptyList()
+                      : new JSONArrayIterable<String>(json.optJSONArray("emails"))).build()));
         }
       }
     }
@@ -186,16 +202,10 @@ public class Seed {
       String fs = seed.optString("fs");
       if(fs != null) {
         File fsRoot;
-        if(fs.startsWith("/")) {
-          // Absolute location
-          fsRoot = new File(fs);
-        } else {
-          // Relative to location of seedFile
-          fsRoot = new File(seedFile.getParentFile(), fs);
-        }
+        fsRoot = fs.startsWith("/") ? new File(fs) : new File(seedFile.getParentFile(), fs);
 
         if(fsRoot.exists() && fsRoot.isDirectory() && fsRoot.canRead()) {
-          System.out.println("Seeding file fystem from " + fsRoot.getAbsolutePath());
+          System.out.println("Seeding file system from " + fsRoot.getAbsolutePath());
           seedDir(opalClient.newUri().segment("files", "meta"), opalClient.newUri().segment("files"), fsRoot);
           System.out.println("Done.");
         } else {
@@ -253,11 +263,12 @@ public class Seed {
 
         HttpResponse r = opalClient.get(opalClient.newUri().segment("datasource", destination, "view", name).build());
         r.getEntity().consumeContent();
-        if(r.getStatusLine().getStatusCode() == 404) {
+        if(r.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
           System.out.println(String.format("Creating view %s from file %s into %s", name, file, destination));
-          ViewDto dto = ViewDto.newBuilder().setName(name).addAllFrom(from).setExtension(FileViewDto.view, FileViewDto.newBuilder().setFilename(file).build()).build();
+          ViewDto dto = ViewDto.newBuilder().setName(name).addAllFrom(from)
+              .setExtension(FileViewDto.view, FileViewDto.newBuilder().setFilename(file).build()).build();
           r = opalClient.post(opalClient.newUri().segment("datasource", destination, "views").build(), dto);
-          if(r.getStatusLine().getStatusCode() != 201) {
+          if(r.getStatusLine().getStatusCode() != SC_CREATED) {
             throw new IOException("Could not create view: " + r.getStatusLine().getReasonPhrase());
           }
           ignore(r);
@@ -289,12 +300,18 @@ public class Seed {
     }
 
     private void importXml(String data, String destination, String unit) throws IOException {
-      FsDatasourceFactoryDto.Builder fs = FsDatasourceFactoryDto.newBuilder().setFile(data);
+
+      DatasourceFactoryDto.Builder dsFactoryDtoBuilder = DatasourceFactoryDto.newBuilder();
+      dsFactoryDtoBuilder.setName("xml");
       if(unit != null) {
-        fs.setUnit(unit);
+        dsFactoryDtoBuilder.setUnit(unit);
       }
-      DatasourceDto csv = createTransientDatasource(DatasourceFactoryDto.newBuilder().setName("xml").setExtension(FsDatasourceFactoryDto.params, fs.build()).build());
-      ImportCommandOptionsDto.Builder importCommand = ImportCommandOptionsDto.newBuilder().setDestination(destination).setSource(csv.getName());
+      dsFactoryDtoBuilder
+          .setExtension(FsDatasourceFactoryDto.params, FsDatasourceFactoryDto.newBuilder().setFile(data).build());
+
+      DatasourceDto csv = createTransientDatasource(dsFactoryDtoBuilder.build());
+      ImportCommandOptionsDto.Builder importCommand = ImportCommandOptionsDto.newBuilder().setDestination(destination)
+          .setSource(csv.getName());
       if(unit != null) {
         importCommand.setUnit(unit);
       }
@@ -325,29 +342,40 @@ public class Seed {
       }
     }
 
-    private void createTables(DatasourceDto source, String destination) throws ClientProtocolException, IOException {
+    private void createTables(DatasourceDto source, String destination) throws IOException {
       UriBuilder sourceUri = opalClient.newUri().segment("datasource", source.getName());
       for(String table : source.getTableList()) {
         HttpResponse r = opalClient.get(opalClient.newUri().segment("datasource", destination, "table", table).build());
         r.getEntity().consumeContent();
-        if(r.getStatusLine().getStatusCode() == 404) {
-          TableDto t = opalClient.getResource(TableDto.class, sourceUri.newBuilder().segment("table", table).build(), TableDto.newBuilder());
-          List<VariableDto> v = opalClient.getResources(VariableDto.class, sourceUri.newBuilder().segment("table", table, "variables").build(), VariableDto.newBuilder());
+        if(r.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
+          TableDto t = opalClient.getResource(TableDto.class, sourceUri.newBuilder().segment("table", table).build(),
+              TableDto.newBuilder());
+          List<VariableDto> v = opalClient
+              .getResources(VariableDto.class, sourceUri.newBuilder().segment("table", table, "variables").build(),
+                  VariableDto.newBuilder());
           ignore(opalClient.post(opalClient.newUri().segment("datasource", destination, "tables").build(), t));
-          ignore(opalClient.post(opalClient.newUri().segment("datasource", destination, "table", table, "variables").build(), v));
+          ignore(opalClient
+              .post(opalClient.newUri().segment("datasource", destination, "table", table, "variables").build(), v));
         }
       }
     }
 
     private void importCsv(String data, String dictionary, String destination, String unit) throws IOException {
-      DatasourceDto variables = createTransientDatasource(DatasourceFactoryDto.newBuilder().setName("none").setExtension(ExcelDatasourceFactoryDto.params, ExcelDatasourceFactoryDto.newBuilder().setFile(dictionary).setReadOnly(true).build()).build());
+      DatasourceDto variables = createTransientDatasource(DatasourceFactoryDto.newBuilder().setName("none")
+          .setExtension(ExcelDatasourceFactoryDto.params,
+              ExcelDatasourceFactoryDto.newBuilder().setFile(dictionary).setReadOnly(true).build()).build());
 
       createTables(variables, destination);
 
       String refTable = variables.getTable(0);
 
-      DatasourceDto csv = createTransientDatasource(DatasourceFactoryDto.newBuilder().setName("csv").setExtension(CsvDatasourceFactoryDto.params, CsvDatasourceFactoryDto.newBuilder().setSeparator(",").setQuote("\"").setCharacterSet("ISO-8859-1").addTables(CsvDatasourceTableBundleDto.newBuilder().setName(refTable).setData(data).setRefTable(destination + "." + refTable)).build()).build());
-      ImportCommandOptionsDto.Builder importCommand = ImportCommandOptionsDto.newBuilder().setDestination(destination).setSource(csv.getName());
+      DatasourceDto csv = createTransientDatasource(DatasourceFactoryDto.newBuilder().setName("csv")
+          .setExtension(CsvDatasourceFactoryDto.params,
+              CsvDatasourceFactoryDto.newBuilder().setSeparator(",").setQuote("\"").setCharacterSet("ISO-8859-1")
+                  .addTables(CsvDatasourceTableBundleDto.newBuilder().setName(refTable).setData(data)
+                      .setRefTable(destination + "." + refTable)).build()).build());
+      ImportCommandOptionsDto.Builder importCommand = ImportCommandOptionsDto.newBuilder().setDestination(destination)
+          .setSource(csv.getName());
       if(unit != null) {
         importCommand.setUnit(unit);
       }
@@ -397,15 +425,15 @@ public class Seed {
     if(r.getEntity() != null) {
       r.getEntity().consumeContent();
     }
-    if(r.getStatusLine().getStatusCode() >= 400) {
+    if(r.getStatusLine().getStatusCode() >= SC_BAD_REQUEST) {
       throw new RuntimeException(r.getStatusLine().getReasonPhrase());
     }
   }
 
-  public static void main(String[] args) throws IOException, URISyntaxException, JSONException {
+  public static void main(String... args) throws IOException, URISyntaxException, JSONException {
     File seedFile = new File(args[0]);
 
-    if(seedFile.exists() == false || seedFile.canRead() == false) {
+    if(!seedFile.exists() || !seedFile.canRead()) {
       throw new IllegalArgumentException("invalid seed file: " + seedFile.getAbsolutePath());
     }
 

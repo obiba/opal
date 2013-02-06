@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,8 +15,8 @@ import java.util.Map;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.unit.IdentifierAssociations.IdentifierAssociation;
@@ -36,7 +36,8 @@ public class FunctionalUnitIdentifierMapper {
 
   private final Map<String, IdentifierAssociation> associations;
 
-  public FunctionalUnitIdentifierMapper(ValueTable identifiersTable, FunctionalUnit drivingUnit, List<FunctionalUnit> units) {
+  public FunctionalUnitIdentifierMapper(ValueTable identifiersTable, FunctionalUnit drivingUnit,
+      List<FunctionalUnit> units) {
     this.identifiersTable = identifiersTable;
     this.drivingUnit = drivingUnit;
     this.units = units;
@@ -66,24 +67,27 @@ public class FunctionalUnitIdentifierMapper {
 
     // Builds an index with driving unit identifiers as keys and IdentifierAssociation as values. The index only
     // contains associations that have an identifier for the driving unit.
-    this.associations = Maps.uniqueIndex(Iterables.filter(new IdentifierAssociations(identifiersTable, units), associationsOfDrivingUnit), identifierOfDrivingUnit);
+    associations = Maps
+        .uniqueIndex(Iterables.filter(new IdentifierAssociations(identifiersTable, units), associationsOfDrivingUnit),
+            identifierOfDrivingUnit);
   }
 
-  public int associate(String drivingUnitIdentifier, List<FunctionalUnit> units, String[] identifiers) {
-    if(drivingUnitIdentifier == null || drivingUnitIdentifier.isEmpty()) throw new IllegalArgumentException("driving unit identifier cannot be empty");
+  public int associate(String drivingUnitIdentifier, List<FunctionalUnit> units, String... identifiers) {
+    if(drivingUnitIdentifier == null || drivingUnitIdentifier.isEmpty())
+      throw new IllegalArgumentException("driving unit identifier cannot be empty");
     int newAssociations = 0;
 
     IdentifierAssociation association = getAssociationForDrivingUnitIdentifier(drivingUnitIdentifier);
     for(int i = 0; i < units.size(); i++) {
       FunctionalUnit unit = units.get(i);
-      if(unit.getName().equals(this.drivingUnit.getName())) continue;
+      if(unit.getName().equals(drivingUnit.getName())) continue;
 
       String identifier = identifiers[i];
-      if(this.units.contains(unit) == false) {
+      if(!this.units.contains(unit)) {
         throw new IllegalStateException("unit '" + unit.getName() + "' was not prepared.");
       }
       // Do not associate to empty identifiers
-      if(identifier != null && identifier.isEmpty() == false) {
+      if(identifier != null && !identifier.isEmpty()) {
         if(association.set(unit.getName(), identifier)) {
           newAssociations++;
         }
@@ -103,9 +107,10 @@ public class FunctionalUnitIdentifierMapper {
     }
   }
 
-  private IdentifierAssociation getAssociationForDrivingUnitIdentifier(final String identifier) {
-    if(associations.containsKey(identifier) == false) {
-      throw new IllegalIdentifierAssociationException("Unit " + drivingUnit.getName() + " does not have an entity identified with " + identifier);
+  private IdentifierAssociation getAssociationForDrivingUnitIdentifier(String identifier) {
+    if(!associations.containsKey(identifier)) {
+      throw new IllegalIdentifierAssociationException(
+          "Unit " + drivingUnit.getName() + " does not have an entity identified with " + identifier);
     }
     return associations.get(identifier);
   }
@@ -115,8 +120,9 @@ public class FunctionalUnitIdentifierMapper {
     VariableWriter vw = writer.writeVariables();
     try {
       for(FunctionalUnit unit : units) {
-        if(!unit.isOpal() && identifiersTable.hasVariable(unit.getKeyVariableName()) == false) {
-          Variable keyVariable = Variable.Builder.newVariable(unit.getKeyVariableName(), TextType.get(), identifiersTable.getEntityType()).build();
+        if(!unit.isOpal() && !identifiersTable.hasVariable(unit.getKeyVariableName())) {
+          Variable keyVariable = Variable.Builder
+              .newVariable(unit.getKeyVariableName(), TextType.get(), identifiersTable.getEntityType()).build();
           vw.writeVariable(keyVariable);
         }
       }

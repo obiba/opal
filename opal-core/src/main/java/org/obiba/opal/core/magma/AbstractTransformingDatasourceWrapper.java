@@ -1,15 +1,17 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
 import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchValueTableException;
@@ -28,15 +30,15 @@ public abstract class AbstractTransformingDatasourceWrapper extends AbstractData
 
   protected abstract ValueTable transformValueTable(ValueTable wrappedTable);
 
-  protected abstract ValueTableWriter transformValueTableWritter(ValueTableWriter wrappedTableWritter, String entityType);
+  protected abstract ValueTableWriter transformValueTableWriter(ValueTableWriter wrappedTableWriter, String entityType);
 
-  protected AbstractTransformingDatasourceWrapper(Datasource wrapped) {
+  protected AbstractTransformingDatasourceWrapper(@Nonnull Datasource wrapped) {
     super(wrapped);
   }
 
   @Override
   public ValueTableWriter createWriter(String tableName, String entityType) {
-    return transformValueTableWritter(getWrappedDatasource().createWriter(tableName, entityType), entityType);
+    return transformValueTableWriter(getWrappedDatasource().createWriter(tableName, entityType), entityType);
   }
 
   @Override
@@ -46,13 +48,14 @@ public abstract class AbstractTransformingDatasourceWrapper extends AbstractData
 
   @Override
   public Set<ValueTable> getValueTables() {
-    return ImmutableSet.copyOf(Iterables.transform(getWrappedDatasource().getValueTables(), new Function<ValueTable, ValueTable>() {
+    return ImmutableSet
+        .copyOf(Iterables.transform(getWrappedDatasource().getValueTables(), new Function<ValueTable, ValueTable>() {
 
-      @Override
-      public ValueTable apply(ValueTable from) {
-        return transformValueTable(from);
-      }
-    }));
+          @Override
+          public ValueTable apply(ValueTable from) {
+            return transformValueTable(from);
+          }
+        }));
   }
 
 }

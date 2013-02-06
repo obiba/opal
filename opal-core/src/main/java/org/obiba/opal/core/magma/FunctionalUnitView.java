@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.obiba.magma.ValueTable;
@@ -32,16 +33,16 @@ public class FunctionalUnitView extends View {
   public enum Policy {
 
     /**
-     * Make the unit's identifiers public. That is, the identifiers exposed by this table are the ones from the
-     * functional unit
+     * Make the unit's identifiers public.
+     * That is, the identifiers exposed by this table are the ones from the functional unit
      */
     UNIT_IDENTIFIERS_ARE_PUBLIC,
 
     /**
-     * Make the unit's identifiers private. That is, the identifiers exposed by this table are the ones to which the
-     * functional unit's identifier map to in the keys table.
+     * Make the unit's identifiers private.
+     * That is, the identifiers exposed by this table are the ones to which the functional unit's identifier map to in the keys table.
      */
-    UNIT_IDENTIFIERS_ARE_PRIVATE;
+    UNIT_IDENTIFIERS_ARE_PRIVATE
 
   }
 
@@ -69,8 +70,11 @@ public class FunctionalUnitView extends View {
    * @param identifierGenerator strategy for generating missing identifiers. can be null, in which case, identifiers
    * will not be generated
    */
-  public FunctionalUnitView(@Nullable FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable,
-      @Nullable IParticipantIdentifier identifierGenerator, boolean ignoreUnknownIdentifier) {
+  @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod", "PMD.NcssMethodCount" })
+  public FunctionalUnitView(@Nonnull FunctionalUnit unit, @Nonnull Policy policy, @Nonnull ValueTable dataTable,
+      @Nonnull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
+      boolean ignoreUnknownIdentifier) {
+
     // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
     super(dataTable == null ? null : dataTable.getName(), dataTable);
     if(unit == null) throw new IllegalArgumentException("unit cannot be null");
@@ -79,38 +83,36 @@ public class FunctionalUnitView extends View {
     if(keysTable == null) throw new IllegalArgumentException("keysTable cannot be null");
 
     this.unit = unit;
-    this.allowIdentifierGeneration = identifierGenerator != null;
+    allowIdentifierGeneration = identifierGenerator != null;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
 
     Variable keyVariable = keysTable.getVariable(unit.getKeyVariableName());
 
-    IParticipantIdentifier identifierGeneratorOrDefault = null;
-    if(allowIdentifierGeneration) {
-      identifierGeneratorOrDefault = identifierGenerator;
-    } else { // default
-      identifierGeneratorOrDefault = new IParticipantIdentifier() {
-        public String generateParticipantIdentifier() {
-          throw new UnsupportedOperationException("cannot generate identifier");
-        }
-      };
-    }
-
-    this.entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, identifierGeneratorOrDefault);
+    entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, getParticipantIdentifier(identifierGenerator));
 
     switch(policy) {
       case UNIT_IDENTIFIERS_ARE_PUBLIC:
-        this.mappingFunction = new UnitIdentifiersArePublic();
+        mappingFunction = new UnitIdentifiersArePublic();
         break;
       case UNIT_IDENTIFIERS_ARE_PRIVATE:
-        this.mappingFunction = new UnitIdentifiersArePrivate();
+        mappingFunction = new UnitIdentifiersArePrivate();
         break;
       default:
         throw new IllegalArgumentException("unknown policy '" + policy + "'");
     }
   }
 
+  private IParticipantIdentifier getParticipantIdentifier(IParticipantIdentifier identifierGenerator) {
+    return allowIdentifierGeneration ? identifierGenerator : new IParticipantIdentifier() {
+      @Override
+      public String generateParticipantIdentifier() {
+        throw new UnsupportedOperationException("cannot generate identifier");
+      }
+    };
+  }
+
   public PrivateVariableEntityMap getPrivateVariableEntityMap() {
-    return this.entityMap;
+    return entityMap;
   }
 
   @Override
@@ -127,9 +129,10 @@ public class FunctionalUnitView extends View {
    * </pre>
    */
   private class UnitIdentifiersArePublic implements BijectiveFunction<VariableEntity, VariableEntity> {
+    @Override
     public VariableEntity apply(VariableEntity from) {
       VariableEntity privateEntity = entityMap.privateEntity(from);
-      if(privateEntity == null && ignoreUnknownIdentifier == false) {
+      if(privateEntity == null && !ignoreUnknownIdentifier) {
         throw new RuntimeException(
             "Functional unit '" + unit.getName() + "' does not have an identifier for entity '" + from.getIdentifier() +
                 "'");
@@ -154,12 +157,13 @@ public class FunctionalUnitView extends View {
    * </pre>
    */
   private class UnitIdentifiersArePrivate implements BijectiveFunction<VariableEntity, VariableEntity> {
+    @Override
     public VariableEntity apply(VariableEntity from) {
       VariableEntity publicEntity = entityMap.publicEntity(from);
       if(publicEntity == null) {
         if(allowIdentifierGeneration) {
           publicEntity = entityMap.createPublicEntity(from);
-        } else if(ignoreUnknownIdentifier == false) {
+        } else if(!ignoreUnknownIdentifier) {
           throw new RuntimeException(
               "Functional unit '" + unit.getName() + "' has an unknown entity with identifier '" +
                   from.getIdentifier() + "'");

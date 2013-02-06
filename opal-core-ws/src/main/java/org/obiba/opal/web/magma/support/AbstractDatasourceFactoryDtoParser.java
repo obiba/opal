@@ -18,7 +18,10 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.support.IncrementalDatasourceFactory;
 import org.obiba.magma.support.Initialisables;
+import org.obiba.opal.core.magma.FunctionalUnitDatasourceFactory;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,15 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
   @Override
   public DatasourceFactory parse(DatasourceFactoryDto dto) {
     DatasourceFactory factory = internalParse(dto);
+
+    if(dto.hasUnit()) {
+      FunctionalUnit unit = functionalUnitService.getFunctionalUnit(dto.getUnit());
+      if(unit == null) {
+        throw new NoSuchFunctionalUnitException(dto.getUnit());
+      }
+      factory = new FunctionalUnitDatasourceFactory(factory, unit.getKeyVariableName(), keysTable, identifierGenerator);
+    }
+
     if(dto.getIncremental() && dto.hasIncrementalDestinationName()) {
       factory = new IncrementalDatasourceFactory(factory, dto.getIncrementalDestinationName());
     }

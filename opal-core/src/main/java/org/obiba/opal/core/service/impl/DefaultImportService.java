@@ -618,8 +618,8 @@ public class DefaultImportService implements ImportService {
         return nonExistentVariableEntities;
       }
 
-      @SuppressWarnings("ConstantConditions")
       private void copyParticipants(ValueTable participantTable) throws IOException {
+        //noinspection ConstantConditions
         String keyVariableName = unit.getKeyVariableName();
         View privateView = createPrivateView(participantTable, unit, null);
         prepareKeysTable(privateView, keyVariableName);
