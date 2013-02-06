@@ -249,6 +249,11 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   }
 
   @Override
+  public void enableDatasourceRemoval(boolean enable) {
+    removeMenuItem.setEnabled(enable);
+  }
+
+  @Override
   public HasAuthorization getAddUpdateTablesAuthorizer() {
     return new MenuItemAuthorizer(toolbar.getAddUpdateTablesItem()) {
 
