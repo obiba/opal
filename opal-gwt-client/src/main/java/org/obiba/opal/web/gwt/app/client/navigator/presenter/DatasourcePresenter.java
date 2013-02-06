@@ -84,6 +84,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   @ProxyEvent
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent e) {
+    enableDatasourceRemoval(e.getSelection());
+
     if(!isVisible()) {
       forceReveal();
       displayDatasource(e.getSelection());
@@ -186,8 +188,6 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       datasourceName = datasourceDto.getName();
       getView().setDatasource(datasourceDto);
       updateTable(tableDto != null ? tableDto.getName() : null);
-      JsArrayString tablesNames = datasourceDto.getTableArray();
-      getView().enableDatasourceRemoval(tablesNames == null || tablesNames.length() == 0);
 
       // make sure the list of datasources is initialized before looking for siblings
       if(datasources == null || datasources.length() == 0 || getDatasourceIndex(datasourceDto) < 0) {
@@ -210,6 +210,17 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     } else {
       updateTable(null);
     }
+  }
+
+  private void enableDatasourceRemoval(DatasourceDto datasourceDto) {
+    if (datasourceDto == null) {
+      return;
+    }
+
+    JsArrayString tableNames = datasourceDto.getTableArray();
+    JsArrayString viewNames = datasourceDto.getViewArray();
+    getView().enableDatasourceRemoval(
+        (tableNames == null || tableNames.length() == 0) && (viewNames == null || viewNames.length() == 0));
   }
 
   private void displayDatasourceSiblings(DatasourceDto datasourceDto) {
@@ -465,6 +476,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   class DatasourceSelectionHandler implements DatasourceSelectionChangeEvent.Handler {
     @Override
     public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+
       displayDatasource(event.getSelection());
     }
   }
