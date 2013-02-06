@@ -82,6 +82,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   protected void initDisplayComponents() {
     initFileSelectionType();
     fileSelectionPresenter.bind();
+    fileSelectionPresenter.getDisplay().setFile("/home/" + credentials.getUsername() + "/export");
     getView().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
     getView().setTablesValidator(new TablesValidator());
     getView().setDestinationValidator(new DestinationValidator());
@@ -135,6 +136,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
           }).send();
     } else {
+      //noinspection ChainOfInstanceofChecks
       if(event.getEventParameters()[0] instanceof String) {
         datasourceName = (String) event.getEventParameters()[0];
       } else if(event.getEventParameters()[0] instanceof TableDto) {
@@ -238,7 +240,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
         return false;
       }
       // Check for duplicate table names
-      Collection<String> namesMemento = new HashSet();
+      Collection<String> namesMemento = new HashSet<String>();
       for(TableDto dto : getView().getSelectedTables()) {
         if(namesMemento.contains(dto.getName())) {
           getEventBus().fireEvent(

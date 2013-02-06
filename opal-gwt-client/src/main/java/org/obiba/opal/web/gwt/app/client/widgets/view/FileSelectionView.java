@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -30,14 +30,13 @@ import com.google.gwt.user.client.ui.Widget;
 public class FileSelectionView extends Composite implements FileSelectionPresenter.Display {
 
   @UiTemplate("FileSelectionView.ui.xml")
-  interface FileSelectionViewUiBinder extends UiBinder<Panel, FileSelectionView> {
-  }
+  interface FileSelectionViewUiBinder extends UiBinder<Panel, FileSelectionView> {}
 
   //
   // Constants
   //
 
-  private static FileSelectionViewUiBinder uiBinder = GWT.create(FileSelectionViewUiBinder.class);
+  private static final FileSelectionViewUiBinder uiBinder = GWT.create(FileSelectionViewUiBinder.class);
 
   //
   // Instance Variables
@@ -54,7 +53,6 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
   //
 
   public FileSelectionView() {
-    super();
     initWidget(uiBinder.createAndBindUi(this));
 
     fileField.setReadOnly(true);
