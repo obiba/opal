@@ -57,7 +57,7 @@ public class VariableEntityResource {
         indexManager, esProvider);
 
     if(var.getTables(1).size() > 0) {
-      return Response.ok().build();
+      return Response.ok().entity(Dtos.asDto(getVariableEntity()).build()).build();
     }
 
     return Response.status(Response.Status.NOT_FOUND).build();
