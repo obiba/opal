@@ -85,6 +85,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
       public void onChange(ChangeEvent event) {
         TableDto table = getView().getSelectedTable();
         if(table != null) {
+          getView().clearFilter();
           selectedTable = table;
           loadVariables(selectedTable);
         }
@@ -265,6 +266,8 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
     void setVariablesFilterHandler(VariablesFilterHandler handler);
 
     void renderRows(List<VariableValueRow> rows);
+
+    void clearFilter();
 
     HasClickHandlers getButton();
 
