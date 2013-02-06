@@ -23,8 +23,16 @@
       <tr>
         <td/>
         <td>
-          <g:Label ui:field="more" addStyleNames="iconb i-fold">more</g:Label>
-          <g:Label ui:field="errorMessage" addStyleNames="message detailedErrorMessage"></g:Label>
+          <g:DisclosurePanel ui:field="morePanel">
+            <g:customHeader>
+              <g:Label>
+                <ui:msg description="More label">more</ui:msg>
+              </g:Label>
+            </g:customHeader>
+            <g:ScrollPanel>
+              <g:Label ui:field="errorMessage" addStyleNames="message detailedErrorMessage"></g:Label>
+            </g:ScrollPanel>
+          </g:DisclosurePanel>
         </td>
       </tr>
 

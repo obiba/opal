@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -28,10 +27,7 @@ public class UnhandledResponseNotificationPresenter extends
 
     HasClickHandlers getOkay();
 
-    Label getMore();
-
     Label getErrorMessage();
-
   }
 
   @Inject
@@ -41,22 +37,6 @@ public class UnhandledResponseNotificationPresenter extends
 
   @Override
   protected void onBind() {
-    getView().getMore().getElement().getStyle().setCursor(Style.Cursor.POINTER);
-    getView().getMore().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        if(getView().getErrorMessage().isVisible()) {
-          getView().getMore().addStyleName("i-fold");
-          getView().getMore().removeStyleName("i-unfold");
-        } else {
-          getView().getMore().addStyleName("i-unfold");
-          getView().getMore().removeStyleName("i-fold");
-        }
-
-        getView().getErrorMessage().setVisible(!getView().getErrorMessage().isVisible());
-
-      }
-    });
 
     getView().getOkay().addClickHandler(new ClickHandler() {
       @Override
