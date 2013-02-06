@@ -36,9 +36,6 @@ public class UnhandledResponseNotificationView extends PopupViewImpl implements
   Label errorMessage;
 
   @UiField
-  Label more;
-
-  @UiField
   Button okay;
 
   @Inject
@@ -52,11 +49,6 @@ public class UnhandledResponseNotificationView extends PopupViewImpl implements
   @Override
   public HasClickHandlers getOkay() {
     return okay;
-  }
-
-  @Override
-  public Label getMore() {
-    return more;
   }
 
   @Override
