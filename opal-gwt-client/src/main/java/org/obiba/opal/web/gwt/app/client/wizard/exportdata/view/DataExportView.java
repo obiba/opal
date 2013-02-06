@@ -26,7 +26,6 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -261,7 +260,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     }
     suffix += "export-" + username + "-" + dateFormat.format(date);
 
-    if(getFileFormat().equalsIgnoreCase("xml")) {
+    if("xml".equalsIgnoreCase(getFileFormat())) {
       return fileSelection.getFile() + suffix + ".zip";
     }
 
@@ -275,8 +274,8 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   }
 
   @Override
-  public void selectTable(TableDto table) {
-    tableChooser.selectTable(table);
+  public void selectTable(TableDto tableDto) {
+    tableChooser.selectTable(tableDto);
   }
 
   @Override
@@ -301,11 +300,6 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     fileSelection.setEnabled(true);
     fileSelection.setFieldWidth("20em");
     fileFormat.setEnabled(true);
-  }
-
-  @Override
-  public HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler) {
-    return fileFormat.addChangeHandler(handler);
   }
 
   @Override
