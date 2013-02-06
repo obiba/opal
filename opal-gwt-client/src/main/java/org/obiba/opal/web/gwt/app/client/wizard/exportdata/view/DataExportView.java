@@ -57,8 +57,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   private String username;
 
   @UiTemplate("DataExportView.ui.xml")
-  interface DataExportUiBinder extends UiBinder<DialogBox, DataExportView> {
-  }
+  interface DataExportUiBinder extends UiBinder<DialogBox, DataExportView> {}
 
   private static final DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
 
@@ -320,7 +319,6 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     fileFormat.setEnabled(true);
     if(fileSelection != null) {
       fileSelection.setEnabled(true);
-      fileSelection.clearFile();
     }
   }
 
