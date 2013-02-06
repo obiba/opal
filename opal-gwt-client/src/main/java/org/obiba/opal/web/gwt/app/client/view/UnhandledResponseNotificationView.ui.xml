@@ -23,7 +23,7 @@
       <tr>
         <td/>
         <td>
-          <g:DisclosurePanel ui:field="morePanel">
+          <g:DisclosurePanel>
             <g:customHeader>
               <g:Label>
                 <ui:msg description="More label">more</ui:msg>
