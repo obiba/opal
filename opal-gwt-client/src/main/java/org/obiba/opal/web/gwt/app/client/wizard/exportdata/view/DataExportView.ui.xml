@@ -38,9 +38,14 @@
           </g:FlowPanel>
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key">
-              <ui:msg description="File field">File</ui:msg>
+              <ui:msg description="File field">Destination Folder</ui:msg>
             </g:Label>
             <g:SimplePanel ui:field="filePanel"/>
+            <g:Label styleName="help-block">
+              <ui:msg description="Destination Folder Help label">Data will be exported in the selected folder in a zip
+                of XML files or in a folder with CSV files.
+              </ui:msg>
+            </g:Label>
           </g:FlowPanel>
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key">
