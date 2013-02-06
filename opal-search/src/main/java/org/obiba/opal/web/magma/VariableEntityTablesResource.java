@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.core.Response;
 
+import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -37,6 +39,7 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.obiba.opal.web.search.support.QueryTermJsonBuilder;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,14 +64,10 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   }
 
   @GET
+  @NoAuthorization
   public List<Magma.TableDto> getTables() {
-
-    FinderResult<List<Magma.TableDto>> results = new FinderResult<List<Magma.TableDto>>(
-        new ArrayList<Magma.TableDto>());
-    VariableEntityTablesFinder finder = new VariableEntityTablesFinder();
-    finder.find(new VariableEntityTablesQuery(variableEntity), results);
-
-    return results.getValue();
+    // maybe should return 404 if list is empty?
+    return getTables(0);
   }
 
   public List<Magma.TableDto> getTables(int limit) {
@@ -103,13 +102,18 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
       for(Datasource datasource : MagmaEngine.get().getDatasources()) {
         for(ValueTable valueTable : datasource.getValueTables()) {
 
-          if(valueTable.getEntityType().equals(query.getEntity().getType())) {
+          if(valueTable.getEntityType().equals(query.getEntity().getType()) && areEntitiesReadable(valueTable)) {
             query.getTableFilter().add(valueTable);
           }
         }
       }
 
       next(query, result);
+    }
+
+    private boolean areEntitiesReadable(ValueTable valueTable) {
+      return SecurityUtils.getSubject().isPermitted("magma:/datasource/" + valueTable.getDatasource().getName() +
+          "/table/" + valueTable.getName() + "/entities:GET");
     }
 
   }

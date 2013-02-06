@@ -18,6 +18,7 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -51,6 +52,7 @@ public class VariableEntityResource {
   }
 
   @GET
+  @NoAuthorization
   public Response exists() {
 
     VariableEntityTablesResource var = new VariableEntityTablesResource(getVariableEntity(), opalSearchService,
