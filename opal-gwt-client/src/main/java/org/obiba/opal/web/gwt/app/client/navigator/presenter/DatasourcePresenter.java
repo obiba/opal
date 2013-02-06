@@ -101,8 +101,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     getView().setExportDataCommand(new ExportDataCommand());
     getView().setCopyDataCommand(new CopyDataCommand());
     getView().setAddUpdateTablesCommand(new AddUpdateTablesCommand());
-    // OPAL-1510
-    // getView().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
+    getView().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
     getView().setAddViewCommand(new AddViewCommand());
     getView().setImportDataCommand(new ImportDataCommand());
     getView().setNextCommand(new NextCommand());
@@ -186,6 +185,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       datasourceName = datasourceDto.getName();
       getView().setDatasource(datasourceDto);
       updateTable(tableDto != null ? tableDto.getName() : null);
+      getView().enableDatasourceRemoval(datasourceDto.getTableArray().length() == 0);
 
       // make sure the list of datasources is initialized before looking for siblings
       if(datasources == null || datasources.length() == 0 || getDatasourceIndex(datasourceDto) < 0) {
@@ -613,6 +613,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater);
 
     void setCopyDataCommand(Command cmd);
+
+    void enableDatasourceRemoval(boolean enable);
 
     HasAuthorization getAddUpdateTablesAuthorizer();
 
