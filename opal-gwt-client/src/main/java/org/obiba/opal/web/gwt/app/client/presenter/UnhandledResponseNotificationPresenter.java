@@ -44,8 +44,6 @@ public class UnhandledResponseNotificationPresenter extends
         getView().hide();
       }
     });
-
-    getView().getErrorMessage().setVisible(false);
   }
 
   public UnhandledResponseNotificationPresenter withResponseEvent(UnhandledResponseEvent event) {
