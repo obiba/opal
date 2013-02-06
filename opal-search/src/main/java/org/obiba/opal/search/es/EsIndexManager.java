@@ -114,8 +114,8 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   @Override
   public boolean isReadyForIndexing(ValueTable valueTable) {
-    return esConfig.getConfig().isEnabled() && indexConfig.getConfig()
-        .isReadyForIndexing(valueTable, getIndex(valueTable));
+    return esConfig.getConfig().isEnabled() &&
+        indexConfig.getConfig().isReadyForIndexing(valueTable, getIndex(valueTable));
   }
 
   @Override
@@ -422,8 +422,10 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
     @Override
     public void delete() {
       try {
-        esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute()
-            .actionGet();
+        if(esProvider.isEnabled()) {
+          esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute()
+              .actionGet();
+        }
       } catch(TypeMissingException e) {
         // ignored
       }
