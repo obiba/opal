@@ -43,6 +43,7 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -185,7 +186,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       datasourceName = datasourceDto.getName();
       getView().setDatasource(datasourceDto);
       updateTable(tableDto != null ? tableDto.getName() : null);
-      getView().enableDatasourceRemoval(datasourceDto.getTableArray().length() == 0);
+      JsArrayString tablesNames = datasourceDto.getTableArray();
+      getView().enableDatasourceRemoval(tablesNames == null || tablesNames.length() == 0);
 
       // make sure the list of datasources is initialized before looking for siblings
       if(datasources == null || datasources.length() == 0 || getDatasourceIndex(datasourceDto) < 0) {
