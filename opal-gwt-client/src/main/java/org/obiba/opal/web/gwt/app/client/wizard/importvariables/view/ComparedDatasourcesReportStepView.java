@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -38,7 +38,8 @@ import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SelectionModel;
 
-public class ComparedDatasourcesReportStepView extends Composite implements ComparedDatasourcesReportStepPresenter.Display {
+public class ComparedDatasourcesReportStepView extends Composite implements
+    ComparedDatasourcesReportStepPresenter.Display {
   //
   // Static Variables
   //
@@ -95,13 +96,14 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     tableComparisonsProvider.addDataDisplay(table);
     table.setEmptyTableWidget(table.getLoadingIndicator());
 
-    SelectionModel<TableComparison> selectionModel = new MultiSelectionModel<TableComparison>(new ProvidesKey<TableComparison>() {
+    SelectionModel<TableComparison> selectionModel = new MultiSelectionModel<TableComparison>(
+        new ProvidesKey<TableComparison>() {
 
-      @Override
-      public Object getKey(TableComparison item) {
-        return item.getTableName();
-      }
-    });
+          @Override
+          public Object getKey(TableComparison item) {
+            return item.getTableName();
+          }
+        });
     table.setSelectionModel(selectionModel);
 
     table.getTableNameColumn().setFieldUpdater(new TableComparisonFieldUpdater());
@@ -115,7 +117,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
   @Override
   public List<String> getSelectedTables() {
-    ImmutableList.Builder<String> builder = ImmutableList.<String> builder();
+    ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
     for(TableComparison tc : tableComparisons) {
       if(tableList.getSelectionModel().isSelected(tc)) {
         builder.add(tc.getTableName());
@@ -156,6 +158,11 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     ignoreAllModifications.setEnabled(enabled);
   }
 
+  @Override
+  public boolean isIgnoreAllModificationsVisible() {
+    return ignoreAllModifications.isVisible();
+  }
+
   public Widget asWidget() {
     return this;
   }
@@ -173,7 +180,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
   private final class TableComparisonFieldUpdater implements FieldUpdater<TableComparison, String> {
     @Override
     public void update(int index, TableComparison object, String value) {
-      TableComparePanel panel = new TableComparePanel(object.getTableCompareDto(), new TableCompareVariableFieldUpdater(), new TableCompareConflictFieldUpdater());
+      TableComparePanel panel = new TableComparePanel(object.getTableCompareDto(),
+          new TableCompareVariableFieldUpdater(), new TableCompareConflictFieldUpdater());
       tableTabs.addAndSelect(panel, object.getTableName());
     }
   }
@@ -226,21 +234,22 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
 
     public String getStatusStyle() {
       switch(result) {
-      case FORBIDDEN:
-        return "iconb i-disapprove";
-      case CONFLICT:
-        return "iconb i-alert";
-      case CREATION:
-        return "iconb i-plus";
-      case MODIFICATION:
-        return "iconb i-reblog";
-      default:
-        return "iconb i-done";
+        case FORBIDDEN:
+          return "iconb i-disapprove";
+        case CONFLICT:
+          return "iconb i-alert";
+        case CREATION:
+          return "iconb i-plus";
+        case MODIFICATION:
+          return "iconb i-reblog";
+        default:
+          return "iconb i-done";
       }
     }
 
     public boolean isSelectable() {
-      return result != ComparisonResult.FORBIDDEN && (ignoreAllModifications.getValue() || result != ComparisonResult.CONFLICT);
+      return result != ComparisonResult.FORBIDDEN && (ignoreAllModifications
+          .getValue() || result != ComparisonResult.CONFLICT);
     }
 
     public TableCompareDto getTableCompareDto() {
@@ -272,7 +281,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements Comp
     }
 
     private int[] getConflictsCounts(JsArray<ConflictDto> conflicts) {
-      int conflictsCount[] = { 0, 0 };
+      int conflictsCount[] = {0, 0};
       for(int i = 0; i < conflicts.length(); i++) {
         if(conflicts.get(i).getVariable().getIsNewVariable()) {
           conflictsCount[0]++;
