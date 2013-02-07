@@ -10,8 +10,6 @@
 package org.obiba.opal.core.runtime.upgrade.binary;
 
 import java.io.IOException;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,10 +23,14 @@ import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
 import org.obiba.opal.core.runtime.support.OpalConfigurationProvider;
 import org.obiba.opal.core.support.TimedExecution;
 import org.obiba.runtime.Version;
+import org.obiba.runtime.jdbc.DatabaseProduct;
+import org.obiba.runtime.jdbc.DatabaseProductRegistry;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig;
 
@@ -93,15 +95,16 @@ public class SqlBinariesTableEngineUpgradeStep extends AbstractUpgradeStep {
 
   private static boolean hasNonInnoDbBinaryValuesTable(DataSource dataSource) {
     try {
-      DatabaseMetaData meta = dataSource.getConnection().getMetaData();
-      ResultSet rs = meta.getTables(null, null, null, new String[] { "TABLE" });
-      while(rs.next()) {
-        log.debug("  table: {}, engine: {}", rs.getString("TABLE_NAME"), rs.getString("ENGINE"));
-        if("value_set_binary_value".equalsIgnoreCase(rs.getString("TABLE_NAME")) &&
-            !"InnoDB".equalsIgnoreCase(rs.getString("ENGINE"))) {
-          return true;
-        }
+      DatabaseProduct product = new DatabaseProductRegistry().getDatabaseProduct(dataSource);
+      if("mysql".equals(product.getNormalizedName())) {
+        JdbcTemplate template = new JdbcTemplate(dataSource);
+        String engine = template
+            .queryForObject("SELECT `engine` FROM information_schema.tables WHERE table_name=? AND table_schema=?",
+                new Object[] { "value_set_binary_value", dataSource.getConnection().getSchema() }, String.class);
+        return !"innodb".equalsIgnoreCase(engine);
       }
+    } catch(DataAccessException e) {
+      log.error("Cannot check if database has a non InnoDB value_set_binary_value table", e);
     } catch(SQLException e) {
       log.error("Cannot check if database has a non InnoDB value_set_binary_value table", e);
     }
