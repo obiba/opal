@@ -59,11 +59,11 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     addHandler();
   }
 
-  public void initialize(TableDto table, VariableDto variable, String entityIdentifier) {
+  public void initialize(TableDto table, VariableDto variable, String entityIdentifier, boolean modal) {
     this.table = table;
     this.variable = variable;
     this.entityIdentifier = entityIdentifier;
-    getView().initialize(table, variable, entityIdentifier);
+    getView().initialize(table, variable, entityIdentifier, modal);
   }
 
   //
@@ -134,7 +134,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
 
   public interface Display extends PopupView {
 
-    void initialize(TableDto table, VariableDto variable, String entityIdentifier);
+    void initialize(TableDto table, VariableDto variable, String entityIdentifier, boolean modal);
 
     HasClickHandlers getButton();
 
