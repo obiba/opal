@@ -247,7 +247,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestValueSequence(VariableDto variable, String entityIdentifier) {
-      valueSequencePopupPresenter.initialize(table, variable, entityIdentifier);
+      valueSequencePopupPresenter.initialize(table, variable, entityIdentifier, false);
       addToPopupSlot(valueSequencePopupPresenter);
     }
 
