@@ -29,7 +29,7 @@ public class NavigatorMenuBar extends MenuBar {
 
   private MenuBar toolsMenu;
 
-  private MenuItem excelDownloadItem;
+  private MenuItem exportVariableDictionaryItem;
 
   private MenuItem importDataItem;
 
@@ -143,16 +143,16 @@ public class NavigatorMenuBar extends MenuBar {
   }
 
   public void setExcelDownloadCommand(Command cmd) {
-    if(excelDownloadItem == null) {
-      excelDownloadItem = new MenuItem(translations.exportToExcelTitle(), cmd);
-      getToolsMenu().addItem(excelDownloadItem);
+    if(exportVariableDictionaryItem == null) {
+      exportVariableDictionaryItem = new MenuItem(translations.exportToExcelTitle(), cmd);
+      getToolsMenu().addItem(exportVariableDictionaryItem);
     } else {
-      excelDownloadItem.setCommand(cmd);
+      exportVariableDictionaryItem.setCommand(cmd);
     }
   }
 
-  public MenuItem getExcelDownloadItem() {
-    return excelDownloadItem;
+  public MenuItem getExportVariableDictionaryItem() {
+    return exportVariableDictionaryItem;
   }
 
   public void setImportDataCommand(Command cmd) {
@@ -266,6 +266,12 @@ public class NavigatorMenuBar extends MenuBar {
 
   public MenuItem getEditItem() {
     return editItem;
+  }
+
+  public void setExportVariableDictionaryItemEnabled(boolean enabled) {
+    if(exportVariableDictionaryItem != null) {
+      exportVariableDictionaryItem.setEnabled(enabled);
+    }
   }
 
   public void setExportDataItemEnabled(boolean enabled) {
