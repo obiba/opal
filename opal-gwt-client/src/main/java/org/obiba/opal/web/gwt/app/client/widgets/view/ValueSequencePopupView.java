@@ -132,7 +132,8 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   }
 
   @Override
-  public void initialize(TableDto table, VariableDto variable, String entityIdentifier) {
+  public void initialize(TableDto table, VariableDto variable, String entityIdentifier, boolean modal) {
+    dialogBox.setModal(modal);
     dialogBox.setText(variable.getName() + " - " + entityIdentifier);
     occurrenceGroup.setText(variable.getOccurrenceGroup());
     toggleGroup.setVisible(variable.getOccurrenceGroup() != null && variable.getOccurrenceGroup().isEmpty() == false);

@@ -101,7 +101,8 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
         getView().hide();
       }
     }));
-    setEscapeKeyUpHandler();
+    // TODO disabled the ESCAPE key event handling to be implemented in the next sprint. Currently it causes a bug when two dialogs are on top of each other.
+//    setEscapeKeyUpHandler();
   }
 
   @Override
@@ -216,8 +217,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
       public void onPreviewNativeEvent(Event.NativePreviewEvent event) {
         Event nativeEvent = Event.as(event.getNativeEvent());
         if(nativeEvent.getTypeInt() == Event.ONKEYUP) {
-          if(KeyCodes.KEY_ESCAPE == nativeEvent.getKeyCode())
-          {
+          if(KeyCodes.KEY_ESCAPE == nativeEvent.getKeyCode()) {
             getView().hide();
           }
         }
@@ -323,7 +323,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
     @Override
     public void requestValueSequenceView(VariableDto variableDto) {
-      valueSequencePopupPresenter.initialize(selectedTable, variableDto, entityId);
+      valueSequencePopupPresenter.initialize(selectedTable, variableDto, entityId, true);
       addToPopupSlot(valueSequencePopupPresenter);
     }
 
