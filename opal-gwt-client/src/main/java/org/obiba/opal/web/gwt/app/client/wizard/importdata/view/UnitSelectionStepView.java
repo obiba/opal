@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,6 +19,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
@@ -29,10 +30,9 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStepPresenter.Display {
 
   @UiTemplate("UnitSelectionStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, UnitSelectionStepView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, UnitSelectionStepView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 
@@ -51,18 +51,18 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   @UiField
   ListBox units;
 
+  @UiField
+  CheckBox incremental;
+
   public UnitSelectionStepView() {
     widget = uiBinder.createAndBindUi(this);
+    incremental.setValue(true);
+    identifierAsIs.setValue(true);
   }
 
   @Override
   public Widget asWidget() {
     return widget;
-  }
-
-  @Override
-  public boolean isIdentifierAsIs() {
-    return units.getItemCount() == 0 || identifierAsIs.getValue();
   }
 
   @Override
@@ -105,29 +105,14 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   }
 
   @Override
-  public void setIdentityEnabled(boolean enabled) {
-    identifierAsIs.setEnabled(enabled);
-    identifierSharedWithUnit.setEnabled(enabled);
-    units.setEnabled(enabled);
+  public boolean isIncremental() {
+    return incremental.getValue();
   }
 
   @Override
-  public void setIdentifierAsIs(boolean checked) {
-    identifierAsIs.setValue(checked);
+  public void setIncrementalEnabled(boolean enabled) {
+    incremental.setEnabled(enabled);
+
   }
 
-  @Override
-  public void setIdentifierSharedWithUnit(boolean checked) {
-    identifierSharedWithUnit.setValue(checked);
-  }
-
-  @Override
-  public void setSelectedUnit(String unit) {
-    for(int i = 0; i < units.getItemCount(); i++) {
-      if(units.getItemText(i).equals(unit)) {
-        units.setSelectedIndex(i);
-        break;
-      }
-    }
-  }
 }

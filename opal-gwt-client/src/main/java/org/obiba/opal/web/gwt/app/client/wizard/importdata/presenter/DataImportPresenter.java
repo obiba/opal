@@ -131,7 +131,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     addEventHandlers();
   }
 
-  protected void addEventHandlers() {
+  private void addEventHandlers() {
     registerHandler(getView().addFormatChangeHandler(new ChangeHandler() {
 
       @Override
@@ -200,7 +200,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateFormatStepDisplay() {
     destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
-    destinationSelectionStepPresenter.setIncremental(getView().isIncremental());
     switch(getView().getImportFormat()) {
       case CSV:
         csvFormatStepPresenter.clear();
@@ -457,8 +456,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     ImportFormat getImportFormat();
-
-    boolean isIncremental();
 
     void setImportDataInputsHandler(ImportDataInputsHandler handler);
 

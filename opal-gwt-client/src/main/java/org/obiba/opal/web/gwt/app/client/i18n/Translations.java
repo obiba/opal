@@ -19,6 +19,7 @@ import com.google.gwt.i18n.client.LocalizableResource.GenerateKeys;
  * Programmatically available localised text strings. This interface will be bound to localised properties files found
  * in the {@code com.google.gwt.i18n.client} package.
  */
+@SuppressWarnings("OverlyComplexClass")
 @GenerateKeys
 @Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = {"default"})
 public interface Translations extends Constants {
@@ -1022,6 +1023,10 @@ public interface Translations extends Constants {
   @Description("Data Import Unit Step")
   @DefaultStringValue("Specify how the participant are identified.")
   String dataImportUnitStep();
+
+  @Description("Data Import Configuration Step")
+  @DefaultStringValue("Configure data import")
+  String configureDataImport();
 
   @Description("Data Import Archive Step")
   @DefaultStringValue("Specify whether the data file is to be archived.")
