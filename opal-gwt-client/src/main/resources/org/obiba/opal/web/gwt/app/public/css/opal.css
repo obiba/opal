@@ -2269,3 +2269,7 @@ a.icon:hover {
   max-height: 200px;
   overflow-y: auto;
 }
+
+.section-title {
+  font-weight: bold;
+}

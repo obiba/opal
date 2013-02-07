@@ -36,7 +36,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -105,9 +104,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @UiField
   Chooser formatChooser;
 
-  @UiField
-  CheckBox incremental;
-
   private final EventBus eventBus;
 
   private WizardStepDisplay formatStepDisplay;
@@ -161,7 +157,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         })//
 
         .append(unitSelectionStep, unitSelectionHelp)//
-        .title(translations.dataImportUnitStep())//
+        .title(translations.configureDataImport())//
 
         .append(comparedDatasourcesReportStep)//
         .title(translations.dataImportComparedDatasourcesReportStep())//
@@ -207,7 +203,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
-    incremental.setValue(true);
   }
 
   @Override
@@ -247,11 +242,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Override
   public ImportFormat getImportFormat() {
     return ImportFormat.valueOf(formatChooser.getSelectedValue());
-  }
-
-  @Override
-  public boolean isIncremental() {
-    return incremental.getValue();
   }
 
   @Override

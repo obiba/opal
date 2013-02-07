@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.w3c.css.sac.ElementSelector;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,7 +28,7 @@ import com.gwtplatform.mvp.client.View;
 public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionStepPresenter.Display> {
 
   @Inject
-  public UnitSelectionStepPresenter(final Display display, final EventBus eventBus) {
+  public UnitSelectionStepPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -40,29 +41,27 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
 
   protected void addEventHandlers() {
     registerHandler(getView().addIdentifierAsIsClickHandler(new ClickHandler() {
-
       @Override
-      public void onClick(ClickEvent arg0) {
+      public void onClick(ClickEvent event) {
         getView().setUnitEnabled(false);
+        getView().setIncrementalEnabled(true);
       }
     }));
     registerHandler(getView().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
-
       @Override
-      public void onClick(ClickEvent arg0) {
+      public void onClick(ClickEvent event) {
         getView().setUnitEnabled(true);
+        getView().setIncrementalEnabled(false);
       }
     }));
   }
 
   public void updateImportData(ImportData importData) {
-    importData.setIdentifierAsIs(getView().isIdentifierAsIs());
-    importData.setIdentifierSharedWithUnit(getView().isIdentifierSharedWithUnit());
-    if(getView().isIdentifierSharedWithUnit()) {
-      importData.setUnit(getView().getSelectedUnit());
-    } else {
-      importData.setUnit(null);
-    }
+    boolean withUnit = getView().isIdentifierSharedWithUnit();
+    importData.setIdentifierSharedWithUnit(withUnit);
+    importData.setIdentifierAsIs(!withUnit);
+    importData.setUnit(withUnit ? getView().getSelectedUnit() : null);
+    importData.setIncremental(!withUnit && getView().isIncremental());
   }
 
   public void initUnits() {
@@ -77,19 +76,11 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
 
   public interface Display extends View {
 
-    boolean isIdentifierAsIs();
-
-    void setIdentifierAsIs(boolean checked);
-
     boolean isIdentifierSharedWithUnit();
-
-    void setIdentifierSharedWithUnit(boolean checked);
 
     void setUnits(JsArray<FunctionalUnitDto> units);
 
     String getSelectedUnit();
-
-    void setSelectedUnit(String unit);
 
     HandlerRegistration addIdentifierAsIsClickHandler(ClickHandler handler);
 
@@ -97,11 +88,9 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
 
     void setUnitEnabled(boolean enabled);
 
-    /**
-     * Allows the identity (unit) section of the form to be enabled and disabled.
-     */
-    void setIdentityEnabled(boolean enabled);
+    boolean isIncremental();
 
+    void setIncrementalEnabled(boolean enabled);
   }
 
 }

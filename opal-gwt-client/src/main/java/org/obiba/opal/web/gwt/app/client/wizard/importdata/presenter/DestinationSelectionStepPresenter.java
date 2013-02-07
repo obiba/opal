@@ -36,8 +36,6 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   private String destination;
 
-  private boolean incremental;
-
   @Inject
   public DestinationSelectionStepPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
@@ -148,7 +146,6 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   public void updateImportData(ImportData importData) {
     importData.setDestinationDatasourceName(getView().getSelectedDatasource());
-    importData.setIncremental(incremental);
     if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
       importData.setDestinationTableName(getView().getSelectedTable());
       importData.setDestinationEntityType(getView().getSelectedEntityType());
@@ -164,10 +161,6 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   public void setDestination(@Nullable String destination) {
     this.destination = destination;
-  }
-
-  public void setIncremental(boolean incremental) {
-    this.incremental = incremental;
   }
 
   //
