@@ -19,13 +19,15 @@ import org.obiba.magma.Initialisable;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.unit.FunctionalUnit;
 
 public class FunctionalUnitDatasourceFactory extends AbstractDatasourceFactory implements Initialisable {
 
   @Nonnull
   private final DatasourceFactory wrappedFactory;
 
-  private final String keyVariableName;
+  @Nonnull
+  private final FunctionalUnit unit;
 
   @Nonnull
   private final ValueTable keysTable;
@@ -33,12 +35,16 @@ public class FunctionalUnitDatasourceFactory extends AbstractDatasourceFactory i
   @Nullable
   private final IParticipantIdentifier identifierGenerator;
 
-  public FunctionalUnitDatasourceFactory(@Nonnull DatasourceFactory wrappedFactory, String keyVariableName,
-      @Nonnull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator) {
+  private final boolean ignoreUnknownIdentifier;
+
+  public FunctionalUnitDatasourceFactory(@Nonnull DatasourceFactory wrappedFactory, @Nonnull FunctionalUnit unit,
+      @Nonnull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
+      boolean ignoreUnknownIdentifier) {
     this.wrappedFactory = wrappedFactory;
-    this.keyVariableName = keyVariableName;
+    this.unit = unit;
     this.keysTable = keysTable;
     this.identifierGenerator = identifierGenerator;
+    this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
   }
 
   @Override
@@ -54,7 +60,9 @@ public class FunctionalUnitDatasourceFactory extends AbstractDatasourceFactory i
   @Nonnull
   @Override
   protected Datasource internalCreate() {
-    return new FunctionalUnitDatasource(wrappedFactory.create(), keyVariableName, keysTable, identifierGenerator);
+    return new FunctionalUnitDatasource(wrappedFactory.create(), unit,
+        FunctionalUnitView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, keysTable, identifierGenerator,
+        ignoreUnknownIdentifier);
   }
 
   @Override

@@ -286,4 +286,5 @@ public class ImportData {
   public void setIgnoreUnknownIdentifier(boolean ignoreUnknownIdentifier) {
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
   }
+
 }

@@ -35,12 +35,14 @@ public class FunctionalUnitView extends View {
     /**
      * Make the unit's identifiers public.
      * That is, the identifiers exposed by this table are the ones from the functional unit
+     * Opal to Unit
      */
     UNIT_IDENTIFIERS_ARE_PUBLIC,
 
     /**
      * Make the unit's identifiers private.
      * That is, the identifiers exposed by this table are the ones to which the functional unit's identifier map to in the keys table.
+     * Unit to Opal
      */
     UNIT_IDENTIFIERS_ARE_PRIVATE
 
@@ -55,10 +57,6 @@ public class FunctionalUnitView extends View {
   private final boolean ignoreUnknownIdentifier;
 
   private final BijectiveFunction<VariableEntity, VariableEntity> mappingFunction;
-
-  public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable) {
-    this(unit, policy, dataTable, keysTable, null, false);
-  }
 
   /**
    * Constructor.
@@ -100,6 +98,10 @@ public class FunctionalUnitView extends View {
       default:
         throw new IllegalArgumentException("unknown policy '" + policy + "'");
     }
+  }
+
+  public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable) {
+    this(unit, policy, dataTable, keysTable, null, false);
   }
 
   private IParticipantIdentifier getParticipantIdentifier(IParticipantIdentifier identifierGenerator) {
@@ -178,4 +180,7 @@ public class FunctionalUnitView extends View {
     }
   }
 
+  public FunctionalUnit getUnit() {
+    return unit;
+  }
 }

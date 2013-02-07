@@ -58,11 +58,7 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
   public void updateImportData(ImportData importData) {
     importData.setIdentifierAsIs(getView().isIdentifierAsIs());
     importData.setIdentifierSharedWithUnit(getView().isIdentifierSharedWithUnit());
-    if(getView().isIdentifierSharedWithUnit()) {
-      importData.setUnit(getView().getSelectedUnit());
-    } else {
-      importData.setUnit(null);
-    }
+    importData.setUnit(getView().isIdentifierSharedWithUnit() ? getView().getSelectedUnit() : null);
   }
 
   public void initUnits() {

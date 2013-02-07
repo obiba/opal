@@ -39,11 +39,11 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultIdentifiersTableService.class);
 
-  private PlatformTransactionManager txManager;
+  private final PlatformTransactionManager txManager;
 
-  private String tableReference;
+  private final String tableReference;
 
-  private String entityType;
+  private final String entityType;
 
   private MagmaEngineReferenceResolver tableResolver;
 
@@ -60,8 +60,8 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
 
     this.txManager = txManager;
-    this.tableReference = keysTableReference;
-    this.entityType = keysTableEntityType;
+    tableReference = keysTableReference;
+    entityType = keysTableEntityType;
   }
 
   public void setKeysSessionFactory(SessionFactory keysSession) {
@@ -145,14 +145,14 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   }
 
   private void initialise(Datasource ds) {
-    this.datasource = ds;
+    datasource = ds;
     new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
 
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
         try {
           Initialisables.initialise(datasource);
-          if(datasource.hasValueTable(getTableName()) == false) {
+          if(!datasource.hasValueTable(getTableName())) {
             datasource.createWriter(getTableName(), getEntityType()).close();
           }
         } catch(IOException e) {

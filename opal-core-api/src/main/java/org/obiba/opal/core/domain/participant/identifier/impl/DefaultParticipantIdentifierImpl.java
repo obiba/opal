@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -20,7 +20,7 @@ import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
  */
 public final class DefaultParticipantIdentifierImpl implements IParticipantIdentifier {
 
-  private Random generator = new SecureRandom();
+  private final Random generator = new SecureRandom();
 
   private int keySize = 10;
 
@@ -30,10 +30,6 @@ public final class DefaultParticipantIdentifierImpl implements IParticipantIdent
 
   public void setKeySize(int keySize) {
     this.keySize = keySize;
-  }
-
-  public int getKeySize() {
-    return keySize;
   }
 
   public void setAllowStartWithZero(boolean allowStartWithZero) {
@@ -48,14 +44,11 @@ public final class DefaultParticipantIdentifierImpl implements IParticipantIdent
     this.prefix = prefix;
   }
 
-  public String getPrefix() {
-    return prefix;
-  }
-
   private int getPrefixLength() {
     return prefix != null ? prefix.length() : 0;
   }
 
+  @Override
   public String generateParticipantIdentifier() {
     if(keySize < 1) {
       throw new IllegalStateException("keySize must be at least 1: " + keySize);
@@ -67,13 +60,10 @@ public final class DefaultParticipantIdentifierImpl implements IParticipantIdent
       sb.append(prefix);
     }
 
-    if(allowStartWithZero == false) {
-      // Generate a random number between 0 and 8, then add 1.
-      sb.append(generator.nextInt(9) + 1);
-    } else {
-      sb.append(generator.nextInt(10));
-    }
-
+    sb.append(allowStartWithZero //
+        ? generator.nextInt(10) //
+        : generator.nextInt(9) + 1 // Generate a random number between 0 and 8, then add 1.
+    );
     for(int i = 1; i < keySize; i++) {
       sb.append(generator.nextInt(10));
     }

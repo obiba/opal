@@ -32,8 +32,8 @@ public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoPa
     FsDatasourceFactory fsFactory = new FsDatasourceFactory();
     FsDatasourceFactoryDto fsDto = dto.getExtension(FsDatasourceFactoryDto.params);
     fsFactory.setFile(resolveLocalFile(fsDto.getFile()));
-    if(dto.hasUnit()) {
-      String unitName = dto.getUnit();
+    if(dto.hasUnitConfig() && dto.getUnitConfig().hasUnit()) {
+      String unitName = dto.getUnitConfig().getUnit();
       FunctionalUnit unit = getFunctionalUnitService().getFunctionalUnit(unitName);
       if(unit == null) {
         throw new NoSuchFunctionalUnitException(unitName);

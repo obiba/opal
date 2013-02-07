@@ -26,6 +26,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -416,6 +417,10 @@ public class DefaultImportService implements ImportService {
     return createPrivateView(participantTable.getName(), participantTable, unit, select);
   }
 
+  private View createPrivateView(FunctionalUnitView functionalUnitView) {
+    return createPrivateView(functionalUnitView.getName(), functionalUnitView, functionalUnitView.getUnit(), null);
+  }
+
   /**
    * Write the key variable.
    *
@@ -480,9 +485,9 @@ public class DefaultImportService implements ImportService {
   }
 
   private boolean isIdentifierVariable(@SuppressWarnings("TypeMayBeWeakened") Variable variable) {
-    return variable.hasAttribute("identifier") &&
-        (variable.getAttribute("identifier").getValue().equals(BooleanType.get().trueValue()) ||
-            "true".equals(variable.getAttribute("identifier").getValue().toString().toLowerCase()));
+    if(!variable.hasAttribute("identifier")) return false;
+    Value value = variable.getAttribute("identifier").getValue();
+    return value.equals(BooleanType.get().trueValue()) || "true".equals(value.toString().toLowerCase());
   }
 
   class TransactionalThread extends Thread {
@@ -509,7 +514,7 @@ public class DefaultImportService implements ImportService {
     private final Set<ValueTable> sourceTables;
 
     @Nullable
-    private final FunctionalUnit unit;
+    private final FunctionalUnit unit; //TODO delete this unit and use the one form FunctionalUnitView
 
     private final Datasource destination;
 
@@ -569,7 +574,10 @@ public class DefaultImportService implements ImportService {
           }
 
           if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
-            if(unit == null) {
+
+            if(valueTable instanceof FunctionalUnitView) {
+              importUnitData((FunctionalUnitView) valueTable);
+            } else {
               addMissingEntitiesToKeysTable(valueTable);
               MultithreadedDatasourceCopier.Builder.newCopier() //
                   .withThreads(new ThreadFactory() {
@@ -583,11 +591,12 @@ public class DefaultImportService implements ImportService {
                   .from(valueTable) //
                   .to(destination).build() //
                   .copy();
-            } else {
-              copyParticipants(valueTable);
             }
+
           } else {
-            DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build()
+            DatasourceCopier.Builder.newCopier() //
+                .dontCopyNullValues() //
+                .withLoggingListener().build() //
                 .copy(valueTable, destination);
           }
         }
@@ -618,13 +627,12 @@ public class DefaultImportService implements ImportService {
         return nonExistentVariableEntities;
       }
 
-      private void copyParticipants(ValueTable participantTable) throws IOException {
-        //noinspection ConstantConditions
-        String keyVariableName = unit.getKeyVariableName();
-        View privateView = createPrivateView(participantTable, unit, null);
+      private void importUnitData(FunctionalUnitView functionalUnitView) throws IOException {
+        String keyVariableName = functionalUnitView.getUnit().getKeyVariableName();
+        View privateView = createPrivateView(functionalUnitView);
         prepareKeysTable(privateView, keyVariableName);
 
-        FunctionalUnitView publicView = createPublicView(participantTable);
+        FunctionalUnitView publicView = createPublicView(functionalUnitView);
         PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
 
         // prepare for copying participant data

@@ -4,13 +4,21 @@ package Magma;
 
 option java_package = "org.obiba.opal.web.model";
 
+message DatasourceUnitConfigDto {
+  optional string unit = 1;
+  optional bool allowIdentifierGeneration = 2 [default = false];
+  optional bool ignoreUnknownIdentifier = 3 [default = false];
+}
+
+message DatasourceIncrementalConfigDto {
+  optional bool incremental = 1 [default = false];
+  optional string incrementalDestinationName = 2;
+}
+
 message DatasourceFactoryDto {
   optional string name = 1;
-  optional bool incremental = 2 [default = false];
-  optional string incrementalDestinationName = 3;
-  optional string unit = 4;
-  optional bool unitAllowIdentifierGeneration = 5 [default = false];
-  optional bool unitIgnoreUnknownIdentifier = 6 [default = false];
+  optional DatasourceIncrementalConfigDto incrementalConfig = 2;
+  optional DatasourceUnitConfigDto unitConfig = 3;
   extensions 1000 to max;
 }
 

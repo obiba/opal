@@ -13,6 +13,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.DatasourceIncrementalConfigDto;
+import org.obiba.opal.web.model.client.magma.DatasourceUnitConfigDto;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.LimesurveyDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.RestDatasourceFactoryDto;
@@ -108,16 +110,20 @@ public class DatasourceDtos {
 
   private static void configureIncremental(ImportData importData, DatasourceFactoryDto dto) {
     if(importData.isIncremental()) {
-      dto.setIncremental(true);
-      dto.setIncrementalDestinationName(importData.getDestinationDatasourceName());
+      DatasourceIncrementalConfigDto configDto = DatasourceIncrementalConfigDto.create();
+      configDto.setIncremental(true);
+      configDto.setIncrementalDestinationName(importData.getDestinationDatasourceName());
+      dto.setIncrementalConfig(configDto);
     }
   }
 
   private static void configureUnit(ImportData importData, DatasourceFactoryDto dto) {
     if(!Strings.isNullOrEmpty(importData.getUnit())) {
-      dto.setUnit(importData.getUnit());
-      dto.setUnitAllowIdentifierGeneration(importData.isAllowIdentifierGeneration());
-      dto.setUnitIgnoreUnknownIdentifier(importData.isIgnoreUnknownIdentifier());
+      DatasourceUnitConfigDto configDto = DatasourceUnitConfigDto.create();
+      configDto.setUnit(importData.getUnit());
+      configDto.setAllowIdentifierGeneration(importData.isAllowIdentifierGeneration());
+      configDto.setIgnoreUnknownIdentifier(importData.isIgnoreUnknownIdentifier());
+      dto.setUnitConfig(configDto);
     }
   }
 }
