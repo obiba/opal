@@ -10,7 +10,6 @@
 package org.obiba.opal.core.runtime.upgrade.binary;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -98,14 +97,12 @@ public class SqlBinariesTableEngineUpgradeStep extends AbstractUpgradeStep {
       DatabaseProduct product = new DatabaseProductRegistry().getDatabaseProduct(dataSource);
       if("mysql".equals(product.getNormalizedName())) {
         JdbcTemplate template = new JdbcTemplate(dataSource);
-        String engine = template
-            .queryForObject("SELECT `engine` FROM information_schema.tables WHERE table_name=? AND table_schema=?",
-                new Object[] { "value_set_binary_value", dataSource.getConnection().getSchema() }, String.class);
+        String engine = template.queryForObject(
+            "SELECT `engine` FROM information_schema.tables WHERE table_name = ? AND table_schema = database()",
+            new Object[] { "value_set_binary_value" }, String.class);
         return !"innodb".equalsIgnoreCase(engine);
       }
     } catch(DataAccessException e) {
-      log.error("Cannot check if database has a non InnoDB value_set_binary_value table", e);
-    } catch(SQLException e) {
       log.error("Cannot check if database has a non InnoDB value_set_binary_value table", e);
     }
     return false;
