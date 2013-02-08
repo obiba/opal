@@ -21,7 +21,7 @@ import com.google.gwt.i18n.client.LocalizableResource.GenerateKeys;
  */
 @SuppressWarnings("OverlyComplexClass")
 @GenerateKeys
-@Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = {"default"})
+@Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = { "default" })
 public interface Translations extends Constants {
 
   @Description("Error dialog title")
@@ -81,7 +81,7 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue({"NOT_STARTED", "Not Started", //
+  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
       "IN_PROGRESS", "In Progress", //
       "SUCCEEDED", "Succeeded", //
       "FAILED", "Failed", //
@@ -95,7 +95,7 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue({"Log", "Log", //
+  @DefaultStringMapValue({ "Log", "Log", //
       "Cancel", "Cancel", //
       "Delete", "Delete", //
       "Edit", "Edit", //
@@ -104,7 +104,7 @@ public interface Translations extends Constants {
       "Download", "Download", //
       "DownloadCertificate", "Download Certificate", //
       "Index now", "Index now", //
-      "Clear", "Clear"})
+      "Clear", "Clear" })
   Map<String, String> actionMap();
 
   @Description("Permission map")
@@ -127,15 +127,18 @@ public interface Translations extends Constants {
       "DATASHIELD_ALL", "Administrate", //
       "DATASHIELD_SESSION_ALL", "Use", //
       "REPORT_TEMPLATE_ALL", "Administrate", //
-      "REPORT_TEMPLATE_READ", "View reports"})
+      "REPORT_TEMPLATE_READ", "View reports" })
   Map<String, String> permissionMap();
 
   @Description("Permission explanation map")
   @DefaultStringMapValue({ //
       "datasource", "Specify the access rights to the datasource and its content.", //
-      "table", "Specify the access rights to the table and its content. Induces the visibility of the parent datasource.", //
-      "view", "Specify the access rights to the view and its content. Induces the visibility of the parent datasource.", //
-      "variable", "Specify the access rights to the variable. Induces the visibility of the parent table and datasource.", //
+      "table",
+      "Specify the access rights to the table and its content. Induces the visibility of the parent datasource.", //
+      "view", "Specify the access rights to the view and its content. Induces the visibility of the parent datasource.",
+      //
+      "variable",
+      "Specify the access rights to the variable. Induces the visibility of the parent table and datasource.", //
       "databases", "Specify the access rights to the databases configuration.",//
       "datashield", "Specify the access rights to the DataShield services.",//
       "r", "Specify the access rights to the R services."//
@@ -143,7 +146,7 @@ public interface Translations extends Constants {
   Map<String, String> permissionExplanationMap();
 
   @Description("Table Comparison Result map")
-  @DefaultStringMapValue({"CREATION", "Table to be created", //
+  @DefaultStringMapValue({ "CREATION", "Table to be created", //
       "MODIFICATION", "Table to be modified", //
       "CONFLICT", "Conflicting table modifications", //
       "SAME", "No table modifications", //
@@ -250,9 +253,12 @@ public interface Translations extends Constants {
       "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", //
       "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", //
       "DeleteCommand_NotFound", "Job could not be deleted (not found).", //
-      "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.", //
-      "cannotCreateFolderPathAlreadyExist", "Could not create the folder, a folder or a file exist with that name at the specified path.", //
-      "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.", //
+      "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.",
+      //
+      "cannotCreateFolderPathAlreadyExist",
+      "Could not create the folder, a folder or a file exist with that name at the specified path.", //
+      "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.",
+      //
       "cannotCreatefolderUnexpectedError", "There was an unexpected error while creating the folder.", //
       "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", //
       "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", //
@@ -268,7 +274,8 @@ public interface Translations extends Constants {
       "DatasourceAlreadyExistsWithThisName", "A datasource already exists with this name.", //
       "ExcelFileRequired", "An Excel file is required.", "ExcelFileSuffixInvalid", //
       "Invalid Excel file suffix: .xls or .xlsx are expected.", //
-      "ViewMustBeAttachedToExistingOrNewDatasource", "The view must be attached to either an existing datasource or a new one.", //
+      "ViewMustBeAttachedToExistingOrNewDatasource",
+      "The view must be attached to either an existing datasource or a new one.", //
       "DuplicateDatasourceName", "The datasource name is already in use. Please choose another.", //
       "UnknownError", "An unknown error has occurred.", //
       "InternalError", "An internal error has occurred. Please contact technical support.", //
@@ -290,14 +297,18 @@ public interface Translations extends Constants {
       "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
       "ScriptIsRequired", "A script is required.",//
       "JavascriptError", "Error in script '{0}': {1} ({2}:{3})",//
-      "CopyFromVariableNameIsRequired", "You must enter the name of a variable from which the new variable will be created from.",//
-      "cannotSwitchTabBecauseOfUnsavedChanges", "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
+      "CopyFromVariableNameIsRequired",
+      "You must enter the name of a variable from which the new variable will be created from.",//
+      "cannotSwitchTabBecauseOfUnsavedChanges",
+      "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
       "UrlRequired", "You must provide the database's URL.",//
       "UsernameRequired", "You must indicate the user name to be used for the database connection.",//
       "PasswordRequired", "You must indicate the password to be used for the database connection.", //
-      "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables", "You must indicate whether meta-data tables are to be used or not.",//
+      "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables",
+      "You must indicate whether meta-data tables are to be used or not.",//
       "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",//
-      "SpecificCharsetNotIndicated", "You have selected to use a specific character set but have not indicated which one.",//
+      "SpecificCharsetNotIndicated",
+      "You have selected to use a specific character set but have not indicated which one.",//
       "NoDataFileSelected", "You must select a data file.",//
       "NoDataToCopy", "No data to copy to the current destination.",//
       "NoFileSelected", "You must select a file.",//
@@ -347,7 +358,8 @@ public interface Translations extends Constants {
       "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
       "DestinationTableCannotBeView", "The destination table cannot be a view.",//
       "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
-      "DataExportationProcessLaunched", "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}",//
+      "DataExportationProcessLaunched",
+      "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}",//
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
@@ -495,29 +507,50 @@ public interface Translations extends Constants {
       "removeView", "Remove View",//
       "removeTable", "Remove Table",//
       "deleteDataShieldMethod", "Delete Aggregating Method",//
-      "deleteDatabase", "Delete Database"})
+      "deleteDatabase", "Delete Database" })
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
   @DefaultStringMapValue({ //
       "confirmVariableDelete", "Delete the currently displayed variable?", //
-      "removingTablesFromViewMayAffectVariables", "Removing tables from the view will have an impact on which Variables can be defined.", //
-      "confirmClearJobsList", "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.", //
-      "confirmCancelJob", "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.", //
-      "confirmReplaceExistingFile", "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.", //
-      "confirmDeleteFile", "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //
-      "confirmDeleteKeyPair", "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore",//
-      "confirmRemoveDatasource", "Please confirm that you want to remove the current datasource from Opal configuration.",//
-      "confirmDeleteReportTemplate", "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",//
-      "confirmDeleteFunctionalUnit", "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",//
-      "confirmOverwriteVariable", "A variable with the same name already exists. Please confirm that you want to overwrite this variable.",//
-      "confirmOverwriteView", "A view with the same name already exists. Please confirm that you want to overwrite this view.",//
+      "removingTablesFromViewMayAffectVariables",
+      "Removing tables from the view will have an impact on which Variables can be defined.", //
+      "confirmClearJobsList",
+      "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.",
+      //
+      "confirmCancelJob",
+      "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.",
+      //
+      "confirmReplaceExistingFile",
+      "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.",
+      //
+      "confirmDeleteFile",
+      "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //
+      "confirmDeleteKeyPair",
+      "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore",
+//
+      "confirmRemoveDatasource",
+      "Please confirm that you want to remove the current datasource from Opal configuration.",//
+      "confirmDeleteReportTemplate",
+      "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",
+//
+      "confirmDeleteFunctionalUnit",
+      "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",
+//
+      "confirmOverwriteVariable",
+      "A variable with the same name already exists. Please confirm that you want to overwrite this variable.",//
+      "confirmOverwriteView",
+      "A view with the same name already exists. Please confirm that you want to overwrite this view.",//
       "confirmCreateView", "Please confirm that you want to create a new view.",//
       "confirmRemoveView", "Please confirm that you want to remove the current view.",//
-      "confirmRemoveTable", "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",//
-      "confirmGenerateFunctionalUnitIdentifiers", "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.",//
+      "confirmRemoveTable",
+      "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",
+//
+      "confirmGenerateFunctionalUnitIdentifiers",
+      "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.",
+//
       "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method.",//
-      "confirmDeleteDatabase", "Please confirm that you want to remove this database."})
+      "confirmDeleteDatabase", "Please confirm that you want to remove this database." })
   Map<String, String> confirmationMessageMap();
 
   @Description("A name is required when creating a new folder")
@@ -720,13 +753,14 @@ public interface Translations extends Constants {
       "CsvCannotSetVariableHeader", "Cannot set variables header", //
       "CsvCannotObtainWriter", "Can not get csv writer", //
       "CsvCannotObtainReader", "Can not get csv reader", //
-      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}"})
+      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}" })
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue({"IncompatibleValueType", "Incompatible value types: {0} / {1}", //
+  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value types: {0} / {1}", //
       "IncompatibleEntityType", "Incompatible entity types: {0} / {1}", //
-      "CsvVariableMissing", "Variable name exists in csv data file, but no Variable associated with this name exists in the destination table"})
+      "CsvVariableMissing",
+      "Variable name exists in csv data file, but no Variable associated with this name exists in the destination table" })
   Map<String, String> datasourceComparisonErrorMap();
 
   @Description("New variables label")
@@ -947,7 +981,7 @@ public interface Translations extends Constants {
   String helpLabel();
 
   @Description("KeyType map")
-  @DefaultStringMapValue({"KEY_PAIR", "Key Pair", "CERTIFICATE", "Certificate"})
+  @DefaultStringMapValue({ "KEY_PAIR", "Key Pair", "CERTIFICATE", "Certificate" })
   Map<String, String> keyTypeMap();
 
   @Description("Paste Private Key PEM label")
@@ -1005,11 +1039,11 @@ public interface Translations extends Constants {
   String csvFormatOptionsStep();
 
   @Description("Datasource Type map")
-  @DefaultStringMapValue({"hibernate", "Opal SQL", //
+  @DefaultStringMapValue({ "hibernate", "Opal SQL", //
       "jdbc", "Custom SQL", //
       "fs", "XML", //
       "csv", "CSV", //
-      "excel", "Excel"})
+      "excel", "Excel" })
   Map<String, String> datasourceTypeMap();
 
   @Description("Data Import Format Step")
@@ -1077,8 +1111,8 @@ public interface Translations extends Constants {
   String whoLabel();
 
   @Description("Subject Type map")
-  @DefaultStringMapValue({"USER", "User Name", //
-      "GROUP", "Group Name"})
+  @DefaultStringMapValue({ "USER", "User Name", //
+      "GROUP", "Group Name" })
   Map<String, String> subjectTypeMap();
 
   @Description("Derive label")
@@ -1443,4 +1477,7 @@ public interface Translations extends Constants {
   @DefaultStringValue("Servers")
   String remoteServerBasedDatasources();
 
+  @Description("Elastic Search Configuration")
+  @DefaultStringValue("Elastic search configuration")
+  String esConfigurationLabel();
 }
