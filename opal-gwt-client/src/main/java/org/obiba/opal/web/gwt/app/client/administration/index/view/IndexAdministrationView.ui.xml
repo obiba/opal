@@ -42,7 +42,7 @@
         <b:Button ui:field="stopButton">
           <ui:msg description="Off">Stop</ui:msg>
         </b:Button>
-        <b:Button ui:field="configureButton">
+        <b:Button ui:field="configureButton" addStyleNames="small-indent">
           <ui:msg description="Configure">Configure</ui:msg>
         </b:Button>
       </g:HorizontalPanel>

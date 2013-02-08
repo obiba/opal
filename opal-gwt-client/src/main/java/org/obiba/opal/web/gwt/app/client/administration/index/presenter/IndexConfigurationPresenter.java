@@ -17,7 +17,6 @@ import org.obiba.opal.web.model.client.opal.ESCfgDto;
 import org.obiba.opal.web.model.client.opal.ServiceCfgDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -35,6 +34,8 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
 
   private Mode dialogMode;
 
+  private boolean isEnabled;
+
   public enum Mode {
     UPDATE
   }
@@ -51,10 +52,9 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
 
           @Override
           public void onResource(Response response, ServiceCfgDto dto) {
-            GWT.log(response.getStatusText() + " : " + response.getStatusCode());
-
             ESCfgDto cfg = (ESCfgDto) dto.getExtension("Opal.ESCfgDto.params");
 
+            isEnabled = cfg.getEnabled();
             getView().setClusterName(cfg.getClusterName());
             getView().setIndexName(cfg.getIndexName());
             getView().setDataNode(cfg.getDataNode());
@@ -97,10 +97,11 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
 
     private void updateConfig() {
       ServiceCfgDto dto = ServiceCfgDto.create();
+
       dto.setName("search");
 
       ESCfgDto config = ESCfgDto.create();
-
+      config.setEnabled(isEnabled);
       config.setClusterName(getView().getClusterName().getText());
       config.setIndexName(getView().getIndexName().getText());
       config.setDataNode(getView().isDataNode().getValue());
