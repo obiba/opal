@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.core.runtime.upgrade.binary;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -20,12 +19,10 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
 import org.obiba.opal.core.runtime.support.OpalConfigurationProvider;
-import org.obiba.opal.core.support.TimedExecution;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.jdbc.DatabaseProduct;
 import org.obiba.runtime.jdbc.DatabaseProductRegistry;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
-import org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -48,8 +45,6 @@ public class SqlBinariesTableEngineUpgradeStep extends AbstractUpgradeStep {
 
   private DataSourceFactory dataSourceFactory;
 
-  private SqlScriptUpgradeStep sqlScriptUpgradeStep;
-
   private final Map<DataSource, String> dataSourceNames = new LinkedHashMap<DataSource, String>();
 
   @Override
@@ -70,42 +65,30 @@ public class SqlBinariesTableEngineUpgradeStep extends AbstractUpgradeStep {
 
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
       DataSource dataSource = entry.getKey();
-      String dataSourceName = entry.getValue();
-      log.debug("Analyse datasource {}", dataSourceName);
-      if(hasNonInnoDbBinaryValuesTable(dataSource)) {
-        upgradeSchema(currentVersion, dataSource, dataSourceName);
+      String name = entry.getValue();
+      log.debug("Analyse datasource {}", name);
+      if(isMySql(dataSource) && hasNonInnoDbBinaryValuesTable(dataSource)) {
+        log.debug("  Alter value_set_binary_value engine for datasource {}", name);
+        new JdbcTemplate(dataSource).execute("ALTER TABLE value_set_binary_value ENGINE = InnoDB");
       }
     }
   }
 
-  private void upgradeSchema(Version currentVersion, DataSource dataSource, String name) {
-    log.info("Start schema upgrade for database {}", name);
-    TimedExecution timedExecution = new TimedExecution().start();
-    sqlScriptUpgradeStep.setDataSource(dataSource);
-    try {
-      sqlScriptUpgradeStep.initialize();
-    } catch(IOException e) {
-      throw new RuntimeException("Cannot upgrade schema for binaries table engine", e);
-    }
-    sqlScriptUpgradeStep.execute(currentVersion);
-
-    log.info("Database {}: schema upgraded in {}", name, timedExecution.end().formatExecutionTime());
+  private static boolean isMySql(DataSource dataSource) {
+    DatabaseProduct product = new DatabaseProductRegistry().getDatabaseProduct(dataSource);
+    return "mysql".equals(product.getNormalizedName());
   }
 
   private static boolean hasNonInnoDbBinaryValuesTable(DataSource dataSource) {
     try {
-      DatabaseProduct product = new DatabaseProductRegistry().getDatabaseProduct(dataSource);
-      if("mysql".equals(product.getNormalizedName())) {
-        JdbcTemplate template = new JdbcTemplate(dataSource);
-        String engine = template.queryForObject(
-            "SELECT `engine` FROM information_schema.tables WHERE table_name = ? AND table_schema = database()",
-            new Object[] { "value_set_binary_value" }, String.class);
-        return !"innodb".equalsIgnoreCase(engine);
-      }
+      String engine = new JdbcTemplate(dataSource).queryForObject(
+          "SELECT `engine` FROM information_schema.tables WHERE table_name = ? AND table_schema = database()",
+          new Object[] { "value_set_binary_value" }, String.class);
+      return !"innodb".equalsIgnoreCase(engine);
     } catch(DataAccessException e) {
       log.error("Cannot check if database has a non InnoDB value_set_binary_value table", e);
+      return false;
     }
-    return false;
   }
 
   public void setOpalDataSource(DataSource opalDataSource) {
@@ -118,10 +101,6 @@ public class SqlBinariesTableEngineUpgradeStep extends AbstractUpgradeStep {
 
   public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
     this.dataSourceFactory = dataSourceFactory;
-  }
-
-  public void setSqlScriptUpgradeStep(SqlScriptUpgradeStep sqlScriptUpgradeStep) {
-    this.sqlScriptUpgradeStep = sqlScriptUpgradeStep;
   }
 
   public void setKeyDataSource(DataSource keyDataSource) {
