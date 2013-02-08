@@ -176,7 +176,6 @@ public class OpalJavaClient {
   public void close() {
     if(client != null) {
       log.info("Disconnecting from Opal: {}", opalURI);
-      log.debug("", new Exception());
       getClient().getConnectionManager().shutdown();
     }
   }

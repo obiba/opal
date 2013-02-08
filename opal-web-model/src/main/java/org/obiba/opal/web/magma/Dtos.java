@@ -228,18 +228,13 @@ public final class Dtos {
   }
 
   public static Magma.TimestampsDto.Builder asDto(Timestamps ts) {
-    Magma.TimestampsDto.Builder tsBuilder = null;
+    Magma.TimestampsDto.Builder tsBuilder = Magma.TimestampsDto.newBuilder();
     if(!ts.getCreated().isNull()) {
-      tsBuilder = Magma.TimestampsDto.newBuilder();
       tsBuilder.setCreated(ts.getCreated().toString());
     }
     if(!ts.getLastUpdate().isNull()) {
-      if(tsBuilder == null) {
-        tsBuilder = Magma.TimestampsDto.newBuilder();
-      }
       tsBuilder.setLastUpdate(ts.getLastUpdate().toString());
     }
-
     return tsBuilder;
   }
 
@@ -320,17 +315,14 @@ public final class Dtos {
     return VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).setEntityType(from.getType());
   }
 
+  /**
+   * Does not add values, nor timestamps.
+   *
+   * @param valueSet
+   * @return
+   */
   public static ValueSetsDto.ValueSetDto.Builder asDto(ValueSet valueSet) {
-    ValueSetsDto.ValueSetDto.Builder vsBuilder = ValueSetsDto.ValueSetDto.newBuilder()
-        .setIdentifier(valueSet.getVariableEntity().getIdentifier());
-
-    // add timestamps
-    Magma.TimestampsDto.Builder tsBuilder = asDto(valueSet.getTimestamps());
-    if(tsBuilder != null) {
-      vsBuilder.setTimestamps(tsBuilder);
-    }
-
-    return vsBuilder;
+    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(valueSet.getVariableEntity().getIdentifier());
   }
 
   public static LocaleDto asDto(Locale locale, @Nullable Locale displayLocale) {

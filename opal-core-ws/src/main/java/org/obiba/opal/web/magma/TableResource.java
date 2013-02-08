@@ -140,9 +140,9 @@ public class TableResource extends AbstractValueTableResource {
   @Path("/valueSet/{identifier}/timestamps")
   public Magma.TimestampsDto getValueSetTimestamps(@Context Request request,
       @PathParam("identifier") String identifier) {
-    TimestampedResponses.evaluate(request, getValueTable());
-    ValueSet vs = getValueTable().getValueSet(new VariableEntityBean(getValueTable().getEntityType(), identifier));
-    return Dtos.asDto(vs.getTimestamps()).build();
+    ValueTable table = getValueTable();
+    TimestampedResponses.evaluate(request, table);
+    return Dtos.asDto(table.getValueSetTimestamps(new VariableEntityBean(table.getEntityType(), identifier))).build();
   }
 
   /**
