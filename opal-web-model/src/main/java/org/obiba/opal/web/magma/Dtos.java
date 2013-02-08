@@ -202,13 +202,20 @@ public final class Dtos {
   }
 
   public static TableDto.Builder asDto(ValueTable valueTable, boolean withCounts) {
+    return asDto(valueTable, withCounts, withCounts);
+  }
+
+  public static TableDto.Builder asDto(ValueTable valueTable, boolean withVariableCounts, boolean withValueSetCount) {
     TableDto.Builder builder = TableDto.newBuilder() //
         .setName(valueTable.getName()) //
         .setEntityType(valueTable.getEntityType());
 
-    if(withCounts) {
-      builder.setVariableCount(Iterables.size(valueTable.getVariables())) //
-          .setValueSetCount(valueTable.getVariableEntities().size());
+    if(withVariableCounts) {
+      builder.setVariableCount(Iterables.size(valueTable.getVariables()));
+    }
+
+    if(withValueSetCount) {
+      builder.setValueSetCount(valueTable.getVariableEntities().size());
     }
 
     Magma.TimestampsDto.Builder tsBuilder = asDto(valueTable.getTimestamps());
