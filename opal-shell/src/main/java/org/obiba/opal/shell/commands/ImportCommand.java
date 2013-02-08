@@ -300,16 +300,20 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       return;
     }
 
+    String archivePath = options.getArchive();
     try {
-      FileObject archiveDir = isRelativeFilePath(options.getArchive())
-          ? getFileInUnitDirectory(options.getArchive())
-          : getFile(options.getArchive());
-      //TODO are we sure that archiveDir won't be null?
+      FileObject archiveDir = isRelativeFilePath(archivePath)
+          ? getFileInUnitDirectory(archivePath)
+          : getFile(archivePath);
+      if(archiveDir == null) {
+        throw new IOException(
+            "Cannot archive file " + file.getName().getPath() + ". Archive directory is null: " + archivePath);
+      }
       archiveDir.createFolder();
       FileObject archiveFile = archiveDir.resolveFile(file.getName().getBaseName());
       file.moveTo(archiveFile);
     } catch(FileSystemException ex) {
-      throw new IOException("Failed to archive file " + file.getName().getPath());
+      throw new IOException("Failed to archive file " + file.getName().getPath() + " to " + archivePath);
     }
   }
 
@@ -396,9 +400,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     if(options.isUnit()) {
       FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
       return unitDir.resolveFile(filePath);
-    } else {
-      return null;
     }
+    return null;
   }
 
   private boolean isRelativeFilePath(String filePath) {

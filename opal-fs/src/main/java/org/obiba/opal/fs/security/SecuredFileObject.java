@@ -38,8 +38,8 @@ class SecuredFileObject extends DecoratedFileObject {
   }
 
   @Override
-  public void findFiles(FileSelector selector, boolean depthwise,
-      List<FileObject> selected) throws FileSystemException {
+  public void findFiles(FileSelector selector, boolean depthwise, List<FileObject> selected)
+      throws FileSystemException {
     super.findFiles(selector, depthwise,
         Arrays.asList(toSecuredFileObjects(selected.toArray(new FileObject[selected.size()]))));
   }
@@ -89,11 +89,10 @@ class SecuredFileObject extends DecoratedFileObject {
 
   @Override
   public boolean delete() throws FileSystemException {
-    if (isPermitted(getDecoratedFileObject(), "DELETE")) {
+    if(isPermitted(getDecoratedFileObject(), "DELETE")) {
       return super.delete();
-    } else {
-      throw new FileSystemException("vfs.provider.local/delete-file.error", getName());
     }
+    throw new FileSystemException("vfs.provider.local/delete-file.error", getName());
   }
 
   private FileObject[] toSecuredFileObjects(FileObject... children) {

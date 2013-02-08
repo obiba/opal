@@ -56,7 +56,6 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
 
   public UnitSelectionStepView() {
     widget = uiBinder.createAndBindUi(this);
-    incremental.setValue(true);
     identifierAsIs.setValue(true);
   }
 
