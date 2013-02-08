@@ -12,7 +12,6 @@ package org.obiba.opal.rest.client.magma;
 import java.net.URI;
 import java.util.Set;
 
-import org.apache.commons.logging.impl.SimpleLog;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.NoSuchValueSetException;
@@ -37,8 +36,6 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
@@ -47,7 +44,7 @@ import com.google.common.collect.Iterables;
 @SuppressWarnings("OverlyCoupledClass")
 class RestValueTable extends AbstractValueTable {
 
-  private static final Logger log = LoggerFactory.getLogger(RestValueTable.class);
+//  private static final Logger log = LoggerFactory.getLogger(RestValueTable.class);
 
   private final TableDto tableDto;
 
@@ -193,7 +190,6 @@ class RestValueTable extends AbstractValueTable {
 
     synchronized private void loadTimestamps() {
       try {
-        log.error("loadTimestamps",new Exception());
         Magma.TimestampsDto tsDto = getOpalClient().getResource(Magma.TimestampsDto.class,
             newUri("valueSet", getVariableEntity().getIdentifier(), "timestamps").build(),
             Magma.TimestampsDto.newBuilder());

@@ -131,6 +131,7 @@ public final class Dtos {
   public static AttributeDto.Builder asDto(Attribute from) {
     AttributeDto.Builder a = AttributeDto.newBuilder().setName(from.getName()).setValue(from.getValue().toString());
     if(from.isLocalised()) {
+      //noinspection ConstantConditions
       a.setLocale(from.getLocale().toString());
     }
     if(from.hasNamespace()) {
@@ -303,7 +304,7 @@ public final class Dtos {
     if(!value.isNull() && value.isSequence()) {
       int i = 0;
       for(Value v : value.asSequence().getValue()) {
-        valueDto.addValues(Dtos.asDto(link + "?pos=" + i, v, filterBinary));
+        valueDto.addValues(asDto(link + "?pos=" + i, v, filterBinary));
         i++;
       }
     }
