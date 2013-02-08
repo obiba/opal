@@ -67,15 +67,14 @@ public class GwtApp implements EntryPoint {
           public void onResource(Response response, Subject subject) {
             if(response.getStatusCode() == Response.SC_OK) {
               opalGinjector.getRequestCredentials().setUsername(subject.getPrincipal());
-              opalGinjector.getPlaceManager().revealCurrentPlace();
             } else {
               // Force logout/login
               ResourceRequestBuilderFactory.newBuilder()
                   .forResource("/auth/session/" + opalGinjector.getRequestCredentials().extractCredentials()).delete()
                   .send();
               opalGinjector.getRequestCredentials().invalidate();
-              opalGinjector.getPlaceManager().revealDefaultPlace();
             }
+            opalGinjector.getPlaceManager().revealDefaultPlace();
           }
         }).send();
 
@@ -120,6 +119,7 @@ public class GwtApp implements EntryPoint {
         .addHandler(RequestCredentialsExpiredEvent.getType(), new RequestCredentialsExpiredEvent.Handler() {
           @Override
           public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
+            opalGinjector.getRequestCredentials().invalidate();
             opalGinjector.getPlaceManager().revealDefaultPlace();
           }
         });
