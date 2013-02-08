@@ -8,12 +8,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-             xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
 
@@ -42,6 +42,9 @@
         <b:Button ui:field="stopButton">
           <ui:msg description="Off">Stop</ui:msg>
         </b:Button>
+        <b:Button ui:field="configureButton">
+          <ui:msg description="Configure">Configure</ui:msg>
+        </b:Button>
       </g:HorizontalPanel>
     </g:FlowPanel>
 
@@ -66,9 +69,9 @@
       </g:FlowPanel>
       <g:HorizontalPanel addStyleNames="content">
         <g:FlowPanel>
-        <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync" size="MINI">
-          <ui:msg description="Refresh indices label">Refresh</ui:msg>
-        </b:Button>
+          <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync" size="MINI">
+            <ui:msg description="Refresh indices label">Refresh</ui:msg>
+          </b:Button>
         </g:FlowPanel>
         <b:DropdownButton ui:field="actionsDropdown" text="Actions" size="MINI" addStyleNames="small-indent">
           <b:NavLink>Schedule indexing</b:NavLink>

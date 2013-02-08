@@ -20,8 +20,10 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShie
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldConfigView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldMethodView;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexConfigurationView;
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
@@ -51,6 +53,8 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenter(IndexAdministrationPresenter.class, IndexAdministrationPresenter.Display.class,
         IndexAdministrationView.class, IndexAdministrationPresenter.Proxy.class);
     bindPresenterWidget(IndexPresenter.class, IndexPresenter.Display.class, IndexView.class);
+    bindPresenterWidget(IndexConfigurationPresenter.class, IndexConfigurationPresenter.Display.class,
+        IndexConfigurationView.class);
 
     bindPresenterWidget(DataShieldAdministrationPresenter.class, DataShieldAdministrationPresenter.Display.class,
         DataShieldAdministrationView.class);
