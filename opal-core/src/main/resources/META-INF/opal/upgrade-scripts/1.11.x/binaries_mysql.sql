@@ -12,4 +12,5 @@ CREATE TABLE `value_set_binary_value` (
   KEY `valueSetIndex` (`value_set_id`),
   CONSTRAINT `valueSetIndex` FOREIGN KEY (`value_set_id`) REFERENCES `value_set` (`id`),
   CONSTRAINT `variableIndex` FOREIGN KEY (`variable_id`) REFERENCES `variable` (`id`)
-) ENGINE = InnoDB;
+)
+  ENGINE = InnoDB;

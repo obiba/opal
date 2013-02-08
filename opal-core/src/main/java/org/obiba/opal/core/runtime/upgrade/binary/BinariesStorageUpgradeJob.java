@@ -45,7 +45,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Component
 public class BinariesStorageUpgradeJob implements BackgroundJob {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(BinariesStorageUpgradeJob.class);
 
   private String progressStatus;
 
