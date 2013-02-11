@@ -42,6 +42,9 @@
         <b:Button ui:field="stopButton">
           <ui:msg description="Off">Stop</ui:msg>
         </b:Button>
+        <b:Button ui:field="configureButton" addStyleNames="small-indent">
+          <ui:msg description="Configure">Configure</ui:msg>
+        </b:Button>
       </g:HorizontalPanel>
     </g:FlowPanel>
 
@@ -66,9 +69,9 @@
       </g:FlowPanel>
       <g:HorizontalPanel addStyleNames="content">
         <g:FlowPanel>
-        <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync" size="MINI">
-          <ui:msg description="Refresh indices label">Refresh</ui:msg>
-        </b:Button>
+          <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync" size="MINI">
+            <ui:msg description="Refresh indices label">Refresh</ui:msg>
+          </b:Button>
         </g:FlowPanel>
         <b:DropdownButton ui:field="actionsDropdown" text="Actions" size="MINI" addStyleNames="small-indent">
           <b:NavLink>Schedule indexing</b:NavLink>
