@@ -134,6 +134,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
     return esConfig.getConfig().getIndexName();
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private String indexName(ValueTable vt) {
     return tableReference(vt).toLowerCase().replaceAll(" ", "_");
   }
@@ -147,6 +148,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
         .put("number_of_replicas", esConfig.getConfig().getReplicas()).build();
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private IndexMetaData getIndexMetaData() {
     if(esProvider.getClient() == null) return null;
 
@@ -157,7 +159,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   private IndexMetaData createIndex() {
     IndicesAdminClient idxAdmin = esProvider.getClient().admin().indices();
-    if(idxAdmin.exists(new IndicesExistsRequest(esIndexName())).actionGet().exists() == false) {
+    if(!idxAdmin.exists(new IndicesExistsRequest(esIndexName())).actionGet().exists()) {
       log.info("Creating index [{}]", esIndexName());
       idxAdmin.prepareCreate(esIndexName()).setSettings(getIndexSettings()).execute().actionGet();
     }
@@ -193,18 +195,19 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
     public void run() {
       log.info("Updating ValueTable index {}", index.valueTableReference);
       IndicesAdminClient idxAdmin = esProvider.getClient().admin().indices();
-      if(idxAdmin.exists(new IndicesExistsRequest(esIndexName())).actionGet().exists() == false) {
-        createIndex();
-      } else {
+      if(idxAdmin.exists(new IndicesExistsRequest(esIndexName())).actionGet().exists()) {
         try {
           idxAdmin.prepareDeleteMapping(esIndexName()).setType(index.name).execute().actionGet();
         } catch(TypeMissingException e) {
           // ignored
         }
+      } else {
+        createIndex();
       }
       index();
     }
 
+    @SuppressWarnings("OverlyComplexAnonymousInnerClass")
     private void index() {
 
       XContentBuilder b = new ValueTableMapping().createMapping(runtimeVersion, index.name, valueTable);
@@ -212,7 +215,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
       esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b)
           .execute().actionGet();
 
-      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).from(valueTable)
+      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).ignoreReadErrors().from(valueTable)
           .variables(index.getVariables()).to(new ConcurrentReaderCallback() {
 
         private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
@@ -239,7 +242,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
             XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
             for(int i = 0; i < variables.length; i++) {
               String fieldName = index.getName() + ":" + variables[i].getName();
-              if(values[i].isSequence() && values[i].isNull() == false) {
+              if(values[i].isSequence() && !values[i].isNull()) {
                 for(Value v : values[i].asSequence().getValue()) {
                   xcb.field(fieldName, esValue(variables[i], v));
                 }
@@ -323,6 +326,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
       return done / (float) total;
     }
 
+    @Override
     public void stop() {
       stop = true;
     }
@@ -398,7 +402,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
         @Override
         public boolean apply(Variable input) {
-          return input.getValueType().equals(BinaryType.get()) == false;
+          return !input.getValueType().equals(BinaryType.get());
         }
 
       });
@@ -450,11 +454,9 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
     @Override
     public boolean equals(Object obj) {
-      if(obj == null) return false;
-      if(obj == this) return true;
-      if(!(obj instanceof EsValueTableIndex)) return false;
+      return obj != null &&
+          (obj == this || obj instanceof EsValueTableIndex && ((EsValueTableIndex) obj).name.equals(name));
 
-      return ((EsValueTableIndex) obj).name.equals(name);
     }
 
     @Override
