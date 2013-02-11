@@ -348,6 +348,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       }
     });
 
+    entityColumn.setCellStyleNames("clickable-entity-id");
+
     return entityColumn;
   }
 
