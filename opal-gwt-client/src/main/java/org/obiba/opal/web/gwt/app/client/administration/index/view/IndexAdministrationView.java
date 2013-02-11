@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IndexStatusImageCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
@@ -21,7 +22,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.google.gwt.cell.client.CheckboxCell;
-import com.google.gwt.cell.client.ImageCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -45,8 +45,6 @@ import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_30;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_5;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.NOT_SCHEDULED;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.OUTDATED;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODATE;
 
 public class IndexAdministrationView extends ViewImpl implements IndexAdministrationPresenter.Display {
 
@@ -173,7 +171,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   @Override
-  public MultiSelectionModel getSelectedIndices() {
+  public MultiSelectionModel<TableIndexStatusDto> getSelectedIndices() {
     return selectedIndices;
   }
 
@@ -265,31 +263,12 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
       }
     };
 
-    static final Column<TableIndexStatusDto, String> status = new Column<TableIndexStatusDto, String>(new ImageCell()) {
+    static final Column<TableIndexStatusDto, String> status = new Column<TableIndexStatusDto, String>(
+        new IndexStatusImageCell()) {
 
       @Override
       public String getValue(TableIndexStatusDto tableIndexStatusDto) {
-        // Up to date: green
-        if(tableIndexStatusDto.getStatus().getName().equals(UPTODATE.getName())) {
-          return "image/16/bullet_green.png";
-        }
-        // Out dated but scheduled
-        if(tableIndexStatusDto.getStatus().getName().equals(OUTDATED.getName()) &&
-            !tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-          return "image/16/bullet_orange.png";
-        }
-        // out dated but not scheduled
-        if(tableIndexStatusDto.getStatus().getName().equals(OUTDATED.getName()) &&
-            tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-          return "image/16/bullet_red.png";
-        }
-        // notify() scheduled
-        if(tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-          return "image/16/bullet_black.png";
-        }
-
-        // When in progress...
-        return "image/in-progress.gif";
+        return IndexStatusImageCell.getSrc(tableIndexStatusDto);
       }
     };
   }
