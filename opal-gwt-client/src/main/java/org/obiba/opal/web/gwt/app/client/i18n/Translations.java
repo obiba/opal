@@ -1465,6 +1465,26 @@ public interface Translations extends Constants {
   @DefaultStringValue("minutes")
   String minutesLabel();
 
+  @Description("Index outdated")
+  @DefaultStringValue("Indexation outdated and scheduled")
+  String indexOutdatedScheduled();
+
+  @Description("Index outdated and not scheduled")
+  @DefaultStringValue("Indexation outdated and not scheduled")
+  String indexOutdatedNotScheduled();
+
+  @Description("Index up-to-date")
+  @DefaultStringValue("Indexation up-to-date")
+  String indexUpToDate();
+
+  @Description("Indexation not scheduled")
+  @DefaultStringValue("Indexation not scheduled")
+  String indexNotScheduled();
+
+  @Description("Indexation in progress")
+  @DefaultStringValue("Indexation on progress")
+  String indexInProgress();
+
   @Description("Select some Tables label")
   @DefaultStringValue("Select some tables...")
   String selectSomeTables();
