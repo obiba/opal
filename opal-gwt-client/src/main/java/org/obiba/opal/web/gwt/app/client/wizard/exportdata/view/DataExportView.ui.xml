@@ -47,16 +47,18 @@
               </ui:msg>
             </g:Label>
           </g:FlowPanel>
-          <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key">
-              <ui:msg description="Options title">Options</ui:msg>
-            </g:Label>
-            <g:CheckBox ui:field="useAlias">
-              <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
-                variables
-              </ui:msg>
-            </g:CheckBox>
-          </g:FlowPanel>
+          <g:DisclosurePanel addStyleNames="full-width">
+            <g:customHeader>
+              <g:Label><ui:msg description="Options title">Options</ui:msg></g:Label>
+            </g:customHeader>
+            <g:FlowPanel styleName="input">
+              <g:CheckBox ui:field="useAlias">
+                <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
+                  variables
+                </ui:msg>
+              </g:CheckBox>
+            </g:FlowPanel>
+          </g:DisclosurePanel>
         </g:FlowPanel>
       </o:WizardStep>
 

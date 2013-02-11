@@ -2273,3 +2273,7 @@ a.icon:hover {
 .section-title {
   font-weight: bold;
 }
+
+.clickable-entity-id a {
+  text-decoration: underline;
+}
