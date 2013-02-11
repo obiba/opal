@@ -17,6 +17,7 @@ import org.obiba.opal.web.model.client.opal.ESCfgDto;
 import org.obiba.opal.web.model.client.opal.ServiceCfgDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
