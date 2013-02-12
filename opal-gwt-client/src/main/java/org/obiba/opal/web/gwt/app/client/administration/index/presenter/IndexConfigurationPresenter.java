@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -25,7 +26,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -35,6 +36,8 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
   private Mode dialogMode;
 
   private boolean isEnabled;
+
+  private boolean dataNode;
 
   public enum Mode {
     UPDATE
@@ -55,9 +58,10 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
             ESCfgDto cfg = (ESCfgDto) dto.getExtension("Opal.ESCfgDto.params");
 
             isEnabled = cfg.getEnabled();
+            dataNode = cfg.getDataNode();
+
             getView().setClusterName(cfg.getClusterName());
             getView().setIndexName(cfg.getIndexName());
-            getView().setDataNode(cfg.getDataNode());
             getView().setNbShards(cfg.getShards());
             getView().setNbReplicas(cfg.getReplicas());
             getView().setSettings(cfg.getSettings());
@@ -104,7 +108,7 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
       config.setEnabled(isEnabled);
       config.setClusterName(getView().getClusterName().getText());
       config.setIndexName(getView().getIndexName().getText());
-      config.setDataNode(getView().isDataNode().getValue());
+      config.setDataNode(dataNode);
       config.setShards(getView().getNbShards().intValue());
       config.setReplicas(getView().getNbReplicas().intValue());
       config.setSettings(getView().getSettings().getText());
@@ -135,6 +139,7 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
+      getEventBus().fireEvent(new TableIndicesRefreshEvent());
       if(!(response.getStatusCode() == Response.SC_OK)) {
         ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
         getEventBus().fireEvent(
@@ -156,19 +161,15 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
 
     void setClusterName(String clusterName);
 
-    HasText getClusterName();
+    TextBox getClusterName();
 
     void setIndexName(String indexName);
 
-    HasText getIndexName();
+    TextBox getIndexName();
 
     void setSettings(String settings);
 
     HasText getSettings();
-
-    void setDataNode(Boolean b);
-
-    HasValue<Boolean> isDataNode();
 
     Number getNbShards();
 

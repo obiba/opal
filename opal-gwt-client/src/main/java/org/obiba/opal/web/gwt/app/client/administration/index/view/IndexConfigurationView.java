@@ -24,8 +24,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
@@ -60,13 +60,10 @@ public class IndexConfigurationView extends PopupViewImpl implements IndexConfig
   Button cancelButton;
 
   @UiField
-  HasText clusterName;
+  TextBox clusterName;
 
   @UiField
-  HasText indexName;
-
-  @UiField
-  HasValue<Boolean> dataNode;
+  TextBox indexName;
 
   @UiField
   NumericTextBox nbShards;
@@ -142,23 +139,18 @@ public class IndexConfigurationView extends PopupViewImpl implements IndexConfig
   }
 
   @Override
-  public HasText getClusterName() {
+  public TextBox getClusterName() {
     return clusterName;
   }
 
   @Override
-  public HasText getIndexName() {
+  public TextBox getIndexName() {
     return indexName;
   }
 
   @Override
   public HasText getSettings() {
     return settings;
-  }
-
-  @Override
-  public HasValue<Boolean> isDataNode() {
-    return dataNode;
   }
 
   @Override
@@ -169,11 +161,6 @@ public class IndexConfigurationView extends PopupViewImpl implements IndexConfig
   @Override
   public Number getNbReplicas() {
     return nbReplicas.getNumberValue();
-  }
-
-  @Override
-  public void setDataNode(Boolean b) {
-    dataNode.setValue(b);
   }
 
   @Override

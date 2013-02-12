@@ -32,6 +32,7 @@ import org.obiba.opal.web.model.client.opal.ServiceStatus;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
@@ -87,7 +88,7 @@ public class IndexAdministrationPresenter
 
     HasClickHandlers getStopButton();
 
-    HasClickHandlers getConfigureButton();
+    Button getConfigureButton();
 
     HasClickHandlers getRefreshButton();
 
@@ -367,11 +368,9 @@ public class IndexAdministrationPresenter
       @Override
       public void onClick(ClickEvent event) {
         IndexConfigurationPresenter dialog = indexConfigurationPresenter.get();
-        //dialog.updateSchedules(objects);
         addToPopupSlot(dialog);
       }
     });
-
   }
 
   private void refresh() {

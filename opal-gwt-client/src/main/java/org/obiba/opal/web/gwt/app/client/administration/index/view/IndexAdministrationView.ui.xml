@@ -35,7 +35,7 @@
           </g:HTMLPanel>
         </o:HelpImage>
       </g:FlowPanel>
-      <g:HorizontalPanel addStyleNames="content">
+      <g:HorizontalPanel addStyleNames="content bottom-margin">
         <b:Button ui:field="startButton">
           <ui:msg description="On">Start</ui:msg>
         </b:Button>
@@ -46,6 +46,13 @@
           <ui:msg description="Configure">Configure</ui:msg>
         </b:Button>
       </g:HorizontalPanel>
+      <g:FlowPanel>
+        <g:Label addStyleNames="help-block">
+          <ui:msg description="configure help label">Search service must be stopped to edit configuration. Changes will
+            take effect on service start.
+          </ui:msg>
+        </g:Label>
+      </g:FlowPanel>
     </g:FlowPanel>
 
     <g:FlowPanel addStyleNames="panel">

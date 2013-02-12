@@ -29,6 +29,11 @@
                 <ui:msg description="Cluster name label">Cluster Name</ui:msg>
               </g:Label>
               <g:TextBox name="clusterName" ui:field="clusterName"/>
+              <g:Label styleName="help-block">
+                <ui:msg description="Cluster name help label">You must restart the search service for the changes to
+                  take effect.
+                </ui:msg>
+              </g:Label>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">
@@ -36,12 +41,12 @@
                 <ui:msg description="Index name label">Index Name</ui:msg>
               </g:Label>
               <g:TextBox name="indexName" ui:field="indexName"/>
-            </g:FlowPanel>
-
-            <g:FlowPanel styleName="input">
-              <g:CheckBox ui:field="dataNode">
-                <ui:msg description="Data node label">Data Node</ui:msg>
-              </g:CheckBox>
+              <g:Label styleName="help-block">
+                <ui:msg description="Index name help label">You must restart the search service for the changes to
+                  take effect.
+                  file.
+                </ui:msg>
+              </g:Label>
             </g:FlowPanel>
 
             <g:FlowPanel styleName="input">

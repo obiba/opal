@@ -130,6 +130,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     stopButton.setVisible(false);
     startButton.setVisible(true);
     startButton.setEnabled(true);
+    configureButton.setEnabled(true);
   }
 
   @Override
@@ -137,6 +138,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     startButton.setVisible(false);
     stopButton.setVisible(true);
     stopButton.setEnabled(true);
+    configureButton.setEnabled(false);
   }
 
   @Override
@@ -156,7 +158,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   @Override
-  public HasClickHandlers getConfigureButton() {
+  public Button getConfigureButton() {
     return configureButton;
   }
 
