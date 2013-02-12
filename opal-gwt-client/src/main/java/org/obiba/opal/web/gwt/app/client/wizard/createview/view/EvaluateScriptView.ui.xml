@@ -8,7 +8,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:ace="urn:import:edu.ycp.cs.dh.acegwt.client.ace"
+    xmlns:ace="urn:import:org.obiba.opal.web.gwt.ace.client"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -17,8 +17,7 @@
     <table class="full-width">
       <tr>
         <td>
-          <ace:AceEditor ui:field="scriptArea" addStyleNames="full-width"/>
-          <!--<g:TextArea ui:field="scriptArea" addStyleNames="code high full-width"/>-->
+          <ace:AceEditor ui:field="scriptArea" addStyleNames="full-width" height="200px"/>
         </td>
       </tr>
       <tr>

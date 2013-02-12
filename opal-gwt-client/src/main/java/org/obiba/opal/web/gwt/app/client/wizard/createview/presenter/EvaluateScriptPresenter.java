@@ -33,7 +33,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
 
   private TableDto table;
 
-  private ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
+  private final ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
 
   private boolean repeatable;
 
@@ -53,9 +53,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
     super.registerHandler(getView().addTestScriptClickHandler(new TestButtonClickHandler()));
   }
 
-  public void setReadyOnly(boolean readyOnly) {
-    getView().setReadOnly(readyOnly);
-  }
+
 
   public void setTable(ViewDto viewDto) {
     UriBuilder ub = UriBuilder.create()
@@ -84,7 +82,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
 
   public String getScript() {
     String script = getView().getScript();
-    return script.trim().equals("") ? "null" : script;
+    return "".equals(script.trim()) ? "null" : script;
   }
 
   public void showTest(boolean b) {
@@ -100,11 +98,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
       VariableDto derived = VariableDto.create();
       derived.setValueType(ValueType.TEXT.getLabel());
       derived.setIsRepeatable(repeatable);
-      if(!Strings.isNullOrEmpty(selectedScript)) {
-        VariableDtos.setScript(derived, selectedScript);
-      } else {
-        VariableDtos.setScript(derived, getScript());
-      }
+      VariableDtos.setScript(derived, Strings.isNullOrEmpty(selectedScript) ? getScript() : selectedScript);
       scriptEvaluationPopupPresenter.initialize(table, derived);
     }
   }
@@ -121,7 +115,6 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
 
     HandlerRegistration addTestScriptClickHandler(ClickHandler handler);
 
-    void setReadOnly(boolean readOnly);
 
     void formEnable(boolean enabled);
 

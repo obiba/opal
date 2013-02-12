@@ -9,10 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
+import org.obiba.opal.web.gwt.ace.client.AceEditor;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,10 +21,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
-
-import edu.ycp.cs.dh.acegwt.client.ace.AceEditor;
-import edu.ycp.cs.dh.acegwt.client.ace.AceEditorMode;
-import edu.ycp.cs.dh.acegwt.client.ace.AceEditorTheme;
 
 public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresenter.Display {
 
@@ -43,11 +39,7 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
 
   public EvaluateScriptView() {
     widget = uiBinder.createAndBindUi(this);
-
-//    scriptArea = new AceEditor(true);
-//    scriptArea.startEditor();
-//    scriptArea.setMode(AceEditorMode.JAVASCRIPT);
-//    scriptArea.setTheme(AceEditorTheme.CHROME);
+    GWT.log("EvaluateScriptView", new Exception());
   }
 
   @Override
@@ -74,21 +66,14 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
 
   @Override
   public String getSelectedScript() {
-    //TODO ace
-    return "";
-//    int start = scriptArea.getCursorPos();
-//    return start < 0 ? "" : getScript().substring(start, start + scriptArea.getSelectionLength());
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-    scriptArea.setReadOnly(readOnly);
+    String selectedText = scriptArea.getSelectedText();
+    GWT.log("selectedText: " + selectedText);
+    return selectedText;
   }
 
   @Override
   public void setScript(String script) {
-    //TODO
-//    scriptArea.setText(script);
+    scriptArea.setText(script);
   }
 
   @Override

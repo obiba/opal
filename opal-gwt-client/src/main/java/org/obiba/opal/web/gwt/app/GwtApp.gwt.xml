@@ -52,7 +52,7 @@
   <inherits name='org.obiba.opal.web.gwt.prettify.Prettify'/>
 
   <!-- Ace editor -->
-  <inherits name='edu.ycp.cs.dh.acegwt.AceGWT'/>
+  <inherits name='org.obiba.opal.web.gwt.ace.Ace'/>
 
   <!-- GWT Query Plugins -->
   <inherits name='com.google.gwt.query.Query'/>
