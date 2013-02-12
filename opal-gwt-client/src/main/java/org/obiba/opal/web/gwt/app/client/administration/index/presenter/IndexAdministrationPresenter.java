@@ -34,7 +34,6 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -59,14 +58,13 @@ import com.gwtplatform.mvp.client.annotations.TabInfo;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
-public class IndexAdministrationPresenter extends
-    ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
+public class IndexAdministrationPresenter
+    extends ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
 
   @ProxyStandard
   @NameToken("!admin.search")
   @TabInfo(container = AdministrationPresenter.class, label = "Search", priority = 4)
-  public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {
-  }
+  public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {}
 
   public interface Display extends View {
 
@@ -90,6 +88,8 @@ public class IndexAdministrationPresenter extends
 
     HasClickHandlers getStopButton();
 
+    Button getConfigureButton();
+
     HasClickHandlers getRefreshButton();
 
     MultiSelectionModel<TableIndexStatusDto> getSelectedIndices();
@@ -103,19 +103,23 @@ public class IndexAdministrationPresenter extends
 
   private final Provider<IndexPresenter> indexPresenter;
 
+  private final Provider<IndexConfigurationPresenter> indexConfigurationPresenter;
+
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final ResourceDataProvider<TableIndexStatusDto> resourceDataProvider = new ResourceDataProvider<TableIndexStatusDto>(
-      Resources.indices());
+  private final ResourceDataProvider<TableIndexStatusDto> resourceDataProvider
+      = new ResourceDataProvider<TableIndexStatusDto>(Resources.indices());
 
   private Command confirmedCommand;
 
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
+      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
+      Provider<IndexConfigurationPresenter> indexConfigurationPresenter) {
     super(eventBus, display, proxy);
     this.indexPresenter = indexPresenter;
     this.authorizationPresenter = authorizationPresenter.get();
+    this.indexConfigurationPresenter = indexConfigurationPresenter;
   }
 
   @ProxyEvent
@@ -287,12 +291,13 @@ public class IndexAdministrationPresenter extends
       }
     }));
 
-    registerHandler(getEventBus().addHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.Handler() {
-      @Override
-      public void onRefresh(TableIndicesRefreshEvent event) {
-        refresh();
-      }
-    }));
+    registerHandler(
+        getEventBus().addHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.Handler() {
+          @Override
+          public void onRefresh(TableIndicesRefreshEvent event) {
+            refresh();
+          }
+        }));
 
     // STOP
     registerHandler(getView().getStopButton().addClickHandler(new ClickHandler() {
@@ -357,6 +362,15 @@ public class IndexAdministrationPresenter extends
             .send();
       }
     }));
+
+    // CONFIGURE
+    getView().getConfigureButton().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        IndexConfigurationPresenter dialog = indexConfigurationPresenter.get();
+        addToPopupSlot(dialog);
+      }
+    });
   }
 
   private void refresh() {
@@ -374,7 +388,7 @@ public class IndexAdministrationPresenter extends
     @Override
     public void authorized() {
       // Only bind the table to its data provider if we're authorized
-      if(resourceDataProvider.getDataDisplays().size() == 0) {
+      if(resourceDataProvider.getDataDisplays().isEmpty()) {
         resourceDataProvider.addDataDisplay(getView().getIndexTable());
       }
     }
