@@ -5,17 +5,22 @@
   <!-- Third-party tools and libraries -->
   <!-- Inherit the core Web Toolkit stuff. -->
   <inherits name='com.google.gwt.user.User'/>
+
   <!-- Logging -->
   <inherits name="com.google.gwt.logging.Logging"/>
-  <set-property name="gwt.logging.enabled" value="FALSE"/>
+  <set-property name="gwt.logging.enabled" value="TRUE"/>
+
   <!-- Guava Collections -->
   <inherits name='com.google.common.collect.Collect'/>
+
   <!-- Sophisticated visualisations -->
   <inherits name='com.google.gwt.visualization.Visualization'/>
+
   <!-- Use an MVP pattern framework -->
   <inherits name='com.google.gwt.place.Place'/>
   <inherits name='net.customware.gwt.presenter.Presenter'/>
   <inherits name='com.gwtplatform.mvp.Mvp'/>
+
   <!-- GWT Bootstrap -->
   <inherits name='com.google.gwt.user.theme.standard.Standard'/>
   <inherits name='com.github.gwtbootstrap.Bootstrap'/>
@@ -25,6 +30,7 @@
 
   <!-- Client-side REST framework -->
   <inherits name='org.obiba.opal.web.gwt.rest.Rest'/>
+
   <!-- Opal's WS data models -->
   <inherits name='org.obiba.opal.web.model.Model'/>
 
@@ -44,6 +50,9 @@
 
   <!-- Syntax Highlighting -->
   <inherits name='org.obiba.opal.web.gwt.prettify.Prettify'/>
+
+  <!-- Ace editor -->
+  <inherits name='edu.ycp.cs.dh.acegwt.AceGWT'/>
 
   <!-- GWT Query Plugins -->
   <inherits name='com.google.gwt.query.Query'/>

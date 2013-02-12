@@ -2274,6 +2274,9 @@ a.icon:hover {
   font-weight: bold;
 }
 
+.text-right-aligned {
+  text-align: right;
+}
 .clickable-entity-id a {
   text-decoration: underline;
 }

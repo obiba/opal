@@ -263,7 +263,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     registerHandler(getView().addNameChangedHandler(formChangedHandler));
     registerHandler(getView().addValueTypeChangedHandler(formChangedHandler));
-    registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(formChangedHandler));
+//    registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(formChangedHandler));
     registerHandler(getView().addRepeatableValueChangeHandler(formChangedHandler));
     registerHandler(getView().addOccurrenceGroupChangedHandler(formChangedHandler));
     registerHandler(getView().addUnitChangedHandler(formChangedHandler));

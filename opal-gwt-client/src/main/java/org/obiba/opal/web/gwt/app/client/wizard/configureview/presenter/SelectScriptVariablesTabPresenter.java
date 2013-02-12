@@ -100,7 +100,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     super.registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     super.registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
     super.registerHandler(getView().addVariablestoViewChangeHandler(new VariablesToViewChangeHandler()));
-    super.registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(new ScriptChangeHandler()));
+//    super.registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(new ScriptChangeHandler()));
   }
 
   private boolean validate() {

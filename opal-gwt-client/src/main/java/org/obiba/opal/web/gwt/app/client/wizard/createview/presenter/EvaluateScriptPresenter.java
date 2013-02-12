@@ -127,7 +127,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
 
     void formClear();
 
-    HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
+//    HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
   }
 
 }
