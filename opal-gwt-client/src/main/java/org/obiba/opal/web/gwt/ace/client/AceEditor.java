@@ -16,6 +16,8 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
@@ -26,32 +28,37 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class AceEditor extends Widget implements HasText, HasChangeHandlers, HasEnabled {
+public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeHandlers {
 
   @SuppressWarnings("StaticNonFinalField")
   private static int nextId = 0;
 
+  @SuppressWarnings("FieldCanBeLocal")
   private JavaScriptObject editor;
 
-  private HandlerRegistration attachHandlerRegistration;
+  private HandlerRegistration setTextHandlerRegistration;
+
+  private HandlerRegistration setEnabledHandlerRegistration;
 
   @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
   public AceEditor() {
     setElement(DOM.createDiv());
     getElement().setId("ace-editor-" + nextId++);
+
+    // hack to avoid fire ChangeEvent on Ace change event because Ace API fire change events all the time for internal changes
+    // so we fire ChangeEvent on key down
+    addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), AceEditor.this);
+      }
+    });
   }
 
   @Override
   protected void onLoad() {
     super.onLoad();
     editor = createEditor(getElement().getId());
-    addAceEditorOnChangeHandler(new AceEditorCallback() {
-      @Override
-      public void invokeAceCallback(JavaScriptObject obj) {
-        GWT.log("invokeAceCallback");
-//        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), AceEditor.this);
-      }
-    });
   }
 
   @Override
@@ -63,12 +70,12 @@ public class AceEditor extends Widget implements HasText, HasChangeHandlers, Has
   public void setText(final String text) {
     if(isAttached()) {
       setEditorValue(text);
-      if(attachHandlerRegistration != null) {
-        attachHandlerRegistration.removeHandler();
-        attachHandlerRegistration = null;
+      if(setTextHandlerRegistration != null) {
+        setTextHandlerRegistration.removeHandler();
+        setTextHandlerRegistration = null;
       }
     } else {
-      attachHandlerRegistration = addAttachHandler(new AttachEvent.Handler() {
+      setTextHandlerRegistration = addAttachHandler(new AttachEvent.Handler() {
         @Override
         public void onAttachOrDetach(AttachEvent event) {
           setText(text);
@@ -82,20 +89,43 @@ public class AceEditor extends Widget implements HasText, HasChangeHandlers, Has
     return addDomHandler(handler, ChangeEvent.getType());
   }
 
+  private HandlerRegistration addKeyUpHandler(KeyUpHandler handler) {
+    return addDomHandler(handler, KeyUpEvent.getType());
+  }
+
   @Override
   public final native boolean isEnabled() /*-{
       return this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getReadOnly();
   }-*/;
 
   @Override
-  public final native void setEnabled(boolean enabled) /*-{
-      this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setReadOnly(enabled);
+  public void setEnabled(final boolean enabled) {
+    if(isAttached()) {
+      GWT.log("enabled: " + enabled);
+      setNativeEnabled(enabled);
+      if(setEnabledHandlerRegistration != null) {
+        setEnabledHandlerRegistration.removeHandler();
+        setEnabledHandlerRegistration = null;
+      }
+    } else {
+      setEnabledHandlerRegistration = addAttachHandler(new AttachEvent.Handler() {
+        @Override
+        public void onAttachOrDetach(AttachEvent event) {
+          setEnabled(enabled);
+        }
+      });
+    }
+  }
+
+  public final native void setNativeEnabled(boolean enabled) /*-{
+      this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setReadOnly(!enabled);
   }-*/;
 
   private static native JavaScriptObject createEditor(String elementId) /*-{
       var editor = $wnd.ace.edit(elementId);
       editor.setTheme("ace/theme/textmate");
       editor.getSession().setMode("ace/mode/javascript");
+      editor.getSession().setTabSize(2);
       return editor;
   }-*/;
 
@@ -118,7 +148,7 @@ public class AceEditor extends Widget implements HasText, HasChangeHandlers, Has
    */
   public final native void addAceEditorOnChangeHandler(AceEditorCallback callback) /*-{
       this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getSession().on("change", function (e) {
-          console.log(e);
+//          console.log(e);
           callback.@org.obiba.opal.web.gwt.ace.client.AceEditorCallback::invokeAceCallback(Lcom/google/gwt/core/client/JavaScriptObject;)(e);
       });
   }-*/;

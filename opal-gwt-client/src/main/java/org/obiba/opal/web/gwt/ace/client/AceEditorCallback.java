@@ -14,7 +14,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 /**
  * Note that the argument the callback receives is a JavaScriptObject, so you will probably need to use JSNI to make use of it.
  */
-public interface AceEditorCallback {
+interface AceEditorCallback {
 
   /**
    * Callback method.

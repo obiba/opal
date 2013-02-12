@@ -75,8 +75,7 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
 
   @Override
   public void formEnable(boolean enabled) {
-    //TODO
-//    scriptArea.setEnabled(enabled);
+    scriptArea.setEnabled(enabled);
     testScript.setEnabled(enabled);
   }
 
