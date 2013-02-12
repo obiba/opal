@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -120,23 +121,10 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     }).withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
+        NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
+            .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
 
-        ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-        if(error.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
-          JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error
-              .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
-
-          NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error("JavascriptError")
-              .args(errors.get(0).getSourceName(), //
-                  errors.get(0).getMessage(), //
-                  String.valueOf(errors.get(0).getLineNumber()),//
-                  String.valueOf(errors.get(0).getColumnNumber())).build();
-          eventBus.fireEvent(notificationEvent);
-        } else {
-          eventBus.fireEvent(
-              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                  .build());
-        }
+        eventBus.fireEvent(notificationEvent);
       }
     }
 
