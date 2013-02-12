@@ -19,6 +19,7 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
@@ -53,19 +54,16 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
     super.registerHandler(getView().addTestScriptClickHandler(new TestButtonClickHandler()));
   }
 
-
-
   public void setTable(ViewDto viewDto) {
-    UriBuilder ub = UriBuilder.create()
-        .segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
-    ResourceRequestBuilderFactory.<TableDto>newBuilder()
-        .forResource(ub.build()).get().withCallback(new ResourceCallback<TableDto>() {
-      @Override
-      public void onResource(Response response, TableDto resource) {
-        setTable(resource);
-      }
+    UriBuilder ub = UriBuilder.create().segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResourceCallback<TableDto>() {
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            setTable(resource);
+          }
 
-    }).send();
+        }).send();
   }
 
   public void setTable(TableDto table) {
@@ -115,12 +113,11 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
 
     HandlerRegistration addTestScriptClickHandler(ClickHandler handler);
 
-
     void formEnable(boolean enabled);
 
     void formClear();
 
-//    HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
+    HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
   }
 
 }

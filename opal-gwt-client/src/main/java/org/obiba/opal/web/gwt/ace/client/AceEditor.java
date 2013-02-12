@@ -10,6 +10,9 @@
 package org.obiba.opal.web.gwt.ace.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
@@ -19,7 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class AceEditor extends Widget implements HasText {
+public class AceEditor extends Widget implements HasText, HasChangeHandlers {
 
   @SuppressWarnings("StaticNonFinalField")
   private static int nextId = 0;
@@ -66,4 +69,12 @@ public class AceEditor extends Widget implements HasText {
   public String getSelectedText() {
     return editor.getSelectedText();
   }
+
+  @Override
+  public HandlerRegistration addChangeHandler(ChangeHandler handler) {
+    return addDomHandler(handler, ChangeEvent.getType());
+  }
+
+  // 			DomEvent.fireNativeEvent(Document.get().createChangeEvent(), DropdownBase.this);
+
 }

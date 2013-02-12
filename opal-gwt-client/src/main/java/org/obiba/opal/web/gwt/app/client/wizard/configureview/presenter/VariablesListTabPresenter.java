@@ -35,7 +35,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePend
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -80,6 +79,7 @@ import com.gwtplatform.mvp.client.View;
 /**
  * Variables tab used to specify a view's variables by defining each variable using a Javascript expression.
  */
+@SuppressWarnings("OverlyCoupledClass")
 public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabPresenter.Display> {
 
   private enum Tabs {
@@ -97,8 +97,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
    * Widget for entering, and testing, the "select" script.
    */
   private final EvaluateScriptPresenter evaluateScriptPresenter;
-
-  private final ScriptEvaluationPresenter scriptEvaluationPresenter;
 
   private final CategoriesPresenter categoriesPresenter;
 
@@ -119,12 +117,14 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
-  public VariablesListTabPresenter(Display display, EventBus eventBus, SummaryTabPresenter summaryPresenter, AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter, EvaluateScriptPresenter evaluateScriptPresenter, ScriptEvaluationPresenter scriptEvaluationPresenter, CategoriesPresenter categoriesPresenter, AttributesPresenter attributesPresenter) {
+  public VariablesListTabPresenter(Display display, EventBus eventBus, SummaryTabPresenter summaryPresenter,
+      AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter,
+      EvaluateScriptPresenter evaluateScriptPresenter, CategoriesPresenter categoriesPresenter,
+      AttributesPresenter attributesPresenter) {
     super(eventBus, display);
     this.summaryPresenter = summaryPresenter;
     this.addDerivedVariableDialogPresenter = addDerivedVariableDialogPresenter;
     this.evaluateScriptPresenter = evaluateScriptPresenter;
-    this.scriptEvaluationPresenter = scriptEvaluationPresenter;
     this.categoriesPresenter = categoriesPresenter;
     this.attributesPresenter = attributesPresenter;
   }
@@ -163,7 +163,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
 
-    VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    VariableListViewDto variableListDto = (VariableListViewDto) viewDto
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     variableListDto.setVariablesArray(JsArrays.toSafeArray(variableListDto.getVariablesArray()));
 
     evaluateScriptPresenter.setTable(viewDto);
@@ -198,7 +199,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
    * Returns an up-to-date list of variables.
    */
   private List<VariableDto> getVariableList() {
-    VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    VariableListViewDto variableListDto = (VariableListViewDto) viewDto
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     return JsArrays.toList(variableListDto.getVariablesArray());
   }
 
@@ -235,7 +237,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   private void registerEventHandlers() {
     registerNavigationEventHandlers();
 
-    registerHandler(getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
+    registerHandler(getEventBus()
+        .addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
 
     registerHandler(getView().addRepeatableValueChangeHandler(new RepeatableClickHandler()));
     registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
@@ -245,7 +248,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     registerHandler(getView().getDetailTabs().addBeforeSelectionHandler(new DetailTabsBeforeSelectionHandler()));
     registerHandler(getEventBus().addHandler(VariableAddRequiredEvent.getType(), new VariableAddRequiredHandler()));
-    registerHandler(getEventBus().addHandler(DerivedVariableConfigurationRequiredEvent.getType(), new DerivedVariableConfigurationRequiredHandler()));
+    registerHandler(getEventBus().addHandler(DerivedVariableConfigurationRequiredEvent.getType(),
+        new DerivedVariableConfigurationRequiredHandler()));
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
 
@@ -263,7 +267,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     registerHandler(getView().addNameChangedHandler(formChangedHandler));
     registerHandler(getView().addValueTypeChangedHandler(formChangedHandler));
-//    registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(formChangedHandler));
+    registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(formChangedHandler));
     registerHandler(getView().addRepeatableValueChangeHandler(formChangedHandler));
     registerHandler(getView().addOccurrenceGroupChangedHandler(formChangedHandler));
     registerHandler(getView().addUnitChangedHandler(formChangedHandler));
@@ -274,7 +278,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   }
 
   private void addValidators() {
-    validators.add(new ConditionalValidator(getView().getRepeatable(), new RequiredTextValidator(getView().getOccurrenceGroup(), "OccurrenceGroupIsRequired")));
+    validators.add(new ConditionalValidator(getView().getRepeatable(),
+        new RequiredTextValidator(getView().getOccurrenceGroup(), "OccurrenceGroupIsRequired")));
     validators.add(new RequiredTextValidator(getView().getName(), "NewVariableNameIsRequired"));
     validators.add(new UniqueVariableNameValidator("VariableNameNotUnique"));
   }
@@ -490,9 +495,9 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     @Override
     public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
       switch(Tabs.values()[event.getItem()]) {
-      case SUMMARY:
-        summaryPresenter.refreshDisplay();
-        break;
+        case SUMMARY:
+          summaryPresenter.refreshDisplay();
+          break;
       }
     }
   }
@@ -501,32 +506,36 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-      VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto
+          .getExtension(VariableListViewDto.ViewDtoExtensions.view);
       variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
 
       final VariableDto currentVariableDto = getView().getVariableDto(evaluateScriptPresenter.getScript());
 
       getView().setInProgress(true);
 
-      UriBuilder ub = UriBuilder.create().segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
-      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<TableDto>() {
-        @Override
-        public void onResource(Response response, TableDto resource) {
-          StringBuilder link = new StringBuilder();
-          link.append(resource.getViewLink()).append("/from");
-          link.append("/variable/_transient/_compile?");
-          link.append("valueType=").append(currentVariableDto.getValueType()) //
-          .append("&repeatable=").append(currentVariableDto.getIsRepeatable());
+      UriBuilder ub = UriBuilder.create()
+          .segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, TableDto resource) {
+              StringBuilder link = new StringBuilder();
+              link.append(resource.getViewLink()).append("/from");
+              link.append("/variable/_transient/_compile?");
+              link.append("valueType=").append(currentVariableDto.getValueType()) //
+                  .append("&repeatable=").append(currentVariableDto.getIsRepeatable());
 
-          final String script = VariableDtos.getScript(currentVariableDto);
-          ResponseCodeCallback callback = new ScriptEvaluationCallback(currentVariableDto);
+              String script = VariableDtos.getScript(currentVariableDto);
+              ResponseCodeCallback callback = new ScriptEvaluationCallback(currentVariableDto);
 
-          ResourceRequestBuilderFactory.newBuilder().forResource(link.toString()).post().withFormBody("script", script)//
-          .withCallback(Response.SC_BAD_REQUEST, callback)//
-          .withCallback(Response.SC_OK, callback).send();
+              ResourceRequestBuilderFactory.newBuilder().forResource(link.toString()).post()
+                  .withFormBody("script", script)//
+                  .withCallback(Response.SC_BAD_REQUEST, callback)//
+                  .withCallback(Response.SC_OK, callback).send();
 
-        }
-      }).send();
+            }
+          }).send();
     }
   }
 
@@ -553,36 +562,40 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       setEmptyDerivedVariable();
       for(int i = 0; i < viewDto.getFromArray().length(); i++) {
         String[] tableParts = viewDto.getFromArray().get(i).split("\\.");
-        UriBuilder ub = UriBuilder.create().segment("datasource", tableParts[0], "table", tableParts[1], "variable", newDerivedVariableName);
-        ResourceRequestBuilderFactory.<VariableDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<VariableDto>() {
-          @Override
-          public void onResource(Response response, VariableDto variableDto) {
-            variableDto.setName(translations.copyOf() + variableDto.getName());
-            getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
-            setButtonsWhenAddingVariable();
-          }
-        }).withCallback(Response.SC_NOT_FOUND, doNothingResponseCodeCallback()).send();
+        UriBuilder ub = UriBuilder.create()
+            .segment("datasource", tableParts[0], "table", tableParts[1], "variable", newDerivedVariableName);
+        ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(ub.build()).get()
+            .withCallback(new ResourceCallback<VariableDto>() {
+              @Override
+              public void onResource(Response response, VariableDto variableDto) {
+                variableDto.setName(translations.copyOf() + variableDto.getName());
+                getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+                setButtonsWhenAddingVariable();
+              }
+            }).withCallback(Response.SC_NOT_FOUND, doNothingResponseCodeCallback()).send();
       }
     }
 
     private void setEmptyDerivedVariable() {
-      UriBuilder ub = UriBuilder.create().segment("datasource", firstTableInViewParts[0], "table", firstTableInViewParts[1]);
-      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<TableDto>() {
-        @Override
-        public void onResource(Response response, TableDto firstTableDto) {
-          VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
-          getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
-          setButtonsWhenAddingVariable();
-        }
+      UriBuilder ub = UriBuilder.create()
+          .segment("datasource", firstTableInViewParts[0], "table", firstTableInViewParts[1]);
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, TableDto firstTableDto) {
+              VariableDto variableDto = createEmptyDerivedVariable(firstTableDto.getEntityType());
+              getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+              setButtonsWhenAddingVariable();
+            }
 
-        private VariableDto createEmptyDerivedVariable(String entityType) {
-          VariableDto variableDto = VariableDto.create();
-          variableDto.setName(newDerivedVariableName);
-          variableDto.setEntityType(entityType);
-          variableDto.setValueType("text");
-          return variableDto;
-        }
-      }).send();
+            private VariableDto createEmptyDerivedVariable(String entityType) {
+              VariableDto variableDto = VariableDto.create();
+              variableDto.setName(newDerivedVariableName);
+              variableDto.setEntityType(entityType);
+              variableDto.setValueType("text");
+              return variableDto;
+            }
+          }).send();
     }
 
     private ResponseCodeCallback doNothingResponseCodeCallback() {
@@ -596,29 +609,31 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     private void newDerivedVariableIsCopyOfExistingDerivedVariable() {
       UriBuilder ub = UriBuilder.create().segment("datasource", viewDto.getDatasourceName(), "view", viewDto.getName());
-      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(ub.build()).get().withCallback(new ResourceCallback<ViewDto>() {
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(new ResourceCallback<ViewDto>() {
 
-        private List<VariableDto> variablesList;
+            private List<VariableDto> variablesList;
 
-        @Override
-        public void onResource(Response response, ViewDto viewDto) {
-          VariableListViewDto variableListDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
-          variablesList = JsArrays.toList(variableListDto.getVariablesArray());
-          VariableDto variableDto = getVariableDto();
-          variableDto.setName(translations.copyOf() + variableDto.getName());
-          getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
-          setButtonsWhenAddingVariable();
-        }
-
-        private VariableDto getVariableDto() {
-          for(VariableDto variableDto : variablesList) {
-            if(newDerivedVariableName.equals(variableDto.getName())) {
-              return variableDto;
+            @Override
+            public void onResource(Response response, ViewDto dto) {
+              VariableListViewDto variableListDto = (VariableListViewDto) dto
+                  .getExtension(VariableListViewDto.ViewDtoExtensions.view);
+              variablesList = JsArrays.toList(variableListDto.getVariablesArray());
+              VariableDto variableDto = getVariableDto();
+              variableDto.setName(translations.copyOf() + variableDto.getName());
+              getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
+              setButtonsWhenAddingVariable();
             }
-          }
-          return null;
-        }
-      }).send();
+
+            private VariableDto getVariableDto() {
+              for(VariableDto variableDto : variablesList) {
+                if(newDerivedVariableName.equals(variableDto.getName())) {
+                  return variableDto;
+                }
+              }
+              return null;
+            }
+          }).send();
     }
 
     private boolean isNewDerivedVariableNameSameAsExistingDerivedVariableName() {
@@ -649,7 +664,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
         private void deleteCurrentVariable() {
           VariableDto nextVariable = variableToDisplayAfterCurrentVariableDeleted();
-          VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+          VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto
+              .getExtension(VariableListViewDto.ViewDtoExtensions.view);
           VariableDto variableToDelete = getView().getVariableDto(evaluateScriptPresenter.getScript());
           @SuppressWarnings("unchecked")
           JsArray<VariableDto> newVariables = (JsArray<VariableDto>) JsArray.createArray();
@@ -671,7 +687,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         }
 
       };
-      getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "deleteVariableTitle", "confirmVariableDelete"));
+      getEventBus().fireEvent(ConfirmationRequiredEvent
+          .createWithKeys(actionRequiringConfirmation, "deleteVariableTitle", "confirmVariableDelete"));
     }
 
   }
@@ -680,7 +697,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+          event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }
@@ -704,11 +722,16 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   private void updateSummaryLink(boolean hasChanges) {
 
     // TODO: this link should be built from VariableDto.getLink() but it's not initialised in ViewResource
-    StringBuilder summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/variable/" + currentVariable.getName() + "/summary");
+    StringBuilder summaryLink = new StringBuilder(
+        "/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/variable/" +
+            currentVariable.getName() + "/summary");
     if(hasChanges) {
 
       // TODO: it would probably be simpler to add a VariableDto to the body instead of putting everything on the URL
-      summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() + "/from/variable/_transient/summary?valueType=" + getView().getVariableDto(evaluateScriptPresenter.getScript()).getValueType() + "&script=" + URL.encodeQueryString(evaluateScriptPresenter.getScript()));
+      summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() +
+          "/from/variable/_transient/summary?valueType=" +
+          getView().getVariableDto(evaluateScriptPresenter.getScript()).getValueType() + "&script=" +
+          URL.encodeQueryString(evaluateScriptPresenter.getScript()));
 
       if(currentVariable.getCategoriesArray() != null) {
         JsArray<CategoryDto> cats = currentVariable.getCategoriesArray();
@@ -721,7 +744,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   }
 
-  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean>, CategoriesUpdatedEvent.Handler, AttributesUpdatedEvent.Handler {
+  class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean>, CategoriesUpdatedEvent.Handler,
+      AttributesUpdatedEvent.Handler {
 
     @Override
     public void onChange(ChangeEvent arg0) {
@@ -816,7 +840,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     private final VariableDto currentVariableDto;
 
     /**
-     * @param eval
      * @param currentVariableDto
      */
     private ScriptEvaluationCallback(VariableDto currentVariableDto) {
@@ -833,7 +856,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
 
     public void onSuccess() {
-      VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto
+          .getExtension(VariableListViewDto.ViewDtoExtensions.view);
       variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
 
       if(isEmptyVariable(variableListViewDto)) {
@@ -854,17 +878,19 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       try {
         ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
         @SuppressWarnings("unchecked")
-        JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto.getExtension(ClientErrorDtoExtensions.errors);
+        JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
+            .getExtension(ClientErrorDtoExtensions.errors);
         List<String> messages = new ArrayList<String>();
         for(JavaScriptErrorDto error : JsArrays.toIterable(errors)) {
           String msg = error.getMessage() + " (line #" + error.getLineNumber() + ")";
           messages.add(msg);
           GWT.log(msg);
         }
-        if(messages.isEmpty() == false) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
+        if(messages.isEmpty()) {
+          getEventBus()
+              .fireEvent(NotificationEvent.newBuilder().error(JsArrays.toList(errorDto.getArgumentsArray())).build());
         } else {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(JsArrays.toList(errorDto.getArgumentsArray())).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
         }
       } catch(Exception e) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("Script compilation failed.").build());

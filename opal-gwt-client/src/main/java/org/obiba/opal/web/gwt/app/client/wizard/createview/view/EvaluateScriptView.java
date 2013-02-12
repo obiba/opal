@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.ace.client.AceEditor;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -52,12 +53,12 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
     return testScript.addClickHandler(handler);
   }
 
-//  @Override
-//  public HandlerRegistration addScriptChangeHandler(ChangeHandler handler) {
-//    //TODO ace
-////    return scriptArea.addChangeHandler(handler);
-//    return null;
-//  }
+  @Override
+  public HandlerRegistration addScriptChangeHandler(ChangeHandler handler) {
+    //TODO ace
+//    return scriptArea.addChangeHandler(handler);
+    return null;
+  }
 
   @Override
   public String getScript() {
