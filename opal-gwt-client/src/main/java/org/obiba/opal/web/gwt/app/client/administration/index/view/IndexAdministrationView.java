@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IndexStatusImageCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
@@ -21,7 +22,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.google.gwt.cell.client.CheckboxCell;
-import com.google.gwt.cell.client.ImageCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -45,14 +45,11 @@ import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_30;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_5;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.NOT_SCHEDULED;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.OUTDATED;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODATE;
 
 public class IndexAdministrationView extends ViewImpl implements IndexAdministrationPresenter.Display {
 
   @UiTemplate("IndexAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, IndexAdministrationView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, IndexAdministrationView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -65,6 +62,9 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
 
   @UiField
   Button stopButton;
+
+  @UiField
+  Button configureButton;
 
   @UiField
   Button refreshIndicesButton;
@@ -89,7 +89,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
       new ActionsProvider<TableIndexStatusDto>() {
 
-        private final String[] all = new String[] {CLEAR_ACTION, INDEX_ACTION};
+        private final String[] all = new String[] { CLEAR_ACTION, INDEX_ACTION };
 
         @Override
         public String[] allActions() {
@@ -130,6 +130,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     stopButton.setVisible(false);
     startButton.setVisible(true);
     startButton.setEnabled(true);
+    configureButton.setEnabled(true);
   }
 
   @Override
@@ -137,6 +138,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     startButton.setVisible(false);
     stopButton.setVisible(true);
     stopButton.setEnabled(true);
+    configureButton.setEnabled(false);
   }
 
   @Override
@@ -156,6 +158,11 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   @Override
+  public Button getConfigureButton() {
+    return configureButton;
+  }
+
+  @Override
   public HasClickHandlers getRefreshButton() {
     return refreshIndicesButton;
   }
@@ -166,7 +173,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   @Override
-  public MultiSelectionModel getSelectedIndices() {
+  public MultiSelectionModel<TableIndexStatusDto> getSelectedIndices() {
     return selectedIndices;
   }
 
@@ -238,8 +245,9 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
         if(object.getSchedule().getType().getName().equals(MINUTES_30.getName())) {
           return translations.minutes30Label();
         }
-        String minutes = object.getSchedule().getMinutes() < 10 ? "0" + object.getSchedule().getMinutes() : String
-            .valueOf(object.getSchedule().getMinutes());
+        String minutes = object.getSchedule().getMinutes() < 10
+            ? "0" + object.getSchedule().getMinutes()
+            : String.valueOf(object.getSchedule().getMinutes());
         if(object.getSchedule().getType().getName().equals(HOURLY.getName())) {
           return translations.hourlyAtLabel().replace("{0}", minutes);
         }
@@ -257,32 +265,12 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
       }
     };
 
-    static final Column<TableIndexStatusDto, String> status = new Column<TableIndexStatusDto,
-        String>(new ImageCell()) {
+    static final Column<TableIndexStatusDto, String> status = new Column<TableIndexStatusDto, String>(
+        new IndexStatusImageCell()) {
 
       @Override
       public String getValue(TableIndexStatusDto tableIndexStatusDto) {
-        // Up to date: green
-        if(tableIndexStatusDto.getStatus().getName().equals(UPTODATE.getName())) {
-          return "image/16/bullet_green.png";
-        }
-        // Out dated but scheduled
-        if(tableIndexStatusDto.getStatus().getName().equals(OUTDATED.getName()) && !tableIndexStatusDto.getSchedule()
-            .getType().isScheduleType(NOT_SCHEDULED)) {
-          return "image/16/bullet_orange.png";
-        }
-        // out dated but not scheduled
-        if(tableIndexStatusDto.getStatus().getName().equals(OUTDATED.getName()) && tableIndexStatusDto.getSchedule()
-            .getType().isScheduleType(NOT_SCHEDULED)) {
-          return "image/16/bullet_red.png";
-        }
-        // notify() scheduled
-        if(tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-          return "image/16/bullet_black.png";
-        }
-
-        // When in progress...
-        return "image/in-progress.gif";
+        return IndexStatusImageCell.getSrc(tableIndexStatusDto);
       }
     };
   }
