@@ -55,9 +55,7 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
 
   @Override
   public HandlerRegistration addScriptChangeHandler(ChangeHandler handler) {
-    //TODO ace
-//    return scriptArea.addChangeHandler(handler);
-    return null;
+    return scriptArea.addChangeHandler(handler);
   }
 
   @Override
@@ -67,9 +65,7 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
 
   @Override
   public String getSelectedScript() {
-    String selectedText = scriptArea.getSelectedText();
-    GWT.log("selectedText: " + selectedText);
-    return selectedText;
+    return scriptArea.getSelectedText();
   }
 
   @Override
@@ -79,7 +75,7 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
 
   @Override
   public void formEnable(boolean enabled) {
-    //TODO ace
+    //TODO
 //    scriptArea.setEnabled(enabled);
     testScript.setEnabled(enabled);
   }
