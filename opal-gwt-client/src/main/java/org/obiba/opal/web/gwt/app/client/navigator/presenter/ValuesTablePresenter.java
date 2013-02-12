@@ -13,12 +13,12 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -145,11 +145,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @SuppressWarnings("unchecked")
     protected void notifyError(Response response) {
-      ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error
-          .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
-      String firstError = errors.get(0).getMessage();
-      NotificationEvent notificationEvent = NotificationEvent.Builder.newNotification().error(firstError).build();
+      NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
+          .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
       getEventBus().fireEvent(notificationEvent);
     }
   }
