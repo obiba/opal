@@ -16,9 +16,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.ESCfgDto;
 import org.obiba.opal.web.model.client.opal.ServiceCfgDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -76,6 +74,7 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
     registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
 
     registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
@@ -120,10 +119,10 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
     }
 
     private void putESCfg(ServiceCfgDto dto) {
-      CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+      ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
       ResourceRequestBuilderFactory.newBuilder().forResource("/service/search/cfg").put()//
           .withResourceBody(ServiceCfgDto.stringify(dto))//
-          .withCallback(Response.SC_OK, callbackHandler).send();
+          .withCallback(callbackHandler, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).send();
     }
 
   }
@@ -132,7 +131,7 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
 
     ServiceCfgDto dto;
 
-    public CreateOrUpdateMethodCallBack(ServiceCfgDto dto) {
+    private CreateOrUpdateMethodCallBack(ServiceCfgDto dto) {
       this.dto = dto;
     }
 
@@ -140,11 +139,8 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
       getEventBus().fireEvent(new TableIndicesRefreshEvent());
-      if(!(response.getStatusCode() == Response.SC_OK)) {
-        ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-        getEventBus().fireEvent(
-            NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                .build());
+      if(response.getStatusCode() != Response.SC_OK) {
+        getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
       }
     }
   }

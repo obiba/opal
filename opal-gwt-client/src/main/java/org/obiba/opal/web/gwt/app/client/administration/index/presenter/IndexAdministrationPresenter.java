@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
@@ -182,15 +183,19 @@ public class IndexAdministrationPresenter
     getView().getActionsDropdown().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().CLEAR_ACTION)) {
+        getView();
+        if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(Display.CLEAR_ACTION)) {
           doClear();
-        } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().SCHEDULE)) {
+        } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(Display.SCHEDULE)) {
           doSchedule();
         }
       }
 
       private void doClear() {
-        if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+        if(getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+          getEventBus()
+              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
+        } else {
 
           for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
             ResponseCodeCallback callback = new ResponseCodeCallback() {
@@ -208,16 +213,16 @@ public class IndexAdministrationPresenter
 
             getView().getSelectedIndices().setSelected(object, false);
           }
-        } else {
-          getEventBus()
-              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
         }
       }
 
       private void doSchedule() {
-        if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+        if(getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+          getEventBus()
+              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
+        } else {
 
-          ArrayList<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
+          List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
           for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
             objects.add(object);
           }
@@ -226,15 +231,13 @@ public class IndexAdministrationPresenter
           dialog.updateSchedules(objects);
           addToPopupSlot(dialog);
 
-        } else {
-          getEventBus()
-              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
         }
       }
     });
 
     getView().getActions().setActionHandler(new ActionHandler<TableIndexStatusDto>() {
 
+      @SuppressWarnings("UnnecessaryFinalOnLocalVariableOrParameter")
       @Override
       public void doAction(final TableIndexStatusDto object, String actionName) {
         if(actionName.equalsIgnoreCase(Display.CLEAR_ACTION)) {
@@ -345,10 +348,7 @@ public class IndexAdministrationPresenter
               refresh();
             } else {
               getView().serviceStartable();
-              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                      .build());
+              getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
             }
           }
 
@@ -358,8 +358,7 @@ public class IndexAdministrationPresenter
         getView().serviceExecutionPending();
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
             .forResource(Resources.searchServiceEnabled()).accept("application/json")//
-            .withCallback(Response.SC_OK, callback).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback).put()
-            .send();
+            .withCallback(callback, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).put().send();
       }
     }));
 
