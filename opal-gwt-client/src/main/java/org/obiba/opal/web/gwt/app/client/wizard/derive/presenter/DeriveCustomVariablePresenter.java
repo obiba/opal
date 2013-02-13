@@ -42,7 +42,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     super(eventBus, view);
     this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
-    this.scriptEditorPresenter.setVariableGenerator(new DeriveCustomVariableGenerator());
+    this.scriptEditorPresenter.setVariableDtoFactory(new DeriveCustomVariableDtoFactory());
   }
 
   @Override
@@ -73,7 +73,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     scriptEvaluationPopupPresenter.getView().hide();
   }
 
-  public class DeriveCustomVariableGenerator implements ScriptEditorPresenter.VariableGenerator {
+  public class DeriveCustomVariableDtoFactory implements ScriptEditorPresenter.VariableDtoFactory {
 
     @Override
     public VariableDto create() {

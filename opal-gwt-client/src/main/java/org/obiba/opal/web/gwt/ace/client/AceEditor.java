@@ -17,35 +17,23 @@ import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SimplePanel;
 
 /**
  * Ace editor
  *
  * @see http://ace.ajax.org
  */
-public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeHandlers {
+public class AceEditor extends SimplePanel implements HasText, HasEnabled, HasChangeHandlers {
 
-  @SuppressWarnings("StaticNonFinalField")
-  private static int nextId = 0;
-
-  @SuppressWarnings("FieldCanBeLocal")
+  @SuppressWarnings({ "FieldCanBeLocal", "UnusedDeclaration" })
   private JavaScriptObject editor;
 
-  private HandlerRegistration setTextHandlerRegistration;
-
-  private HandlerRegistration setEnabledHandlerRegistration;
-
-  @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
   public AceEditor() {
-    setElement(DOM.createDiv());
-    getElement().setId("ace-editor-" + nextId++);
-
     // Hack to avoid fire ChangeEvent on Ace change event because Ace API fire change events on SetValue() and for all internal changes.
     // So we fire ChangeEvent on key down
     addKeyUpHandler(new KeyUpHandler() {
@@ -59,40 +47,27 @@ public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeH
   @Override
   protected void onLoad() {
     super.onLoad();
-    editor = createEditor(getElement().getId());
+    editor = createEditor(getElement());
   }
 
-  private static native JavaScriptObject createEditor(String elementId) /*-{
-      var editor = $wnd.ace.edit(elementId);
+  private static native JavaScriptObject createEditor(Element element) /*-{
+      var editor = $wnd.ace.edit(element);
       editor.setTheme("ace/theme/textmate");
       editor.getSession().setMode("ace/mode/javascript");
       editor.getSession().setTabSize(2);
       return editor;
   }-*/;
 
+  /**
+   * Beautify JS before returning it
+   *
+   * @return
+   */
   @Override
   public final native String getText() /*-{
       var value = this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getValue();
       return $wnd.js_beautify(value, { 'indent_size': 2 });
   }-*/;
-
-  @Override
-  public void setText(final String text) {
-    if(isAttached()) {
-      setEditorValue(text);
-      if(setTextHandlerRegistration != null) {
-        setTextHandlerRegistration.removeHandler();
-        setTextHandlerRegistration = null;
-      }
-    } else {
-      setTextHandlerRegistration = addAttachHandler(new AttachEvent.Handler() {
-        @Override
-        public void onAttachOrDetach(AttachEvent event) {
-          setText(text);
-        }
-      });
-    }
-  }
 
   @Override
   public HandlerRegistration addChangeHandler(ChangeHandler handler) {
@@ -109,28 +84,12 @@ public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeH
   }-*/;
 
   @Override
-  public void setEnabled(final boolean enabled) {
-    if(isAttached()) {
-      setNativeEnabled(enabled);
-      if(setEnabledHandlerRegistration != null) {
-        setEnabledHandlerRegistration.removeHandler();
-        setEnabledHandlerRegistration = null;
-      }
-    } else {
-      setEnabledHandlerRegistration = addAttachHandler(new AttachEvent.Handler() {
-        @Override
-        public void onAttachOrDetach(AttachEvent event) {
-          setEnabled(enabled);
-        }
-      });
-    }
-  }
-
-  public final native void setNativeEnabled(boolean enabled) /*-{
+  public final native void setEnabled(boolean enabled) /*-{
       this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setReadOnly(!enabled);
   }-*/;
 
-  private native void setEditorValue(String value) /*-{
+  @Override
+  public native void setText(String value) /*-{
       this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setValue(value);
   }-*/;
 

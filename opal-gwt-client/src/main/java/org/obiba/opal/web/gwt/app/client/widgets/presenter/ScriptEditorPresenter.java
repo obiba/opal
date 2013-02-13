@@ -37,7 +37,7 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
 
   private boolean repeatable;
 
-  private VariableGenerator variableGenerator = new DefaultVariableGenerator();
+  private VariableDtoFactory variableDtoFactory = new DefaultVariableDtoFactory();
 
   @Inject
   public ScriptEditorPresenter(EventBus eventBus, Display view,
@@ -55,7 +55,7 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     registerHandler(getView().addTestScriptClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        scriptEvaluationPopupPresenter.initialize(table, getVariableGenerator().create());
+        scriptEvaluationPopupPresenter.initialize(table, getVariableDtoFactory().create());
       }
     }));
   }
@@ -97,19 +97,19 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     getView().showTest(b);
   }
 
-  public void setVariableGenerator(VariableGenerator variableGenerator) {
-    this.variableGenerator = variableGenerator;
+  public void setVariableDtoFactory(VariableDtoFactory variableDtoFactory) {
+    this.variableDtoFactory = variableDtoFactory;
   }
 
-  public VariableGenerator getVariableGenerator() {
-    return variableGenerator;
+  public VariableDtoFactory getVariableDtoFactory() {
+    return variableDtoFactory;
   }
 
-  public interface VariableGenerator {
+  public interface VariableDtoFactory {
     VariableDto create();
   }
 
-  public class DefaultVariableGenerator implements VariableGenerator {
+  public class DefaultVariableDtoFactory implements VariableDtoFactory {
 
     @Override
     public VariableDto create() {
