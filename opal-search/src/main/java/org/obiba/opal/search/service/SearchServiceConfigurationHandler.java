@@ -64,19 +64,23 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
 
     // delete indices and restart service
     if(flushIndices) {
-      log.info("Clear Elastic Search indexes: {}", indexPath);
-      try {
-        File indexDir = new File(indexPath);
-        if(indexDir.exists() && indexDir.isDirectory()) {
-          deleteDirectoryContents(indexDir);
-        } else {
-          log.warn("Cannot find Elastic Search indexes: {}", indexPath);
-        }
-      } catch(IOException e) {
-        throw new RuntimeException("Error while clearing Elastic Search indexes " + indexPath, e);
-      }
+      deleteESData();
     }
     configService.update(config);
+  }
+
+  private void deleteESData() {
+    log.info("Clear Elastic Search indexes: {}", indexPath);
+    try {
+      File indexDir = new File(indexPath);
+      if(indexDir.exists() && indexDir.isDirectory()) {
+        deleteDirectoryContents(indexDir);
+      } else {
+        log.warn("Cannot find Elastic Search indexes: {}", indexPath);
+      }
+    } catch(IOException e) {
+      throw new RuntimeException("Error while clearing Elastic Search indexes " + indexPath, e);
+    }
   }
 
   @Override
