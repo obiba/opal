@@ -7,10 +7,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
+package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.ace.client.AceEditor;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEditorPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -23,10 +23,10 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresenter.Display {
+public class ScriptEditorView extends ViewImpl implements ScriptEditorPresenter.Display {
 
-  @UiTemplate("EvaluateScriptView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, EvaluateScriptView> {}
+  @UiTemplate("ScriptEditorView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, ScriptEditorView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -38,7 +38,7 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
   @UiField
   Button testScript;
 
-  public EvaluateScriptView() {
+  public ScriptEditorView() {
     widget = uiBinder.createAndBindUi(this);
   }
 

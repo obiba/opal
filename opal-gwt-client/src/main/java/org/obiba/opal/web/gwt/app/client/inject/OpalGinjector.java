@@ -57,11 +57,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.view.ScriptEditorView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.view.EvaluateScriptView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ArchiveStepPresenter;
@@ -182,7 +182,7 @@ public interface OpalGinjector extends Ginjector {
 
   UnitSelectionStepPresenter getUnitSelectionStepPresenter();
 
-  EvaluateScriptView getEvaluateScriptView();
+  ScriptEditorView getEvaluateScriptView();
 
   HibernateDatasourceFormPresenter getHibernateDatasourceFormPresenter();
 

@@ -13,21 +13,16 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <g:HTMLPanel addStyleNames="evaluateScriptPanel">
-    <table class="full-width">
-      <tr>
-        <td>
-          <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor full-width"/>
-        </td>
-      </tr>
-      <tr>
-        <td class="text-right-aligned">
-          <g:Button ui:field="testScript" styleName="btn btn-info">
-            <ui:msg description="Test button label">Test</ui:msg>
-          </g:Button>
-        </td>
-      </tr>
-    </table>
-  </g:HTMLPanel>
+  <g:FlowPanel styleName="evaluateScriptPanel">
+    <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor full-width"/>
+    <g:Label styleName="help-block inline">
+      <ui:msg description="Script Help label">
+        Edit the script and test it. Or select a portion of the script and test it.
+      </ui:msg>
+    </g:Label>
+    <g:Button ui:field="testScript" addStyleNames="btn btn-info right-aligned">
+      <ui:msg description="Test label">Test</ui:msg>
+    </g:Button>
+  </g:FlowPanel>
 
 </ui:UiBinder>

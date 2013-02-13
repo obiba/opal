@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -37,41 +37,42 @@ public class ScriptSuggestBox extends Composite {
     suggest = new MultiWordSuggestOracle();
     SuggestBox.DefaultSuggestionDisplay display = new SuggestBox.DefaultSuggestionDisplay();
     inner = new InnerAutoCompleteTextArea();
-    display.setPositionRelativeTo(new CustomPositionnedUIObject());
+    display.setPositionRelativeTo(new CustomPositionedUIObject());
     variable = new SuggestBox(suggest, inner, display);
     initWidget(variable);
     addStyleName("code");
   }
 
   public void addAsyncSuggestions(TableDto table) {
-    if(table.hasViewLink() == false) {
-      requestVariables(table.getLink());
+    if(table.hasViewLink()) {
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(table.getViewLink()).get()
+          .withCallback(new ResourceCallback<ViewDto>() {
+            @Override
+            public void onResource(Response response, ViewDto view) {
+              for(String table : JsArrays.toIterable(view.getFromArray())) {
+                String[] tableNameParts = table.split("\\.");
+                requestVariables("/datasource/" + tableNameParts[0] + "/table/" + tableNameParts[1]);
+              }
+            }
+          }).send();
     } else {
-      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(table.getViewLink()).get().withCallback(new ResourceCallback<ViewDto>() {
-
-        @Override
-        public void onResource(Response response, ViewDto view) {
-          for(String table : JsArrays.toIterable(view.getFromArray())) {
-            String[] tableNameParts = table.split("\\.");
-            requestVariables("/datasource/" + tableNameParts[0] + "/table/" + tableNameParts[1]);
-          }
-        }
-      }).send();
+      requestVariables(table.getLink());
     }
   }
 
   private void requestVariables(String link) {
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link + "/variables").get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link + "/variables").get()
+        .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<VariableDto> resource) {
-        for(int i = 0; i < resource.length(); i++) {
-          String suggestion = "$('" + resource.get(i).getName() + "')";
-          suggest.add(suggestion);
-          inner.addSuggestion(suggestion);
-        }
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArray<VariableDto> resource) {
+            for(int i = 0; i < resource.length(); i++) {
+              String suggestion = "$('" + resource.get(i).getName() + "')";
+              suggest.add(suggestion);
+              inner.addSuggestion(suggestion);
+            }
+          }
+        }).send();
   }
 
   public void focus() {
@@ -87,7 +88,6 @@ public class ScriptSuggestBox extends Composite {
   }
 
   public void setValue(String value) {
-
     variable.setValue(value);
     inner.initializeText(value);
   }
@@ -96,7 +96,7 @@ public class ScriptSuggestBox extends Composite {
     return inner.getRealText();
   }
 
-  class CustomPositionnedUIObject extends UIObject {
+  class CustomPositionedUIObject extends UIObject {
     @Override
     public int getAbsoluteLeft() {
       return inner.getAbsoluteLeft() + inner.getOffsetWidth();
@@ -120,10 +120,6 @@ public class ScriptSuggestBox extends Composite {
 
   public void setEnabled(boolean enabled) {
     inner.setEnabled(enabled);
-  }
-
-  public void setReadOnly(boolean readOnly) {
-    inner.setReadOnly(readOnly);
   }
 
   public HandlerRegistration addChangeHandler(ChangeHandler handler) {

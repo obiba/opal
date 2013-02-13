@@ -13,25 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEditorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGenerator;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;
 
@@ -39,11 +31,20 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
   private final ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
 
+  private final ScriptEditorPresenter scriptEditorPresenter;
+
   @Inject
   public DeriveCustomVariablePresenter(EventBus eventBus, Display view,
-      ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
+      ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter, ScriptEditorPresenter scriptEditorPresenter) {
     super(eventBus, view);
     this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
+    this.scriptEditorPresenter = scriptEditorPresenter;
+  }
+
+  @Override
+  protected void onBind() {
+    super.onBind();
+    setInSlot(ScriptEditorPresenter.Display.Slots.Editor, scriptEditorPresenter);
   }
 
   @Override
@@ -51,18 +52,15 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
       VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     getView().getRepeatable().setValue(originalVariable.getIsRepeatable());
-    getView().getTestButton().addClickHandler(new TestButtonClickHandler());
     getView().getValueType().setValue(originalVariable.getValueType());
-
     String name = getOriginalVariable().getName();
     if(originalTable.hasViewLink()) {
       String datasourceName = originalTable.getDatasourceName();
       String tableName = originalTable.getName();
-      getView().getScriptBox().setValue("$('" + datasourceName + "." + tableName + ":" + name + "')");
+      scriptEditorPresenter.setScript("$('" + datasourceName + "." + tableName + ":" + name + "')");
     } else {
-      getView().getScriptBox().setValue("$('" + name + "')");
+      scriptEditorPresenter.setScript("$('" + name + "')");
     }
-    getView().addSuggestions(originalTable);
   }
 
   @Override
@@ -70,34 +68,11 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     scriptEvaluationPopupPresenter.getView().hide();
   }
 
-  class TestButtonClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(getOriginalVariable().getParentLink().getLink())
-          .get().withCallback(new ResourceCallback<TableDto>() {
-        @Override
-        public void onResource(Response response, TableDto table) {
-          generateDerivedVariable();
-          VariableDto variable = getDerivedVariable();
-          if(getView().getScriptBox().isTextSelected()) {
-            variable.setValueType(ValueType.TEXT.getLabel());
-            variable.setIsRepeatable(false);
-            VariableDtos.setScript(variable, getView().getScriptBox().getSelectedScript());
-          }
-          scriptEvaluationPopupPresenter.initialize(table, variable);
-        }
-      }).send();
-      getView().getScriptBox().focus();
-    }
-  }
-
   @Override
   public void generateDerivedVariable() {
     VariableDto derived = DerivedVariableGenerator.copyVariable(getOriginalVariable(), false);
     derived.setIsRepeatable(getView().getRepeatable().getValue());
-    VariableDtos.setScript(derived, getView().getScriptBox().getValue());
-
+    VariableDtos.setScript(derived, scriptEditorPresenter.getScript());
     derived.setValueType(getView().getValueType().getValue());
     setDerivedVariable(derived);
   }
@@ -112,14 +87,6 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   public interface Display extends View {
 
     BranchingWizardStepController.Builder getDeriveStepController();
-
-    HasClickHandlers getTestButton();
-
-    void addSuggestions(TableDto table);
-
-    void add(Widget widget);
-
-    ScriptSuggestBox getScriptBox();
 
     HasValue<String> getValueType();
 

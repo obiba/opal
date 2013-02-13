@@ -7,11 +7,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
+package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -30,7 +29,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPresenter.Display> {
+public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter.Display> {
 
   private TableDto table;
 
@@ -39,7 +38,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
   private boolean repeatable;
 
   @Inject
-  public EvaluateScriptPresenter(EventBus eventBus, Display view,
+  public ScriptEditorPresenter(EventBus eventBus, Display view,
       ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
     super(eventBus, view);
     this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
@@ -102,6 +101,10 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
   }
 
   public interface Display extends View {
+
+    enum Slots {
+      Editor
+    }
 
     String getScript();
 

@@ -17,10 +17,10 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEditorPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScriptPresenter;
 import org.obiba.opal.web.model.client.magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
@@ -57,21 +57,21 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
   /**
    * Widget for entering, and testing, the "select" script.
    */
-  private final EvaluateScriptPresenter evaluateScriptPresenter;
+  private final ScriptEditorPresenter scriptEditorPresenter;
 
   private final Iterable<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   @Inject
   public SelectScriptVariablesTabPresenter(Display display, EventBus eventBus,
-      EvaluateScriptPresenter evaluateScriptPresenter) {
+      ScriptEditorPresenter scriptEditorPresenter) {
     super(eventBus, display);
-    this.evaluateScriptPresenter = evaluateScriptPresenter;
+    this.scriptEditorPresenter = scriptEditorPresenter;
   }
 
   @Override
   protected void onBind() {
-    evaluateScriptPresenter.showTest(false);
-    setInSlot(Display.Slots.Test, evaluateScriptPresenter);
+    scriptEditorPresenter.showTest(false);
+    setInSlot(Display.Slots.Test, scriptEditorPresenter);
 
     getView().saveChangesEnabled(false);
 
@@ -82,15 +82,15 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     this.viewDto = viewDto;
 
     viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
-    evaluateScriptPresenter.setTable(viewDto);
+    scriptEditorPresenter.setTable(viewDto);
 
     JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
     if(jsViewDto != null && jsViewDto.hasSelect()) {
       getView().setVariablesToView(VariablesToView.SCRIPT);
-      evaluateScriptPresenter.setScript(jsViewDto.getSelect());
+      scriptEditorPresenter.setScript(jsViewDto.getSelect());
     } else {
       getView().setVariablesToView(VariablesToView.ALL);
-      evaluateScriptPresenter.setScript("");
+      scriptEditorPresenter.setScript("");
     }
   }
 
@@ -100,7 +100,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
     registerHandler(getView().addVariablesToViewChangeHandler(new VariablesToViewChangeHandler()));
-    registerHandler(evaluateScriptPresenter.getView().addScriptChangeHandler(new ScriptChangeHandler()));
+    registerHandler(scriptEditorPresenter.getView().addScriptChangeHandler(new ScriptChangeHandler()));
   }
 
   private boolean validate() {
@@ -176,7 +176,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
       JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
 
       if(getView().getVariablesToView() == VariablesToView.SCRIPT) {
-        String script = evaluateScriptPresenter.getScript().trim();
+        String script = scriptEditorPresenter.getScript().trim();
         if(script.isEmpty()) {
           jsViewDto.clearSelect();
         } else {
@@ -203,7 +203,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     @Override
     public void onChange(ChangeEvent event) {
       if(getView().getVariablesToView() == VariablesToView.ALL) {
-        evaluateScriptPresenter.setScript("");
+        scriptEditorPresenter.setScript("");
       }
       getView().setScriptWidgetVisible(getView().getVariablesToView() == VariablesToView.SCRIPT);
       getView().saveChangesEnabled(true);
