@@ -200,7 +200,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   public void afterRenderRows() {
     boolean enableItem = dataProvider.getList().size() > 0;
     pager.setVisible(dataProvider.getList().size() > NavigatorView.PAGE_SIZE);
-    createCodingViewItem.setEnabled(enableItem);
     toolbar.setExportVariableDictionaryItemEnabled(enableItem);
     toolbar.setExportDataItemEnabled(enableItem);
     toolbar.setCopyDataItemEnabled(enableItem);
@@ -209,6 +208,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void renderRows(final JsArray<VariableDto> rows) {
+    createCodingViewItem.setEnabled(rows.length() > 0);
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
