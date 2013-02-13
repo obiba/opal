@@ -93,6 +93,11 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     return "".equals(script.trim()) ? "null" : script;
   }
 
+  public String getBeautifiedScript() {
+    String script = getView().getBeautifiedScript();
+    return "".equals(script.trim()) ? "null" : script;
+  }
+
   public void showTest(boolean b) {
     getView().showTest(b);
   }
@@ -140,6 +145,7 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
 
     HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
 
+    String getBeautifiedScript();
   }
 
 }

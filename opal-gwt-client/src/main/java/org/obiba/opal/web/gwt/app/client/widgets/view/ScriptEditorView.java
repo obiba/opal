@@ -58,6 +58,11 @@ public class ScriptEditorView extends ViewImpl implements ScriptEditorPresenter.
   }
 
   @Override
+  public String getBeautifiedScript() {
+    return scriptArea.getBeautifiedText();
+  }
+
+  @Override
   public String getScript() {
     return scriptArea.getText();
   }

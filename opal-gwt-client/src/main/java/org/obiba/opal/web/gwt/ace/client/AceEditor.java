@@ -58,13 +58,17 @@ public class AceEditor extends SimplePanel implements HasText, HasEnabled, HasCh
       return editor;
   }-*/;
 
+  @Override
+  public final native String getText() /*-{
+      return this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getValue();
+  }-*/;
+
   /**
    * Beautify JS before returning it
    *
    * @return
    */
-  @Override
-  public final native String getText() /*-{
+  public final native String getBeautifiedText() /*-{
       var value = this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getValue();
       return $wnd.js_beautify(value, { 'indent_size': 2 });
   }-*/;

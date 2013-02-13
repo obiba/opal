@@ -857,6 +857,9 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
           .getExtension(VariableListViewDto.ViewDtoExtensions.view);
       variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
 
+      // get beautified script version now we know the Javascript is valid
+      VariableDtos.setScript(currentVariableDto, scriptEditorPresenter.getBeautifiedScript());
+
       if(isEmptyVariable(variableListViewDto)) {
         // This view has no variables. Clear the variable list and save.
         variableListViewDto.clearVariablesArray();
