@@ -38,6 +38,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.EvaluateScr
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
@@ -75,6 +76,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_OK;
 
 /**
  * Variables tab used to specify a view's variables by defining each variable using a Javascript expression.
@@ -510,7 +514,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
           .getExtension(VariableListViewDto.ViewDtoExtensions.view);
       variableListViewDto.setVariablesArray(JsArrays.toSafeArray(variableListViewDto.getVariablesArray()));
 
-      final VariableDto currentVariableDto = getView().getVariableDto(evaluateScriptPresenter.getScript());
+      final VariableDto currentVariableDto = getCurrentVariableDto();
 
       getView().setInProgress(true);
 
@@ -520,19 +524,14 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
             public void onResource(Response response, TableDto resource) {
-              StringBuilder link = new StringBuilder();
-              link.append(resource.getViewLink()).append("/from");
-              link.append("/variable/_transient/_compile?");
-              link.append("valueType=").append(currentVariableDto.getValueType()) //
-                  .append("&repeatable=").append(currentVariableDto.getIsRepeatable());
-
               String script = VariableDtos.getScript(currentVariableDto);
-              ResponseCodeCallback callback = new ScriptEvaluationCallback(currentVariableDto);
-
-              ResourceRequestBuilderFactory.newBuilder().forResource(link.toString()).post()
-                  .withFormBody("script", script)//
-                  .withCallback(Response.SC_BAD_REQUEST, callback)//
-                  .withCallback(Response.SC_OK, callback).send();
+              String uri = resource.getViewLink() + "/from/variable/_transient/_compile?valueType=" +
+                  currentVariableDto.getValueType() + "&repeatable=" + currentVariableDto.getIsRepeatable();
+              ResourceRequestBuilderFactory.newBuilder().forResource(uri) //
+                  .post() //
+                  .withFormBody("script", script) //
+                  .withCallback(new ScriptEvaluationCallback(currentVariableDto), SC_BAD_REQUEST, SC_OK) //
+                  .send();
 
             }
           }).send();
@@ -572,7 +571,9 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
                 getEventBus().fireEvent(new DerivedVariableConfigurationRequiredEvent(variableDto));
                 setButtonsWhenAddingVariable();
               }
-            }).withCallback(Response.SC_NOT_FOUND, doNothingResponseCodeCallback()).send();
+            }) //
+            .withCallback(Response.SC_NOT_FOUND, ResponseCodeCallbacks.NO_OP) //
+            .send();
       }
     }
 
@@ -596,15 +597,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
               return variableDto;
             }
           }).send();
-    }
-
-    private ResponseCodeCallback doNothingResponseCodeCallback() {
-      return new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          // Do nothing.
-        }
-      };
     }
 
     private void newDerivedVariableIsCopyOfExistingDerivedVariable() {
@@ -666,7 +658,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
           VariableDto nextVariable = variableToDisplayAfterCurrentVariableDeleted();
           VariableListViewDto variableListViewDto = (VariableListViewDto) viewDto
               .getExtension(VariableListViewDto.ViewDtoExtensions.view);
-          VariableDto variableToDelete = getView().getVariableDto(evaluateScriptPresenter.getScript());
+          VariableDto variableToDelete = getCurrentVariableDto();
           @SuppressWarnings("unchecked")
           JsArray<VariableDto> newVariables = (JsArray<VariableDto>) JsArray.createArray();
           for(int i = 0; i < variableListViewDto.getVariablesArray().length(); i++) {
@@ -719,19 +711,20 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     getEventBus().fireEvent(new ViewSavePendingEvent());
   }
 
+  private VariableDto getCurrentVariableDto() {
+    return getView().getVariableDto(evaluateScriptPresenter.getScript());
+  }
+
   private void updateSummaryLink(boolean hasChanges) {
 
-    // TODO: this link should be built from VariableDto.getLink() but it's not initialised in ViewResource
-    StringBuilder summaryLink = new StringBuilder(
-        "/datasource/" + viewDto.getDatasourceName() + "/table/" + viewDto.getName() + "/variable/" +
-            currentVariable.getName() + "/summary");
+    String uri = null;
+    String datasourceName = viewDto.getDatasourceName();
+    String viewName = viewDto.getName();
     if(hasChanges) {
-
       // TODO: it would probably be simpler to add a VariableDto to the body instead of putting everything on the URL
-      summaryLink = new StringBuilder("/datasource/" + viewDto.getDatasourceName() + "/view/" + viewDto.getName() +
-          "/from/variable/_transient/summary?valueType=" +
-          getView().getVariableDto(evaluateScriptPresenter.getScript()).getValueType() + "&script=" +
-          URL.encodeQueryString(evaluateScriptPresenter.getScript()));
+      StringBuilder summaryLink = new StringBuilder("/datasource/" + datasourceName + "/view/" + viewName +
+          "/from/variable/_transient/summary?valueType=" + getCurrentVariableDto().getValueType() +
+          "&script=" + URL.encodeQueryString(evaluateScriptPresenter.getScript()));
 
       if(currentVariable.getCategoriesArray() != null) {
         JsArray<CategoryDto> cats = currentVariable.getCategoriesArray();
@@ -739,9 +732,14 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
           summaryLink.append("&category=").append(URL.encodeQueryString(cats.get(i).getName()));
         }
       }
+      uri = summaryLink.toString();
+    } else {
+      // TODO: this link should be built from VariableDto.getLink() but it's not initialised in ViewResource
+      uri = "/datasource/" + datasourceName + "/table/" + viewName + "/variable/" + currentVariable.getName() +
+          "/summary";
     }
-    getEventBus().fireEvent(new SummaryRequiredEvent(summaryLink.toString()));
 
+    getEventBus().fireEvent(new SummaryRequiredEvent(uri));
   }
 
   class FormChangedHandler implements ChangeHandler, ValueChangeHandler<Boolean>, CategoriesUpdatedEvent.Handler,
@@ -774,12 +772,12 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       getView().navigationEnabled(false);
       getView().removeButtonEnabled(false);
 
+      // TODO check if we really need to do that on all form changes, it seems expensive when editing the script
       updateSummaryLink(true);
       if(isTabSelected(Tabs.SUMMARY)) {
         summaryPresenter.refreshDisplay();
       }
     }
-
   }
 
   private class ViewSavedHandler implements ViewSavedEvent.Handler {
@@ -848,7 +846,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == Response.SC_OK) {
+      if(response.getStatusCode() == SC_OK) {
         onSuccess();
       } else {
         onFailure(response);

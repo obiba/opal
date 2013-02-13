@@ -9,6 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.presenter;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
+
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,16 +29,6 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-
-import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
 
 public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPresenter.Display> {
 
@@ -51,7 +51,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getView().addTestScriptClickHandler(new TestButtonClickHandler()));
+    registerHandler(getView().addTestScriptClickHandler(new TestButtonClickHandler()));
   }
 
   public void setTable(ViewDto viewDto) {
@@ -118,6 +118,7 @@ public class EvaluateScriptPresenter extends PresenterWidget<EvaluateScriptPrese
     void formClear();
 
     HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
+
   }
 
 }

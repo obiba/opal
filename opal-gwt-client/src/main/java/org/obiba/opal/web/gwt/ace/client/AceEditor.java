@@ -70,7 +70,8 @@ public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeH
 
   @Override
   public final native String getText() /*-{
-      return this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getValue();
+      var value = this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getValue();
+      return $wnd.js_beautify(value, { 'indent_size': 2 });
   }-*/;
 
   @Override
@@ -125,15 +126,6 @@ public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeH
 
   public final native void setNativeEnabled(boolean enabled) /*-{
       this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setReadOnly(!enabled);
-  }-*/;
-
-  public final native void beautify() /*-{
-      var value = this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getValue();
-      console.log("before beautify: " + value);
-      console.log("***************");
-      value = $wnd.js_beautify(value, { 'indent_size': 2 });
-      console.log("after beautify: " + value);
-      this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setValue(value);
   }-*/;
 
   private native void setEditorValue(String value) /*-{
