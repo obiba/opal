@@ -17,7 +17,7 @@
     <table class="full-width">
       <tr>
         <td>
-          <ace:AceEditor ui:field="scriptArea" addStyleNames="full-width" height="200px"/>
+          <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor full-width"/>
         </td>
       </tr>
       <tr>

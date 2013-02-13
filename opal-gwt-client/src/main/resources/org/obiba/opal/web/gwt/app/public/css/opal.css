@@ -744,7 +744,7 @@ td.row-actions span {
   color: #333333;
   max-width: 400px;
   max-height: 150px;
-  overflow:auto;
+  overflow: auto;
 }
 
 /* Top */
@@ -2277,6 +2277,14 @@ a.icon:hover {
 .text-right-aligned {
   text-align: right;
 }
+
 .clickable-entity-id a {
   text-decoration: underline;
+}
+
+.ace-editor {
+  height: 200px;
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  border-bottom-right-radius: 0;
 }

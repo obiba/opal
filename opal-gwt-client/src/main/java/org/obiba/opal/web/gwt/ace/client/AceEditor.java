@@ -25,7 +25,9 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
+ * Ace editor
  *
+ * @see http://ace.ajax.org
  */
 public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeHandlers {
 
