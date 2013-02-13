@@ -29,7 +29,6 @@ def do_ws(args):
         if args.tables:
             ws = ws + '/tables'
 
-    print ws
     return ws
 
 def do_command(args):
