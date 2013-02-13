@@ -40,7 +40,6 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
 
   public EvaluateScriptView() {
     widget = uiBinder.createAndBindUi(this);
-    GWT.log("EvaluateScriptView", new Exception());
   }
 
   @Override
@@ -60,6 +59,8 @@ public class EvaluateScriptView extends ViewImpl implements EvaluateScriptPresen
 
   @Override
   public String getScript() {
+    GWT.log("getScript", new Exception());
+    scriptArea.beautify();
     return scriptArea.getText();
   }
 

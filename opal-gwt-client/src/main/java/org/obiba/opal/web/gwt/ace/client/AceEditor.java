@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.gwt.ace.client;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -45,8 +44,8 @@ public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeH
     setElement(DOM.createDiv());
     getElement().setId("ace-editor-" + nextId++);
 
-    // hack to avoid fire ChangeEvent on Ace change event because Ace API fire change events all the time for internal changes
-    // so we fire ChangeEvent on key down
+    // Hack to avoid fire ChangeEvent on Ace change event because Ace API fire change events on SetValue() and for all internal changes.
+    // So we fire ChangeEvent on key down
     addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
@@ -60,6 +59,14 @@ public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeH
     super.onLoad();
     editor = createEditor(getElement().getId());
   }
+
+  private static native JavaScriptObject createEditor(String elementId) /*-{
+      var editor = $wnd.ace.edit(elementId);
+      editor.setTheme("ace/theme/textmate");
+      editor.getSession().setMode("ace/mode/javascript");
+      editor.getSession().setTabSize(2);
+      return editor;
+  }-*/;
 
   @Override
   public final native String getText() /*-{
@@ -101,7 +108,6 @@ public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeH
   @Override
   public void setEnabled(final boolean enabled) {
     if(isAttached()) {
-      GWT.log("enabled: " + enabled);
       setNativeEnabled(enabled);
       if(setEnabledHandlerRegistration != null) {
         setEnabledHandlerRegistration.removeHandler();
@@ -121,12 +127,13 @@ public class AceEditor extends Widget implements HasText, HasEnabled, HasChangeH
       this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setReadOnly(!enabled);
   }-*/;
 
-  private static native JavaScriptObject createEditor(String elementId) /*-{
-      var editor = $wnd.ace.edit(elementId);
-      editor.setTheme("ace/theme/textmate");
-      editor.getSession().setMode("ace/mode/javascript");
-      editor.getSession().setTabSize(2);
-      return editor;
+  public final native void beautify() /*-{
+      var value = this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.getValue();
+      console.log("before beautify: " + value);
+      console.log("***************");
+      value = $wnd.js_beautify(value, { 'indent_size': 2 });
+      console.log("after beautify: " + value);
+      this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setValue(value);
   }-*/;
 
   private native void setEditorValue(String value) /*-{
