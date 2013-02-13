@@ -22,10 +22,13 @@ import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivedVariableGen
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;
+
+import static org.obiba.opal.web.gwt.app.client.util.VariableDtos.ValueType;
 
 public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCustomVariablePresenter.Display> {
 
@@ -39,12 +42,13 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     super(eventBus, view);
     this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
+    this.scriptEditorPresenter.setVariableGenerator(new DeriveCustomVariableGenerator());
   }
 
   @Override
   protected void onBind() {
     super.onBind();
-    setInSlot(ScriptEditorPresenter.Display.Slots.Editor, scriptEditorPresenter);
+    setInSlot(Display.Slots.Editor, scriptEditorPresenter);
   }
 
   @Override
@@ -53,7 +57,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     getView().getRepeatable().setValue(originalVariable.getIsRepeatable());
     getView().getValueType().setValue(originalVariable.getValueType());
-    String name = getOriginalVariable().getName();
+    String name = originalVariable.getName();
     if(originalTable.hasViewLink()) {
       String datasourceName = originalTable.getDatasourceName();
       String tableName = originalTable.getName();
@@ -61,11 +65,28 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     } else {
       scriptEditorPresenter.setScript("$('" + name + "')");
     }
+    scriptEditorPresenter.setTable(originalTable);
   }
 
   @Override
   public void onClose() {
     scriptEvaluationPopupPresenter.getView().hide();
+  }
+
+  public class DeriveCustomVariableGenerator implements ScriptEditorPresenter.VariableGenerator {
+
+    @Override
+    public VariableDto create() {
+      generateDerivedVariable();
+      VariableDto variable = getDerivedVariable();
+      String selectedScript = scriptEditorPresenter.getSelectedScript();
+      if(!Strings.isNullOrEmpty(selectedScript)) {
+        variable.setValueType(ValueType.TEXT.getLabel());
+        variable.setIsRepeatable(false);
+        VariableDtos.setScript(variable, selectedScript);
+      }
+      return variable;
+    }
   }
 
   @Override
@@ -85,6 +106,10 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   }
 
   public interface Display extends View {
+
+    enum Slots {
+      Editor
+    }
 
     BranchingWizardStepController.Builder getDeriveStepController();
 

@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEditorPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCustomVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ValueTypeBox;
@@ -66,7 +65,7 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    if(slot == ScriptEditorPresenter.Display.Slots.Editor) {
+    if(slot == Slots.Editor) {
       scriptEditor.clear();
       scriptEditor.add(content);
     }

@@ -37,6 +37,8 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
 
   private boolean repeatable;
 
+  private VariableGenerator variableGenerator = new DefaultVariableGenerator();
+
   @Inject
   public ScriptEditorPresenter(EventBus eventBus, Display view,
       ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
@@ -50,7 +52,12 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
   }
 
   private void addEventHandlers() {
-    registerHandler(getView().addTestScriptClickHandler(new TestButtonClickHandler()));
+    registerHandler(getView().addTestScriptClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        scriptEvaluationPopupPresenter.initialize(table, getVariableGenerator().create());
+      }
+    }));
   }
 
   public void setTable(ViewDto viewDto) {
@@ -77,6 +84,10 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     getView().setScript(script);
   }
 
+  public String getSelectedScript() {
+    return getView().getSelectedScript();
+  }
+
   public String getScript() {
     String script = getView().getScript();
     return "".equals(script.trim()) ? "null" : script;
@@ -86,25 +97,32 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     getView().showTest(b);
   }
 
-  class TestButtonClickHandler implements ClickHandler {
+  public void setVariableGenerator(VariableGenerator variableGenerator) {
+    this.variableGenerator = variableGenerator;
+  }
+
+  public VariableGenerator getVariableGenerator() {
+    return variableGenerator;
+  }
+
+  public interface VariableGenerator {
+    VariableDto create();
+  }
+
+  public class DefaultVariableGenerator implements VariableGenerator {
 
     @Override
-    public void onClick(ClickEvent event) {
-
+    public VariableDto create() {
       String selectedScript = getView().getSelectedScript();
       VariableDto derived = VariableDto.create();
       derived.setValueType(ValueType.TEXT.getLabel());
       derived.setIsRepeatable(repeatable);
       VariableDtos.setScript(derived, Strings.isNullOrEmpty(selectedScript) ? getScript() : selectedScript);
-      scriptEvaluationPopupPresenter.initialize(table, derived);
+      return derived;
     }
   }
 
   public interface Display extends View {
-
-    enum Slots {
-      Editor
-    }
 
     String getScript();
 
