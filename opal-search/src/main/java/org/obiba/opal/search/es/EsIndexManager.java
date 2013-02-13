@@ -441,11 +441,16 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
     private EsMapping readMapping() {
       try {
-        MappingMetaData metaData = getIndexMetaData().mapping(name);
-        if(metaData != null) {
-          byte[] mappingSource = metaData.source().uncompressed();
-          return new EsMapping(name, mappingSource);
+        IndexMetaData indexMetaData = getIndexMetaData();
+
+        if (indexMetaData != null) {
+          MappingMetaData metaData = indexMetaData.mapping(name);
+          if(metaData != null) {
+            byte[] mappingSource = metaData.source().uncompressed();
+            return new EsMapping(name, mappingSource);
+          }
         }
+
         return new EsMapping(name);
       } catch(IOException e) {
         throw new RuntimeException(e);
