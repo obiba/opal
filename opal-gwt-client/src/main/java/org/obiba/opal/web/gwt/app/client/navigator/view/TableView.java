@@ -202,11 +202,13 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     pager.setVisible(dataProvider.getList().size() > NavigatorView.PAGE_SIZE);
     toolbar.setExportVariableDictionaryItemEnabled(enableItem);
     toolbar.setExportDataItemEnabled(enableItem);
+    toolbar.setCopyDataItemEnabled(enableItem);
     table.setEmptyTableWidget(noVariables);
   }
 
   @Override
   public void renderRows(final JsArray<VariableDto> rows) {
+    createCodingViewItem.setEnabled(rows.length() > 0);
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
