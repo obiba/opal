@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -41,17 +42,119 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <!-- Opal dependencies -->
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-core-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-core-ws</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-sshd</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-shell</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-fs</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-reporting</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-reporting</artifactId>
+        <version>${project.version}</version>
+        <classifier>dist</classifier>
+        <scope>runtime</scope>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-r</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-httpd</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-ws</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-web-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-gwt-client</artifactId>
+        <version>${project.version}</version>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-rest-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-python-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-php-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-datashield</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-search</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Obiba dependencies -->
       <dependency>
         <groupId>org.obiba</groupId>
         <artifactId>obiba-core</artifactId>
-        <version>${obiba.commons.version}</version>
+        <version>${obiba-commons.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.obiba</groupId>
         <artifactId>obiba-security</artifactId>
-        <version>${obiba.commons.version}</version>
+        <version>${obiba-commons.version}</version>
       </dependency>
 
       <!-- Magma dependencies -->
@@ -391,14 +494,14 @@
       <dependency>
         <groupId>org.ow2.spec.ee</groupId>
         <artifactId>ow2-connector-1.5-spec</artifactId>
-        <version>${ow2.spec.version}</version>
+        <version>${ow2-spec.version}</version>
       </dependency>
 
       <!-- javax.transaction -->
       <dependency>
         <groupId>org.ow2.spec.ee</groupId>
         <artifactId>ow2-jta-1.1-spec</artifactId>
-        <version>${ow2.spec.version}</version>
+        <version>${ow2-spec.version}</version>
       </dependency>
 
       <dependency>
@@ -622,7 +725,7 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
           </exclusion>
-          </exclusions>
+        </exclusions>
       </dependency>
 
       <!-- Jetty dependencies -->
@@ -665,6 +768,11 @@
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
         <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-util</artifactId>
+        <version>${jetty-util.version}</version>
       </dependency>
 
       <!-- Protobuf dependencies -->
@@ -753,7 +861,170 @@
       <dependency>
         <groupId>com.watopi</groupId>
         <artifactId>gwtchosen</artifactId>
-        <version>${gwtchosen.version}</version>
+        <version>${gwt-chosen.version}</version>
+      </dependency>
+
+      <!-- BIRT dependencies -->
+      <dependency>
+        <groupId>org.obiba.opal.oda</groupId>
+        <artifactId>org.obiba.opal.oda.runtime</artifactId>
+        <version>${opal-oda.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal.oda</groupId>
+        <artifactId>update-site</artifactId>
+        <version>${opal-oda.version}</version>
+        <scope>provided</scope>
+        <type>zip</type>
+        <classifier>assembly</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.birt</groupId>
+        <artifactId>birt-coreapi</artifactId>
+        <version>${birt.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.birt</groupId>
+        <artifactId>birt-modelapi</artifactId>
+        <version>${birt.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.birt</groupId>
+        <artifactId>birt-engineapi</artifactId>
+        <version>${birt.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.birt</groupId>
+        <artifactId>birt-report-engine</artifactId>
+        <version>${birt.version}</version>
+        <scope>provided</scope>
+        <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${httpclient.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient-cache</artifactId>
+        <version>${httpclient.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>${httpclient.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>${json.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.elasticsearch</groupId>
+        <artifactId>elasticsearch</artifactId>
+        <version>${elasticsearch.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-daemon</groupId>
+        <artifactId>commons-daemon</artifactId>
+        <version>${commons-daemon.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${commons-codec.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons-io.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache-core</artifactId>
+        <version>${ehcache-core.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>jline</groupId>
+        <artifactId>jline</artifactId>
+        <version>${jline.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.co.flamingpenguin.jewelcli</groupId>
+        <artifactId>jewelcli</artifactId>
+        <version>${jewelcli.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>${mail.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.velocity</groupId>
+        <artifactId>velocity</artifactId>
+        <version>${velocity.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-vfs2</artifactId>
+        <version>${commons-vfs.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockftpserver</groupId>
+        <artifactId>MockFtpServer</artifactId>
+        <version>${mockftpserver.version}</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>${commons-httpclient.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.rosuda</groupId>
+        <artifactId>RserveEngine</artifactId>
+        <version>${REngine.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.rosuda</groupId>
+        <artifactId>REngine</artifactId>
+        <version>${REngine.version}</version>
       </dependency>
 
     </dependencies>
@@ -783,6 +1054,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -902,6 +1174,18 @@
           <version>${protostuff.version}</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>javacc-maven-plugin</artifactId>
+          <version>${maven-javacc-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>gwt-maven-plugin</artifactId>
+          <version>${gwt.version}</version>
+        </plugin>
+
       </plugins>
 
     </pluginManagement>
@@ -1006,6 +1290,13 @@
 
   </repositories>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <id>obiba</id>
+      <url>http://repo.obiba.org/repo</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <distributionManagement>
 
     <repository>
@@ -1054,48 +1345,64 @@
 
     <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
 
+    <birt.version>2.6.2</birt.version>
     <bouncycastle.version>1.46</bouncycastle.version>
     <cglib-nodep.version>2.2</cglib-nodep.version>
+    <commons-codec.version>1.3</commons-codec.version>
     <commons-collections.version>3.2</commons-collections.version>
+    <commons-daemon.version>1.0.3</commons-daemon.version>
     <commons-dbcp.version>1.4</commons-dbcp.version>
     <commons-fileupload.version>1.2.1</commons-fileupload.version>
+    <commons-httpclient.version>3.1</commons-httpclient.version>
     <commons-io.version>1.3.2</commons-io.version>
+    <commons-vfs.version>2.0</commons-vfs.version>
     <crowd.version>2.5.1</crowd.version>
     <dbunit.version>2.2.2</dbunit.version>
     <easymock.version>2.4</easymock.version>
+    <ehcache-core.version>2.4.2</ehcache-core.version>
     <elasticsearch.version>0.19.11</elasticsearch.version>
     <gin.version>1.5.0</gin.version>
     <guava.version>10.0.1</guava.version>
+    <gwt.version>2.4.0</gwt.version>
     <gwt-bootstrap.version>2.0.4.0</gwt-bootstrap.version>
+    <gwt-chosen.version>1.1.0</gwt-chosen.version>
     <gwt-presenter.version>1.0.0</gwt-presenter.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
-    <gwt.version>2.4.0</gwt.version>
-    <gwtchosen.version>1.1.0</gwtchosen.version>
     <gwtp.version>0.6</gwtp.version>
     <gwtquery.version>1.2.0</gwtquery.version>
     <hamcrest.version>1.1</hamcrest.version>
     <hibernate.version>3.5.6-Final</hibernate.version>
     <hsqldb.version>2.2.6</hsqldb.version>
+    <httpclient.version>4.1.3</httpclient.version>
     <jetty.version>7.6.8.v20121106</jetty.version>
+    <jetty-util.version>6.1.22</jetty-util.version>
+    <jewelcli.version>0.6</jewelcli.version>
+    <jline.version>0.9.94</jline.version>
     <jotm.version>2.1.9</jotm.version>
     <jpa.version>1.0</jpa.version>
+    <json.version>20090211</json.version>
     <jta.version>1.0.1B</jta.version>
     <junit.version>4.7</junit.version>
     <liquibase.version>1.9.4</liquibase.version>
-    <magma.version>1.4.0</magma.version>
+    <magma.version>1.4-SNAPSHOT</magma.version>
+    <mail.version>1.4</mail.version>
+    <mockftpserver.version>2.1</mockftpserver.version>
     <mysql-connector-java.version>5.1.17</mysql-connector-java.version>
-    <obiba.commons.version>1.3.1</obiba.commons.version>
-    <ow2.spec.version>1.0.2</ow2.spec.version>
+    <obiba-commons.version>1.3.1</obiba-commons.version>
+    <opal-oda.version>1.2.3</opal-oda.version>
+    <ow2-spec.version>1.0.2</ow2-spec.version>
     <protobuf-java-format.version>1.2</protobuf-java-format.version>
     <protobuf.version>2.3.0</protobuf.version>
     <protostuff.version>1.0.1</protostuff.version>
     <quartz.version>1.8.3</quartz.version>
+    <REngine.version>0.6-3</REngine.version>
     <resteasy.version>2.1.0.GA</resteasy.version>
     <shiro.version>1.1.0</shiro.version>
     <slf4j.version>1.7.1</slf4j.version>
-    <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <spring.version>3.1.2.RELEASE</spring.version>
+    <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>
+    <velocity.version>1.6.4</velocity.version>
     <xfire.version>1.2.6</xfire.version>
     <xstream.version>1.4.2</xstream.version>
 
@@ -1109,8 +1416,8 @@
     <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>2.7</maven-deploy-plugin.version>
     <maven-findbugs-plugin.version>2.5.2</maven-findbugs-plugin.version>
-    <build-helper-maven-plugin.version>1.7</build-helper-maven-plugin.version>
     <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+    <maven-javacc-plugin.version>2.6</maven-javacc-plugin.version>
     <maven-javadoc-plugin.version>2.9</maven-javadoc-plugin.version>
     <maven-pmd-plugin.version>2.7.1</maven-pmd-plugin.version>
     <maven-release-plugin.version>2.3.2</maven-release-plugin.version>

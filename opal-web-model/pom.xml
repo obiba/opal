@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -7,12 +8,9 @@
     <groupId>org.obiba.opal</groupId>
     <version>1.13-SNAPSHOT</version>
   </parent>
-
   <artifactId>opal-web-model</artifactId>
   <packaging>jar</packaging>
-
   <name>opal-web-model</name>
-  <url>http://maven.apache.org</url>
 
   <dependencies>
     <dependency>
@@ -32,12 +30,6 @@
       <groupId>com.dyuproject.protostuff</groupId>
       <artifactId>protostuff-core</artifactId>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.7</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -106,60 +98,60 @@
                 <!-- Determine which protoc binary we can use -->
                 <condition property="os.protoc" value="${protobuf.version}-linux-x86_64">
                   <or>
-                    <os name="linux" arch="amd64" />
-                    <os name="linux" arch="x86_64" />
+                    <os name="linux" arch="amd64"/>
+                    <os name="linux" arch="x86_64"/>
                   </or>
                 </condition>
                 <condition property="os.protoc" value="${protobuf.version}-linux-x86_32">
                   <or>
-                    <os name="linux" arch="x86" />
-                    <os name="linux" arch="i386" />
+                    <os name="linux" arch="x86"/>
+                    <os name="linux" arch="i386"/>
                   </or>
                 </condition>
                 <condition property="os.protoc" value="${protobuf.version}-win32">
-                  <os family="windows" />
+                  <os family="windows"/>
                 </condition>
 
-                <fail message="No protoc binary for your OS: ${os.name} ${os.arch}." unless="os.protoc" />
+                <fail message="No protoc binary for your OS: ${os.name} ${os.arch}." unless="os.protoc"/>
 
                 <path id="protofiles">
                   <fileset dir="src/main/protobuf">
-                    <include name="*.proto" />
+                    <include name="*.proto"/>
                   </fileset>
                 </path>
                 <pathconvert pathsep=" " property="protofilesList" refid="protofiles">
-                  <map from="${basedir}/" to="" />
+                  <map from="${basedir}/" to=""/>
                 </pathconvert>
 
                 <!-- Compile our .proto file -->
                 <!-- Java -->
-                <mkdir dir="target/generated-sources/protobuf-server" />
+                <mkdir dir="target/generated-sources/protobuf-server"/>
                 <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
-                  <arg value="--java_out=target/generated-sources/protobuf-server" />
-                  <arg line="${protofilesList}" />
-                  <arg line="-Isrc/main/protobuf" />
+                  <arg value="--java_out=target/generated-sources/protobuf-server"/>
+                  <arg line="${protofilesList}"/>
+                  <arg line="-Isrc/main/protobuf"/>
                 </exec>
                 <!-- Python -->
-                <mkdir dir="target/generated-sources/protobuf-python" />
+                <mkdir dir="target/generated-sources/protobuf-python"/>
                 <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
-                  <arg value="--python_out=target/generated-sources/protobuf-python" />
-                  <arg line="${protofilesList}" />
-                  <arg line="-Isrc/main/protobuf" />
+                  <arg value="--python_out=target/generated-sources/protobuf-python"/>
+                  <arg line="${protofilesList}"/>
+                  <arg line="-Isrc/main/protobuf"/>
                 </exec>
                 <!-- PHP -->
-                <copy file="${basedir}/tools/protobuf-php/template/wrapper.proto" todir="${basedir}/src/main/protobuf" />
-                <replace file="${basedir}/src/main/protobuf/wrapper.proto" token="__PROTO_FILE__" value="Search" />
-                <mkdir dir="target/generated-sources/protobuf-php" />
+                <copy file="${basedir}/tools/protobuf-php/template/wrapper.proto" todir="${basedir}/src/main/protobuf"/>
+                <replace file="${basedir}/src/main/protobuf/wrapper.proto" token="__PROTO_FILE__" value="Search"/>
+                <mkdir dir="target/generated-sources/protobuf-php"/>
                 <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
-                  <arg value="--php_out=target/generated-sources/protobuf-php" />
-                  <arg line="--plugin=${basedir}/tools/protobuf-php/protoc-gen-php" />
-                  <arg line="-I${basedir}/tools/protobuf-php/library/DrSlump/Protobuf/Compiler/protos" />
-                  <arg line="-Isrc/main/protobuf" />
-                  <arg line="-I${basedir}/tools/protobuf-php/template" />
-                  <arg line="--proto_path=${basedir}" />
-                  <arg line="${basedir}/src/main/protobuf/wrapper.proto" />
+                  <arg value="--php_out=target/generated-sources/protobuf-php"/>
+                  <arg line="--plugin=${basedir}/tools/protobuf-php/protoc-gen-php"/>
+                  <arg line="-I${basedir}/tools/protobuf-php/library/DrSlump/Protobuf/Compiler/protos"/>
+                  <arg line="-Isrc/main/protobuf"/>
+                  <arg line="-I${basedir}/tools/protobuf-php/template"/>
+                  <arg line="--proto_path=${basedir}"/>
+                  <arg line="${basedir}/src/main/protobuf/wrapper.proto"/>
                 </exec>
-                <delete file="${basedir}/src/main/protobuf/wrapper.proto" />
+                <delete file="${basedir}/src/main/protobuf/wrapper.proto"/>
               </tasks>
             </configuration>
             <goals>
@@ -317,13 +309,6 @@
 
     </plugins>
   </build>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>obiba</id>
-      <url>http://maven.obiba.org/maven2</url>
-    </pluginRepository>
-  </pluginRepositories>
 
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
