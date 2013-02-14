@@ -1,22 +1,20 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-    xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-    xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"  
-    xmlns:pretty="urn:import:org.obiba.opal.web.gwt.prettify.client"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-    <g:DialogBox ui:field="dialogBox" modal="false">
-      <g:DockLayoutPanel styleName="main" ui:field="content" unit="EM" height="35em" width="45em">
-        <g:south size="4">
-            <g:FlowPanel addStyleNames="footer">
-              <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
-              <g:Button styleName="btn right-aligned top-margin" ui:field="closeButton">
-                <ui:msg description="Close label">Close</ui:msg>
-              </g:Button>
-            </g:FlowPanel>
-        </g:south>
-      </g:DockLayoutPanel>
-    </g:DialogBox>
+  <g:DialogBox ui:field="dialogBox" modal="false">
+    <g:DockLayoutPanel styleName="main" ui:field="content" unit="EM" height="35em" width="45em">
+      <g:south size="4">
+        <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"/>
+          <g:Button styleName="btn right-aligned top-margin" ui:field="closeButton">
+            <ui:msg description="Close label">Close</ui:msg>
+          </g:Button>
+        </g:FlowPanel>
+      </g:south>
+    </g:DockLayoutPanel>
+  </g:DialogBox>
 </ui:UiBinder>

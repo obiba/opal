@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -30,12 +30,11 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 public class ScriptEvaluationPopupView extends PopupViewImpl implements Display {
 
   @UiTemplate("ScriptEvaluationPopupView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationPopupView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationPopupView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -54,7 +53,7 @@ public class ScriptEvaluationPopupView extends PopupViewImpl implements Display 
   @Inject
   public ScriptEvaluationPopupView(EventBus eventBus) {
     super(eventBus);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     dialogBox.setText(translations.scriptEvaluationLabel());
     resizeHandle.makeResizable(content);
   }
