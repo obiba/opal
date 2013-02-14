@@ -1,4 +1,4 @@
-# Opal [![Build Status](http://ci.obiba.org/view/Opal/job/Opal-1.11.x/badge/icon)](http://ci.obiba.org/view/Opal/job/Opal-1.11.x/)
+# Opal [![Build Status](http://ci.obiba.org/view/Opal/job/Opal-1.12.x/badge/icon)](http://ci.obiba.org/view/Opal/job/Opal-1.12.x/)
 
 Opal is OBiBa’s core database application for biobanks or epidemiological studies.
 
