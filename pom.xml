@@ -1024,7 +1024,7 @@
     <connection>scm:git:git://github.com/obiba/opal.git</connection>
     <developerConnection>scm:git:https://github.com/obiba/opal.git</developerConnection>
     <url>https://github.com/obiba/opal</url>
-    <tag>HEAD</tag>
+    <tag>opal-1.12.x</tag>
   </scm>
 
   <issueManagement>
