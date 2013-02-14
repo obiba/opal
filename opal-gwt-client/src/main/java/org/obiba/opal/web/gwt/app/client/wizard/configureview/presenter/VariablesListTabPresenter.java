@@ -170,7 +170,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         .getExtension(VariableListViewDto.ViewDtoExtensions.view);
     variableListDto.setVariablesArray(JsArrays.toSafeArray(variableListDto.getVariablesArray()));
 
-    scriptEditorPresenter.setTable(viewDto);
+    scriptEditorPresenter.setView(viewDto);
 
     getView().saveChangesEnabled(false);
 

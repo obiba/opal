@@ -82,7 +82,7 @@ public class SelectScriptVariablesTabPresenter extends PresenterWidget<SelectScr
     this.viewDto = viewDto;
 
     viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
-    scriptEditorPresenter.setTable(viewDto);
+    scriptEditorPresenter.setView(viewDto);
 
     JavaScriptViewDto jsViewDto = (JavaScriptViewDto) viewDto.getExtension(JavaScriptViewDto.ViewDtoExtensions.view);
     if(jsViewDto != null && jsViewDto.hasSelect()) {
