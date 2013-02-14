@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
@@ -34,7 +35,6 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -59,14 +59,13 @@ import com.gwtplatform.mvp.client.annotations.TabInfo;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
-public class IndexAdministrationPresenter extends
-    ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
+public class IndexAdministrationPresenter
+    extends ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
 
   @ProxyStandard
   @NameToken("!admin.search")
   @TabInfo(container = AdministrationPresenter.class, label = "Search", priority = 4)
-  public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {
-  }
+  public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {}
 
   public interface Display extends View {
 
@@ -90,6 +89,8 @@ public class IndexAdministrationPresenter extends
 
     HasClickHandlers getStopButton();
 
+    Button getConfigureButton();
+
     HasClickHandlers getRefreshButton();
 
     MultiSelectionModel<TableIndexStatusDto> getSelectedIndices();
@@ -103,19 +104,23 @@ public class IndexAdministrationPresenter extends
 
   private final Provider<IndexPresenter> indexPresenter;
 
+  private final Provider<IndexConfigurationPresenter> indexConfigurationPresenter;
+
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final ResourceDataProvider<TableIndexStatusDto> resourceDataProvider = new ResourceDataProvider<TableIndexStatusDto>(
-      Resources.indices());
+  private final ResourceDataProvider<TableIndexStatusDto> resourceDataProvider
+      = new ResourceDataProvider<TableIndexStatusDto>(Resources.indices());
 
   private Command confirmedCommand;
 
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
+      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
+      Provider<IndexConfigurationPresenter> indexConfigurationPresenter) {
     super(eventBus, display, proxy);
     this.indexPresenter = indexPresenter;
     this.authorizationPresenter = authorizationPresenter.get();
+    this.indexConfigurationPresenter = indexConfigurationPresenter;
   }
 
   @ProxyEvent
@@ -178,15 +183,19 @@ public class IndexAdministrationPresenter extends
     getView().getActionsDropdown().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().CLEAR_ACTION)) {
+        getView();
+        if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(Display.CLEAR_ACTION)) {
           doClear();
-        } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(getView().SCHEDULE)) {
+        } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(Display.SCHEDULE)) {
           doSchedule();
         }
       }
 
       private void doClear() {
-        if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+        if(getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+          getEventBus()
+              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
+        } else {
 
           for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
             ResponseCodeCallback callback = new ResponseCodeCallback() {
@@ -204,16 +213,16 @@ public class IndexAdministrationPresenter extends
 
             getView().getSelectedIndices().setSelected(object, false);
           }
-        } else {
-          getEventBus()
-              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
         }
       }
 
       private void doSchedule() {
-        if(!getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+        if(getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+          getEventBus()
+              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
+        } else {
 
-          ArrayList<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
+          List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
           for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
             objects.add(object);
           }
@@ -222,15 +231,13 @@ public class IndexAdministrationPresenter extends
           dialog.updateSchedules(objects);
           addToPopupSlot(dialog);
 
-        } else {
-          getEventBus()
-              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
         }
       }
     });
 
     getView().getActions().setActionHandler(new ActionHandler<TableIndexStatusDto>() {
 
+      @SuppressWarnings("UnnecessaryFinalOnLocalVariableOrParameter")
       @Override
       public void doAction(final TableIndexStatusDto object, String actionName) {
         if(actionName.equalsIgnoreCase(Display.CLEAR_ACTION)) {
@@ -287,12 +294,13 @@ public class IndexAdministrationPresenter extends
       }
     }));
 
-    registerHandler(getEventBus().addHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.Handler() {
-      @Override
-      public void onRefresh(TableIndicesRefreshEvent event) {
-        refresh();
-      }
-    }));
+    registerHandler(
+        getEventBus().addHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.Handler() {
+          @Override
+          public void onRefresh(TableIndicesRefreshEvent event) {
+            refresh();
+          }
+        }));
 
     // STOP
     registerHandler(getView().getStopButton().addClickHandler(new ClickHandler() {
@@ -340,10 +348,7 @@ public class IndexAdministrationPresenter extends
               refresh();
             } else {
               getView().serviceStartable();
-              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                      .build());
+              getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
             }
           }
 
@@ -353,10 +358,18 @@ public class IndexAdministrationPresenter extends
         getView().serviceExecutionPending();
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
             .forResource(Resources.searchServiceEnabled()).accept("application/json")//
-            .withCallback(Response.SC_OK, callback).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback).put()
-            .send();
+            .withCallback(callback, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).put().send();
       }
     }));
+
+    // CONFIGURE
+    getView().getConfigureButton().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        IndexConfigurationPresenter dialog = indexConfigurationPresenter.get();
+        addToPopupSlot(dialog);
+      }
+    });
   }
 
   private void refresh() {
@@ -374,7 +387,7 @@ public class IndexAdministrationPresenter extends
     @Override
     public void authorized() {
       // Only bind the table to its data provider if we're authorized
-      if(resourceDataProvider.getDataDisplays().size() == 0) {
+      if(resourceDataProvider.getDataDisplays().isEmpty()) {
         resourceDataProvider.addDataDisplay(getView().getIndexTable());
       }
     }

@@ -43,6 +43,7 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -83,6 +84,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   @ProxyEvent
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent e) {
+    enableDatasourceRemoval(e.getSelection());
+
     if(!isVisible()) {
       forceReveal();
       displayDatasource(e.getSelection());
@@ -101,8 +104,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     getView().setExportDataCommand(new ExportDataCommand());
     getView().setCopyDataCommand(new CopyDataCommand());
     getView().setAddUpdateTablesCommand(new AddUpdateTablesCommand());
-    // OPAL-1510
-    // getView().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
+    getView().setRemoveDatasourceCommand(new RemoveDatasourceCommand());
     getView().setAddViewCommand(new AddViewCommand());
     getView().setImportDataCommand(new ImportDataCommand());
     getView().setNextCommand(new NextCommand());
@@ -208,6 +210,17 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     } else {
       updateTable(null);
     }
+  }
+
+  private void enableDatasourceRemoval(DatasourceDto datasourceDto) {
+    if (datasourceDto == null) {
+      return;
+    }
+
+    JsArrayString tableNames = datasourceDto.getTableArray();
+    JsArrayString viewNames = datasourceDto.getViewArray();
+    getView().enableDatasourceRemoval(
+        (tableNames == null || tableNames.length() == 0) && (viewNames == null || viewNames.length() == 0));
   }
 
   private void displayDatasourceSiblings(DatasourceDto datasourceDto) {
@@ -463,6 +476,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   class DatasourceSelectionHandler implements DatasourceSelectionChangeEvent.Handler {
     @Override
     public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+
       displayDatasource(event.getSelection());
     }
   }
@@ -613,6 +627,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater);
 
     void setCopyDataCommand(Command cmd);
+
+    void enableDatasourceRemoval(boolean enable);
 
     HasAuthorization getAddUpdateTablesAuthorizer();
 

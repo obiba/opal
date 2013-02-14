@@ -29,22 +29,22 @@ public class InnerAutoCompleteTextArea extends TextArea {
 
       @Override
       public void onKeyDown(KeyDownEvent event) {
-        if(Strings.isNullOrEmpty(currentSuggestion) == false) {
+        if(!Strings.isNullOrEmpty(currentSuggestion)) {
           switch(event.getNativeKeyCode()) {
-          case KeyCodes.KEY_ENTER:
-          case KeyCodes.KEY_UP:
-          case KeyCodes.KEY_DOWN:
-            cancelKey();
-            break;
+            case KeyCodes.KEY_ENTER:
+            case KeyCodes.KEY_UP:
+            case KeyCodes.KEY_DOWN:
+              cancelKey();
+              break;
 
-          case KeyCodes.KEY_ESCAPE:
-          case KeyCodes.KEY_LEFT:
-          case KeyCodes.KEY_RIGHT:
-            currentSuggestion = "";
-            break;
+            case KeyCodes.KEY_ESCAPE:
+            case KeyCodes.KEY_LEFT:
+            case KeyCodes.KEY_RIGHT:
+              currentSuggestion = "";
+              break;
           }
         }
-        backspacePressed = (event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE);
+        backspacePressed = event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE;
       }
     });
   }
@@ -64,7 +64,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
     }
     previousText = text;
     if(backspacePressed) {
-      if(Strings.isNullOrEmpty(currentSuggestion) == false) {
+      if(!Strings.isNullOrEmpty(currentSuggestion)) {
         currentSuggestion = currentSuggestion.substring(0, currentSuggestion.length() - 1);
       }
     } else {
@@ -73,7 +73,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
       currentSuggestion += Character.toString(charAt);
     }
     currentSuggestionPosition = cursorPosition;
-    if(isSuggestionMatch() == false) currentSuggestion = "";
+    if(!isSuggestionMatch()) currentSuggestion = "";
     return currentSuggestion;
   }
 
@@ -142,7 +142,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
    * Intern for InnerAutoCompleteTextArea. Not part of API...
    */
   public void setSelectionRange(int pos, int length) {
-    if(isAttached() == false) {
+    if(!isAttached()) {
       return;
     }
     getImpl().setSelectionRange(getElement(), pos, length);

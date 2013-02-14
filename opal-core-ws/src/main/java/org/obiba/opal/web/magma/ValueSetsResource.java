@@ -125,7 +125,8 @@ public class ValueSetsResource extends AbstractValueTableResource {
                     Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
                     return Dtos.asDto(link, value, filterBinary).build();
                   }
-                })).build();
+                })) //
+                .setTimestamps(Dtos.asDto(valueSet.getTimestamps())).build();
           }
         })).build();
   }

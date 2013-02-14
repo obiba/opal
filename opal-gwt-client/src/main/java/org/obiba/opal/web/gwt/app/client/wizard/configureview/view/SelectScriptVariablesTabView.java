@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -28,10 +28,9 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class SelectScriptVariablesTabView extends ViewImpl implements SelectScriptVariablesTabPresenter.Display {
 
   @UiTemplate("SelectScriptVariablesTabView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, SelectScriptVariablesTabView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, SelectScriptVariablesTabView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 
@@ -81,7 +80,7 @@ public class SelectScriptVariablesTabView extends ViewImpl implements SelectScri
 
   @Override
   public void setVariablesToView(VariablesToView scriptOrAll) {
-    String valueToSelect = (scriptOrAll.equals(VariablesToView.SCRIPT)) ? "script" : "all";
+    String valueToSelect = scriptOrAll == VariablesToView.SCRIPT ? "script" : "all";
 
     for(int i = 0; i < variablesToView.getItemCount(); i++) {
       if(variablesToView.getValue(i).equals(valueToSelect)) {
@@ -90,13 +89,14 @@ public class SelectScriptVariablesTabView extends ViewImpl implements SelectScri
       }
     }
 
-    setScriptWidgetVisible(scriptOrAll.equals(VariablesToView.SCRIPT));
+    setScriptWidgetVisible(scriptOrAll == VariablesToView.SCRIPT);
   }
 
   @Override
   public VariablesToView getVariablesToView() {
-    int selectedIndex = variablesToView.getSelectedIndex();
-    return (variablesToView.getValue(selectedIndex).equals("script")) ? VariablesToView.SCRIPT : VariablesToView.ALL;
+    return "script".equals(variablesToView.getValue(variablesToView.getSelectedIndex()))
+        ? VariablesToView.SCRIPT
+        : VariablesToView.ALL;
   }
 
   @Override
@@ -105,7 +105,7 @@ public class SelectScriptVariablesTabView extends ViewImpl implements SelectScri
   }
 
   @Override
-  public HandlerRegistration addVariablestoViewChangeHandler(ChangeHandler changeHandler) {
+  public HandlerRegistration addVariablesToViewChangeHandler(ChangeHandler changeHandler) {
     return variablesToView.addChangeHandler(changeHandler);
   }
 
@@ -114,8 +114,4 @@ public class SelectScriptVariablesTabView extends ViewImpl implements SelectScri
     return widget;
   }
 
-  @Override
-  public ListBox getVariablesToViewListBox() {
-    return variablesToView;
-  }
 }

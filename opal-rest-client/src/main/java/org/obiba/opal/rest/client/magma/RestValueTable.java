@@ -205,6 +205,7 @@ class RestValueTable extends AbstractValueTable {
         valueSet = getOpalClient().getResource(ValueSetsDto.class,
             newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "false").build(),
             ValueSetsDto.newBuilder());
+        timestamps = new ValueSetTimestamps(valueSet.getValueSets(0).getTimestamps());
       }
       return valueSet;
     }
@@ -219,18 +220,18 @@ class RestValueTable extends AbstractValueTable {
 
       @Override
       public Value getLastUpdate() {
-        if(tsDto.hasLastUpdate()) {
+        if(tsDto != null && tsDto.hasLastUpdate()) {
           return DateTimeType.get().valueOf(tsDto.getLastUpdate());
         }
-        return getTimestamps().getLastUpdate();
+        return RestValueTable.this.getTimestamps().getLastUpdate();
       }
 
       @Override
       public Value getCreated() {
-        if(tsDto.hasCreated()) {
+        if(tsDto != null && tsDto.hasCreated()) {
           return DateTimeType.get().valueOf(tsDto.getCreated());
         }
-        return getTimestamps().getCreated();
+        return RestValueTable.this.getTimestamps().getCreated();
       }
     }
 

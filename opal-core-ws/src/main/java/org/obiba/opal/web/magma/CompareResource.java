@@ -147,10 +147,10 @@ public class CompareResource {
   private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Iterable<Variable> newVariables,
       Iterable<Variable> missingVariables, Iterable<Variable> existingVariables) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
-    dtoBuilder.setCompared(Dtos.asDto(compared));
+    dtoBuilder.setCompared(Dtos.asDto(compared, true, false));
 
     if(with != null) {
-      dtoBuilder.setWithTable(Dtos.asDto(with));
+      dtoBuilder.setWithTable(Dtos.asDto(with, true, false));
     }
 
     Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);

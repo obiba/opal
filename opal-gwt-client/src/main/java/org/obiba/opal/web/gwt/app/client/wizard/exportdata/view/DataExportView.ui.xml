@@ -38,20 +38,27 @@
           </g:FlowPanel>
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key">
-              <ui:msg description="File field">File</ui:msg>
+              <ui:msg description="File field">Destination Folder</ui:msg>
             </g:Label>
             <g:SimplePanel ui:field="filePanel"/>
-          </g:FlowPanel>
-          <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key">
-              <ui:msg description="Options title">Options</ui:msg>
-            </g:Label>
-            <g:CheckBox ui:field="useAlias">
-              <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
-                variables
+            <g:Label styleName="help-block">
+              <ui:msg description="Destination Folder Help label">Data will be exported in the selected folder in a zip
+                of XML files or in a folder with CSV files.
               </ui:msg>
-            </g:CheckBox>
+            </g:Label>
           </g:FlowPanel>
+          <g:DisclosurePanel addStyleNames="full-width">
+            <g:customHeader>
+              <g:Label><ui:msg description="Options title">Options</ui:msg></g:Label>
+            </g:customHeader>
+            <g:FlowPanel styleName="input">
+              <g:CheckBox ui:field="useAlias">
+                <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
+                  variables
+                </ui:msg>
+              </g:CheckBox>
+            </g:FlowPanel>
+          </g:DisclosurePanel>
         </g:FlowPanel>
       </o:WizardStep>
 

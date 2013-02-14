@@ -89,11 +89,26 @@ class SecuredFileObject extends DecoratedFileObject {
 
   @Override
   public boolean delete() throws FileSystemException {
-    if (isPermitted(getDecoratedFileObject(), "DELETE")) {
+    if(isPermitted(getDecoratedFileObject(), "DELETE")) {
       return super.delete();
-    } else {
-      throw new FileSystemException("vfs.provider.local/delete-file.error", getName());
     }
+    throw new FileSystemException("vfs.provider.local/delete-file.error", getName());
+  }
+
+  @Override
+  public void moveTo(FileObject destFile) throws FileSystemException {
+    FileObject sourceFile = getDecoratedFileObject();
+
+    if(isPermitted(sourceFile, "DELETE")) {
+      if(!(destFile instanceof SecuredFileObject)) {
+        super.moveTo(destFile);
+        return;
+      }
+
+      sourceFile.moveTo(((SecuredFileObject) destFile).getDecoratedFileObject());
+      return;
+    }
+    throw new FileSystemException("vfs.provider.local/delete-file.error", getName());
   }
 
   private FileObject[] toSecuredFileObjects(FileObject... children) {

@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.12-SNAPSHOT</version>
+    <version>1.13-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal-reporting</artifactId>
-  <version>1.12-SNAPSHOT</version>
 
   <name>opal-reporting</name>
   <description>Opal Reporting Module</description>
@@ -21,30 +20,25 @@
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-core-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-ws</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-web-model</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <!-- BIRT dependencies -->
     <dependency>
       <groupId>org.obiba.opal.oda</groupId>
       <artifactId>org.obiba.opal.oda.runtime</artifactId>
-      <version>${opal.oda.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal.oda</groupId>
       <artifactId>update-site</artifactId>
-      <version>${opal.oda.version}</version>
       <scope>provided</scope>
       <type>zip</type>
       <classifier>assembly</classifier>
@@ -62,25 +56,21 @@
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-coreapi</artifactId>
-      <version>${birt.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-modelapi</artifactId>
-      <version>${birt.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-engineapi</artifactId>
-      <version>${birt.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.birt</groupId>
       <artifactId>birt-report-engine</artifactId>
-      <version>${birt.version}</version>
       <scope>provided</scope>
       <type>zip</type>
     </dependency>
@@ -104,7 +94,8 @@
         <executions>
           <execution>
             <id>make-assembly</id>
-            <phase>package</phase> <!-- append to the packaging phase. -->
+            <!-- append to the packaging phase. -->
+            <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
@@ -116,8 +107,6 @@
 
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
-    <birt.version>2.6.2</birt.version>
-    <opal.oda.version>1.2.3</opal.oda.version>
   </properties>
 
 </project>

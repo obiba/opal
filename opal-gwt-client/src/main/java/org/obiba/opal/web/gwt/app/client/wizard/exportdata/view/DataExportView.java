@@ -26,7 +26,6 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -58,8 +57,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   private String username;
 
   @UiTemplate("DataExportView.ui.xml")
-  interface DataExportUiBinder extends UiBinder<DialogBox, DataExportView> {
-  }
+  interface DataExportUiBinder extends UiBinder<DialogBox, DataExportView> {}
 
   private static final DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
 
@@ -261,7 +259,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     }
     suffix += "export-" + username + "-" + dateFormat.format(date);
 
-    if(getFileFormat().equalsIgnoreCase("xml")) {
+    if("xml".equalsIgnoreCase(getFileFormat())) {
       return fileSelection.getFile() + suffix + ".zip";
     }
 
@@ -275,8 +273,8 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   }
 
   @Override
-  public void selectTable(TableDto table) {
-    tableChooser.selectTable(table);
+  public void selectTable(TableDto tableDto) {
+    tableChooser.selectTable(tableDto);
   }
 
   @Override
@@ -304,11 +302,6 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   }
 
   @Override
-  public HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler) {
-    return fileFormat.addChangeHandler(handler);
-  }
-
-  @Override
   public void show() {
     stepChain.reset();
     super.show();
@@ -326,7 +319,6 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
     fileFormat.setEnabled(true);
     if(fileSelection != null) {
       fileSelection.setEnabled(true);
-      fileSelection.clearFile();
     }
   }
 

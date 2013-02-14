@@ -36,10 +36,7 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -69,7 +66,8 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   protected String identifierEntityType;
 
   @Inject
-  public DataExportPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter, RequestCredentials credentials) {
+  public DataExportPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter,
+      RequestCredentials credentials) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
     this.credentials = credentials;
@@ -84,7 +82,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   protected void initDisplayComponents() {
     initFileSelectionType();
     fileSelectionPresenter.bind();
-    registerHandler(getView().addFileFormatChangeHandler(new FileFormatChangeHandler()));
+    fileSelectionPresenter.getDisplay().setFile("/home/" + credentials.getUsername() + "/export");
     getView().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
     getView().setTablesValidator(new TablesValidator());
     getView().setDestinationValidator(new DestinationValidator());
@@ -127,7 +125,18 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
-    if(event.getEventParameters().length != 0) {
+    if(event.getEventParameters().length == 0) {
+      datasourceName = null;
+      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
+          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<TableDto> resource) {
+              getView().addTableSelections(JsArrays.toSafeArray(resource));
+            }
+
+          }).send();
+    } else {
+      //noinspection ChainOfInstanceofChecks
       if(event.getEventParameters()[0] instanceof String) {
         datasourceName = (String) event.getEventParameters()[0];
       } else if(event.getEventParameters()[0] instanceof TableDto) {
@@ -141,22 +150,12 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
           .withCallback(new ResourceCallback<JsArray<TableDto>>() {
             @Override
             public void onResource(Response response, JsArray<TableDto> resource) {
-              getView().addTableSelections(JsArrays.toSafeArray((JsArray<TableDto>) resource));
+              getView().addTableSelections(JsArrays.toSafeArray(resource));
               if(table != null) {
                 getView().selectTable(table);
               } else {
                 getView().selectAllTables();
               }
-            }
-
-          }).send();
-    } else {
-      datasourceName = null;
-      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
-          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<TableDto> resource) {
-              getView().addTableSelections(JsArrays.toSafeArray((JsArray<TableDto>) resource));
             }
 
           }).send();
@@ -180,8 +179,8 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     }
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
         .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions())) //
-        .withCallback(400, new ClientFailureResponseCodeCallBack()) //
-        .withCallback(201, new SuccessResponseCodeCallBack()).send();
+        .withCallback(Response.SC_BAD_REQUEST, new ClientFailureResponseCodeCallBack()) //
+        .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack()).send();
   }
 
   private CopyCommandOptionsDto createCopyCommandOptions() {
@@ -191,8 +190,8 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     if(table != null) {
       selectedTables.push(table.getDatasourceName() + "." + table.getName());
     } else {
-      for(TableDto table : getView().getSelectedTables()) {
-        selectedTables.push(table.getDatasourceName() + "." + table.getName());
+      for(TableDto tableDto : getView().getSelectedTables()) {
+        selectedTables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
       }
     }
 
@@ -226,7 +225,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
       List<String> result = new ArrayList<String>();
 
       String filename = getView().getOutFile();
-      if(filename == null || filename.equals("")) {
+      if(filename == null || "".equals(filename)) {
         result.add("DestinationFileIsMissing");
       }
       return result;
@@ -236,15 +235,16 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   private final class TablesValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(getView().getSelectedTables().size() == 0) {
+      if(getView().getSelectedTables().isEmpty()) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
         return false;
       }
       // Check for duplicate table names
-      Collection<String> namesMemento = new HashSet();
+      Collection<String> namesMemento = new HashSet<String>();
       for(TableDto dto : getView().getSelectedTables()) {
-        if (namesMemento.contains(dto.getName())){
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExportDataDuplicateTableNames").args(dto.getName()).build());
+        if(namesMemento.contains(dto.getName())) {
+          getEventBus().fireEvent(
+              NotificationEvent.newBuilder().error("ExportDataDuplicateTableNames").args(dto.getName()).build());
           return false;
         }
         namesMemento.add(dto.getName());
@@ -262,14 +262,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     }
   }
 
-  class FileFormatChangeHandler implements ChangeHandler {
-    @Override
-    public void onChange(ChangeEvent arg0) {
-      initFileSelectionType();
-      fileSelectionPresenter.getDisplay().clearFile();
-    }
-  }
-
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
@@ -283,8 +275,8 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
       String destination = getView().getOutFile();
-      getEventBus()
-          .fireEvent(NotificationEvent.newBuilder().info("DataExportationProcessLaunched").args(jobId, destination).build());
+      getEventBus().fireEvent(
+          NotificationEvent.newBuilder().info("DataExportationProcessLaunched").args(jobId, destination).build());
     }
   }
 
@@ -310,15 +302,13 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
     void addTableSelections(JsArray<TableDto> tables);
 
-    void selectTable(TableDto table);
+    void selectTable(TableDto tableDto);
 
     void selectAllTables();
 
     List<TableDto> getSelectedTables();
 
     String getFileFormat();
-
-    HandlerRegistration addFileFormatChangeHandler(ChangeHandler handler);
 
     boolean isIncremental();
 

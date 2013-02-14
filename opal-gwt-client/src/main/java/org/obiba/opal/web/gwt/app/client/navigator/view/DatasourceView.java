@@ -167,9 +167,11 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public void afterRenderRows() {
+    boolean enableItem = table.getRowCount() > 0;
     pager.setVisible(table.getRowCount() > NavigatorView.PAGE_SIZE);
-    toolbar.setExportDataItemEnabled(table.getRowCount() > 0);
-    toolbar.setCopyDataItemEnabled(table.getRowCount() > 0);
+    toolbar.setExportVariableDictionaryItemEnabled(enableItem);
+    toolbar.setExportDataItemEnabled(enableItem);
+    toolbar.setCopyDataItemEnabled(enableItem);
     table.setEmptyTableWidget(noTables);
   }
 
@@ -249,6 +251,11 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   }
 
   @Override
+  public void enableDatasourceRemoval(boolean enable) {
+    removeMenuItem.setEnabled(enable);
+  }
+
+  @Override
   public HasAuthorization getAddUpdateTablesAuthorizer() {
     return new MenuItemAuthorizer(toolbar.getAddUpdateTablesItem()) {
 
@@ -296,7 +303,7 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getExcelDownloadItem());
+    return new MenuItemAuthorizer(toolbar.getExportVariableDictionaryItem());
   }
 
   @Override

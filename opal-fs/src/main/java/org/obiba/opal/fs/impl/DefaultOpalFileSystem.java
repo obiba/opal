@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -29,56 +31,62 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
 
   private static final Logger log = LoggerFactory.getLogger(OpalFileSystem.class);
 
+  @Nonnull
   private final FileObject root;
 
+  @Nonnull
   private final String nativeRootURL;
 
-  public DefaultOpalFileSystem(final String fsRoot) {
+  public DefaultOpalFileSystem(String fsRoot) {
     Assert.hasText(fsRoot, "You must specify a root directory for the Opal File System.");
 
     try {
-      String root = Placeholders.replaceAll(fsRoot);
-      log.info("Setting up Opal filesystem rooted at '{}'", root);
+      String rootWithPlaceholdersReplaced = Placeholders.replaceAll(fsRoot);
+      log.info("Setting up Opal filesystem rooted at '{}'", rootWithPlaceholdersReplaced);
       FileSystemManager fsm = VFS.getManager();
-      FileObject vfsRoot = fsm.resolveFile(root);
+      FileObject vfsRoot = fsm.resolveFile(rootWithPlaceholdersReplaced);
 
-      if(vfsRoot.exists() == false) {
+      if(!vfsRoot.exists()) {
         log.info("Opal File System does not exist. Trying to create it.");
         vfsRoot.createFolder();
       }
       nativeRootURL = vfsRoot.getURL().toString() + "/";
 
-      if(vfsRoot.isReadable() == false) {
+      if(!vfsRoot.isReadable()) {
         log.error("Opal File System is not readable.  Please check your Opal File System configuration.");
-        throw new RuntimeException("Opal File System is not readable.  Please check your Opal File System configuration.");
+        throw new RuntimeException(
+            "Opal File System is not readable.  Please check your Opal File System configuration.");
       }
-      if(vfsRoot.isWriteable() == false) {
-        log.error("The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
-        throw new RuntimeException("The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
+      if(!vfsRoot.isWriteable()) {
+        log.error(
+            "The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
+        throw new RuntimeException(
+            "The root of the Opal File System is not writable.  Please reconfigure the Opal File System with a writable root.");
       }
 
       // This is similar to what chroot does. We obtain a "filesystem" that appears to be rooted at vfsRoot
-      this.root = fsm.createVirtualFileSystem(vfsRoot);
+      root = fsm.createVirtualFileSystem(vfsRoot);
     } catch(FileSystemException e) {
       throw new RuntimeException(e);
     }
   }
 
+  @Nonnull
+  @Override
   public FileObject getRoot() {
     return root;
   }
 
+  @Override
   public File getLocalFile(FileObject virtualFile) {
     Assert.notNull(virtualFile, "A virtualFile is required.");
     try {
       if(isLocalFile(virtualFile)) {
         String virtualFileURL = virtualFile.getURL().toString();
         String nativeFileURL = virtualFileURL.replace(root.getURL().toString(), nativeRootURL);
-        File file = new File(nativeFileURL.replaceFirst("[a-zA-Z]*[0-9]?://", ""));
-        return file;
-      } else {
-        return convertVirtualFileToLocal(virtualFile);
+        return new File(nativeFileURL.replaceFirst("[a-zA-Z]*[0-9]?://", ""));
       }
+      return convertVirtualFileToLocal(virtualFile);
     } catch(Exception e) {
       throw new RuntimeException(e);
     }
@@ -90,7 +98,8 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
       virtualFileType = virtualFile.getType();
 
       if(virtualFileType == FileType.FOLDER) {
-        throw new RuntimeException("This FileObject cannot be converted to a local File because it represents a folder in the VFS.");
+        throw new RuntimeException(
+            "This FileObject cannot be converted to a local File because it represents a folder in the VFS.");
       } else if(virtualFileType == FileType.IMAGINARY) {
         virtualFile.createFile();
       }
@@ -100,6 +109,7 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     }
   }
 
+  @Override
   public File convertVirtualFileToLocal(FileObject virtualFile) {
     Assert.notNull(virtualFile, "A virtualFile is required.");
     makeSureThatFileCanBeConverted(virtualFile);
@@ -126,22 +136,20 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     return File.createTempFile("temp_local_vfs_", "." + virtualFileName.getExtension());
   }
 
-  public boolean isLocalFile(FileObject virtualFile) {
+  @SuppressWarnings("ChainOfInstanceofChecks")
+  @Override
+  public boolean isLocalFile(@Nonnull FileObject virtualFile) {
     Preconditions.checkNotNull(virtualFile);
-
     FileObject currentFile = virtualFile;
     while(true) {
       if(currentFile instanceof DelegateFileObject) {
         currentFile = ((DelegateFileObject) currentFile).getDelegateFile();
       } else if(currentFile instanceof DecoratedFileObject) {
         currentFile = ((DecoratedFileObject) currentFile).getDecoratedFileObject();
-      } else if(currentFile instanceof LocalFile) {
-        return true;
       } else {
-        return false;
+        return currentFile instanceof LocalFile;
       }
     }
-
   }
 
   @Override
@@ -153,10 +161,12 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     return convertBytesToString(getDigester().digest(stringToObfuscate.getBytes()));
   }
 
-  private String convertBytesToString(byte[] digestedBytes) {
+  private String convertBytesToString(byte... digestedBytes) {
     StringBuilder hexString = new StringBuilder();
-    for(int i = 0; i < digestedBytes.length; i++) {
-      hexString.append(Integer.toHexString(0xFF & digestedBytes[i]));
+    if(digestedBytes != null) {
+      for(byte digestedByte : digestedBytes) {
+        hexString.append(Integer.toHexString(0xFF & digestedByte));
+      }
     }
     return hexString.toString();
   }
@@ -178,13 +188,12 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     } catch(FileSystemException e) {
       throw new RuntimeException("Unsuspected error : ", e);
     }
-
   }
 
   private FileObject searchFolder(FileObject folder, String obfuscatedPath) throws FileSystemException {
     FileObject matchingFile = null;
     for(FileObject file : folder.getChildren()) {
-      if(file.getType().equals(FileType.FOLDER) && file.getChildren().length > 0) {
+      if(file.getType() == FileType.FOLDER && file.getChildren().length > 0) {
         matchingFile = searchFolder(file, obfuscatedPath);
         if(matchingFile != null) break;
       } else {
@@ -194,7 +203,6 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
         }
       }
     }
-
     return matchingFile;
   }
 }

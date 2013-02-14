@@ -40,6 +40,7 @@ public abstract class DerivationPresenter<V extends View> extends PresenterWidge
     super(eventBus, view);
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
       VariableDto derivedVariable) {
     this.originalTable = originalTable;

@@ -1,35 +1,35 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-  xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
-    	
-  	<g:FlowPanel> 
-	   <o:WizardStep ui:field="deriveStep">
-	     <g:FlowPanel>
-	       <g:FlowPanel styleName="input">
-             <g:Label addStyleNames="key"><ui:msg description="Value Type label">Value Type</ui:msg></g:Label>
-             <o2:ValueTypeBox ui:field="valueTypeBox" />
-           </g:FlowPanel>
-           <g:FlowPanel styleName="input">
-             <g:CheckBox ui:field="repeatable" addStyleNames="key"><ui:msg description="Repeatable label">Repeatable</ui:msg></g:CheckBox>
-           </g:FlowPanel>
-           
-           <o:HorizontalTabLayout>
-             <g:Anchor><ui:msg description="Script label">Script</ui:msg></g:Anchor>
-             <g:FlowPanel styleName="input">
-               <o2:ScriptSuggestBox ui:field="scriptBox" addStyleNames="x-high full-width"/>
-               <g:Label styleName="help-block inline"><ui:msg description="Script Help label">Edit the script and test it. Or select a portion of the script and test it.</ui:msg></g:Label>
-               <g:Button ui:field="testButton" addStyleNames="btn btn-info right-aligned" >
-  		         <ui:msg description="Test label">Test</ui:msg>
-  		       </g:Button>
-  		     </g:FlowPanel>
-  		   </o:HorizontalTabLayout>
-  		   
-	     </g:FlowPanel>
-	   </o:WizardStep>
-    </g:FlowPanel>
-    
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel>
+    <o:WizardStep ui:field="deriveStep">
+      <g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key">
+            <ui:msg description="Value Type label">Value Type</ui:msg>
+          </g:Label>
+          <o2:ValueTypeBox ui:field="valueTypeBox"/>
+        </g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:CheckBox ui:field="repeatable" addStyleNames="key">
+            <ui:msg description="Repeatable label">Repeatable</ui:msg>
+          </g:CheckBox>
+        </g:FlowPanel>
+
+        <o:HorizontalTabLayout>
+          <g:Anchor>
+            <ui:msg description="Script label">Script</ui:msg>
+          </g:Anchor>
+          <g:FlowPanel ui:field="scriptEditor"/>
+        </o:HorizontalTabLayout>
+
+      </g:FlowPanel>
+    </o:WizardStep>
+  </g:FlowPanel>
+
 </ui:UiBinder>

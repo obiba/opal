@@ -209,13 +209,17 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   @Override
   public void renderRows(List<EntityDialogPresenter.VariableValueRow> rows) {
-    clearFilter();
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
     setRefreshing(false);
   }
 
+  @Override
+  public void clearFilter() {
+    filter.setText("");
+    lastFilter = "";
+  }
   private void clear() {
     tableChooser.clear();
 
@@ -225,11 +229,6 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
     clearFilter();
     addTableColumns();
-  }
-
-  private void clearFilter() {
-    filter.setText("");
-    lastFilter = "";
   }
 
   private void addTableColumns() {

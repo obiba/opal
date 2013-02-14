@@ -131,6 +131,7 @@ public final class Dtos {
   public static AttributeDto.Builder asDto(Attribute from) {
     AttributeDto.Builder a = AttributeDto.newBuilder().setName(from.getName()).setValue(from.getValue().toString());
     if(from.isLocalised()) {
+      //noinspection ConstantConditions
       a.setLocale(from.getLocale().toString());
     }
     if(from.hasNamespace()) {
@@ -201,13 +202,20 @@ public final class Dtos {
   }
 
   public static TableDto.Builder asDto(ValueTable valueTable, boolean withCounts) {
+    return asDto(valueTable, withCounts, withCounts);
+  }
+
+  public static TableDto.Builder asDto(ValueTable valueTable, boolean withVariableCounts, boolean withValueSetCount) {
     TableDto.Builder builder = TableDto.newBuilder() //
         .setName(valueTable.getName()) //
         .setEntityType(valueTable.getEntityType());
 
-    if(withCounts) {
-      builder.setVariableCount(Iterables.size(valueTable.getVariables())) //
-          .setValueSetCount(valueTable.getVariableEntities().size());
+    if(withVariableCounts) {
+      builder.setVariableCount(Iterables.size(valueTable.getVariables()));
+    }
+
+    if(withValueSetCount) {
+      builder.setValueSetCount(valueTable.getVariableEntities().size());
     }
 
     Magma.TimestampsDto.Builder tsBuilder = asDto(valueTable.getTimestamps());
@@ -228,18 +236,13 @@ public final class Dtos {
   }
 
   public static Magma.TimestampsDto.Builder asDto(Timestamps ts) {
-    Magma.TimestampsDto.Builder tsBuilder = null;
+    Magma.TimestampsDto.Builder tsBuilder = Magma.TimestampsDto.newBuilder();
     if(!ts.getCreated().isNull()) {
-      tsBuilder = Magma.TimestampsDto.newBuilder();
       tsBuilder.setCreated(ts.getCreated().toString());
     }
     if(!ts.getLastUpdate().isNull()) {
-      if(tsBuilder == null) {
-        tsBuilder = Magma.TimestampsDto.newBuilder();
-      }
       tsBuilder.setLastUpdate(ts.getLastUpdate().toString());
     }
-
     return tsBuilder;
   }
 
@@ -308,7 +311,7 @@ public final class Dtos {
     if(!value.isNull() && value.isSequence()) {
       int i = 0;
       for(Value v : value.asSequence().getValue()) {
-        valueDto.addValues(Dtos.asDto(link + "?pos=" + i, v, filterBinary));
+        valueDto.addValues(asDto(link + "?pos=" + i, v, filterBinary));
         i++;
       }
     }
@@ -320,17 +323,14 @@ public final class Dtos {
     return VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).setEntityType(from.getType());
   }
 
+  /**
+   * Does not add values, nor timestamps.
+   *
+   * @param valueSet
+   * @return
+   */
   public static ValueSetsDto.ValueSetDto.Builder asDto(ValueSet valueSet) {
-    ValueSetsDto.ValueSetDto.Builder vsBuilder = ValueSetsDto.ValueSetDto.newBuilder()
-        .setIdentifier(valueSet.getVariableEntity().getIdentifier());
-
-    // add timestamps
-    Magma.TimestampsDto.Builder tsBuilder = asDto(valueSet.getTimestamps());
-    if(tsBuilder != null) {
-      vsBuilder.setTimestamps(tsBuilder);
-    }
-
-    return vsBuilder;
+    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(valueSet.getVariableEntity().getIdentifier());
   }
 
   public static LocaleDto asDto(Locale locale, @Nullable Locale displayLocale) {

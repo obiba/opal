@@ -8,14 +8,33 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel>
+
+      <g:Label styleName="section-title">
+        <ui:msg description="Incremental import">Specify how existing data is managed</ui:msg>
+      </g:Label>
+      <g:FlowPanel styleName="input">
+        <g:CheckBox ui:field="incremental" addStyleNames="small-indent">
+          <ui:msg description="Incremental import">Incremental import</ui:msg>
+        </g:CheckBox>
+        <g:Label styleName="help-block large-indent">
+          <ui:msg description="Import only new data">Import only new data</ui:msg>
+        </g:Label>
+      </g:FlowPanel>
+
+
+      <g:Label styleName="section-title">
+        <ui:msg description="Specify how the participant are identified">
+          Specify how the participant are identified
+        </ui:msg>
+      </g:Label>
       <g:InlineLabel ui:field="noUnitLabel">
         <ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will be
           used as-is (no unit is defined).
@@ -28,7 +47,7 @@
           </ui:msg>
         </g:InlineLabel>
         <g:FlowPanel styleName="input">
-          <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" checked="true" addStyleNames="small-indent">
+          <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" addStyleNames="small-indent">
             <ui:msg description="Leave identifier as-is label">be used as-is</ui:msg>
           </g:RadioButton>
         </g:FlowPanel>

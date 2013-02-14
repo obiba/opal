@@ -12,30 +12,27 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCustomVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ScriptSuggestBox;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.widget.ValueTypeBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
-import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCustomVariablePresenter.Display {
 
+  @UiTemplate("DeriveCustomVariableStepView.ui.xml")
+  interface ViewUiBinder extends UiBinder<Widget, DeriveCustomVariableStepView> {}
+
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
-
-  @UiTemplate("DeriveCustomVariableStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveCustomVariableStepView> {
-  }
 
   private final Widget widget;
 
@@ -46,13 +43,10 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
   ValueTypeBox valueTypeBox;
 
   @UiField
-  ScriptSuggestBox scriptBox;
+  FlowPanel scriptEditor;
 
   @UiField
   CheckBox repeatable;
-
-  @UiField
-  HasClickHandlers testButton;
 
   public DeriveCustomVariableStepView() {
     widget = uiBinder.createAndBindUi(this);
@@ -70,28 +64,16 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
   }
 
   @Override
-  public void add(Widget widget) {
-    deriveStep.add(widget);
-  }
-
-  @Override
-  public ScriptSuggestBox getScriptBox() {
-    return scriptBox;
+  public void setInSlot(Object slot, Widget content) {
+    if(slot == Slots.Editor) {
+      scriptEditor.clear();
+      scriptEditor.add(content);
+    }
   }
 
   @Override
   public HasValue<String> getValueType() {
     return valueTypeBox;
-  }
-
-  @Override
-  public void addSuggestions(TableDto table) {
-    scriptBox.addAsyncSuggestions(table);
-  }
-
-  @Override
-  public HasClickHandlers getTestButton() {
-    return testButton;
   }
 
   @Override

@@ -1,0 +1,95 @@
+<!--
+  ~ Copyright (c) 2013 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateLocales="default">
+
+  <ui:style>
+    .optionsPanelMsg td {
+      margin: 0.5em 0.5em 0.5em 0.5em;
+    }
+  </ui:style>
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="35em" width="40em">
+      <g:center>
+        <g:ScrollPanel>
+          <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Cluster name label">Cluster Name</ui:msg>
+              </g:Label>
+              <g:TextBox name="clusterName" ui:field="clusterName"/>
+              <g:Label styleName="help-block">
+                <ui:msg description="Cluster name help label">You must restart the search service for the changes to
+                  take effect.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Index name label">Index Name</ui:msg>
+              </g:Label>
+              <g:TextBox name="indexName" ui:field="indexName"/>
+              <g:Label styleName="help-block">
+                <ui:msg description="Index name help label">You must restart the search service for the changes to
+                  take effect.
+                  file.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Number of shards label">Number of shards</ui:msg>
+              </g:Label>
+              <o:NumericTextBox ui:field="nbShards" width="6em" minConstrained="true"
+                  maxConstrained="false"></o:NumericTextBox>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Number of replicas label">Number of replicas</ui:msg>
+              </g:Label>
+              <o:NumericTextBox ui:field="nbReplicas" width="6em" minConstrained="true"
+                  maxConstrained="false"></o:NumericTextBox>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Settings">Settings</ui:msg>
+              </g:Label>
+              <g:TextArea addStyleNames="not-so-full-width" name="settings" ui:field="settings"/>
+            </g:FlowPanel>
+
+
+          </g:FlowPanel>
+        </g:ScrollPanel>
+      </g:center>
+
+      <g:south size="4">
+        <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
+          <g:Button ui:field="cancelButton" styleName="btn right-aligned top-margin">
+            <ui:msg description="Cancel button label">Cancel</ui:msg>
+          </g:Button>
+          <g:Button ui:field="saveButton" styleName="btn btn-primary right-aligned top-margin">
+            <ui:msg description="Save button label">Save</ui:msg>
+          </g:Button>
+        </g:FlowPanel>
+      </g:south>
+
+    </g:DockLayoutPanel>
+  </g:DialogBox>
+
+</ui:UiBinder>

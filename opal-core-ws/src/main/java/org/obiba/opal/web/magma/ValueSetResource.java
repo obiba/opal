@@ -152,7 +152,7 @@ public class ValueSetResource extends AbstractValueTableResource {
             Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
             return Dtos.asDto(link, value, filterBinary).build();
           }
-        }));
+        })).setTimestamps(Dtos.asDto(valueSet.getTimestamps()));
 
     return ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType())
         .addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {

@@ -36,6 +36,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Component;
 
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 @SuppressWarnings("MagicNumber")
 @Component
 public class BinariesStorageUpgradeJob implements BackgroundJob {
@@ -84,11 +89,57 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
       DataSource dataSource = entry.getKey();
       String dataSourceName = entry.getValue();
-      log.debug("Process dataSource {}", dataSourceName);
       if(SqlBinariesStorageUpgradeStep.hasHibernateDatasource(dataSource)) {
-        processDataSource(dataSource, dataSourceName);
+        processAndRetryDatasource(dataSource, dataSourceName);
       }
     }
+  }
+
+  private void processAndRetryDatasource(DataSource dataSource, String dataSourceName) {
+    boolean done = false;
+    long sleep = 5;
+    while(!done) {
+      try {
+        log.debug("Process dataSource {}", dataSourceName);
+        processDataSource(dataSource, dataSourceName);
+        done = true;
+      } catch(Throwable e) {
+        //noinspection StringConcatenationArgumentToLogCall
+        log.error("Error while moving binaries for " + dataSourceName, e);
+        log.info("Waiting {}s", formatSleepPeriod(sleep));
+        try {
+          Thread.sleep(sleep * 1000);
+          sleep *= 2;
+        } catch(InterruptedException ignored) {
+        }
+      }
+    }
+  }
+
+  //TODO use Joda PeriodFormatter
+  private String formatSleepPeriod(long sleep) {
+    long hours = MILLISECONDS.toHours(sleep);
+    long minutes = MILLISECONDS.toMinutes(sleep) - HOURS.toMinutes(hours);
+    long seconds = MILLISECONDS.toSeconds(sleep) - HOURS.toSeconds(hours) - MINUTES.toSeconds(minutes);
+    long millis = sleep - HOURS.toMillis(hours) - MINUTES.toMillis(minutes) - SECONDS.toMillis(seconds);
+
+    Collection<Object> args = new ArrayList<Object>();
+    StringBuilder format = new StringBuilder();
+    if(hours > 0) {
+      format.append("%dhours ");
+      args.add(hours);
+    }
+    if(minutes > 0) {
+      format.append("%dmin ");
+      args.add(minutes);
+    }
+    if(seconds > 0) {
+      format.append("%dsec ");
+      args.add(seconds);
+    }
+    format.append("%dms");
+    args.add(millis);
+    return String.format(format.toString(), args.toArray(new Object[args.size()]));
   }
 
   @SuppressWarnings("OverlyNestedMethod")
@@ -135,7 +186,6 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
     template.query( //
         "SELECT d.name AS datasourceName, vt.name AS tableName, v.name AS variableName, ve.identifier AS entityId " + //
             "FROM value_set_value vsv, value_set vs, variable_entity ve, value_table vt, datasource d, variable v  " +
-            //
             "WHERE vsv.value_set_id = vs.id " + //
             "AND vs.variable_entity_id = ve.id " + //
             "AND vs.value_table_id = vt.id " + //

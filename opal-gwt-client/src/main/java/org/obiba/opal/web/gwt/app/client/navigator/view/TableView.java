@@ -198,13 +198,17 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void afterRenderRows() {
+    boolean enableItem = dataProvider.getList().size() > 0;
     pager.setVisible(dataProvider.getList().size() > NavigatorView.PAGE_SIZE);
-    toolbar.setExportDataItemEnabled(dataProvider.getList().size() > 0);
+    toolbar.setExportVariableDictionaryItemEnabled(enableItem);
+    toolbar.setExportDataItemEnabled(enableItem);
+    toolbar.setCopyDataItemEnabled(enableItem);
     table.setEmptyTableWidget(noVariables);
   }
 
   @Override
   public void renderRows(final JsArray<VariableDto> rows) {
+    createCodingViewItem.setEnabled(rows.length() > 0);
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
@@ -396,7 +400,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getExcelDownloadItem());
+    return new MenuItemAuthorizer(toolbar.getExportVariableDictionaryItem());
   }
 
   @Override

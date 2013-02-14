@@ -176,7 +176,6 @@ public class OpalJavaClient {
   public void close() {
     if(client != null) {
       log.info("Disconnecting from Opal: {}", opalURI);
-      log.debug("", new Exception());
       getClient().getConnectionManager().shutdown();
     }
   }
@@ -293,7 +292,7 @@ public class OpalJavaClient {
   private HttpResponse execute(HttpUriRequest msg) throws IOException {
     msg.addHeader("Accept", "application/x-protobuf, text/html");
     authenticate(msg);
-    log.info("{} {}", msg.getMethod(), msg.getURI());
+    log.debug("{} {}", msg.getMethod(), msg.getURI());
     if(log.isTraceEnabled()) {
       for(Header allHeader : msg.getAllHeaders()) {
         log.trace("  {} {}", allHeader.getName(), allHeader.getValue());
