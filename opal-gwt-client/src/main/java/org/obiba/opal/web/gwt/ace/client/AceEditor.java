@@ -31,11 +31,10 @@ import com.google.gwt.user.client.ui.SimplePanel;
 public class AceEditor extends SimplePanel implements HasText, HasEnabled, HasChangeHandlers {
 
   @SuppressWarnings({ "FieldCanBeLocal", "UnusedDeclaration" })
-  private JavaScriptObject editor;
+  private final JavaScriptObject editor;
 
   public AceEditor() {
     editor = createEditor(getElement());
-
     // Hack to avoid fire ChangeEvent on Ace change event because Ace API fire change events on SetValue() and for all internal changes.
     // So we fire ChangeEvent on key down
     addKeyUpHandler(new KeyUpHandler() {
@@ -44,13 +43,6 @@ public class AceEditor extends SimplePanel implements HasText, HasEnabled, HasCh
         DomEvent.fireNativeEvent(Document.get().createChangeEvent(), AceEditor.this);
       }
     });
-  }
-
-  @Override
-  protected void onUnload() {
-    super.onUnload();
-    destroy();
-    editor = null;
   }
 
   private static native JavaScriptObject createEditor(Element element) /*-{
@@ -92,12 +84,10 @@ public class AceEditor extends SimplePanel implements HasText, HasEnabled, HasCh
 
   @Override
   public native void setText(String value) /*-{
-      this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor.setValue(value);
-  }-*/;
-
-  private native void destroy() /*-{
       var editor = this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor;
-      if (editor != null) editor.destroy();
+      editor.setValue(value);
+      editor.clearSelection();
+      editor.gotoLine(0);
   }-*/;
 
   /**
