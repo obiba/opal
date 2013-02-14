@@ -82,6 +82,6 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
 
   public interface Handler extends EventHandler {
 
-    public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event);
+    void onViewConfigurationRequired(ViewConfigurationRequiredEvent event);
   }
 }

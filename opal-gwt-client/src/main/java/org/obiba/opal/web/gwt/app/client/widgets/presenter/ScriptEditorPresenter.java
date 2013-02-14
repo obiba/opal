@@ -60,7 +60,7 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     }));
   }
 
-  public void setTable(ViewDto viewDto) {
+  public void setView(ViewDto viewDto) {
     UriBuilder ub = UriBuilder.create().segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
         .withCallback(new ResourceCallback<TableDto>() {
