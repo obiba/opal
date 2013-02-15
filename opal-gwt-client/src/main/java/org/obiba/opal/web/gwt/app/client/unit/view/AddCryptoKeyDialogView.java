@@ -33,7 +33,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -102,7 +102,7 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
   RadioButton publicKeyCreated;
 
   @UiField
-  HTMLPanel publicKeyForm;
+  FlowPanel publicKeyForm;
 
   @UiField
   TextBox names;
@@ -158,11 +158,6 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
                 publicKeyImported.setVisible(privateKeyImported.getValue());
                 publicKeyPEM.setVisible(privateKeyImported.getValue());
                 updateCertFields();
-                if(privateKeyCreated.getValue()) {
-                  publicKeyForm.removeStyleName("indent");
-                } else {
-                  publicKeyForm.addStyleName("indent");
-                }
               }
             }).onValidate(publicKeyValidators).build()).build();
 
