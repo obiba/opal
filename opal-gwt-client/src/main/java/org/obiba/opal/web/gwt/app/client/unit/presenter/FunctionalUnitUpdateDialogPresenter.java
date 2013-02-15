@@ -39,6 +39,7 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<FunctionalUnitUpdateDialogPresenter.Display> {
 
+  @SuppressWarnings("TypeMayBeWeakened")
   private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   private Mode dialogMode;
@@ -47,6 +48,7 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     CREATE, UPDATE
   }
 
+  @SuppressWarnings("unused")
   public interface Display extends PopupView {
 
     void hideDialog();
@@ -61,9 +63,13 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
 
     void setName(String name);
 
+    void setDescription(String description);
+
     void setSelect(String select);
 
     HasText getName();
+
+    HasText getDescription();
 
     HasText getSelect();
 
@@ -96,9 +102,10 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
   }
 
   private void addEventHandlers() {
-    super.registerHandler(
+    registerHandler(
         getView().getUpdateFunctionalUnitButton().addClickHandler(new CreateOrUpdateFunctionalUnitClickHandler()));
-    super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
@@ -110,6 +117,7 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     getView().setDialogMode(dialogMode);
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass, TypeMayBeWeakened")
   private void updateFunctionalUnit() {
     if(validFunctionalUnit()) {
       FunctionalUnitDto functionalUnit = getFunctionalUnitDto();
@@ -122,6 +130,7 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     }
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass, TypeMayBeWeakened")
   private void createFunctionalUnit() {
     if(validFunctionalUnit()) {
       CreateFunctionalUnitCallBack createFunctionalUnitCallback = new CreateFunctionalUnitCallBack();
@@ -154,8 +163,11 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     FunctionalUnitDto functionalUnit = FunctionalUnitDto.create();
     functionalUnit.setName(getView().getName().getText());
     functionalUnit.setKeyVariableName(getView().getName().getText());
+    if(getView().getDescription().getText().trim().length() > 0) {
+      functionalUnit.setDescription(getView().getDescription().getText());
+    }
     if(getView().getSelect().getText().trim().length() > 0) {
-      functionalUnit.setKeyVariableName(getView().getSelect().getText());
+      functionalUnit.setSelect(getView().getSelect().getText());
     }
     return functionalUnit;
   }

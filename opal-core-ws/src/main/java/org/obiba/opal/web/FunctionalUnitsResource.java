@@ -119,6 +119,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     final List<Opal.FunctionalUnitDto> functionalUnits = Lists.newArrayList();
     for(FunctionalUnit functionalUnit : getFunctionalUnitService().getFunctionalUnits()) {
       Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName())
+          .setDescription(functionalUnit.hasDescription() ? functionalUnit.getDescription() : "")
           .setKeyVariableName(functionalUnit.getKeyVariableName());
       if(functionalUnit.getSelect() instanceof JavascriptClause) {
         fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
@@ -137,6 +138,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private FunctionalUnitDto.Builder getFunctionalUnitDtoBuilder(FunctionalUnit functionalUnit) {
     Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName())
+        .setDescription(functionalUnit.hasDescription() ? functionalUnit.getDescription() : "")
         .setKeyVariableName(functionalUnit.getKeyVariableName());
     if(functionalUnit.getSelect() instanceof JavascriptClause) {
       fuBuilder.setSelect(((JavascriptClause) functionalUnit.getSelect()).getScript());
@@ -154,6 +156,9 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     ResponseBuilder response = null;
     try {
       FunctionalUnit functionalUnit = new FunctionalUnit(unit.getName(), unit.getKeyVariableName());
+      if(unit.hasDescription()) {
+        functionalUnit.setDescription(unit.getDescription());
+      }
       if(unit.hasSelect()) {
         functionalUnit.setSelect(new JavascriptClause(unit.getSelect()));
       }
@@ -409,6 +414,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     for(FunctionalUnit functionalUnit : getUnitsFromIdentifiersMap(reader)) {
       Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
           setName(functionalUnit.getName()). //
+          setDescription(functionalUnit.getDescription()). //
           setKeyVariableName(functionalUnit.getKeyVariableName());
       unitDtos.add(fuBuilder.build());
     }

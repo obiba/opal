@@ -32,6 +32,8 @@ public class FunctionalUnit {
 
   private String name;
 
+  private String description;
+
   private String keyVariableName;
 
   private DatasourceEncryptionStrategy datasourceEncryptionStrategy;
@@ -45,7 +47,6 @@ public class FunctionalUnit {
   //
 
   public FunctionalUnit() {
-    super();
   }
 
   public FunctionalUnit(String name, String keyVariableName) {
@@ -73,10 +74,23 @@ public class FunctionalUnit {
     this.name = name;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
+  public boolean hasDescription() {
+    return description != null;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   public String getKeyVariableName() {
     return keyVariableName;
   }
 
+  @SuppressWarnings("unused")
   public void setKeyVariableName(String keyVariableName) {
     this.keyVariableName = keyVariableName;
   }
@@ -89,6 +103,7 @@ public class FunctionalUnit {
     return datasourceEncryptionStrategy;
   }
 
+  @SuppressWarnings("unused")
   public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy datasourceEncryptionStrategy) {
     this.datasourceEncryptionStrategy = datasourceEncryptionStrategy;
   }
@@ -98,11 +113,7 @@ public class FunctionalUnit {
   }
 
   public UnitKeyStore getKeyStore(boolean create) {
-    if(create) {
-      return unitKeyStoreService.getOrCreateUnitKeyStore(getName());
-    } else {
-      return unitKeyStoreService.getUnitKeyStore(getName());
-    }
+    return create ? unitKeyStoreService.getOrCreateUnitKeyStore(getName()) : unitKeyStoreService.getUnitKeyStore(getName());
   }
 
   public SelectClause getSelect() {
