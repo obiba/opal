@@ -11,15 +11,17 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display> implements DataImportPresenter.DataImportFormatStepPresenter {
+import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
+
+public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display>
+    implements DataImportPresenter.DataImportFormatStepPresenter {
 
   @Inject
   public RestStepPresenter(EventBus eventBus, RestStepPresenter.Display view) {
@@ -32,14 +34,14 @@ public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display
   }
 
   @Override
-  public ImportData getImportData() {
-    ImportData importData = new ImportData();
-    importData.setImportFormat(ImportFormat.REST);
-    importData.put("url", getView().getUrl()) //
-    .put("username", getView().getUsername())//
-    .put("password", getView().getPassword())//
-    .put("remoteDatasource", getView().getRemoteDatasource());
-    return importData;
+  public ImportConfig getImportData() {
+    ImportConfig importConfig = new ImportConfig();
+    importConfig.setImportFormat(ImportFormat.REST);
+    importConfig.put("url", getView().getUrl()) //
+        .put("username", getView().getUsername())//
+        .put("password", getView().getPassword())//
+        .put("remoteDatasource", getView().getRemoteDatasource());
+    return importConfig;
   }
 
   @Override

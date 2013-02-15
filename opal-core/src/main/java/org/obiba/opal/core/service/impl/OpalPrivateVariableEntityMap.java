@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -17,13 +17,14 @@ import java.util.TreeSet;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
@@ -50,9 +51,10 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   private final BiMap<VariableEntity, VariableEntity> publicToPrivate = HashBiMap.create();
 
   /**
-   * 
+   *
    */
-  public OpalPrivateVariableEntityMap(ValueTable keysValueTable, Variable ownerVariable, IParticipantIdentifier participantIdentifier) {
+  public OpalPrivateVariableEntityMap(ValueTable keysValueTable, Variable ownerVariable,
+      IParticipantIdentifier participantIdentifier) {
     if(keysValueTable == null) throw new IllegalArgumentException("keysValueTable cannot be null");
     if(ownerVariable == null) throw new IllegalArgumentException("ownerVariable cannot be null");
     if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
@@ -102,7 +104,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     ValueTable keyTable = getKeyValueTable();
     for(int i = 0; i < 100; i++) {
       VariableEntity privateEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
-      if(publicToPrivate.inverse().containsKey(privateEntity) == false) {
+      if(!publicToPrivate.inverse().containsKey(privateEntity)) {
         try {
           writeEntities(keyTable, publicEntity, privateEntity);
           log.debug("{}<-->({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
@@ -113,7 +115,9 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
         return privateEntity;
       }
     }
-    throw new IllegalStateException("Unable to generate a unique private entity for the owner [" + ownerVariable + "] and public entity [" + publicEntity.getIdentifier() + "]. " + "One hundred attempts made.");
+    throw new IllegalStateException(
+        "Unable to generate a unique private entity for the owner [" + ownerVariable + "] and public entity [" +
+            publicEntity.getIdentifier() + "]. " + "One hundred attempts made.");
   }
 
   @Override
@@ -122,7 +126,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     ValueTable keyTable = getKeyValueTable();
     for(int i = 0; i < 100; i++) {
       VariableEntity publicEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
-      if(publicToPrivate.containsKey(publicEntity) == false) {
+      if(!publicToPrivate.containsKey(publicEntity)) {
         try {
           writeEntities(keyTable, publicEntity, privateEntity);
           publicToPrivate.put(publicEntity, entityFor(privateEntity.getIdentifier()));
@@ -132,13 +136,16 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
         return publicEntity;
       }
     }
-    throw new IllegalStateException("Unable to generate a unique public entity for the owner [" + ownerVariable + "] and private entity [" + privateEntity.getIdentifier() + "]. " + "One hundred attempts made.");
+    throw new IllegalStateException(
+        "Unable to generate a unique public entity for the owner [" + ownerVariable + "] and private entity [" +
+            privateEntity.getIdentifier() + "]. " + "One hundred attempts made.");
   }
 
-  private void writeEntities(ValueTable keyTable, VariableEntity publicEntity, VariableEntity privateEntity) throws IOException {
+  private void writeEntities(ValueTable keyTable, VariableEntity publicEntity, VariableEntity privateEntity)
+      throws IOException {
     ValueTableWriter vtw = keyTable.getDatasource().createWriter(keyTable.getName(), keyTable.getEntityType());
     ValueSetWriter vsw = vtw.writeValueSet(publicEntity);
-    vsw.writeValue(this.ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
+    vsw.writeValue(ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
     vsw.close();
     vtw.close();
     log.debug("{}<-->({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
@@ -164,12 +171,12 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     log.info("Done");
   }
 
-  private void constructCacheFromTable(ValueTable keyTable, VariableValueSource ownerVariableSource) {
+  private void constructCacheFromTable(ValueTable keyTable, ValueSource ownerVariableSource) {
     for(ValueSet valueSet : keyTable.getValueSets()) {
       Value value = ownerVariableSource.getValue(valueSet);
       // OPAL-619: The value could be null, in which case don't cache it. Whenever new participant
       // data are imported, the key variable is written first and its corresponding VariableValueSource
-      // is added *without a value* (see DefaultImportService.prepareKeysTable()). The key variable's
+      // is added *without a value* (see DefaultImportService.createKeyVariable()). The key variable's
       // value is written afterwards, in the process of copying the participant data to the destination
       // datasource. Also, more obviously, it is not necessarily the case that all value sets have a value
       // for all key variables.

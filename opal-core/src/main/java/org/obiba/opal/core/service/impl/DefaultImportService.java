@@ -28,6 +28,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
+import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.StaticValueTable;
@@ -77,13 +78,13 @@ public class DefaultImportService implements ImportService {
 
   private final IdentifiersTableService identifiersTableService;
 
-  private final IdentifiersService identifiersService;
+  private final IdentifierService identifierService;
 
   @Autowired
   public DefaultImportService(TransactionTemplate txTemplate, FunctionalUnitService functionalUnitService,
       OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier,
-      IdentifiersTableService identifiersTableService, IdentifiersService identifiersService) {
-    this.identifiersService = identifiersService;
+      IdentifiersTableService identifiersTableService, IdentifierService identifierService) {
+    this.identifierService = identifierService;
     if(txTemplate == null) throw new IllegalArgumentException("txManager cannot be null");
     if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
@@ -186,8 +187,7 @@ public class DefaultImportService implements ImportService {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
 
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
-    FunctionalUnit unit = getFunctionalUnit(nonEmptyUnitName);
-    copyValueTables(sourceTables, destinationDatasource, unit, allowIdentifierGeneration, ignoreUnknownIdentifier);
+    copyValueTables(sourceTables, destinationDatasource, allowIdentifierGeneration, ignoreUnknownIdentifier);
   }
 
   @Override
@@ -204,11 +204,7 @@ public class DefaultImportService implements ImportService {
 
     ValueTable keysTable = identifiersTableService.getValueTable();
     if(!keysTable.hasVariable(unit.getKeyVariableName())) {
-      try {
-        identifiersService.prepareKeysTable(null, unit.getKeyVariableName());
-      } catch(IOException e) {
-        throw new RuntimeException(e);
-      }
+      identifierService.createKeyVariable(null, unit.getKeyVariableName());
     }
     PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(keysTable,
         keysTable.getVariable(unit.getKeyVariableName()), localParticipantIdentifier);
@@ -245,8 +241,8 @@ public class DefaultImportService implements ImportService {
     try {
       for(ValueTable vt : sourceDatasource.getValueTables()) {
         if(vt.getEntityType().equals(identifiersTableService.getEntityType())) {
-          ValueTable sourceKeysTable = identifiersService.createPrivateView(vt.getName(), vt, unit, select);
-          Variable unitKeyVariable = identifiersService.prepareKeysTable(sourceKeysTable, unit.getKeyVariableName());
+          ValueTable sourceKeysTable = identifierService.createPrivateView(vt.getName(), vt, unit, select);
+          Variable unitKeyVariable = identifierService.createKeyVariable(sourceKeysTable, unit.getKeyVariableName());
           PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(identifiersTableService.getValueTable(),
               unitKeyVariable, participantIdentifier);
           ValueTableWriter identifiersTableWriter = identifiersTableService.createValueTableWriter();
@@ -255,12 +251,12 @@ public class DefaultImportService implements ImportService {
               if(entityMap.publicEntity(privateEntity) == null) {
                 entityMap.createPublicEntity(privateEntity);
               }
-              identifiersService
+              identifierService
                   .copyParticipantIdentifiers(entityMap.publicEntity(privateEntity), sourceKeysTable, entityMap,
                       identifiersTableWriter);
             }
           } finally {
-            identifiersTableWriter.close();
+            Closeables.closeQuietly(identifiersTableWriter);
           }
         }
       }
@@ -340,7 +336,7 @@ public class DefaultImportService implements ImportService {
 
     try {
       sourceDatasource.initialise();
-      copyValueTables(sourceDatasource.getValueTables(), destinationDatasource, unit, allowIdentifierGeneration,
+      copyValueTables(sourceDatasource.getValueTables(), destinationDatasource, allowIdentifierGeneration,
           ignoreUnknownIdentifier);
     } finally {
       sourceDatasource.dispose();
@@ -352,16 +348,15 @@ public class DefaultImportService implements ImportService {
    *
    * @param sourceTables
    * @param destination
-   * @param unit
    * @param allowIdentifierGeneration
    * @throws IOException
    * @throws InterruptedException
    */
-  private void copyValueTables(Set<ValueTable> sourceTables, Datasource destination, @Nullable FunctionalUnit unit,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws IOException, InterruptedException {
+  private void copyValueTables(Set<ValueTable> sourceTables, Datasource destination, boolean allowIdentifierGeneration,
+      boolean ignoreUnknownIdentifier) throws IOException, InterruptedException {
     try {
-      new CopyValueTablesLockingAction(this, identifiersTableService, participantIdentifier, identifiersService,
-          txTemplate, sourceTables, unit, destination, allowIdentifierGeneration, ignoreUnknownIdentifier).execute();
+      new CopyValueTablesLockingAction(identifiersTableService, identifierService, txTemplate, sourceTables,
+          destination, allowIdentifierGeneration, ignoreUnknownIdentifier).execute();
     } catch(InvocationTargetException ex) {
       if(ex.getCause() instanceof IOException) {
         throw (IOException) ex.getCause();

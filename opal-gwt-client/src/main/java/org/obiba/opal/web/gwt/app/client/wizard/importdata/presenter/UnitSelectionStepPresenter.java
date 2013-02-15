@@ -9,11 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
-import org.w3c.css.sac.ElementSelector;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -56,12 +55,12 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
     }));
   }
 
-  public void updateImportData(ImportData importData) {
+  public void updateImportData(ImportConfig importConfig) {
     boolean withUnit = getView().isIdentifierSharedWithUnit();
-    importData.setIdentifierSharedWithUnit(withUnit);
-    importData.setIdentifierAsIs(!withUnit);
-    importData.setUnit(withUnit ? getView().getSelectedUnit() : null);
-    importData.setIncremental(!withUnit && getView().isIncremental());
+    importConfig.setIdentifierSharedWithUnit(withUnit);
+    importConfig.setIdentifierAsIs(!withUnit);
+    importConfig.setUnit(withUnit ? getView().getSelectedUnit() : null);
+    importConfig.setIncremental(!withUnit && getView().isIncremental());
   }
 
   public void initUnits() {

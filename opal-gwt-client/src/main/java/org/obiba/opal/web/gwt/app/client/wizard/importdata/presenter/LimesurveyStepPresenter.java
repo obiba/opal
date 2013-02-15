@@ -9,6 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
@@ -17,17 +25,10 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
-public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPresenter.Display> implements
-    DataImportPresenter.DataImportFormatStepPresenter {
+public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPresenter.Display>
+    implements DataImportPresenter.DataImportFormatStepPresenter {
 
   @Inject
   public LimesurveyStepPresenter(EventBus eventBus, LimesurveyStepPresenter.Display view) {
@@ -59,12 +60,12 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
   }
 
   @Override
-  public ImportData getImportData() {
-    ImportData importData = new ImportData();
-    importData.setImportFormat(ImportFormat.LIMESURVEY);
-    importData.setDatabase(getView().getSelectedDatabase());
-    importData.setTablePrefix(getView().getTablePrefix());
-    return importData;
+  public ImportConfig getImportData() {
+    ImportConfig importConfig = new ImportConfig();
+    importConfig.setImportFormat(ImportFormat.LIMESURVEY);
+    importConfig.setDatabase(getView().getSelectedDatabase());
+    importConfig.setTablePrefix(getView().getTablePrefix());
+    return importConfig;
   }
 
   @Override

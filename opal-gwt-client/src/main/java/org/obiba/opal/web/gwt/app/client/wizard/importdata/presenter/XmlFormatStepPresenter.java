@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,12 +19,14 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 
 import com.google.inject.Inject;
 
-public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresenter.Display> implements DataImportPresenter.DataImportFormatStepPresenter {
+import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
+
+public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresenter.Display>
+    implements DataImportPresenter.DataImportFormatStepPresenter {
 
   @Inject
   private FileSelectionPresenter xmlFileSelectionPresenter;
@@ -63,12 +65,12 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
   }
 
   @Override
-  public ImportData getImportData() {
-    ImportData importData = new ImportData();
-    importData.setFormat(ImportFormat.XML);
-    importData.setXmlFile(getDisplay().getSelectedFile());
+  public ImportConfig getImportData() {
+    ImportConfig importConfig = new ImportConfig();
+    importConfig.setFormat(ImportFormat.XML);
+    importConfig.setXmlFile(getDisplay().getSelectedFile());
 
-    return importData;
+    return importConfig;
   }
 
   @Override

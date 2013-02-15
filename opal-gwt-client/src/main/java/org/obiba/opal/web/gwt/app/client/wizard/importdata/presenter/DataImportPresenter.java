@@ -21,8 +21,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter.Display.Slots;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -52,6 +51,7 @@ import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
+import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class DataImportPresenter extends WizardPresenterWidget<DataImportPresenter.Display> {
@@ -80,7 +80,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private TransientDatasourceHandler transientDatasourceHandler;
 
-  private ImportData importData;
+  private ImportConfig importConfig;
 
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
@@ -153,7 +153,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @Override
   protected void onFinish() {
-    ImportData dataToImport = transientDatasourceHandler.getImportData();
+    ImportConfig dataToImport = transientDatasourceHandler.getImportConfig();
     archiveStepPresenter.updateImportData(dataToImport);
     launchImport(dataToImport);
   }
@@ -224,14 +224,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
   }
 
-  private void launchImport(@SuppressWarnings("ParameterHidesMemberVariable") ImportData importData) {
-    this.importData = importData;
-    switch(importData.getImportFormat()) {
+  private void launchImport(@SuppressWarnings("ParameterHidesMemberVariable") ImportConfig importConfig) {
+    this.importConfig = importConfig;
+    switch(importConfig.getImportFormat()) {
       case XML:
-        submitJob(createImportCommandOptionsDto(importData.getXmlFile()));
+        submitJob(createImportCommandOptionsDto(importConfig.getXmlFile()));
         break;
       case CSV:
-        submitJob(createImportCommandOptionsDto(importData.getCsvFile()));
+        submitJob(createImportCommandOptionsDto(importConfig.getCsvFile()));
         break;
       case LIMESURVEY:
         submitJob(createLimesurveyImportCommandOptionsDto());
@@ -261,21 +261,21 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private ImportCommandOptionsDto createImportCommandOptionsDto(@Nullable String selectedFile) {
     ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
-    dto.setDestination(importData.getDestinationDatasourceName());
-    if(importData.isArchiveMove()) {
-      dto.setArchive(importData.getArchiveDirectory());
+    dto.setDestination(importConfig.getDestinationDatasourceName());
+    if(importConfig.isArchiveMove()) {
+      dto.setArchive(importConfig.getArchiveDirectory());
       JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
       selectedFiles.push(selectedFile);
       dto.setFilesArray(selectedFiles);
     }
-    if(importData.isIdentifierSharedWithUnit()) {
-      dto.setUnit(importData.getUnit());
+    if(importConfig.isIdentifierSharedWithUnit()) {
+      dto.setUnit(importConfig.getUnit());
       dto.setForce(false);
       dto.setIgnore(true);
     }
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
     for(String tableName : comparedDatasourcesReportPresenter.getSelectedTables()) {
-      selectedTables.push(importData.getTransientDatasourceName() + "." + tableName);
+      selectedTables.push(importConfig.getTransientDatasourceName() + "." + tableName);
     }
     dto.setTablesArray(selectedTables);
     return dto;
@@ -326,8 +326,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
         return false;
       }
-      ImportData localImportData = transientDatasourceHandler.getImportData();
-      datasourceValuesStepPresenter.setDatasource(localImportData.getTransientDatasourceName(),
+      ImportConfig localImportConfig = transientDatasourceHandler.getImportConfig();
+      datasourceValuesStepPresenter.setDatasource(localImportConfig.getTransientDatasourceName(),
           comparedDatasourcesReportPresenter.getSelectedTables());
 
       return comparedDatasourcesReportPresenter.canBeSubmitted();
@@ -345,28 +345,28 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final class TransientDatasourceHandler implements StepInHandler {
 
-    private ImportData importData;
+    private ImportConfig importConfig;
 
     private Request transientRequest;
 
     private Request diffRequest;
 
-    public ImportData getImportData() {
-      return importData;
+    public ImportConfig getImportConfig() {
+      return importConfig;
     }
 
     @Override
     public void onStepIn() {
       comparedDatasourcesReportPresenter.getDisplay().clearDisplay();
       removeTransientDatasource();
-      importData = formatStepPresenter.getImportData();
-      destinationSelectionStepPresenter.updateImportData(importData);
-      unitSelectionStepPresenter.updateImportData(importData);
+      importConfig = formatStepPresenter.getImportData();
+      destinationSelectionStepPresenter.updateImportData(importConfig);
+      unitSelectionStepPresenter.updateImportData(importConfig);
       createTransientDatasource();
     }
 
     private void removeTransientDatasource() {
-      if(importData == null) return;
+      if(importConfig == null) return;
       if(transientRequest != null) {
         transientRequest.cancel();
         transientRequest = null;
@@ -377,14 +377,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       }
 
       deleteTransientDatasource();
-      importData = null;
+      importConfig = null;
     }
 
     private void deleteTransientDatasource() {
-      if(importData.getTransientDatasourceName() == null) return;
+      if(importConfig.getTransientDatasourceName() == null) return;
 
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(UriBuilder.create().segment("datasource", importData.getTransientDatasourceName()).build()) //
+          .forResource(UriBuilder.create().segment("datasource", importConfig.getTransientDatasourceName()).build()) //
           .delete() //
           .withCallback(ResponseCodeCallbacks.NO_OP, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
           .send();
@@ -393,7 +393,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     private void createTransientDatasource() {
       getView().prepareDatasourceCreation();
 
-      DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importData);
+      DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importConfig);
 
       transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
           .forResource("/transient-datasources") //
@@ -417,7 +417,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         transientRequest = null;
         if(response.getStatusCode() == SC_CREATED) {
           DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
-          importData.setTransientDatasourceName(datasourceDto.getName());
+          importConfig.setTransientDatasourceName(datasourceDto.getName());
           datasourceDiff(datasourceDto);
         } else {
           getView().showDatasourceCreationError((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
@@ -441,7 +441,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           }
         };
         diffRequest = comparedDatasourcesReportPresenter
-            .compare(importData.getTransientDatasourceName(), importData.getDestinationDatasourceName(),
+            .compare(importConfig.getTransientDatasourceName(), importConfig.getDestinationDatasourceName(),
                 datasourceCreatedCallback, factory, datasourceDto);
         getView().showDatasourceCreationSuccess();
       }
@@ -482,7 +482,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
      *
      * @return
      */
-    ImportData getImportData();
+    ImportConfig getImportData();
 
     /**
      * Validate the import data were correctly provided, and send notification error messages if any.

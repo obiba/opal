@@ -15,25 +15,20 @@ import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
-import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.magma.FunctionalUnitView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -47,38 +42,25 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
   private final Set<ValueTable> sourceTables;
 
-  @Nullable
-  private final FunctionalUnit unit; //TODO delete this unit and use the one form FunctionalUnitView
-
   private final Datasource destination;
 
   private final boolean allowIdentifierGeneration;
 
   private final boolean ignoreUnknownIdentifier;
 
-  private final DefaultImportService defaultImportService;
-
   private final IdentifiersTableService identifiersTableService;
 
-  private final IParticipantIdentifier participantIdentifier;
-
-  private final IdentifiersService identifiersService;
+  private final IdentifierService identifierService;
 
   private final TransactionTemplate txTemplate;
 
-  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
-  CopyValueTablesLockingAction(DefaultImportService defaultImportService,
-      IdentifiersTableService identifiersTableService, IParticipantIdentifier participantIdentifier,
-      IdentifiersService identifiersService, TransactionTemplate txTemplate, Set<ValueTable> sourceTables,
-      @Nullable FunctionalUnit unit, Datasource destination, boolean allowIdentifierGeneration,
-      boolean ignoreUnknownIdentifier) {
-    this.defaultImportService = defaultImportService;
+  CopyValueTablesLockingAction(IdentifiersTableService identifiersTableService, IdentifierService identifierService,
+      TransactionTemplate txTemplate, Set<ValueTable> sourceTables, Datasource destination,
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) {
     this.identifiersTableService = identifiersTableService;
-    this.participantIdentifier = participantIdentifier;
-    this.identifiersService = identifiersService;
+    this.identifierService = identifierService;
     this.txTemplate = txTemplate;
     this.sourceTables = sourceTables;
-    this.unit = unit;
     this.destination = destination;
     this.allowIdentifierGeneration = allowIdentifierGeneration;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
@@ -202,20 +184,24 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
     private void importUnitData(FunctionalUnitView functionalUnitView) throws IOException {
       String keyVariableName = functionalUnitView.getUnit().getKeyVariableName();
 
-      View privateView = identifiersService
+      View privateView = identifierService
           .createPrivateView(functionalUnitView.getName(), functionalUnitView, functionalUnitView.getUnit(), null);
-      identifiersService.prepareKeysTable(privateView, keyVariableName);
+      identifierService.createKeyVariable(privateView, keyVariableName);
 
-      FunctionalUnitView publicView = createPublicView(functionalUnitView);
+      FunctionalUnitView publicView = identifierService
+          .createPublicView(functionalUnitView, allowIdentifierGeneration, ignoreUnknownIdentifier);
       PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
 
       // prepare for copying participant data
       ValueTableWriter keysTableWriter = identifiersTableService.createValueTableWriter();
-
       try {
-        copyPublicViewToDestinationDatasource(publicView, createKeysListener(privateView, entityMap, keysTableWriter));
+        DatasourceCopier.DatasourceCopyEventListener keysListener = createKeysListener(privateView, entityMap,
+            keysTableWriter);
+        // Copy participant's non-identifiable variables and data
+        DatasourceCopier datasourceCopier = newCopierForParticipants().withListener(keysListener).build();
+        datasourceCopier.copy(publicView, destination);
       } finally {
-        keysTableWriter.close();
+        Closeables.closeQuietly(keysTableWriter);
       }
     }
 
@@ -227,7 +213,6 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
     private DatasourceCopier.DatasourceCopyEventListener createKeysListener(final ValueTable privateView,
         final PrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
       return new DatasourceCopier.DatasourceCopyValueSetEventListener() {
-
         @Override
         public void onValueSetCopied(ValueTable source, ValueSet valueSet, @SuppressWarnings(
             "ParameterHidesMemberVariable") String... destination) {
@@ -235,19 +220,10 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
         @Override
         public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
-          identifiersService
+          identifierService
               .copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, entityMap, keysTableWriter);
         }
-
       };
-    }
-
-    private void copyPublicViewToDestinationDatasource(ValueTable publicView,
-        DatasourceCopier.DatasourceCopyEventListener createKeysListener) throws IOException {
-      newCopierForParticipants() //
-          .withListener(createKeysListener).build()
-          // Copy participant's non-identifiable variables and data
-          .copy(publicView, destination);
     }
 
     private DatasourceCopier.Builder newCopierForParticipants() {
@@ -255,35 +231,5 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
           .withLoggingListener() //
           .withThroughtputListener();
     }
-
-    /**
-     * Wraps the participant table in a {@link org.obiba.magma.views.View} that exposes public entities and non-identifier variables.
-     *
-     * @param participantTable
-     * @param unit
-     * @param allowIdentifierGeneration
-     * @return
-     */
-    private FunctionalUnitView createPublicView(ValueTable participantTable) {
-      FunctionalUnitView publicTable = new FunctionalUnitView(unit,
-          FunctionalUnitView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable,
-          identifiersTableService.getValueTable(), allowIdentifierGeneration ? participantIdentifier : null,
-          ignoreUnknownIdentifier);
-      publicTable.setSelectClause(new SelectClause() {
-
-        @Override
-        public boolean select(Variable variable) {
-          return !identifiersService.isIdentifierVariable(variable) && !isIdentifierVariableForUnit(variable);
-        }
-
-        private boolean isIdentifierVariableForUnit(Variable variable) {
-          return unit != null && unit.getSelect() != null && unit.getSelect().select(variable);
-        }
-
-      });
-      publicTable.initialise();
-      return publicTable;
-    }
-
   }
 }

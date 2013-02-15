@@ -13,8 +13,7 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -27,6 +26,8 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+
+import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
 public class DestinationSelectionStepPresenter extends PresenterWidget<DestinationSelectionStepPresenter.Display> {
 
@@ -144,13 +145,13 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     refreshDatasources();
   }
 
-  public void updateImportData(ImportData importData) {
-    importData.setDestinationDatasourceName(getView().getSelectedDatasource());
+  public void updateImportData(ImportConfig importConfig) {
+    importConfig.setDestinationDatasourceName(getView().getSelectedDatasource());
     if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
-      importData.setDestinationTableName(getView().getSelectedTable());
-      importData.setDestinationEntityType(getView().getSelectedEntityType());
+      importConfig.setDestinationTableName(getView().getSelectedTable());
+      importConfig.setDestinationEntityType(getView().getSelectedEntityType());
     } else {
-      importData.setDestinationTableName(null);
+      importConfig.setDestinationTableName(null);
     }
   }
 

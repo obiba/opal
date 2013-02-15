@@ -9,23 +9,24 @@
  */
 package org.obiba.opal.core.service.impl;
 
-import java.io.IOException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.AttributeAware;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
+import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
+import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.magma.FunctionalUnitView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -36,10 +37,13 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class IdentifiersServiceImpl implements IdentifiersService {
+public class IdentifierServiceImpl implements IdentifierService {
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private IParticipantIdentifier participantIdentifier;
 
   /**
    * Creates a {@link org.obiba.magma.views.View} of the participant table's "private" variables (i.e., identifiers).
@@ -70,6 +74,40 @@ public class IdentifiersServiceImpl implements IdentifiersService {
   }
 
   /**
+   * Wraps the participant table in a {@link org.obiba.magma.views.View} that exposes public entities and non-identifier variables.
+   *
+   * @param participantTable
+   * @param unit
+   * @param allowIdentifierGeneration
+   * @return
+   */
+  @Override
+  public FunctionalUnitView createPublicView(FunctionalUnitView participantTable, boolean allowIdentifierGeneration,
+      boolean ignoreUnknownIdentifier) {
+
+    final FunctionalUnit unit = participantTable.getUnit();
+
+    FunctionalUnitView publicTable = new FunctionalUnitView(unit,
+        FunctionalUnitView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable,
+        identifiersTableService.getValueTable(), allowIdentifierGeneration ? participantIdentifier : null,
+        ignoreUnknownIdentifier);
+    publicTable.setSelectClause(new SelectClause() {
+
+      @Override
+      public boolean select(Variable variable) {
+        return !isIdentifierVariable(variable) && !isIdentifierVariableForUnit(variable);
+      }
+
+      private boolean isIdentifierVariableForUnit(Variable variable) {
+        return unit.getSelect() != null && unit.getSelect().select(variable);
+      }
+
+    });
+    publicTable.initialise();
+    return publicTable;
+  }
+
+  /**
    * Write the key variable.
    *
    * @param privateView
@@ -78,15 +116,14 @@ public class IdentifiersServiceImpl implements IdentifiersService {
    * @throws java.io.IOException
    */
   @Override
-  public Variable prepareKeysTable(@Nullable ValueTable privateView, @Nonnull String keyVariableName)
-      throws IOException {
+  public Variable createKeyVariable(@Nullable ValueTable privateView, @Nonnull String keyVariableName) {
 
     Variable keyVariable = Variable.Builder
         .newVariable(keyVariableName, TextType.get(), identifiersTableService.getEntityType()).build();
 
-    ValueTableWriter tableWriter = identifiersTableService.createValueTableWriter();
+    ValueTableWriter identifiersTableWriter = identifiersTableService.createValueTableWriter();
     try {
-      ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables();
+      ValueTableWriter.VariableWriter variableWriter = identifiersTableWriter.writeVariables();
       try {
         // Create private variables
         variableWriter.writeVariable(keyVariable);
@@ -94,41 +131,34 @@ public class IdentifiersServiceImpl implements IdentifiersService {
           DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(privateView, variableWriter);
         }
       } finally {
-        variableWriter.close();
+        Closeables.closeQuietly(variableWriter);
       }
     } finally {
-      tableWriter.close();
+      Closeables.closeQuietly(identifiersTableWriter);
     }
     return keyVariable;
   }
 
-  @Override
-  public boolean isIdentifierVariable(@Nonnull Variable variable) {
+  private boolean isIdentifierVariable(@Nonnull AttributeAware variable) {
     if(!variable.hasAttribute("identifier")) return false;
     Value value = variable.getAttribute("identifier").getValue();
     return value.equals(BooleanType.get().trueValue()) || "true".equals(value.toString().toLowerCase());
   }
 
   @Override
-  public VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
+  public void copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
       PrivateVariableEntityMap entityMap, ValueTableWriter keysTableWriter) {
     VariableEntity privateEntity = entityMap.privateEntity(publicEntity);
 
     ValueTableWriter.ValueSetWriter valueSetWriter = keysTableWriter.writeValueSet(publicEntity);
     try {
       // Copy all other private variable values
-      DatasourceCopier.Builder.newCopier().dontCopyMetadata().build()
-          .copyValues(privateView, privateView.getValueSet(privateEntity),
-              identifiersTableService.getValueTable().getName(), valueSetWriter);
+      DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
+      datasourceCopier.copyValues(privateView, privateView.getValueSet(privateEntity),
+          identifiersTableService.getValueTable().getName(), valueSetWriter);
     } finally {
-      try {
-        valueSetWriter.close();
-      } catch(IOException e) {
-        //noinspection ThrowFromFinallyBlock
-        throw new MagmaRuntimeException(e);
-      }
+      Closeables.closeQuietly(valueSetWriter);
     }
-    return publicEntity;
   }
 
 }

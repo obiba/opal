@@ -21,6 +21,8 @@ import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
+import static org.springframework.util.Assert.notNull;
+
 /**
  * When an Opal table is exported to some functional unit, entities must be exported with the identifiers understood by
  * that unit. The "public" Opal identifiers must be replaced by the "private" identifiers for the unit in question.
@@ -75,10 +77,10 @@ public class FunctionalUnitView extends View {
 
     // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
     super(dataTable == null ? null : dataTable.getName(), dataTable);
-    if(unit == null) throw new IllegalArgumentException("unit cannot be null");
-    if(policy == null) throw new IllegalArgumentException("policy cannot be null");
-    if(dataTable == null) throw new IllegalArgumentException("dataTable cannot be null");
-    if(keysTable == null) throw new IllegalArgumentException("keysTable cannot be null");
+    notNull(unit, "unit cannot be null");
+    notNull(policy, "policy cannot be null");
+    notNull(dataTable, "dataTable cannot be null");
+    notNull(keysTable, "keysTable cannot be null");
 
     this.unit = unit;
     allowIdentifierGeneration = identifierGenerator != null;

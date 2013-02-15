@@ -13,7 +13,13 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-public class ImportData {
+public class ImportConfig {
+
+  public enum ImportFormat {
+
+    CSV, EXCEL, XML, LIMESURVEY, REST
+
+  }
 
   private ImportFormat importFormat;
 
@@ -61,7 +67,7 @@ public class ImportData {
 
   private boolean ignoreUnknownIdentifier;
 
-  @SuppressWarnings("PMD.NcssMethodCount")
+  @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   public void clear() {
     importFormat = null;
     incremental = false;
@@ -257,7 +263,7 @@ public class ImportData {
     return properties;
   }
 
-  public ImportData put(String key, Object value) {
+  public ImportConfig put(String key, Object value) {
     getProperties().put(key, value);
     return this;
   }

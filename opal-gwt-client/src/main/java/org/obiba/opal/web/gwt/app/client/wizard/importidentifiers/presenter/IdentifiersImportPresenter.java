@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -31,8 +31,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -51,6 +50,8 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+
+import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
 public class IdentifiersImportPresenter extends WizardPresenterWidget<IdentifiersImportPresenter.Display> {
 
@@ -85,10 +86,14 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
     ImportFormat getImportFormat();
 
-    /** Display no format options in the Format Options Step. The format chosen has no options. */
+    /**
+     * Display no format options in the Format Options Step. The format chosen has no options.
+     */
     void setNoFormatOptions();
 
-    /** Display the CSV format options in the Format Options Step. */
+    /**
+     * Display the CSV format options in the Format Options Step.
+     */
     void setCsvFormatOptions();
 
     void renderPendingConclusion();
@@ -107,7 +112,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
   private FileSelectionPresenter csvOptionsFileSelectionPresenter;
 
-  private ImportData importData;
+  private ImportConfig importConfig;
 
   private List<String> availableCharsets = new ArrayList<String>();
 
@@ -116,7 +121,8 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   protected TableDto identifiersTable;
 
   @Inject
-  public IdentifiersImportPresenter(final Display display, final EventBus eventBus, Provider<FileSelectionPresenter> fileSelectionPresenter) {
+  public IdentifiersImportPresenter(final Display display, final EventBus eventBus,
+      Provider<FileSelectionPresenter> fileSelectionPresenter) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter.get();
     this.csvOptionsFileSelectionPresenter = fileSelectionPresenter.get();
@@ -161,15 +167,16 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   }
 
   private void getIdentifiersTable() {
-    ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource("/functional-units/entities/table").get().withCallback(new ResourceCallback<TableDto>() {
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource("/functional-units/entities/table").get()
+        .withCallback(new ResourceCallback<TableDto>() {
 
-      @Override
-      public void onResource(Response response, TableDto resource) {
-        if(resource != null) {
-          identifiersTable = resource;
-        }
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            if(resource != null) {
+              identifiersTable = resource;
+            }
+          }
+        }).send();
   }
 
   @Override
@@ -222,9 +229,11 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
       if(getView().getImportFormat().equals(ImportFormat.CSV)) {
         validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "i", "CSVFileRequired"));
-        validators.add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
+        validators
+            .add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
         validators.add(new RequiredTextValidator(getView().getCsvOptions().getCharsetText(), "CharsetNotAvailable"));
-        validators.add(new RequiredTextValidator(getView().getCsvOptions().getFieldSeparatorText(), "FieldSeparatorRequired"));
+        validators.add(
+            new RequiredTextValidator(getView().getCsvOptions().getFieldSeparatorText(), "FieldSeparatorRequired"));
         validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuoteText(), "QuoteSeparatorRequired"));
       } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
         validators.add(new RegExValidator(getSelectedFile(), ".zip$", "i", "ZipFileRequired"));
@@ -237,22 +246,22 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   }
 
   private void populateImportData() {
-    importData = new ImportData();
-    importData.setFormat(getView().getImportFormat());
-    importData.setDestinationDatasourceName(null); // no ref table
-    importData.setDestinationTableName(identifiersTable.getName());
-    importData.setDestinationEntityType("Participant");
-    importData.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
-    importData.setXmlFile(fileSelectionPresenter.getSelectedFile());
-    importData.setUnit(functionalUnit.getName());
-    importData.setCharacterSet(getView().getCsvOptions().getCharsetText().getText());
-    importData.setRow(Integer.parseInt(getView().getCsvOptions().getRowText().getText()));
-    importData.setQuote(getView().getCsvOptions().getQuote());
-    importData.setField(getView().getCsvOptions().getFieldSeparator());
+    importConfig = new ImportConfig();
+    importConfig.setFormat(getView().getImportFormat());
+    importConfig.setDestinationDatasourceName(null); // no ref table
+    importConfig.setDestinationTableName(identifiersTable.getName());
+    importConfig.setDestinationEntityType("Participant");
+    importConfig.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
+    importConfig.setXmlFile(fileSelectionPresenter.getSelectedFile());
+    importConfig.setUnit(functionalUnit.getName());
+    importConfig.setCharacterSet(getView().getCsvOptions().getCharsetText().getText());
+    importConfig.setRow(Integer.parseInt(getView().getCsvOptions().getRowText().getText()));
+    importConfig.setQuote(getView().getCsvOptions().getQuote());
+    importConfig.setField(getView().getCsvOptions().getFieldSeparator());
   }
 
   private void importIdentifiers() {
-    final DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importData);
+    final DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importConfig);
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -260,10 +269,12 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
         if(response.getStatusCode() == 200) {
           getView().renderCompletedConclusion();
           getEventBus().fireEvent(new FunctionalUnitSelectedEvent(functionalUnit));
-          getEventBus().fireEvent(NotificationEvent.newBuilder().info(translations.identifierImportCompletedConclusion()).build());
+          getEventBus().fireEvent(
+              NotificationEvent.newBuilder().info(translations.identifierImportCompletedConclusion()).build());
         } else {
           getView().renderFailedConclusion();
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.identifierImportFailedConclusion()).build());
+          getEventBus()
+              .fireEvent(NotificationEvent.newBuilder().error(translations.identifierImportFailedConclusion()).build());
         }
       }
     };
@@ -271,34 +282,36 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
     // import only the identifiers, ignore identifying variables if any.
     String path = "/functional-unit/" + functionalUnit.getName() + "/entities?select=false";
 
-    ResourceRequestBuilderFactory.<DatasourceFactoryDto> newBuilder().forResource(path).post()//
-    .withResourceBody(DatasourceFactoryDto.stringify(factory))//
-    .withCallback(200, callbackHandler)//
-    .withCallback(400, callbackHandler)//
-    .withCallback(500, callbackHandler).send();
+    ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(path).post()//
+        .withResourceBody(DatasourceFactoryDto.stringify(factory))//
+        .withCallback(200, callbackHandler)//
+        .withCallback(400, callbackHandler)//
+        .withCallback(500, callbackHandler).send();
   }
 
   public void getDefaultCharset() {
-    ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
+    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
+        .withCallback(new ResourceCallback<JsArrayString>() {
 
-      @Override
-      public void onResource(Response response, JsArrayString resource) {
-        String charset = resource.get(0);
-        getView().setDefaultCharset(charset);
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArrayString resource) {
+            String charset = resource.get(0);
+            getView().setDefaultCharset(charset);
+          }
+        }).send();
 
   }
 
   public void getAvailableCharsets() {
-    ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/available").get().withCallback(new ResourceCallback<JsArrayString>() {
-      @Override
-      public void onResource(Response response, JsArrayString datasources) {
-        for(int i = 0; i < datasources.length(); i++) {
-          availableCharsets.add(datasources.get(i));
-        }
-      }
-    }).send();
+    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/available").get()
+        .withCallback(new ResourceCallback<JsArrayString>() {
+          @Override
+          public void onResource(Response response, JsArrayString datasources) {
+            for(int i = 0; i < datasources.length(); i++) {
+              availableCharsets.add(datasources.get(i));
+            }
+          }
+        }).send();
   }
 
   private HasText getSelectedCsvFile() {

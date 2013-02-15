@@ -9,8 +9,6 @@
  */
 package org.obiba.opal.core.service.impl;
 
-import java.io.IOException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -19,23 +17,25 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.views.View;
+import org.obiba.opal.core.magma.FunctionalUnitView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
 /**
  *
  */
-public interface IdentifiersService {
+public interface IdentifierService {
 
-  Variable prepareKeysTable(@Nullable ValueTable privateView, @Nonnull String keyVariableName) throws IOException;
-
-  boolean isIdentifierVariable(@Nonnull Variable variable);
+  Variable createKeyVariable(@Nullable ValueTable privateView, @Nonnull String keyVariableName);
 
   /**
    * Write the key variable and the identifier variables values; update the participant key private/public map.
    */
-  VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
+  void copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
       PrivateVariableEntityMap entityMap, ValueTableWriter keysTableWriter);
 
   View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit, @Nullable String select);
+
+  FunctionalUnitView createPublicView(FunctionalUnitView participantTable, boolean allowIdentifierGeneration,
+      boolean ignoreUnknownIdentifier);
 }

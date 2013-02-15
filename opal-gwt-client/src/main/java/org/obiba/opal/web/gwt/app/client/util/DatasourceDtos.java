@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.util;
 
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -31,48 +31,48 @@ public class DatasourceDtos {
   private DatasourceDtos() {
   }
 
-  public static DatasourceFactoryDto createDatasourceFactoryDto(ImportData importData) {
-    switch(importData.getImportFormat()) {
+  public static DatasourceFactoryDto createDatasourceFactoryDto(ImportConfig importConfig) {
+    switch(importConfig.getImportFormat()) {
       case CSV:
-        return createCSVDatasourceFactoryDto(importData);
+        return createCSVDatasourceFactoryDto(importConfig);
       case XML:
-        return createXMLDatasourceFactoryDto(importData);
+        return createXMLDatasourceFactoryDto(importConfig);
       case LIMESURVEY:
-        return createLimesurveyDatasourceFactoryDto(importData);
+        return createLimesurveyDatasourceFactoryDto(importConfig);
       case REST:
-        return createRestDatasourceFactoryDto(importData);
+        return createRestDatasourceFactoryDto(importConfig);
       default:
-        throw new IllegalArgumentException("Import data format not supported: " + importData.getImportFormat());
+        throw new IllegalArgumentException("Import data format not supported: " + importConfig.getImportFormat());
     }
   }
 
-  private static DatasourceFactoryDto createLimesurveyDatasourceFactoryDto(ImportData importData) {
+  private static DatasourceFactoryDto createLimesurveyDatasourceFactoryDto(ImportConfig importConfig) {
     LimesurveyDatasourceFactoryDto factoryDto = LimesurveyDatasourceFactoryDto.create();
-    factoryDto.setDatabase(importData.getDatabase());
-    factoryDto.setTablePrefix(importData.getTablePrefix());
-    return createAndConfigureDatasourceFactoryDto(importData,
+    factoryDto.setDatabase(importConfig.getDatabase());
+    factoryDto.setTablePrefix(importConfig.getTablePrefix());
+    return createAndConfigureDatasourceFactoryDto(importConfig,
         LimesurveyDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
-  private static DatasourceFactoryDto createRestDatasourceFactoryDto(ImportData importData) {
+  private static DatasourceFactoryDto createRestDatasourceFactoryDto(ImportConfig importConfig) {
     RestDatasourceFactoryDto factoryDto = RestDatasourceFactoryDto.create();
-    factoryDto.setUrl(importData.getString("url"));
-    factoryDto.setUsername(importData.getString("username"));
-    factoryDto.setPassword(importData.getString("password"));
-    factoryDto.setRemoteDatasource(importData.getString("remoteDatasource"));
+    factoryDto.setUrl(importConfig.getString("url"));
+    factoryDto.setUsername(importConfig.getString("username"));
+    factoryDto.setPassword(importConfig.getString("password"));
+    factoryDto.setRemoteDatasource(importConfig.getString("remoteDatasource"));
 
-    return createAndConfigureDatasourceFactoryDto(importData,
+    return createAndConfigureDatasourceFactoryDto(importConfig,
         RestDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
-  private static DatasourceFactoryDto createCSVDatasourceFactoryDto(ImportData importData) {
+  private static DatasourceFactoryDto createCSVDatasourceFactoryDto(ImportConfig importConfig) {
 
     CsvDatasourceTableBundleDto bundleDto = CsvDatasourceTableBundleDto.create();
-    bundleDto.setName(importData.getDestinationTableName());
-    bundleDto.setData(importData.getCsvFile());
-    bundleDto.setEntityType(importData.getEntityType());
-    if(importData.getDestinationDatasourceName() != null) {
-      bundleDto.setRefTable(importData.getDestinationDatasourceName() + "." + importData.getDestinationTableName());
+    bundleDto.setName(importConfig.getDestinationTableName());
+    bundleDto.setData(importConfig.getCsvFile());
+    bundleDto.setEntityType(importConfig.getEntityType());
+    if(importConfig.getDestinationDatasourceName() != null) {
+      bundleDto.setRefTable(importConfig.getDestinationDatasourceName() + "." + importConfig.getDestinationTableName());
     }
 
     @SuppressWarnings("unchecked")
@@ -80,49 +80,49 @@ public class DatasourceDtos {
     tables.push(bundleDto);
 
     CsvDatasourceFactoryDto factoryDto = CsvDatasourceFactoryDto.create();
-    factoryDto.setCharacterSet(importData.getCharacterSet());
-    factoryDto.setFirstRow(importData.getRow());
-    factoryDto.setQuote(importData.getQuote());
-    factoryDto.setSeparator(importData.getField());
+    factoryDto.setCharacterSet(importConfig.getCharacterSet());
+    factoryDto.setFirstRow(importConfig.getRow());
+    factoryDto.setQuote(importConfig.getQuote());
+    factoryDto.setSeparator(importConfig.getField());
     factoryDto.setTablesArray(tables);
 
-    return createAndConfigureDatasourceFactoryDto(importData,
+    return createAndConfigureDatasourceFactoryDto(importConfig,
         CsvDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
-  private static DatasourceFactoryDto createXMLDatasourceFactoryDto(ImportData importData) {
+  private static DatasourceFactoryDto createXMLDatasourceFactoryDto(ImportConfig importConfig) {
 
     FsDatasourceFactoryDto factoryDto = FsDatasourceFactoryDto.create();
-    factoryDto.setFile(importData.getXmlFile());
+    factoryDto.setFile(importConfig.getXmlFile());
     factoryDto.setOnyxWrapper(true);
-    return createAndConfigureDatasourceFactoryDto(importData,
+    return createAndConfigureDatasourceFactoryDto(importConfig,
         FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
-  private static DatasourceFactoryDto createAndConfigureDatasourceFactoryDto(ImportData importData,
+  private static DatasourceFactoryDto createAndConfigureDatasourceFactoryDto(ImportConfig importConfig,
       String extensionName, JavaScriptObject extension) {
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    configureUnit(importData, dto);
-    configureIncremental(importData, dto);
+    configureUnit(importConfig, dto);
+    configureIncremental(importConfig, dto);
     dto.setExtension(extensionName, extension);
     return dto;
   }
 
-  private static void configureIncremental(ImportData importData, DatasourceFactoryDto dto) {
-    if(importData.isIncremental()) {
+  private static void configureIncremental(ImportConfig importConfig, DatasourceFactoryDto dto) {
+    if(importConfig.isIncremental()) {
       DatasourceIncrementalConfigDto configDto = DatasourceIncrementalConfigDto.create();
       configDto.setIncremental(true);
-      configDto.setIncrementalDestinationName(importData.getDestinationDatasourceName());
+      configDto.setIncrementalDestinationName(importConfig.getDestinationDatasourceName());
       dto.setIncrementalConfig(configDto);
     }
   }
 
-  private static void configureUnit(ImportData importData, DatasourceFactoryDto dto) {
-    if(!Strings.isNullOrEmpty(importData.getUnit())) {
+  private static void configureUnit(ImportConfig importConfig, DatasourceFactoryDto dto) {
+    if(!Strings.isNullOrEmpty(importConfig.getUnit())) {
       DatasourceUnitConfigDto configDto = DatasourceUnitConfigDto.create();
-      configDto.setUnit(importData.getUnit());
-      configDto.setAllowIdentifierGeneration(importData.isAllowIdentifierGeneration());
-      configDto.setIgnoreUnknownIdentifier(importData.isIgnoreUnknownIdentifier());
+      configDto.setUnit(importConfig.getUnit());
+      configDto.setAllowIdentifierGeneration(importConfig.isAllowIdentifierGeneration());
+      configDto.setIgnoreUnknownIdentifier(importConfig.isIgnoreUnknownIdentifier());
       dto.setUnitConfig(configDto);
     }
   }
