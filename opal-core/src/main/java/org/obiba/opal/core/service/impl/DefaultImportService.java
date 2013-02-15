@@ -13,45 +13,26 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.ValueTableWriter.ValueSetWriter;
-import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
-import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.DatasourceCopier.DatasourceCopyValueSetEventListener;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.support.StaticValueTable;
-import org.obiba.magma.type.BooleanType;
-import org.obiba.magma.type.TextType;
-import org.obiba.magma.views.SelectClause;
-import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
-import org.obiba.opal.core.magma.FunctionalUnitView;
-import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
-import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
@@ -65,8 +46,6 @@ import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
@@ -75,7 +54,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 
 /**
  * Default implementation of {@link ImportService}.
@@ -99,10 +77,13 @@ public class DefaultImportService implements ImportService {
 
   private final IdentifiersTableService identifiersTableService;
 
+  private final IdentifiersService identifiersService;
+
   @Autowired
   public DefaultImportService(TransactionTemplate txTemplate, FunctionalUnitService functionalUnitService,
       OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier,
-      IdentifiersTableService identifiersTableService) {
+      IdentifiersTableService identifiersTableService, IdentifiersService identifiersService) {
+    this.identifiersService = identifiersService;
     if(txTemplate == null) throw new IllegalArgumentException("txManager cannot be null");
     if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
     if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
@@ -221,10 +202,10 @@ public class DefaultImportService implements ImportService {
 
     int count = 0;
 
-    ValueTable keysTable = getIdentifiersValueTable();
+    ValueTable keysTable = identifiersTableService.getValueTable();
     if(!keysTable.hasVariable(unit.getKeyVariableName())) {
       try {
-        prepareKeysTable(null, unit.getKeyVariableName());
+        identifiersService.prepareKeysTable(null, unit.getKeyVariableName());
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
@@ -264,16 +245,22 @@ public class DefaultImportService implements ImportService {
     try {
       for(ValueTable vt : sourceDatasource.getValueTables()) {
         if(vt.getEntityType().equals(identifiersTableService.getEntityType())) {
-          ValueTable sourceKeysTable = createPrivateView(vt, unit, select);
-          Variable unitKeyVariable = prepareKeysTable(sourceKeysTable, unit.getKeyVariableName());
-          PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(getIdentifiersValueTable(),
+          ValueTable sourceKeysTable = identifiersService.createPrivateView(vt.getName(), vt, unit, select);
+          Variable unitKeyVariable = identifiersService.prepareKeysTable(sourceKeysTable, unit.getKeyVariableName());
+          PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(identifiersTableService.getValueTable(),
               unitKeyVariable, participantIdentifier);
-          for(VariableEntity privateEntity : sourceKeysTable.getVariableEntities()) {
-            if(entityMap.publicEntity(privateEntity) == null) {
-              entityMap.createPublicEntity(privateEntity);
+          ValueTableWriter identifiersTableWriter = identifiersTableService.createValueTableWriter();
+          try {
+            for(VariableEntity privateEntity : sourceKeysTable.getVariableEntities()) {
+              if(entityMap.publicEntity(privateEntity) == null) {
+                entityMap.createPublicEntity(privateEntity);
+              }
+              identifiersService
+                  .copyParticipantIdentifiers(entityMap.publicEntity(privateEntity), sourceKeysTable, entityMap,
+                      identifiersTableWriter);
             }
-            copyParticipantIdentifiers(entityMap.publicEntity(privateEntity), sourceKeysTable, writeToKeysTable(),
-                entityMap);
+          } finally {
+            identifiersTableWriter.close();
           }
         }
       }
@@ -295,7 +282,7 @@ public class DefaultImportService implements ImportService {
       if(sourceDatasource.getValueTables().isEmpty()) {
         throw new IllegalArgumentException("source identifiers datasource is empty (no tables)");
       }
-      String idTableName = getIdentifiersValueTable().getName();
+      String idTableName = identifiersTableService.getValueTable().getName();
       ValueTable sourceKeysTable = sourceDatasource.hasValueTable(idTableName) //
           ? sourceDatasource.getValueTable(idTableName) //
           : sourceDatasource.getValueTables().iterator().next();
@@ -316,7 +303,7 @@ public class DefaultImportService implements ImportService {
     }
 
     ValueTable sourceKeysTableCopy = sourceKeysTable;
-    String idTableName = getIdentifiersValueTable().getName();
+    String idTableName = identifiersTableService.getValueTable().getName();
     if(!sourceKeysTable.getName().equals(idTableName)) {
       ImmutableSet.Builder<String> builder = ImmutableSet.builder();
       builder.addAll(Iterables.transform(sourceKeysTable.getVariableEntities(), new Function<VariableEntity, String>() {
@@ -332,7 +319,7 @@ public class DefaultImportService implements ImportService {
 
     // Don't copy null values otherwise, we'll delete existing mappings
     DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build()
-        .copy(sourceKeysTableCopy, getIdentifiersValueTable().getDatasource());
+        .copy(sourceKeysTableCopy, identifiersTableService.getValueTable().getDatasource());
   }
 
   private Datasource getDatasourceOrTransientDatasource(String datasourceName) throws NoSuchDatasourceException {
@@ -373,8 +360,8 @@ public class DefaultImportService implements ImportService {
   private void copyValueTables(Set<ValueTable> sourceTables, Datasource destination, @Nullable FunctionalUnit unit,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) throws IOException, InterruptedException {
     try {
-      new CopyValueTablesLockingAction(sourceTables, unit, destination, allowIdentifierGeneration,
-          ignoreUnknownIdentifier).execute();
+      new CopyValueTablesLockingAction(this, identifiersTableService, participantIdentifier, identifiersService,
+          txTemplate, sourceTables, unit, destination, allowIdentifierGeneration, ignoreUnknownIdentifier).execute();
     } catch(InvocationTargetException ex) {
       if(ex.getCause() instanceof IOException) {
         throw (IOException) ex.getCause();
@@ -386,330 +373,4 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  /**
-   * Creates a {@link View} of the participant table's "private" variables (i.e., identifiers).
-   *
-   * @param viewName
-   * @param participantTable
-   * @return
-   */
-  private View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit,
-      @Nullable String select) {
-    if(select != null) {
-      View privateView = View.Builder.newView(viewName, participantTable).select(new JavascriptClause(select)).build();
-      privateView.initialise();
-      return privateView;
-    }
-    if(unit.getSelect() != null) {
-      View privateView = View.Builder.newView(viewName, participantTable).select(unit.getSelect()).build();
-      privateView.initialise();
-      return privateView;
-    }
-    return View.Builder.newView(viewName, participantTable).select(new SelectClause() {
-      @Override
-      public boolean select(Variable variable) {
-        return isIdentifierVariable(variable);
-      }
-    }).build();
-  }
-
-  private View createPrivateView(ValueTable participantTable, FunctionalUnit unit, @Nullable String select) {
-    return createPrivateView(participantTable.getName(), participantTable, unit, select);
-  }
-
-  private View createPrivateView(FunctionalUnitView functionalUnitView) {
-    return createPrivateView(functionalUnitView.getName(), functionalUnitView, functionalUnitView.getUnit(), null);
-  }
-
-  /**
-   * Write the key variable.
-   *
-   * @param privateView
-   * @param keyVariableName
-   * @return
-   * @throws IOException
-   */
-  private Variable prepareKeysTable(@Nullable ValueTable privateView, String keyVariableName) throws IOException {
-
-    Variable keyVariable = Variable.Builder
-        .newVariable(keyVariableName, TextType.get(), identifiersTableService.getEntityType()).build();
-
-    ValueTableWriter tableWriter = writeToKeysTable();
-    try {
-      VariableWriter variableWriter = tableWriter.writeVariables();
-      try {
-        // Create private variables
-        variableWriter.writeVariable(keyVariable);
-        if(privateView != null) {
-          DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(privateView, variableWriter);
-        }
-      } finally {
-        variableWriter.close();
-      }
-    } finally {
-      tableWriter.close();
-    }
-    return keyVariable;
-  }
-
-  /**
-   * Write the key variable and the identifier variables values; update the participant key private/public map.
-   */
-  private VariableEntity copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
-      ValueTableWriter tableWriter, PrivateVariableEntityMap entityMap) {
-    VariableEntity privateEntity = entityMap.privateEntity(publicEntity);
-
-    ValueSetWriter valueSetWriter = tableWriter.writeValueSet(publicEntity);
-    try {
-      // Copy all other private variable values
-      DatasourceCopier.Builder.newCopier().dontCopyMetadata().build()
-          .copyValues(privateView, privateView.getValueSet(privateEntity), getIdentifiersValueTable().getName(),
-              valueSetWriter);
-    } finally {
-      try {
-        valueSetWriter.close();
-      } catch(IOException e) {
-        //noinspection ThrowFromFinallyBlock
-        throw new MagmaRuntimeException(e);
-      }
-    }
-    return publicEntity;
-  }
-
-  private ValueTable getIdentifiersValueTable() {
-    return identifiersTableService.getValueTable();
-  }
-
-  private ValueTableWriter writeToKeysTable() {
-    return identifiersTableService.createValueTableWriter();
-  }
-
-  private boolean isIdentifierVariable(@SuppressWarnings("TypeMayBeWeakened") Variable variable) {
-    if(!variable.hasAttribute("identifier")) return false;
-    Value value = variable.getAttribute("identifier").getValue();
-    return value.equals(BooleanType.get().trueValue()) || "true".equals(value.toString().toLowerCase());
-  }
-
-  class TransactionalThread extends Thread {
-
-    private Runnable runnable;
-
-    TransactionalThread(Runnable runnable) {
-      this.runnable = runnable;
-    }
-
-    @Override
-    public void run() {
-      txTemplate.execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          runnable.run();
-        }
-      });
-    }
-  }
-
-  private class CopyValueTablesLockingAction extends LockingActionTemplate {
-
-    private final Set<ValueTable> sourceTables;
-
-    @Nullable
-    private final FunctionalUnit unit; //TODO delete this unit and use the one form FunctionalUnitView
-
-    private final Datasource destination;
-
-    private final boolean allowIdentifierGeneration;
-
-    private final boolean ignoreUnknownIdentifier;
-
-    private CopyValueTablesLockingAction(Set<ValueTable> sourceTables, @Nullable FunctionalUnit unit,
-        Datasource destination, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) {
-      this.sourceTables = sourceTables;
-      this.unit = unit;
-      this.destination = destination;
-      this.allowIdentifierGeneration = allowIdentifierGeneration;
-      this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
-    }
-
-    @Override
-    protected Set<String> getLockNames() {
-      return getTablesToLock();
-    }
-
-    private Set<String> getTablesToLock() {
-      Set<String> tablesToLock = new TreeSet<String>();
-
-      boolean needToLockKeysTable = false;
-
-      for(ValueTable valueTable : sourceTables) {
-        tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
-        if(valueTable.getEntityType().equals(identifiersTableService.getEntityType())) {
-          needToLockKeysTable = true;
-        }
-      }
-
-      if(needToLockKeysTable) {
-        tablesToLock.add(identifiersTableService.getTableReference());
-      }
-
-      return tablesToLock;
-    }
-
-    @Override
-    protected TransactionTemplate getTransactionTemplate() {
-      return txTemplate;
-    }
-
-    @Override
-    protected Action getAction() {
-      return new CopyAction();
-    }
-
-    private class CopyAction implements Action {
-      @Override
-      public void execute() throws Exception {
-        for(ValueTable valueTable : sourceTables) {
-          if(Thread.interrupted()) {
-            throw new InterruptedException("Thread interrupted");
-          }
-
-          if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
-
-            if(valueTable instanceof FunctionalUnitView) {
-              importUnitData((FunctionalUnitView) valueTable);
-            } else {
-              addMissingEntitiesToKeysTable(valueTable);
-              MultithreadedDatasourceCopier.Builder.newCopier() //
-                  .withThreads(new ThreadFactory() {
-                    @Nonnull
-                    @Override
-                    public Thread newThread(@Nonnull Runnable r) {
-                      return new TransactionalThread(r);
-                    }
-                  }) //
-                  .withCopier(newCopierForParticipants()) //
-                  .from(valueTable) //
-                  .to(destination).build() //
-                  .copy();
-            }
-
-          } else {
-            DatasourceCopier.Builder.newCopier() //
-                .dontCopyNullValues() //
-                .withLoggingListener().build() //
-                .copy(valueTable, destination);
-          }
-        }
-      }
-
-      private Set<VariableEntity> addMissingEntitiesToKeysTable(ValueTable valueTable) {
-        Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
-
-        if(identifiersTableService.hasValueTable()) {
-          // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
-          Set<VariableEntity> entitiesInKeysTable = getIdentifiersValueTable().getVariableEntities();
-          nonExistentVariableEntities.removeAll(entitiesInKeysTable);
-        }
-
-        if(nonExistentVariableEntities.size() > 0) {
-          ValueTableWriter keysTableWriter = writeToKeysTable();
-          try {
-            for(VariableEntity ve : nonExistentVariableEntities) {
-              keysTableWriter.writeValueSet(ve).close();
-            }
-          } catch(IOException e) {
-            throw new RuntimeException(e);
-          } finally {
-            Closeables.closeQuietly(keysTableWriter);
-          }
-        }
-
-        return nonExistentVariableEntities;
-      }
-
-      private void importUnitData(FunctionalUnitView functionalUnitView) throws IOException {
-        String keyVariableName = functionalUnitView.getUnit().getKeyVariableName();
-        View privateView = createPrivateView(functionalUnitView);
-        prepareKeysTable(privateView, keyVariableName);
-
-        FunctionalUnitView publicView = createPublicView(functionalUnitView);
-        PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
-
-        // prepare for copying participant data
-        ValueTableWriter keysTableWriter = writeToKeysTable();
-
-        try {
-          copyPublicViewToDestinationDatasource(publicView,
-              createKeysListener(privateView, entityMap, keysTableWriter));
-        } finally {
-          keysTableWriter.close();
-        }
-      }
-
-      /**
-       * This listener will insert all participant identifiers in the keys datasource prior to copying the valueSet to the
-       * data datasource. It will also generate the public variable entity if it does not exist yet. As such, it must be
-       * executed before the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
-       */
-      private DatasourceCopier.DatasourceCopyEventListener createKeysListener(final ValueTable privateView,
-          final PrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
-        return new DatasourceCopyValueSetEventListener() {
-
-          @Override
-          public void onValueSetCopied(ValueTable source, ValueSet valueSet, @SuppressWarnings(
-              "ParameterHidesMemberVariable") String... destination) {
-          }
-
-          @Override
-          public void onValueSetCopy(ValueTable source, ValueSet valueSet) {
-            copyParticipantIdentifiers(valueSet.getVariableEntity(), privateView, keysTableWriter, entityMap);
-          }
-
-        };
-      }
-
-      private void copyPublicViewToDestinationDatasource(ValueTable publicView,
-          DatasourceCopier.DatasourceCopyEventListener createKeysListener) throws IOException {
-        newCopierForParticipants() //
-            .withListener(createKeysListener).build()
-            // Copy participant's non-identifiable variables and data
-            .copy(publicView, destination);
-      }
-
-      private DatasourceCopier.Builder newCopierForParticipants() {
-        return DatasourceCopier.Builder.newCopier() //
-            .withLoggingListener() //
-            .withThroughtputListener();
-      }
-
-      /**
-       * Wraps the participant table in a {@link View} that exposes public entities and non-identifier variables.
-       *
-       * @param participantTable
-       * @param unit
-       * @param allowIdentifierGeneration
-       * @return
-       */
-      private FunctionalUnitView createPublicView(ValueTable participantTable) {
-        FunctionalUnitView publicTable = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PRIVATE,
-            participantTable, getIdentifiersValueTable(), allowIdentifierGeneration ? participantIdentifier : null,
-            ignoreUnknownIdentifier);
-        publicTable.setSelectClause(new SelectClause() {
-
-          @Override
-          public boolean select(Variable variable) {
-            return !isIdentifierVariable(variable) && !isIdentifierVariableForUnit(variable);
-          }
-
-          private boolean isIdentifierVariableForUnit(Variable variable) {
-            return unit != null && unit.getSelect() != null && unit.getSelect().select(variable);
-          }
-
-        });
-        publicTable.initialise();
-        return publicTable;
-      }
-
-    }
-  }
 }

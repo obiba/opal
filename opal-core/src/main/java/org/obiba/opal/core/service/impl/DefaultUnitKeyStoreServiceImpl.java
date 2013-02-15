@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -58,6 +58,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   // UnitKeyStore Methods
   //
 
+  @Override
   public UnitKeyStore getUnitKeyStore(String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
 
@@ -72,6 +73,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     return null;
   }
 
+  @Override
   public UnitKeyStore getOrCreateUnitKeyStore(String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
 
@@ -83,6 +85,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     return unitKeyStore;
   }
 
+  @Override
   public void saveUnitKeyStore(UnitKeyStore unitKeyStore) {
     Assert.notNull(unitKeyStore, "unitKeyStore must not be null");
 
@@ -98,6 +101,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     getPersistenceManager().save(unitKeyStoreState);
   }
 
+  @Override
   public void createOrUpdateKey(String unitName, String alias, String algorithm, int size, String certificateInfo) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
@@ -118,6 +122,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     saveUnitKeyStore(unitKeyStore);
   }
 
+  @Override
   public boolean aliasExists(String unitName, String alias) {
     Assert.hasText(alias, "alias must not be null or empty");
 
@@ -128,6 +133,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     return false;
   }
 
+  @Override
   public void deleteKey(String unitName, String alias) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
@@ -155,7 +161,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public void importKey(String unitName, String alias, InputStream privateKey, InputStream certificate) throws NoSuchFunctionalUnitException {
+  public void importKey(String unitName, String alias, InputStream privateKey, InputStream certificate)
+      throws NoSuchFunctionalUnitException {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -181,7 +188,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo) throws NoSuchFunctionalUnitException {
+  public void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo)
+      throws NoSuchFunctionalUnitException {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -206,7 +214,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   private UnitKeyStore loadUnitKeyStore(String unitName, UnitKeyStoreState unitKeyStoreState) {
-    CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(unitName)).build();
+    CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
+        .prompt(getPasswordFor(unitName)).build();
 
     UnitKeyStore unitKeyStore = null;
     try {
@@ -225,7 +234,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     return unitKeyStore;
   }
 
-  private KeyStore loadKeyStore(byte[] keyStoreBytes, CacheablePasswordCallback passwordCallback) throws GeneralSecurityException, UnsupportedCallbackException, IOException {
+  private KeyStore loadKeyStore(byte[] keyStoreBytes, CacheablePasswordCallback passwordCallback)
+      throws GeneralSecurityException, UnsupportedCallbackException, IOException {
     KeyStore ks = KeyStore.getInstance("JCEKS");
     ks.load(new ByteArrayInputStream(keyStoreBytes), getKeyPassword(passwordCallback));
 
@@ -237,7 +247,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName).prompt(getPasswordFor(unitName)).build();
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
+          .prompt(getPasswordFor(unitName)).build();
       unitKeyStore.getKeyStore().store(baos, getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
       clearPasswordCache(callbackHandler, unitKeyStore.getUnitName());
@@ -253,7 +264,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     return baos.toByteArray();
   }
 
-  private char[] getKeyPassword(CacheablePasswordCallback passwordCallback) throws UnsupportedCallbackException, IOException {
+  private char[] getKeyPassword(CacheablePasswordCallback passwordCallback)
+      throws UnsupportedCallbackException, IOException {
     callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
     return passwordCallback.getPassword();
   }

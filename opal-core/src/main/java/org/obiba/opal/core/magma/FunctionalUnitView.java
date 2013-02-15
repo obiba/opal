@@ -35,14 +35,14 @@ public class FunctionalUnitView extends View {
     /**
      * Make the unit's identifiers public.
      * That is, the identifiers exposed by this table are the ones from the functional unit
-     * Opal to Unit
+     * Opal unit to Unit
      */
     UNIT_IDENTIFIERS_ARE_PUBLIC,
 
     /**
      * Make the unit's identifiers private.
      * That is, the identifiers exposed by this table are the ones to which the functional unit's identifier map to in the keys table.
-     * Unit to Opal
+     * Unit to Opal unit
      */
     UNIT_IDENTIFIERS_ARE_PRIVATE
 
