@@ -433,6 +433,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       FunctionalUnitUpdateDialogPresenter.Display display = functionalUnitUpdateDialogPresenter.getView();
       FunctionalUnitDto functionalUnit = getView().getFunctionalUnitDetails();
       display.setName(functionalUnit.getName());
+      display.setDescription(functionalUnit.getDescription());
       display.setSelect(functionalUnit.getSelect());
       addToPopupSlot(functionalUnitUpdateDialogPresenter);
     }

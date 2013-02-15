@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.unit.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
@@ -24,6 +25,8 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.DisclosurePanel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -37,12 +40,19 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
   interface FunctionalUnitUpdateDialogUiBinder extends UiBinder<DialogBox, FunctionalUnitUpdateDialogView> {
   }
 
-  private static FunctionalUnitUpdateDialogUiBinder uiBinder = GWT.create(FunctionalUnitUpdateDialogUiBinder.class);
+  private static final FunctionalUnitUpdateDialogUiBinder uiBinder = GWT.create(FunctionalUnitUpdateDialogUiBinder
+      .class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
   DialogBox dialog;
+
+  @UiField
+  DockLayoutPanel content;
+
+  @UiField
+  ResizeHandle resizeHandle;
 
   @UiField
   Button updateFunctionalUnitButton;
@@ -54,10 +64,16 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
   TextBox functionalUnitName;
 
   @UiField
+  TextArea functionalUnitDescription;
+
+  @UiField
   TextArea select;
 
   @UiField
   CheckBox selectEnabled;
+
+  @UiField
+  DisclosurePanel options;
 
   @Inject
   public FunctionalUnitUpdateDialogView(EventBus eventBus) {
@@ -76,6 +92,7 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
     });
     selectEnabled.setValue(false);
     select.setEnabled(false);
+    resizeHandle.makeResizable(content);
   }
 
   @Override
@@ -87,6 +104,7 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
   public void show() {
     super.show();
     functionalUnitName.setFocus(true);
+    options.setOpen(!select.getText().isEmpty());
   }
 
   @Override
@@ -126,14 +144,25 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
   }
 
   @Override
+  public HasText getDescription() {
+    return functionalUnitDescription;
+  }
+
+  @Override
+  public void setDescription(String description) {
+    functionalUnitDescription.setText(description != null ? description : "");
+  }
+
+  @Override
   public void clear() {
     setName("");
+    setDescription("");
     setSelect("");
   }
 
   @Override
   public void setSelect(String select) {
-    if(select == null || select.trim().length() == 0) {
+    if(select == null || select.trim().isEmpty()) {
       selectEnabled.setValue(false);
       this.select.setEnabled(false);
       this.select.setText("");

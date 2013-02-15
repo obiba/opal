@@ -335,6 +335,11 @@ img.clickable {
   margin-top: -5px;
 }
 
+.help-block a {
+  color: #888888;
+  text-decoration: underline;
+}
+
 /* GWT */
 
 .gwt-MenuBar-horizontal .gwt-MenuItem {
