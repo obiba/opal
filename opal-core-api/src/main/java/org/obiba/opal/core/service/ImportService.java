@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.vfs2.FileObject;
@@ -41,9 +42,10 @@ public interface ImportService {
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  void importData(@Nullable String unitName, FileObject sourceFile, String destinationDatasourceName,
+  void importData(String unitName, @Nonnull FileObject sourceFile, @Nonnull String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
-      throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException, InterruptedException;
+      throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException,
+      InterruptedException;
 
   /**
    * Imports data from a source Opal datasource into a destination Opal datasource. Usually the source datasource will

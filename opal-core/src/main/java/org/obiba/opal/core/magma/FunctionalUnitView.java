@@ -20,8 +20,7 @@ import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
-
-import static org.springframework.util.Assert.notNull;
+import org.springframework.util.Assert;
 
 /**
  * When an Opal table is exported to some functional unit, entities must be exported with the identifiers understood by
@@ -37,14 +36,14 @@ public class FunctionalUnitView extends View {
     /**
      * Make the unit's identifiers public.
      * That is, the identifiers exposed by this table are the ones from the functional unit
-     * Opal unit to Unit
+     * OpalInstance to Unit
      */
     UNIT_IDENTIFIERS_ARE_PUBLIC,
 
     /**
      * Make the unit's identifiers private.
      * That is, the identifiers exposed by this table are the ones to which the functional unit's identifier map to in the keys table.
-     * Unit to Opal unit
+     * Unit to OpalInstance
      */
     UNIT_IDENTIFIERS_ARE_PRIVATE
 
@@ -77,10 +76,10 @@ public class FunctionalUnitView extends View {
 
     // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
     super(dataTable == null ? null : dataTable.getName(), dataTable);
-    notNull(unit, "unit cannot be null");
-    notNull(policy, "policy cannot be null");
-    notNull(dataTable, "dataTable cannot be null");
-    notNull(keysTable, "keysTable cannot be null");
+    Assert.notNull(unit, "unit cannot be null");
+    Assert.notNull(policy, "policy cannot be null");
+    Assert.notNull(dataTable, "dataTable cannot be null");
+    Assert.notNull(keysTable, "keysTable cannot be null");
 
     this.unit = unit;
     allowIdentifierGeneration = identifierGenerator != null;

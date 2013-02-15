@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.vfs2.FileObject;
@@ -62,9 +63,6 @@ import com.google.common.collect.Iterables;
 @SuppressWarnings("OverlyCoupledClass")
 public class DefaultImportService implements ImportService {
 
-  @SuppressWarnings("UnusedDeclaration")
-  public static final String STAGE_ATTRIBUTE_NAME = "stage";
-
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DefaultImportService.class);
 
@@ -84,28 +82,24 @@ public class DefaultImportService implements ImportService {
   public DefaultImportService(TransactionTemplate txTemplate, FunctionalUnitService functionalUnitService,
       OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier,
       IdentifiersTableService identifiersTableService, IdentifierService identifierService) {
-    this.identifierService = identifierService;
-    if(txTemplate == null) throw new IllegalArgumentException("txManager cannot be null");
-    if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
-    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
-    if(participantIdentifier == null) throw new IllegalArgumentException("participantIdentifier cannot be null");
-    if(identifiersTableService == null) throw new IllegalArgumentException("identifiersTableService cannot be null");
 
-    this.opalRuntime = opalRuntime;
-    this.functionalUnitService = functionalUnitService;
-    this.participantIdentifier = participantIdentifier;
-    this.identifiersTableService = identifiersTableService;
+    Assert.notNull(txTemplate, "txManager cannot be null");
+    Assert.notNull(functionalUnitService, "functionalUnitService cannot be null");
+    Assert.notNull(opalRuntime, "opalRuntime cannot be null");
+    Assert.notNull(participantIdentifier, "participantIdentifier cannot be null");
+    Assert.notNull(identifiersTableService, "identifiersTableService cannot be null");
 
     this.txTemplate = txTemplate;
     this.txTemplate.setIsolationLevel(TransactionTemplate.ISOLATION_READ_COMMITTED);
+    this.functionalUnitService = functionalUnitService;
+    this.opalRuntime = opalRuntime;
+    this.participantIdentifier = participantIdentifier;
+    this.identifierService = identifierService;
+    this.identifiersTableService = identifiersTableService;
   }
 
-  //
-  // ImportService Methods
-  //
-
   @Override
-  public void importData(String unitName, FileObject sourceFile, String destinationDatasourceName,
+  public void importData(String unitName, @Nonnull FileObject sourceFile, @Nonnull String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException,
       InterruptedException {
@@ -136,7 +130,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(String unitName, String sourceDatasourceName, String destinationDatasourceName,
+  public void importData(String unitName, @Nonnull String sourceDatasourceName, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException,
       InterruptedException {
@@ -151,14 +145,13 @@ public class DefaultImportService implements ImportService {
     }
   }
 
-  @SuppressWarnings("ConstantConditions")
   @Override
-  public void importData(String unitName, List<String> sourceTableNames, String destinationDatasourceName,
+  public void importData(String unitName, @Nonnull List<String> sourceTableNames, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException {
-    Assert.isTrue(sourceTableNames != null, "sourceTableNames is null");
-    Assert.isTrue(sourceTableNames.size() > 0, "sourceTableNames is empty");
+    Assert.notNull(sourceTableNames, "sourceTableNames is null");
+    Assert.notEmpty(sourceTableNames, "sourceTableNames is empty");
 
     ImmutableSet.Builder<ValueTable> builder = ImmutableSet.builder();
     for(String tableName : sourceTableNames) {
@@ -177,7 +170,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(String unitName, Set<ValueTable> sourceTables, String destinationDatasourceName,
+  public void importData(String unitName, Set<ValueTable> sourceTables, @Nonnull String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
     // If unitName is the empty string, coerce it to null
@@ -191,7 +184,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier) {
+  public int importIdentifiers(@Nonnull String unitName, IParticipantIdentifier pIdentifier) {
     Assert.hasText(unitName, "unitName is null or empty");
     IParticipantIdentifier localParticipantIdentifier = pIdentifier == null ? participantIdentifier : pIdentifier;
 
@@ -221,7 +214,8 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importIdentifiers(String unitName, String sourceDatasourceName, String select) throws IOException {
+  public void importIdentifiers(@Nonnull String unitName, @Nonnull String sourceDatasourceName, String select)
+      throws IOException {
     Assert.hasText(unitName, "unitName is null or empty");
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
@@ -266,7 +260,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importIdentifiers(String sourceDatasourceName) throws IOException, NoSuchDatasourceException {
+  public void importIdentifiers(@Nonnull String sourceDatasourceName) throws IOException, NoSuchDatasourceException {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
     importIdentifiers(getDatasourceOrTransientDatasource(sourceDatasourceName));
@@ -292,11 +286,10 @@ public class DefaultImportService implements ImportService {
 
   @Override
   public void importIdentifiers(ValueTable sourceKeysTable) throws IOException {
-    if(!sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType())) {
-      throw new IllegalArgumentException(
-          "source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" +
-              identifiersTableService.getEntityType() + "')");
-    }
+
+    Assert.isTrue(!sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType()),
+        "source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" +
+            identifiersTableService.getEntityType() + "')");
 
     ValueTable sourceKeysTableCopy = sourceKeysTable;
     String idTableName = identifiersTableService.getValueTable().getName();
