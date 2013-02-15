@@ -147,6 +147,9 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     ResponseBuilder response = null;
     try {
       FunctionalUnit functionalUnit = new FunctionalUnit(unitDto.getName(), unitDto.getKeyVariableName());
+      if (unitDto.hasDescription()) {
+        functionalUnit.setDescription(unitDto.getDescription());
+      }
       if(unitDto.hasSelect()) {
         functionalUnit.setSelect(new JavascriptClause(unitDto.getSelect()));
       }
