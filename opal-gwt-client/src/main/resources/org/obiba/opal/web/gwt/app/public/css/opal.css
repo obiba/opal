@@ -266,6 +266,10 @@ td.link {
   width: 95%;
 }
 
+.half-width {
+  width: 50%;
+}
+
 .block {
   display: block;
 }
@@ -1311,6 +1315,13 @@ div.paging > span {
 
 .key {
   color: #444444;
+}
+
+.key-subtitle {
+  color: #444444;
+  font-size: 14px;
+  white-space: nowrap;
+  font-weight: bold;
 }
 
 table.table {
