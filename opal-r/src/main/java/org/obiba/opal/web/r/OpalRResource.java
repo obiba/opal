@@ -10,6 +10,7 @@
 package org.obiba.opal.web.r;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -24,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
 
 /**
  * Handles web services on the current R session of the invoking Opal user. A current R session must be defined,
@@ -46,18 +49,23 @@ public class OpalRResource {
     this.opalRSessionManager = opalRSessionManager;
   }
 
-  @GET
-  @Path("/query")
+  @POST
+  @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  public Response query(@QueryParam("script") String script) {
-    if(script == null) return Response.status(Status.BAD_REQUEST).build();
+  public Response query(@QueryParam("script") String script, String body) {
+    String rscript = script;
+    if (Strings.isNullOrEmpty(rscript)) {
+      rscript = body;
+    }
 
-    RScriptROperation rop = new RScriptROperation(script);
+    if(Strings.isNullOrEmpty(rscript)) return Response.status(Status.BAD_REQUEST).build();
+
+    RScriptROperation rop = new RScriptROperation(rscript);
     opalRService.execute(rop);
     if(rop.hasResult() && rop.hasRawResult()) {
       return Response.ok().entity(rop.getRawResult().asBytes()).build();
     } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}", new Object[] { script, rop.hasResult(), rop.hasRawResult() });
+      log.error("R Script '{}' has result: {}, has raw result: {}", new Object[] { rscript, rop.hasResult(), rop.hasRawResult() });
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }

@@ -27,6 +27,8 @@ import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
 
+import com.google.common.base.Strings;
+
 /**
  * Handles web services on a particular R session of the invoking Opal user.
  */
@@ -59,11 +61,15 @@ public class OpalRSessionResource extends AbstractOpalRSessionResource {
     return Response.ok().build();
   }
 
-  @GET
-  @Path("/query")
+  @POST
+  @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  public Response query(@QueryParam("script") String script) {
-    return executeScript(rSession, script);
+  public Response execute(@QueryParam("script") String script, String body) {
+    String rscript = script;
+    if (Strings.isNullOrEmpty(rscript)) {
+      rscript = body;
+    }
+    return executeScript(rSession, rscript);
   }
 
   @GET
