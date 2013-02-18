@@ -1486,6 +1486,22 @@ public interface Translations extends Constants {
   @DefaultStringValue("Indexation on progress")
   String indexInProgress();
 
+  @Description("Table index is out-of-date")
+  @DefaultStringValue("Table index is out-of-date")
+  String indexStatusOutOfDate();
+
+  @Description("Indexing of this table is in progress")
+  @DefaultStringValue("Indexing of this table is in progress")
+  String indexStatusInProgress();
+
+  @Description("Values of this table are not indexed")
+  @DefaultStringValue("Values of this table are not indexed")
+  String indexStatusNotIndexed();
+
+  @Description("Table index is up-to-date")
+  @DefaultStringValue("Table index is up-to-date")
+  String indexAlertUpToDate();
+
   @Description("Select some Tables label")
   @DefaultStringValue("Select some tables...")
   String selectSomeTables();
