@@ -94,7 +94,7 @@ public class OpalRSessionResource extends AbstractOpalRSessionResource {
   }
 
   protected RSymbolResource onGetRSymbolResource(String name) {
-    return new RSymbolResource(rSession, name);
+    return new SecuredRSymbolResource(rSession, name);
   }
 
   protected OpalRSession getOpalRSession() {

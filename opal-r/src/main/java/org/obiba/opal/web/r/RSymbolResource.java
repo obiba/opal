@@ -30,14 +30,13 @@ import org.obiba.opal.r.service.OpalRSession;
  * Handles web services on the symbols of the current R session of the invoking Opal user. A current R session must be
  * defined, otherwise the web service calls will fail with a 404 status.
  */
-public class RSymbolResource extends AbstractOpalRSessionResource {
+public abstract class RSymbolResource extends AbstractOpalRSessionResource {
 
   private final String name;
 
   private final OpalRSession rSession;
 
   public RSymbolResource(OpalRSession rSession, String name) {
-    super();
     this.rSession = rSession;
     this.name = name;
   }
