@@ -15,6 +15,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
@@ -67,11 +68,12 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
         ValueSequencePopupPresenter.Display.class);
     EntityDialogPresenter.Display entityDialogDisplayMock = createMock(EntityDialogPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
+    Provider<IndexPresenter> mockIndexProvider = createMock(Provider.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null,
         new ValueSequencePopupPresenter(null, valueSequenceDisplayMock),
         new EntityDialogPresenter(null, entityDialogDisplayMock, createMock(ValueSequencePopupPresenter.class)));
-    presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider);
+    presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider);
   }
 
   @SuppressWarnings({ "unchecked", "OverlyLongMethod" })
