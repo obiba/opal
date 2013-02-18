@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitDetailsView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitListView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitUpdateDialogView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitView;
+import org.obiba.opal.web.gwt.app.client.unit.view.GenerateIdentifiersDialogView;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersDialogPresenter;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
@@ -31,6 +33,8 @@ public class UnitsModule extends AbstractPresenterModule {
     bindPresenterWidget(FunctionalUnitDetailsPresenter.class, FunctionalUnitDetailsPresenter.Display.class, FunctionalUnitDetailsView.class);
     bindPresenterWidget(FunctionalUnitUpdateDialogPresenter.class, FunctionalUnitUpdateDialogPresenter.Display.class, FunctionalUnitUpdateDialogView.class);
     bindPresenterWidget(AddKeyPairDialogPresenter.class, AddKeyPairDialogPresenter.Display.class, AddCryptoKeyDialogView.class);
+    bindPresenterWidget(GenerateIdentifiersDialogPresenter.class, GenerateIdentifiersDialogPresenter.Display.class,
+        GenerateIdentifiersDialogView.class);
   }
 
 }

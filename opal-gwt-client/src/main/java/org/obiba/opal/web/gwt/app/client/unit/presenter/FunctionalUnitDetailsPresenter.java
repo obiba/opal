@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.GenerateIdentifiersConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
@@ -35,6 +36,7 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
@@ -59,6 +61,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   private FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
 
   private Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter;
+
+  private final GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter;
 
   private FunctionalUnitDto functionalUnit;
 
@@ -112,10 +116,12 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   @Inject
   public FunctionalUnitDetailsPresenter(final Display display, final EventBus eventBus,
       FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter,
+      GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter,
       Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter) {
     super(eventBus, display);
     this.functionalUnitUpdateDialogPresenter = functionalUnitUpdateDialogPresenter;
     this.addKeyPairDialogPresenter = addKeyPairDialogPresenter;
+    this.generateIdentifiersDialogPresenter = generateIdentifiersDialogPresenter;
   }
 
   @Override
@@ -146,8 +152,10 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       }
     });
 
-    super.registerHandler(
-        getEventBus().addHandler(FunctionalUnitSelectedEvent.getType(), new FunctionalUnitSelectedEvent.Handler() {
+    EventBus eventBus = getEventBus();
+
+    registerHandler(
+        eventBus.addHandler(FunctionalUnitSelectedEvent.getType(), new FunctionalUnitSelectedEvent.Handler() {
 
           @Override
           public void onFunctionalUnitSelected(FunctionalUnitSelectedEvent event) {
@@ -155,10 +163,11 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
           }
         }));
 
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(
-        getEventBus().addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
-    super.registerHandler(getEventBus().addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
+    registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(eventBus.addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
+    registerHandler(eventBus.addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
+    registerHandler(eventBus.addHandler(GenerateIdentifiersConfirmationEvent.getType(),
+        new GenerateIdentifiersHandler()));
   }
 
   private void setCommands() {
@@ -196,8 +205,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     };
 
     UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "entities", "count");
-    countIdentifiersRequest = ResourceRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).get()//
+    countIdentifiersRequest = ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).get()//
         .withCallback(Response.SC_OK, callbackHandler) //
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
@@ -207,27 +215,23 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     UriBuilder ub;
 
     // export identifiers
-    ub = UriBuilder.create()
-        .segment("functional-unit", functionalUnit.getName(), "entities", "identifiers");
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).get()
+    ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "entities", "identifiers");
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).get()
         .authorize(getView().getDownloadIdentifiersAuthorizer()).send();
 
     // export identifiers mapping
     ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "entities", "csv");
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).get()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).get()
         .authorize(getView().getExportIdentifiersAuthorizer()).send();
 
     // remove
     ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build())
-        .delete().authorize(getView().getRemoveFunctionalUnitAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete()
+        .authorize(getView().getRemoveFunctionalUnitAuthorizer()).send();
 
     // generate identifiers
     ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "entities", "identifiers");
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).post()
         .authorize(getView().getGenerateIdentifiersAuthorizer()).send();
 
     // add identifiers
@@ -240,31 +244,30 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     // add key pair
     ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "keys");
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).post().authorize(getView().getAddKeyPairAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).post()
+        .authorize(getView().getAddKeyPairAuthorizer()).send();
 
     // edit
     ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build())
-        .put().authorize(getView().getUpdateFunctionalUnitAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
+        .authorize(getView().getUpdateFunctionalUnitAuthorizer()).send();
 
     // display key pairs
     ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "keys");
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).get().authorize(getView().getListKeyPairsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).get()
+        .authorize(getView().getListKeyPairsAuthorizer()).send();
   }
 
   private void authorizeDownloadCertificate(KeyDto dto, HasAuthorization authorizer) {
     UriBuilder ub = UriBuilder.create()
         .segment("functional-unit", functionalUnit.getName(), "key", dto.getAlias(), "certificate");
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).get().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).get().authorize(authorizer).send();
   }
 
   private void authorizeDeleteKeyPair(KeyDto dto, HasAuthorization authorizer) {
     UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "key", dto.getAlias());
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).delete().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete().authorize(authorizer)
+        .send();
   }
 
   protected void doActionImpl(final KeyDto dto, String actionName) {
@@ -286,8 +289,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
               deleteKeyPair(dto);
             }
           };
-          getEventBus()
-              .fireEvent(ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
+          getEventBus().fireEvent(
+              ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "deleteKeyPair", "confirmDeleteKeyPair"));
         }
       });
     }
@@ -325,7 +328,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       getView().setAvailable(false);
     } else {
       String name = functionalUnit.getName();
-      UriBuilder ub = UriBuilder.create().segment("functional-units","unit", name);
+      UriBuilder ub = UriBuilder.create().segment("functional-units", "unit", name);
       ResourceRequestBuilderFactory.<FunctionalUnitDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new FunctionalUnitFoundCallBack())
           .withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
@@ -359,9 +362,10 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       if(generateConfirmation != null) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
       } else {
-        generateConfirmation = new GenerateConfirmationRunnable();
-        getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(generateConfirmation, "generateFunctionalUnitIdentifiers",
-            "confirmGenerateFunctionalUnitIdentifiers"));
+        addToPopupSlot(generateIdentifiersDialogPresenter);
+//        getEventBus().fireEvent(ConfirmationRequiredEvent
+//            .createWithKeys(generateConfirmation, "generateFunctionalUnitIdentifiers",
+//                "confirmGenerateFunctionalUnitIdentifiers"));
       }
     }
   }
@@ -376,6 +380,19 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   }
 
   private final class GenerateConfirmationRunnable implements Runnable {
+
+    private final Number size;
+
+    private final boolean allowZeros;
+
+    private final String prefix;
+
+    public GenerateConfirmationRunnable(Number size, boolean allowZeros, String prefix) {
+      this.size = size;
+      this.allowZeros = allowZeros;
+      this.prefix = prefix;
+    }
+
     public void run() {
       ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -407,9 +424,9 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       };
 
       UriBuilder ub = UriBuilder.create()
-          .segment("functional-unit", functionalUnit.getName(), "entities", "identifiers");
-      ResourceRequestBuilderFactory.newBuilder()
-          .forResource(ub.build()).post()//
+          .segment("functional-unit", functionalUnit.getName(), "entities", "identifiers")
+          .query("size", String.valueOf(size), "zeros", String.valueOf(allowZeros), "prefix", prefix);
+      ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).post()//
           .withCallback(Response.SC_OK, callbackHandler) //
           .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
           .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
@@ -448,13 +465,13 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         public void run() {
           ResponseCodeCallback callbackHandler = new FunctionalUnitDeleteCallback();
           UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
-          ResourceRequestBuilderFactory.newBuilder().forResource(ub.build())
-              .delete().withCallback(Response.SC_OK, callbackHandler)
-              .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+          ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).delete()
+              .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler)
+              .send();
         }
       };
-      getEventBus().fireEvent(
-          ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
+      getEventBus().fireEvent(ConfirmationRequiredEvent
+          .createWithKeys(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
     }
 
   }
@@ -483,13 +500,14 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
         removeConfirmation.run();
         removeConfirmation = null;
-      } else if(generateConfirmation != null && event.getSource().equals(generateConfirmation)) {
-        if(event.isConfirmed()) {
-          generateConfirmation.run();
-        } else {
-          generateConfirmation = null;
-        }
       }
+//      else if(generateConfirmation != null && event.getSource().equals(generateConfirmation)) {
+//        if(event.isConfirmed()) {
+//          generateConfirmation.run();
+//        } else {
+//          generateConfirmation = null;
+//        }
+//      }
     }
   }
 
@@ -546,6 +564,13 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       if(event.getFunctionalUnit().getName().equals(functionalUnit.getName())) {
         refreshKeyPairs(functionalUnit);
       }
+    }
+  }
+  private final class GenerateIdentifiersHandler implements GenerateIdentifiersConfirmationEvent.Handler {
+    @Override
+    public void onGenerateIdentifiersConfirmation(GenerateIdentifiersConfirmationEvent event) {
+      generateConfirmation = new GenerateConfirmationRunnable(event.getSize(), event.isAllowZeros(), event.getPrefix());
+      generateConfirmation.run();
     }
   }
 

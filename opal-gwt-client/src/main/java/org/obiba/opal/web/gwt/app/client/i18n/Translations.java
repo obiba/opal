@@ -547,8 +547,6 @@ public interface Translations extends Constants {
       "confirmRemoveTable",
       "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",
 //
-      "confirmGenerateFunctionalUnitIdentifiers",
-      "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.",
 //
       "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method.",//
       "confirmDeleteDatabase", "Please confirm that you want to remove this database." })
@@ -1517,4 +1515,13 @@ public interface Translations extends Constants {
   @Description("Elastic Search Configuration")
   @DefaultStringValue("Elastic search configuration")
   String esConfigurationLabel();
+
+  @Description("Confirm Generate Functional Unit Identifiers")
+  @Constants.DefaultStringValue("Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.")
+  String confirmGenerateFunctionalUnitIdentifiers();
+
+  @Description("Generate Identifiers button label")
+  @DefaultStringValue("Generate")
+  String generateIdentifiersButton();
+
 }
