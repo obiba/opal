@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -42,9 +46,16 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
+import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
+import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -54,6 +65,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -70,20 +82,30 @@ import static com.google.gwt.http.client.Response.SC_OK;
 
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
+  private static final int DELAY_MILLIS = 500;
+
   private JsArray<VariableDto> variables;
 
   private TableDto table;
+
+  private TableIndexStatusDto statusDto;
 
   private String previous;
 
   private String next;
 
-  private Provider<AuthorizationPresenter> authorizationPresenter;
+  private boolean cancelIndexation = false;
+
+  //private boolean indexNow = false;
+
+  private final Provider<AuthorizationPresenter> authorizationPresenter;
 
   @Inject
   private CodingViewDialogPresenter codingViewDialogPresenter;
 
-  private ValuesTablePresenter valuesTablePresenter;
+  private final ValuesTablePresenter valuesTablePresenter;
+
+  private final Provider<IndexPresenter> indexPresenter;
 
   private Runnable removeConfirmation;
 
@@ -96,11 +118,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
    * @param eventBus
    */
   @Inject
-  public TablePresenter(final Display display, final EventBus eventBus, Proxy proxy,
-      ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
+  public TablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter,
+      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
     super(eventBus, display, proxy);
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
+    this.indexPresenter = indexPresenter;
   }
 
   @Override
@@ -109,6 +132,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   // This makes this presenter reveal itself whenever a TableSelectionChangeEvent occurs (anywhere for any reason).
+  @SuppressWarnings("UnusedDeclaration")
   @ProxyEvent
   public void onTableSelectionChanged(TableSelectionChangeEvent e) {
     if(!isVisible()) {
@@ -125,6 +149,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     addEventHandlers();
   }
 
+  @SuppressWarnings("OverlyLongMethod")
   private void addEventHandlers() {
     registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     registerHandler(
@@ -139,7 +164,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().setNextCommand(new NextCommand());
     getView().setValuesTabCommand(new ValuesCommand());
 
-    VariableNameFieldUpdater updater = new VariableNameFieldUpdater();
+    FieldUpdater<VariableDto, String> updater = new VariableNameFieldUpdater();
     getView().setVariableNameFieldUpdater(updater);
     getView().setVariableIndexFieldUpdater(updater);
     registerHandler(getView().addVariableSuggestionHandler(new VariableSuggestionHandler()));
@@ -147,6 +172,106 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     // OPAL-975
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+
+    //Link actions: CLEAR
+    getView().getClear().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == SC_OK) {
+              updateIndexStatus();
+            } else {
+              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                      .build());
+            }
+          }
+
+        };
+        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+            .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index")//
+            .withCallback(Response.SC_OK, callback)//
+            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
+      }
+    });
+    getView().getCancel().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == SC_OK) {
+              cancelIndexation = true;
+              updateIndexStatus();
+            } else {
+              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                      .build());
+            }
+          }
+
+        };
+        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+            .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index")//
+            .withCallback(Response.SC_OK, callback)//
+            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
+      }
+    });
+
+    //Link actions: INDEX NOW
+    getView().getIndexNow().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == SC_OK) {
+              // Wait a few seconds for the task to launch before checking its status
+              Timer t = new Timer() {
+                @Override
+                public void run() {
+                  updateIndexStatus();
+                }
+              };
+              // Schedule the timer to run once in 2 seconds.
+              t.schedule(DELAY_MILLIS);
+            } else {
+              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                      .build());
+            }
+          }
+
+        };
+        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+            .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index")//
+            .withCallback(Response.SC_OK, callback) //
+            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).put().send();
+      }
+    });
+
+    // Link action: Schedule indexing
+    getView().getScheduleIndexing().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
+        objects.add(statusDto);
+
+        IndexPresenter dialog = indexPresenter.get();
+        dialog.setUpdateMethodCallbackRefreshIndices(false);
+        dialog.updateSchedules(objects);
+        addToPopupSlot(dialog);
+
+      }
+    });
   }
 
   @Override
@@ -190,6 +315,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get()
         .authorize(getView().getValuesAuthorizer()).send();
 
+    // Table indexation status
+//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
+//        .authorize(getView().getTableIndexStatusAuthorizer()).send();
+
+//    GWT.log(table.getLink());
+//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
+//        .authorize(getView().getTableIndexEditAuthorizer()).send();
+
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
@@ -219,7 +352,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       getView().setEditCommand(null);
     }
 
+    updateIndexStatus();
     updateVariables();
+  }
+
+  private void updateIndexStatus() {
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
+        .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index").get()
+        .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND)
+        .withCallback(new TableIndexStatusResourceCallback()).send();
   }
 
   private void updateVariables() {
@@ -232,8 +373,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .withCallback(new VariablesResourceCallback(table)).send();
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void downloadMetadata() {
-    String downloadUrl = new StringBuilder(table.getLink()).append("/variables/excel").toString();
+    String downloadUrl = table.getLink() + "/variables/excel";
     getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
@@ -253,7 +395,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     return next;
   }
 
-  private void removeView(String viewName) {
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
+  private void removeView() {
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -273,7 +416,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
   }
 
-  private void removeTable(String viewName) {
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
+  private void removeTable() {
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -425,7 +569,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   final class DownloadViewCommand implements Command {
     @Override
     public void execute() {
-      String downloadUrl = new StringBuilder(table.getViewLink()).append("/xml").toString();
+      String downloadUrl = table.getViewLink() + "/xml";
       getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
     }
   }
@@ -434,21 +578,20 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void execute() {
       removeConfirmation = new Runnable() {
+        @Override
         public void run() {
           if(tableIsView()) {
-            removeView(table.getName());
+            removeView();
           } else {
-            removeTable(table.getName());
+            removeTable();
           }
         }
       };
 
       ConfirmationRequiredEvent event;
-      if(tableIsView()) {
-        event = ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeView", "confirmRemoveView");
-      } else {
-        event = ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeTable", "confirmRemoveTable");
-      }
+      event = tableIsView()
+          ? ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeView", "confirmRemoveView")
+          : ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeTable", "confirmRemoveTable");
 
       getEventBus().fireEvent(event);
     }
@@ -466,6 +609,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
         removeConfirmation.run();
@@ -492,12 +636,53 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
+  class TableIndexStatusUnavailableCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      getView().setIndexStatusVisible(false);
+    }
+  }
+
+  class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
+
+    private static final int DELAY_MILLIS = 2000;
+
+    @Override
+    public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
+      if(response.getStatusCode() == SC_OK) {
+        getView().setIndexStatusVisible(true);
+        statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
+//        GWT.log(statusDto.getStatus().getName());
+        getView().setIndexStatusAlert(statusDto);
+
+        // Refetch if in progress
+        if(!cancelIndexation && statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
+
+          Timer t = new Timer() {
+            @Override
+            public void run() {
+              updateIndexStatus();
+            }
+          };
+
+          // Schedule the timer to run once in 2 seconds.
+          t.schedule(DELAY_MILLIS);
+        }
+//        else if (cancelIndexation && statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())){
+//          // wait for the cancel event to propagate and refresh
+//          updateIndexStatus();
+//        }
+      } else {
+        getView().setIndexStatusVisible(false);
+      }
+    }
+  }
+
   class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
-    private TableDto table;
+    private final TableDto table;
 
-    public VariablesResourceCallback(TableDto table) {
-      super();
+    VariablesResourceCallback(TableDto table) {
       this.table = table;
       getView().beforeRenderRows();
     }
@@ -534,29 +719,25 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   class SiblingVariableSelectionHandler implements SiblingVariableSelectionEvent.Handler {
     @Override
     public void onSiblingVariableSelection(SiblingVariableSelectionEvent event) {
-      VariableDto siblingSelection = event.getCurrentSelection();
 
       // Look for the variable and its position in the list by its name.
       // Having a position of the current variable would be more efficient.
       int siblingIndex = 0;
       for(int i = 0; i < variables.length(); i++) {
         if(variables.get(i).getName().equals(event.getCurrentSelection().getName())) {
-          if(event.getDirection().equals(SiblingVariableSelectionEvent.Direction.NEXT) && i < variables.length() - 1) {
+          if(event.getDirection() == SiblingVariableSelectionEvent.Direction.NEXT && i < variables.length() - 1) {
             siblingIndex = i + 1;
-          } else if(event.getDirection().equals(SiblingVariableSelectionEvent.Direction.PREVIOUS) && i != 0) {
-            siblingIndex = i - 1;
-          } else {
-            siblingIndex = i;
-          }
+          } else siblingIndex = event.getDirection() == SiblingVariableSelectionEvent.Direction.PREVIOUS && i != 0
+              ? i - 1
+              : i;
           break;
         }
       }
-      siblingSelection = variables.get(siblingIndex);
+      VariableDto variableDto = variables.get(siblingIndex);
 
-      getView().setVariableSelection(siblingSelection, siblingIndex);
-      getEventBus().fireEvent(
-          new VariableSelectionChangeEvent(table, siblingSelection, getPreviousVariable(siblingIndex),
-              getNextVariable(siblingIndex)));
+      getView().setVariableSelection(variableDto, siblingIndex);
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(siblingIndex),
+          getNextVariable(siblingIndex)));
     }
   }
 
@@ -572,8 +753,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   @ProxyStandard
-  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<TablePresenter> {
-  }
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<TablePresenter> {}
 
   public interface Display extends View {
 
@@ -649,12 +829,27 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     HasAuthorization getPermissionsAuthorizer();
 
+//    HasAuthorization getTableIndexStatusAuthorizer();
+//
+//    HasAuthorization getTableIndexEditAuthorizer();
+
     String getClickableColumnName(Column<?, ?> column);
 
     void setValuesTabCommand(Command cmd);
 
     boolean isValuesTabSelected();
 
+    void setIndexStatusVisible(boolean b);
+
+    void setIndexStatusAlert(TableIndexStatusDto statusDto);
+
+    HasClickHandlers getClear();
+
+    HasClickHandlers getCancel();
+
+    HasClickHandlers getIndexNow();
+
+    HasClickHandlers getScheduleIndexing();
   }
 
 }
