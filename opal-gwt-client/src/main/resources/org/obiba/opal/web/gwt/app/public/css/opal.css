@@ -2305,3 +2305,13 @@ a.icon:hover {
   border-bottom-right-radius: 0;
   margin-bottom: 5px;
 }
+
+/* Index status progress bar */
+.indexStatusProgressBar {
+  display: table-cell;
+  width: 100px;
+}
+
+.indexStatusAction {
+  text-decoration: underline;
+}

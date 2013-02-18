@@ -78,7 +78,7 @@ public abstract class IndexResource {
   }
 
   protected boolean isInProgress(String table) {
-    return Float.compare(getValueTableIndexationProgress(table), 0f) > 1;
+    return Float.compare(getValueTableIndexationProgress(table), 0f) > 0;
   }
 
   protected ValueTableIndex getValueTableIndex(String datasource, String table) {
@@ -94,7 +94,7 @@ public abstract class IndexResource {
     if(indexManager.isIndexable(valueTable) && !upToDate && !inProgress) {
       return Opal.TableIndexationStatus.OUTDATED;
     }
-    if(indexManager.isIndexable(valueTable) && !upToDate && inProgress) {
+    if(indexManager.isIndexable(valueTable) && inProgress) {
       return Opal.TableIndexationStatus.IN_PROGRESS;
     }
     if(indexManager.isIndexable(valueTable) && upToDate) {
