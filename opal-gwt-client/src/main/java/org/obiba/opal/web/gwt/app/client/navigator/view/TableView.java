@@ -34,6 +34,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -92,6 +93,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiField
   Label entityCount;
+
+  @UiField
+  Label fromTables;
+
+  @UiField
+  Label from;
 
   @UiField
   FlowPanel indexStatus;
@@ -153,7 +160,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private MenuItemSeparator removeItemSeparator;
 
   public TableView() {
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
   }
@@ -237,7 +244,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void renderRows(final JsArray<VariableDto> rows) {
+  public void renderRows(JsArray<VariableDto> rows) {
     createCodingViewItem.setEnabled(rows.length() > 0);
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
@@ -246,7 +253,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void setVariableSelection(VariableDto variable, int index) {
-    int pageIndex = (int) (index / table.getPageSize());
+    int pageIndex = index / table.getPageSize();
     if(pageIndex != pager.getPage()) {
       pager.setPage(pageIndex);
     }
@@ -274,6 +281,18 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     entityType.setText(dto.getEntityType());
 
     entityCount.setText(Integer.toString(dto.getValueSetCount()));
+  }
+
+  @Override
+  public void setFromTables(JsArrayString viewDto) {
+    if(viewDto == null) {
+      from.setVisible(false);
+      fromTables.setVisible(false);
+    } else {
+      from.setVisible(true);
+      fromTables.setVisible(true);
+      fromTables.setText(viewDto.join(", "));
+    }
   }
 
   @Override
@@ -479,7 +498,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
-        if(event.getSelectedItem() == VALUES_TAB_INDEX) {
+        if(event.getSelectedItem().equals(VALUES_TAB_INDEX)) {
           cmd.execute();
         }
       }
@@ -496,6 +515,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     indexStatus.setVisible(b);
   }
 
+  @SuppressWarnings({ "OverlyLongMethod", "IfStatementWithTooManyBranches" })
   @Override
   public void setIndexStatusAlert(TableIndexStatusDto statusDto) {
 

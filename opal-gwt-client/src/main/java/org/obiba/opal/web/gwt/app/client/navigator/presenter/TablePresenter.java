@@ -52,6 +52,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -347,9 +348,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     if(tableIsView()) {
       getView().setViewDownloadCommand(new DownloadViewCommand());
       getView().setEditCommand(new EditCommand());
+
+      // Show from tables
+      ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
+          .withCallback(new ViewResourceCallback()).send();
     } else {
       getView().setViewDownloadCommand(null);
       getView().setEditCommand(null);
+      getView().setFromTables(null);
     }
 
     updateIndexStatus();
@@ -700,6 +706,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
+  class ViewResourceCallback implements ResourceCallback<JsArray<ViewDto>> {
+
+    @Override
+    public void onResource(Response response, JsArray<ViewDto> resource) {
+      ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
+      getView().setFromTables(viewDto.getFromArray());
+    }
+  }
+
   class TableSelectionChangeHandler implements TableSelectionChangeEvent.Handler {
     @Override
     public void onTableSelectionChanged(TableSelectionChangeEvent event) {
@@ -850,6 +865,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasClickHandlers getIndexNow();
 
     HasClickHandlers getScheduleIndexing();
+
+    void setFromTables(JsArrayString viewDto);
   }
 
 }

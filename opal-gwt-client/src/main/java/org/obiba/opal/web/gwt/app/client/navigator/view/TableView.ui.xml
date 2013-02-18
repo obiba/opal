@@ -32,6 +32,12 @@
         </g:Label>
         <g:Label ui:field="entityCount"/>
       </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label ui:field="from">
+          <ui:msg description="From table label">From</ui:msg>
+        </g:Label>
+        <g:Label ui:field="fromTables"/>
+      </g:FlowPanel>
     </o:PropertiesTable>
 
     <!--<g:HorizontalPanel ui:field="indexStatus" addStyleNames="small-dual-indent top-margin">-->
