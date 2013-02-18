@@ -21,6 +21,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.AbstractDatasourceWrapper;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -45,6 +46,11 @@ public class FunctionalUnitDatasource extends AbstractDatasourceWrapper {
       @Nonnull FunctionalUnitView.Policy policy, @Nonnull ValueTable keysTable,
       @Nullable IParticipantIdentifier identifierGenerator, boolean ignoreUnknownIdentifier) {
     super(wrapped);
+
+    Assert.notNull(wrapped, "wrapped datasource cannot be null");
+    Assert.notNull(unit, "unit datasource cannot be null");
+    Assert.notNull(policy, "policy datasource cannot be null");
+    Assert.notNull(keysTable, "keysTable datasource cannot be null");
 
     this.unit = unit;
     this.policy = policy;
