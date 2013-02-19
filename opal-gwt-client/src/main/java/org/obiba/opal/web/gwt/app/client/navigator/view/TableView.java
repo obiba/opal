@@ -70,7 +70,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiTemplate("TableView.ui.xml")
-  private interface TableViewUiBinder extends UiBinder<Widget, TableView> {}
+  interface TableViewUiBinder extends UiBinder<Widget, TableView> {}
 
   private static final TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
 

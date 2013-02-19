@@ -98,16 +98,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private boolean cancelIndexation = false;
 
-  //private boolean indexNow = false;
-
-  private final Provider<AuthorizationPresenter> authorizationPresenter;
+  private Provider<AuthorizationPresenter> authorizationPresenter;
 
   @Inject
   private CodingViewDialogPresenter codingViewDialogPresenter;
 
-  private final ValuesTablePresenter valuesTablePresenter;
+  private ValuesTablePresenter valuesTablePresenter;
 
-  private final Provider<IndexPresenter> indexPresenter;
+  private Provider<IndexPresenter> indexPresenter;
 
   private Runnable removeConfirmation;
 
