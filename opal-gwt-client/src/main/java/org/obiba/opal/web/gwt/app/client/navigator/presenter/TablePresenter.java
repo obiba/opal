@@ -84,7 +84,7 @@ import static com.google.gwt.http.client.Response.SC_OK;
 
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
-  private static final int DELAY_MILLIS = 500;
+  private static final int DELAY_MILLIS = 2000;
 
   private JsArray<VariableDto> variables;
 
@@ -241,7 +241,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
                   updateIndexStatus();
                 }
               };
-              // Schedule the timer to run once in 2 seconds.
+              // Schedule the timer to run once in 0.5 seconds.
               t.schedule(DELAY_MILLIS);
             } else {
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
@@ -651,8 +651,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
 
-    private static final int DELAY_MILLIS = 2000;
-
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
       if(response.getStatusCode() == SC_OK) {
@@ -661,7 +659,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         getView().setIndexStatusAlert(statusDto);
 
         // Refetch if in progress
-        if(!cancelIndexation && statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
+        if(statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
 
           Timer t = new Timer() {
             @Override

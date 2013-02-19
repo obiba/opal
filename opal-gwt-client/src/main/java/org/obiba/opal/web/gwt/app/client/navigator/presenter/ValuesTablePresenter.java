@@ -69,17 +69,22 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, String select) {
-    hidePopups(table);
-    this.table = table;
+    if(table == null) {
+      getView().setTable(null);
+    } else {
+      hidePopups(table);
+      this.table = table;
 
-    getView().setTable(table);
-    fetcher.updateVariables(select);
+      getView().setTable(table);
+      fetcher.updateVariables(select);
+    }
   }
 
   @Override
   protected void onBind() {
     super.onBind();
     getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+//    getView().getValueSetsProvider().clearValues();
     getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
   }
 
@@ -264,6 +269,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         variablesRequest.cancel();
         variablesRequest = null;
       }
+      setTable(null);
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
           .withCallback(new VariablesResourceCallback(table))
           .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
@@ -293,7 +299,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   public enum ViewMode {
     DETAILED_MODE,
     SIMPLE_MODE;
-  };
+  }
+
+  ;
 
   public interface DataFetcher {
     void request(List<VariableDto> variables, int offset, int limit);
@@ -311,6 +319,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   public interface ValueSetsProvider {
     void populateValues(int offset, ValueSetsDto valueSets);
+
+    void clearValues();
   }
 
   public interface EntitySelectionHandler {
