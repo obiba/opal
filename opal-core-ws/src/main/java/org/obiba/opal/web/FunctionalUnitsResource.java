@@ -155,16 +155,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
     ResponseBuilder response = null;
     try {
-      FunctionalUnit functionalUnit = new FunctionalUnit(unit.getName(), unit.getKeyVariableName());
-      if(unit.hasDescription()) {
-        functionalUnit.setDescription(unit.getDescription());
-      }
-      if(unit.hasSelect()) {
-        functionalUnit.setSelect(new JavascriptClause(unit.getSelect()));
-      }
-      functionalUnit.setUnitKeyStoreService(unitKeyStoreService);
-
-      getFunctionalUnitService().addOrReplaceFunctionalUnit(functionalUnit);
+      getFunctionalUnitService().addOrReplaceFunctionalUnit(createFunctionalUnitFromDto(unit));
 
       try {
         prepareKeysTable(unit);
@@ -425,6 +416,18 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   //
   // Private methods
   //
+
+  private FunctionalUnit createFunctionalUnitFromDto(FunctionalUnitDto unit) {
+    FunctionalUnit functionalUnit = new FunctionalUnit(unit.getName(), unit.getKeyVariableName());
+    if(unit.hasDescription()) {
+      functionalUnit.setDescription(unit.getDescription());
+    }
+    if(unit.hasSelect()) {
+      functionalUnit.setSelect(new JavascriptClause(unit.getSelect()));
+    }
+    functionalUnit.setUnitKeyStoreService(unitKeyStoreService);
+    return functionalUnit;
+  }
 
   private void importIdentifiersFromTransientDatasource(
       DatasourceFactoryDto datasourceFactoryDto) throws NoSuchValueTableException, IOException {

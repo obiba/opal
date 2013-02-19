@@ -385,8 +385,9 @@ public interface Translations extends Constants {
       "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}",//
       "NoVariablesFound", "Failed to retrieve the list of variables",//
       "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
-      "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}"//
-  })
+      "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
+      "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}"//
+      })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -547,8 +548,6 @@ public interface Translations extends Constants {
       "confirmRemoveTable",
       "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",
 //
-      "confirmGenerateFunctionalUnitIdentifiers",
-      "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.",
 //
       "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method.",//
       "confirmDeleteDatabase", "Please confirm that you want to remove this database." })
@@ -1517,4 +1516,16 @@ public interface Translations extends Constants {
   @Description("Elastic Search Configuration")
   @DefaultStringValue("Elastic search configuration")
   String esConfigurationLabel();
+
+  @Description("Specify Generate Functional Unit Identifiers")
+  @Constants.DefaultStringValue("{0} new identifier{1} will be generated for this unit. To customize the identifier format modify the settings below.")
+  String specifyGenerateFunctionalUnitIdentifiers();
+
+  @Description("Generate Identifiers button label")
+  @DefaultStringValue("Generate")
+  String generateIdentifiersButton();
+
+  @Description("Generate Identifiers size help")
+  @DefaultStringValue("Identifier size must be {0} to {1} digits long")
+  String generateIdentifiersSizeHelp();
 }
