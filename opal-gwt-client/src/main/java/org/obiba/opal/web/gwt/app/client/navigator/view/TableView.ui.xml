@@ -49,17 +49,34 @@
     <g:FlowPanel ui:field="indexStatus" addStyleNames="small-dual-indent top-margin">
       <b:Alert ui:field="indexStatusAlert" close="false">
 
-        <g:Label ui:field="indexStatusText" addStyleNames="inline"></g:Label>
-        <b:ProgressBar ui:field="progress" addStyleNames="indexStatusProgressBar"></b:ProgressBar>
-        <g:Anchor ui:field="clearIndexLink" addStyleNames="inline indexStatusAction">Clear</g:Anchor>
-        <g:Anchor ui:field="indexNowLink" addStyleNames="inline indexStatusAction">Index now</g:Anchor>
-        <g:Anchor ui:field="scheduleLink" addStyleNames="inline indexStatusAction">Schedule indexing</g:Anchor>
-        <g:Anchor ui:field="cancelLink" addStyleNames="inline indexStatusAction">Cancel</g:Anchor>
+        <g:Grid>
+          <g:row>
+            <g:customCell styleName="top-aligned">
+              <g:Label ui:field="indexStatusText" addStyleNames="inline"></g:Label>
+            </g:customCell>
+            <g:customCell styleName="top-aligned">
 
+              <b:ProgressBar ui:field="progress" addStyleNames="indexStatusProgressBar"></b:ProgressBar>
+            </g:customCell>
+            <g:customCell styleName="top-aligned">
+
+              <g:Anchor ui:field="clearIndexLink" addStyleNames="inline indexStatusAction">Clear</g:Anchor>
+            </g:customCell>
+            <g:customCell styleName="top-aligned">
+
+              <g:Anchor ui:field="indexNowLink" addStyleNames="inline indexStatusAction">Index now</g:Anchor>
+            </g:customCell>
+            <g:customCell styleName="top-aligned">
+
+              <g:Anchor ui:field="scheduleLink" addStyleNames="inline indexStatusAction">Schedule indexing</g:Anchor>
+            </g:customCell>
+            <g:customCell styleName="top-aligned">
+              <g:Anchor ui:field="cancelLink" addStyleNames="inline indexStatusAction">Cancel</g:Anchor>
+            </g:customCell>
+          </g:row>
+        </g:Grid>
       </b:Alert>
 
-
-      <!--</g:HorizontalPanel>-->
     </g:FlowPanel>
 
     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">

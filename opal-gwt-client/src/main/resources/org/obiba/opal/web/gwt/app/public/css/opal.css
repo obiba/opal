@@ -2308,7 +2308,6 @@ a.icon:hover {
 
 /* Index status progress bar */
 .indexStatusProgressBar {
-  display: table-cell;
   width: 100px;
 }
 
