@@ -560,6 +560,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     }
   }
 
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   private void setStatusText(String text, AlertType type, boolean clear, boolean indexNow, boolean schedule,
       boolean cancel, boolean progressBar) {
     indexStatusText.setText(text);
