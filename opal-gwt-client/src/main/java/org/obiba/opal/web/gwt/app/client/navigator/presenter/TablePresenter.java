@@ -658,7 +658,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
-//        GWT.log(statusDto.getStatus().getName());
         getView().setIndexStatusAlert(statusDto);
 
         // Refetch if in progress
@@ -713,6 +712,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
       getView().setFromTables(viewDto.getFromArray());
 
+      fromTablesSize = getView().getFromTablesAnchor().size();
       // Add click handlers
       for(Anchor tableLink : getView().getFromTablesAnchor()) {
         updateFromTableLink(tableLink);
