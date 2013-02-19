@@ -32,11 +32,11 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
@@ -84,6 +84,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     void setExportIdentifiersCommand(Command command);
 
     void setUpdateFunctionalUnitCommand(Command command);
+
+    String getCurrentCountOfIdentifiers();
 
     void setCurrentCountOfIdentifiers(String count);
 
@@ -362,12 +364,30 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       if(generateConfirmation != null) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
       } else {
-        addToPopupSlot(generateIdentifiersDialogPresenter);
-//        getEventBus().fireEvent(ConfirmationRequiredEvent
-//            .createWithKeys(generateConfirmation, "generateFunctionalUnitIdentifiers",
-//                "confirmGenerateFunctionalUnitIdentifiers"));
+        UriBuilder uriBuilder = UriBuilder.create().segment("functional-units", "entities","table");
+        ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(uriBuilder.build()).get()
+            .withCallback(new ResourceCallback<TableDto>() {
+              @Override
+              public void onResource(Response response, TableDto tableDto) {
+                showGenerateIdentifiersDialog(tableDto);
+              }
+            }).send();
       }
     }
+  }
+
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
+  private void showGenerateIdentifiersDialog(TableDto tableDto) {
+    int currentCount = Integer.valueOf(getView().getCurrentCountOfIdentifiers());
+    int affectedCount = tableDto.getValueSetCount() - currentCount;
+
+    if (affectedCount == 0) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ParticipantIdentifiersAlreadyGenerated")
+          .args(functionalUnit.getName()).build());
+      return;
+    }
+    generateIdentifiersDialogPresenter.setAffectedEntitiesCount(affectedCount);
+    addToPopupSlot(generateIdentifiersDialogPresenter);
   }
 
   private final class DownloadIdentifiersCommand implements Command {
@@ -501,13 +521,6 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         removeConfirmation.run();
         removeConfirmation = null;
       }
-//      else if(generateConfirmation != null && event.getSource().equals(generateConfirmation)) {
-//        if(event.isConfirmed()) {
-//          generateConfirmation.run();
-//        } else {
-//          generateConfirmation = null;
-//        }
-//      }
     }
   }
 
@@ -566,6 +579,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       }
     }
   }
+
   private final class GenerateIdentifiersHandler implements GenerateIdentifiersConfirmationEvent.Handler {
     @Override
     public void onGenerateIdentifiersConfirmation(GenerateIdentifiersConfirmationEvent event) {

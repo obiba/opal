@@ -10,9 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
 import org.obiba.opal.web.gwt.app.client.unit.event.GenerateIdentifiersConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -32,14 +30,12 @@ public class GenerateIdentifiersDialogPresenter extends PresenterWidget<Generate
   // Instance Variables
   //
 
-  private Object confirmationRequiredSource;
-
   //
   // Constructors
   //
 
   @Inject
-  public GenerateIdentifiersDialogPresenter(final Display display, final EventBus eventBus) {
+  public GenerateIdentifiersDialogPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -49,7 +45,6 @@ public class GenerateIdentifiersDialogPresenter extends PresenterWidget<Generate
 
   @Override
   protected void onBind() {
-    GWT.log("GenerateIdentifiersDialogPresenter.onBind()");
     super.onBind();
     addEventHandlers();
   }
@@ -60,6 +55,10 @@ public class GenerateIdentifiersDialogPresenter extends PresenterWidget<Generate
     getView().clear();
   }
 
+  public void setAffectedEntitiesCount(int affectedEntitiesCount) {
+    getView().setAffectedEntities(affectedEntitiesCount);
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -68,11 +67,11 @@ public class GenerateIdentifiersDialogPresenter extends PresenterWidget<Generate
 
     void hideDialog();
 
+    void setAffectedEntities(int count);
+
     HasClickHandlers getGenerateIdentifiersButton();
 
     HasClickHandlers getCancelButton();
-
-    HasCloseHandlers<DialogBox> getDialog();
 
     Number getSize();
 
@@ -99,7 +98,7 @@ public class GenerateIdentifiersDialogPresenter extends PresenterWidget<Generate
   //
 
   private void addEventHandlers() {
-    registerHandler( getView().getGenerateIdentifiersButton().addClickHandler(new GetGenerateIdentifiersClickHandler()));
+    registerHandler(getView().getGenerateIdentifiersButton().addClickHandler(new GetGenerateIdentifiersClickHandler()));
     registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
