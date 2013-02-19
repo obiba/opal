@@ -725,8 +725,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     String[] s = tableLink.getText().split("\\.");
     UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(s[0], s[1])).get()
-        .withCallback(new TableResourceNotFoundCallback(tableLink), SC_NOT_FOUND)
-        .withCallback(new TableResourceCallback(tableLink)).send();
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // nothing
+          }
+        }, SC_NOT_FOUND).withCallback(new TableResourceCallback(tableLink)).send();
   }
 
   class TableResourceCallback implements ResourceCallback<TableDto> {
@@ -739,27 +743,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void onResource(Response response, final TableDto resource) {
-
+      link.setVisible(true);
       link.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
           getEventBus().fireEvent(new TableSelectionChangeEvent(TablePresenter.this, resource));
         }
       });
-    }
-  }
-
-  static class TableResourceNotFoundCallback implements ResponseCodeCallback {
-    private final Anchor link;
-
-    TableResourceNotFoundCallback(Anchor link) {
-      this.link = link;
-    }
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      link.setEnabled(false);
-      link.addStyleName("disabledLink");
     }
   }
 
