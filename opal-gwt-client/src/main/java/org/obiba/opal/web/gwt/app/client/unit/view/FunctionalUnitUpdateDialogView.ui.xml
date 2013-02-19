@@ -6,7 +6,7 @@
              ui:generateLocales="default">
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
-    <g:DockLayoutPanel unit="EM" ui:field="content" height="46em" width="50em">
+    <g:DockLayoutPanel unit="EM" ui:field="content" height="370px" width="600px">
       <g:center>
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main">

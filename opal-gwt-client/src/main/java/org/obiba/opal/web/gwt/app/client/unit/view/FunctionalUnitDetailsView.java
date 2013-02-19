@@ -200,6 +200,11 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   }
 
   @Override
+  public String getCurrentCountOfIdentifiers() {
+    return currentCountOfIdentifiers.getText();
+  }
+
+  @Override
   public void setCurrentCountOfIdentifiers(String count) {
     currentCountOfIdentifiers.setText(count);
   }
