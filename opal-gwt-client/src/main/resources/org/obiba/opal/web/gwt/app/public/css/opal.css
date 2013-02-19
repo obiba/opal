@@ -2315,3 +2315,9 @@ a.icon:hover {
 .indexStatusAction {
   text-decoration: underline;
 }
+
+/* Views from tables */
+.disabledLink:hover {
+  text-decoration: none;
+  cursor: default;
+}

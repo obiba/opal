@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
@@ -67,7 +70,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiTemplate("TableView.ui.xml")
-  interface TableViewUiBinder extends UiBinder<Widget, TableView> {}
+  private interface TableViewUiBinder extends UiBinder<Widget, TableView> {}
 
   private static final TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
 
@@ -76,6 +79,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private static final Integer PERMISSIONS_TAB_INDEX = 2;
 
   private final Widget widget;
+
+  private List<Anchor> tables = new ArrayList<Anchor>();
 
   @UiField
   FlowPanel toolbarPanel;
@@ -95,10 +100,13 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   Label entityCount;
 
   @UiField
-  Label fromTables;
+  FlowPanel fromTable;
 
   @UiField
-  Label from;
+  FlowPanel fromTableLinks;
+
+  @UiField
+  Label fromTableLabel;
 
   @UiField
   FlowPanel indexStatus;
@@ -284,15 +292,31 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void setFromTables(JsArrayString viewDto) {
-    if(viewDto == null) {
-      from.setVisible(false);
-      fromTables.setVisible(false);
+  public void setFromTables(JsArrayString tableNames) {
+    if(tableNames == null) {
+      fromTable.setVisible(false);
     } else {
-      from.setVisible(true);
-      fromTables.setVisible(true);
-      fromTables.setText(viewDto.join(", "));
+      fromTable.setVisible(true);
+      fromTableLinks.clear();
+      for(int i = 0; i < tableNames.length(); i++) {
+        Anchor a = new Anchor();
+        a.setText(tableNames.get(i));
+        fromTableLinks.add(a);
+
+        tables.add(a);
+
+        if(i < tableNames.length() - 1) {
+          Label l = new Label(", ");
+          l.addStyleName("inline");
+          fromTableLinks.add(l);
+        }
+      }
     }
+  }
+
+  @Override
+  public List<Anchor> getFromTablesAnchor() {
+    return tables;
   }
 
   @Override
@@ -515,45 +539,43 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     indexStatus.setVisible(b);
   }
 
-  @SuppressWarnings({ "OverlyLongMethod", "IfStatementWithTooManyBranches" })
+  @SuppressWarnings({ "IfStatementWithTooManyBranches" })
   @Override
   public void setIndexStatusAlert(TableIndexStatusDto statusDto) {
 
     if(statusDto.getStatus().getName().equals(TableIndexationStatus.UPTODATE.getName())) {
-      indexStatusText.setText(translations.indexAlertUpToDate());
-      indexStatusAlert.setType(AlertType.SUCCESS);
-      clearIndexLink.setVisible(true);
-      indexNowLink.setVisible(false);
-      scheduleLink.setVisible(true);
-      cancelLink.setVisible(false);
-      progress.setVisible(false);
+      setStatusText(translations.indexAlertUpToDate(), AlertType.SUCCESS, true, false, true, false, false);
+      setProgressBar(false, 0);
     } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.OUTDATED.getName())) {
-      indexStatusText.setText(translations.indexStatusOutOfDate());
-      indexStatusAlert.setType(AlertType.ERROR);
-      clearIndexLink.setVisible(true);
-      indexNowLink.setVisible(true);
-      scheduleLink.setVisible(true);
-      cancelLink.setVisible(false);
-      progress.setVisible(false);
+      setStatusText(translations.indexStatusOutOfDate(), AlertType.ERROR, true, true, true, false, false);
+      setProgressBar(false, 0);
     } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
-      indexStatusText.setText(translations.indexStatusInProgress());
-      indexStatusAlert.setType(AlertType.INFO);
-      clearIndexLink.setVisible(false);
-      indexNowLink.setVisible(false);
-      scheduleLink.setVisible(false);
-      cancelLink.setVisible(true);
+      setStatusText(translations.indexStatusInProgress(), AlertType.INFO, false, false, false, true, true);
+      setProgressBar(true, (int) (statusDto.getProgress() * 100));
+    } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.NOT_INDEXED.getName())) {
+      setStatusText(translations.indexStatusNotIndexed(), AlertType.WARNING, false, true, true, false, false);
+      setProgressBar(false, 0);
+    }
+  }
+
+  private void setStatusText(String text, AlertType type, boolean clear, boolean indexNow, boolean schedule,
+      boolean cancel, boolean progressBar) {
+    indexStatusText.setText(text);
+    indexStatusAlert.setType(type);
+    clearIndexLink.setVisible(clear);
+    indexNowLink.setVisible(indexNow);
+    scheduleLink.setVisible(schedule);
+    cancelLink.setVisible(cancel);
+    progress.setVisible(progressBar);
+  }
+
+  private void setProgressBar(boolean progressBar, int percent) {
+    if(progressBar) {
       progress.setVisible(true);
       progress.setType(ProgressBar.Style.ANIMATED);
-      int percent = (int) (statusDto.getProgress() * 100);
       progress.setPercent(percent);
       progress.setTitle(percent + "%");
-    } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.NOT_INDEXED.getName())) {
-      indexStatusText.setText(translations.indexStatusNotIndexed());
-      indexStatusAlert.setType(AlertType.WARNING);
-      clearIndexLink.setVisible(false);
-      indexNowLink.setVisible(true);
-      scheduleLink.setVisible(true);
-      cancelLink.setVisible(false);
+    } else {
       progress.setVisible(false);
     }
   }
