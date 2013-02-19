@@ -176,6 +176,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
 
     //Link actions: CLEAR
+    final UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}", "index");
     getView().getClear().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -195,7 +196,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(table.getLink() + "/index")//
+            .forResource(ub.build(table.getDatasourceName(), table.getName()))//
             .withCallback(Response.SC_OK, callback)//
             .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
       }
@@ -220,7 +221,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(table.getLink() + "/index")//
+            .forResource(ub.build(table.getDatasourceName(), table.getName()))//
             .withCallback(Response.SC_OK, callback)//
             .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
       }
