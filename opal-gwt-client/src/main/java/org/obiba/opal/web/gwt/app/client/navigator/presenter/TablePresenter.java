@@ -712,7 +712,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
       getView().setFromTables(viewDto.getFromArray());
 
-      fromTablesSize = getView().getFromTablesAnchor().size();
       // Add click handlers
       for(Anchor tableLink : getView().getFromTablesAnchor()) {
         updateFromTableLink(tableLink);
