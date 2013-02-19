@@ -31,7 +31,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
@@ -71,8 +70,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private static final int DEFAULT_PAGE_SIZE = 20;
 
   @UiTemplate("ValuesTableView.ui.xml")
-  interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {
-  }
+  interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {}
 
   private static final ValuesTableViewUiBinder uiBinder = GWT.create(ValuesTableViewUiBinder.class);
 
@@ -203,27 +201,31 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void setTable(TableDto table) {
-    this.table = table;
-    valuesTable.setRowCount(table.getValueSetCount());
-    valuesTable.setPageStart(0);
+    if(table == null) {
+      valuesTable.setRowCount(0);
+      setRefreshing(true);
+    } else {
+      this.table = table;
+      valuesTable.setRowCount(table.getValueSetCount());
+      valuesTable.setPageStart(0);
 
-    if(dataProvider != null) {
-      dataProvider.removeDataDisplay(valuesTable);
-      dataProvider = null;
+      if(dataProvider != null) {
+        dataProvider.removeDataDisplay(valuesTable);
+        dataProvider = null;
+      }
+
+      searchBox.setText("");
+      filter.setText("");
+      lastFilter = "";
+      filter.setValue(lastFilter, false);
+      setRefreshing(false);
     }
-
-    searchBox.setText("");
-    filter.setText("");
-    lastFilter = "";
-    filter.setValue(lastFilter, false);
-    setRefreshing(false);
   }
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
     setVariables(JsArrays.toList(variables));
   }
-
 
   private String escape(String string) {
     return string.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
@@ -244,7 +246,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     viewMode = mode;
     searchPanel.setVisible(viewMode == ValuesTablePresenter.ViewMode.DETAILED_MODE);
 
-    if (listVariable != null && !listVariable.isEmpty()) {
+    if(listVariable != null && !listVariable.isEmpty()) {
       setTable(table);
       setVariables(listVariable);
     }
@@ -320,7 +322,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
     firstVisibleIndex = 0;
 
-    Column<ValueSetDto, ?> entityColumn = viewMode == ValuesTablePresenter.ViewMode.SIMPLE_MODE ? createTextEntityColumn() : createClickableEntityColumn();
+    Column<ValueSetDto, ?> entityColumn = viewMode == ValuesTablePresenter.ViewMode.SIMPLE_MODE
+        ? createTextEntityColumn()
+        : createClickableEntityColumn();
 
     setMinimumWidth(entityColumn);
 
@@ -433,7 +437,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         timer.cancel();
       }
       if(navigationPopup.isShowing()) return;
-
       navigate(1);
       refreshRows();
     }
@@ -554,8 +557,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   }
 
-  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements
-      ValuesTablePresenter.ValueSetsProvider {
+  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto>
+      implements ValuesTablePresenter.ValueSetsProvider {
 
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
