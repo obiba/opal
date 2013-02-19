@@ -319,8 +319,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   public interface ValueSetsProvider {
     void populateValues(int offset, ValueSetsDto valueSets);
-
-    void clearValues();
   }
 
   public interface EntitySelectionHandler {

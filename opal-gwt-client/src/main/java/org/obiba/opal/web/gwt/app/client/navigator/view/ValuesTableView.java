@@ -585,11 +585,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
       updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
     }
-
-    @Override
-    public void clearValues() {
-      valuesTable.setRowCount(0);
-    }
   }
 
   private final class VariableValueSelectionHandler implements ValueSelectionHandler {
