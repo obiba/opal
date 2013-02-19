@@ -52,6 +52,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -66,6 +67,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -96,16 +98,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private boolean cancelIndexation = false;
 
-  //private boolean indexNow = false;
-
-  private final Provider<AuthorizationPresenter> authorizationPresenter;
+  private Provider<AuthorizationPresenter> authorizationPresenter;
 
   @Inject
   private CodingViewDialogPresenter codingViewDialogPresenter;
 
-  private final ValuesTablePresenter valuesTablePresenter;
+  private ValuesTablePresenter valuesTablePresenter;
 
-  private final Provider<IndexPresenter> indexPresenter;
+  private Provider<IndexPresenter> indexPresenter;
 
   private Runnable removeConfirmation;
 
@@ -174,6 +174,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
 
     //Link actions: CLEAR
+    final UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}", "index");
     getView().getClear().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -193,7 +194,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index")//
+            .forResource(ub.build(table.getDatasourceName(), table.getName()))//
             .withCallback(Response.SC_OK, callback)//
             .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
       }
@@ -218,7 +219,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index")//
+            .forResource(ub.build(table.getDatasourceName(), table.getName()))//
             .withCallback(Response.SC_OK, callback)//
             .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
       }
@@ -347,9 +348,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     if(tableIsView()) {
       getView().setViewDownloadCommand(new DownloadViewCommand());
       getView().setEditCommand(new EditCommand());
+
+      // Show from tables
+      ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
+          .withCallback(new ViewResourceCallback()).send();
     } else {
       getView().setViewDownloadCommand(null);
       getView().setEditCommand(null);
+      getView().setFromTables(null);
     }
 
     updateIndexStatus();
@@ -441,7 +447,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     return table.hasViewLink();
   }
 
-  final class ValuesCommand implements Command {
+  private final class ValuesCommand implements Command {
 
     @Override
     public void execute() {
@@ -516,21 +522,21 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  final class NextCommand implements Command {
+  private final class NextCommand implements Command {
     @Override
     public void execute() {
       getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
     }
   }
 
-  final class PreviousCommand implements Command {
+  private final class PreviousCommand implements Command {
     @Override
     public void execute() {
       getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
     }
   }
 
-  final class ParentCommand implements Command {
+  private final class ParentCommand implements Command {
     @Override
     public void execute() {
       UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
@@ -545,28 +551,28 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  final class ExcelDownloadCommand implements Command {
+  private final class ExcelDownloadCommand implements Command {
     @Override
     public void execute() {
       downloadMetadata();
     }
   }
 
-  final class ExportDataCommand implements Command {
+  private final class ExportDataCommand implements Command {
     @Override
     public void execute() {
       getEventBus().fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, table));
     }
   }
 
-  final class CopyDataCommand implements Command {
+  private final class CopyDataCommand implements Command {
     @Override
     public void execute() {
       getEventBus().fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, table));
     }
   }
 
-  final class DownloadViewCommand implements Command {
+  private final class DownloadViewCommand implements Command {
     @Override
     public void execute() {
       String downloadUrl = table.getViewLink() + "/xml";
@@ -574,7 +580,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  final class RemoveCommand implements Command {
+  private final class RemoveCommand implements Command {
     @Override
     public void execute() {
       removeConfirmation = new Runnable() {
@@ -597,7 +603,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  final class CreateCodingViewCommand implements Command {
+  private final class CreateCodingViewCommand implements Command {
 
     @Override
     public void execute() {
@@ -607,7 +613,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
+  private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
@@ -618,7 +624,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  final class EditCommand implements Command {
+  private final class EditCommand implements Command {
     @Override
     public void execute() {
       UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "view", table.getName());
@@ -636,7 +642,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  class TableIndexStatusUnavailableCallback implements ResponseCodeCallback {
+  private class TableIndexStatusUnavailableCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().setIndexStatusVisible(false);
@@ -652,7 +658,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
-//        GWT.log(statusDto.getStatus().getName());
         getView().setIndexStatusAlert(statusDto);
 
         // Refetch if in progress
@@ -700,7 +705,55 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  class TableSelectionChangeHandler implements TableSelectionChangeEvent.Handler {
+  private class ViewResourceCallback implements ResourceCallback<JsArray<ViewDto>> {
+
+    @Override
+    public void onResource(Response response, JsArray<ViewDto> resource) {
+      ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
+      getView().setFromTables(viewDto.getFromArray());
+
+      fromTablesSize = getView().getFromTablesAnchor().size();
+      // Add click handlers
+      for(Anchor tableLink : getView().getFromTablesAnchor()) {
+        updateFromTableLink(tableLink);
+      }
+    }
+  }
+
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
+  private void updateFromTableLink(Anchor tableLink) {
+    String[] s = tableLink.getText().split("\\.");
+    UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}");
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(s[0], s[1])).get()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // nothing
+          }
+        }, SC_NOT_FOUND).withCallback(new TableResourceCallback(tableLink)).send();
+  }
+
+  class TableResourceCallback implements ResourceCallback<TableDto> {
+
+    private final Anchor link;
+
+    TableResourceCallback(Anchor link) {
+      this.link = link;
+    }
+
+    @Override
+    public void onResource(Response response, final TableDto resource) {
+      link.setVisible(true);
+      link.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          getEventBus().fireEvent(new TableSelectionChangeEvent(TablePresenter.this, resource));
+        }
+      });
+    }
+  }
+
+  private class TableSelectionChangeHandler implements TableSelectionChangeEvent.Handler {
     @Override
     public void onTableSelectionChanged(TableSelectionChangeEvent event) {
       updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
@@ -708,7 +761,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
+  private class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
       getEventBus().fireEvent(
@@ -716,7 +769,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  class SiblingVariableSelectionHandler implements SiblingVariableSelectionEvent.Handler {
+  private class SiblingVariableSelectionHandler implements SiblingVariableSelectionEvent.Handler {
     @Override
     public void onSiblingVariableSelection(SiblingVariableSelectionEvent event) {
 
@@ -742,7 +795,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   // OPAL-975
-  class ViewSavedEventHandler implements ViewSavedEvent.Handler {
+  private class ViewSavedEventHandler implements ViewSavedEvent.Handler {
 
     @Override
     public void onViewSaved(ViewSavedEvent event) {
@@ -850,6 +903,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasClickHandlers getIndexNow();
 
     HasClickHandlers getScheduleIndexing();
+
+    void setFromTables(JsArrayString tables);
+
+    List<Anchor> getFromTablesAnchor();
   }
 
 }

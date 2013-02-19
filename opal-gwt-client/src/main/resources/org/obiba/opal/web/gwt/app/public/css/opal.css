@@ -2308,10 +2308,16 @@ a.icon:hover {
 
 /* Index status progress bar */
 .indexStatusProgressBar {
-  display: table-cell;
   width: 100px;
+  margin-bottom: 0px;
 }
 
 .indexStatusAction {
   text-decoration: underline;
+}
+
+/* Views from tables */
+.disabledLink:hover {
+  text-decoration: none;
+  cursor: default;
 }
