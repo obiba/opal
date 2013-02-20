@@ -606,7 +606,7 @@
 
     </g:DisclosurePanel>
     <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"></c:SimplePager>
-    <o:Table ui:field="valuesTable" addStyleNames="full-width left-aligned values-table"></o:Table>
+    <o:Table ui:field="valuesTable" addStyleNames="full-width left-aligned"></o:Table>
   </g:FlowPanel>
 
 </ui:UiBinder>
