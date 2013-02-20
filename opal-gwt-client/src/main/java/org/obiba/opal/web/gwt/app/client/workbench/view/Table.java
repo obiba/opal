@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -22,7 +22,7 @@ public class Table<T> extends CellTable<T> {
 
   public static final int DEFAULT_PAGESIZE = 15;
 
-  private static final TableResources resources = GWT.<TableResources> create(TableResources.class);
+  private static final TableResources resources = GWT.create(TableResources.class);
 
   public interface TableResources extends CellTable.Resources {
     @NotStrict
