@@ -27,7 +27,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.ValueUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
@@ -94,7 +93,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                 public void onResource(Response response, JsArray<VariableDto> resource) {
                   if(response.getStatusCode() == SC_OK) {
                     VariableDto dto = VariableDto.get(JsArrays.toSafeArray(resource));
-                    GWT.log(dto.getLink());
                     getEventBus().fireEvent(new VariableSelectionChangeEvent(table, dto));
                   }
                 }
@@ -325,7 +323,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   public enum ViewMode {
     DETAILED_MODE,
     SIMPLE_MODE;
-  };
+  }
+
+  ;
 
   public interface DataFetcher {
     void request(List<VariableDto> variables, int offset, int limit);
