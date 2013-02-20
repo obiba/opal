@@ -30,7 +30,9 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
@@ -40,6 +42,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -135,6 +141,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private int maxVisibleColumns = DEFAULT_MAX_VISIBLE_COLUMNS;
 
   private ValuesTablePresenter.ViewMode viewMode = ValuesTablePresenter.ViewMode.DETAILED_MODE;
+
+  private ValueUpdater<String> updater;
 
   public ValuesTableView() {
     widget = uiBinder.createAndBindUi(this);
@@ -269,6 +277,42 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     return listVariable.get(i).getName();
   }
 
+  static class VariableHeaderHtmlRenderer implements SafeHtmlRenderer<String> {
+    @Override
+    public SafeHtml render(String object) {
+      if(object == null) return SafeHtmlUtils.EMPTY_SAFE_HTML;
+
+      return new SafeHtmlBuilder().appendHtmlConstant("<a>").appendEscaped(object).appendHtmlConstant("</a>")
+          .toSafeHtml();
+    }
+
+    @Override
+    public void render(String object, SafeHtmlBuilder builder) {
+      builder.append(new SafeHtmlBuilder().appendHtmlConstant("<a>").appendEscaped(object).appendHtmlConstant("</a>")
+          .toSafeHtml());
+    }
+  }
+
+  private Header<String> getColumnHeader(final int i) {
+
+    Header<String> header = new Header<String>(new ClickableTextCell(new VariableHeaderHtmlRenderer())) {
+      @Override
+      public String getValue() {
+        GWT.log(listVariable.get(i).getName());
+        return listVariable.get(i).getName();
+      }
+    };
+
+    header.setUpdater(updater);
+
+    return header;
+  }
+
+  @Override
+  public void setVariableLabelFieldUpdater(ValueUpdater<String> updater) {
+    this.updater = updater;
+  }
+
   private VariableDto getVariableAt(int i) {
     return listVariable.get(i);
   }
@@ -294,7 +338,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     listVariable = variables;
     int visible = listVariable.size() < getMaxVisibleColumns() ? listVariable.size() : getMaxVisibleColumns();
     for(int i = 0; i < visible; i++) {
-      valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnLabel(i));
+      valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnHeader(i));
     }
 
     if(listVariable.size() > getMaxVisibleColumns() + 1) {
@@ -437,6 +481,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         timer.cancel();
       }
       if(navigationPopup.isShowing()) return;
+
       navigate(1);
       refreshRows();
     }
@@ -513,7 +558,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         valuesTable.removeColumn(2);
         int idx = firstVisibleIndex++ + getMaxVisibleColumns();
         valuesTable
-            .insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnLabel(idx));
+            .insertColumn(valuesTable.getColumnCount() - 1, createColumn(getVariableAt(idx)), getColumnHeader(idx));
       }
       valuesTable.redrawHeaders();
     }

@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -24,6 +26,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
@@ -35,6 +38,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_OK;
 
 public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display> {
 
@@ -68,7 +72,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setVariables(variables);
   }
 
-  public void setTable(TableDto table, String select) {
+  public void setTable(final TableDto table, String select) {
     if(table == null) {
       getView().setTable(null);
     } else {
@@ -76,6 +80,26 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       this.table = table;
 
       getView().setTable(table);
+      getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
+        @Override
+        public void update(String value) {
+          // Get the variable
+          UriBuilder uriBuilder = UriBuilder.create()
+              .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", value);
+
+          ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
+              .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+                @Override
+                public void onResource(Response response, JsArray<VariableDto> resource) {
+                  if(response.getStatusCode() == SC_OK) {
+                    VariableDto dto = VariableDto.get(JsArrays.toSafeArray(resource));
+                    getEventBus().fireEvent(new VariableSelectionChangeEvent(table, dto));
+                  }
+                }
+
+              }).send();
+        }
+      });
       fetcher.updateVariables(select);
     }
   }
@@ -84,7 +108,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   protected void onBind() {
     super.onBind();
     getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
-//    getView().getValueSetsProvider().clearValues();
     getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
   }
 
@@ -294,6 +317,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void addEntitySearchHandler(EntitySearchHandler handler);
 
     void setViewMode(ViewMode mode);
+
+    void setVariableLabelFieldUpdater(ValueUpdater<String> updater);
   }
 
   public enum ViewMode {
