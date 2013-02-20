@@ -292,6 +292,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         variablesRequest.cancel();
         variablesRequest = null;
       }
+      setTable(null);
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
           .withCallback(new VariablesResourceCallback(table))
           .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
