@@ -116,7 +116,7 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
   }
 
   private boolean hasTableAccess(ValueTable vt) {
-    return MagmaEngine.get().hasDatasource(vt.getDatasource().getName()) &&
+    return vt != null && vt.getDatasource() != null && MagmaEngine.get().hasDatasource(vt.getDatasource().getName()) &&
         MagmaEngine.get().getDatasource(vt.getDatasource().getName()).hasValueTable(vt.getName());
   }
 }
