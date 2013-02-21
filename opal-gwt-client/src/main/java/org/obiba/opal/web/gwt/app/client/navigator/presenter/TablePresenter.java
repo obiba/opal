@@ -154,7 +154,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     addEventHandlers();
   }
 
-  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+  @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
     registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     registerHandler(
@@ -343,7 +343,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateDisplay(TableDto tableDto, String previous, String next) {
     table = tableDto;
     this.previous = previous;
@@ -363,15 +362,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     if(tableIsView()) {
       getView().setViewDownloadCommand(new DownloadViewCommand());
       getView().setEditCommand(new EditCommand());
+      showFromTables(tableDto);
 
-      // Show from tables
-      ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
-          .withCallback(new ViewResourceCallback()).withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          // Nothing
-        }
-      }).send();
     } else {
       getView().setViewDownloadCommand(null);
       getView().setEditCommand(null);
@@ -379,8 +371,16 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
 
     updateVariables();
+    updateTableIndexStatus();
 
-    // Check if service is enabled
+  }
+
+  private void showFromTables(TableDto tableDto) {// Show from tables
+    ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
+        .withCallback(new ViewResourceCallback()).send();
+  }
+
+  private void updateTableIndexStatus() {// Check if service is enabled
     getView().setIndexStatusVisible(false);
     ResourceRequestBuilderFactory.<JsArray<ServiceDto>>newBuilder().forResource("/service/search").get()
         .withCallback(new ResourceCallback<JsArray<ServiceDto>>() {

@@ -75,15 +75,7 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
 
-    ValueTable from = view.getWrappedValueTable();
-    if(from instanceof JoinTable) {
-      List<ValueTable> fromTables = ((JoinTable) from).getTables();
-      for(ValueTable vt : fromTables) {
-        if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
-      }
-    } else {
-      if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
-    }
+    setFromTables(view, viewDtoBuilder);
 
     VariableListViewDto.Builder listDtoBuilder = VariableListViewDto.newBuilder();
     for(Variable v : view.getVariables()) {
@@ -96,6 +88,18 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
     viewDtoBuilder.setExtension(VariableListViewDto.view, listDtoBuilder.build());
 
     return viewDtoBuilder.build();
+  }
+
+  private void setFromTables(View view, ViewDto.Builder viewDtoBuilder) {
+    ValueTable from = view.getWrappedValueTable();
+    if(from instanceof JoinTable) {
+      List<ValueTable> fromTables = ((JoinTable) from).getTables();
+      for(ValueTable vt : fromTables) {
+        if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
+      }
+    } else {
+      if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
+    }
   }
 
   String toStringReference(ValueTable vt) {
