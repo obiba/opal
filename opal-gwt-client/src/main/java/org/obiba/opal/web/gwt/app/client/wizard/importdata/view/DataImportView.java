@@ -36,6 +36,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -88,6 +89,18 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @UiField
   WizardStep archiveStep;
+
+  @UiField
+  FlowPanel helpCsv;
+
+  @UiField
+  FlowPanel helpOpalXml;
+
+  @UiField
+  FlowPanel helpLimeSurvey;
+
+  @UiField
+  FlowPanel helpOpalRest;
 
   @UiField
   HTMLPanel formatSelectionHelp;
@@ -336,4 +349,26 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     dialog.setProgress(false);
   }
 
+  @Override
+  public void updateHelp() {
+    helpCsv.setVisible(false);
+    helpOpalXml.setVisible(false);
+    helpLimeSurvey.setVisible(false);
+    helpOpalRest.setVisible(false);
+
+    switch(getImportFormat()) {
+      case CSV:
+        helpCsv.setVisible(true);
+        break;
+      case XML:
+        helpOpalXml.setVisible(true);
+        break;
+      case LIMESURVEY:
+        helpLimeSurvey.setVisible(true);
+        break;
+      case REST:
+        helpOpalRest.setVisible(true);
+        break;
+    }
+  }
 }
