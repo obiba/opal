@@ -200,6 +200,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateFormatStepDisplay() {
     destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
+    getView().updateHelp();
     switch(getView().getImportFormat()) {
       case CSV:
         csvFormatStepPresenter.clear();
@@ -456,6 +457,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     ImportFormat getImportFormat();
+
+    void updateHelp();
 
     void setImportDataInputsHandler(ImportDataInputsHandler handler);
 
