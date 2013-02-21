@@ -366,7 +366,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
       // Show from tables
       ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
-          .withCallback(new ViewResourceCallback()).send();
+          .withCallback(new ViewResourceCallback()).withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          // Nothing
+        }
+      }).send();
     } else {
       getView().setViewDownloadCommand(null);
       getView().setEditCommand(null);
@@ -754,7 +759,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     String[] s = tableLink.getText().split("\\.");
     UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(s[0], s[1])).get()
-        .withCallback(new TableResourceCallback(tableLink)).send();
+        .withCallback(new TableResourceCallback(tableLink)).withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        // Nothing table does not exists
+      }
+    }).send();
   }
 
   class TableResourceCallback implements ResourceCallback<TableDto> {
