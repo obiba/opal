@@ -301,14 +301,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       for(int i = 0; i < tableNames.length(); i++) {
         Anchor a = new Anchor();
         a.setText(tableNames.get(i));
-        // default not visible, show if we have the rights
-        a.setVisible(false);
         fromTableLinks.add(a);
 
         tables.add(a);
 
         if(i < tableNames.length() - 1) {
-          Label l = new Label("  ");
+          Label l = new Label(", ");
           l.addStyleName("inline");
           fromTableLinks.add(l);
         }
