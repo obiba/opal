@@ -33,11 +33,11 @@
 
     <!-- R dependencies -->
     <dependency>
-      <groupId>org.rosuda</groupId>
-      <artifactId>RserveEngine</artifactId>
+      <groupId>net.rforge</groupId>
+      <artifactId>Rserve</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.rosuda</groupId>
+      <groupId>net.rforge</groupId>
       <artifactId>REngine</artifactId>
     </dependency>
   </dependencies>
