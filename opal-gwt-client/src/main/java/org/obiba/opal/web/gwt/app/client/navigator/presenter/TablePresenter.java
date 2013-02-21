@@ -154,7 +154,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     addEventHandlers();
   }
 
-  @SuppressWarnings({ "OverlyLongMethod" })
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   private void addEventHandlers() {
     registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     registerHandler(
@@ -343,6 +343,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateDisplay(TableDto tableDto, String previous, String next) {
     table = tableDto;
     this.previous = previous;
