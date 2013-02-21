@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma.view;
 
 import java.util.List;
 
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.ValueTableReference;
@@ -63,10 +64,10 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     if(from instanceof JoinTable) {
       List<ValueTable> fromTables = ((JoinTable) from).getTables();
       for(ValueTable vt : fromTables) {
-        viewDtoBuilder.addFrom(toStringReference(vt));
+        if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
       }
     } else {
-      viewDtoBuilder.addFrom(toStringReference(from));
+      if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
     }
 
     JavaScriptViewDto.Builder jsDtoBuilder = JavaScriptViewDto.newBuilder();
@@ -92,5 +93,10 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
   @Override
   public TableDto asTableDto(ViewDto viewDto, org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder) {
     throw new UnsupportedOperationException();
+  }
+
+  private boolean hasTableAccess(ValueTable vt) {
+    return MagmaEngine.get().hasDatasource(vt.getDatasource().getName()) &&
+        MagmaEngine.get().getDatasource(vt.getDatasource().getName()).hasValueTable(vt.getName());
   }
 }
