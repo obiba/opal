@@ -60,15 +60,7 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
 
-    ValueTable from = view.getWrappedValueTable();
-    if(from instanceof JoinTable) {
-      List<ValueTable> fromTables = ((JoinTable) from).getTables();
-      for(ValueTable vt : fromTables) {
-        if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
-      }
-    } else {
-      if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
-    }
+    setFromTables(view, viewDtoBuilder);
 
     JavaScriptViewDto.Builder jsDtoBuilder = JavaScriptViewDto.newBuilder();
     if(view.getSelectClause() instanceof JavascriptClause) {
@@ -81,6 +73,18 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     viewDtoBuilder.setExtension(JavaScriptViewDto.view, jsDtoBuilder.build());
 
     return viewDtoBuilder.build();
+  }
+
+  private void setFromTables(View view, ViewDto.Builder viewDtoBuilder) {
+    ValueTable from = view.getWrappedValueTable();
+    if(from instanceof JoinTable) {
+      List<ValueTable> fromTables = ((JoinTable) from).getTables();
+      for(ValueTable vt : fromTables) {
+        if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
+      }
+    } else {
+      if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
+    }
   }
 
   String toStringReference(ValueTable vt) {
@@ -96,7 +100,7 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
   }
 
   private boolean hasTableAccess(ValueTable vt) {
-    return MagmaEngine.get().hasDatasource(vt.getDatasource().getName()) &&
+    return vt != null && vt.getDatasource() != null && MagmaEngine.get().hasDatasource(vt.getDatasource().getName()) &&
         MagmaEngine.get().getDatasource(vt.getDatasource().getName()).hasValueTable(vt.getName());
   }
 }
