@@ -46,6 +46,8 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
+import org.obiba.opal.web.model.client.opal.ServiceDto;
+import org.obiba.opal.web.model.client.opal.ServiceStatus;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -54,6 +56,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -68,6 +71,7 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -81,6 +85,7 @@ import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
+import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
@@ -149,7 +154,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     addEventHandlers();
   }
 
-  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+  @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
     registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     registerHandler(
@@ -178,13 +183,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().getClear().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        ResponseCodeCallback callback = new ResponseCodeCallback() {
+        showWaitCursor();
 
+        ResponseCodeCallback callback = new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             if(response.getStatusCode() == SC_OK) {
               updateIndexStatus();
             } else {
+              showDefaultCursor();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
@@ -195,13 +202,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
             .forResource(ub.build(table.getDatasourceName(), table.getName()))//
-            .withCallback(Response.SC_OK, callback)//
-            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
+            .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).delete().send();
       }
     });
     getView().getCancel().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
+        showWaitCursor();
+
         ResponseCodeCallback callback = new ResponseCodeCallback() {
 
           @Override
@@ -210,6 +218,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
               cancelIndexation = true;
               updateIndexStatus();
             } else {
+              showDefaultCursor();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
@@ -220,8 +229,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
             .forResource(ub.build(table.getDatasourceName(), table.getName()))//
-            .withCallback(Response.SC_OK, callback)//
-            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
+            .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).delete().send();
       }
     });
 
@@ -229,6 +237,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().getIndexNow().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
+        showWaitCursor();
+
         ResponseCodeCallback callback = new ResponseCodeCallback() {
 
           @Override
@@ -244,6 +254,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
               // Schedule the timer to run once in 0.5 seconds.
               t.schedule(DELAY_MILLIS);
             } else {
+              showDefaultCursor();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
@@ -254,8 +265,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
             .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index")//
-            .withCallback(Response.SC_OK, callback) //
-            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).put().send();
+            .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).put().send();
       }
     });
 
@@ -274,6 +284,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
     });
   }
+
+  private void showWaitCursor() {RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.WAIT);}
+
+  private void showDefaultCursor() {RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.DEFAULT);}
 
   @Override
   protected void onReveal() {
@@ -329,7 +343,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateDisplay(TableDto tableDto, String previous, String next) {
     table = tableDto;
     this.previous = previous;
@@ -349,18 +362,36 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     if(tableIsView()) {
       getView().setViewDownloadCommand(new DownloadViewCommand());
       getView().setEditCommand(new EditCommand());
+      showFromTables(tableDto);
 
-      // Show from tables
-      ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
-          .withCallback(new ViewResourceCallback()).send();
     } else {
       getView().setViewDownloadCommand(null);
       getView().setEditCommand(null);
       getView().setFromTables(null);
     }
 
-    updateIndexStatus();
     updateVariables();
+    updateTableIndexStatus();
+
+  }
+
+  private void showFromTables(TableDto tableDto) {// Show from tables
+    ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
+        .withCallback(new ViewResourceCallback()).send();
+  }
+
+  private void updateTableIndexStatus() {// Check if service is enabled
+    getView().setIndexStatusVisible(false);
+    ResourceRequestBuilderFactory.<JsArray<ServiceDto>>newBuilder().forResource("/service/search").get()
+        .withCallback(new ResourceCallback<JsArray<ServiceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<ServiceDto> resource) {
+            ServiceDto serviceStatusDto = ServiceDto.get(JsArrays.toSafeArray(resource));
+            if(serviceStatusDto.getStatus().isServiceStatus(ServiceStatus.RUNNING)) {
+              updateIndexStatus();
+            }
+          }
+        }).send();
   }
 
   private void updateIndexStatus() {
@@ -647,6 +678,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().setIndexStatusVisible(false);
+      showDefaultCursor();
     }
   }
 
@@ -655,6 +687,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
       if(response.getStatusCode() == SC_OK) {
+        getView().setIndexStatusVisible(true);
         getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
         getView().setIndexStatusAlert(statusDto);
@@ -671,6 +704,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
           // Schedule the timer to run once in 2 seconds.
           t.schedule(DELAY_MILLIS);
+        } else {
+          showDefaultCursor();
         }
 //        else if (cancelIndexation && statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())){
 //          // wait for the cancel event to propagate and refresh
@@ -678,6 +713,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 //        }
       } else {
         getView().setIndexStatusVisible(false);
+        showDefaultCursor();
       }
     }
   }
@@ -723,7 +759,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     String[] s = tableLink.getText().split("\\.");
     UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(s[0], s[1])).get()
-        .withCallback(new TableResourceCallback(tableLink)).send();
+        .withCallback(new TableResourceCallback(tableLink)).withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        // Nothing table does not exists
+      }
+    }).send();
   }
 
   class TableResourceCallback implements ResourceCallback<TableDto> {

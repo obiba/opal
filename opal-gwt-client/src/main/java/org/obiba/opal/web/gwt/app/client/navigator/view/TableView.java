@@ -298,6 +298,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     } else {
       fromTable.setVisible(true);
       fromTableLinks.clear();
+      tables.clear();
       for(int i = 0; i < tableNames.length(); i++) {
         Anchor a = new Anchor();
         a.setText(tableNames.get(i));
