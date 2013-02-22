@@ -332,11 +332,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
         .authorize(getView().getTableIndexStatusAuthorizer()).send();
 
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink()).get()
-        .authorize(CascadingAuthorizer.newBuilder()//
-            .and(table.getLink() + "/index", HttpMethod.DELETE)//
-            .authorize(getView().getTableIndexEditAuthorizer()).build())//
-        .send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
+        .authorize(getView().getTableIndexEditAuthorizer()).send();
 
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
@@ -372,7 +369,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
 
     updateVariables();
-    updateIndexStatus();
+    updateTableIndexStatus();
+
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables
@@ -380,8 +378,11 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .withCallback(new ViewResourceCallback()).send();
   }
 
+  private void updateTableIndexStatus() {// Check if service is enabled
+    updateIndexStatus();
+  }
+
   private void updateIndexStatus() {
-    getView().setIndexStatusVisible(false);
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
         .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index").get()
         .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND)
@@ -675,6 +676,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
+        getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
         getView().setIndexStatusAlert(statusDto);
 
@@ -694,7 +696,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
           showDefaultCursor();
         }
       } else {
-        getView().setIndexStatusVisible(false);
         showDefaultCursor();
       }
     }
