@@ -31,3 +31,9 @@ message RScriptDataShieldMethodDto {
     optional RScriptDataShieldMethodDto method = 1001;
   }
 }
+
+message DataShieldPackageMethodsDto {
+  required string name = 1;
+  repeated DataShieldMethodDto aggregate = 2;
+  repeated DataShieldMethodDto assign = 3;
+}

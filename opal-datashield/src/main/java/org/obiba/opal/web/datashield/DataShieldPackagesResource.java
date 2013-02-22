@@ -62,8 +62,7 @@ public class DataShieldPackagesResource extends RPackageResource {
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
       @QueryParam("ref") String ref) {
-    RScriptROperation rop = installDatashieldPackage(name, ref);
-    // TODO check it worked
+    installDatashieldPackage(name, ref);
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
     return Response.created(ub.build(name)).build();
   }

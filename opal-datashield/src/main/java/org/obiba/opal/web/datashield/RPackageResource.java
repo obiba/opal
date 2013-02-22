@@ -40,8 +40,10 @@ public abstract class RPackageResource {
 
   private static final Logger log = LoggerFactory.getLogger(RPackageResource.class);
 
+  protected static final String AGGREGATE_METHODS = "AggregateMethods";
+  protected static final String ASSIGN_METHODS = "AssignMethods";
   private static final String[] defaultFields = new String[] { "Title", "Description", "Author", "Maintainer",
-      "Date/Publication", "AggregateMethods", "AssignMethods" };
+      "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS};
 
   private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", "http://cran.datashield.org",
       "http://cran.rstudio.com" };
