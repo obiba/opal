@@ -512,14 +512,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       public void authorized() {
         super.authorized();
         TableView.this.hasLinkAuthorization = true;
-        GWT.log("AUTHORIZED");
       }
 
       @Override
       public void unauthorized() {
         super.unauthorized();    //To change body of overridden methods use File | Settings | File Templates.
         TableView.this.hasLinkAuthorization = false;
-        GWT.log("UNAUTHORIZED");
       }
     };
   }
