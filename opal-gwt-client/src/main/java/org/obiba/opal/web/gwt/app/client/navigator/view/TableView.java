@@ -82,6 +82,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   private List<Anchor> tables = new ArrayList<Anchor>();
 
+  private boolean hasLinkAuthorization = true;
+
   @UiField
   FlowPanel toolbarPanel;
 
@@ -497,17 +499,28 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     return new TabAuthorizer(tabs, PERMISSIONS_TAB_INDEX);
   }
 
-//  @Override
-//  public HasAuthorization getTableIndexStatusAuthorizer() {
-//    return new UIObjectAuthorizer(indexStatus);
-//  }
-//
-//  @Override
-//  public HasAuthorization getTableIndexEditAuthorizer() {
-//    return new CompositeAuthorizer(new UIObjectAuthorizer(clearIndexLink), new UIObjectAuthorizer(indexNowLink),
-//        new UIObjectAuthorizer(scheduleLink), new UIObjectAuthorizer(cancelLink));
-//
-//  }
+  @Override
+  public HasAuthorization getTableIndexStatusAuthorizer() {
+    return new UIObjectAuthorizer(indexStatus);
+  }
+
+  @Override
+  public HasAuthorization getTableIndexEditAuthorizer() {
+    return new CompositeAuthorizer(new UIObjectAuthorizer(clearIndexLink), new UIObjectAuthorizer(indexNowLink),
+        new UIObjectAuthorizer(scheduleLink), new UIObjectAuthorizer(cancelLink)) {
+      @Override
+      public void authorized() {
+        super.authorized();
+        TableView.this.hasLinkAuthorization = true;
+      }
+
+      @Override
+      public void unauthorized() {
+        super.unauthorized();    //To change body of overridden methods use File | Settings | File Templates.
+        TableView.this.hasLinkAuthorization = false;
+      }
+    };
+  }
 
   @Override
   public String getClickableColumnName(Column<?, ?> column) {
@@ -564,11 +577,14 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       boolean cancel, boolean progressBar) {
     indexStatusText.setText(text);
     indexStatusAlert.setType(type);
-    clearIndexLink.setVisible(clear);
-    indexNowLink.setVisible(indexNow);
-    scheduleLink.setVisible(schedule);
-    cancelLink.setVisible(cancel);
-    progress.setVisible(progressBar);
+
+    if(hasLinkAuthorization) {
+      clearIndexLink.setVisible(clear);
+      indexNowLink.setVisible(indexNow);
+      scheduleLink.setVisible(schedule);
+      cancelLink.setVisible(cancel);
+      progress.setVisible(progressBar);
+    }
   }
 
   private void setProgressBar(boolean progressBar, int percent) {

@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -26,6 +27,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.http.HttpHeaders;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Maps;
@@ -46,6 +48,7 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.OpalMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -65,7 +68,13 @@ public class ValueTableIndexResource extends IndexResource {
     super(indexManager, configService, esProvider, synchroManager);
   }
 
+  @OPTIONS
+  public Response getOptions() {
+    return Response.ok().header(HttpHeaders.ALLOW, HttpMethod.GET).header(HttpHeaders.ALLOW, HttpMethod.DELETE).build();
+  }
+
   @GET
+  @Path("/")
   public Opal.TableIndexStatusDto getTableStatus() throws SearchServiceException {
     if(esProvider.isEnabled()) {
       ValueTable valueTable = getValueTable(datasource, table);
@@ -109,6 +118,7 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @DELETE
+  @Path("/")
   public Response deleteIndex() {
     if(esProvider.isEnabled()) {
 
@@ -118,8 +128,7 @@ public class ValueTableIndexResource extends IndexResource {
           synchroManager.getCurrentTask().getValueTable().getDatasource().getName().equals(datasource)) {
         // Stop task
         synchroManager.stopTask();
-      }
-      else{
+      } else {
         getValueTableIndex(datasource, table).delete();
       }
 
@@ -130,14 +139,14 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @GET
-  @Path("/schedule")
+  @Path("schedule")
   public Opal.ScheduleDto getSchedule() {
 
     return getScheduleDto(datasource, table);
   }
 
   @DELETE
-  @Path("/schedule")
+  @Path("schedule")
   public Response deleteSchedule() {
 
     configService.getConfig().removeSchedule(getValueTable(datasource, table));
@@ -146,7 +155,7 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @PUT
-  @Path("/schedule")
+  @Path("schedule")
   public Response setSchedule(Opal.ScheduleDto scheduleDto) {
 
     Schedule schedule = new Schedule();

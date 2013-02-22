@@ -46,8 +46,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
-import org.obiba.opal.web.model.client.opal.ServiceDto;
-import org.obiba.opal.web.model.client.opal.ServiceStatus;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -331,12 +329,11 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .authorize(getView().getValuesAuthorizer()).send();
 
     // Table indexation status
-//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
-//        .authorize(getView().getTableIndexStatusAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
+        .authorize(getView().getTableIndexStatusAuthorizer()).send();
 
-//    GWT.log(table.getLink());
-//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
-//        .authorize(getView().getTableIndexEditAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
+        .authorize(getView().getTableIndexEditAuthorizer()).send();
 
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
@@ -382,17 +379,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateTableIndexStatus() {// Check if service is enabled
-    getView().setIndexStatusVisible(false);
-    ResourceRequestBuilderFactory.<JsArray<ServiceDto>>newBuilder().forResource("/service/search").get()
-        .withCallback(new ResourceCallback<JsArray<ServiceDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<ServiceDto> resource) {
-            ServiceDto serviceStatusDto = ServiceDto.get(JsArrays.toSafeArray(resource));
-            if(serviceStatusDto.getStatus().isServiceStatus(ServiceStatus.RUNNING)) {
-              updateIndexStatus();
-            }
-          }
-        }).send();
+    updateIndexStatus();
   }
 
   private void updateIndexStatus() {
@@ -708,12 +695,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         } else {
           showDefaultCursor();
         }
-//        else if (cancelIndexation && statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())){
-//          // wait for the cancel event to propagate and refresh
-//          updateIndexStatus();
-//        }
       } else {
-        getView().setIndexStatusVisible(false);
         showDefaultCursor();
       }
     }
@@ -916,9 +898,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     HasAuthorization getPermissionsAuthorizer();
 
-//    HasAuthorization getTableIndexStatusAuthorizer();
-//
-//    HasAuthorization getTableIndexEditAuthorizer();
+    HasAuthorization getTableIndexStatusAuthorizer();
+
+    HasAuthorization getTableIndexEditAuthorizer();
 
     String getClickableColumnName(Column<?, ?> column);
 
