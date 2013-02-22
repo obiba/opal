@@ -43,7 +43,7 @@ public abstract class RPackageResource {
   private static final String[] defaultFields = new String[] { "Title", "Description", "Author", "Maintainer",
       "Date/Publication", "AggregateMethods", "AssignMethods" };
 
-  private static final String[] defaultRepos = new String[] { "http://cran.obiba.org/stable",
+  private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", "http://cran.datashield.org",
       "http://cran.rstudio.com" };
 
   protected final OpalRService opalRService;
@@ -74,21 +74,25 @@ public abstract class RPackageResource {
 
   protected RScriptROperation installDatashieldPackage(String name, String ref) {
     String cmd;
-    if (Strings.isNullOrEmpty(ref)) {
+    if(Strings.isNullOrEmpty(ref)) {
       cmd = getInstallPackagesCommand(name);
     } else {
-      cmd = getInstallGitHubCommand(name,"datashield",ref);
+      execute(getInstallDevtoolsPackageCommand());
+      cmd = getInstallGitHubCommand(name, "datashield", ref);
     }
     return execute(cmd);
   }
 
   private String getInstallPackagesCommand(String name) {
     String repos = StringUtils.collectionToDelimitedString(Lists.newArrayList(defaultRepos), ",", "'", "'");
-    return "install.packages('" + name + "', repos=c(" + repos + "))";
+    return "install.packages('" + name + "', repos=c(" + repos + "), dependencies=TRUE)";
+  }
+
+  private String getInstallDevtoolsPackageCommand() {
+    return "if (!require('devtools', character.only=TRUE)) { " + getInstallPackagesCommand("devtools") + " }";
   }
 
   private String getInstallGitHubCommand(String name, String username, String ref) {
-    String repos = StringUtils.collectionToDelimitedString(Lists.newArrayList(defaultRepos), ",", "'", "'");
     return "devtools::install_github('" + name + "', username='" + username + "', ref='" + ref + "')";
   }
 
@@ -136,8 +140,8 @@ public abstract class RPackageResource {
   protected static class DataShieldPackagePredicate implements Predicate<OpalR.RPackageDto> {
     @Override
     public boolean apply(@Nullable OpalR.RPackageDto input) {
-      for (OpalR.EntryDto entry : input.getDescriptionList()) {
-        if (entry.getKey().equals("AggregationMethods") || entry.getKey().equals("AssignMethods")) {
+      for(OpalR.EntryDto entry : input.getDescriptionList()) {
+        if(entry.getKey().equals("AggregationMethods") || entry.getKey().equals("AssignMethods")) {
           return true;
         }
       }
