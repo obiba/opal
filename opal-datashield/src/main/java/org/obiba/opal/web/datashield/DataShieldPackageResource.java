@@ -53,25 +53,14 @@ public class DataShieldPackageResource extends RPackageResource {
     super(opalRService);
   }
 
+  public DataShieldPackageResource(String name, OpalRService opalRService) {
+    super(opalRService);
+    this.name = name;
+  }
+
   @GET
   public OpalR.RPackageDto getPackage() throws REXPMismatchException {
-    RScriptROperation rop = getInstalledPackages();
-    REXP rexp = rop.getResult();
-    final RStringMatrix matrix = new RStringMatrix(rexp);
-
-    Iterator<OpalR.RPackageDto> iter = Iterables
-        .filter(Iterables.transform(matrix.iterateRows(), new StringsToRPackageDto(matrix)),
-            new DataShieldPackagePredicate() {
-              @Override
-              public boolean apply(@Nullable OpalR.RPackageDto input) {
-                return input.getName().equals(name) && super.apply(input);
-              }
-            }).iterator();
-
-    if(iter.hasNext()) {
-      return iter.next();
-    }
-    throw new NoSuchRPackageException(name);
+    return getDatashieldPackage(name);
   }
 
   @GET

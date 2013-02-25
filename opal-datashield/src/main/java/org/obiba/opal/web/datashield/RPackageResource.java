@@ -12,6 +12,7 @@ package org.obiba.opal.web.datashield;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -19,9 +20,12 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.r.RMatrix;
 import org.obiba.opal.r.RScriptROperation;
+import org.obiba.opal.r.RStringMatrix;
 import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.web.datashield.support.NoSuchRPackageException;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -34,7 +38,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
- *
+ * Base class for R package management.
  */
 public abstract class RPackageResource {
 
@@ -105,12 +109,24 @@ public abstract class RPackageResource {
     return rop;
   }
 
-  protected Response asResponse(RScriptROperation rop) {
-    if(rop.hasResult() && rop.hasRawResult()) {
-      return Response.ok().entity(rop.getRawResult().asBytes()).build();
-    } else {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+  protected OpalR.RPackageDto getDatashieldPackage(final String name) throws REXPMismatchException {
+    RScriptROperation rop = getInstalledPackages();
+    REXP rexp = rop.getResult();
+    final RStringMatrix matrix = new RStringMatrix(rexp);
+
+    Iterator<OpalR.RPackageDto> iter = Iterables
+        .filter(Iterables.transform(matrix.iterateRows(), new StringsToRPackageDto(matrix)),
+            new DataShieldPackagePredicate() {
+              @Override
+              public boolean apply(@Nullable OpalR.RPackageDto input) {
+                return input.getName().equals(name) && super.apply(input);
+              }
+            }).iterator();
+
+    if(iter.hasNext()) {
+      return iter.next();
     }
+    throw new NoSuchRPackageException(name);
   }
 
   public class StringsToRPackageDto implements Function<String[], OpalR.RPackageDto> {

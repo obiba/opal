@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.RStringMatrix;
 import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.web.datashield.support.NoSuchRPackageException;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
@@ -61,8 +62,19 @@ public class DataShieldPackagesResource extends RPackageResource {
 
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
-      @QueryParam("ref") String ref) {
+      @QueryParam("ref") String ref) throws REXPMismatchException {
+    // TODO make sure package is a valid Datashield package (i.e. with aggregate/assign methods) before installation
     installDatashieldPackage(name, ref);
+
+    // will throw a NoSuchRPackageException if installation failed
+    try {
+      getDatashieldPackage(name);
+    } catch(NoSuchRPackageException e) {
+      // maybe it was not specifically a Datashield package, so do some clean up
+      removePackage(name);
+      throw e;
+    }
+
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
     return Response.created(ub.build(name)).build();
   }
