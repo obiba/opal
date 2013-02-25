@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.wizard.importvariables.support.DatasourceFileType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErr
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
+import org.obiba.opal.web.model.client.magma.SpssDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -168,14 +170,13 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private final class FileSelectionValidator implements ValidationHandler {
     @Override
     public boolean validate() {
-      if(getView().getSelectedFile().length() > 0 &&
-          (getView().getSelectedFile().endsWith(".xls") || getView().getSelectedFile().endsWith(".xlsx") ||
-              getView().getSelectedFile().endsWith(".xml"))) {
-        return true;
-      } else {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExcelFileRequired").build());
+      String selectedFile = getView().getSelectedFile();
+
+      if (selectedFile.isEmpty()) {
         return false;
       }
+
+      return DatasourceFileType.INVALID != DatasourceFileType.getFileType(getView().getSelectedFile());
     }
   }
 
@@ -259,9 +260,18 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     }
 
     private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
-      return tmpFilePath.endsWith(".xls") || tmpFilePath.endsWith(".xlsx") //
-          ? createExcelDatasourceFactoryDto(tmpFilePath) //
-          : createStaticDatasourceFactoryDto(tmpFilePath);
+      DatasourceFileType type = DatasourceFileType.getFileType(tmpFilePath);
+
+      switch(type) {
+        case XLS:
+        case XLSX:
+          return createExcelDatasourceFactoryDto(tmpFilePath);
+
+        case SAV:
+          return createSpssDatasourceFactoryDto(tmpFilePath);
+      }
+
+      return createStaticDatasourceFactoryDto(tmpFilePath);
     }
 
     private DatasourceFactoryDto createExcelDatasourceFactoryDto(String tmpFilePath) {
@@ -271,6 +281,16 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
       DatasourceFactoryDto dto = DatasourceFactoryDto.create();
       dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, excelDto);
+
+      return dto;
+    }
+
+    private DatasourceFactoryDto createSpssDatasourceFactoryDto(String tmpFilePath) {
+      SpssDatasourceFactoryDto spssDto = SpssDatasourceFactoryDto.create();
+      spssDto.setFile(tmpFilePath);
+
+      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+      dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, spssDto);
 
       return dto;
     }
