@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- *
+ * 
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -44,8 +44,7 @@ public class AuthorizationQueryResource {
   }
 
   @GET
-  public Iterable<Acls> get(@QueryParam("domain") String domain, @QueryParam("type") SubjectAclService.SubjectType type,
-      @QueryParam("node") List<String> nodes) {
+  public Iterable<Acls> get(@QueryParam("domain") String domain, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("node") List<String> nodes) {
     if(nodes == null || nodes.size() == 0) return getSubjects(domain, type);
 
     return getAclsGroupedBySubject(domain, type, nodes);
@@ -60,13 +59,11 @@ public class AuthorizationQueryResource {
     return acls;
   }
 
-  private Iterable<Acls> getAclsGroupedBySubject(String domain, SubjectAclService.SubjectType type,
-      List<String> nodes) {
+  private Iterable<Acls> getAclsGroupedBySubject(String domain, SubjectAclService.SubjectType type, List<String> nodes) {
     Map<Opal.Subject, Acls.Builder> aclMap = new HashMap<Opal.Subject, Acls.Builder>();
 
     for(String node : nodes) {
-      for(Acl acl : Iterables
-          .transform(subjectAclService.getNodePermissions(domain, node, type), PermissionsToAclFunction.INSTANCE)) {
+      for(Acl acl : Iterables.transform(subjectAclService.getNodePermissions(domain, node, type), PermissionsToAclFunction.INSTANCE)) {
         Acls.Builder acls;
         if(aclMap.containsKey(acl.getSubject())) {
           acls = aclMap.get(acl.getSubject());
@@ -75,10 +72,6 @@ public class AuthorizationQueryResource {
           aclMap.put(acl.getSubject(), acls);
         }
         acls.addAcls(acl);
-
-        // getPermissions() in PermissionsToAclFunction.INSTANCE returns all permissions because it calls mergePermissions
-        // therefore, we have all permissions on the first iteration
-        break;
       }
     }
 
