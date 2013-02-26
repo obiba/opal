@@ -104,7 +104,10 @@ public interface Translations extends Constants {
       "Download", "Download", //
       "DownloadCertificate", "Download Certificate", //
       "Index now", "Index now", //
-      "Clear", "Clear" })
+      "Clear", "Clear",//
+      "View", "View",//
+      "Remove", "Remove",//
+      "Publish methods", "Publish methods" })
   Map<String, String> actionMap();
 
   @Description("Permission map")
@@ -342,9 +345,11 @@ public interface Translations extends Constants {
       "MappedUnitsCannotBeIdentified", "Units to be mapped cannot be identified.",//
       "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",//
       "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
+      "DataShieldPackageAlreadyExistWithTheSpecifiedName", "A package already exists with the specified name.",//
       "DataShieldMethodNameIsRequired", "A name is required.",//
       "DataShieldRScriptIsRequired", "A R script is required.",//
       "DataShieldRFunctionIsRequired", "A R function is required.",//
+      "DataShieldPackageNameIsRequired", "A name is required",//
       "RIsAlive", "R server is alive.",//
       "RConnectionFailed", "Connection with R server failed.", //
       "UnauthorizedOperation", "You are not allowed to perform this operation.",//
@@ -387,7 +392,7 @@ public interface Translations extends Constants {
       "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
       "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}"//
-      })
+  })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -1090,6 +1095,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("First column MUST be Opal identifiers.")
   String importOpalIdentifiersInstructions();
 
+  @Description("Package description label")
+  @DefaultStringValue("Package Description")
+  String dataShieldPackageDescription();
+
+  @Description("Add DataShield package label")
+  @DefaultStringValue("Add DataSHIELD Package")
+  String addDataShieldPackage();
+
   @Description("Add DataShield method label")
   @DefaultStringValue("Add Method")
   String addDataShieldMethod();
@@ -1518,7 +1531,8 @@ public interface Translations extends Constants {
   String esConfigurationLabel();
 
   @Description("Specify Generate Functional Unit Identifiers")
-  @Constants.DefaultStringValue("{0} new identifier{1} will be generated for this unit. To customize the identifier format modify the settings below.")
+  @Constants.DefaultStringValue(
+      "{0} new identifier{1} will be generated for this unit. To customize the identifier format modify the settings below.")
   String specifyGenerateFunctionalUnitIdentifiers();
 
   @Description("Generate Identifiers button label")
@@ -1528,4 +1542,12 @@ public interface Translations extends Constants {
   @Description("Generate Identifiers size help")
   @DefaultStringValue("Identifier size must be {0} to {1} digits long")
   String generateIdentifiersSizeHelp();
+
+  @Description("Title label")
+  @DefaultStringValue("Title")
+  String titleLabel();
+
+  @Description("Version label")
+  @DefaultStringValue("Version")
+  String versionLabel();
 }
