@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 /**
@@ -143,16 +144,24 @@ public class ValueSetResource extends AbstractValueTableResource {
       final boolean filterBinary) {
     final ValueSet valueSet = getValueTable().getValueSet(entity);
 
-    ValueSetsDto.ValueSetDto.Builder vsBuilder = Dtos.asDto(valueSet)
-        .addAllValues(Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
+    // Do not add iterable directly otherwise the values will be fetched as many times it is iterated
+    // (i.e. 2 times, see AbstractMessageLite.addAll()).
+    Iterable<ValueSetsDto.ValueDto> valueDtoIterable = Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
 
-          @Override
-          public ValueSetsDto.ValueDto apply(Variable fromVariable) {
-            String link = uriInfo.getPath() + "/variable/" + fromVariable.getName() + "/value";
-            Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
-            return Dtos.asDto(link, value, filterBinary).build();
-          }
-        })).setTimestamps(Dtos.asDto(valueSet.getTimestamps()));
+      @Override
+      public ValueSetsDto.ValueDto apply(Variable fromVariable) {
+        String link = uriInfo.getPath() + "/variable/" + fromVariable.getName() + "/value";
+        Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
+        return Dtos.asDto(link, value, filterBinary).build();
+      }
+    });
+    ImmutableList.Builder<ValueSetsDto.ValueDto> valueDtos = ImmutableList.builder();
+    for (ValueSetsDto.ValueDto dto : valueDtoIterable) {
+      valueDtos.add(dto);
+    }
+
+    ValueSetsDto.ValueSetDto.Builder vsBuilder = Dtos.asDto(valueSet)
+        .addAllValues(valueDtos.build()).setTimestamps(Dtos.asDto(valueSet.getTimestamps()));
 
     return ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType())
         .addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
