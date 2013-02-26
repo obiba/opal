@@ -27,7 +27,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.http.HttpHeaders;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Maps;
@@ -48,7 +47,6 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.OpalMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -68,12 +66,8 @@ public class ValueTableIndexResource extends IndexResource {
     super(indexManager, configService, esProvider, synchroManager);
   }
 
-  @OPTIONS
-  public Response getOptions() {
-    return Response.ok().header(HttpHeaders.ALLOW, HttpMethod.GET).header(HttpHeaders.ALLOW, HttpMethod.DELETE).build();
-  }
-
   @GET
+  @OPTIONS
   @Path("/")
   public Opal.TableIndexStatusDto getTableStatus() throws SearchServiceException {
     if(esProvider.isEnabled()) {

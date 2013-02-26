@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -46,7 +46,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 @Component
-public class AuthorizationInterceptor extends AbstractSecurityComponent implements RequestCyclePreProcess, RequestCyclePostProcess, ExceptionMapper<DefaultOptionsMethodException> {
+public class AuthorizationInterceptor extends AbstractSecurityComponent
+    implements RequestCyclePreProcess, RequestCyclePostProcess, ExceptionMapper<DefaultOptionsMethodException> {
 
   private static final Logger log = LoggerFactory.getLogger(AuthorizationInterceptor.class);
 
@@ -61,7 +62,8 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
   private final RequestAttributesProvider requestAttributeProvider;
 
   @Autowired
-  public AuthorizationInterceptor(SessionsSecurityManager securityManager, SubjectAclService subjectAclService, RequestAttributesProvider requestAttributeProvider) {
+  public AuthorizationInterceptor(SessionsSecurityManager securityManager, SubjectAclService subjectAclService,
+      RequestAttributesProvider requestAttributeProvider) {
     super(securityManager);
     this.subjectAclService = subjectAclService;
     this.requestAttributeProvider = requestAttributeProvider;
@@ -69,17 +71,20 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
 
   @Override
   public Response preProcess(HttpRequest request, ResourceMethod resourceMethod) {
-    if(isWebServicePublic(resourceMethod) == false && isWebServiceWithoutAuthorization(resourceMethod) == false) {
-      if(getSubject().isPermitted("magma:" + getResourceMethodUri(request, resourceMethod) + ":" + request.getHttpMethod()) == false) {
-        return Response.status(Status.FORBIDDEN).build();
-      }
+    if(HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
+      // Allow header will be added on postProcess
+      return Response.ok().build();
+    }
+    if(!isWebServicePublic(resourceMethod) && !isWebServiceWithoutAuthorization(resourceMethod) && !getSubject()
+        .isPermitted("magma:" + getResourceMethodUri(request, resourceMethod) + ":" + request.getHttpMethod())) {
+      return Response.status(Status.FORBIDDEN).build();
     }
     return null;
   }
 
   @Override
   public void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
-    if(HttpMethod.GET.equals(request.getHttpMethod())) {
+    if(HttpMethod.GET.equals(request.getHttpMethod()) || HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
       Set<String> allowed = allowed(request, resourceMethod);
       if(allowed != null && allowed.size() > 0) {
         response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
@@ -139,7 +144,8 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
   private void addPermission(List<SubjectAclService.Permissions> resourcePermissions) {
     for(SubjectAclService.Permissions resourcePermission : resourcePermissions) {
       for(String perm : resourcePermission.getPermissions()) {
-        subjectAclService.addSubjectPermission(resourcePermission.getDomain(), resourcePermission.getNode(), SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), perm);
+        subjectAclService.addSubjectPermission(resourcePermission.getDomain(), resourcePermission.getNode(),
+            SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), perm);
       }
     }
   }
@@ -148,7 +154,8 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
     for(URI resourceUri : resourceUris) {
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
       if(getSubject().isPermitted("magma:" + resource + ":*") == false) {
-        subjectAclService.addSubjectPermission("magma", resource, SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), "*:GET/*");
+        subjectAclService.addSubjectPermission("magma", resource,
+            SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), "*:GET/*");
       }
     }
   }
@@ -169,6 +176,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent implemen
   /**
    * Returns a {@code Set} of allowed HTTP methods on the provided resource URI. Note that this method always includes
    * "OPTIONS" in the set.
+   *
    * @param uri
    * @param availableMethods
    * @return
