@@ -55,8 +55,8 @@ public class DataShieldPackageView extends PopupViewImpl implements DataShieldPa
   @UiField
   Button closeButton;
 
-  @UiField
-  Label name;
+//  @UiField
+//  Label name;
 
   @UiField
   Label packageName;
@@ -133,10 +133,10 @@ public class DataShieldPackageView extends PopupViewImpl implements DataShieldPa
     return closeButton;
   }
 
-  @Override
-  public void setName(String name) {
-    this.name.setText(name != null ? name : "");
-  }
+//  @Override
+//  public void setName(String name) {
+//    this.name.setText(name != null ? name : "");
+//  }
 
   @Override
   public void setPackageName(String packageName) {

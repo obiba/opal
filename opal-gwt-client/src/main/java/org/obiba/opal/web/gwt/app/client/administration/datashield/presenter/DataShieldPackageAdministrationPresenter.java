@@ -1,17 +1,19 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsPackageRColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
@@ -19,11 +21,13 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -32,7 +36,7 @@ import com.gwtplatform.mvp.client.View;
 public class DataShieldPackageAdministrationPresenter
     extends PresenterWidget<DataShieldPackageAdministrationPresenter.Display> {
 
-  private Runnable removeMethodConfirmation;
+  private Runnable removePackageConfirmation;
 
   private DataShieldPackageCreatePresenter dataShieldPackageCreatePresenter;
 
@@ -81,15 +85,6 @@ public class DataShieldPackageAdministrationPresenter
           }
         }));
     registerHandler(
-        getEventBus().addHandler(DataShieldMethodUpdatedEvent.getType(), new DataShieldMethodUpdatedEvent.Handler() {
-
-          @Override
-          public void onDataShieldMethodUpdated(DataShieldMethodUpdatedEvent event) {
-            updateDataShieldPackages();
-          }
-
-        }));
-    registerHandler(
         getEventBus().addHandler(DataShieldPackageCreatedEvent.getType(), new DataShieldPackageCreatedEvent.Handler() {
 
           @Override
@@ -97,6 +92,9 @@ public class DataShieldPackageAdministrationPresenter
             updateDataShieldPackages();
           }
         }));
+
+    FieldUpdater<RPackageDto, String> updater = new PackageNameFieldUpdater();
+    getView().setPackageNameFieldUpdater(updater);
   }
 
   @Override
@@ -140,12 +138,11 @@ public class DataShieldPackageAdministrationPresenter
         .authorize(authorizer).send();
   }
 
-  //
-//  private void authorizeDeleteMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete().authorize(
-//        authorizer).send();
-//  }
-//
+  private void authorizeDeleteMethod(RPackageDto dto, HasAuthorization authorizer) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packageR(dto.getName())).delete()
+        .authorize(authorizer).send();
+  }
+
   private void updateDataShieldPackages() {
     ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder().forResource(packagesR()).get()//
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
@@ -158,17 +155,7 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   protected void doDataShieldPackageActionImpl(final RPackageDto dto, String actionName) {
-    if(actionName.equals(ActionsPackageRColumn.VIEW_ACTION)) {
-
-      authorizeViewMethod(dto, new Authorizer(getEventBus()) {
-
-        @Override
-        public void authorized() {
-          dataShieldPackagePresenter.displayPackage(dto);
-          addToPopupSlot(dataShieldPackagePresenter);
-        }
-      });
-    } else if(actionName.equals(ActionsPackageRColumn.PUBLISH_ACTION)) {
+    if(actionName.equals(ActionsPackageRColumn.PUBLISH_ACTION)) {
 //      authorizeEditMethod(dto, new Authorizer(getEventBus()) {
 //
 //        @Override
@@ -179,41 +166,41 @@ public class DataShieldPackageAdministrationPresenter
 //      });
 
     } else if(actionName.equals(ActionsPackageRColumn.REMOVE_ACTION)) {
-//      authorizeDeleteMethod(dto, new Authorizer(getEventBus()) {
-//        @Override
-//        public void authorized() {
-//          removeMethodConfirmation = new Runnable() {
-//            public void run() {
-//              deleteDataShieldMethod(dto);
-//            }
-//          };
-//          getEventBus().fireEvent(ConfirmationRequiredEvent
-//              .createWithKeys(removeMethodConfirmation, "deleteDataShieldMethod", "confirmDeleteDataShieldMethod"));
-//        }
-//      });
-
+      authorizeDeleteMethod(dto, new Authorizer(getEventBus()) {
+        @Override
+        public void authorized() {
+          removePackageConfirmation = new Runnable() {
+            @Override
+            public void run() {
+              removeDataShieldPackage(dto);
+            }
+          };
+          getEventBus().fireEvent(ConfirmationRequiredEvent
+              .createWithKeys(removePackageConfirmation, "deleteDataShieldPackage", "confirmDeleteDataShieldPackage"));
+        }
+      });
     }
   }
-//
-//  private void deleteDataShieldMethod(final DataShieldMethodDto dto) {
-//    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-//
-//      @Override
-//      public void onResponseCode(Request request, Response response) {
-//        if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
-//          updateDataShieldMethods();
-//        } else {
-//          getEventBus().fireEvent(NotificationEvent.newBuilder().error("Failed removing aggregating method.").build());
-//        }
-//      }
-//
-//    };
-//
-//    ResourceRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete() //
-//        .withCallback(Response.SC_OK, callbackHandler) //
-//        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-//        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
-//  }
+
+  private void removeDataShieldPackage(final RPackageDto dto) {
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          updateDataShieldPackages();
+        } else {
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        }
+      }
+
+    };
+
+    ResourceRequestBuilderFactory.newBuilder().forResource(packageR(dto.getName())).delete() //
+        .withCallback(Response.SC_OK, callbackHandler) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+  }
 
   //
   // Inner Classes / Interfaces
@@ -243,13 +230,26 @@ public class DataShieldPackageAdministrationPresenter
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) &&
+      if(removePackageConfirmation != null && event.getSource().equals(removePackageConfirmation) &&
           event.isConfirmed()) {
-        removeMethodConfirmation.run();
-        removeMethodConfirmation = null;
+        removePackageConfirmation.run();
+        removePackageConfirmation = null;
       }
     }
+  }
 
+  private class PackageNameFieldUpdater implements FieldUpdater<RPackageDto, String> {
+    @Override
+    public void update(int index, final RPackageDto dto, String value) {
+      authorizeViewMethod(dto, new Authorizer(getEventBus()) {
+
+        @Override
+        public void authorized() {
+          dataShieldPackagePresenter.displayPackage(dto);
+          addToPopupSlot(dataShieldPackagePresenter);
+        }
+      });
+    }
   }
 
   public interface Display extends View {
@@ -263,6 +263,8 @@ public class DataShieldPackageAdministrationPresenter
     HasAuthorization getAddPackageAuthorizer();
 
     HasAuthorization getPackagesAuthorizer();
+
+    void setPackageNameFieldUpdater(FieldUpdater<RPackageDto, String> updater);
 
   }
 

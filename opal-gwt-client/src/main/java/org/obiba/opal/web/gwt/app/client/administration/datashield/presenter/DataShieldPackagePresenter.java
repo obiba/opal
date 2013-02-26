@@ -44,7 +44,7 @@ public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackag
   public void displayPackage(RPackageDto dto) {
     Map<String, EntryDto> entriesMap = descriptionArrayToMap(dto);
 
-    getView().setName(dto.getName());
+//    getView().setName(dto.getName());
     getView().setPackageName(entriesMap.get("package").getValue());
     getView().setVersion(entriesMap.get("version").getValue());
     getView().setTitle(entriesMap.get("title").getValue());
@@ -82,7 +82,7 @@ public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackag
 
     HasClickHandlers getCloseButton();
 
-    void setName(String name);
+//    void setName(String name);
 
 //    HasText getName();
 

@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreatePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreatePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
@@ -93,6 +92,7 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
 
   @Override
   public void show() {
+    dialog.setText(translations.addDataShieldPackage());
     name.setFocus(true);
     super.show();
   }
@@ -100,14 +100,6 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   @Override
   public void hideDialog() {
     dialog.hide();
-  }
-
-  @Override
-  public void setDialogMode(DataShieldPackageCreatePresenter.Mode dialogMode) {
-    name.setEnabled(DataShieldPackageCreatePresenter.Mode.CREATE == dialogMode);
-    if(DataShieldPackageCreatePresenter.Mode.CREATE == dialogMode) {
-      dialog.setText(translations.addDataShieldPackage());
-    }
   }
 
   @Override

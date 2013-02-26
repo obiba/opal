@@ -8,12 +8,12 @@
     <g:FlowPanel ui:field="packagesPanel" addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
         <g:InlineLabel>
-          <ui:msg description="Packages label">Package</ui:msg>
+          <ui:msg description="Packages label">Packages</ui:msg>
         </g:InlineLabel>
         <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
           <g:HTMLPanel>
             <g:Label addStyleNames="title">
-              <ui:msg description="Restriction Level">Package</ui:msg>
+              <ui:msg description="Restriction Level">Packages</ui:msg>
             </g:Label>
             <p>
               <ui:msg description="Package information">

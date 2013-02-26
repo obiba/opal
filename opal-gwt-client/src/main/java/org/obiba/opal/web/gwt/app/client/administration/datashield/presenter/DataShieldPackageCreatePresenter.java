@@ -36,13 +36,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShieldPackageCreatePresenter.Display> {
 
-  private Mode dialogMode;
-
-  public enum Mode {
-    CREATE, UPDATE
-  }
-
-  private MethodValidationHandler methodValidationHandler;
+  private PackageValidationHandler packageValidationHandler;
 
   @Inject
   public DataShieldPackageCreatePresenter(Display display, EventBus eventBus) {
@@ -51,9 +45,7 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
 
   @Override
   protected void onBind() {
-    setDialogMode(Mode.CREATE);
-
-    registerHandler(getView().getInstallButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
+    registerHandler(getView().getInstallButton().addClickHandler(new CreatePackageClickHandler()));
 
     registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       @Override
@@ -62,46 +54,16 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
       }
     }));
 
-    methodValidationHandler = new MethodValidationHandler(getEventBus());
-
-  }
-
-  private void setDialogMode(Mode dialogMode) {
-    this.dialogMode = dialogMode;
-    getView().setDialogMode(dialogMode);
+    this.packageValidationHandler = new PackageValidationHandler(getEventBus());
   }
 
   /**
    * Setup the dialog for creating a method
    */
   public void addNewPackage() {
-    setDialogMode(Mode.CREATE);
     getView().clear();
   }
 
-  /**
-   * Setup the dialog for updating an existing method
-   *
-   * @param dto method to update
-   */
-//  public void showPackage(RPackageDto dto) {
-//    setDialogMode(Mode.UPDATE);
-//    displayMethod(dto.getName(), dto);
-//  }
-
-  /**
-   * Setup the dialog for copying an existing method
-   *
-   * @param dto method to copy
-   */
-//  public void copyMethod(RPackageDto dto) {
-//    setDialogMode(Mode.CREATE);
-//    displayMethod("copy_of_" + dto.getName(), dto);
-//  }
-
-//  private void displayMethod(String name, RPackageDto dto) {
-//    getView().setName(name);
-//  }
   private String packageR(String name) {
     return UriBuilder.create().segment("datashield", "package", "{name}").build(name);
   }
@@ -115,15 +77,9 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
         .build(name, reference);
   }
 
-//  private void showPackage() {
-//    if(methodValidationHandler.validate()) {
-//      putMethod(getDataShieldPackageDto());
-//    }
-//  }
-
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void createPackage() {
-    if(methodValidationHandler.validate()) {
+    if(packageValidationHandler.validate()) {
       ResponseCodeCallback createCallback = new CreatePackageCallBack();
       ResourceCallback alreadyExistCallback = new AlreadyExistMethodCallBack();
       ResourceRequestBuilderFactory.<RPackageDto>newBuilder().forResource(packageR(getView().getName().getText()))
@@ -153,15 +109,6 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     }
   }
 
-//  private void putMethod(RPackageDto dto) {
-//    CreateOrUpdatePackageCallBack callbackHandler = new CreateOrUpdatePackageCallBack(dto);
-//    ResourceRequestBuilderFactory.newBuilder().forResource(name(getView().getName().getText())).put()//
-//        .withResourceBody(DataShieldMethodDto.stringify(dto))//
-//        .withCallback(Response.SC_OK, callbackHandler)//
-//        .withCallback(Response.SC_CREATED, callbackHandler)//
-//        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-//  }
-
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private RPackageDto getDataShieldPackageDto() {
     RPackageDto dto = RPackageDto.create();
@@ -174,9 +121,9 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
   // Inner classes and interfaces
   //
 
-  private class MethodValidationHandler extends AbstractValidationHandler {
+  private class PackageValidationHandler extends AbstractValidationHandler {
 
-    MethodValidationHandler(EventBus eventBus) {
+    PackageValidationHandler(EventBus eventBus) {
       super(eventBus);
     }
 
@@ -210,16 +157,11 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     }
   }
 
-  public class CreateOrUpdateMethodClickHandler implements ClickHandler {
+  public class CreatePackageClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent arg0) {
-      if(dialogMode == Mode.CREATE) {
-        createPackage();
-      }
-//      else if(dialogMode == Mode.UPDATE) {
-//        showPackage();
-//      }
+      createPackage();
     }
 
   }
@@ -235,10 +177,8 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
-      if(response.getStatusCode() == Response.SC_OK) {
+      if(response.getStatusCode() == Response.SC_CREATED) {
         getEventBus().fireEvent(new DataShieldPackageCreatedEvent(dto));
-//      } else if(response.getStatusCode() == Response.SC_CREATED) {
-//        getEventBus().fireEvent(new DataShieldMethodCreatedEvent(dto));
       } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
@@ -248,8 +188,6 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
   public interface Display extends PopupView {
 
     void hideDialog();
-
-    void setDialogMode(Mode dialogMode);
 
     HasClickHandlers getInstallButton();
 

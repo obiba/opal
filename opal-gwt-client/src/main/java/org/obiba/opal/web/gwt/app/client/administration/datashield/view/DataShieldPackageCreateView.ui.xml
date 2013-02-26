@@ -32,10 +32,10 @@
                 </g:Label>
                 <g:TextBox name="reference" ui:field="reference"/>
                 <g:FlowPanel>
-                  <g:InlineLabel addStyleNames="help-block">
+                  <g:HTMLPanel addStyleNames="help-block">
                     <ui:msg description="Git reference description">Could be a commit, tag, or branch name on</ui:msg>
-                  </g:InlineLabel>
-                  <g:Anchor>DataSHIELD source</g:Anchor>
+                    <g:Anchor href="https://github.com/datashield" target="_blank">DataSHIELD source</g:Anchor>
+                  </g:HTMLPanel>
                 </g:FlowPanel>
               </g:FlowPanel>
             </g:DisclosurePanel>

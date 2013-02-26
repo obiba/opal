@@ -17,12 +17,12 @@
           <o:PropertiesTable condensed="true" borderedCell="false" zebra="true"
               addStyleNames="small-dual-indent top-margin"
               keyStyleNames="span3 small-indent">
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Name label">Name</ui:msg>
-              </g:Label>
-              <g:Label ui:field="name"/>
-            </g:FlowPanel>
+            <!--<g:FlowPanel>-->
+            <!--<g:Label>-->
+            <!--<ui:msg description="Name label">Name</ui:msg>-->
+            <!--</g:Label>-->
+            <!--<g:Label ui:field="name"/>-->
+            <!--</g:FlowPanel>-->
             <g:FlowPanel>
               <g:Label>
                 <ui:msg description="Package label">Package</ui:msg>

@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsPackageRColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -21,6 +22,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.r.EntryDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -44,6 +46,8 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class DataShieldPackageAdministrationView extends ViewImpl
     implements DataShieldPackageAdministrationPresenter.Display {
 
+  private static final int PAGE_SIZE = 10;
+
   @UiTemplate("DataShieldPackageAdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DataShieldPackageAdministrationView> {}
 
@@ -52,6 +56,8 @@ public class DataShieldPackageAdministrationView extends ViewImpl
   private final Translations translations;
 
   private final Widget widget;
+
+  private PackageClickableColumn packageNameColumn;
 
   @UiField
   Panel packagesPanel;
@@ -103,17 +109,15 @@ public class DataShieldPackageAdministrationView extends ViewImpl
   }
 
   private void initPackagesTable() {
-
     addPackageTableColumns();
 
-    //noinspection MagicNumber
-    packagesTable.setPageSize(50);
+    packagesTable.setPageSize(PAGE_SIZE);
     packagesTablePager.setDisplay(packagesTable);
     packagesDataProvider.addDataDisplay(packagesTable);
   }
 
   private void addPackageTableColumns() {
-    packagesTable.addColumn(new TextColumn<RPackageDto>() {
+    packagesTable.addColumn(packageNameColumn = new PackageClickableColumn("name") {
       @Override
       public String getValue(RPackageDto object) {
         return object.getName();
@@ -135,7 +139,7 @@ public class DataShieldPackageAdministrationView extends ViewImpl
     }, translations.versionLabel());
 
     actionsColumn = new ActionsPackageRColumn<RPackageDto>(
-        new ConstantActionsProvider<RPackageDto>(ActionsPackageRColumn.VIEW_ACTION, ActionsPackageRColumn.REMOVE_ACTION,
+        new ConstantActionsProvider<RPackageDto>(ActionsPackageRColumn.REMOVE_ACTION,
             ActionsPackageRColumn.PUBLISH_ACTION));
     packagesTable.addColumn(actionsColumn, translations.actionsLabel());
     packagesTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
@@ -152,6 +156,20 @@ public class DataShieldPackageAdministrationView extends ViewImpl
     return "";
   }
 
+  private abstract static class PackageClickableColumn extends ClickableColumn<RPackageDto> {
+
+    private final String name;
+
+    private PackageClickableColumn(String name) {
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+  }
+
   @Override
   public HasAuthorization getAddPackageAuthorizer() {
     return new WidgetAuthorizer(addPackageButton);
@@ -162,4 +180,8 @@ public class DataShieldPackageAdministrationView extends ViewImpl
     return new WidgetAuthorizer(packagesPanel);
   }
 
+  @Override
+  public void setPackageNameFieldUpdater(FieldUpdater<RPackageDto, String> updater) {
+    packageNameColumn.setFieldUpdater(updater);
+  }
 }

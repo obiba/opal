@@ -514,6 +514,7 @@ public interface Translations extends Constants {
       "removeView", "Remove View",//
       "removeTable", "Remove Table",//
       "deleteDataShieldMethod", "Delete Aggregating Method",//
+      "deleteDataShieldPackage", "Delete Package",//
       "deleteDatabase", "Delete Database" })
   Map<String, String> confirmationTitleMap();
 
@@ -555,6 +556,7 @@ public interface Translations extends Constants {
 //
 //
       "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method.",//
+      "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package.",//
       "confirmDeleteDatabase", "Please confirm that you want to remove this database." })
   Map<String, String> confirmationMessageMap();
 

@@ -13,8 +13,6 @@ import com.google.gwt.user.cellview.client.Column;
 
 public class ActionsPackageRColumn<T> extends Column<T, T> implements HasActionHandler<T> {
 
-  public static final String VIEW_ACTION = "View";
-
   public static final String REMOVE_ACTION = "Remove";
 
   public static final String PUBLISH_ACTION = "Publish methods";
