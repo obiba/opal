@@ -2306,13 +2306,19 @@ a.icon:hover {
   margin-bottom: 5px;
 }
 
-/* Index status progress bar */
-.indexStatusProgressBar {
+/* Index status */
+.index-status .alert {
+  padding: 0 1.2em;
+  border-radius: 0px;
+  margin-bottom: 0px;
+}
+
+.index-status .progress {
   width: 100px;
   margin-bottom: 0px;
 }
 
-.indexStatusAction {
+.index-status .action {
   text-decoration: underline;
 }
 
