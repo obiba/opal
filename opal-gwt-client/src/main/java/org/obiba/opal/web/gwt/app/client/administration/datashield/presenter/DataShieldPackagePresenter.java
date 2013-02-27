@@ -44,7 +44,6 @@ public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackag
   public void displayPackage(RPackageDto dto) {
     Map<String, EntryDto> entriesMap = descriptionArrayToMap(dto);
 
-//    getView().setName(dto.getName());
     getView().setPackageName(entriesMap.get("package").getValue());
     getView().setVersion(entriesMap.get("version").getValue());
     getView().setTitle(entriesMap.get("title").getValue());
@@ -54,10 +53,8 @@ public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackag
     getView().setDescription(entriesMap.get("description").getValue());
     getView().setLicense(entriesMap.get("license").getValue());
     getView().setOpalVersion(entriesMap.get("opalVersion").getValue());
-    getView().setUrl("http://www.obiba.org", "http://www.obiba.org");
-    getView().setBugReports("http://jira.obiba.org", "http://jira.obiba.org");
-//    getView().setUrl(entriesMap.get("url").getValue(), entriesMap.get("url").getValue());
-//    getView().setBugReports(entriesMap.get("bugReports").getValue(), entriesMap.get("bugReports").getValue());
+    getView().setUrl(entriesMap.get("url").getValue(), entriesMap.get("url").getValue());
+    getView().setBugReports(entriesMap.get("bugReports").getValue(), entriesMap.get("bugReports").getValue());
 
   }
 
@@ -81,10 +78,6 @@ public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackag
     void hideDialog();
 
     HasClickHandlers getCloseButton();
-
-//    void setName(String name);
-
-//    HasText getName();
 
     void setPackageName(String s);
 

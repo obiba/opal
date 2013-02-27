@@ -1,6 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -19,6 +20,8 @@ import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
+import org.obiba.opal.web.model.client.datashield.DataShieldPackageMethodsDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
@@ -36,7 +39,13 @@ import com.gwtplatform.mvp.client.View;
 public class DataShieldPackageAdministrationPresenter
     extends PresenterWidget<DataShieldPackageAdministrationPresenter.Display> {
 
+  private static final String AGGREGATE = "aggregate";
+
+  private static final String ASSIGN = "assign";
+
   private Runnable removePackageConfirmation;
+
+  private Runnable publishMethodsConfirmation;
 
   private DataShieldPackageCreatePresenter dataShieldPackageCreatePresenter;
 
@@ -124,6 +133,18 @@ public class DataShieldPackageAdministrationPresenter
     return UriBuilder.create().segment("datashield", "package", "{package}").build(packageR);
   }
 
+  private String packageRMethods(String packageR) {
+    return UriBuilder.create().segment("datashield", "package", "{package}", "methods").build(packageR);
+  }
+
+  private String environmentMethod(String env, String name) {
+    return UriBuilder.create().segment("datashield", "env", "{env}", "method", "{method}").build(env, name);
+  }
+
+  private String environmentMethods(String env) {
+    return UriBuilder.create().segment("datashield", "env", "{env}", "methods").build(env);
+  }
+
   private void authorizePackagesR(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packagesR()).get().authorize(authorizer).send();
   }
@@ -143,6 +164,12 @@ public class DataShieldPackageAdministrationPresenter
         .authorize(authorizer).send();
   }
 
+  private void authorizePublishMethods(RPackageDto dto, HasAuthorization authorizer) {
+    // Check acces to delete/put a method
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packageRMethods(dto.getName())).get()
+        .authorize(authorizer).send();
+  }
+
   private void updateDataShieldPackages() {
     ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder().forResource(packagesR()).get()//
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
@@ -156,14 +183,22 @@ public class DataShieldPackageAdministrationPresenter
 
   protected void doDataShieldPackageActionImpl(final RPackageDto dto, String actionName) {
     if(actionName.equals(ActionsPackageRColumn.PUBLISH_ACTION)) {
-//      authorizeEditMethod(dto, new Authorizer(getEventBus()) {
-//
-//        @Override
-//        public void authorized() {
-//          dataShieldMethodPresenter.showPackage(dto);
-//          addToPopupSlot(dataShieldMethodPresenter);
-//        }
-//      });
+      authorizePublishMethods(dto, new Authorizer(getEventBus()) {
+
+        @Override
+        public void authorized() {
+          publishMethodsConfirmation = new Runnable() {
+            @Override
+            public void run() {
+
+              publishDataShieldMethods(dto);
+            }
+          };
+          getEventBus().fireEvent(ConfirmationRequiredEvent
+              .createWithKeys(publishMethodsConfirmation, "publishDataShieldMethods",
+                  "confirmPublishDataShieldMethods"));
+        }
+      });
 
     } else if(actionName.equals(ActionsPackageRColumn.REMOVE_ACTION)) {
       authorizeDeleteMethod(dto, new Authorizer(getEventBus()) {
@@ -202,13 +237,90 @@ public class DataShieldPackageAdministrationPresenter
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
+  private void publishDataShieldMethods(final RPackageDto dto) {
+//    GET /datashield/package/xxx/methods
+//    for each aggregate method
+//    DELETE /datashield/env/aggregate/method/mmm
+//    POST /datashield/env/aggregate/methods
+//    for each assign method
+//    DELETE /datashield/env/assign/method/mmm
+//    POST /datashield/env/assing/methods
+    ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder().forResource(packageRMethods(dto.getName()))
+        .get()//
+        .withCallback(new ResourceCallback<DataShieldPackageMethodsDto>() {
+
+          @Override
+          public void onResource(Response response, DataShieldPackageMethodsDto resource) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              // For each method, delete and post
+              for(int i = 0; i < resource.getAggregateCount(); i++) {
+                DataShieldMethodDto aggregate = resource.getAggregate(i);
+                ResourceRequestBuilderFactory.newBuilder()
+                    .forResource(environmentMethod(AGGREGATE, aggregate.getName())).delete() //
+                    .withCallback(new DeleteMethodCallback(aggregate, AGGREGATE), Response.SC_OK,
+                        Response.SC_NOT_FOUND) //
+                    .send();
+              }
+              for(int i = 0; i < resource.getAssignCount(); i++) {
+                DataShieldMethodDto assign = resource.getAssign(i);
+                ResourceRequestBuilderFactory.newBuilder().forResource(environmentMethod(ASSIGN, assign.getName()))
+                    .delete() //
+                    .withCallback(new DeleteMethodCallback(assign, ASSIGN), Response.SC_OK, Response.SC_NOT_FOUND) //
+                    .send();
+              }
+            } else {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            }
+          }
+        }).send();
+  }
+
   //
   // Inner Classes / Interfaces
   //
 
-  /**
-   *
-   */
+  private class DeleteMethodCallback implements ResponseCodeCallback {
+
+    private DataShieldMethodDto dto;
+
+    private String environment;
+
+    private DeleteMethodCallback(DataShieldMethodDto dto, String environment) {
+      this.dto = dto;
+      this.environment = environment;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
+        // Put new method
+        ResourceRequestBuilderFactory.newBuilder().forResource(environmentMethods(environment)).post() //
+            .withResourceBody(DataShieldMethodDto.stringify(dto))
+            .withCallback(new PublishMethodCallback(dto), Response.SC_CREATED, Response.SC_BAD_REQUEST) //
+            .send();
+      } else {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      }
+    }
+  }
+
+  private class PublishMethodCallback implements ResponseCodeCallback {
+    private DataShieldMethodDto dto;
+
+    private PublishMethodCallback(DataShieldMethodDto dto) {
+      this.dto = dto;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+//      if(response.getStatusCode() == Response.SC_OK) {
+      getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(dto));
+//      } else {
+//        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+//      }
+    }
+  }
+
   private final class PackagesUpdate implements HasAuthorization {
     @Override
     public void unauthorized() {
@@ -234,6 +346,10 @@ public class DataShieldPackageAdministrationPresenter
           event.isConfirmed()) {
         removePackageConfirmation.run();
         removePackageConfirmation = null;
+      } else if(publishMethodsConfirmation != null && event.getSource().equals(publishMethodsConfirmation) &&
+          event.isConfirmed()) {
+        publishMethodsConfirmation.run();
+        publishMethodsConfirmation = null;
       }
     }
   }
