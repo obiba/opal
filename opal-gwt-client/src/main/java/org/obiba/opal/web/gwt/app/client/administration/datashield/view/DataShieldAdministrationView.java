@@ -1,16 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
-
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -39,14 +36,18 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
+
 /**
  *
  */
 public class DataShieldAdministrationView extends ViewImpl implements DataShieldAdministrationPresenter.Display {
 
+  private static final int PAGE_SIZE = 50;
+
   @UiTemplate("DataShieldAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DataShieldAdministrationView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, DataShieldAdministrationView> {}
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -72,7 +73,6 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
 
   @Inject
   public DataShieldAdministrationView(Translations translations) {
-    super();
     this.translations = translations;
     widget = uiBinder.createAndBindUi(this);
     initMethodsTable();
@@ -108,7 +108,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
 
     addMethodsTableColumns();
 
-    methodsTable.setPageSize(50);
+    methodsTable.setPageSize(PAGE_SIZE);
     methodsTablePager.setDisplay(methodsTable);
     methodsDataProvider.addDataDisplay(methodsTable);
   }
@@ -124,14 +124,14 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
     methodsTable.addColumn(new TextColumn<DataShieldMethodDto>() {
       @Override
       public String getValue(DataShieldMethodDto object) {
-        if(object.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
-          return translations.rScriptLabel();
-        } else
-          return translations.rFunctionLabel();
+        return object.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null
+            ? translations.rScriptLabel()
+            : translations.rFunctionLabel();
       }
     }, translations.typeLabel());
 
-    actionsColumn = new ActionsColumn<DataShieldMethodDto>(new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, DELETE_ACTION));
+    actionsColumn = new ActionsColumn<DataShieldMethodDto>(
+        new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, DELETE_ACTION));
     methodsTable.addColumn(actionsColumn, translations.actionsLabel());
   }
 

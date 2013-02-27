@@ -1,0 +1,61 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="22em" width="40em">
+      <g:center>
+        <g:ScrollPanel>
+          <g:FlowPanel addStyleNames="main">
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Name label">Name</ui:msg>
+              </g:Label>
+              <g:TextBox name="name" ui:field="name"/>
+              <g:InlineLabel addStyleNames="help-block">
+                <ui:msg description="DataShield package name description">Name of the DataSHIELD package to be installed
+                  on R server.
+                </ui:msg>
+              </g:InlineLabel>
+            </g:FlowPanel>
+
+            <g:DisclosurePanel>
+              <g:customHeader>
+                <g:Label>
+                  <ui:msg description="Advanced options label">Advanced Options</ui:msg>
+                </g:Label>
+              </g:customHeader>
+              <g:FlowPanel>
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Git reference label">Git reference</ui:msg>
+                </g:Label>
+                <g:TextBox name="reference" ui:field="reference"/>
+                <g:FlowPanel>
+                  <g:HTMLPanel addStyleNames="help-block">
+                    <ui:msg description="Git reference description">Could be a commit, tag, or branch name on</ui:msg>
+                    <g:Anchor href="https://github.com/datashield" target="_blank">DataSHIELD source</g:Anchor>
+                  </g:HTMLPanel>
+                </g:FlowPanel>
+              </g:FlowPanel>
+            </g:DisclosurePanel>
+
+          </g:FlowPanel>
+        </g:ScrollPanel>
+      </g:center>
+      <g:south size="4">
+        <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
+          <g:Button ui:field="cancelButton" styleName="btn btn-primary right-aligned top-margin">
+            <ui:msg description="Cancel button label">Cancel</ui:msg>
+          </g:Button>
+          <g:Button ui:field="installButton" styleName="btn right-aligned top-margin">
+            <ui:msg description="Install button label">Install</ui:msg>
+          </g:Button>
+        </g:FlowPanel>
+      </g:south>
+    </g:DockLayoutPanel>
+
+  </g:DialogBox>
+
+</ui:UiBinder>

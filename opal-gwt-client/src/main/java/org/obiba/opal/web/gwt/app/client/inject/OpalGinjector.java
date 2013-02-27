@@ -15,6 +15,9 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Datab
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreatePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackagePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
@@ -81,12 +84,11 @@ import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.annotations.DefaultGatekeeper;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
-@SuppressWarnings("UnusedDeclaration")
-@GinModules(
-    { OpalGinModule.class, AuthorizationModule.class, AdministrationModule.class, DashboardModule.class,
-        NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class,
-        ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class,
-        ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
+@SuppressWarnings({ "UnusedDeclaration", "OverlyCoupledClass" })
+@GinModules({ OpalGinModule.class, AuthorizationModule.class, AdministrationModule.class, DashboardModule.class,
+    NavigatorModule.class, FileSystemModule.class, JobModule.class, ImportModule.class, ExportModule.class,
+    ImportVariablesWizardModule.class, CreateViewWizardModule.class, ConfigureViewWizardModule.class,
+    ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
 public interface OpalGinjector extends Ginjector {
 
   EventBus getOldEventBus();
@@ -210,7 +212,13 @@ public interface OpalGinjector extends Ginjector {
 
   Provider<DataShieldConfigPresenter> getDataShieldConfigPresenter();
 
+  Provider<DataShieldPackageAdministrationPresenter> getDataShieldPackageAdministrationPresenter();
+
   Provider<RAdministrationPresenter> getRAdministrationPresenter();
+
+  Provider<DataShieldPackageCreatePresenter> getDataShieldPackageCreatePresenter();
+
+  Provider<DataShieldPackagePresenter> getDataShieldPackagePresenter();
 
   Provider<DataShieldMethodPresenter> getDataShieldMethodPresenter();
 
