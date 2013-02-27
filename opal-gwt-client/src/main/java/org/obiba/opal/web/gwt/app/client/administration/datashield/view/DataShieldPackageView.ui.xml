@@ -1,0 +1,108 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <ui:style>
+    .optionsPanelMsg td {
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    }
+  </ui:style>
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="32em" width="40em">
+      <g:center>
+        <g:ScrollPanel>
+
+          <o:PropertiesTable condensed="true" borderedCell="false" zebra="true"
+              addStyleNames="small-dual-indent top-margin"
+              keyStyleNames="span3 small-indent">
+            <!--<g:FlowPanel>-->
+            <!--<g:Label>-->
+            <!--<ui:msg description="Name label">Name</ui:msg>-->
+            <!--</g:Label>-->
+            <!--<g:Label ui:field="name"/>-->
+            <!--</g:FlowPanel>-->
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Package label">Package</ui:msg>
+              </g:Label>
+              <g:Label ui:field="packageName"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Version label">Version</ui:msg>
+              </g:Label>
+              <g:Label ui:field="version"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Title label">Title</ui:msg>
+              </g:Label>
+              <g:Label ui:field="title"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Author label">Author</ui:msg>
+              </g:Label>
+              <g:Label ui:field="author"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Maintainer label">Maintainer</ui:msg>
+              </g:Label>
+              <g:Label ui:field="maintainer"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Depends label">Depends</ui:msg>
+              </g:Label>
+              <g:Label ui:field="depends"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Description label">Description</ui:msg>
+              </g:Label>
+              <g:Label ui:field="description"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="License label">License</ui:msg>
+              </g:Label>
+              <g:Label ui:field="license"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Opal version label">Opal version</ui:msg>
+              </g:Label>
+              <g:Label ui:field="opalVersion"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Url label">URL</ui:msg>
+              </g:Label>
+              <g:Anchor ui:field="url"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Bug reports label">Bug reports</ui:msg>
+              </g:Label>
+              <g:Anchor ui:field="bugReports"/>
+            </g:FlowPanel>
+          </o:PropertiesTable>
+
+        </g:ScrollPanel>
+      </g:center>
+      <g:south size="4">
+        <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
+          <g:Button ui:field="closeButton" styleName="btn right-aligned top-margin">
+            <ui:msg description="Close button label">Close</ui:msg>
+          </g:Button>
+        </g:FlowPanel>
+      </g:south>
+    </g:DockLayoutPanel>
+
+  </g:DialogBox>
+
+</ui:UiBinder>

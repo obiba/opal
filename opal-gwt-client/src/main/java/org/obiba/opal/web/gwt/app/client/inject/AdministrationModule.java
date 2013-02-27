@@ -16,9 +16,15 @@ import org.obiba.opal.web.gwt.app.client.administration.database.view.DatabaseVi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreatePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackagePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldConfigView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldMethodView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldPackageAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldPackageCreateView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldPackageView;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
@@ -35,6 +41,7 @@ import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 /**
  *
  */
+@SuppressWarnings("OverlyCoupledClass")
 public class AdministrationModule extends AbstractPresenterModule {
 
   @Override
@@ -56,8 +63,14 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(IndexConfigurationPresenter.class, IndexConfigurationPresenter.Display.class,
         IndexConfigurationView.class);
 
+    bindPresenterWidget(DataShieldPackageAdministrationPresenter.class,
+        DataShieldPackageAdministrationPresenter.Display.class, DataShieldPackageAdministrationView.class);
     bindPresenterWidget(DataShieldAdministrationPresenter.class, DataShieldAdministrationPresenter.Display.class,
         DataShieldAdministrationView.class);
+    bindPresenterWidget(DataShieldPackageCreatePresenter.class, DataShieldPackageCreatePresenter.Display.class,
+        DataShieldPackageCreateView.class);
+    bindPresenterWidget(DataShieldPackagePresenter.class, DataShieldPackagePresenter.Display.class,
+        DataShieldPackageView.class);
     bindPresenterWidget(DataShieldMethodPresenter.class, DataShieldMethodPresenter.Display.class,
         DataShieldMethodView.class);
 
