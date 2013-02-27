@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.Day;
@@ -39,6 +40,8 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   private List<TableIndexStatusDto> tableIndexStatusDtos;
 
   private boolean refreshIndices = true;
+
+  private boolean refreshTable = false;
 
   public enum Mode {
     UPDATE
@@ -191,6 +194,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
       getView().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
         if(refreshIndices) getEventBus().fireEvent(new TableIndicesRefreshEvent());
+        if(refreshTable) getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
       } else {
         ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
         getEventBus().fireEvent(
@@ -202,6 +206,10 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
   public void setUpdateMethodCallbackRefreshIndices(boolean b) {
     refreshIndices = b;
+  }
+
+  public void setUpdateMethodCallbackRefreshTable(boolean b) {
+    refreshTable = b;
   }
 
   public interface Display extends PopupView {
