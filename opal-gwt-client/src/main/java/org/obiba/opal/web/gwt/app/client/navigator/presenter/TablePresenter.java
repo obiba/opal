@@ -332,13 +332,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get()
         .authorize(getView().getValuesAuthorizer()).send();
 
-    // Table indexation status
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
-        .authorize(getView().getTableIndexStatusAuthorizer()).send();
-
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
-        .authorize(getView().getTableIndexEditAuthorizer()).send();
-
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
@@ -389,8 +382,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private void updateIndexStatus() {
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
         .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index").get()
-        .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND)
-        .withCallback(new TableIndexStatusResourceCallback()).send();
+        .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
+            SC_SERVICE_UNAVAILABLE).withCallback(new TableIndexStatusResourceCallback()).send();
   }
 
   private void updateVariables() {
@@ -678,6 +671,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
+      // Table indexation status
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
+          .authorize(getView().getTableIndexStatusAuthorizer()).send();
+
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
+          .authorize(getView().getTableIndexEditAuthorizer()).send();
+
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
         getView().setIndexStatusVisible(true);
