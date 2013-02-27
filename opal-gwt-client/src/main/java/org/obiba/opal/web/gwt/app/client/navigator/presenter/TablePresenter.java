@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
@@ -87,7 +88,7 @@ import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
-  private static final int DELAY_MILLIS = 2000;
+  private static final int DELAY_MILLIS = 1000;
 
   private JsArray<VariableDto> variables;
 
@@ -176,6 +177,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     // OPAL-975
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
 
+    registerHandler(
+        getEventBus().addHandler(TableIndexStatusRefreshEvent.getType(), new TableIndexStatusRefreshHandler()));
     //Link actions: CLEAR
     final UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}", "index");
     getView().getClear().addClickHandler(new ClickHandler() {
@@ -249,7 +252,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
                   updateIndexStatus();
                 }
               };
-              // Schedule the timer to run once in 0.5 seconds.
+              // Schedule the timer to run once in X seconds.
               t.schedule(DELAY_MILLIS);
             } else {
               showDefaultCursor();
@@ -276,6 +279,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
         IndexPresenter dialog = indexPresenter.get();
         dialog.setUpdateMethodCallbackRefreshIndices(false);
+        dialog.setUpdateMethodCallbackRefreshTable(true);
         dialog.updateSchedules(objects);
         addToPopupSlot(dialog);
 
@@ -328,13 +332,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get()
         .authorize(getView().getValuesAuthorizer()).send();
 
-    // Table indexation status
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
-        .authorize(getView().getTableIndexStatusAuthorizer()).send();
-
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
-        .authorize(getView().getTableIndexEditAuthorizer()).send();
-
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
@@ -385,8 +382,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private void updateIndexStatus() {
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
         .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index").get()
-        .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND)
-        .withCallback(new TableIndexStatusResourceCallback()).send();
+        .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
+            SC_SERVICE_UNAVAILABLE).withCallback(new TableIndexStatusResourceCallback()).send();
   }
 
   private void updateVariables() {
@@ -674,6 +671,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
+      // Table indexation status
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
+          .authorize(getView().getTableIndexStatusAuthorizer()).send();
+
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
+          .authorize(getView().getTableIndexEditAuthorizer()).send();
+
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
         getView().setIndexStatusVisible(true);
@@ -818,6 +822,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       if(table != null) {
         updateDisplay(table, previous, next);
       }
+    }
+  }
+
+  private class TableIndexStatusRefreshHandler implements TableIndexStatusRefreshEvent.Handler {
+
+    @Override
+    public void onRefresh(TableIndexStatusRefreshEvent event) {
+      updateTableIndexStatus();
     }
   }
 

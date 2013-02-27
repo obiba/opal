@@ -69,7 +69,7 @@ public class ValueTableIndexResource extends IndexResource {
   @GET
   @OPTIONS
   @Path("/")
-  public Opal.TableIndexStatusDto getTableStatus() throws SearchServiceException {
+  public Response getTableStatus() {
     if(esProvider.isEnabled()) {
       ValueTable valueTable = getValueTable(datasource, table);
 
@@ -88,10 +88,10 @@ public class ValueTableIndexResource extends IndexResource {
             .setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
       }
 
-      return tableStatusDto;
+      return Response.ok().entity(tableStatusDto).build();
     }
 
-    throw new SearchServiceException();
+    return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
   }
 
   @PUT

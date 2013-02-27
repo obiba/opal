@@ -506,8 +506,9 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public HasAuthorization getTableIndexEditAuthorizer() {
-    return new CompositeAuthorizer(new UIObjectAuthorizer(clearIndexLink), new UIObjectAuthorizer(indexNowLink),
-        new UIObjectAuthorizer(scheduleLink), new UIObjectAuthorizer(cancelLink)) {
+    return new CompositeAuthorizer(new UIObjectAuthorizer(indexStatusAlert), new UIObjectAuthorizer(clearIndexLink),
+        new UIObjectAuthorizer(indexNowLink), new UIObjectAuthorizer(scheduleLink),
+        new UIObjectAuthorizer(cancelLink)) {
       @Override
       public void authorized() {
         super.authorized();
@@ -561,7 +562,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       setStatusText(translations.indexAlertUpToDate(), AlertType.SUCCESS, true, false, true, false, false);
       setProgressBar(false, 0);
     } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.OUTDATED.getName())) {
-      setStatusText(translations.indexStatusOutOfDate(), AlertType.ERROR, true, true, true, false, false);
+      setStatusText(translations.indexStatusOutOfDate(), AlertType.ERROR, false, true, true, false, false);
       setProgressBar(false, 0);
     } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
       setStatusText(translations.indexStatusInProgress(), AlertType.INFO, false, false, false, true, true);
