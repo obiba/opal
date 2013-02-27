@@ -17,8 +17,8 @@ import junit.framework.Assert;
 /**
  *
  */
-public class DatasourcesPermissionConverterTest extends
-    OpalPermissionConverterTest<DatasourcesPermissionConverter.Permission> {
+public class DatasourcesPermissionConverterTest
+    extends OpalPermissionConverterTest<DatasourcesPermissionConverter.Permission> {
 
   @Test
   public void testArgs() {
@@ -56,8 +56,8 @@ public class DatasourcesPermissionConverterTest extends
   public void testTableEdit() {
     testConversion("/datasource/patate/table/pwel", DatasourcesPermissionConverter.Permission.TABLE_EDIT, //
         "magma:/datasource/patate/table/pwel/variables:POST:GET", //
-        "magma:/datasource/patate/table/pwel/index:*:GET", //
-        "magma:/datasource/patate/table/pwel/index/schedule:*:GET", //
+        "magma:/datasource/patate/table/pwel/index:GET:GET", //
+        "magma:/datasource/patate/table/pwel/index/schedule:GET:GET", //
         "magma:/datasource/patate/table/pwel:GET:GET", //
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/variables:GET:GET/GET", //
