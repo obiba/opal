@@ -71,6 +71,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ArchiveStep
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.SpssFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.UnitSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
@@ -177,6 +178,8 @@ public interface OpalGinjector extends Ginjector {
   CsvFormatStepPresenter getCsvFormatStepPresenter();
 
   XmlFormatStepPresenter getXmlFormatStepPresenter();
+
+  SpssFormatStepPresenter getSpssFormatStepPresenter();
 
   DestinationSelectionStepPresenter getDestinationSelectionStepPresenter();
 
