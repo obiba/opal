@@ -228,6 +228,8 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
         validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuoteText(), "QuoteSeparatorRequired"));
       } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
         validators.add(new RegExValidator(getSelectedFile(), ".zip$", "i", "ZipFileRequired"));
+      } else if(getView().getImportFormat().equals(ImportFormat.SPSS)) {
+        validators.add(new RegExValidator(getSelectedFile(), ".sav$", "i", "SpssFileRequired"));
       } else {
         validators.add(new RequiredTextValidator(getView().getSelectedFile(), "NoFileSelected"));
       }

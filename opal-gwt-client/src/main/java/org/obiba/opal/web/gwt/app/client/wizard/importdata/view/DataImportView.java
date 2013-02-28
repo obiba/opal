@@ -97,6 +97,9 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   FlowPanel helpOpalXml;
 
   @UiField
+  FlowPanel helpSpss;
+
+  @UiField
   FlowPanel helpLimeSurvey;
 
   @UiField
@@ -213,6 +216,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     formatChooser.addGroup(translations.fileBasedDatasources());
     formatChooser.addItemToGroup(translations.csvLabel(), ImportFormat.CSV.name());
     formatChooser.addItemToGroup(translations.opalXmlLabel(), ImportFormat.XML.name());
+    formatChooser.addItemToGroup(translations.spssLabel(), ImportFormat.SPSS.name());
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
@@ -368,6 +372,9 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         break;
       case REST:
         helpOpalRest.setVisible(true);
+        break;
+      case SPSS:
+        helpSpss.setVisible(true);
         break;
     }
   }
