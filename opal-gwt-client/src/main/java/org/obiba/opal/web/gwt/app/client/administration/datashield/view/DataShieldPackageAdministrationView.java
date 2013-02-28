@@ -184,4 +184,10 @@ public class DataShieldPackageAdministrationView extends ViewImpl
   public void setPackageNameFieldUpdater(FieldUpdater<RPackageDto, String> updater) {
     packageNameColumn.setFieldUpdater(updater);
   }
+
+  @Override
+  public void setAddPackageButtonEnabled(boolean b) {
+    addPackageButton.setEnabled(b);
+  }
+
 }
