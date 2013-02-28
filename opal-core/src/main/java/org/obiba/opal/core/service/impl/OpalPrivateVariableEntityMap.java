@@ -66,10 +66,6 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     constructCache();
   }
 
-  //
-  // PrivateVariableEntityMap Methods
-  //
-
   @Override
   public VariableEntity publicEntity(@Nonnull VariableEntity privateEntity) {
     Assert.notNull(privateEntity, "privateEntity cannot be null");
@@ -116,7 +112,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     }
     throw new IllegalStateException(
         "Unable to generate a unique private entity for the owner [" + ownerVariable + "] and public entity [" +
-            publicEntity.getIdentifier() + "]. " + "One hundred attempts made.");
+            publicEntity.getIdentifier() + "]. One hundred attempts made.");
   }
 
   @Override
@@ -136,7 +132,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     }
     throw new IllegalStateException(
         "Unable to generate a unique public entity for the owner [" + ownerVariable + "] and private entity [" +
-            privateEntity.getIdentifier() + "]. " + "One hundred attempts made.");
+            privateEntity.getIdentifier() + "]. One hundred attempts made.");
   }
 
   private void writeEntities(ValueTable keyTable, VariableEntity publicEntity, VariableEntity privateEntity)

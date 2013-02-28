@@ -9,16 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.obiba.magma.Datasource;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.support.AbstractDatasourceWrapper;
+import org.obiba.magma.support.AbstractDatasourceWrapperWithCachedTables;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.util.Assert;
@@ -26,7 +22,7 @@ import org.springframework.util.Assert;
 /**
  *
  */
-public class FunctionalUnitDatasource extends AbstractDatasourceWrapper {
+public class FunctionalUnitDatasource extends AbstractDatasourceWrapperWithCachedTables {
 
   @Nonnull
   private final FunctionalUnit unit;
@@ -60,18 +56,8 @@ public class FunctionalUnitDatasource extends AbstractDatasourceWrapper {
   }
 
   @Override
-  public ValueTable getValueTable(String name) throws NoSuchValueTableException {
-    return new FunctionalUnitView(unit, policy, super.getValueTable(name), keysTable, identifierGenerator,
-        ignoreUnknownIdentifier);
+  protected ValueTable createValueTable(ValueTable table) {
+    return new FunctionalUnitView(unit, policy, table, keysTable, identifierGenerator, ignoreUnknownIdentifier);
   }
 
-  @Override
-  public Set<ValueTable> getValueTables() {
-    Set<ValueTable> views = new HashSet<ValueTable>();
-    for(ValueTable sourceTable : super.getValueTables()) {
-      views.add(
-          new FunctionalUnitView(unit, policy, sourceTable, keysTable, identifierGenerator, ignoreUnknownIdentifier));
-    }
-    return views;
-  }
 }

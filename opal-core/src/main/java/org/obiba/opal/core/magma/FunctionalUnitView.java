@@ -20,6 +20,8 @@ import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -48,6 +50,8 @@ public class FunctionalUnitView extends View {
     UNIT_IDENTIFIERS_ARE_PRIVATE
 
   }
+
+  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitView.class);
 
   private final FunctionalUnit unit;
 
@@ -99,6 +103,9 @@ public class FunctionalUnitView extends View {
       default:
         throw new IllegalArgumentException("unknown policy '" + policy + "'");
     }
+
+    log.debug("Create FunctionalUnitView. Table: {}, unit: {}, policy: {}", dataTable.getName(), unit.getName(),
+        policy);
   }
 
   public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable) {
