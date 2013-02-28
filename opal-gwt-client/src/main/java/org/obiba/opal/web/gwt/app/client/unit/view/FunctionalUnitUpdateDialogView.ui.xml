@@ -32,7 +32,7 @@
                 </g:CheckBox>
                 <g:TextArea name="select" ui:field="select" addStyleNames="not-so-full-width"/>
                 <g:FlowPanel addStyleNames="help-block">
-                  <g:InlineLabel><ui:msg description="Filter with Magma Javascript API">Filter script written with</ui:msg></g:InlineLabel>
+                  <g:InlineLabel><ui:msg description="Filter with Magma Javascript API">Filter the variables which values would identify the participant. Use a script written with</ui:msg></g:InlineLabel>
                   <g:Anchor styleName="xsmall-indent" href="http://wiki.obiba.org/display/OPALDOC/Magma+Javascript+API" target="_blank" text="Magma Javascript API." />
                 </g:FlowPanel>
               </g:FlowPanel>
