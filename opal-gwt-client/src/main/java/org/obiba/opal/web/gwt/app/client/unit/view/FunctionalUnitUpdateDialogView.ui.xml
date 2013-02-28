@@ -12,7 +12,7 @@
           <g:FlowPanel addStyleNames="main">
             <g:FlowPanel styleName="input">
               <g:Label addStyleNames="p large-bottom-margin"><ui:msg description="Name label">A "Unit" is used to
-                protect participant's privacy while importing or exporting data with Opal. This privacu is ensured by hiding the private participant identifier and encrypting the data.</ui:msg></g:Label>
+                protect participant's privacy while importing or exporting data with Opal. This privacy is ensured by hiding the private participant identifier and encrypting the data.</ui:msg></g:Label>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
               <g:Label addStyleNames="key"><ui:msg description="Name label">Name</ui:msg></g:Label>
