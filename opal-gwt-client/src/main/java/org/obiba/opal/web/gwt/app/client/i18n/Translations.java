@@ -288,6 +288,7 @@ public interface Translations extends Constants {
       "XMLFileRequired", "An XML file is required.", //
       "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
       "ZipFileRequired", "A Zip file is required.", //
+      "SpssFileRequired", "An SPSS file is required.", //
       "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
       "ReportTemplateWasNotFound", "The specified report template could not be found.",//
       "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list.",//
@@ -698,6 +699,10 @@ public interface Translations extends Constants {
   @Description("Opal XML label")
   @DefaultStringValue("Opal XML")
   String opalXmlLabel();
+
+  @Description("SPSS label")
+  @DefaultStringValue("SPSS")
+  String spssLabel();
 
   @Description("Opal REST label")
   @DefaultStringValue("Opal")
