@@ -73,35 +73,36 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(final TableDto table, String select) {
-    if(table == null) {
-      getView().setTable(null);
-    } else {
-      hidePopups(table);
-      this.table = table;
+//    if(table == null) {
+//      getView().setTable(null);
+//    } else {
+    hidePopups(table);
+    this.table = table;
 
-      getView().setTable(table);
-      getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
-        @Override
-        public void update(String value) {
-          // Get the variable
-          UriBuilder uriBuilder = UriBuilder.create()
-              .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", value);
+    getView().clearTable();
+    getView().setTable(table);
+    getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
+      @Override
+      public void update(String value) {
+        // Get the variable
+        UriBuilder uriBuilder = UriBuilder.create()
+            .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", value);
 
-          ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
-              .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-                @Override
-                public void onResource(Response response, JsArray<VariableDto> resource) {
-                  if(response.getStatusCode() == SC_OK) {
-                    VariableDto dto = VariableDto.get(JsArrays.toSafeArray(resource));
-                    getEventBus().fireEvent(new VariableSelectionChangeEvent(table, dto));
-                  }
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
+            .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+              @Override
+              public void onResource(Response response, JsArray<VariableDto> resource) {
+                if(response.getStatusCode() == SC_OK) {
+                  VariableDto dto = VariableDto.get(JsArrays.toSafeArray(resource));
+                  getEventBus().fireEvent(new VariableSelectionChangeEvent(table, dto));
                 }
+              }
 
-              }).send();
-        }
-      });
-      fetcher.updateVariables(select);
-    }
+            }).send();
+      }
+    });
+    fetcher.updateVariables(select);
+//    }
   }
 
   @Override
@@ -292,7 +293,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         variablesRequest.cancel();
         variablesRequest = null;
       }
-      setTable(null);
+      getView().clearTable();
       variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
           .withCallback(new VariablesResourceCallback(table))
           .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
@@ -307,6 +308,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   public interface Display extends View {
     void setTable(TableDto table);
+
+    void clearTable();
 
     void setVariables(JsArray<VariableDto> variables);
 
