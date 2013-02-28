@@ -130,6 +130,7 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   @Override
   public void clear() {
     name.setText("");
+    reference.setText("");
   }
 
 }

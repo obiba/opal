@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -32,7 +32,6 @@ public class PropertiesTable extends FlowPanel {
   private String valueStyleNames;
 
   public PropertiesTable() {
-    super();
     innerTable = new DefaultFlexTable();
     super.add(innerTable);
   }
@@ -48,7 +47,8 @@ public class PropertiesTable extends FlowPanel {
         span = ((PropertyPanel) child).getSpan();
       }
       if(children.getWidgetCount() != 2) {
-        throw new IllegalArgumentException("PropertiesGrid expects a pair of key/value widgets at row " + innerTable.getRowCount());
+        throw new IllegalArgumentException(
+            "PropertiesGrid expects a pair of key/value widgets at row " + innerTable.getRowCount());
       }
       addProperty(children.getWidget(0), children.getWidget(1), column, span);
     } else {
@@ -167,6 +167,15 @@ public class PropertiesTable extends FlowPanel {
         }
       }
     }
+  }
+
+  /**
+   * Clears all properties, needs to reapply set properties afterwards
+   */
+  public void clearProperties() {
+    remove(innerTable);
+    innerTable = new DefaultFlexTable();
+    super.add(innerTable);
   }
 
 }
