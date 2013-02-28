@@ -208,30 +208,35 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   @Override
+  public void clearTable() {
+    valuesTable.setVisible(false);
+    pager.setVisible(false);
+    setRefreshing(true);
+  }
+
+  @Override
   public void setTable(TableDto table) {
-    if(table == null) {
-      valuesTable.setRowCount(0);
-      setRefreshing(true);
-    } else {
-      this.table = table;
-      valuesTable.setRowCount(table.getValueSetCount());
-      valuesTable.setPageStart(0);
+    valuesTable.setEmptyTableWidget(noValues);
+    this.table = table;
+    valuesTable.setRowCount(table.getValueSetCount());
+    valuesTable.setPageStart(0);
 
-      if(dataProvider != null) {
-        dataProvider.removeDataDisplay(valuesTable);
-        dataProvider = null;
-      }
-
-      searchBox.setText("");
-      filter.setText("");
-      lastFilter = "";
-      filter.setValue(lastFilter, false);
-      setRefreshing(false);
+    if(dataProvider != null) {
+      dataProvider.removeDataDisplay(valuesTable);
+      dataProvider = null;
     }
+
+    searchBox.setText("");
+    filter.setText("");
+    lastFilter = "";
+    filter.setValue(lastFilter, false);
+    setRefreshing(false);
   }
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
+    valuesTable.setVisible(true);
+    pager.setVisible(true);
     setVariables(JsArrays.toList(variables));
   }
 
