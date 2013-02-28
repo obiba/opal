@@ -16,7 +16,7 @@
 
     <o:PropertiesTable  ui:field="propertiesPanel" condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
       <o:PropertyPanel>
-        <g:Label><ui:msg description="Functional Unit description">Unit description</ui:msg></g:Label>
+        <g:Label><ui:msg description="Functional Unit description">Description</ui:msg></g:Label>
         <g:Label ui:field="description"/>
       </o:PropertyPanel>
       <o:PropertyPanel>
