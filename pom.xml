@@ -1027,6 +1027,12 @@
         <version>${REngine.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>${jsr305.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -1071,6 +1077,11 @@
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
     </dependency>
 
   </dependencies>
@@ -1362,7 +1373,7 @@
     <ehcache-core.version>2.4.2</ehcache-core.version>
     <elasticsearch.version>0.19.11</elasticsearch.version>
     <gin.version>1.5.0</gin.version>
-    <guava.version>10.0.1</guava.version>
+    <guava.version>14.0</guava.version>
     <gwt.version>2.4.0</gwt.version>
     <gwt-bootstrap.version>2.0.4.0</gwt-bootstrap.version>
     <gwt-chosen.version>1.1.0</gwt-chosen.version>
@@ -1381,6 +1392,7 @@
     <jotm.version>2.1.9</jotm.version>
     <jpa.version>1.0</jpa.version>
     <json.version>20090211</json.version>
+    <jsr305.version>2.0.1</jsr305.version>
     <jta.version>1.0.1B</jta.version>
     <junit.version>4.7</junit.version>
     <liquibase.version>1.9.4</liquibase.version>

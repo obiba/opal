@@ -31,9 +31,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
@@ -76,7 +76,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   private final ExtensionConfigurationSupplier<JdbcDataSourcesConfig> configSupplier;
 
-  private final Cache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder()
+  private final LoadingCache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new RemovalListener<String, BasicDataSource>() {
 
         @Override
@@ -98,7 +98,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
         }
       });
 
-  private final Cache<String, SessionFactory> sessionFactoryCache = CacheBuilder.newBuilder()
+  private final LoadingCache<String, SessionFactory> sessionFactoryCache = CacheBuilder.newBuilder()
       .removalListener(new RemovalListener<String, SessionFactory>() {
         @Override
         public void onRemoval(RemovalNotification<String, SessionFactory> notification) {

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -31,6 +31,7 @@ import org.obiba.opal.reporting.service.birt.common.BirtEngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.util.FileSystemUtils;
 
 import com.google.common.io.Files;
 
@@ -49,7 +50,8 @@ public class EmbeddedBirtEngine implements BirtEngine {
   private File osgiHome;
 
   @Override
-  public void render(String formatName, Map<String, String> parameters, String reportDesign, String reportOutput) throws BirtEngineException {
+  public void render(String formatName, Map<String, String> parameters, String reportDesign, String reportOutput)
+      throws BirtEngineException {
     if(isRunning() == false) {
       throw new BirtEngineException("Report engine not running. Please check startup logs for details.");
     }
@@ -84,7 +86,8 @@ public class EmbeddedBirtEngine implements BirtEngine {
 
     try {
       // make sure BIRT_HOME is set and valid
-      File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine").getAbsoluteFile();
+      File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine")
+          .getAbsoluteFile();
 
       if(reportEngineHome.exists() == false) {
         log.warn("BIRT ReportEngine directory does not exist {}", reportEngineHome.getPath());
@@ -97,7 +100,8 @@ public class EmbeddedBirtEngine implements BirtEngine {
       bindLoggingToSlf4J(config);
 
       Platform.startup(config);
-      IReportEngineFactory factory = (IReportEngineFactory) Platform.createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
+      IReportEngineFactory factory = (IReportEngineFactory) Platform
+          .createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
       engine = factory.createReportEngine(config);
     } catch(Exception e) {
       throw new RuntimeException(e);
@@ -114,17 +118,12 @@ public class EmbeddedBirtEngine implements BirtEngine {
       log.warn("Exception during BIRT shutdown", e);
     } finally {
       engine = null;
-      try {
-        if(osgiHome != null) {
-          Files.deleteRecursively(osgiHome);
-        }
-      } catch(IOException e) {
-        // ignore
-      }
+      FileSystemUtils.deleteRecursively(osgiHome);
     }
   }
 
-  private IRunAndRenderTask createTask(IReportRunnable design, Map<String, String> parameters, BirtReportFormat format, String reportOutput) {
+  private IRunAndRenderTask createTask(IReportRunnable design, Map<String, String> parameters, BirtReportFormat format,
+      String reportOutput) {
     IRunAndRenderTask task = engine.createRunAndRenderTask(design);
 
     // Set parameter values and validate
@@ -155,14 +154,14 @@ public class EmbeddedBirtEngine implements BirtEngine {
 
     // To get the errors after running, we must call getErrors() BEFORE task.close().
     switch(task.getStatus()) {
-    case IEngineTask.STATUS_FAILED:
-      List<EngineException> errors = task.getErrors();
-      List<String> msgs = new ArrayList<String>();
-      for(EngineException e : errors) {
-        msgs.add(e.getLocalizedMessage());
-      }
-      throw new BirtEngineException(msgs);
-    default:
+      case IEngineTask.STATUS_FAILED:
+        List<EngineException> errors = task.getErrors();
+        List<String> msgs = new ArrayList<String>();
+        for(EngineException e : errors) {
+          msgs.add(e.getLocalizedMessage());
+        }
+        throw new BirtEngineException(msgs);
+      default:
     }
   }
 
@@ -178,6 +177,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
 
   /**
    * Binds BIRT's logging output to SLF4J so that logging is consistent with Opal's configuration.
+   *
    * @param config
    */
   private void bindLoggingToSlf4J(EngineConfig config) {
