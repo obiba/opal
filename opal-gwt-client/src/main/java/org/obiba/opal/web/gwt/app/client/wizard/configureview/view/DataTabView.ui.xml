@@ -1,10 +1,9 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <ui:style>
     .tab { min-height: 30em; }
@@ -14,11 +13,11 @@
     <g:Label addStyleNames="inline">
       <ui:msg description="Select tables to be viewed label">Select the tables which data will be viewed:</ui:msg>
     </g:Label>
-    <g:Button ui:field="saveChangesButton" styleName="btn right-aligned">
+    <g:Button ui:field="saveChangesButton" styleName="btn right-aligned small-bottom-margin">
       <ui:msg description="Save changes button label">Save Changes</ui:msg>
     </g:Button>
     <g:FlowPanel>
-      <o:TableChooser ui:field="tableChooser"/>
+      <o:TableChooser ui:field="tableChooser" addStyleNames="full-width"/>
     </g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>
