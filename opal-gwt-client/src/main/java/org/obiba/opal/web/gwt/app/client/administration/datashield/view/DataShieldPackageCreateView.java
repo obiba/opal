@@ -133,4 +133,13 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
     reference.setText("");
   }
 
+  @Override
+  public void setInstallButtonEnabled(boolean b) {
+    installButton.setEnabled(b);
+  }
+
+  @Override
+  public void setCancelButtonEnabled(boolean b) {
+    cancelButton.setEnabled(b);
+  }
 }
