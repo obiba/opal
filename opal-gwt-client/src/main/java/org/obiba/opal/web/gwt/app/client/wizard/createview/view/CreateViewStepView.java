@@ -9,17 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createview.view;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
+import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
@@ -48,7 +44,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
-import com.watopi.chosen.client.gwt.ChosenListBox;
 
 public class CreateViewStepView extends PopupViewImpl implements CreateViewStepPresenter.Display {
 
@@ -112,6 +107,7 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   public CreateViewStepView(EventBus eventBus) {
     super(eventBus);
     tableChooser = new TableChooser(true);
+    tableChooser.setWidth("");
     this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
 
@@ -162,6 +158,14 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
           @Override
           public void onReset() {
             tableChooser.clear();
+          }
+        })//
+        .onStepIn(new WizardStepController.StepInHandler() {
+          @Override
+          public void onStepIn() {
+            int w = (int) (tablesStep.getParent().getElement().getClientWidth() * 0.90);
+            tableChooser.setWidth(w + "px");
+            tableChooser.forceRedraw();
           }
         })//
 
@@ -281,8 +285,7 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   }
 
   @UiTemplate("CreateViewStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, CreateViewStepView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, CreateViewStepView> {}
 
   @Override
   public void renderPendingConclusion() {
