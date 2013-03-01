@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
@@ -43,7 +44,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
   private final Set<SubjectAclChangeCallback> callbacks = Sets.newHashSet();
 
   @Autowired
-  public DefaultSubjectAclService(@Qualifier("opal-data") PersistenceManager persistenceManager, @Qualifier("opal-data") SessionFactory sessionFactory) {
+  public DefaultSubjectAclService(@Qualifier("opal-data") PersistenceManager persistenceManager,
+      @Qualifier("opal-data") SessionFactory sessionFactory) {
     this.persistenceManager = persistenceManager;
     this.sessionFactory = sessionFactory;
   }
@@ -90,7 +92,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject, String permission) {
+  public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject,
+      String permission) {
     for(SubjectAcl acl : persistenceManager.match(new SubjectAcl(domain, node, subject, permission))) {
       persistenceManager.delete(acl);
     }
@@ -98,7 +101,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void addSubjectPermissions(String domain, String node, SubjectAclService.Subject subject, Iterable<String> permissions) {
+  public void addSubjectPermissions(String domain, String node, SubjectAclService.Subject subject,
+      Iterable<String> permissions) {
     for(String permission : permissions) {
       addSubjectPermission(domain, node, subject, permission);
     }
@@ -113,7 +117,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Permissions getSubjectPermissions(final String domain, final String node, final SubjectAclService.Subject subject) {
+  public Permissions getSubjectPermissions(final String domain, final String node,
+      final SubjectAclService.Subject subject) {
     if(node == null) throw new IllegalArgumentException("node cannot be null");
     if(subject == null) throw new IllegalArgumentException("subject cannot be null");
 
@@ -214,32 +219,33 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Iterable<SubjectAclService.Subject> getSubjects(final String domain, final SubjectType type) {
+  public Iterable<SubjectAclService.Subject> getSubjects(String domain, SubjectType type) {
     SubjectAcl template = new SubjectAcl(domain, null, type);
 
-    return Iterables.filter(Iterables.transform(persistenceManager.match(template), new Function<SubjectAcl, SubjectAclService.Subject>() {
+    return FluentIterable.from(persistenceManager.match(template))
+        .transform(new Function<SubjectAcl, SubjectAclService.Subject>() {
 
-      @Override
-      public SubjectAclService.Subject apply(SubjectAcl from) {
-        return from.getSubject();
-      }
+          @Override
+          public SubjectAclService.Subject apply(SubjectAcl from) {
+            return from.getSubject();
+          }
 
-    }), new Predicate<SubjectAclService.Subject>() {
+        }).filter(new Predicate<SubjectAclService.Subject>() {
 
-      final TreeSet<SubjectAclService.Subject> set = new TreeSet<SubjectAclService.Subject>();
+          final TreeSet<SubjectAclService.Subject> set = new TreeSet<SubjectAclService.Subject>();
 
-      @Override
-      public boolean apply(SubjectAclService.Subject input) {
-        // add returns false if the set already contains the element
-        return set.add(input);
-      }
-    });
+          @Override
+          public boolean apply(SubjectAclService.Subject input) {
+            // add returns false if the set already contains the element
+            return set.add(input);
+          }
+        });
   }
 
   /**
    * @param subjects
    */
-  private void notifyListeners(Set<SubjectAclService.Subject> subjects) {
+  private void notifyListeners(Iterable<Subject> subjects) {
     for(SubjectAclService.Subject s : subjects)
       notifyListeners(s);
   }
