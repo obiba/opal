@@ -3,6 +3,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -165,18 +166,27 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   private void authorizePublishMethods(RPackageDto dto, HasAuthorization authorizer) {
-    // Check acces to delete/put a method
+    // Check access to delete/put a method
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packageRMethods(dto.getName())).get()
         .authorize(authorizer).send();
   }
 
   private void updateDataShieldPackages() {
     ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder().forResource(packagesR()).get()//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setAddPackageButtonEnabled(false);
+            getView().renderDataShieldPackagesRows(null);
+          }
+        }, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_SERVICE_UNAVAILABLE)//
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
-
           @Override
           public void onResource(Response response, JsArray<RPackageDto> resource) {
-            getView().renderDataShieldPackagesRows(JsArrays.toSafeArray(resource));
+            if(response.getStatusCode() == Response.SC_OK) {
+              getView().setAddPackageButtonEnabled(true);
+              getView().renderDataShieldPackagesRows(JsArrays.toSafeArray(resource));
+            }
           }
         }).send();
   }
@@ -224,6 +234,7 @@ public class DataShieldPackageAdministrationPresenter
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_OK) {
           updateDataShieldPackages();
+          getEventBus().fireEvent(new DataShieldPackageRemovedEvent(dto));
         } else {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
@@ -238,13 +249,6 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   private void publishDataShieldMethods(final RPackageDto dto) {
-//    GET /datashield/package/xxx/methods
-//    for each aggregate method
-//    DELETE /datashield/env/aggregate/method/mmm
-//    POST /datashield/env/aggregate/methods
-//    for each assign method
-//    DELETE /datashield/env/assign/method/mmm
-//    POST /datashield/env/assing/methods
     ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder().forResource(packageRMethods(dto.getName()))
         .get()//
         .withCallback(new ResourceCallback<DataShieldPackageMethodsDto>() {
@@ -281,9 +285,9 @@ public class DataShieldPackageAdministrationPresenter
 
   private class DeleteMethodCallback implements ResponseCodeCallback {
 
-    private DataShieldMethodDto dto;
+    private final DataShieldMethodDto dto;
 
-    private String environment;
+    private final String environment;
 
     private DeleteMethodCallback(DataShieldMethodDto dto, String environment) {
       this.dto = dto;
@@ -305,7 +309,7 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   private class PublishMethodCallback implements ResponseCodeCallback {
-    private DataShieldMethodDto dto;
+    private final DataShieldMethodDto dto;
 
     private PublishMethodCallback(DataShieldMethodDto dto) {
       this.dto = dto;
@@ -313,11 +317,7 @@ public class DataShieldPackageAdministrationPresenter
 
     @Override
     public void onResponseCode(Request request, Response response) {
-//      if(response.getStatusCode() == Response.SC_OK) {
       getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(dto));
-//      } else {
-//        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-//      }
     }
   }
 
@@ -375,6 +375,8 @@ public class DataShieldPackageAdministrationPresenter
     HasActionHandler<RPackageDto> getDataShieldPackageActionsColumn();
 
     HandlerRegistration addPackageHandler(ClickHandler handler);
+
+    void setAddPackageButtonEnabled(boolean b);
 
     HasAuthorization getAddPackageAuthorizer();
 

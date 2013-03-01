@@ -11,7 +11,9 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackagePresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
+import org.obiba.opal.web.model.client.opal.r.EntryDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -55,41 +57,44 @@ public class DataShieldPackageView extends PopupViewImpl implements DataShieldPa
   @UiField
   Button closeButton;
 
+  @UiField
+  PropertiesTable properties;
+
 //  @UiField
 //  Label name;
 
-  @UiField
-  Label packageName;
-
-  @UiField
-  Label version;
-
-  @UiField
-  Label title;
-
-  @UiField
-  Label author;
-
-  @UiField
-  Label maintainer;
-
-  @UiField
-  Label depends;
-
-  @UiField
-  Label description;
-
-  @UiField
-  Label license;
-
-  @UiField
-  Label opalVersion;
-
-  @UiField
-  Anchor url;
-
-  @UiField
-  Anchor bugReports;
+//  @UiField
+//  Label packageName;
+//
+//  @UiField
+//  Label version;
+//
+//  @UiField
+//  Label title;
+//
+//  @UiField
+//  Label author;
+//
+//  @UiField
+//  Label maintainer;
+//
+//  @UiField
+//  Label depends;
+//
+//  @UiField
+//  Label description;
+//
+//  @UiField
+//  Label license;
+//
+//  @UiField
+//  Label opalVersion;
+//
+//  @UiField
+//  Anchor url;
+//
+//  @UiField
+//  Anchor bugReports;
 
   //
   // Constructors
@@ -133,76 +138,27 @@ public class DataShieldPackageView extends PopupViewImpl implements DataShieldPa
     return closeButton;
   }
 
-//  @Override
-//  public void setName(String name) {
-//    this.name.setText(name != null ? name : "");
-//  }
-
   @Override
-  public void setPackageName(String packageName) {
-    this.packageName.setText(packageName != null ? packageName : "");
-  }
-
-  @Override
-  public void setVersion(String version) {
-    this.version.setText(version != null ? version : "");
-  }
-
-  @Override
-  public void setTitle(String title) {
-    this.title.setText(title != null ? title : "");
-  }
-
-  @Override
-  public void setAuthor(String author) {
-    this.author.setText(author != null ? author : "");
-  }
-
-  @Override
-  public void setMaintainer(String maintainer) {
-    this.maintainer.setText(maintainer != null ? maintainer : "");
-  }
-
-  @Override
-  public void setDepends(String depends) {
-    this.depends.setText(depends != null ? depends : "");
-  }
-
-  @Override
-  public void setDescription(String description) {
-    this.description.setText(description != null ? description : "");
-  }
-
-  @Override
-  public void setLicense(String license) {
-    this.license.setText(license != null ? license : "");
-  }
-
-  @Override
-  public void setOpalVersion(String opalVersion) {
-    this.opalVersion.setText(opalVersion != null ? opalVersion : "");
-  }
-
-  @Override
-  public void setUrl(String url, String href) {
-    if(url != null) {
-      this.url.setHref(href);
-      this.url.setText(url);
-      this.url.setTarget("_blank");
+  public void addProperty(EntryDto dto) {
+    if(dto.getValue().toLowerCase().startsWith("http")) {
+      Anchor a = new Anchor();
+      a.setTarget("_blank");
+      a.setHref(dto.getValue());
+      a.setText(dto.getValue());
+      properties.addProperty(new Label(dto.getKey()), a.asWidget());
     } else {
-      this.url.setText("");
+      properties.addProperty(dto.getKey(), dto.getValue());
     }
   }
 
   @Override
-  public void setBugReports(String bugReports, String href) {
-    if(bugReports != null) {
-      this.bugReports.setHref(href);
-      this.bugReports.setText(bugReports);
-      this.bugReports.setTarget("_blank");
-    } else {
-      this.bugReports.setText("");
-    }
+  public void clearProperties() {
+    properties.clearProperties();
+    properties.setBordered(false);
+    properties.setCondensed(true);
+    properties.setZebra(true);
+    properties.setKeyStyleNames("span3 small-indent");
+    properties.addStyleName("small-dual-indent");
+    properties.addStyleName("top-margin");
   }
-
 }

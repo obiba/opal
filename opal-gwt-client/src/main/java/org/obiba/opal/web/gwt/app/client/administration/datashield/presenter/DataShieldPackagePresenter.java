@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.obiba.opal.web.model.client.opal.r.EntryDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
@@ -42,31 +39,12 @@ public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackag
   }
 
   public void displayPackage(RPackageDto dto) {
-    Map<String, EntryDto> entriesMap = descriptionArrayToMap(dto);
-
-    getView().setPackageName(entriesMap.get("package").getValue());
-    getView().setVersion(entriesMap.get("version").getValue());
-    getView().setTitle(entriesMap.get("title").getValue());
-    getView().setAuthor(entriesMap.get("author").getValue());
-    getView().setMaintainer(entriesMap.get("maintainer").getValue());
-    getView().setDepends(entriesMap.get("depends").getValue());
-    getView().setDescription(entriesMap.get("description").getValue());
-    getView().setLicense(entriesMap.get("license").getValue());
-    getView().setOpalVersion(entriesMap.get("opalVersion").getValue());
-    getView().setUrl(entriesMap.get("url").getValue(), entriesMap.get("url").getValue());
-    getView().setBugReports(entriesMap.get("bugReports").getValue(), entriesMap.get("bugReports").getValue());
-
-  }
-
-  private Map<String, EntryDto> descriptionArrayToMap(RPackageDto dto) {
-    Map<String, EntryDto> entriesMap = new HashMap<String, EntryDto>();
     JsArray<EntryDto> entries = dto.getDescriptionArray();
 
+    getView().clearProperties();
     for(int i = 0; i < entries.length(); i++) {
-      entriesMap.put(entries.get(i).getKey().toLowerCase(), entries.get(i));
+      getView().addProperty(entries.get(i));
     }
-
-    return entriesMap;
   }
 
   //
@@ -79,27 +57,9 @@ public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackag
 
     HasClickHandlers getCloseButton();
 
-    void setPackageName(String s);
+    void addProperty(EntryDto dto);
 
-    void setVersion(String s);
-
-    void setTitle(String s);
-
-    void setAuthor(String s);
-
-    void setMaintainer(String s);
-
-    void setDepends(String s);
-
-    void setDescription(String s);
-
-    void setLicense(String s);
-
-    void setOpalVersion(String s);
-
-    void setUrl(String s, String href);
-
-    void setBugReports(String s, String href);
+    void clearProperties();
   }
 
 }

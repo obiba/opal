@@ -54,7 +54,7 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
       }
     }));
 
-    this.packageValidationHandler = new PackageValidationHandler(getEventBus());
+    packageValidationHandler = new PackageValidationHandler(getEventBus());
   }
 
   /**
@@ -77,9 +77,10 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
         .build(name, reference);
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void createPackage() {
     if(packageValidationHandler.validate()) {
+      getView().setInstallButtonEnabled(false);
+      getView().setCancelButtonEnabled(false);
       ResponseCodeCallback createCallback = new CreatePackageCallBack();
       ResourceCallback alreadyExistCallback = new AlreadyExistMethodCallBack();
       ResourceRequestBuilderFactory.<RPackageDto>newBuilder().forResource(packageR(getView().getName().getText()))
@@ -89,19 +90,18 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     }
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void postMethod(RPackageDto dto) {
     ResponseCodeCallback callbackHandler = new CreateOrUpdatePackageCallBack(dto);
 
-    if(!getView().getReference().getText().isEmpty()) {
-      ResourceRequestBuilderFactory.newBuilder()
-          .forResource(packagesR(getView().getName().getText(), getView().getReference().getText())).post()//
+    if(getView().getReference().getText().isEmpty()) {
+      ResourceRequestBuilderFactory.newBuilder().forResource(packagesR(getView().getName().getText())).post()//
           .withResourceBody(RPackageDto.stringify(dto))//
           .withCallback(Response.SC_OK, callbackHandler)//
           .withCallback(Response.SC_CREATED, callbackHandler)//
           .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
     } else {
-      ResourceRequestBuilderFactory.newBuilder().forResource(packagesR(getView().getName().getText())).post()//
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(packagesR(getView().getName().getText(), getView().getReference().getText())).post()//
           .withResourceBody(RPackageDto.stringify(dto))//
           .withCallback(Response.SC_OK, callbackHandler)//
           .withCallback(Response.SC_CREATED, callbackHandler)//
@@ -109,7 +109,6 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     }
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private RPackageDto getDataShieldPackageDto() {
     RPackageDto dto = RPackageDto.create();
     dto.setName(getView().getName().getText());
@@ -170,7 +169,7 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
 
     RPackageDto dto;
 
-    public CreateOrUpdatePackageCallBack(RPackageDto dto) {
+    private CreateOrUpdatePackageCallBack(RPackageDto dto) {
       this.dto = dto;
     }
 
@@ -200,6 +199,10 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     HasText getReference();
 
     void clear();
+
+    void setInstallButtonEnabled(boolean b);
+
+    void setCancelButtonEnabled(boolean b);
 
   }
 

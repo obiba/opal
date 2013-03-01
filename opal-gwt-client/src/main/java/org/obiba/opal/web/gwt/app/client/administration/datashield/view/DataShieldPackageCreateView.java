@@ -130,6 +130,16 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   @Override
   public void clear() {
     name.setText("");
+    reference.setText("");
   }
 
+  @Override
+  public void setInstallButtonEnabled(boolean b) {
+    installButton.setEnabled(b);
+  }
+
+  @Override
+  public void setCancelButtonEnabled(boolean b) {
+    cancelButton.setEnabled(b);
+  }
 }

@@ -14,81 +14,9 @@
       <g:center>
         <g:ScrollPanel>
 
-          <o:PropertiesTable condensed="true" borderedCell="false" zebra="true"
+          <o:PropertiesTable ui:field="properties" condensed="true" borderedCell="false" zebra="true"
               addStyleNames="small-dual-indent top-margin"
               keyStyleNames="span3 small-indent">
-            <!--<g:FlowPanel>-->
-            <!--<g:Label>-->
-            <!--<ui:msg description="Name label">Name</ui:msg>-->
-            <!--</g:Label>-->
-            <!--<g:Label ui:field="name"/>-->
-            <!--</g:FlowPanel>-->
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Package label">Package</ui:msg>
-              </g:Label>
-              <g:Label ui:field="packageName"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Version label">Version</ui:msg>
-              </g:Label>
-              <g:Label ui:field="version"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Title label">Title</ui:msg>
-              </g:Label>
-              <g:Label ui:field="title"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Author label">Author</ui:msg>
-              </g:Label>
-              <g:Label ui:field="author"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Maintainer label">Maintainer</ui:msg>
-              </g:Label>
-              <g:Label ui:field="maintainer"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Depends label">Depends</ui:msg>
-              </g:Label>
-              <g:Label ui:field="depends"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Description label">Description</ui:msg>
-              </g:Label>
-              <g:Label ui:field="description"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="License label">License</ui:msg>
-              </g:Label>
-              <g:Label ui:field="license"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Opal version label">Opal version</ui:msg>
-              </g:Label>
-              <g:Label ui:field="opalVersion"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Url label">URL</ui:msg>
-              </g:Label>
-              <g:Anchor ui:field="url"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Bug reports label">Bug reports</ui:msg>
-              </g:Label>
-              <g:Anchor ui:field="bugReports"/>
-            </g:FlowPanel>
           </o:PropertiesTable>
 
         </g:ScrollPanel>

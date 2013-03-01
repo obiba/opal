@@ -9,53 +9,54 @@
  */
 package org.obiba.opal.web.datashield;
 
-import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
+import org.obiba.opal.datashield.DataShieldLog;
+import org.obiba.opal.datashield.NoSuchDataShieldMethodException;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
-import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.r.RStringMatrix;
+import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRService;
-import org.obiba.opal.web.datashield.support.NoSuchRPackageException;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.OpalR;
-import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
  * Manage a Datashield Package.
  */
+@SuppressWarnings("SpringJavaAutowiringInspection")
 @Component
 @Scope("request")
 @Path("/datashield/package/{name}")
 public class DataShieldPackageResource extends RPackageResource {
 
+  private final DatashieldConfigurationSupplier configurationSupplier;
+
   @PathParam("name")
   private String name;
 
   @Autowired
-  public DataShieldPackageResource(OpalRService opalRService) {
+  public DataShieldPackageResource(OpalRService opalRService, DatashieldConfigurationSupplier configurationSupplier) {
     super(opalRService);
+    this.configurationSupplier = configurationSupplier;
   }
 
-  public DataShieldPackageResource(String name, OpalRService opalRService) {
+  public DataShieldPackageResource(String name, OpalRService opalRService,
+      DatashieldConfigurationSupplier configurationSupplier) {
     super(opalRService);
     this.name = name;
+    this.configurationSupplier = configurationSupplier;
   }
 
   @GET
@@ -65,8 +66,7 @@ public class DataShieldPackageResource extends RPackageResource {
 
   @GET
   @Path("/methods")
-  public DataShield.DataShieldPackageMethodsDto getPackageMethods()
-      throws REXPMismatchException {
+  public DataShield.DataShieldPackageMethodsDto getPackageMethods() throws REXPMismatchException {
     OpalR.RPackageDto packageDto = getPackage();
     List<DataShield.DataShieldMethodDto> aggregateMethodDtos = Lists.newArrayList();
     List<DataShield.DataShieldMethodDto> assignMethodDtos = Lists.newArrayList();
@@ -97,13 +97,62 @@ public class DataShieldPackageResource extends RPackageResource {
   }
 
   /**
-   * Silently deletes a package.
+   * Silently deletes a package and its methods.
    *
    * @return
    */
   @DELETE
   public Response deletePackage() {
-    removePackage(name);
+
+    try {
+      final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods();
+
+//      ImmutableList<Object> allMethods = ImmutableList.builder()
+//          .addAll(methods.getAggregateList()).addAll(methods.getAssignList()).build();
+      // Aggregate
+      for(int i = 0; i < methods.getAggregateCount(); i++) {
+        final String methodName = methods.getAggregate(i).getName();
+
+        try {
+          configurationSupplier
+              .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
+
+                @Override
+                public void doWithConfig(DatashieldConfiguration config) {
+                  config.getEnvironment(DatashieldConfiguration.Environment.AGGREGATE).removeMethod(methodName);
+                }
+              });
+          DataShieldLog.adminLog("deleted method '{}' from environment {}.", methodName,
+              DatashieldConfiguration.Environment.AGGREGATE);
+        } catch(NoSuchDataShieldMethodException nothing) {
+          // nothing, the method may have been deleted manually
+        }
+      }
+
+      // Assign
+      for(int i = 0; i < methods.getAssignCount(); i++) {
+        final String methodName = methods.getAssign(i).getName();
+
+        try {
+          configurationSupplier
+              .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
+
+                @Override
+                public void doWithConfig(DatashieldConfiguration config) {
+                  config.getEnvironment(DatashieldConfiguration.Environment.ASSIGN).removeMethod(methodName);
+                }
+              });
+          DataShieldLog.adminLog("deleted method '{}' from environment {}.", methodName,
+              DatashieldConfiguration.Environment.ASSIGN);
+        } catch(NoSuchDataShieldMethodException nothing) {
+          // nothing, the method may have been deleted manually
+        }
+      }
+      removePackage(name);
+    } catch(REXPMismatchException e) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+
     return Response.ok().build();
   }
 
