@@ -42,6 +42,13 @@
               </ui:msg>
             </g:Label>
           </g:FlowPanel>
+          <g:FlowPanel ui:field="helpSpss" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="SPSS information">This format expects the file to be a valid SPSS binary file
+                containing the variable dictionary and optionally the variable data.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
           <g:FlowPanel ui:field="helpLimeSurvey" visible="false">
             <g:Label styleName="help-block">
               <ui:msg description="LimeSurvey Information">This format imports variable dictionaries and data from a

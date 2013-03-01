@@ -42,6 +42,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
+import org.obiba.opal.web.magma.support.SpssDatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtoExtension;
@@ -103,6 +104,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newDatasourceCreated"));
   }
 
+  @Test
+  public void testCreateDatasource_SpssDatasourceCreatedSuccessfully() {
+    Response response = createNewSpssDatasource("newSpssDatasourceCreated");
+    Assert.assertTrue(MagmaEngine.get().hasDatasource("newSpssDatasourceCreated"));
+    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newSpssDatasourceCreated"));
+  }
+
   private Response createNewDatasource(String name) {
     OpalConfigurationService opalruntimeMock = createMock(OpalConfigurationService.class);
     UriInfo uriInfoMock = createMock(UriInfo.class);
@@ -117,6 +126,26 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
         .setExtension(ExcelDatasourceFactoryDto.params,
             Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
                 .build()).build();
+
+    Response response = resource.createDatasource(uriInfoMock, factoryDto);
+
+    verify(uriInfoMock, opalruntimeMock);
+    return response;
+  }
+
+  private Response createNewSpssDatasource(String name) {
+    OpalConfigurationService opalruntimeMock = createMock(OpalConfigurationService.class);
+    UriInfo uriInfoMock = createMock(UriInfo.class);
+
+    opalruntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
+
+    replay(uriInfoMock, opalruntimeMock);
+
+    DatasourcesResource resource = new DatasourcesResource(newSpssDatasourceFactoryRegistry(), opalruntimeMock);
+    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName(name)
+        .setExtension(Magma.SpssDatasourceFactoryDto.params,
+            Magma.SpssDatasourceFactoryDto.newBuilder().setFile("src/test/resources/spss/DatabaseTest.sav").build()).build();
 
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
 
@@ -593,6 +622,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     assertEqualsLocaleDto(localeDtoList.get(1), "fr", null);
   }
 
+
   private DatasourceResource createDatasourceResource(String mockDatasourceName, final Datasource mockDatasource,
       OpalConfigurationService mockOpalRuntime, ViewManager mockViewManager) {
     DatasourceResource sut = new DatasourceResource(mockOpalRuntime, mockViewManager, newViewDtos(),
@@ -609,6 +639,17 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   private DatasourceFactoryRegistry newDatasourceFactoryRegistry() {
     return new DatasourceFactoryRegistry(
         ImmutableSet.<DatasourceFactoryDtoParser>of(new ExcelDatasourceFactoryDtoParser() {
+          @Override
+          protected File resolveLocalFile(String path) {
+            return new File(path);
+          }
+        }));
+  }
+
+
+  private DatasourceFactoryRegistry newSpssDatasourceFactoryRegistry() {
+    return new DatasourceFactoryRegistry(
+        ImmutableSet.<DatasourceFactoryDtoParser>of(new SpssDatasourceFactoryDtoParser() {
           @Override
           protected File resolveLocalFile(String path) {
             return new File(path);

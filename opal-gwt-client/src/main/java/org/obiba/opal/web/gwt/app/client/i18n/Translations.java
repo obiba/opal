@@ -288,6 +288,7 @@ public interface Translations extends Constants {
       "XMLFileRequired", "An XML file is required.", //
       "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
       "ZipFileRequired", "A Zip file is required.", //
+      "SpssFileRequired", "An SPSS file is required.", //
       "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
       "ReportTemplateWasNotFound", "The specified report template could not be found.",//
       "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list.",//
@@ -699,6 +700,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Opal XML")
   String opalXmlLabel();
 
+  @Description("SPSS label")
+  @DefaultStringValue("SPSS")
+  String spssLabel();
+
   @Description("Opal REST label")
   @DefaultStringValue("Opal")
   String opalRestLabel();
@@ -762,7 +767,11 @@ public interface Translations extends Constants {
       "CsvCannotSetVariableHeader", "Cannot set variables header", //
       "CsvCannotObtainWriter", "Can not get csv writer", //
       "CsvCannotObtainReader", "Can not get csv reader", //
-      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}" })
+      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
+      "SpssFailedToLoadMetadata", "Failed to load metadata from file {0}",//
+      "SpssFailedToLoadData", "Failed to load data from file {0}",//
+      "SpssDuplicateEntity", "Duplicate entity identifier {0}",//
+      "FailedToOpenFile", "Failed to open file {0}" })
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
