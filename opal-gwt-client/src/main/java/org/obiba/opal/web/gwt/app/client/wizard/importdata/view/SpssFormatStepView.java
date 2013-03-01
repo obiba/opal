@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.view.CharacterSetView;
+import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.SpssFormatStepPresenter;
 
 import com.google.gwt.core.client.GWT;
@@ -18,6 +20,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 public class SpssFormatStepView extends Composite implements SpssFormatStepPresenter.Display {
@@ -36,6 +39,9 @@ public class SpssFormatStepView extends Composite implements SpssFormatStepPrese
   @UiField
   HTMLPanel help;
 
+  @UiField
+  CharacterSetView charsetView;
+
   public SpssFormatStepView() {
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -53,8 +59,23 @@ public class SpssFormatStepView extends Composite implements SpssFormatStepPrese
   }
 
   @Override
+  public void addToSlot(Object slot, Widget content) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
   public Widget asWidget() {
     return this;
+  }
+
+  @Override
+  public void removeFromSlot(Object slot, Widget content) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
@@ -69,6 +90,16 @@ public class SpssFormatStepView extends Composite implements SpssFormatStepPrese
   public Widget getStepHelp() {
     help.removeFromParent();
     return help;
+  }
+
+  @Override
+  public HasText getCharsetText() {
+    return charsetView.getCharsetText();
+  }
+
+  @Override
+  public void setDefaultCharset(String defaultCharset) {
+    charsetView.setDefaultCharset(defaultCharset);
   }
 
 }
