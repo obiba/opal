@@ -24,9 +24,11 @@ import org.obiba.magma.js.MagmaContext;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.type.BooleanType;
+import org.obiba.opal.web.model.Magma;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -108,13 +110,19 @@ abstract class AbstractValueTableResource {
     SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
     final Iterator<Value> values = jvs.asVectorSource().getValues(entities).iterator();
 
-    return Iterables.filter(entities, new Predicate<VariableEntity>() {
+    // filter the entities once and for all
+    ImmutableList.Builder<VariableEntity> entityDtos = ImmutableList.builder();
+    for(VariableEntity dto : Iterables.filter(entities, new Predicate<VariableEntity>() {
 
       @Override
       public boolean apply(VariableEntity input) {
         return values.next().getValue() == Boolean.TRUE;
       }
-    });
+    })) {
+      entityDtos.add(dto);
+    }
+
+    return entityDtos.build();
   }
 
   protected JavascriptValueSource newJavaScriptValueSource(ValueType valueType, String script) {
