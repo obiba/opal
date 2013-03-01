@@ -108,10 +108,4 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
     return incremental.getValue();
   }
 
-  @Override
-  public void setIncrementalEnabled(boolean enabled) {
-    incremental.setEnabled(enabled);
-
-  }
-
 }

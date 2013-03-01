@@ -120,8 +120,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     setInSlot(Slots.Unit, unitSelectionStepPresenter);
     setInSlot(Slots.Values, datasourceValuesStepPresenter);
     setInSlot(Slots.Archive, archiveStepPresenter);
-
-    // TODO
     setInSlot(Slots.Limesurvey, limesurveyStepPresenter);
     setInSlot(Slots.Rest, restStepPresenter);
 
@@ -140,7 +138,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       }
     }));
     getView().setImportDataInputsHandler(new ImportDataInputsHandlerImpl());
-
   }
 
   public interface ImportDataInputsHandler {
@@ -280,10 +277,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     dto.setTablesArray(selectedTables);
     return dto;
   }
-
-  //
-  // Inner classes and interfaces
-  //
 
   private final class SubmitJobResponseCodeCallBack implements ResponseCodeCallback {
     @Override

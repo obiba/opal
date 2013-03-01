@@ -18,6 +18,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.domain.participant.identifier.impl.ParticipantIdentifiers;
 import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
@@ -76,7 +77,7 @@ public class FunctionalUnitView extends View {
    * @param identifierGenerator strategy for generating missing identifiers. can be null, in which case, identifiers
    * will not be generated
    */
-  @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod", "PMD.NcssMethodCount" })
+  @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod", "PMD.NcssMethodCount", "AssignmentToMethodParameter" })
   public FunctionalUnitView(@Nonnull FunctionalUnit unit, @Nonnull Policy policy, @Nonnull ValueTable dataTable,
       @Nonnull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
       boolean ignoreUnknownIdentifier) {
@@ -94,7 +95,8 @@ public class FunctionalUnitView extends View {
 
     Variable keyVariable = keysTable.getVariable(unit.getKeyVariableName());
 
-    entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable, getParticipantIdentifier(identifierGenerator));
+    entityMap = new OpalPrivateVariableEntityMap(keysTable, keyVariable,
+        identifierGenerator == null ? ParticipantIdentifiers.UNSUPPORTED : identifierGenerator);
 
     switch(policy) {
       case UNIT_IDENTIFIERS_ARE_PUBLIC:
@@ -117,16 +119,6 @@ public class FunctionalUnitView extends View {
   }
 
   @Nonnull
-  private IParticipantIdentifier getParticipantIdentifier(@Nullable IParticipantIdentifier identifierGenerator) {
-    return identifierGenerator != null ? identifierGenerator : new IParticipantIdentifier() {
-      @Override
-      public String generateParticipantIdentifier() {
-        throw new UnsupportedOperationException("cannot generate identifier");
-      }
-    };
-  }
-
-  @Nonnull
   public PrivateVariableEntityMap getPrivateVariableEntityMap() {
     return entityMap;
   }
@@ -134,6 +126,11 @@ public class FunctionalUnitView extends View {
   @Override
   public BijectiveFunction<VariableEntity, VariableEntity> getVariableEntityMappingFunction() {
     return mappingFunction;
+  }
+
+  @Nonnull
+  public FunctionalUnit getUnit() {
+    return unit;
   }
 
   /**
@@ -194,8 +191,4 @@ public class FunctionalUnitView extends View {
     }
   }
 
-  @Nonnull
-  public FunctionalUnit getUnit() {
-    return unit;
-  }
 }

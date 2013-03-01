@@ -124,21 +124,23 @@ public class DefaultCommandJobService implements CommandJobService {
   // CommandJobService Methods
   //
 
+  @Override
   public Integer launchCommand(CommandJob commandJob, Subject owner) {
     commandJob.setId(nextJobId());
     commandJob.setOwner(owner.getPrincipal().toString());
     commandJob.setSubmitTime(getCurrentTime());
 
-    FutureCommandJob futureCommandJob = new FutureCommandJob(owner, commandJob);
-    executor.execute(futureCommandJob);
+    executor.execute(new FutureCommandJob(owner, commandJob));
 
     return commandJob.getId();
   }
 
+  @Override
   public Integer launchCommand(CommandJob commandJob) {
     return launchCommand(commandJob, SecurityUtils.getSubject());
   }
 
+  @Override
   public CommandJob getCommand(Integer id) {
     for(CommandJob job : getHistory()) {
       if(job.getId().equals(id)) {
@@ -148,6 +150,7 @@ public class DefaultCommandJobService implements CommandJobService {
     return null;
   }
 
+  @Override
   public List<CommandJob> getHistory() {
     List<CommandJob> allJobs = new ArrayList<CommandJob>();
 
@@ -159,6 +162,7 @@ public class DefaultCommandJobService implements CommandJobService {
     return allJobs;
   }
 
+  @Override
   public void cancelCommand(Integer id) {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
@@ -175,6 +179,7 @@ public class DefaultCommandJobService implements CommandJobService {
     throw new NoSuchCommandJobException(id);
   }
 
+  @Override
   public void deleteCommand(Integer id) {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
@@ -190,6 +195,7 @@ public class DefaultCommandJobService implements CommandJobService {
     throw new NoSuchCommandJobException(id);
   }
 
+  @Override
   public void deleteCompletedCommands() {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
@@ -286,7 +292,7 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   private boolean isCancellable(CommandJob commandJob) {
-    return commandJob.getStatus().equals(Status.NOT_STARTED) || commandJob.getStatus().equals(Status.IN_PROGRESS);
+    return commandJob.getStatus() == Status.NOT_STARTED || commandJob.getStatus() == Status.IN_PROGRESS;
   }
 
   //
@@ -297,9 +303,8 @@ public class DefaultCommandJobService implements CommandJobService {
 
     private CommandJob commandJob;
 
-    public FutureCommandJob(Subject subject, CommandJob commandJob) {
+    FutureCommandJob(Subject subject, CommandJob commandJob) {
       super(subject.associateWith(commandJob), null);
-
       this.commandJob = commandJob;
     }
 
@@ -312,14 +317,12 @@ public class DefaultCommandJobService implements CommandJobService {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public int compare(CommandJob o1, CommandJob o2) {
       if(o1.getSubmitTime().after(o2.getSubmitTime())) {
         return -1;
-      } else if(o1.getSubmitTime().before(o2.getSubmitTime())) {
-        return 1;
-      } else {
-        return 0;
       }
+      return o1.getSubmitTime().before(o2.getSubmitTime()) ? 1 : 0;
     }
   }
 

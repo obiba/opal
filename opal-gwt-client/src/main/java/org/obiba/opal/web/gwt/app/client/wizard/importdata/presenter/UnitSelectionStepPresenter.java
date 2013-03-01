@@ -43,14 +43,12 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
       @Override
       public void onClick(ClickEvent event) {
         getView().setUnitEnabled(false);
-        getView().setIncrementalEnabled(true);
       }
     }));
     registerHandler(getView().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         getView().setUnitEnabled(true);
-        getView().setIncrementalEnabled(false);
       }
     }));
   }
@@ -60,7 +58,7 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
     importConfig.setIdentifierSharedWithUnit(withUnit);
     importConfig.setIdentifierAsIs(!withUnit);
     importConfig.setUnit(withUnit ? getView().getSelectedUnit() : null);
-    importConfig.setIncremental(!withUnit && getView().isIncremental());
+    importConfig.setIncremental(getView().isIncremental());
   }
 
   public void initUnits() {
@@ -89,7 +87,6 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
 
     boolean isIncremental();
 
-    void setIncrementalEnabled(boolean enabled);
   }
 
 }

@@ -193,7 +193,7 @@ public class CompareResource {
     if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
       // support IncrementalView wrapping compared table
       CsvValueTable csvValueTable = (CsvValueTable) (compared.isView() //
-          ? ((ValueTableWrapper) compared).getWrappedValueTable() //
+          ? ((ValueTableWrapper) compared).getInnermostWrappedValueTable() //
           : compared);
       for(Variable missingVariable : csvValueTable.getMissingVariables()) {
         conflicts
