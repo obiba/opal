@@ -1,0 +1,36 @@
+<!--
+  ~ Copyright (c) 2012 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
+  ui:generateLocales="default">
+
+  <g:FlowPanel>
+    <g:FlowPanel styleName="input">
+      <g:Label addStyleNames="key"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
+      <g:SimplePanel ui:field="selectSpssFilePanel" />
+      <g:Label styleName="help-block"><ui:msg description="SPSS File Description label">Data in SPSS format are packaged in an archive file (.sav)</ui:msg></g:Label>
+    </g:FlowPanel>
+
+    <g:FlowPanel styleName="input block">
+      <g:Label addStyleNames="key"><ui:msg description="Character set label">Character Set</ui:msg></g:Label>
+      <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
+    </g:FlowPanel>
+
+    <g:HTMLPanel ui:field="help">
+      <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
+      <p><ui:msg description="SPSS data file information">The SPSS file to use must be on the server. Use the file ex plorer to upload it if it's not already there.</ui:msg></p>
+    </g:HTMLPanel>
+      
+  </g:FlowPanel>
+  
+</ui:UiBinder>

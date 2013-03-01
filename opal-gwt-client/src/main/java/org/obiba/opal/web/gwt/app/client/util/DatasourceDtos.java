@@ -16,6 +16,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.LimesurveyDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.RestDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.SpssDatasourceFactoryDto;
 
 import com.google.gwt.core.client.JsArray;
 
@@ -37,6 +38,8 @@ public class DatasourceDtos {
         return createLimesurveyDatasourceFactoryDto(importData);
       case REST:
         return createRestDatasourceFactoryDto(importData);
+      case SPSS:
+        return createSpssDatasourceFactoryDto(importData);
       default:
         throw new IllegalArgumentException("Import data format not supported: " + importData.getImportFormat());
     }
@@ -111,6 +114,19 @@ public class DatasourceDtos {
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     configureIncremental(importData, dto);
     dto.setExtension(FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
+
+    return dto;
+  }
+
+  private static DatasourceFactoryDto createSpssDatasourceFactoryDto(ImportData importData) {
+
+    SpssDatasourceFactoryDto factoryDto = SpssDatasourceFactoryDto.create();
+    factoryDto.setFile(importData.getSpssFile());
+    factoryDto.setCharacterSet(importData.getCharacterSet());
+
+    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    configureIncremental(importData, dto);
+    dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
 
     return dto;
   }
