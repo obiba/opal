@@ -355,11 +355,11 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   public void updateHelp() {
-    helpCsv.setVisible(false);
-    helpOpalXml.setVisible(false);
-    helpLimeSurvey.setVisible(false);
-    helpOpalRest.setVisible(false);
+    hideHelpPanels();
+    updateHelpPanelsVisibility();
+  }
 
+  private void updateHelpPanelsVisibility() {
     switch(getImportFormat()) {
       case CSV:
         helpCsv.setVisible(true);
@@ -377,5 +377,12 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         helpSpss.setVisible(true);
         break;
     }
+  }
+
+  private void hideHelpPanels() {
+    helpCsv.setVisible(false);
+    helpOpalXml.setVisible(false);
+    helpLimeSurvey.setVisible(false);
+    helpOpalRest.setVisible(false);
   }
 }
