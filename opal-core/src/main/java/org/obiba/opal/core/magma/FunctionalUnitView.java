@@ -53,14 +53,17 @@ public class FunctionalUnitView extends View {
 
   private static final Logger log = LoggerFactory.getLogger(FunctionalUnitView.class);
 
+  @Nonnull
   private final FunctionalUnit unit;
 
+  @Nonnull
   private final PrivateVariableEntityMap entityMap;
 
   private final boolean allowIdentifierGeneration;
 
   private final boolean ignoreUnknownIdentifier;
 
+  @Nonnull
   private final BijectiveFunction<VariableEntity, VariableEntity> mappingFunction;
 
   /**
@@ -108,12 +111,14 @@ public class FunctionalUnitView extends View {
         policy);
   }
 
-  public FunctionalUnitView(FunctionalUnit unit, Policy policy, ValueTable dataTable, ValueTable keysTable) {
+  public FunctionalUnitView(@Nonnull FunctionalUnit unit, @Nonnull Policy policy, @Nonnull ValueTable dataTable,
+      @Nonnull ValueTable keysTable) {
     this(unit, policy, dataTable, keysTable, null, false);
   }
 
-  private IParticipantIdentifier getParticipantIdentifier(IParticipantIdentifier identifierGenerator) {
-    return allowIdentifierGeneration ? identifierGenerator : new IParticipantIdentifier() {
+  @Nonnull
+  private IParticipantIdentifier getParticipantIdentifier(@Nullable IParticipantIdentifier identifierGenerator) {
+    return identifierGenerator != null ? identifierGenerator : new IParticipantIdentifier() {
       @Override
       public String generateParticipantIdentifier() {
         throw new UnsupportedOperationException("cannot generate identifier");
@@ -121,6 +126,7 @@ public class FunctionalUnitView extends View {
     };
   }
 
+  @Nonnull
   public PrivateVariableEntityMap getPrivateVariableEntityMap() {
     return entityMap;
   }
@@ -188,6 +194,7 @@ public class FunctionalUnitView extends View {
     }
   }
 
+  @Nonnull
   public FunctionalUnit getUnit() {
     return unit;
   }

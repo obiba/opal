@@ -88,7 +88,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     final FunctionalUnit unit = participantTable.getUnit();
 
     FunctionalUnitView publicTable = new FunctionalUnitView(unit,
-        FunctionalUnitView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable,
+        FunctionalUnitView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable.getWrappedValueTable(),
         identifiersTableService.getValueTable(), allowIdentifierGeneration ? participantIdentifier : null,
         ignoreUnknownIdentifier);
     publicTable.setSelectClause(new SelectClause() {

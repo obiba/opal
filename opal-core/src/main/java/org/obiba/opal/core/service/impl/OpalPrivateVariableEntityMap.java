@@ -45,12 +45,16 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
 
   private static final Logger log = LoggerFactory.getLogger(OpalPrivateVariableEntityMap.class);
 
+  @Nonnull
   private final ValueTable keysValueTable;
 
+  @Nonnull
   private final Variable ownerVariable;
 
+  @Nonnull
   private final IParticipantIdentifier participantIdentifier;
 
+  @Nonnull
   private final BiMap<VariableEntity, VariableEntity> publicToPrivate = HashBiMap.create();
 
   public OpalPrivateVariableEntityMap(@Nonnull ValueTable keysValueTable, @Nonnull Variable ownerVariable,

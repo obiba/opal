@@ -185,7 +185,8 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
       String keyVariableName = functionalUnitView.getUnit().getKeyVariableName();
 
       View privateView = identifierService
-          .createPrivateView(functionalUnitView.getName(), functionalUnitView, functionalUnitView.getUnit(), null);
+          .createPrivateView(functionalUnitView.getName(), functionalUnitView.getWrappedValueTable(),
+              functionalUnitView.getUnit(), null);
       identifierService.createKeyVariable(privateView, keyVariableName);
 
       FunctionalUnitView publicView = identifierService
