@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -95,6 +96,13 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
             updateDataShieldMethods();
           }
 
+        }));
+    registerHandler(
+        getEventBus().addHandler(DataShieldPackageRemovedEvent.getType(), new DataShieldPackageRemovedEvent.Handler() {
+          @Override
+          public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
+            updateDataShieldMethods();
+          }
         }));
   }
 

@@ -3,6 +3,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -165,7 +166,7 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   private void authorizePublishMethods(RPackageDto dto, HasAuthorization authorizer) {
-    // Check acces to delete/put a method
+    // Check access to delete/put a method
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packageRMethods(dto.getName())).get()
         .authorize(authorizer).send();
   }
@@ -233,6 +234,7 @@ public class DataShieldPackageAdministrationPresenter
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_OK) {
           updateDataShieldPackages();
+          getEventBus().fireEvent(new DataShieldPackageRemovedEvent(dto));
         } else {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
@@ -283,9 +285,9 @@ public class DataShieldPackageAdministrationPresenter
 
   private class DeleteMethodCallback implements ResponseCodeCallback {
 
-    private DataShieldMethodDto dto;
+    private final DataShieldMethodDto dto;
 
-    private String environment;
+    private final String environment;
 
     private DeleteMethodCallback(DataShieldMethodDto dto, String environment) {
       this.dto = dto;
@@ -307,7 +309,7 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   private class PublishMethodCallback implements ResponseCodeCallback {
-    private DataShieldMethodDto dto;
+    private final DataShieldMethodDto dto;
 
     private PublishMethodCallback(DataShieldMethodDto dto) {
       this.dto = dto;
