@@ -767,7 +767,11 @@ public interface Translations extends Constants {
       "CsvCannotSetVariableHeader", "Cannot set variables header", //
       "CsvCannotObtainWriter", "Can not get csv writer", //
       "CsvCannotObtainReader", "Can not get csv reader", //
-      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}" })
+      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
+      "SpssFailedToLoadMetadata", "Failed to load metadata from file {0}",//
+      "SpssFailedToLoadData", "Failed to load data from file {0}",//
+      "SpssDuplicateEntity", "Duplicate entity identifier {0}",//
+      "FailedToOpenFile", "Failed to open file {0}" })
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")

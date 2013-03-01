@@ -14,6 +14,8 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.CharacterSetDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
@@ -37,7 +39,9 @@ import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -84,6 +88,15 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.conclusionPresenter = conclusionPresenter;
     this.fileSelectionPresenter = fileSelectionPresenter;
+    setDefaultCharset();
+
+    getEventBus().addHandler(FileSelectionUpdateEvent.getType(),new FileSelectionUpdateEvent.Handler() {
+      @Override
+      public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
+        String selectedFile = ((FileSelectionPresenter)event.getSource()).getSelectedFile();
+        getView().showCharacterSetPanel(DatasourceFileType.isSpssFile(selectedFile));
+      }
+    });
   }
 
   @Override
@@ -144,6 +157,18 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     conclusionPresenter.sendResourceRequests();
   }
 
+  private void setDefaultCharset() {
+    ResourceRequestBuilderFactory
+        .<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
+
+      @Override
+      public void onResource(Response response, JsArrayString resource) {
+        String charset = resource.get(0);
+        getView().setDefaultCharset(charset);
+      }
+    }).send();
+  }
+
   private final class ImportableValidator implements ValidationHandler {
     @Override
     public boolean validate() {
@@ -180,7 +205,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     }
   }
 
-  public interface Display extends WizardView {
+  public interface Display extends WizardView, CharacterSetDisplay {
 
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
 
@@ -189,6 +214,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     void setImportableValidator(ValidationHandler handler);
 
     void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
+
+    void showCharacterSetPanel(boolean show);
 
     HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler);
 
@@ -288,6 +315,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     private DatasourceFactoryDto createSpssDatasourceFactoryDto(String tmpFilePath) {
       SpssDatasourceFactoryDto spssDto = SpssDatasourceFactoryDto.create();
       spssDto.setFile(tmpFilePath);
+      spssDto.setCharacterSet(getView().getCharsetText().getText());
 
       DatasourceFactoryDto dto = DatasourceFactoryDto.create();
       dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, spssDto);

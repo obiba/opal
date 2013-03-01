@@ -122,6 +122,7 @@ public class DatasourceDtos {
 
     SpssDatasourceFactoryDto factoryDto = SpssDatasourceFactoryDto.create();
     factoryDto.setFile(importData.getSpssFile());
+    factoryDto.setCharacterSet(importData.getCharacterSet());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     configureIncremental(importData, dto);

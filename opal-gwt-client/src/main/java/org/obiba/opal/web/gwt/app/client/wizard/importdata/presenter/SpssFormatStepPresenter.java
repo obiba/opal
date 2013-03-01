@@ -16,12 +16,17 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.CharacterSetDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
 public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPresenter.Display> implements DataImportPresenter.DataImportFormatStepPresenter {
@@ -44,6 +49,7 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
     spssFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
     spssFileSelectionPresenter.bind();
     getDisplay().setSpssFileSelectorWidgetDisplay(spssFileSelectionPresenter.getDisplay());
+    setDefaultCharset();
   }
 
   @Override
@@ -67,6 +73,7 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
     ImportData importData = new ImportData();
     importData.setFormat(ImportFormat.SPSS);
     importData.setSpssFile(getDisplay().getSelectedFile());
+    importData.setCharacterSet(getDisplay().getCharsetText().getText());
 
     return importData;
   }
@@ -84,12 +91,28 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
   // Interfaces
   //
 
-  public interface Display extends WidgetDisplay, WizardStepDisplay {
+  public interface Display extends WidgetDisplay, WizardStepDisplay, CharacterSetDisplay {
 
     void setSpssFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
     String getSelectedFile();
 
+  }
+
+  //
+  // Private methods
+  //
+
+  private void setDefaultCharset() {
+    ResourceRequestBuilderFactory
+        .<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
+
+      @Override
+      public void onResource(Response response, JsArrayString resource) {
+        String charset = resource.get(0);
+        getDisplay().setDefaultCharset(charset);
+      }
+    }).send();
   }
 
 }

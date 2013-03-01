@@ -121,6 +121,7 @@ message IncrementalDatasourceFactoryDto {
 
 message SpssDatasourceFactoryDto {
   required string file = 1;
+  optional string characterSet = 2;
   extend DatasourceFactoryDto {
     optional SpssDatasourceFactoryDto params = 1009;
   }
