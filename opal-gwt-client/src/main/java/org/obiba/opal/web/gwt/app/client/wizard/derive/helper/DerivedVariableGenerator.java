@@ -68,7 +68,7 @@ public abstract class DerivedVariableGenerator {
     VariableDtos.setScript(derived, scriptBuilder.toString());
 
     // new categories if destination does not already define them
-    JsArray<CategoryDto> cats = destination == null ? null : destination.getCategoriesArray();
+    JsArray<CategoryDto> cats = destination == null ? null : derived.getCategoriesArray();
     if(cats == null || cats.length() == 0) {
       cats = JsArrays.create();
       for(CategoryDto cat : newCategoriesMap.values()) {
