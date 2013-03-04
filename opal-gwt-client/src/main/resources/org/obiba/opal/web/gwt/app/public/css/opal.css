@@ -266,6 +266,10 @@ td.link {
   width: 95%;
 }
 
+.half-width {
+  width: 50%;
+}
+
 .block {
   display: block;
 }
@@ -333,6 +337,11 @@ img.clickable {
 .help-inline, .help-block {
   color: #888888;
   margin-top: -5px;
+}
+
+.help-block a {
+  color: #888888;
+  text-decoration: underline;
 }
 
 /* GWT */
@@ -1306,6 +1315,13 @@ div.paging > span {
 
 .key {
   color: #444444;
+}
+
+.key-subtitle {
+  color: #444444;
+  font-size: 14px;
+  white-space: nowrap;
+  font-weight: bold;
 }
 
 table.table {
@@ -2288,4 +2304,26 @@ a.icon:hover {
   border-radius: 4px;
   border-bottom-right-radius: 0;
   margin-bottom: 5px;
+}
+
+/* Index status */
+.index-status .alert {
+  padding: 0 1.2em;
+  border-radius: 0px;
+  margin-bottom: 0px;
+}
+
+.index-status .progress {
+  width: 100px;
+  margin-bottom: 0px;
+}
+
+.index-status .action {
+  text-decoration: underline;
+}
+
+/* Views from tables */
+.disabledLink:hover {
+  text-decoration: none;
+  cursor: default;
 }

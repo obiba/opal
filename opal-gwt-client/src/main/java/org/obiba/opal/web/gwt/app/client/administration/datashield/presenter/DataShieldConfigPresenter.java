@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -38,13 +38,13 @@ import com.gwtplatform.mvp.client.annotations.TabInfo;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
-public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy> {
+public class DataShieldConfigPresenter
+    extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy> {
 
   @ProxyStandard
   @NameToken("!admin.datashield")
   @TabInfo(container = AdministrationPresenter.class, label = "DataSHIELD", priority = 3)
-  public interface Proxy extends TabContentProxyPlace<DataShieldConfigPresenter> {
-  }
+  public interface Proxy extends TabContentProxyPlace<DataShieldConfigPresenter> {}
 
   public interface Display extends View {
 
@@ -54,11 +54,15 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
   }
 
+  public static final Object PackageSlot = new Object();
+
   public static final Object AggregateEnvironmentSlot = new Object();
 
   public static final Object AssignEnvironmentSlot = new Object();
 
   public static final Object PermissionSlot = new Object();
+
+  private final DataShieldPackageAdministrationPresenter packagePresenter;
 
   private final DataShieldAdministrationPresenter aggregatePresenter;
 
@@ -66,9 +70,14 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
   private final AuthorizationPresenter authorizationPresenter;
 
+  private final String DATASHIELD_NAME = "DataSHIELD";
+
   @Inject
-  public DataShieldConfigPresenter(Display display, EventBus eventBus, Proxy proxy, Provider<DataShieldAdministrationPresenter> adminPresenterProvider, AuthorizationPresenter authorizationPresenter) {
+  public DataShieldConfigPresenter(Display display, EventBus eventBus, Proxy proxy,
+      Provider<DataShieldAdministrationPresenter> adminPresenterProvider,
+      DataShieldPackageAdministrationPresenter packagePresenter, AuthorizationPresenter authorizationPresenter) {
     super(eventBus, display, proxy);
+    this.packagePresenter = packagePresenter;
     aggregatePresenter = adminPresenterProvider.get();
     assignPresenter = adminPresenterProvider.get();
     aggregatePresenter.setEnvironment("aggregate");
@@ -89,21 +98,23 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
   @Override
   public String getName() {
-    return "DataSHIELD";
+    return DATASHIELD_NAME;
   }
 
   @Override
   protected void onReveal() {
-    ResourceRequestBuilderFactory.<DataShieldConfigDto> newBuilder().forResource("/datashield/cfg").withCallback(new ResourceCallback<DataShieldConfigDto>() {
+    ResourceRequestBuilderFactory.<DataShieldConfigDto>newBuilder().forResource("/datashield/cfg")
+        .withCallback(new ResourceCallback<DataShieldConfigDto>() {
 
-      @Override
-      public void onResource(Response response, DataShieldConfigDto resource) {
-        getView().levelSelector().setValue(resource.getLevel(), true);
-      }
-    }).get().send();
+          @Override
+          public void onResource(Response response, DataShieldConfigDto resource) {
+            getView().levelSelector().setValue(resource.getLevel(), true);
+          }
+        }).get().send();
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder()
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   @Override
@@ -114,8 +125,11 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
 
   @Override
   protected void onBind() {
-    authorizationPresenter.setAclRequest("datashield", new AclRequest(AclAction.DATASHIELD_SESSION_ALL, "/datashield/session"), new AclRequest(AclAction.DATASHIELD_ALL, "/datashield"));
+    authorizationPresenter
+        .setAclRequest("datashield", new AclRequest(AclAction.DATASHIELD_SESSION_ALL, "/datashield/session"),
+            new AclRequest(AclAction.DATASHIELD_ALL, "/datashield"));
 
+    addToSlot(PackageSlot, packagePresenter);
     addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
     addToSlot(AssignEnvironmentSlot, assignPresenter);
 
@@ -124,7 +138,9 @@ public class DataShieldConfigPresenter extends ItemAdministrationPresenter<DataS
       public void onValueChange(ValueChangeEvent<Level> event) {
         DataShieldConfigDto dto = DataShieldConfigDto.create();
         dto.setLevel(event.getValue());
-        ResourceRequestBuilderFactory.<DataShieldConfigDto> newBuilder().forResource("/datashield/cfg").withResourceBody(DataShieldConfigDto.stringify(dto)).withCallback(ResourceCallbacks.<DataShieldConfigDto> noOp()).put().send();
+        ResourceRequestBuilderFactory.<DataShieldConfigDto>newBuilder().forResource("/datashield/cfg")
+            .withResourceBody(DataShieldConfigDto.stringify(dto))
+            .withCallback(ResourceCallbacks.<DataShieldConfigDto>noOp()).put().send();
       }
     });
 

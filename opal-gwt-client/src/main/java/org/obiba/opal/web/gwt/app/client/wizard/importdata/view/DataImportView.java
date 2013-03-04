@@ -35,6 +35,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -89,6 +90,21 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @UiField
   WizardStep archiveStep;
+
+  @UiField
+  FlowPanel helpCsv;
+
+  @UiField
+  FlowPanel helpOpalXml;
+
+  @UiField
+  FlowPanel helpSpss;
+
+  @UiField
+  FlowPanel helpLimeSurvey;
+
+  @UiField
+  FlowPanel helpOpalRest;
 
   @UiField
   HTMLPanel formatSelectionHelp;
@@ -209,6 +225,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     formatChooser.addGroup(translations.fileBasedDatasources());
     formatChooser.addItemToGroup(translations.csvLabel(), ImportFormat.CSV.name());
     formatChooser.addItemToGroup(translations.opalXmlLabel(), ImportFormat.XML.name());
+    formatChooser.addItemToGroup(translations.spssLabel(), ImportFormat.SPSS.name());
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
@@ -350,4 +367,36 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     dialog.setProgress(false);
   }
 
+  @Override
+  public void updateHelp() {
+    hideHelpPanels();
+    updateHelpPanelsVisibility();
+  }
+
+  private void updateHelpPanelsVisibility() {
+    switch(getImportFormat()) {
+      case CSV:
+        helpCsv.setVisible(true);
+        break;
+      case XML:
+        helpOpalXml.setVisible(true);
+        break;
+      case LIMESURVEY:
+        helpLimeSurvey.setVisible(true);
+        break;
+      case REST:
+        helpOpalRest.setVisible(true);
+        break;
+      case SPSS:
+        helpSpss.setVisible(true);
+        break;
+    }
+  }
+
+  private void hideHelpPanels() {
+    helpCsv.setVisible(false);
+    helpOpalXml.setVisible(false);
+    helpLimeSurvey.setVisible(false);
+    helpOpalRest.setVisible(false);
+  }
 }

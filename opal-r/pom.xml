@@ -33,75 +33,17 @@
 
     <!-- R dependencies -->
     <dependency>
-      <groupId>org.rosuda</groupId>
-      <artifactId>RserveEngine</artifactId>
+      <groupId>net.rforge</groupId>
+      <artifactId>Rserve</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.rosuda</groupId>
+      <groupId>net.rforge</groupId>
       <artifactId>REngine</artifactId>
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <finalName>opal_${package.version}</finalName>
-          <appendAssemblyId>false</appendAssemblyId>
-          <descriptors>
-            <descriptor>src/main/assembly/r-package.xml</descriptor>
-          </descriptors>
-          <filters/>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <!-- A profile for the builds performed by the continuous integration server -->
-      <id>ci-build</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>deploy-package</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <!-- Deploy R package file in R repo -->
-                    <copy todir="${obiba.cran.dir}/${opal.deploy.dir}/src/contrib"
-                        file="target/opal_${package.version}.tar.gz"/>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-
-    </profile>
-  </profiles>
-
   <properties>
     <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
-    <!-- This is the R package version. It needs to be set manually because R has restrictions on the version string format. -->
-    <package.version>1.13.0-${buildNumber}</package.version>
   </properties>
 
 </project>

@@ -64,6 +64,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final XmlFormatStepPresenter xmlFormatStepPresenter;
 
+  private final SpssFormatStepPresenter spssFormatStepPresenter;
+
   private final LimesurveyStepPresenter limesurveyStepPresenter;
 
   private final RestStepPresenter restStepPresenter;
@@ -86,7 +88,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public DataImportPresenter(Display display, EventBus eventBus, //
       CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
-      LimesurveyStepPresenter limesurveyStepPresenter,//
+      LimesurveyStepPresenter limesurveyStepPresenter, SpssFormatStepPresenter spssFormatStepPresenter,//
       RestStepPresenter restStepPresenter,//
       DestinationSelectionStepPresenter destinationSelectionStepPresenter,
       UnitSelectionStepPresenter unitSelectionStepPresenter, //
@@ -96,6 +98,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
+    this.spssFormatStepPresenter = spssFormatStepPresenter;
     this.limesurveyStepPresenter = limesurveyStepPresenter;
     this.restStepPresenter = restStepPresenter;
     this.destinationSelectionStepPresenter = destinationSelectionStepPresenter;
@@ -110,6 +113,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     super.onBind();
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
+    spssFormatStepPresenter.bind();
     limesurveyStepPresenter.bind();
     restStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
@@ -161,6 +165,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     super.onUnbind();
     csvFormatStepPresenter.unbind();
     xmlFormatStepPresenter.unbind();
+    spssFormatStepPresenter.unbind();
     limesurveyStepPresenter.unbind();
     restStepPresenter.unbind();
   }
@@ -198,6 +203,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateFormatStepDisplay() {
     destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
+    getView().updateHelp();
     switch(getView().getImportFormat()) {
       case CSV:
         csvFormatStepPresenter.clear();
@@ -215,6 +221,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       case REST:
         formatStepPresenter = restStepPresenter;
         getView().setFormatStepDisplay(restStepPresenter.getView());
+        break;
+      case SPSS:
+        formatStepPresenter = spssFormatStepPresenter;
+        getView().setFormatStepDisplay(spssFormatStepPresenter.getDisplay());
         break;
       default:
         formatStepPresenter = null;
@@ -236,6 +246,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         break;
       case REST:
         submitJob(createRestImportCommandOptionsDto());
+        break;
+      case SPSS:
+        submitJob(createImportCommandOptionsDto(importData.getSpssFile()));
         break;
     }
   }
@@ -460,6 +473,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     ImportFormat getImportFormat();
+
+    void updateHelp();
 
     void setImportDataInputsHandler(ImportDataInputsHandler handler);
 

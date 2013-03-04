@@ -26,6 +26,44 @@
             <ui:msg description="Data format label">Data Format</ui:msg>
           </g:Label>
           <o:Chooser ui:field="formatChooser"/>
+          <g:FlowPanel ui:field="helpCsv" visible="true">
+            <g:Label styleName="help-block">
+              <ui:msg description="CSV format information">This format expects the file to use a "delimiter
+                separated values" format (default delimiter being comma). The first column should represent the
+                participant identifiers and the subsequent column names identify variables.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+          <g:FlowPanel ui:field="helpOpalXml" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="Opal XML information">This format comes as a .zip file containing a folder for each
+                table having: the full data dictionary in a XML file, a XML data
+                file per entity. This is the file format used when exporting data from Onyx.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+          <g:FlowPanel ui:field="helpSpss" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="SPSS information">This format expects the file to be a valid SPSS binary file
+                containing the variable dictionary and optionally the variable data.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+          <g:FlowPanel ui:field="helpLimeSurvey" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="LimeSurvey Information">This format imports variable dictionaries and data from a
+                LimeSurvey database.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+          <g:FlowPanel ui:field="helpOpalRest" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="Opal REST Information">This format imports variable dictionaries and data from a
+                remote
+                Opal.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
         </g:FlowPanel>
       </o:WizardStep>
 
@@ -53,7 +91,7 @@
 
       <g:HTMLPanel ui:field="formatSelectionHelp">
         <p>
-          <ui:msg description="Number of formats information">There are three formats currently supported:
+          <ui:msg description="Number of formats information">There are four formats currently supported:
           </ui:msg>
         </p>
         <ul>

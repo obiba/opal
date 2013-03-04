@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -51,9 +52,10 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
   void setEnvironment(String env) {
     this.env = env;
-    this.dataShieldMethodPresenter.setEnvironement(env);
+    dataShieldMethodPresenter.setEnvironement(env);
   }
 
+  @Override
   protected void onBind() {
     super.onBind();
     addEventHandlers();
@@ -62,6 +64,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   private void addEventHandlers() {
 
     getView().getDataShieldMethodActionsColumn().setActionHandler(new ActionHandler<DataShieldMethodDto>() {
+      @Override
       public void doAction(DataShieldMethodDto dto, String actionName) {
         if(actionName != null) {
           doDataShieldMethodActionImpl(dto, actionName);
@@ -94,6 +97,13 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
           }
 
         }));
+    registerHandler(
+        getEventBus().addHandler(DataShieldPackageRemovedEvent.getType(), new DataShieldPackageRemovedEvent.Handler() {
+          @Override
+          public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
+            updateDataShieldMethods();
+          }
+        }));
   }
 
   @Override
@@ -116,7 +126,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   private String environment() {
-    return UriBuilder.create().segment("datashield", "env", "{env}").build(this.env);
+    return UriBuilder.create().segment("datashield", "env", "{env}").build(env);
   }
 
   private String methods() {
@@ -136,13 +146,13 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   private void authorizeEditMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).put().authorize(
-        authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).put()
+        .authorize(authorizer).send();
   }
 
   private void authorizeDeleteMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete().authorize(
-        authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete()
+        .authorize(authorizer).send();
   }
 
   private void updateDataShieldMethods() {
@@ -172,18 +182,20 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
         @Override
         public void authorized() {
           removeMethodConfirmation = new Runnable() {
+            @Override
             public void run() {
               deleteDataShieldMethod(dto);
             }
           };
-          getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(removeMethodConfirmation, "deleteDataShieldMethod",
-              "confirmDeleteDataShieldMethod"));
+          getEventBus().fireEvent(ConfirmationRequiredEvent
+              .createWithKeys(removeMethodConfirmation, "deleteDataShieldMethod", "confirmDeleteDataShieldMethod"));
         }
       });
 
     }
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void deleteDataShieldMethod(final DataShieldMethodDto dto) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -232,8 +244,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) && event
-          .isConfirmed()) {
+      if(removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) &&
+          event.isConfirmed()) {
         removeMethodConfirmation.run();
         removeMethodConfirmation = null;
       }

@@ -2,6 +2,7 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui" 
   xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
   ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  xmlns:w='urn:import:org.obiba.opal.web.gwt.app.client.widgets.view'
   ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
   ui:generateLocales="default">
 
@@ -22,6 +23,10 @@
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key"><ui:msg description="Variables File label">Variables File</ui:msg></g:Label>
             <g:SimplePanel ui:field="fileSelectionPanel" />
+          </g:FlowPanel>
+          <g:FlowPanel styleName="input" ui:field="charsetPanel">
+            <g:Label addStyleNames="key"><ui:msg description="Character set label">Character Set</ui:msg></g:Label>
+            <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
           </g:FlowPanel>
           <g:FlowPanel>
             <g:Label ui:field="failed" addStyleNames="p"><ui:msg description="Variables file validation failed">Some errors have been detected. You should fix them before importing this variables file.</ui:msg></g:Label>

@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -66,7 +67,9 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @GET
-  public Opal.TableIndexStatusDto getTableStatus() throws SearchServiceException {
+  @OPTIONS
+  @Path("/")
+  public Response getTableStatus() {
     if(esProvider.isEnabled()) {
       ValueTable valueTable = getValueTable(datasource, table);
 
@@ -85,10 +88,10 @@ public class ValueTableIndexResource extends IndexResource {
             .setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
       }
 
-      return tableStatusDto;
+      return Response.ok().entity(tableStatusDto).build();
     }
 
-    throw new SearchServiceException();
+    return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
   }
 
   @PUT
@@ -109,6 +112,7 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @DELETE
+  @Path("/")
   public Response deleteIndex() {
     if(esProvider.isEnabled()) {
 
@@ -118,8 +122,7 @@ public class ValueTableIndexResource extends IndexResource {
           synchroManager.getCurrentTask().getValueTable().getDatasource().getName().equals(datasource)) {
         // Stop task
         synchroManager.stopTask();
-      }
-      else{
+      } else {
         getValueTableIndex(datasource, table).delete();
       }
 
@@ -130,14 +133,14 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @GET
-  @Path("/schedule")
+  @Path("schedule")
   public Opal.ScheduleDto getSchedule() {
 
     return getScheduleDto(datasource, table);
   }
 
   @DELETE
-  @Path("/schedule")
+  @Path("schedule")
   public Response deleteSchedule() {
 
     configService.getConfig().removeSchedule(getValueTable(datasource, table));
@@ -146,7 +149,7 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @PUT
-  @Path("/schedule")
+  @Path("schedule")
   public Response setSchedule(Opal.ScheduleDto scheduleDto) {
 
     Schedule schedule = new Schedule();

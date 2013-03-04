@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma.view;
 
 import java.util.List;
 
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.ValueTableReference;
@@ -59,15 +60,7 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
 
-    ValueTable from = view.getWrappedValueTable();
-    if(from instanceof JoinTable) {
-      List<ValueTable> fromTables = ((JoinTable) from).getTables();
-      for(ValueTable vt : fromTables) {
-        viewDtoBuilder.addFrom(toStringReference(vt));
-      }
-    } else {
-      viewDtoBuilder.addFrom(toStringReference(from));
-    }
+    setFromTables(view, viewDtoBuilder);
 
     JavaScriptViewDto.Builder jsDtoBuilder = JavaScriptViewDto.newBuilder();
     if(view.getSelectClause() instanceof JavascriptClause) {
@@ -82,6 +75,18 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     return viewDtoBuilder.build();
   }
 
+  private void setFromTables(View view, ViewDto.Builder viewDtoBuilder) {
+    ValueTable from = view.getWrappedValueTable();
+    if(from instanceof JoinTable) {
+      List<ValueTable> fromTables = ((JoinTable) from).getTables();
+      for(ValueTable vt : fromTables) {
+        if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
+      }
+    } else {
+      if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
+    }
+  }
+
   String toStringReference(ValueTable vt) {
     if(vt instanceof ValueTableReference) {
       return ((ValueTableReference) vt).getReference();
@@ -92,5 +97,10 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
   @Override
   public TableDto asTableDto(ViewDto viewDto, org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder) {
     throw new UnsupportedOperationException();
+  }
+
+  private boolean hasTableAccess(ValueTable vt) {
+    return vt != null && vt.getDatasource() != null && MagmaEngine.get().hasDatasource(vt.getDatasource().getName()) &&
+        MagmaEngine.get().getDatasource(vt.getDatasource().getName()).hasValueTable(vt.getName());
   }
 }

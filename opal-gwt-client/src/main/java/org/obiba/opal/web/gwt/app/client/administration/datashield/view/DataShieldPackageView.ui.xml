@@ -1,0 +1,36 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <ui:style>
+    .optionsPanelMsg td {
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    }
+  </ui:style>
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="32em" width="40em">
+      <g:center>
+        <g:ScrollPanel>
+
+          <o:PropertiesTable ui:field="properties" condensed="true" borderedCell="false" zebra="true"
+              addStyleNames="small-dual-indent top-margin"
+              keyStyleNames="span3 small-indent">
+          </o:PropertiesTable>
+
+        </g:ScrollPanel>
+      </g:center>
+      <g:south size="4">
+        <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
+          <g:Button ui:field="closeButton" styleName="btn right-aligned top-margin">
+            <ui:msg description="Close button label">Close</ui:msg>
+          </g:Button>
+        </g:FlowPanel>
+      </g:south>
+    </g:DockLayoutPanel>
+
+  </g:DialogBox>
+
+</ui:UiBinder>

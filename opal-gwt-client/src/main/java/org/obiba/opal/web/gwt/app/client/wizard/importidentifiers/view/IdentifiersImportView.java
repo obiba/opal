@@ -83,6 +83,7 @@ public class IdentifiersImportView extends PopupViewImpl implements IdentifiersI
   private void initWidgets() {
     formatListBox.addItem(translations.csvLabel(), ImportFormat.CSV.name());
     formatListBox.addItem(translations.opalXmlLabel(), ImportFormat.XML.name());
+    formatListBox.addItem(translations.spssLabel(), ImportFormat.SPSS.name());
   }
 
   private void initWizardDialog() {

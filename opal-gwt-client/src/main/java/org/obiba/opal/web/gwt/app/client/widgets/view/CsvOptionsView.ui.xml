@@ -45,7 +45,7 @@
         </g:Grid>        
         <g:FlowPanel styleName="input block">
             <g:Label addStyleNames="key"><ui:msg description="Character set label">Character Set</ui:msg></g:Label>
-            <w:EditableListBox ui:field='charsetListBox'></w:EditableListBox>
+            <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
           </g:FlowPanel>
       </g:FlowPanel>
 

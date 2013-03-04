@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.Day;
@@ -28,7 +29,6 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -38,6 +38,10 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   private Mode dialogMode;
 
   private List<TableIndexStatusDto> tableIndexStatusDtos;
+
+  private boolean refreshIndices = true;
+
+  private boolean refreshTable = false;
 
   public enum Mode {
     UPDATE
@@ -55,6 +59,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
 
     registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
@@ -84,7 +89,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     getView().setSchedule(dto);
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
+  @SuppressWarnings({ "PMD.NcssMethodCount", "MethodOnlyUsedFromInnerClass" })
   private ScheduleType getScheduleTypeFromName(String type) {
     if(type.equals(ScheduleType.MINUTES_5.getName())) {
       return ScheduleType.MINUTES_5;
@@ -103,21 +108,27 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     }
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
+  @SuppressWarnings({ "PMD.NcssMethodCount", "MethodOnlyUsedFromInnerClass" })
   private Day getDayFromName(String day) {
     if(day.equals(Day.SUNDAY.getName())) {
       return Day.SUNDAY;
-    } else if(day.equals(Day.MONDAY.getName())) {
+    }
+    if(day.equals(Day.MONDAY.getName())) {
       return Day.MONDAY;
-    } else if(day.equals(Day.TUESDAY.getName())) {
+    }
+    if(day.equals(Day.TUESDAY.getName())) {
       return Day.TUESDAY;
-    } else if(day.equals(Day.WEDNESDAY.getName())) {
+    }
+    if(day.equals(Day.WEDNESDAY.getName())) {
       return Day.WEDNESDAY;
-    } else if(day.equals(Day.THURSDAY.getName())) {
+    }
+    if(day.equals(Day.THURSDAY.getName())) {
       return Day.THURSDAY;
-    } else if(day.equals(Day.FRIDAY.getName())) {
+    }
+    if(day.equals(Day.FRIDAY.getName())) {
       return Day.FRIDAY;
-    } else if(day.equals(Day.SATURDAY.getName())) {
+    }
+    if(day.equals(Day.SATURDAY.getName())) {
       return Day.SATURDAY;
     }
     return Day.MONDAY;
@@ -174,7 +185,7 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
 
     ScheduleDto dto;
 
-    public CreateOrUpdateMethodCallBack(ScheduleDto dto) {
+    private CreateOrUpdateMethodCallBack(ScheduleDto dto) {
       this.dto = dto;
     }
 
@@ -182,7 +193,8 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
-        getEventBus().fireEvent(new TableIndicesRefreshEvent());
+        if(refreshIndices) getEventBus().fireEvent(new TableIndicesRefreshEvent());
+        if(refreshTable) getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
       } else {
         ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
         getEventBus().fireEvent(
@@ -190,6 +202,14 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
                 .build());
       }
     }
+  }
+
+  public void setUpdateMethodCallbackRefreshIndices(boolean b) {
+    refreshIndices = b;
+  }
+
+  public void setUpdateMethodCallbackRefreshTable(boolean b) {
+    refreshTable = b;
   }
 
   public interface Display extends PopupView {

@@ -72,7 +72,7 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
   }
 
   @Override
-  public Response query(String script) {
+  public Response execute(String script, String body) {
     return Response.noContent().build();
   }
 

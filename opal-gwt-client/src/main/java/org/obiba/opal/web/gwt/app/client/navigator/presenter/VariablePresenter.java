@@ -76,6 +76,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     RevealContentEvent.fire(this, NavigatorPresenter.CENTER_PANE, this);
   }
 
+  @SuppressWarnings("UnusedDeclaration")
   @ProxyEvent
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
     if(!isVisible()) {
@@ -167,8 +168,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
     // values
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(variable.getParentLink().getLink() + "/valueSets").get()
-        .authorize(getView().getValuesAuthorizer()).send();
+        .forResource(variable.getParentLink().getLink() + "/valueSets").get().authorize(getView().getValuesAuthorizer())
+        .send();
 
     // edit variable
     if(table.hasViewLink()) {
@@ -181,23 +182,27 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private boolean isCurrentVariable(VariableDto variableDto) {
-    return variableDto.getName().equals(variable.getName())
-        && variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
+    return variableDto.getName().equals(variable.getName()) &&
+        variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private boolean isCurrentTable(ViewDto viewDto) {
-    return table != null && table.getDatasourceName().equals(viewDto.getDatasourceName())
-        && table.getName().equals(viewDto.getName());
+    return table != null && table.getDatasourceName().equals(viewDto.getDatasourceName()) &&
+        table.getName().equals(viewDto.getName());
   }
 
   /**
    * @param selection
    */
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void requestSummary(VariableDto selection) {
     getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private String getViewLink() {
     return variable.getParentLink().getLink().replaceFirst("/table/", "/view/");
   }
@@ -211,22 +216,22 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void onViewSaved(ViewSavedEvent event) {
       if(isVisible() && isCurrentTable(event.getView())) {
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(table.getLink() + "/variables")
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables")
             .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
-              @Override
-              public void onResource(Response response, JsArray<VariableDto> resource) {
-                JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
-                for(int i = 0; i < variables.length(); i++) {
-                  if(isCurrentVariable(variables.get(i))) {
-                    variable = null;
-                    updateDisplay(table, variables.get(i), i > 0 ? variables.get(i - 1) : null,
-                        i < (variables.length() + 1) ? variables.get(i + 1) : null);
-                    break;
-                  }
-                }
+          @Override
+          public void onResource(Response response, JsArray<VariableDto> resource) {
+            JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
+            for(int i = 0; i < variables.length(); i++) {
+              if(isCurrentVariable(variables.get(i))) {
+                variable = null;
+                updateDisplay(table, variables.get(i), i > 0 ? variables.get(i - 1) : null,
+                    i < variables.length() + 1 ? variables.get(i + 1) : null);
+                break;
               }
-            }).send();
+            }
+          }
+        }).send();
       }
     }
   }
@@ -269,11 +274,9 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
-      String node =
-          UriBuilder
-              .create()
-              .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable",
-                  variable.getName()).build();
+      String node = UriBuilder.create()
+          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", variable.getName())
+          .build();
       authz.setAclRequest("variable", new AclRequest(AclAction.VARIABLE_READ, node));
       setInSlot(Display.Slots.Permissions, authz);
     }
@@ -328,7 +331,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class ParentCommand implements Command {
     @Override
     public void execute() {
-      ResourceRequestBuilderFactory.<TableDto> newBuilder().forResource(variable.getParentLink().getLink()).get()
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(variable.getParentLink().getLink()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
             public void onResource(Response response, TableDto resource) {
@@ -359,7 +362,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void execute() {
 
-      ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(getViewLink()).get()
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(getViewLink()).get()
           .withCallback(new ResourceCallback<ViewDto>() {
 
             @Override
@@ -378,8 +381,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   }
 
   @ProxyStandard
-  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<VariablePresenter> {
-  }
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<VariablePresenter> {}
 
   public interface Display extends View {
 

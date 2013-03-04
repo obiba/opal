@@ -66,6 +66,10 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-spss</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-fs</artifactId>
     </dependency>
     <dependency>

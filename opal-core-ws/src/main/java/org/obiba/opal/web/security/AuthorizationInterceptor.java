@@ -71,19 +71,20 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
   @Override
   public Response preProcess(HttpRequest request, ResourceMethod resourceMethod) {
-    if(isWebServicePublic(resourceMethod) == false && isWebServiceWithoutAuthorization(resourceMethod) == false) {
-      if(getSubject()
-          .isPermitted("magma:" + getResourceMethodUri(request, resourceMethod) + ":" + request.getHttpMethod()) ==
-          false) {
-        return Response.status(Status.FORBIDDEN).build();
-      }
+    if(HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
+      // Allow header will be added on postProcess
+      return Response.ok().build();
+    }
+    if(!isWebServicePublic(resourceMethod) && !isWebServiceWithoutAuthorization(resourceMethod) && !getSubject()
+        .isPermitted("magma:" + getResourceMethodUri(request, resourceMethod) + ":" + request.getHttpMethod())) {
+      return Response.status(Status.FORBIDDEN).build();
     }
     return null;
   }
 
   @Override
   public void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
-    if(HttpMethod.GET.equals(request.getHttpMethod())) {
+    if(HttpMethod.GET.equals(request.getHttpMethod()) || HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
       Set<String> allowed = allowed(request, resourceMethod);
       if(allowed != null && allowed.size() > 0) {
         response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
@@ -106,7 +107,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     // path
     String availableMethods = (String) response.getMetadata().getFirst(ALLOW_HTTP_HEADER);
     UriInfo uri = requestAttributeProvider.getUriInfo();
-    return allow(allowed(uri.getPath(), ImmutableSet.copyOf(availableMethods.split(", "))));
+    return allow(allowed(uri.getPath(), ImmutableSet.of(availableMethods.split(", "))));
   }
 
   protected String getResourceMethodUri(HttpRequest request, ResourceMethod resourceMethod) {

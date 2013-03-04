@@ -51,6 +51,8 @@ public class ImportConfig {
 
   private String csvFile;
 
+  private String spssFile;
+
   private String transientDatasourceName;
 
   private String entityType;
@@ -85,6 +87,7 @@ public class ImportConfig {
     quote = null;
     field = null;
     csvFile = null;
+    spssFile = null;
     transientDatasourceName = null;
     database = null;
     tablePrefix = null;
@@ -198,6 +201,14 @@ public class ImportConfig {
 
   public void setCsvFile(String csvFile) {
     this.csvFile = csvFile;
+  }
+
+  public String getSpssFile() {
+    return spssFile;
+  }
+
+  public void setSpssFile(String spssFile) {
+    this.spssFile = spssFile;
   }
 
   public String getQuote() {

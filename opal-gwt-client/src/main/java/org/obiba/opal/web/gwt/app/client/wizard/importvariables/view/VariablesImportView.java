@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.view.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
@@ -38,7 +39,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -88,6 +91,13 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   @UiField
   Label destinationLabel;
 
+  @UiField
+  FlowPanel charsetPanel;
+
+  @UiField
+  CharacterSetView charsetView;
+
+
   private FileSelectionPresenter.Display fileSelection;
 
   private WizardStepChain stepChain;
@@ -108,6 +118,8 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   }
 
   private void initWizardDialog() {
+    charsetPanel.setVisible(false);
+
     stepChain = WizardStepChain.Builder.create(dialog)//
         .append(fileSelectionStep, fileSelectionHelp)//
         .title(translations.variablesImportFileSelectionStep())//
@@ -299,6 +311,22 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   @Override
   protected PopupPanel asPopupPanel() {
     return dialog;
+  }
+
+  @Override
+  public HasText getCharsetText() {
+    return charsetView.getCharsetText();
+  }
+
+  @Override
+  public void setDefaultCharset(String defaultCharset) {
+    charsetView.setDefaultCharset(defaultCharset);
+  }
+
+  @Override
+  public void showCharacterSetPanel(boolean show)
+  {
+    charsetPanel.setVisible(show);
   }
 
   //

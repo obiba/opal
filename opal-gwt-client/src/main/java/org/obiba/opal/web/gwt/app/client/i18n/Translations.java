@@ -104,7 +104,10 @@ public interface Translations extends Constants {
       "Download", "Download", //
       "DownloadCertificate", "Download Certificate", //
       "Index now", "Index now", //
-      "Clear", "Clear" })
+      "Clear", "Clear",//
+      "View", "View",//
+      "Remove", "Remove",//
+      "Publish methods", "Publish methods" })
   Map<String, String> actionMap();
 
   @Description("Permission map")
@@ -285,6 +288,7 @@ public interface Translations extends Constants {
       "XMLFileRequired", "An XML file is required.", //
       "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
       "ZipFileRequired", "A Zip file is required.", //
+      "SpssFileRequired", "An SPSS file is required.", //
       "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
       "ReportTemplateWasNotFound", "The specified report template could not be found.",//
       "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list.",//
@@ -342,9 +346,11 @@ public interface Translations extends Constants {
       "MappedUnitsCannotBeIdentified", "Units to be mapped cannot be identified.",//
       "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",//
       "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
+      "DataShieldPackageAlreadyExistWithTheSpecifiedName", "A package already exists with the specified name.",//
       "DataShieldMethodNameIsRequired", "A name is required.",//
       "DataShieldRScriptIsRequired", "A R script is required.",//
       "DataShieldRFunctionIsRequired", "A R function is required.",//
+      "DataShieldPackageNameIsRequired", "A name is required",//
       "RIsAlive", "R server is alive.",//
       "RConnectionFailed", "Connection with R server failed.", //
       "UnauthorizedOperation", "You are not allowed to perform this operation.",//
@@ -385,7 +391,8 @@ public interface Translations extends Constants {
       "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}",//
       "NoVariablesFound", "Failed to retrieve the list of variables",//
       "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
-      "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}"//
+      "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
+      "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}"//
   })
   Map<String, String> userMessageMap();
 
@@ -508,6 +515,8 @@ public interface Translations extends Constants {
       "removeView", "Remove View",//
       "removeTable", "Remove Table",//
       "deleteDataShieldMethod", "Delete Aggregating Method",//
+      "deleteDataShieldPackage", "Delete Package",//
+      "publishDataShieldMethods", "Publish Package Methods",//
       "deleteDatabase", "Delete Database" })
   Map<String, String> confirmationTitleMap();
 
@@ -547,10 +556,10 @@ public interface Translations extends Constants {
       "confirmRemoveTable",
       "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",
 //
-      "confirmGenerateFunctionalUnitIdentifiers",
-      "Please confirm that you want to generate an identifier for each existing participant without identifier in the current unit.",
 //
       "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method.",//
+      "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package and all its methods.",//
+      "confirmPublishDataShieldMethods", "Please confirm that you want to publish this package methods.",//
       "confirmDeleteDatabase", "Please confirm that you want to remove this database." })
   Map<String, String> confirmationMessageMap();
 
@@ -691,6 +700,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Opal XML")
   String opalXmlLabel();
 
+  @Description("SPSS label")
+  @DefaultStringValue("SPSS")
+  String spssLabel();
+
   @Description("Opal REST label")
   @DefaultStringValue("Opal")
   String opalRestLabel();
@@ -754,7 +767,11 @@ public interface Translations extends Constants {
       "CsvCannotSetVariableHeader", "Cannot set variables header", //
       "CsvCannotObtainWriter", "Can not get csv writer", //
       "CsvCannotObtainReader", "Can not get csv reader", //
-      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}" })
+      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
+      "SpssFailedToLoadMetadata", "Failed to load metadata from file {0}",//
+      "SpssFailedToLoadData", "Failed to load data from file {0}",//
+      "SpssDuplicateEntity", "Duplicate entity identifier {0}",//
+      "FailedToOpenFile", "Failed to open file {0}" })
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
@@ -1090,6 +1107,14 @@ public interface Translations extends Constants {
   @Description("Import Opal Identifiers Instructions")
   @DefaultStringValue("First column MUST be Opal identifiers.")
   String importOpalIdentifiersInstructions();
+
+  @Description("Package description label")
+  @DefaultStringValue("Package Description")
+  String dataShieldPackageDescription();
+
+  @Description("Add DataShield package label")
+  @DefaultStringValue("Add DataSHIELD Package")
+  String addDataShieldPackage();
 
   @Description("Add DataShield method label")
   @DefaultStringValue("Add Method")
@@ -1486,6 +1511,22 @@ public interface Translations extends Constants {
   @DefaultStringValue("Indexation on progress")
   String indexInProgress();
 
+  @Description("Table index is out-of-date")
+  @DefaultStringValue("Table index is out-of-date")
+  String indexStatusOutOfDate();
+
+  @Description("Indexing of this table is in progress")
+  @DefaultStringValue("Indexing of this table is in progress")
+  String indexStatusInProgress();
+
+  @Description("Values of this table are not indexed")
+  @DefaultStringValue("Values of this table are not indexed")
+  String indexStatusNotIndexed();
+
+  @Description("Table index is up-to-date")
+  @DefaultStringValue("Table index is up-to-date")
+  String indexAlertUpToDate();
+
   @Description("Select some Tables label")
   @DefaultStringValue("Select some tables...")
   String selectSomeTables();
@@ -1501,4 +1542,25 @@ public interface Translations extends Constants {
   @Description("Elastic Search Configuration")
   @DefaultStringValue("Elastic search configuration")
   String esConfigurationLabel();
+
+  @Description("Specify Generate Functional Unit Identifiers")
+  @Constants.DefaultStringValue(
+      "{0} new identifier{1} will be generated for this unit. To customize the identifier format modify the settings below.")
+  String specifyGenerateFunctionalUnitIdentifiers();
+
+  @Description("Generate Identifiers button label")
+  @DefaultStringValue("Generate")
+  String generateIdentifiersButton();
+
+  @Description("Generate Identifiers size help")
+  @DefaultStringValue("Identifier size must be {0} to {1} digits long")
+  String generateIdentifiersSizeHelp();
+
+  @Description("Title label")
+  @DefaultStringValue("Title")
+  String titleLabel();
+
+  @Description("Version label")
+  @DefaultStringValue("Version")
+  String versionLabel();
 }

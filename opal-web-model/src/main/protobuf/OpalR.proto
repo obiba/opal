@@ -7,3 +7,13 @@ message RSessionDto {
   required string id = 1;
   optional string link = 2;
 }
+
+message RPackageDto {
+  required string name = 1;
+  repeated EntryDto description = 2;
+}
+
+message EntryDto {
+  required string key = 1;
+  required string value = 2;
+}

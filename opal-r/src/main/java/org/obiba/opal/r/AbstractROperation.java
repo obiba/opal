@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -26,6 +26,7 @@ public abstract class AbstractROperation implements ROperation {
 
   /**
    * Check if connection is still operational.
+   *
    * @return
    */
   protected boolean isConnected() {
@@ -34,6 +35,7 @@ public abstract class AbstractROperation implements ROperation {
 
   /**
    * Assign a string value to a symbol in R.
+   *
    * @param sym symbol
    * @param ct content
    * @see RConnection#assign(String, String)
@@ -49,6 +51,7 @@ public abstract class AbstractROperation implements ROperation {
 
   /**
    * Assign a REXP object to a symbol in R.
+   *
    * @param sym
    * @param ct
    */
@@ -63,16 +66,32 @@ public abstract class AbstractROperation implements ROperation {
 
   /**
    * Safe evaluation of a R script.
+   *
    * @param script
-   * @return result
+   * @return result serialized
    */
   protected REXP eval(String script) {
+    return eval(script, true);
+  }
+
+  /**
+   * Safe evaluation of a R script with result optionally serialized.
+   *
+   * @param script
+   * @param serialize
+   * @return
+   */
+  protected REXP eval(String script, boolean serialize) {
     if(script == null) throw new IllegalArgumentException("R script cannot be null");
 
     REXP evaled;
     try {
       log.debug("evaluating {}", script);
-      evaled = connection.eval("try(serialize({" + script + "}, NULL))");
+      String cmd = script;
+      if(serialize) {
+        cmd = "serialize({" + script + "}, NULL)";
+      }
+      evaled = connection.eval("try(" + cmd + ")");
     } catch(RserveException e) {
       log.warn("Failed evaluating: " + script, e);
       throw new RRuntimeException(e);
@@ -87,6 +106,7 @@ public abstract class AbstractROperation implements ROperation {
 
   /**
    * Get the current R connection.
+   *
    * @return
    */
   protected RConnection getConnection() {

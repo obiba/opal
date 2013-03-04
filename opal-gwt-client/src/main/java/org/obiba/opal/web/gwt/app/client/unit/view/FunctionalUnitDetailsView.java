@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -52,9 +52,9 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   interface FunctionalUnitDetailsViewUiBinder extends UiBinder<Widget, FunctionalUnitDetailsView> {
   }
 
-  private static FunctionalUnitDetailsViewUiBinder uiBinder = GWT.create(FunctionalUnitDetailsViewUiBinder.class);
+  private static final FunctionalUnitDetailsViewUiBinder uiBinder = GWT.create(FunctionalUnitDetailsViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -78,6 +78,9 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
 
   @UiField
   PropertiesTable propertiesPanel;
+
+  @UiField
+  Label description;
 
   @UiField
   Label select;
@@ -178,7 +181,7 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
     renderKeyPairs(keyPairs);
   }
 
-  private void renderKeyPairs(final JsArray<KeyDto> kpList) {
+  private void renderKeyPairs(JsArray<KeyDto> kpList) {
     dataProvider.setArray(kpList);
     pager.firstPage();
     dataProvider.refresh();
@@ -197,15 +200,21 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   }
 
   @Override
-  public void setCurrentCountOfIdentifiers(String count) {
-    this.currentCountOfIdentifiers.setText(count);
+  public String getCurrentCountOfIdentifiers() {
+    return currentCountOfIdentifiers.getText();
   }
 
-  private void renderFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
+  @Override
+  public void setCurrentCountOfIdentifiers(String count) {
+    currentCountOfIdentifiers.setText(count);
+  }
+
+  private void renderFunctionalUnitDetails(FunctionalUnitDto functionalUnitDto) {
     functionalUnitDetails.setVisible(true);
-    this.functionalUnit = functionalUnit;
-    select.setText(functionalUnit.getSelect());
-    functionalUnitName.setText(functionalUnit.getName());
+    functionalUnit = functionalUnitDto;
+    description.setText(functionalUnitDto.getDescription());
+    select.setText(functionalUnitDto.getSelect());
+    functionalUnitName.setText(functionalUnitDto.getName());
 
   }
 
@@ -294,7 +303,8 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
 
   @Override
   public HasAuthorization getRemoveFunctionalUnitAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(remove), new UIObjectAuthorizer(removeSeparator)) {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(remove),
+        new UIObjectAuthorizer(removeSeparator)) {
       @Override
       public void unauthorized() {
       }
@@ -339,7 +349,8 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
 
   @Override
   public HasAuthorization getAddKeyPairAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(cryptoKey), new UIObjectAuthorizer(keyPairSeparator)) {
+    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(cryptoKey),
+        new UIObjectAuthorizer(keyPairSeparator)) {
       @Override
       public void unauthorized() {
       }

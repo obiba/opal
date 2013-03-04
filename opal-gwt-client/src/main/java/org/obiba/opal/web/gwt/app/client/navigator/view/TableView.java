@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
@@ -24,12 +27,19 @@ import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
+import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
+import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.ProgressBar;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -43,6 +53,7 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -59,8 +70,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiTemplate("TableView.ui.xml")
-  interface TableViewUiBinder extends UiBinder<Widget, TableView> {
-  }
+  interface TableViewUiBinder extends UiBinder<Widget, TableView> {}
 
   private static final TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
 
@@ -69,6 +79,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private static final Integer PERMISSIONS_TAB_INDEX = 2;
 
   private final Widget widget;
+
+  private List<Anchor> tables = new ArrayList<Anchor>();
+
+  private boolean hasLinkAuthorization = true;
 
   @UiField
   FlowPanel toolbarPanel;
@@ -86,6 +100,39 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiField
   Label entityCount;
+
+  @UiField
+  FlowPanel fromTable;
+
+  @UiField
+  FlowPanel fromTableLinks;
+
+  @UiField
+  Label fromTableLabel;
+
+  @UiField
+  FlowPanel indexStatus;
+
+  @UiField
+  Label indexStatusText;
+
+  @UiField
+  Alert indexStatusAlert;
+
+  @UiField
+  Anchor clearIndexLink;
+
+  @UiField
+  Anchor indexNowLink;
+
+  @UiField
+  Anchor scheduleLink;
+
+  @UiField
+  Anchor cancelLink;
+
+  @UiField
+  ProgressBar progress;
 
   @UiField
   InlineLabel noVariables;
@@ -123,7 +170,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private MenuItemSeparator removeItemSeparator;
 
   public TableView() {
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
   }
@@ -207,7 +254,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void renderRows(final JsArray<VariableDto> rows) {
+  public void renderRows(JsArray<VariableDto> rows) {
     createCodingViewItem.setEnabled(rows.length() > 0);
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
@@ -216,7 +263,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void setVariableSelection(VariableDto variable, int index) {
-    int pageIndex = (int) (index / table.getPageSize());
+    int pageIndex = index / table.getPageSize();
     if(pageIndex != pager.getPage()) {
       pager.setPage(pageIndex);
     }
@@ -244,6 +291,35 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     entityType.setText(dto.getEntityType());
 
     entityCount.setText(Integer.toString(dto.getValueSetCount()));
+  }
+
+  @Override
+  public void setFromTables(JsArrayString tableNames) {
+    if(tableNames == null) {
+      fromTable.setVisible(false);
+    } else {
+      fromTable.setVisible(true);
+      fromTableLinks.clear();
+      tables.clear();
+      for(int i = 0; i < tableNames.length(); i++) {
+        Anchor a = new Anchor();
+        a.setText(tableNames.get(i));
+        fromTableLinks.add(a);
+
+        tables.add(a);
+
+        if(i < tableNames.length() - 1) {
+          Label l = new Label(", ");
+          l.addStyleName("inline");
+          fromTableLinks.add(l);
+        }
+      }
+    }
+  }
+
+  @Override
+  public List<Anchor> getFromTablesAnchor() {
+    return tables;
   }
 
   @Override
@@ -424,6 +500,30 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
+  public HasAuthorization getTableIndexStatusAuthorizer() {
+    return new UIObjectAuthorizer(indexStatus);
+  }
+
+  @Override
+  public HasAuthorization getTableIndexEditAuthorizer() {
+    return new CompositeAuthorizer(new UIObjectAuthorizer(indexStatusAlert), new UIObjectAuthorizer(clearIndexLink),
+        new UIObjectAuthorizer(indexNowLink), new UIObjectAuthorizer(scheduleLink),
+        new UIObjectAuthorizer(cancelLink)) {
+      @Override
+      public void authorized() {
+        super.authorized();
+        TableView.this.hasLinkAuthorization = true;
+      }
+
+      @Override
+      public void unauthorized() {
+        super.unauthorized();    //To change body of overridden methods use File | Settings | File Templates.
+        TableView.this.hasLinkAuthorization = false;
+      }
+    };
+  }
+
+  @Override
   public String getClickableColumnName(Column<?, ?> column) {
     if(column instanceof VariableClickableColumn) {
       return ((VariableClickableColumn) column).getName();
@@ -437,7 +537,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
-        if(event.getSelectedItem() == VALUES_TAB_INDEX) {
+        if(event.getSelectedItem().equals(VALUES_TAB_INDEX)) {
           cmd.execute();
         }
       }
@@ -449,4 +549,73 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     return tabs.getSelectedIndex() == VALUES_TAB_INDEX;
   }
 
+  @Override
+  public void setIndexStatusVisible(boolean b) {
+    indexStatus.setVisible(b);
+  }
+
+  @SuppressWarnings({ "IfStatementWithTooManyBranches" })
+  @Override
+  public void setIndexStatusAlert(TableIndexStatusDto statusDto) {
+
+    if(statusDto.getStatus().getName().equals(TableIndexationStatus.UPTODATE.getName())) {
+      setStatusText(translations.indexAlertUpToDate(), AlertType.SUCCESS, true, false, true, false, false);
+      setProgressBar(false, 0);
+    } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.OUTDATED.getName())) {
+      setStatusText(translations.indexStatusOutOfDate(), AlertType.ERROR, false, true, true, false, false);
+      setProgressBar(false, 0);
+    } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
+      setStatusText(translations.indexStatusInProgress(), AlertType.INFO, false, false, false, true, true);
+      setProgressBar(true, (int) (statusDto.getProgress() * 100));
+    } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.NOT_INDEXED.getName())) {
+      setStatusText(translations.indexStatusNotIndexed(), AlertType.WARNING, false, true, true, false, false);
+      setProgressBar(false, 0);
+    }
+  }
+
+  @SuppressWarnings("PMD.ExcessiveParameterList")
+  private void setStatusText(String text, AlertType type, boolean clear, boolean indexNow, boolean schedule,
+      boolean cancel, boolean progressBar) {
+    indexStatusText.setText(text);
+    indexStatusAlert.setType(type);
+
+    if(hasLinkAuthorization) {
+      clearIndexLink.setVisible(clear);
+      indexNowLink.setVisible(indexNow);
+      scheduleLink.setVisible(schedule);
+      cancelLink.setVisible(cancel);
+      progress.setVisible(progressBar);
+    }
+  }
+
+  private void setProgressBar(boolean progressBar, int percent) {
+    if(progressBar) {
+      progress.setVisible(true);
+      progress.setType(ProgressBar.Style.ANIMATED);
+      progress.setPercent(percent);
+      progress.setTitle(percent + "%");
+    } else {
+      progress.setVisible(false);
+    }
+  }
+
+  @Override
+  public HasClickHandlers getClear() {
+    return clearIndexLink;
+  }
+
+  @Override
+  public HasClickHandlers getCancel() {
+    return cancelLink;
+  }
+
+  @Override
+  public HasClickHandlers getIndexNow() {
+    return indexNowLink;
+  }
+
+  @Override
+  public HasClickHandlers getScheduleIndexing() {
+    return scheduleLink;
+  }
 }

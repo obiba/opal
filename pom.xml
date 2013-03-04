@@ -202,6 +202,12 @@
 
       <dependency>
         <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-datasource-spss</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
         <artifactId>magma-datasource-csv</artifactId>
         <version>${magma.version}</version>
       </dependency>
@@ -1017,12 +1023,12 @@
       </dependency>
 
       <dependency>
-        <groupId>org.rosuda</groupId>
-        <artifactId>RserveEngine</artifactId>
+        <groupId>net.rforge</groupId>
+        <artifactId>Rserve</artifactId>
         <version>${REngine.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.rosuda</groupId>
+        <groupId>net.rforge</groupId>
         <artifactId>REngine</artifactId>
         <version>${REngine.version}</version>
       </dependency>
@@ -1407,7 +1413,7 @@
     <protobuf.version>2.3.0</protobuf.version>
     <protostuff.version>1.0.1</protostuff.version>
     <quartz.version>1.8.3</quartz.version>
-    <REngine.version>0.6-3</REngine.version>
+    <REngine.version>0.6-8</REngine.version>
     <resteasy.version>2.1.0.GA</resteasy.version>
     <shiro.version>1.1.0</shiro.version>
     <slf4j.version>1.7.1</slf4j.version>
