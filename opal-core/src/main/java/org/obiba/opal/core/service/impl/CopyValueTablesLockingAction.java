@@ -54,6 +54,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
   private final TransactionTemplate txTemplate;
 
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   CopyValueTablesLockingAction(IdentifiersTableService identifiersTableService, IdentifierService identifierService,
       TransactionTemplate txTemplate, Set<ValueTable> sourceTables, Datasource destination,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) {
