@@ -12,6 +12,8 @@ package org.obiba.opal.rest.client.magma;
 import java.net.URI;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.NoSuchValueSetException;
@@ -82,6 +84,7 @@ class RestValueTable extends AbstractValueTable {
           return v;
         }
 
+        @Nonnull
         @Override
         public Value getValue(ValueSet valueSet) {
           return ((LazyValueSet) valueSet).get(v);

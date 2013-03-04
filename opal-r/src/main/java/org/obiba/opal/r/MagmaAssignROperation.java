@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.obiba.magma.Datasource;
@@ -235,6 +236,7 @@ public class MagmaAssignROperation extends AbstractROperation {
         return TextType.get();
       }
 
+      @Nonnull
       @Override
       public Value getValue(ValueSet valueSet) {
         return TextType.get().valueOf(valueSet.getVariableEntity().getIdentifier());
