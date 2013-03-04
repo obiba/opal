@@ -26,7 +26,6 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 
 /**
@@ -84,14 +83,12 @@ public abstract class DerivedVariableGenerator {
   protected abstract void generateScript();
 
   protected void appendCategoryValueMapEntries() {
-
     if(originalVariable.getCategoriesArray() == null) return;
     int nbCategories = originalVariable.getCategoriesArray().length();
     for(int i = 0; i < nbCategories; i++) {
       CategoryDto origCat = originalVariable.getCategoriesArray().get(i);
       ValueMapEntry entry = getValueMapEntry(origCat.getName());
 
-      GWT.log(origCat.getName());
       if(entry.isType(ValueMapEntryType.CATEGORY_NAME)) {
         // script
         scriptBuilder.append("\n    '").append(normalize(entry.getValue())).append("': ");
