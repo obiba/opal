@@ -107,7 +107,6 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   public CreateViewStepView(EventBus eventBus) {
     super(eventBus);
     tableChooser = new TableChooser(true);
-    tableChooser.setWidth("");
     this.widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
 
