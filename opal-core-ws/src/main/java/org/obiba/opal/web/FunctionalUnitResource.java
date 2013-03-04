@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -154,11 +155,9 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       }
       functionalUnit.setUnitKeyStoreService(unitKeyStoreService);
 
-      if(getFunctionalUnitService().hasFunctionalUnit(unitDto.getName())) {
-        response = Response.ok();
-      } else {
-        response = Response.created(uri.getAbsolutePath());
-      }
+      response = getFunctionalUnitService().hasFunctionalUnit(unitDto.getName())
+          ? Response.ok()
+          : Response.created(uri.getAbsolutePath());
 
       getFunctionalUnitService().addOrReplaceFunctionalUnit(functionalUnit);
 
@@ -308,7 +307,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       List<FunctionalUnit> units = getUnitsFromIdentifiersMap(reader);
       FunctionalUnit drivingUnit = determineDrivingUnit(units);
       int unitIdx = units.indexOf(drivingUnit);
-      List<String[]> rows = (List<String[]>) reader.readAll();
+      Iterable<String[]> rows = reader.readAll();
 
       // make sure all entities exist
       if(create) {
@@ -323,24 +322,24 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     }
   }
 
-  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, List<String[]> rows, int unitIdx)
+  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, Iterable<String[]> rows, int unitIdx)
       throws NoSuchValueTableException, IOException {
     ImmutableSet.Builder<String> ids = ImmutableSet.builder();
     for(String[] map : rows) {
-      if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
+      if(map[unitIdx] != null && !map[unitIdx].isEmpty()) {
         ids.add(map[unitIdx]);
       }
     }
     importIdentifiers(drivingUnit, ids.build());
   }
 
-  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, List<String[]> rows, int unitIdx)
-      throws IOException {
+  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, Iterable<String[]> rows,
+      int unitIdx) throws IOException {
     FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(),
         drivingUnit, units);
     int count = 0;
     for(String[] map : rows) {
-      if(map[unitIdx] != null && map[unitIdx].isEmpty() == false) {
+      if(map[unitIdx] != null && !map[unitIdx].isEmpty()) {
         count += mapper.associate(map[unitIdx], units, map);
       }
     }
@@ -350,7 +349,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @PUT
   @Path("/entities/identifiers/map/functional-unit/{toUnit}")
-  public Response mapIdentifiers(List<EntryDto> identifiers, @PathParam("toUnit") String toUnit,
+  public Response mapIdentifiers(Iterable<EntryDto> identifiers, @PathParam("toUnit") String toUnit,
       @QueryParam("create") @DefaultValue("false") boolean create) {
     try {
       List<FunctionalUnit> units = getUnitsFromName(unit, toUnit);
@@ -369,7 +368,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     }
   }
 
-  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, List<EntryDto> identifiers)
+  private void prepareMapIdentifiers(FunctionalUnit drivingUnit, Iterable<EntryDto> identifiers)
       throws NoSuchValueTableException, IOException {
     ImmutableSet.Builder<String> ids = ImmutableSet.builder();
     for(EntryDto entry : identifiers) {
@@ -378,7 +377,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     importIdentifiers(drivingUnit, ids.build());
   }
 
-  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, List<EntryDto> identifiers)
+  private int doMapIdentifiers(FunctionalUnit drivingUnit, List<FunctionalUnit> units, Iterable<EntryDto> identifiers)
       throws IOException {
     FunctionalUnitIdentifierMapper mapper = new FunctionalUnitIdentifierMapper(identifiersTableService.getValueTable(),
         drivingUnit, units);
@@ -397,7 +396,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @GET
   @Path("/keys")
   public List<Opal.KeyDto> getFunctionalUnitKeyPairs() throws KeyStoreException, IOException {
-    final List<Opal.KeyDto> keyPairs = Lists.newArrayList();
+    List<Opal.KeyDto> keyPairs = Lists.newArrayList();
 
     UnitKeyStore keystore = unitKeyStoreService.getUnitKeyStore(unit);
     if(keystore != null) {
@@ -425,11 +424,9 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
     ResponseBuilder response = null;
     try {
-      if(kpForm.getKeyType() == KeyType.KEY_PAIR) {
-        response = doCreateOrImportKeyPair(kpForm);
-      } else {
-        response = doImportCertificate(kpForm);
-      }
+      response = kpForm.getKeyType() == KeyType.KEY_PAIR
+          ? doCreateOrImportKeyPair(kpForm)
+          : doImportCertificate(kpForm);
       if(response == null) {
         response = Response.created(
             UriBuilder.fromPath("/").path(FunctionalUnitResource.class).path("/key/" + kpForm.getAlias()).build(unit));
@@ -491,8 +488,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   private ResponseBuilder doImportCertificate(Opal.KeyForm kpForm) {
     try {
-      unitKeyStoreService.importCertificate(this.unit, kpForm.getAlias(),
-          new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+      unitKeyStoreService
+          .importCertificate(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
     } catch(MagmaCryptRuntimeException e) {
       return Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "InvalidCertificate").build());
@@ -505,11 +502,11 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
       unitKeyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(),
           kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
-    } else if(kpForm.hasPrivateImport()) {
-      response = doImportKeyPair(kpForm);
     } else {
-      response = Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
+      response = kpForm.hasPrivateImport()
+          ? doImportKeyPair(kpForm)
+          : Response.status(Status.BAD_REQUEST)
+              .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
     }
     return response;
   }
@@ -572,7 +569,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     });
   }
 
-  private void readUnitIdentifiers(final VectorCallback callback) {
+  private void readUnitIdentifiers(VectorCallback callback) {
     ValueTable keysTable = identifiersTableService.getValueTable();
     FunctionalUnit functionalUnit = resolveFunctionalUnit(unit);
     if(keysTable.hasVariable(functionalUnit.getKeyVariableName())) {
@@ -583,16 +580,16 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     }
   }
 
-  private FunctionalUnit determineDrivingUnit(List<FunctionalUnit> units) {
+  private FunctionalUnit determineDrivingUnit(Collection<FunctionalUnit> units) {
     FunctionalUnit drivingUnit;
     try {
-      drivingUnit = resolveFunctionalUnit(this.unit);
+      drivingUnit = resolveFunctionalUnit(unit);
       // When the driving unit is not Opal, the Opal unit cannot be present in the list of functional units
       if(units.contains(FunctionalUnit.OPAL)) {
         throw new IllegalIdentifierAssociationException("Cannot create Opal identifiers through this function.");
       }
     } catch(NoSuchFunctionalUnitException e) {
-      if(this.unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
+      if(unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
         drivingUnit = FunctionalUnit.OPAL;
       } else {
         throw e;
@@ -603,7 +600,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   private interface VectorCallback {
 
-    public void onValue(UnitIdentifier unitIdentifier);
+    void onValue(UnitIdentifier unitIdentifier);
 
   }
 
