@@ -265,7 +265,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index")//
+            .forResource(getIndexResource(table.getDatasourceName(), table.getName()))//
             .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).put().send();
       }
     });
@@ -290,6 +290,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private void showWaitCursor() {RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.WAIT);}
 
   private void showDefaultCursor() {RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.DEFAULT);}
+
+  private String getIndexResource(String datasource, String table) {
+    return UriBuilder.create().segment("datasource", "{}", "table", "{}", "index").build(datasource, table);
+  }
 
   @Override
   protected void onReveal() {
@@ -376,14 +380,31 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateTableIndexStatus() {// Check if service is enabled
+    // Table indexation status
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
+        .authorize(getView().getTableIndexStatusAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
+        .authorize(getView().getTableIndexEditAuthorizer()).send();
+
     updateIndexStatus();
   }
 
   private void updateIndexStatus() {
-    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
-        .forResource("/datasource/" + table.getDatasourceName() + "/table/" + table.getName() + "/index").get()
-        .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
-            SC_SERVICE_UNAVAILABLE).withCallback(new TableIndexStatusResourceCallback()).send();
+    // If cancelation, call the delete ws
+    if(cancelIndexation) {
+      ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
+          .forResource(getIndexResource(table.getDatasourceName(), table.getName())).delete()
+          .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
+              SC_SERVICE_UNAVAILABLE).withCallback(new TableIndexStatusResourceCallback()).send();
+
+      cancelIndexation = false;
+    } else {
+      ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
+          .forResource(getIndexResource(table.getDatasourceName(), table.getName())).get()
+          .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
+              SC_SERVICE_UNAVAILABLE).withCallback(new TableIndexStatusResourceCallback()).send();
+    }
   }
 
   private void updateVariables() {
@@ -671,12 +692,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
-      // Table indexation status
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
-          .authorize(getView().getTableIndexStatusAuthorizer()).send();
-
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
-          .authorize(getView().getTableIndexEditAuthorizer()).send();
 
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
