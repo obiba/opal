@@ -129,7 +129,9 @@ public abstract class DerivedVariableGenerator {
   }
 
   private String normalize(String text) {
-    return text == null ? text : text.replace("'", "\\'").replace("\n", "\\n").replace("\r", "\\r");
+    return text == null
+        ? text
+        : text.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "\\r");
   }
 
   protected ValueMapEntry getValueMapEntry(String value) {
