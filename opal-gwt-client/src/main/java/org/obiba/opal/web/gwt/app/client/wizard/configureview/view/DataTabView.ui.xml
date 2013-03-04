@@ -6,7 +6,9 @@
     ui:generateLocales="default">
 
   <ui:style>
-    .tab { min-height: 30em; }
+    .tab {
+      min-height: 30em;
+    }
   </ui:style>
 
   <g:FlowPanel addStyleNames="{style.tab}">

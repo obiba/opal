@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
@@ -34,7 +33,6 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
 import org.obiba.opal.web.TimestampedResponses;
-import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
 import org.slf4j.Logger;
@@ -44,7 +42,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 /**
  *
@@ -117,10 +114,11 @@ public class ValueSetsResource extends AbstractValueTableResource {
     }));
 
     ImmutableList.Builder<ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
-    for (ValueSetDto dto : Iterables.transform(entities, new VariableEntityValueSetDtoFunction(variables, uriInfo, filterBinary))) {
+    for(ValueSetDto dto : Iterables
+        .transform(entities, new VariableEntityValueSetDtoFunction(variables, uriInfo, filterBinary))) {
       valueSetDtoBuilder.add(dto);
     }
-    
+
     builder.addAllValueSets(valueSetDtoBuilder.build());
 
     return builder.build();

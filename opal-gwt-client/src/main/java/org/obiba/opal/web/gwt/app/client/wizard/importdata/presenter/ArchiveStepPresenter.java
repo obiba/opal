@@ -43,14 +43,14 @@ public class ArchiveStepPresenter extends PresenterWidget<ArchiveStepPresenter.D
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getView().addArchiveLeaveClickHandler(new ClickHandler() {
+    registerHandler(getView().addArchiveLeaveClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
         archiveFolderSelectionPresenter.getDisplay().setEnabled(false);
       }
     }));
-    super.registerHandler(getView().addArchiveMoveClickHandler(new ClickHandler() {
+    registerHandler(getView().addArchiveMoveClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {

@@ -1,15 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.r;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -54,7 +53,7 @@ public class OpalRResource {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response query(@QueryParam("script") String script, String body) {
     String rscript = script;
-    if (Strings.isNullOrEmpty(rscript)) {
+    if(Strings.isNullOrEmpty(rscript)) {
       rscript = body;
     }
 
@@ -65,7 +64,8 @@ public class OpalRResource {
     if(rop.hasResult() && rop.hasRawResult()) {
       return Response.ok().entity(rop.getRawResult().asBytes()).build();
     } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}", new Object[] { rscript, rop.hasResult(), rop.hasRawResult() });
+      log.error("R Script '{}' has result: {}, has raw result: {}",
+          new Object[] { rscript, rop.hasResult(), rop.hasRawResult() });
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }

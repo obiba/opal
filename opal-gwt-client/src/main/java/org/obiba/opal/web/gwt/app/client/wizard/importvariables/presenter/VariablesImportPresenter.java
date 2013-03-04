@@ -39,7 +39,6 @@ import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -90,10 +89,10 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     this.fileSelectionPresenter = fileSelectionPresenter;
     setDefaultCharset();
 
-    getEventBus().addHandler(FileSelectionUpdateEvent.getType(),new FileSelectionUpdateEvent.Handler() {
+    getEventBus().addHandler(FileSelectionUpdateEvent.getType(), new FileSelectionUpdateEvent.Handler() {
       @Override
       public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
-        String selectedFile = ((FileSelectionPresenter)event.getSource()).getSelectedFile();
+        String selectedFile = ((FileSelectionPresenter) event.getSource()).getSelectedFile();
         getView().showCharacterSetPanel(DatasourceFileType.isSpssFile(selectedFile));
       }
     });
@@ -158,15 +157,15 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   private void setDefaultCharset() {
-    ResourceRequestBuilderFactory
-        .<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
+    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
+        .withCallback(new ResourceCallback<JsArrayString>() {
 
-      @Override
-      public void onResource(Response response, JsArrayString resource) {
-        String charset = resource.get(0);
-        getView().setDefaultCharset(charset);
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArrayString resource) {
+            String charset = resource.get(0);
+            getView().setDefaultCharset(charset);
+          }
+        }).send();
   }
 
   private final class ImportableValidator implements ValidationHandler {
@@ -197,7 +196,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     public boolean validate() {
       String selectedFile = getView().getSelectedFile();
 
-      if (selectedFile.isEmpty()) {
+      if(selectedFile.isEmpty()) {
         return false;
       }
 

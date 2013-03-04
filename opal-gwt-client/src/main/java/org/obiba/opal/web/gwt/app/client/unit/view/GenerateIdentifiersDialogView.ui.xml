@@ -8,9 +8,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
     <g:DockLayoutPanel unit="EM" ui:field="content" height="360px" width="360px">
@@ -18,22 +18,34 @@
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main">
             <g:FlowPanel styleName="input">
-              <g:Label ui:field="confirmationMessage" addStyleNames="p large-bottom-margin"><ui:msg
-                  description="Specify Generate Functional Unit Identifiers">Description</ui:msg></g:Label>
+              <g:Label ui:field="confirmationMessage" addStyleNames="p large-bottom-margin">
+                <ui:msg
+                    description="Specify Generate Functional Unit Identifiers">Description
+                </ui:msg>
+              </g:Label>
             </g:FlowPanel>
             <g:FlowPanel styleName="instructions key">
-              <g:InlineLabel><ui:msg description="Sample Identifier label">Sample Identifier:</ui:msg> </g:InlineLabel>
-              <g:InlineLabel addStyleNames="small-indent" ui:field="sampleIdentifier"><ui:msg>99999</ui:msg></g:InlineLabel>
+              <g:InlineLabel>
+                <ui:msg description="Sample Identifier label">Sample Identifier:</ui:msg>
+              </g:InlineLabel>
+              <g:InlineLabel addStyleNames="small-indent" ui:field="sampleIdentifier">
+                <ui:msg>99999</ui:msg>
+              </g:InlineLabel>
             </g:FlowPanel>
             <g:FlowPanel styleName="input large-top-margin">
-              <g:Label addStyleNames="key"><ui:msg description="Identifiers size">Identifier size</ui:msg></g:Label>
-              <o:NumericTextBox ui:field="size" width="6em" minConstrained="true" maxConstrained="false"></o:NumericTextBox>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Identifiers size">Identifier size</ui:msg>
+              </g:Label>
+              <o:NumericTextBox ui:field="size" width="6em" minConstrained="true"
+                  maxConstrained="false"></o:NumericTextBox>
               <g:Label ui:field="sizeHelp" addStyleNames="help-block">
                 <ui:msg description="configure help label">Size Help</ui:msg>
               </g:Label>
             </g:FlowPanel>
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key"><ui:msg description="Identifiers prefix">Identifier Prefix</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Identifiers prefix">Identifier Prefix</ui:msg>
+              </g:Label>
               <g:TextBox name="prefix" ui:field="prefix"></g:TextBox>
             </g:FlowPanel>
             <g:FlowPanel>

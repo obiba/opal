@@ -50,8 +50,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairDialogPresenter.Display {
 
   @UiTemplate("AddCryptoKeyDialogView.ui.xml")
-  interface ViewUiBinder extends UiBinder<WizardDialogBox, AddCryptoKeyDialogView> {
-  }
+  interface ViewUiBinder extends UiBinder<WizardDialogBox, AddCryptoKeyDialogView> {}
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -146,7 +145,8 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
 
   private void initWizardDialog() {
 
-    DefaultWizardStepController keyPairWizardStepController = DefaultWizardStepController.Builder.create(privateKeyStep)//
+    DefaultWizardStepController keyPairWizardStepController = DefaultWizardStepController.Builder
+        .create(privateKeyStep)//
         .title(translations.privateKeyStep())//
         .onValidate(privateKeyValidators)//
         .next(DefaultWizardStepController.Builder.create(publicKeyStep).title(translations.publicKeyStep())
@@ -161,16 +161,19 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
               }
             }).onValidate(publicKeyValidators).build()).build();
 
-    DefaultWizardStepController certificateWizardStepController = DefaultWizardStepController.Builder.create(importCertificateStep)//
+    DefaultWizardStepController certificateWizardStepController = DefaultWizardStepController.Builder
+        .create(importCertificateStep)//
         .title(translations.importCertificateStep()).onValidate(certificateStepValidators).build();
 
-    DefaultWizardStepController keyTypeWizardStepController = BranchingWizardStepController.Builder.create(keyTypeStep) //
-    .branch(keyPairWizardStepController, keyPairType)//
-    .branch(certificateWizardStepController, certificateType)//
-    .title(translations.keyTypeStep())//
-    .onValidate(keyTypeStepValidators).build();
+    DefaultWizardStepController keyTypeWizardStepController = BranchingWizardStepController.Builder
+        .create(keyTypeStep) //
+        .branch(keyPairWizardStepController, keyPairType)//
+        .branch(certificateWizardStepController, certificateType)//
+        .title(translations.keyTypeStep())//
+        .onValidate(keyTypeStepValidators).build();
 
-    stepChain = WizardStepChain.Builder.create(dialog).append(keyTypeWizardStepController).onNext().onPrevious().build();
+    stepChain = WizardStepChain.Builder.create(dialog).append(keyTypeWizardStepController).onNext().onPrevious()
+        .build();
 
     initImportCertificateStep();
     initPrivateKeyStep();

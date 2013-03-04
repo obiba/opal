@@ -248,7 +248,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         submitJob(createRestImportCommandOptionsDto());
         break;
       case SPSS:
-        submitJob(createImportCommandOptionsDto(importData.getSpssFile()));
+        submitJob(createImportCommandOptionsDto(importConfig.getSpssFile()));
         break;
     }
   }

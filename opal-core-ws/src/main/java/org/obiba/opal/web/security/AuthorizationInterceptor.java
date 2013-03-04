@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 
+import org.apache.http.HttpStatus;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
@@ -33,7 +34,6 @@ import org.obiba.opal.core.service.SubjectAclService.SubjectType;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
-import org.obiba.opal.web.ws.security.AuthorizeResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,13 +89,13 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       if(allowed != null && allowed.size() > 0) {
         response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
       }
-    } else if(HttpMethod.DELETE.equals(request.getHttpMethod()) && response.getStatus() == 200) {
+    } else if(HttpMethod.DELETE.equals(request.getHttpMethod()) && response.getStatus() == HttpStatus.SC_OK) {
       // TODO delete all nodes starting with resource
       String resource = requestAttributeProvider.getResourcePath(request.getUri().getRequestUri());
       subjectAclService.deleteNodePermissions(resource);
     }
 
-    if(response.getStatus() == 201) {
+    if(response.getStatus() == HttpStatus.SC_CREATED) {
       addPermissions(response);
     }
   }
@@ -107,16 +107,12 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     // path
     String availableMethods = (String) response.getMetadata().getFirst(ALLOW_HTTP_HEADER);
     UriInfo uri = requestAttributeProvider.getUriInfo();
-    return allow(allowed(uri.getPath(), ImmutableSet.of(availableMethods.split(", "))));
+    return allow(allowed(uri.getPath(), ImmutableSet.copyOf(availableMethods.split(", "))));
   }
 
   protected String getResourceMethodUri(HttpRequest request, ResourceMethod resourceMethod) {
     UriInfo info = request.getUri();
-    if(resourceMethod.getMethod().isAnnotationPresent(AuthorizeResource.class)) {
-      return info.getPath();
-    } else {
-      return info.getPath();
-    }
+    return info.getPath();
   }
 
   @SuppressWarnings("unchecked")
@@ -128,20 +124,19 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     }
     List<?> permissions = response.getMetadata().get(ALT_PERMISSIONS);
     if(permissions != null) {
-      addPermission((List<SubjectAclService.Permissions>) permissions);
+      addPermission((Iterable<SubjectAclService.Permissions>) permissions);
       response.getMetadata().remove(ALT_PERMISSIONS);
     } else {
       List<?> altLocations = response.getMetadata().get(ALT_LOCATION);
-
       Iterable<URI> locations = ImmutableList.of(resourceUri);
       if(altLocations != null) {
-        locations = Iterables.concat(locations, (List<URI>) altLocations);
+        locations = Iterables.concat(locations, (Iterable<URI>) altLocations);
       }
-      addPermission(locations);
+      addPermissionUris(locations);
     }
   }
 
-  private void addPermission(List<SubjectAclService.Permissions> resourcePermissions) {
+  private void addPermission(Iterable<SubjectAclService.Permissions> resourcePermissions) {
     for(SubjectAclService.Permissions resourcePermission : resourcePermissions) {
       for(String perm : resourcePermission.getPermissions()) {
         subjectAclService.addSubjectPermission(resourcePermission.getDomain(), resourcePermission.getNode(),
@@ -150,17 +145,17 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     }
   }
 
-  private void addPermission(Iterable<URI> resourceUris) {
+  private void addPermissionUris(Iterable<URI> resourceUris) {
     for(URI resourceUri : resourceUris) {
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
-      if(getSubject().isPermitted("magma:" + resource + ":*") == false) {
+      if(!getSubject().isPermitted("magma:" + resource + ":*")) {
         subjectAclService.addSubjectPermission("magma", resource,
             SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), "*:GET/*");
       }
     }
   }
 
-  private Response allow(Set<String> allowed) {
+  private Response allow(Iterable<String> allowed) {
     return Response.ok().header(ALLOW_HTTP_HEADER, asHeader(allowed)).build();
   }
 
@@ -181,25 +176,25 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
    * @param availableMethods
    * @return
    */
-  private Set<String> allowed(final String uri, Set<String> availableMethods) {
+  private Set<String> allowed(final String uri, Iterable<String> availableMethods) {
     return ImmutableSet.copyOf(Iterables.concat(Iterables.filter(availableMethods, new Predicate<String>() {
 
       @Override
       public boolean apply(String from) {
         String perm = "magma:" + uri + ":" + from;
         boolean permitted = getSubject().isPermitted(perm);
-        log.debug("isPermitted({}, {})=={}", new Object[] { getSubject().getPrincipal(), perm, permitted });
+        log.debug("isPermitted({}, {})=={}", getSubject().getPrincipal(), perm, permitted);
         return permitted;
       }
 
     }), ImmutableSet.of(HttpMethod.OPTIONS)));
   }
 
-  private Set<String> allowed(final HttpRequest request, ResourceMethod method) {
+  private Set<String> allowed(HttpRequest request, ResourceMethod method) {
     return allowed(request.getUri().getPath(), availableMethods(method));
   }
 
-  private Set<String> availableMethods(ResourceMethod method) {
+  private Iterable<String> availableMethods(ResourceMethod method) {
     Set<String> availableMethods = Sets.newHashSet();
     String path = getPath(method);
     for(Method otherMethod : method.getResourceClass().getMethods()) {

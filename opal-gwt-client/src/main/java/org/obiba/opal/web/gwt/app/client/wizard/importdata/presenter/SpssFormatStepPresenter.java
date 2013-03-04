@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -20,8 +20,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.CharacterSetDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportData;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportFormat;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
@@ -29,13 +29,14 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 
-public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPresenter.Display> implements DataImportPresenter.DataImportFormatStepPresenter {
+public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPresenter.Display>
+    implements DataImportPresenter.DataConfigFormatStepPresenter {
 
   @Inject
   private FileSelectionPresenter spssFileSelectionPresenter;
 
   @Inject
-  public SpssFormatStepPresenter(final Display display, final EventBus eventBus) {
+  public SpssFormatStepPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -69,8 +70,8 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
   }
 
   @Override
-  public ImportData getImportData() {
-    ImportData importData = new ImportData();
+  public ImportConfig getImportConfig() {
+    ImportConfig importData = new ImportConfig();
     importData.setFormat(ImportFormat.SPSS);
     importData.setSpssFile(getDisplay().getSelectedFile());
     importData.setCharacterSet(getDisplay().getCharsetText().getText());
@@ -87,10 +88,6 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
     return true;
   }
 
-  //
-  // Interfaces
-  //
-
   public interface Display extends WidgetDisplay, WizardStepDisplay, CharacterSetDisplay {
 
     void setSpssFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
@@ -99,20 +96,16 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
 
   }
 
-  //
-  // Private methods
-  //
-
   private void setDefaultCharset() {
-    ResourceRequestBuilderFactory
-        .<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
+    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
+        .withCallback(new ResourceCallback<JsArrayString>() {
 
-      @Override
-      public void onResource(Response response, JsArrayString resource) {
-        String charset = resource.get(0);
-        getDisplay().setDefaultCharset(charset);
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArrayString resource) {
+            String charset = resource.get(0);
+            getDisplay().setDefaultCharset(charset);
+          }
+        }).send();
   }
 
 }

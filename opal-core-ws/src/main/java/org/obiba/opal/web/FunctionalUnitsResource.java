@@ -352,15 +352,15 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
     ImmutableList.Builder<TableIdentifiersSync> builder = ImmutableList.builder();
 
-    Iterable<ValueTable> tables = Iterables.filter(
-        (tableList == null || tableList.size() == 0) ? ds.getValueTables() : Iterables
-            .transform(tableList, new Function<String, ValueTable>() {
+    Iterable<ValueTable> tables = Iterables.filter((tableList == null || tableList.size() == 0)
+        ? ds.getValueTables()
+        : Iterables.transform(tableList, new Function<String, ValueTable>() {
 
-              @Override
-              public ValueTable apply(String input) {
-                return ds.getValueTable(input);
-              }
-            }), new Predicate<ValueTable>() {
+          @Override
+          public ValueTable apply(String input) {
+            return ds.getValueTable(input);
+          }
+        }), new Predicate<ValueTable>() {
 
       @Override
       public boolean apply(ValueTable input) {
@@ -429,8 +429,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     return functionalUnit;
   }
 
-  private void importIdentifiersFromTransientDatasource(
-      DatasourceFactoryDto datasourceFactoryDto) throws NoSuchValueTableException, IOException {
+  private void importIdentifiersFromTransientDatasource(DatasourceFactoryDto datasourceFactoryDto)
+      throws NoSuchValueTableException, IOException {
     Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
     try {
       importIdentifiersFromDatasource(sourceDatasource);

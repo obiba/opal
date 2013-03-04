@@ -13,11 +13,12 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+@SuppressWarnings("UnusedDeclaration")
 public class ImportConfig {
 
   public enum ImportFormat {
 
-    CSV, EXCEL, XML, LIMESURVEY, REST
+    CSV, EXCEL, XML, LIMESURVEY, REST, SPSS
 
   }
 
@@ -88,6 +89,7 @@ public class ImportConfig {
     field = null;
     csvFile = null;
     spssFile = null;
+
     transientDatasourceName = null;
     database = null;
     tablePrefix = null;
@@ -203,14 +205,6 @@ public class ImportConfig {
     this.csvFile = csvFile;
   }
 
-  public String getSpssFile() {
-    return spssFile;
-  }
-
-  public void setSpssFile(String spssFile) {
-    this.spssFile = spssFile;
-  }
-
   public String getQuote() {
     return quote;
   }
@@ -302,6 +296,14 @@ public class ImportConfig {
 
   public void setIgnoreUnknownIdentifier(boolean ignoreUnknownIdentifier) {
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
+  }
+
+  public String getSpssFile() {
+    return spssFile;
+  }
+
+  public void setSpssFile(String spssFile) {
+    this.spssFile = spssFile;
   }
 
 }

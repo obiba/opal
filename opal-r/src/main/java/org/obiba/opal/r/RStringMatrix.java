@@ -47,8 +47,8 @@ public class RStringMatrix implements RMatrix<String> {
 
   @Override
   public int getColumnIndex(String name) {
-    for (int i=0; i<columnNames.length; i++) {
-      if (columnNames[i].equals(name)) {
+    for(int i = 0; i < columnNames.length; i++) {
+      if(columnNames[i].equals(name)) {
         return i;
       }
     }
@@ -72,8 +72,8 @@ public class RStringMatrix implements RMatrix<String> {
 
   @Override
   public int getRowIndex(String name) {
-    for (int i=0; i<rowNames.length; i++) {
-      if (rowNames[i].equals(name)) {
+    for(int i = 0; i < rowNames.length; i++) {
+      if(rowNames[i].equals(name)) {
         return i;
       }
     }
@@ -106,13 +106,13 @@ public class RStringMatrix implements RMatrix<String> {
 
     @Override
     public boolean hasNext() {
-      return current< getRowCount();
+      return current < getRowCount();
     }
 
     @Override
     public String[] next() {
       String[] row = new String[getColumnCount()];
-      for (int i=0; i<getColumnCount();i++) {
+      for(int i = 0; i < getColumnCount(); i++) {
         row[i] = values[current + i * getRowCount()];
       }
       current++;
@@ -131,13 +131,13 @@ public class RStringMatrix implements RMatrix<String> {
 
     @Override
     public boolean hasNext() {
-      return current<getColumnCount();
+      return current < getColumnCount();
     }
 
     @Override
     public String[] next() {
       String[] col = new String[getRowCount()];
-      for (int i=0; i< getRowCount();i++) {
+      for(int i = 0; i < getRowCount(); i++) {
         col[i] = values[current * getColumnCount() + i];
       }
       current++;

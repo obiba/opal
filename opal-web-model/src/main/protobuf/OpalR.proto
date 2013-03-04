@@ -1,4 +1,5 @@
 import "Ws.proto";
+
 package OpalR;
 
 option java_package = "org.obiba.opal.web.model";

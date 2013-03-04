@@ -1,4 +1,5 @@
 import "Ws.proto";
+
 package DataShield;
 
 option java_package = "org.obiba.opal.web.model";
@@ -9,7 +10,7 @@ message DataShieldConfigDto {
     RESTRICTED = 0;
     UNRESTRICTED = 1;
   }
-  
+
   required Level level = 1;
 }
 

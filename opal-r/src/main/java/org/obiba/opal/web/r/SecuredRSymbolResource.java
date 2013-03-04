@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.web.r;
 
-import java.util.List;
-import java.util.Set;
-
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -38,18 +35,19 @@ public class SecuredRSymbolResource extends RSymbolResource {
 
   /**
    * Only user with permission to see the values of a table/variable can push the data to R.
+   *
    * @param uri
    * @param path
    * @return
    */
   @Override
   public Response putMagma(@Context UriInfo uri, String path) {
-    if (path == null) {
+    if(path == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    for (ValueTable table : getValueTables(path)) {
-      if (!areValueSetReadable(table)) {
+    for(ValueTable table : getValueTables(path)) {
+      if(!areValueSetReadable(table)) {
         return Response.status(Response.Status.FORBIDDEN).build();
       }
     }
@@ -58,9 +56,9 @@ public class SecuredRSymbolResource extends RSymbolResource {
   }
 
   private Iterable<ValueTable> getValueTables(String path) {
-    if (!path.contains(".") && !path.contains(":")) {
+    if(!path.contains(".") && !path.contains(":")) {
       return MagmaEngine.get().getDatasource(path).getValueTables();
-    } else if (path.contains(".") && !path.contains(":")) {
+    } else if(path.contains(".") && !path.contains(":")) {
       return ImmutableSet.of(getValueTable(path, MagmaEngineTableResolver.valueOf(path)));
     } else {
       return ImmutableSet.of(getValueTable(path, MagmaEngineVariableResolver.valueOf(path)));

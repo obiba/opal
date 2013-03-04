@@ -33,14 +33,19 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.XmlFormatStepVie
 /**
  * Bind concrete implementations to interfaces within the import wizard.
  */
+@SuppressWarnings("OverlyCoupledClass")
 public class ImportModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bindWizardPresenterWidget(DataImportPresenter.class, DataImportPresenter.Display.class, DataImportView.class, DataImportPresenter.Wizard.class);
-    bindPresenterWidget(DestinationSelectionStepPresenter.class, DestinationSelectionStepPresenter.Display.class, DestinationSelectionStepView.class);
-    bindPresenterWidget(UnitSelectionStepPresenter.class, UnitSelectionStepPresenter.Display.class, UnitSelectionStepView.class);
-    bindPresenterWidget(DatasourceValuesStepPresenter.class, DatasourceValuesStepPresenter.Display.class, DatasourceValuesStepView.class);
+    bindWizardPresenterWidget(DataImportPresenter.class, DataImportPresenter.Display.class, DataImportView.class,
+        DataImportPresenter.Wizard.class);
+    bindPresenterWidget(DestinationSelectionStepPresenter.class, DestinationSelectionStepPresenter.Display.class,
+        DestinationSelectionStepView.class);
+    bindPresenterWidget(UnitSelectionStepPresenter.class, UnitSelectionStepPresenter.Display.class,
+        UnitSelectionStepView.class);
+    bindPresenterWidget(DatasourceValuesStepPresenter.class, DatasourceValuesStepPresenter.Display.class,
+        DatasourceValuesStepView.class);
     bindPresenterWidget(ArchiveStepPresenter.class, ArchiveStepPresenter.Display.class, ArchiveStepView.class);
 
     bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class);

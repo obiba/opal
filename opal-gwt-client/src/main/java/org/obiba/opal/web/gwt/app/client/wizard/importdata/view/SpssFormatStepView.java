@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -11,25 +11,26 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CharacterSetView;
-import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.SpssFormatStepPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-public class SpssFormatStepView extends Composite implements SpssFormatStepPresenter.Display {
+import com.gwtplatform.mvp.client.ViewImpl;
+
+public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresenter.Display {
 
   @UiTemplate("SpssFormatStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, SpssFormatStepView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, SpssFormatStepView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget widget;
 
   private Display fileSelection;
 
@@ -43,7 +44,7 @@ public class SpssFormatStepView extends Composite implements SpssFormatStepPrese
   CharacterSetView charsetView;
 
   public SpssFormatStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
@@ -59,23 +60,8 @@ public class SpssFormatStepView extends Composite implements SpssFormatStepPrese
   }
 
   @Override
-  public void addToSlot(Object slot, Widget content) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void removeFromSlot(Object slot, Widget content) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void setInSlot(Object slot, Widget content) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    return widget;
   }
 
   @Override

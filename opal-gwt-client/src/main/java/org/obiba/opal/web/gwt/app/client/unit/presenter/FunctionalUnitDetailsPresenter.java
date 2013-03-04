@@ -168,8 +168,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     registerHandler(eventBus.addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
     registerHandler(eventBus.addHandler(FunctionalUnitUpdatedEvent.getType(), new FunctionalUnitUpdatedHandler()));
     registerHandler(eventBus.addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
-    registerHandler(eventBus.addHandler(GenerateIdentifiersConfirmationEvent.getType(),
-        new GenerateIdentifiersHandler()));
+    registerHandler(
+        eventBus.addHandler(GenerateIdentifiersConfirmationEvent.getType(), new GenerateIdentifiersHandler()));
   }
 
   private void setCommands() {
@@ -364,7 +364,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       if(generateConfirmation != null) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
       } else {
-        UriBuilder uriBuilder = UriBuilder.create().segment("functional-units", "entities","table");
+        UriBuilder uriBuilder = UriBuilder.create().segment("functional-units", "entities", "table");
         ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(uriBuilder.build()).get()
             .withCallback(new ResourceCallback<TableDto>() {
               @Override
@@ -381,9 +381,10 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     int currentCount = Integer.valueOf(getView().getCurrentCountOfIdentifiers());
     int affectedCount = tableDto.getValueSetCount() - currentCount;
 
-    if (affectedCount == 0) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ParticipantIdentifiersAlreadyGenerated")
-          .args(functionalUnit.getName()).build());
+    if(affectedCount == 0) {
+      getEventBus().fireEvent(
+          NotificationEvent.newBuilder().error("ParticipantIdentifiersAlreadyGenerated").args(functionalUnit.getName())
+              .build());
       return;
     }
     generateIdentifiersDialogPresenter.setAffectedEntitiesCount(affectedCount);

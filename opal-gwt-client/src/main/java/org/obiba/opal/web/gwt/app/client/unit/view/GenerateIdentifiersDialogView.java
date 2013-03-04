@@ -23,7 +23,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -46,26 +45,25 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 public class GenerateIdentifiersDialogView extends PopupViewImpl implements Display {
 
   @UiTemplate("GenerateIdentifiersDialogView.ui.xml")
-  interface GenerateIdentifiersDialogUiBinder extends UiBinder<DialogBox, GenerateIdentifiersDialogView> {
-  }
+  interface GenerateIdentifiersDialogUiBinder extends UiBinder<DialogBox, GenerateIdentifiersDialogView> {}
 
   //
   // Constants
   //
 
   private static final int MIN_IDENTIFIER_SIZE = 5;
+
   private static final int MAX_IDENTIFIER_SIZE = 20;
 
   private static final GenerateIdentifiersDialogUiBinder uiBinder = GWT.create(GenerateIdentifiersDialogUiBinder.class);
-  private static final Translations translations = GWT.create(Translations.class);
 
+  private static final Translations translations = GWT.create(Translations.class);
 
   //
   // Data members
   //
 
   private int affectedEntities = 0;
-
 
   @UiField
   DialogBox dialog;
@@ -229,18 +227,19 @@ public class GenerateIdentifiersDialogView extends PopupViewImpl implements Disp
     List<String> args = new ArrayList<String>();
     args.add(String.valueOf(affectedEntities));
     args.add(affectedEntities > 1 ? "s" : "");
-    confirmationMessage.setText(TranslationsUtils.replaceArguments(translations.specifyGenerateFunctionalUnitIdentifiers(), args));
+    confirmationMessage
+        .setText(TranslationsUtils.replaceArguments(translations.specifyGenerateFunctionalUnitIdentifiers(), args));
   }
 
   private String generateSampleIdentifier() {
     int count = Integer.valueOf(size.getValue());
     String sample = replicateString('9', count);
 
-    if (allowZeros.getValue()) {
+    if(allowZeros.getValue()) {
       sample = "0" + replicateString('9', count - 1);
     }
 
-    if (!prefix.getText().isEmpty()) {
+    if(!prefix.getText().isEmpty()) {
       sample = prefix.getText() + sample;
     }
 

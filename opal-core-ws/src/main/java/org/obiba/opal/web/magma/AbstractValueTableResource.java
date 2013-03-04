@@ -24,7 +24,6 @@ import org.obiba.magma.js.MagmaContext;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.type.BooleanType;
-import org.obiba.opal.web.model.Magma;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;

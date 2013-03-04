@@ -145,7 +145,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourcesResource resource = new DatasourcesResource(newSpssDatasourceFactoryRegistry(), opalruntimeMock);
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName(name)
         .setExtension(Magma.SpssDatasourceFactoryDto.params,
-            Magma.SpssDatasourceFactoryDto.newBuilder().setFile("src/test/resources/spss/DatabaseTest.sav").build()).build();
+            Magma.SpssDatasourceFactoryDto.newBuilder().setFile("src/test/resources/spss/DatabaseTest.sav").build())
+        .build();
 
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
 
@@ -622,7 +623,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     assertEqualsLocaleDto(localeDtoList.get(1), "fr", null);
   }
 
-
   private DatasourceResource createDatasourceResource(String mockDatasourceName, final Datasource mockDatasource,
       OpalConfigurationService mockOpalRuntime, ViewManager mockViewManager) {
     DatasourceResource sut = new DatasourceResource(mockOpalRuntime, mockViewManager, newViewDtos(),
@@ -645,7 +645,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
           }
         }));
   }
-
 
   private DatasourceFactoryRegistry newSpssDatasourceFactoryRegistry() {
     return new DatasourceFactoryRegistry(

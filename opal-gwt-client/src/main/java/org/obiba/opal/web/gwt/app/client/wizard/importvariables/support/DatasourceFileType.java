@@ -14,18 +14,16 @@ public enum DatasourceFileType {
   XLSX,
   XML,
   SAV,
-  INVALID
-  ;
+  INVALID;
 
-  public static DatasourceFileType getFileType(String filename){
+  public static DatasourceFileType getFileType(String filename) {
     DatasourceFileType type = DatasourceFileType.INVALID;
-    int position = filename.length() > 0 ? filename.lastIndexOf('.'): -1;
+    int position = filename.length() > 0 ? filename.lastIndexOf('.') : -1;
 
-    if (position > -1) {
+    if(position > -1) {
       try {
         type = valueOf(filename.substring(position + 1).toUpperCase());
-      }
-      catch(Exception e) {
+      } catch(Exception e) {
       }
     }
 

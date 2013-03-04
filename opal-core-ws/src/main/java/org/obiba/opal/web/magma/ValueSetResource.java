@@ -27,7 +27,6 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.NoSuchValueSetException;
-import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -146,22 +145,23 @@ public class ValueSetResource extends AbstractValueTableResource {
 
     // Do not add iterable directly otherwise the values will be fetched as many times it is iterated
     // (i.e. 2 times, see AbstractMessageLite.addAll()).
-    Iterable<ValueSetsDto.ValueDto> valueDtoIterable = Iterables.transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
+    Iterable<ValueSetsDto.ValueDto> valueDtoIterable = Iterables
+        .transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
 
-      @Override
-      public ValueSetsDto.ValueDto apply(Variable fromVariable) {
-        String link = uriInfo.getPath() + "/variable/" + fromVariable.getName() + "/value";
-        Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
-        return Dtos.asDto(link, value, filterBinary).build();
-      }
-    });
+          @Override
+          public ValueSetsDto.ValueDto apply(Variable fromVariable) {
+            String link = uriInfo.getPath() + "/variable/" + fromVariable.getName() + "/value";
+            Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
+            return Dtos.asDto(link, value, filterBinary).build();
+          }
+        });
     ImmutableList.Builder<ValueSetsDto.ValueDto> valueDtos = ImmutableList.builder();
-    for (ValueSetsDto.ValueDto dto : valueDtoIterable) {
+    for(ValueSetsDto.ValueDto dto : valueDtoIterable) {
       valueDtos.add(dto);
     }
 
-    ValueSetsDto.ValueSetDto.Builder vsBuilder = Dtos.asDto(valueSet)
-        .addAllValues(valueDtos.build()).setTimestamps(Dtos.asDto(valueSet.getTimestamps()));
+    ValueSetsDto.ValueSetDto.Builder vsBuilder = Dtos.asDto(valueSet).addAllValues(valueDtos.build())
+        .setTimestamps(Dtos.asDto(valueSet.getTimestamps()));
 
     return ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType())
         .addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {

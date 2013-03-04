@@ -1,56 +1,72 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-  xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
-      <g:SimplePanel ui:field="selectCsvFilePanel" />
-      <g:Label styleName="help-block"><ui:msg description="CSV File Description label">Data in CSV format are in a text file (.csv)</ui:msg></g:Label>
+      <g:Label addStyleNames="key">
+        <ui:msg description="Data File label">Data File</ui:msg>
+      </g:Label>
+      <g:SimplePanel ui:field="selectCsvFilePanel"/>
+      <g:Label styleName="help-block">
+        <ui:msg description="CSV File Description label">Data in CSV format are in a text file (.csv)</ui:msg>
+      </g:Label>
     </g:FlowPanel>
-  
+
     <g:DisclosurePanel ui:field="advancedOptions" addStyleNames="full-width">
       <g:customHeader>
-        <g:Label><ui:msg description="Advanced Options label">Advanced Options</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Advanced Options label">Advanced Options</ui:msg>
+        </g:Label>
       </g:customHeader>
       <g:FlowPanel>
         <g:Grid width="100%">
           <g:row>
             <g:customCell styleName="top">
-          <g:FlowPanel styleName="input block">
-            <g:Label addStyleNames="key"><ui:msg description="From row label">From Row</ui:msg></g:Label>
-            <o:NumericTextBox ui:field="row" addStyleNames="span1"/>
-          </g:FlowPanel>                  
+              <g:FlowPanel styleName="input block">
+                <g:Label addStyleNames="key">
+                  <ui:msg description="From row label">From Row</ui:msg>
+                </g:Label>
+                <o:NumericTextBox ui:field="row" addStyleNames="span1"/>
+              </g:FlowPanel>
             </g:customCell>
             <g:customCell styleName="top small-indent">
-             <g:FlowPanel styleName="input block">
-            <g:Label addStyleNames="key"><ui:msg description="Separators label">Separators</ui:msg></g:Label>
-            <g:FlowPanel>
-              <g:FlowPanel addStyleNames="inline">
-                <w:EditableListBox ui:field="field" textStyleNames="span1"/>
-                <g:Label styleName="help-block"><ui:msg description="Field label">Field</ui:msg></g:Label>  
+              <g:FlowPanel styleName="input block">
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Separators label">Separators</ui:msg>
+                </g:Label>
+                <g:FlowPanel>
+                  <g:FlowPanel addStyleNames="inline">
+                    <w:EditableListBox ui:field="field" textStyleNames="span1"/>
+                    <g:Label styleName="help-block">
+                      <ui:msg description="Field label">Field</ui:msg>
+                    </g:Label>
+                  </g:FlowPanel>
+                  <g:FlowPanel addStyleNames="inline">
+                    <w:EditableListBox ui:field="quote" textStyleNames="span1"/>
+                    <g:Label styleName="help-block">
+                      <ui:msg description="Quote label">Quote</ui:msg>
+                    </g:Label>
+                  </g:FlowPanel>
+                </g:FlowPanel>
               </g:FlowPanel>
-              <g:FlowPanel addStyleNames="inline">
-                <w:EditableListBox ui:field="quote" textStyleNames="span1"/>
-                <g:Label styleName="help-block"><ui:msg description="Quote label">Quote</ui:msg></g:Label>
-              </g:FlowPanel>
-            </g:FlowPanel>
-          </g:FlowPanel>                          
             </g:customCell>
           </g:row>
-        </g:Grid>        
+        </g:Grid>
         <g:FlowPanel styleName="input block">
-            <g:Label addStyleNames="key"><ui:msg description="Character set label">Character Set</ui:msg></g:Label>
-            <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
-          </g:FlowPanel>
+          <g:Label addStyleNames="key">
+            <ui:msg description="Character set label">Character Set</ui:msg>
+          </g:Label>
+          <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
+        </g:FlowPanel>
       </g:FlowPanel>
 
     </g:DisclosurePanel>
-  
+
   </g:FlowPanel>
-  
+
 </ui:UiBinder>

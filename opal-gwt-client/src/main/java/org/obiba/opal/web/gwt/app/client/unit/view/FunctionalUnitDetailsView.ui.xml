@@ -1,39 +1,50 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel ui:field="functionalUnitDetails" addStyleNames="item-details">
-  
+
     <g:Label ui:field="noUnit" addStyleNames="small-top-margin small-indent" visible="false">
       <ui:msg description="No Unit">No Unit</ui:msg>
     </g:Label>
 
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-    <o:PropertiesTable  ui:field="propertiesPanel" condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
+    <o:PropertiesTable ui:field="propertiesPanel" condensed="true" borderedCell="false" zebra="true"
+        addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
       <o:PropertyPanel>
-        <g:Label><ui:msg description="Functional Unit description">Description</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Functional Unit description">Description</ui:msg>
+        </g:Label>
         <g:Label ui:field="description"/>
       </o:PropertyPanel>
       <o:PropertyPanel>
-        <g:Label><ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>
+        </g:Label>
         <g:Label ui:field="select"/>
       </o:PropertyPanel>
       <o:PropertyPanel>
-        <g:Label><ui:msg description="Current Count of Identifiers label">Current Count of Identifiers</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Current Count of Identifiers label">Current Count of Identifiers</ui:msg>
+        </g:Label>
         <g:Label ui:field="currentCountOfIdentifiers"/>
       </o:PropertyPanel>
     </o:PropertiesTable>
 
     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
-	  <g:Anchor><ui:msg description="Keystore title">Keystore</ui:msg></g:Anchor>
+      <g:Anchor>
+        <ui:msg description="Keystore title">Keystore</ui:msg>
+      </g:Anchor>
       <g:VerticalPanel width="100%">
-        <g:InlineLabel ui:field="noKeyPairs"><ui:msg description="No Key Pairs label">No Key Pairs</ui:msg></g:InlineLabel>
-        <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
+        <g:InlineLabel ui:field="noKeyPairs">
+          <ui:msg description="No Key Pairs label">No Key Pairs</ui:msg>
+        </g:InlineLabel>
+        <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
         <o:Table ui:field="keyPairsTable" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
       </g:VerticalPanel>
     </o:HorizontalTabLayout>

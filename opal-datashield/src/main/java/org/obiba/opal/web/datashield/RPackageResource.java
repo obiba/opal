@@ -11,12 +11,10 @@ package org.obiba.opal.web.datashield;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.core.Response;
 
 import org.obiba.opal.r.RMatrix;
 import org.obiba.opal.r.RScriptROperation;
@@ -33,7 +31,6 @@ import org.springframework.util.StringUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -45,9 +42,11 @@ public abstract class RPackageResource {
   private static final Logger log = LoggerFactory.getLogger(RPackageResource.class);
 
   protected static final String AGGREGATE_METHODS = "AggregateMethods";
+
   protected static final String ASSIGN_METHODS = "AssignMethods";
+
   private static final String[] defaultFields = new String[] { "Title", "Description", "Author", "Maintainer",
-      "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS};
+      "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS };
 
   private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", "http://cran.datashield.org",
       "http://cran.rstudio.com" };

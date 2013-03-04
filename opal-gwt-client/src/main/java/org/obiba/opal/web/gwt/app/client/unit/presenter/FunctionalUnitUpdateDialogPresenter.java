@@ -14,6 +14,17 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -26,16 +37,6 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<FunctionalUnitUpdateDialogPresenter.Display> {
 
@@ -136,8 +137,9 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
       CreateFunctionalUnitCallBack createFunctionalUnitCallback = new CreateFunctionalUnitCallBack();
       AlreadyExistFunctionalUnitCallBack alreadyExistFunctionalUnitCallback = new AlreadyExistFunctionalUnitCallBack();
       UriBuilder ub = UriBuilder.create().segment("functional-unit", getView().getName().getText());
-      ResourceRequestBuilderFactory.<FunctionalUnitDto>newBuilder().forResource(ub.build()).get().withCallback
-          (alreadyExistFunctionalUnitCallback).withCallback(Response.SC_NOT_FOUND, createFunctionalUnitCallback).send();
+      ResourceRequestBuilderFactory.<FunctionalUnitDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(alreadyExistFunctionalUnitCallback)
+          .withCallback(Response.SC_NOT_FOUND, createFunctionalUnitCallback).send();
     }
   }
 

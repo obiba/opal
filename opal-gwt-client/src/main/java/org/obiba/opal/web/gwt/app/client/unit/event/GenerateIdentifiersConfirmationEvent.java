@@ -36,7 +36,6 @@ public class GenerateIdentifiersConfirmationEvent extends GwtEvent<GenerateIdent
     return TYPE;
   }
 
-
   public Number getSize() {
     return size;
   }

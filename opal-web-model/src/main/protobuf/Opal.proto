@@ -1,4 +1,5 @@
 import "Ws.proto";
+
 package Opal;
 
 option java_package = "org.obiba.opal.web.model";
@@ -14,31 +15,31 @@ enum KeyType {
   KEY_PAIR = 0;
   CERTIFICATE = 1;
 }
- 
+
 message KeyDto {
   required string alias = 1;
   required string certificate = 2;
   required KeyType keyType = 3;
 }
- 
+
 message KeyForm {
   required string alias = 1;
- 
+
   optional PrivateKeyForm privateForm = 2;
   optional string privateImport = 3;
- 
+
   optional PublicKeyForm publicForm = 4;
   optional string publicImport = 5;
   optional string certificateFile = 6;
- 
+
   required KeyType keyType = 7;
 }
- 
+
 message PrivateKeyForm {
   required string algo = 1;
-  required int32 size = 2; 
+  required int32 size = 2;
 }
- 
+
 message PublicKeyForm {
   required string name = 1;
   required string organizationalUnit = 2;
@@ -64,12 +65,12 @@ message FileDto {
 }
 
 message LocaleDto {
-  required string name = 1;    // Locale.toString()
+  required string name = 1; // Locale.toString()
   optional string display = 2; // Locale.getDisplayName(clientLocale)
 }
 
 message JdbcDriverDto {
-  required string driverName = 1;  // e.g., "MySQL 5.1"
+  required string driverName = 1; // e.g., "MySQL 5.1"
   required string driverClass = 2; // e.g., "com.mysql.jdbc.Driver"
   required string jdbcUrlTemplate = 3; // e.g., "jdbc:mysql://{hostname}:{port}/{databaseName}"
   optional string version = 4;
@@ -194,10 +195,10 @@ message ESCfgDto {
 }
 
 enum TableIndexationStatus {
-  NOT_INDEXED = 1;        // this table is not indexable
-  OUTDATED = 2;    // this table is indexable, index is not up-to-date and is not in progress
+  NOT_INDEXED = 1; // this table is not indexable
+  OUTDATED = 2; // this table is indexable, index is not up-to-date and is not in progress
   IN_PROGRESS = 3; // this table is indexable, index is not up-to-date and is in progress
-  UPTODATE = 4;     // this table is indexable and index is up-to-date
+  UPTODATE = 4; // this table is indexable and index is up-to-date
 }
 
 message TableIndexStatusDto {

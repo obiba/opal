@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.web.datashield.support;
 
-import org.obiba.opal.datashield.DataShieldMethod;
-import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
-
 /**
  *
  */

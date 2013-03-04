@@ -12,7 +12,6 @@ package org.obiba.opal.web.r;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

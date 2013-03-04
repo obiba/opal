@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -96,7 +96,6 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
 
   @UiField
   CharacterSetView charsetView;
-
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -218,8 +217,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
             dialog.setNextEnabled(false);
             dialog.setCancelEnabled(false);
           }
-        } else
-          stepChain.onNext();
+        } else stepChain.onNext();
       }
     });
   }
@@ -324,8 +322,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   }
 
   @Override
-  public void showCharacterSetPanel(boolean show)
-  {
+  public void showCharacterSetPanel(boolean show) {
     charsetPanel.setVisible(show);
   }
 
@@ -334,7 +331,6 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   //
 
   @UiTemplate("VariablesImportView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, VariablesImportView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, VariablesImportView> {}
 
 }
