@@ -58,7 +58,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   public static final WizardType WizardType = new WizardType();
 
-  private DataImportFormatStepPresenter formatStepPresenter;
+  private DataConfigFormatStepPresenter formatStepPresenter;
 
   private final CsvFormatStepPresenter csvFormatStepPresenter;
 
@@ -123,6 +123,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     setInSlot(Slots.Limesurvey, limesurveyStepPresenter);
     setInSlot(Slots.Rest, restStepPresenter);
 
+    getView().setUnitSelectionStepInHandler(new UnitSelectionStepInHandler());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
 
@@ -336,6 +337,16 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   }
 
+  private final class UnitSelectionStepInHandler implements StepInHandler {
+
+    @Override
+    public void onStepIn() {
+      importConfig = formatStepPresenter.getImportConfig();
+      destinationSelectionStepPresenter.updateImportConfig(importConfig);
+      unitSelectionStepPresenter.setEntityType(importConfig.getEntityType());
+    }
+  }
+
   private final class TransientDatasourceHandler implements StepInHandler {
 
     private ImportConfig importConfig;
@@ -352,9 +363,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     public void onStepIn() {
       comparedDatasourcesReportPresenter.getDisplay().clearDisplay();
       removeTransientDatasource();
-      importConfig = formatStepPresenter.getImportData();
-      destinationSelectionStepPresenter.updateImportData(importConfig);
-      unitSelectionStepPresenter.updateImportData(importConfig);
+      importConfig = formatStepPresenter.getImportConfig();
+      destinationSelectionStepPresenter.updateImportConfig(importConfig);
+      unitSelectionStepPresenter.updateImportConfig(importConfig);
       createTransientDatasource();
     }
 
@@ -458,6 +469,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     void showDatasourceCreationError(ClientErrorDto errorDto);
 
+    void setUnitSelectionStepInHandler(StepInHandler handler);
+
     void setComparedDatasourcesReportStepInHandler(StepInHandler handler);
 
     void setComparedDatasourcesReportDisplay(WizardStepDisplay display);
@@ -468,14 +481,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   }
 
-  public interface DataImportFormatStepPresenter {
+  public interface DataConfigFormatStepPresenter {
 
     /**
-     * Get the import data as collected.
+     * Get the import config as collected.
      *
      * @return
      */
-    ImportConfig getImportData();
+    ImportConfig getImportConfig();
 
     /**
      * Validate the import data were correctly provided, and send notification error messages if any.

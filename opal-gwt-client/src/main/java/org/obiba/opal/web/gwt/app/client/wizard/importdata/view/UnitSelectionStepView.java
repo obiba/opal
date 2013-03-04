@@ -20,6 +20,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
@@ -53,6 +54,9 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
 
   @UiField
   CheckBox incremental;
+
+  @UiField
+  FlowPanel unitSection;
 
   public UnitSelectionStepView() {
     widget = uiBinder.createAndBindUi(this);
@@ -101,6 +105,17 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   @Override
   public void setUnitEnabled(boolean enabled) {
     units.setEnabled(enabled);
+  }
+
+  @Override
+  public void setUnitRadiosEnabled(boolean enabled) {
+    identifierAsIs.setEnabled(enabled);
+    identifierSharedWithUnit.setEnabled(enabled);
+    if(enabled) {
+      unitSection.removeStyleName("gwt-RadioButton-disabled");
+    } else {
+      unitSection.addStyleName("gwt-RadioButton-disabled");
+    }
   }
 
   @Override

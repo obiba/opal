@@ -28,10 +28,10 @@ import com.gwtplatform.mvp.client.View;
 import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
 public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPresenter.Display>
-    implements DataImportPresenter.DataImportFormatStepPresenter {
+    implements DataImportPresenter.DataConfigFormatStepPresenter {
 
   @Inject
-  public LimesurveyStepPresenter(EventBus eventBus, LimesurveyStepPresenter.Display view) {
+  public LimesurveyStepPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
   }
 
@@ -60,7 +60,7 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
   }
 
   @Override
-  public ImportConfig getImportData() {
+  public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setImportFormat(ImportFormat.LIMESURVEY);
     importConfig.setDatabase(getView().getSelectedDatabase());

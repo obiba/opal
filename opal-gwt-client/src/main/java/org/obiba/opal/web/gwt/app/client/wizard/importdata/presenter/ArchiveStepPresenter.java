@@ -26,7 +26,7 @@ public class ArchiveStepPresenter extends PresenterWidget<ArchiveStepPresenter.D
   private final FileSelectionPresenter archiveFolderSelectionPresenter;
 
   @Inject
-  public ArchiveStepPresenter(final EventBus eventBus, final Display display,
+  public ArchiveStepPresenter(EventBus eventBus, Display display,
       FileSelectionPresenter archiveFolderSelectionPresenter) {
     super(eventBus, display);
     this.archiveFolderSelectionPresenter = archiveFolderSelectionPresenter;

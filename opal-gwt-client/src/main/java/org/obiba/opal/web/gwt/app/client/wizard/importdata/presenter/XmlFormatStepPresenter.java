@@ -26,13 +26,13 @@ import com.google.inject.Inject;
 import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
 public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresenter.Display>
-    implements DataImportPresenter.DataImportFormatStepPresenter {
+    implements DataImportPresenter.DataConfigFormatStepPresenter {
 
   @Inject
   private FileSelectionPresenter xmlFileSelectionPresenter;
 
   @Inject
-  public XmlFormatStepPresenter(final Display display, final EventBus eventBus) {
+  public XmlFormatStepPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -65,7 +65,7 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
   }
 
   @Override
-  public ImportConfig getImportData() {
+  public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setFormat(ImportFormat.XML);
     importConfig.setXmlFile(getDisplay().getSelectedFile());

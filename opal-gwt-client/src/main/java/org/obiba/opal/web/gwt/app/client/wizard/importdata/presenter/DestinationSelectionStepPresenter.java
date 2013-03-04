@@ -145,7 +145,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     refreshDatasources();
   }
 
-  public void updateImportData(ImportConfig importConfig) {
+  public void updateImportConfig(ImportConfig importConfig) {
     importConfig.setDestinationDatasourceName(getView().getSelectedDatasource());
     if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
       importConfig.setDestinationTableName(getView().getSelectedTable());

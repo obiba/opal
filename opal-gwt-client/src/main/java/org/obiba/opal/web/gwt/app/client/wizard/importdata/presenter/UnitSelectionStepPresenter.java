@@ -38,7 +38,7 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
     initUnits();
   }
 
-  protected void addEventHandlers() {
+  private void addEventHandlers() {
     registerHandler(getView().addIdentifierAsIsClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -53,15 +53,7 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
     }));
   }
 
-  public void updateImportData(ImportConfig importConfig) {
-    boolean withUnit = getView().isIdentifierSharedWithUnit();
-    importConfig.setIdentifierSharedWithUnit(withUnit);
-    importConfig.setIdentifierAsIs(!withUnit);
-    importConfig.setUnit(withUnit ? getView().getSelectedUnit() : null);
-    importConfig.setIncremental(getView().isIncremental());
-  }
-
-  public void initUnits() {
+  private void initUnits() {
     ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units").get()
         .withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
           @Override
@@ -69,6 +61,18 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
             getView().setUnits(units);
           }
         }).send();
+  }
+
+  public void setEntityType(String entityType) {
+    getView().setUnitRadiosEnabled("Participant".equalsIgnoreCase(entityType));
+  }
+
+  public void updateImportConfig(ImportConfig importConfig) {
+    boolean withUnit = getView().isIdentifierSharedWithUnit();
+    importConfig.setIdentifierSharedWithUnit(withUnit);
+    importConfig.setIdentifierAsIs(!withUnit);
+    importConfig.setUnit(withUnit ? getView().getSelectedUnit() : null);
+    importConfig.setIncremental(getView().isIncremental());
   }
 
   public interface Display extends View {
@@ -87,6 +91,7 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
 
     boolean isIncremental();
 
+    void setUnitRadiosEnabled(boolean enabled);
   }
 
 }

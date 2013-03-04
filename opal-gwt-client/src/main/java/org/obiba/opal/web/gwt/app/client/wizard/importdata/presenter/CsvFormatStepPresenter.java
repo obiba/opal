@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.customware.gwt.presenter.client.EventBus;
@@ -36,17 +37,17 @@ import com.google.inject.Inject;
 import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
 public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresenter.Display>
-    implements DataImportPresenter.DataImportFormatStepPresenter {
+    implements DataImportPresenter.DataConfigFormatStepPresenter {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
-  private List<String> availableCharsets = new ArrayList<String>();
+  private final Collection<String> availableCharsets = new ArrayList<String>();
 
   @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
 
   @Inject
-  public CsvFormatStepPresenter(final Display display, final EventBus eventBus) {
+  public CsvFormatStepPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -85,9 +86,9 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     return getDisplay().getCharsetText().getText();
   }
 
-  private List<String> validateCharacterSet(String charset) {
-    List<String> errors = new ArrayList<String>();
-    if(charset == null || charset.equals("")) {
+  private Collection<String> validateCharacterSet(String charset) {
+    Collection<String> errors = new ArrayList<String>();
+    if(charset == null || "".equals(charset)) {
       errors.add(translations.charsetMustNotBeNullMessage());
 
     } else if(!charsetExistsInAvailableCharsets(charset)) {
@@ -141,7 +142,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
   //
 
   @Override
-  public ImportConfig getImportData() {
+  public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setFormat(ImportFormat.CSV);
     importConfig.setCsvFile(getSelectedFile());
@@ -167,7 +168,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
       eventBus.fireEvent(NotificationEvent.newBuilder().error(errors).build());
     }
 
-    return errors.size() == 0;
+    return errors.isEmpty();
   }
 
   //

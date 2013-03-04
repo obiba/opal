@@ -21,10 +21,10 @@ import com.gwtplatform.mvp.client.View;
 import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
 public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display>
-    implements DataImportPresenter.DataImportFormatStepPresenter {
+    implements DataImportPresenter.DataConfigFormatStepPresenter {
 
   @Inject
-  public RestStepPresenter(EventBus eventBus, RestStepPresenter.Display view) {
+  public RestStepPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
   }
 
@@ -34,7 +34,7 @@ public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display
   }
 
   @Override
-  public ImportConfig getImportData() {
+  public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setImportFormat(ImportFormat.REST);
     importConfig.put("url", getView().getUrl()) //

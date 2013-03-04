@@ -30,39 +30,44 @@
       </g:FlowPanel>
 
 
-      <g:Label styleName="section-title">
-        <ui:msg description="Specify how the participant are identified">
-          Specify how the participant are identified
-        </ui:msg>
-      </g:Label>
-      <g:InlineLabel ui:field="noUnitLabel">
-        <ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will be
-          used as-is (no unit is defined).
-        </ui:msg>
-      </g:InlineLabel>
-      <g:FlowPanel ui:field="unitPanel">
-        <g:InlineLabel>
-          <ui:msg description="Participant identifier in files label">The participant identifiers in the file(s)
-            should:
+      <g:FlowPanel ui:field="unitSection" addStyleNames="blabla">
+        <g:Label styleName="section-title">
+          <ui:msg description="Specify how the participant are identified">
+            Specify how the participant are identified
+          </ui:msg>
+        </g:Label>
+        <g:InlineLabel ui:field="noUnitLabel">
+          <ui:msg description="Participant Opal identifiers in file label">The participant identifiers in the file will
+            be
+            used as-is (no unit is defined).
           </ui:msg>
         </g:InlineLabel>
-        <g:FlowPanel styleName="input">
-          <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" addStyleNames="small-indent">
-            <ui:msg description="Leave identifier as-is label">be used as-is</ui:msg>
-          </g:RadioButton>
-        </g:FlowPanel>
-        <g:FlowPanel styleName="input">
-          <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent">
-            <ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit</ui:msg>
-          </g:RadioButton>
-          <o:Chooser ui:field="units" enabled="false"/>
-          <g:Label styleName="help-block large-indent">
-            <ui:msg description="Share identifier with unit help label">Participant's identifiers must have been
-              imported first through the selected unit, otherwise data import will fail
+        <g:FlowPanel ui:field="unitPanel">
+          <g:InlineLabel>
+            <ui:msg description="Participant identifier in files label">The participant identifiers in the file(s)
+              should:
             </ui:msg>
-          </g:Label>
+          </g:InlineLabel>
+          <g:FlowPanel styleName="input">
+            <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" addStyleNames="small-indent">
+              <ui:msg description="Leave identifier as-is label">be used as-is</ui:msg>
+            </g:RadioButton>
+          </g:FlowPanel>
+          <g:FlowPanel styleName="input">
+            <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent">
+              <ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit
+              </ui:msg>
+            </g:RadioButton>
+            <o:Chooser ui:field="units" enabled="false"/>
+            <g:Label styleName="help-block large-indent">
+              <ui:msg description="Share identifier with unit help label">Participant's identifiers must have been
+                imported first through the selected unit, otherwise data import will fail
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
         </g:FlowPanel>
       </g:FlowPanel>
+
     </g:FlowPanel>
   </g:FlowPanel>
 
