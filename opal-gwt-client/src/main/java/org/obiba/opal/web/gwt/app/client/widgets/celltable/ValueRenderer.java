@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -31,7 +31,6 @@ public enum ValueRenderer {
     }
   },
   BINARY {
-
     @Override
     protected String getValue(ValueSetsDto.ValueDto value) {
       if(value.getLink().isEmpty()) return "";
@@ -40,13 +39,13 @@ public enum ValueRenderer {
 
     @Override
     protected String getValue(String value) {
-      if(value == null || value.length() == 0) return "";
+      if(value == null || value.isEmpty()) return "";
       return translations.downloadLabel();
     }
   },
   INTEGER, DECIMAL, BOOLEAN, LOCALE, TEXT;
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private static final int MAX_VALUES_IN_SEQUENCE = 3;
 

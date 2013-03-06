@@ -103,7 +103,7 @@ public class TableChooser extends Chooser {
   public void selectTables(JsArrayString tableFullNames) {
     for(String tableFullName : JsArrays.toIterable(tableFullNames)) {
       for(int i = 0; i < getItemCount(); i++) {
-        if(getItemText(i).equals(tableFullName)) {
+        if(getValue(i).equals(tableFullName)) {
           setItemSelected(i, true);
           break;
         }
@@ -126,16 +126,17 @@ public class TableChooser extends Chooser {
       addGroup(ds);
       for(TableDto table : datasourceMap.get(ds)) {
         String fullName = table.getDatasourceName() + "." + table.getName();
-        addItemToGroup(fullName, fullName);
+        addItemToGroup(table.getName(), fullName);
         tableDtoMap.put(fullName, table);
       }
     }
   }
 
   private void addTableSelections(List<TableDto> tables) {
+    int i = 0;
     for(TableDto table : tables) {
       String fullName = table.getDatasourceName() + "." + table.getName();
-      addItem(table.getName(), fullName);
+      insertItem(table.getName(), fullName, i++);
       tableDtoMap.put(fullName, table);
     }
   }

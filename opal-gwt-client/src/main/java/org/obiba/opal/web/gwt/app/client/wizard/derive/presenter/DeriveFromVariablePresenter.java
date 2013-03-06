@@ -31,10 +31,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -56,6 +54,8 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   private String preSelectedDatasource;
 
   private String preSelectedTable;
+
+  private TableDto table;
 
   private String preSelectedVariable;
 
@@ -91,36 +91,37 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   private void findDerivedFromVariable() {
     String derivedFromUri = VariableDtos.getDerivedFrom(getDerivedVariable());
     if(derivedFromUri == null) {
-      initDatasources();
+      loadTables();
     } else {
       ResponseCodeCallback failureCallback = new ResponseCodeCallback() {
 
         @Override
         public void onResponseCode(Request request, Response response) {
-          initDatasources();
+          loadTables();
         }
       };
 
-      ResourceRequestBuilderFactory.<VariableDto> newBuilder().forResource(derivedFromUri).get()
+      ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(derivedFromUri).get()
           .withCallback(new ResourceCallback<VariableDto>() {
             @Override
             public void onResource(Response response, VariableDto derivedFromVariable) {
               preSelectedVariable = derivedFromVariable.getName();
 
-              ResourceRequestBuilderFactory.<TableDto> newBuilder()
+              ResourceRequestBuilderFactory.<TableDto>newBuilder()
                   .forResource(derivedFromVariable.getParentLink().getLink()).get()
                   .withCallback(new ResourceCallback<TableDto>() {
                     @Override
                     public void onResource(Response response, TableDto tableDto) {
                       preSelectedTable = tableDto.getName();
+                      table = tableDto;
                       preSelectedDatasource = tableDto.getDatasourceName();
-                      initDatasources();
+                      loadTables();
                     }
                   }).send();
 
             }
           })
-          //
+              //
           .withCallback(Response.SC_NOT_FOUND, failureCallback)//
           .withCallback(Response.SC_FORBIDDEN, failureCallback)//
           .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failureCallback)//
@@ -129,44 +130,9 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
     }
   }
 
-  private void initDatasources() {
-
-    ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(getDestinationTable().getViewLink()).get()
-        .withCallback(new ResourceCallback<ViewDto>() {
-          @Override
-          public void onResource(Response response, ViewDto view) {
-            for(String table : JsArrays.toIterable(view.getFromArray())) {
-              String[] parts = table.split("\\.");
-              restrictedDatasources.add(parts[0]);
-              restrictedTables.add(parts[1]);
-            }
-
-            ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
-                .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-                  @Override
-                  public void onResource(Response response, JsArray<DatasourceDto> resource) {
-                    List<String> datasources = new ArrayList<String>();
-                    if(resource != null) {
-                      for(int i = 0; i < resource.length(); i++) {
-                        String name = resource.get(i).getName();
-                        if(restrictedDatasources.contains(name)) datasources.add(name);
-                      }
-                      Collections.sort(datasources);
-                    }
-                    getView().setDatasources(datasources, preSelectedDatasource);
-                    loadTables();
-                  }
-                }).send();
-
-          }
-        }).send();
-
-  }
-
   private void loadTables() {
 
-    UriBuilder uriBuilder = UriBuilder.create().segment("datasource", getView().getSelectedDatasource(), "tables");
-    ResourceRequestBuilderFactory.<JsArray<TableDto>> newBuilder().forResource(uriBuilder.build()).get()
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
@@ -182,7 +148,10 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
               tables.addAll(tablesByName.keySet());
               Collections.sort(tables);
             }
-            getView().setTables(tables, preSelectedTable);
+            getView().addTableSelections(JsArrays.toSafeArray(resource));
+            if(table != null) {
+              getView().selectTable(table);
+            }
             onTableSelection();
             loadVariables();
           }
@@ -190,10 +159,11 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   }
 
   private void loadVariables() {
-    UriBuilder uriBuilder =
-        UriBuilder.create().segment("datasource", getView().getSelectedDatasource(), "table",
-            getView().getSelectedTable(), "variables");
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(uriBuilder.build()).get()
+    getView().setVariableListEnabled(false);
+    UriBuilder uriBuilder = UriBuilder.create()
+        .segment("datasource", getView().getSelectedTable().getDatasourceName(), "table",
+            getView().getSelectedTable().getName(), "variables");
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
           @Override
           public void onResource(Response response, JsArray<VariableDto> resource) {
@@ -205,6 +175,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
                 variablesByName.put(variableDto.getName(), variableDto);
               }
             }
+            getView().setVariableListEnabled(true);
             onVariableSelection();
           }
         }).send();
@@ -213,23 +184,22 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
     List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
-    stepBuilders.add(getView()
-        .getDeriveFromVariableStepController(wizardType != DeriveVariablePresenter.FromWizardType).onValidate(
-            new ValidationHandler() {
-              @Override
-              public boolean validate() {
-                if(wizardType == DeriveVariablePresenter.FromWizardType && getView().getSelectedVariable() == null) {
-                  getEventBus().fireEvent(NotificationEvent.newBuilder().error("VariableSelectionIsRequired").build());
-                  return false;
-                }
-                return true;
-              }
-            }));
+    stepBuilders.add(getView().getDeriveFromVariableStepController(wizardType != DeriveVariablePresenter.FromWizardType)
+        .onValidate(new ValidationHandler() {
+          @Override
+          public boolean validate() {
+            if(wizardType == DeriveVariablePresenter.FromWizardType && getView().getSelectedVariable() == null) {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error("VariableSelectionIsRequired").build());
+              return false;
+            }
+            return true;
+          }
+        }));
     return stepBuilders;
   }
 
   private void onTableSelection() {
-    setOriginalTable(tablesByName.get(getView().getSelectedTable()));
+    setOriginalTable(getView().getSelectedTable());
   }
 
   private void onVariableSelection() {
@@ -238,12 +208,6 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   }
 
   private void addChangeHandlers() {
-    getView().getDatasourceList().addChangeHandler(new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        loadTables();
-      }
-    });
     getView().getTableList().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
@@ -267,38 +231,24 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
 
     BranchingWizardStepController.Builder getDeriveFromVariableStepController(boolean skip);
 
-    /**
-     * Set a collection of datasources retrieved from Opal.
-     */
-    void setDatasources(List<String> datasources, @Nullable
-    String selectedDatasource);
-
-    /**
-     * Get the datasource selected by the user.
-     */
-    String getSelectedDatasource();
-
-    HasChangeHandlers getDatasourceList();
-
-    /**
-     * Get the table selected by the user.
-     */
-    String getSelectedTable();
-
     HasChangeHandlers getTableList();
 
     HasChangeHandlers getVariableList();
+
+    void setVariableListEnabled(boolean b);
 
     /**
      * Get the variable selected by the user.
      */
     String getSelectedVariable();
 
-    void setVariables(JsArray<VariableDto> variables, @Nullable
-    String selectedVariable);
+    void setVariables(JsArray<VariableDto> variables, @Nullable String selectedVariable);
 
-    void setTables(List<String> tables, @Nullable
-    String selectedTable);
+    void addTableSelections(JsArray<TableDto> tables);
+
+    void selectTable(TableDto table);
+
+    TableDto getSelectedTable();
 
   }
 

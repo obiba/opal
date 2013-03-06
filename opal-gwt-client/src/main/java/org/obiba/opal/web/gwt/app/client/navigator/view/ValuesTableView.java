@@ -303,7 +303,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     Header<String> header = new Header<String>(new ClickableTextCell(new VariableHeaderHtmlRenderer())) {
       @Override
       public String getValue() {
-        GWT.log(listVariable.get(i).getName());
         return listVariable.get(i).getName();
       }
     };

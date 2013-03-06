@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
@@ -55,6 +56,9 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     }
     if("binary".equalsIgnoreCase(variable.getValueType())) {
       return new ClickableTextCell(new ClickableIconRenderer("i-down"));
+    }
+    if(VariableDtos.ValueType.TEXT.is(variable.getValueType())) {
+      return new TextCell(new MultilineTextRenderer());
     }
     return new TextCell();
   }
