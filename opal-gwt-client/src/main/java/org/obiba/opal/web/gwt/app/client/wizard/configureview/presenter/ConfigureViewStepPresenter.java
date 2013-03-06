@@ -65,7 +65,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   //
 
   @Inject
-  public ConfigureViewStepPresenter(final Display display, final EventBus eventBus, //
+  public ConfigureViewStepPresenter(Display display, EventBus eventBus, //
       DataTabPresenter dataTabPresenter, SelectScriptVariablesTabPresenter selectScriptVariablesTabPresenter, //
       VariablesListTabPresenter variablesListTabPresenter) {
     super(eventBus, display);
@@ -110,11 +110,11 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   //
 
   private void addEventHandlers() {
-    super.registerHandler(
+    registerHandler(
         getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
-    super.registerHandler(getEventBus().addHandler(ViewSaveRequiredEvent.getType(), new ViewSaveRequiredHandler()));
+    registerHandler(getEventBus().addHandler(ViewSaveRequiredEvent.getType(), new ViewSaveRequiredHandler()));
 
-    super.registerHandler(getView().getViewTabs().addSelectionHandler(new SelectionHandler<Integer>() {
+    registerHandler(getView().getViewTabs().addSelectionHandler(new SelectionHandler<Integer>() {
 
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
@@ -122,7 +122,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
         getView().getHelpDeck().showWidget(event.getSelectedItem());
       }
     }));
-    super.registerHandler(getView().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
+    registerHandler(getView().getViewTabs().addBeforeSelectionHandler(new BeforeSelectionHandler<Integer>() {
 
       @Override
       public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
@@ -134,10 +134,10 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
         }
       }
     }));
-    super.registerHandler(getEventBus().addHandler(ViewSavePendingEvent.getType(), new ViewSavePendingHandler()));
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(getEventBus().addHandler(ViewSavePendingEvent.getType(), new ViewSavePendingHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
-    super.registerHandler(getView().addCloseClickHandler(new ClickHandler() {
+    registerHandler(getView().addCloseClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -194,6 +194,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
       if(event.getVariable() != null) {
         getView().displayTab(1);
       }
+      dataTabPresenter.setViewDto(viewDto);
     }
 
     private PresenterWidget<?> getVariablesTabWidget() {
@@ -218,7 +219,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
   class ViewSaveRequiredHandler implements ViewSaveRequiredEvent.Handler {
 
-    private ResponseCodeCallback callback;
+    private final ResponseCodeCallback callback;
 
     ViewSaveRequiredHandler() {
       callback = createResponseCodeCallback();
@@ -226,20 +227,15 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
     @Override
     public void onViewUpdate(ViewSaveRequiredEvent event) {
-      ViewDto viewDto = event.getViewDto();
-      saveView(viewDto);
+      ViewDto dto = event.getViewDto();
+      saveView(dto);
     }
 
-    private void saveView(ViewDto viewDto) {
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", viewDto.getDatasourceName(), "view", viewDto.getName());
-      ResourceRequestBuilderFactory.newBuilder()
-          .put()
-          .forResource(ub.build())
-          .accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(viewDto))
-          .withCallback(Response.SC_OK, callback)
-          .withCallback(Response.SC_BAD_REQUEST, callback)
-          .send();
+    private void saveView(ViewDto dto) {
+      UriBuilder ub = UriBuilder.create().segment("datasource", dto.getDatasourceName(), "view", dto.getName());
+      ResourceRequestBuilderFactory.newBuilder().put().forResource(ub.build()).accept("application/x-protobuf+json")
+          .withResourceBody(ViewDto.stringify(dto)).withCallback(Response.SC_OK, callback)
+          .withCallback(Response.SC_BAD_REQUEST, callback).send();
     }
 
     private ResponseCodeCallback createResponseCodeCallback() {
@@ -261,9 +257,10 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
   private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event
-          .isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+          event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }
