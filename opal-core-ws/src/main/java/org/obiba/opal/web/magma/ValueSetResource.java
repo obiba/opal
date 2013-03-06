@@ -54,16 +54,16 @@ public class ValueSetResource extends AbstractValueTableResource {
   private static final Logger log = LoggerFactory.getLogger(ValueSetResource.class);
 
   @Nullable
-  private VariableValueSource vvs;
+  private final VariableValueSource vvs;
 
   @Nullable
-  private VariableEntity entity;
+  private final VariableEntity entity;
 
   public ValueSetResource(ValueTable valueTable, VariableEntity entity) {
     this(valueTable, null, entity);
   }
 
-  public ValueSetResource(ValueTable valueTable, VariableValueSource vvs, VariableEntity entity) {
+  public ValueSetResource(ValueTable valueTable, @Nullable VariableValueSource vvs, VariableEntity entity) {
     super(valueTable, new HashSet<Locale>());
     this.vvs = vvs;
     this.entity = entity;
@@ -77,16 +77,15 @@ public class ValueSetResource extends AbstractValueTableResource {
    */
   @GET
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public Response getValueSet(@Context final UriInfo uriInfo, @QueryParam("select") String select,
+  public Response getValueSet(@Context UriInfo uriInfo, @QueryParam("select") String select,
       @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
     if(vvs == null) {
       ValueSetsDto vs = getValueSetDto(uriInfo, filterVariables(select, 0, null), filterBinary);
       return TimestampedResponses.ok(getValueTable(), vs).build();
-    } else {
-      // ignore select parameter if value set is accessed by variable value source
-      ValueSetsDto.ValueDto vs = getValueDto(uriInfo, filterBinary);
-      return TimestampedResponses.ok(getValueTable(), vs).build();
     }
+    // ignore select parameter if value set is accessed by variable value source
+    ValueSetsDto.ValueDto vs = getValueDto(uriInfo, filterBinary);
+    return TimestampedResponses.ok(getValueTable(), vs).build();
   }
 
   /**
@@ -127,11 +126,9 @@ public class ValueSetResource extends AbstractValueTableResource {
         builder = Response.status(Status.NOT_FOUND);
       } else {
         value = getValueAt(value, pos);
-        if(value.isNull()) {
-          builder = Response.status(Status.NOT_FOUND);
-        } else {
-          builder = getValueResponse(entity.getIdentifier(), value, pos);
-        }
+        builder = value.isNull()
+            ? Response.status(Status.NOT_FOUND)
+            : getValueResponse(entity.getIdentifier(), value, pos);
       }
     } catch(NoSuchValueSetException ex) {
       builder = Response.status(Status.NOT_FOUND);
@@ -139,8 +136,7 @@ public class ValueSetResource extends AbstractValueTableResource {
     return builder.build();
   }
 
-  private ValueSetsDto getValueSetDto(final UriInfo uriInfo, final Iterable<Variable> variables,
-      final boolean filterBinary) {
+  private ValueSetsDto getValueSetDto(final UriInfo uriInfo, Iterable<Variable> variables, final boolean filterBinary) {
     final ValueSet valueSet = getValueTable().getValueSet(entity);
 
     // Do not add iterable directly otherwise the values will be fetched as many times it is iterated
@@ -174,7 +170,7 @@ public class ValueSetResource extends AbstractValueTableResource {
         })).addValueSets(vsBuilder.build()).build();
   }
 
-  private ValueSetsDto.ValueDto getValueDto(final UriInfo uriInfo, final boolean filterBinary) {
+  private ValueSetsDto.ValueDto getValueDto(UriInfo uriInfo, boolean filterBinary) {
     String link = uriInfo.getPath() + "/value";
     Value value = extractValue(entity.getIdentifier());
     return Dtos.asDto(link, value, filterBinary).build();
@@ -187,8 +183,7 @@ public class ValueSetResource extends AbstractValueTableResource {
   }
 
   private Value getValueAt(Value value, Integer occurrence) {
-    if(value.isSequence() && occurrence != null) return value.asSequence().get(occurrence);
-    else return value;
+    return value.isSequence() && occurrence != null ? value.asSequence().get(occurrence) : value;
   }
 
   private ResponseBuilder getValueResponse(String identifier, Value value, Integer pos) {
@@ -257,12 +252,7 @@ public class ValueSetResource extends AbstractValueTableResource {
 
     // if file extension is defined, get the mime-type from it
     String name = getFileExtensionFromAttributes(variable);
-    if(name != null) {
-      name = "file." + name;
-    } else {
-      // if file name is defined, get the mime-type from it
-      name = getFileNameFromAttributes(variable);
-    }
+    name = name == null ? getFileNameFromAttributes(variable) : "file." + name;
 
     if(name != null) {
       return MimetypesFileExtensionsMap.get().getMimeType(name);
@@ -273,7 +263,7 @@ public class ValueSetResource extends AbstractValueTableResource {
 
   private String getFileNameFromAttributes(Variable variable) {
     for(Attribute attr : variable.getAttributes()) {
-      if(attr.getName().equalsIgnoreCase("filename") || attr.getName().equalsIgnoreCase("file-name")) {
+      if("filename".equalsIgnoreCase(attr.getName()) || "file-name".equalsIgnoreCase(attr.getName())) {
         String name = variable.getAttributeStringValue(attr.getName());
         if(name.length() > 0) {
           return name;
@@ -285,7 +275,7 @@ public class ValueSetResource extends AbstractValueTableResource {
 
   private String getFileExtensionFromAttributes(Variable variable) {
     for(Attribute attr : variable.getAttributes()) {
-      if(attr.getName().equalsIgnoreCase("fileextension") || attr.getName().equalsIgnoreCase("file-extension")) {
+      if("fileextension".equalsIgnoreCase(attr.getName()) || "file-extension".equalsIgnoreCase(attr.getName())) {
         String extension = variable.getAttributeStringValue(attr.getName());
         if(extension.startsWith(".")) {
           extension = extension.substring(1);
