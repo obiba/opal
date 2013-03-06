@@ -133,9 +133,10 @@ public class TableChooser extends Chooser {
   }
 
   private void addTableSelections(List<TableDto> tables) {
+    int i = 0;
     for(TableDto table : tables) {
       String fullName = table.getDatasourceName() + "." + table.getName();
-      addItem(table.getName(), fullName);
+      insertItem(table.getName(), fullName, i++);
       tableDtoMap.put(fullName, table);
     }
   }

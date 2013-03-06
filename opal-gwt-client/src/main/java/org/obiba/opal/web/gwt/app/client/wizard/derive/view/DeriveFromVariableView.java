@@ -9,15 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Skippable;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveFromVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
@@ -26,7 +26,6 @@ import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -36,8 +35,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariablePresenter.Display {
 
   @UiTemplate("DeriveFromVariableView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveFromVariableView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, DeriveFromVariableView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -45,15 +43,18 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
 
   private final Widget widget;
 
-  @UiField WizardStep deriveFromVariableStep;
+  @UiField
+  WizardStep deriveFromVariableStep;
 
-  @UiField ListBox datasourceBox;
+  @UiField(provided = true)
+  TableChooser tableChooser;
 
-  @UiField ListBox tableBox;
-
-  @UiField ListBox variableBox;
+  @UiField
+  TableChooser variableBox;
 
   public DeriveFromVariableView() {
+    tableChooser = new TableChooser(false); // Single-select
+    tableChooser.setWidth("30em");
     widget = uiBinder.createAndBindUi(this);
   }
 
@@ -69,52 +70,13 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   }
 
   @Override
-  public void setDatasources(List<String> datasources, @Nullable String selectedDatasource) {
-    datasourceBox.clear();
-
-    for(int i = 0; i < datasources.size(); i++) {
-      String name = datasources.get(i);
-      datasourceBox.addItem(name);
-      if(selectedDatasource != null && selectedDatasource.equals(name)) {
-        datasourceBox.setSelectedIndex(i);
-      }
-    }
-    if(datasourceBox.getSelectedIndex() == -1) datasourceBox.setSelectedIndex(0);
-  }
-
-  @Override
-  public String getSelectedDatasource() {
-    int index = datasourceBox.getSelectedIndex();
-    return index == -1 ? null : datasourceBox.getValue(index);
-  }
-
-  @Override
-  public HasChangeHandlers getDatasourceList() {
-    return datasourceBox;
-  }
-
-  @Override
   public HasChangeHandlers getVariableList() {
     return variableBox;
   }
 
   @Override
-  public void setTables(List<String> tables, @Nullable String selectedTable) {
-    tableBox.clear();
-    for(int i = 0; i < tables.size(); i++) {
-      String name = tables.get(i);
-      tableBox.addItem(name);
-      if(selectedTable != null && selectedTable.equals(name)) {
-        tableBox.setSelectedIndex(i);
-      }
-    }
-    if(tableBox.getSelectedIndex() == -1) tableBox.setSelectedIndex(0);
-  }
-
-  @Override
-  public String getSelectedTable() {
-    int index = tableBox.getSelectedIndex();
-    return index == -1 ? null : tableBox.getValue(index);
+  public void setVariableListEnabled(boolean b) {
+    variableBox.setEnabled(b);
   }
 
   @Override
@@ -126,12 +88,14 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   @Override
   public void setVariables(JsArray<VariableDto> variables, @Nullable String selectedVariable) {
     variableBox.clear();
+    variableBox.setWidth("30em");
+    variableBox.forceRedraw();
     if(variables != null) {
       for(int i = 0; i < variables.length(); i++) {
         String name = variables.get(i).getName();
-        variableBox.addItem(name);
+        variableBox.insertItem(name, i);
         if(selectedVariable != null && selectedVariable.equals(name)) {
-          variableBox.setSelectedIndex(i);
+          variableBox.setSelectedValue(name);
         }
       }
       if(variableBox.getSelectedIndex() == -1) variableBox.setSelectedIndex(0);
@@ -145,6 +109,24 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
 
   @Override
   public HasChangeHandlers getTableList() {
-    return tableBox;
+    return tableChooser;
+  }
+
+  @Override
+  public void addTableSelections(JsArray<TableDto> tables) {
+    tableChooser.addTableSelections(tables);
+  }
+
+  @Override
+  public void selectTable(TableDto table) {
+    tableChooser.selectTable(table);
+  }
+
+  @Override
+  public TableDto getSelectedTable() {
+    if(tableChooser.getSelectedTables().size() == 1) {
+      return tableChooser.getSelectedTables().get(0);
+    }
+    return null;
   }
 }

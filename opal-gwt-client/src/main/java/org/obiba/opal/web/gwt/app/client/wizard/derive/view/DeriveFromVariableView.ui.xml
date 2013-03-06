@@ -1,27 +1,26 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
     <o:WizardStep ui:field="deriveFromVariableStep">
       <g:FlowPanel>
 
         <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
-          <o:Chooser ui:field="datasourceBox" />
+          <g:Label addStyleNames="key">
+            <ui:msg description="Table label">Table</ui:msg>
+          </g:Label>
+          <o:TableChooser ui:field="tableChooser"/>
         </g:FlowPanel>
 
         <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Table label">Table</ui:msg></g:Label>
-          <o:Chooser ui:field="tableBox" />
-        </g:FlowPanel>
-
-        <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Variable label">Variable</ui:msg></g:Label>
-          <o:Chooser ui:field="variableBox" />
+          <g:Label addStyleNames="key">
+            <ui:msg description="Variable label">Variable</ui:msg>
+          </g:Label>
+          <o:TableChooser ui:field="variableBox"/>
         </g:FlowPanel>
 
       </g:FlowPanel>
