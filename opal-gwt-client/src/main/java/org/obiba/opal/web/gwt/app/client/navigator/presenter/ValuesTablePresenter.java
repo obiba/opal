@@ -73,9 +73,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(final TableDto table, String select) {
-//    if(table == null) {
-//      getView().setTable(null);
-//    } else {
     hidePopups(table);
     this.table = table;
 
@@ -102,7 +99,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
     });
     fetcher.updateVariables(select);
-//    }
   }
 
   @Override
@@ -326,10 +322,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   public enum ViewMode {
     DETAILED_MODE,
-    SIMPLE_MODE;
+    SIMPLE_MODE
   }
-
-  ;
 
   public interface DataFetcher {
     void request(List<VariableDto> variables, int offset, int limit);

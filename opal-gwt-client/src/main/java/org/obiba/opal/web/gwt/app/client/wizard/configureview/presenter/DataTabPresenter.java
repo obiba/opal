@@ -35,7 +35,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -76,7 +75,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   private Request refreshRequest;
 
   @Inject
-  public DataTabPresenter(final Display display, final EventBus eventBus) {
+  public DataTabPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 
@@ -102,12 +101,12 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   }
 
   private void refreshTables() {
-    if(refreshRequest == null || refreshRequest.isPending() == false) {
+    if(refreshRequest == null || !refreshRequest.isPending()) {
       refreshRequest = ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables")
           .get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
             @Override
             public void onResource(Response response, JsArray<TableDto> resource) {
-              JsArray<TableDto> tables = JsArrays.toSafeArray((JsArray<TableDto>) resource);
+              JsArray<TableDto> tables = JsArrays.toSafeArray(resource);
               TableDto viewTableDto = findViewTabledto(tables);
               getDisplay().addTableSelections(filterTables(tables, viewTableDto));
               if(viewDto != null) {
@@ -126,8 +125,8 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
               TableDto viewTableDto = null;
               for(TableDto table : JsArrays.toIterable(tables)) {
-                if(viewDto.getDatasourceName().equals(table.getDatasourceName()) && viewDto.getName()
-                    .equals(table.getName())) {
+                if(viewDto.getDatasourceName().equals(table.getDatasourceName()) &&
+                    viewDto.getName().equals(table.getName())) {
                   viewTableDto = table;
                   break;
                 }
@@ -146,7 +145,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
               JsArray<TableDto> filteredTables = JsArrays.create();
               for(TableDto table : JsArrays.toIterable(tables)) {
-                if(table.equals(viewTableDto) == false && table.getEntityType().equals(viewTableDto.getEntityType())) {
+                if(!table.equals(viewTableDto) && table.getEntityType().equals(viewTableDto.getEntityType())) {
                   filteredTables.push(table);
                 }
               }
@@ -167,10 +166,10 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   }
 
   private void addEventHandlers() {
-    super.registerHandler(
+    registerHandler(
         eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-    super.registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
-    super.registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
+    registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
     getDisplay().setTableListListener(new FormChangedHandler());
   }
 
@@ -178,7 +177,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
-      DataTabPresenter.this.setViewDto(event.getView());
+      setViewDto(event.getView());
     }
   }
 
@@ -186,9 +185,9 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
     private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-    public SaveChangesClickHandler() {
-      super();
+    SaveChangesClickHandler() {
       HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {
+        @Override
         public Collection<TableDto> getCollection() {
           return getDisplay().getSelectedTables();
         }
@@ -197,6 +196,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
       validators.add(new MatchingTableEntitiesValidator(tablesField));
     }
 
+    @Override
     public void onClick(ClickEvent event) {
       String errorMessageKey = validate();
       if(errorMessageKey != null) {
@@ -226,16 +226,16 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
       List<TableDto> tables = getDisplay().getSelectedTables();
 
       boolean changed = false;
-      if(tables.size() != viewDto.getFromArray().length()) {
-        changed = true;
-      } else {
+      if(tables.size() == viewDto.getFromArray().length()) {
         List<String> fromTables = JsArrays.toList(viewDto.getFromArray());
         for(TableDto table : tables) {
-          if(fromTables.contains(table.getDatasourceName() + "." + table.getName()) == false) {
+          if(!fromTables.contains(table.getDatasourceName() + "." + table.getName())) {
             changed = true;
             break;
           }
         }
+      } else {
+        changed = true;
       }
       getDisplay().saveChangesEnabled(changed);
       eventBus.fireEvent(new ViewSavePendingEvent(changed));
@@ -262,5 +262,6 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
     viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
+    getDisplay().selectTables(viewDto.getFromArray());
   }
 }

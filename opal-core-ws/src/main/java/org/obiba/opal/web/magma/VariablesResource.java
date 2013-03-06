@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -40,11 +40,11 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.TimestampedResponses;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableDto.Builder;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
 
@@ -61,6 +61,7 @@ public class VariablesResource extends AbstractValueTableResource {
 
   /**
    * Get a chunk of variables, optionally filtered by a script
+   *
    * @param uriInfo
    * @param script script for filtering the variables
    * @param offset
@@ -69,7 +70,9 @@ public class VariablesResource extends AbstractValueTableResource {
    */
   @GET
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public Response getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
+  public Response getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script,
+      @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
+
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
     }
@@ -84,13 +87,14 @@ public class VariablesResource extends AbstractValueTableResource {
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
 
     Iterable<Variable> variables = filterVariables(script, offset, limit);
-    Iterable<VariableDto> entity = Iterables.transform(variables, Functions.compose(new Function<VariableDto.Builder, VariableDto>() {
+    Iterable<VariableDto> entity = Iterables
+        .transform(variables, Functions.compose(new Function<VariableDto.Builder, VariableDto>() {
 
-      @Override
-      public VariableDto apply(Builder input) {
-        return input.setLink(ub.build(input.getName()).toString()).build();
-      }
-    }, Dtos.asDtoFunc(tableLinkBuilder.build())));
+          @Override
+          public VariableDto apply(Builder input) {
+            return input.setLink(ub.build(input.getName()).toString()).build();
+          }
+        }, Dtos.asDtoFunc(tableLinkBuilder.build())));
 
     // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
     return TimestampedResponses.ok(getValueTable(), new GenericEntity<Iterable<VariableDto>>(entity) {
@@ -105,7 +109,8 @@ public class VariablesResource extends AbstractValueTableResource {
   @AuthorizeResource
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
-    String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() + "-dictionary";
+    String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() +
+        "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
     ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
 
@@ -116,7 +121,8 @@ public class VariablesResource extends AbstractValueTableResource {
       Disposables.silentlyDispose(destinationDatasource);
     }
 
-    return TimestampedResponses.ok(getValueTable()).entity(excelOutput.toByteArray()).type("application/vnd.ms-excel").header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
+    return TimestampedResponses.ok(getValueTable()).entity(excelOutput.toByteArray()).type("application/vnd.ms-excel")
+        .header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 
   @POST
@@ -130,19 +136,22 @@ public class VariablesResource extends AbstractValueTableResource {
       if(getValueTable().isView() == false) {
         vw = addOrUpdateTableVariables(variables);
       } else {
-        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView")).build();
+        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView"))
+            .build();
       }
 
       return Response.ok().build();
     } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
     } finally {
       StreamUtil.silentSafeClose(vw);
     }
   }
 
   protected VariableWriter addOrUpdateTableVariables(List<VariableDto> variables) {
-    VariableWriter vw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
+    VariableWriter vw = getValueTable().getDatasource()
+        .createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
     for(VariableDto variable : variables) {
       vw.writeVariable(Dtos.fromDto(variable));
     }
