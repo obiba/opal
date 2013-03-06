@@ -20,7 +20,7 @@
           <g:Label addStyleNames="key">
             <ui:msg description="Variable label">Variable</ui:msg>
           </g:Label>
-          <o:TableChooser ui:field="variableBox"/>
+          <o:Chooser ui:field="variableBox"/>
         </g:FlowPanel>
 
       </g:FlowPanel>
