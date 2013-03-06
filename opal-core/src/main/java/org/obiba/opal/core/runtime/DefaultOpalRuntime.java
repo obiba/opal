@@ -60,8 +60,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private final Object syncFs = new Object();
 
-  private Throwable NoSuchServiceException;
-
   @Override
   public void start() {
 
@@ -84,7 +82,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
       try {
         if(service.isRunning()) service.stop();
       } catch(RuntimeException e) {
-        log.warn("Error stoping service " + service.getClass(), e);
+        //noinspection StringConcatenationArgumentToLogCall
+        log.warn("Error stopping service " + service.getClass(), e);
       }
     }
 
@@ -143,8 +142,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
       while(opalFileSystem == null) {
         try {
           syncFs.wait();
-        } catch(InterruptedException ex) {
-          ;
+        } catch(InterruptedException ignored) {
         }
       }
     }
@@ -172,6 +170,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
       try {
         service.start();
       } catch(RuntimeException e) {
+        //noinspection StringConcatenationArgumentToLogCall
         log.warn("Error starting service " + service.getClass(), e);
       }
     }
@@ -209,7 +208,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
         log.debug("Datasource exception:", e);
       }
     }
-
   }
 
   //

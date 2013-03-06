@@ -23,6 +23,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
@@ -67,7 +69,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public void writeViews(String datasourceName, Set<View> views) {
+  public void writeViews(@Nonnull String datasourceName, @Nonnull Set<View> views) {
     w.lock();
     try {
       doWriteViews(datasourceName, views);
@@ -77,7 +79,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public Set<View> readViews(String datasourceName) {
+  public Set<View> readViews(@Nonnull String datasourceName) {
     r.lock();
     try {
       return doReadViews(datasourceName);
@@ -86,23 +88,22 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     }
   }
 
-  private void doWriteViews(String datasourceName, Collection<View> views) {
+  private void doWriteViews(@Nonnull String datasourceName, @Nonnull Collection<View> views) {
     createViewsDirectory(); // Creates the views directory if it doesn't exist.
     if(views.isEmpty()) {
       if(getDatasourceViewsFile(datasourceName).exists()) {
-        if(getDatasourceViewsFile(datasourceName).delete() == false) {
+        if(!getDatasourceViewsFile(datasourceName).delete()) {
           // Ignore, but this may be a problem.
         }
       }
       // Do nothing. The file containing the views has already been deleted.
     } else {
-      XStream xstream = getXStream();
       OutputStreamWriter writer = null;
       try {
         // OPAL-1285 tmp file prefix must be at least 3 chars
         File tmpFile = File.createTempFile("opal-" + datasourceName, ".xml");
         writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
-        xstream.toXML(views, writer);
+        getXStream().toXML(views, writer);
 
         FileUtil.copyFile(tmpFile, getDatasourceViewsFile(datasourceName));
         if(!tmpFile.delete()) {
@@ -122,17 +123,17 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @SuppressWarnings("unchecked")
-  private Set<View> doReadViews(String datasourceName) {
+  @Nonnull
+  private Set<View> doReadViews(@Nonnull String datasourceName) {
     Set<View> result = ImmutableSet.of();
     if(!viewsDirectory.isDirectory()) {
-      log.info("The views directory '" + viewsDirectory.getAbsolutePath() + "' does not exist.");
+      log.info("The views directory '{}' does not exist.", viewsDirectory.getAbsolutePath());
       return result;
     }
-    XStream xstream = getXStream();
     InputStreamReader reader = null;
     try {
       reader = new InputStreamReader(new FileInputStream(getDatasourceViewsFile(datasourceName)), Charsets.UTF_8);
-      result = (Set<View>) xstream.fromXML(reader);
+      result = (Set<View>) getXStream().fromXML(reader);
     } catch(FileNotFoundException e) {
       return ImmutableSet.of();
     } finally {
