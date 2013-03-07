@@ -40,10 +40,6 @@ import com.gwtplatform.mvp.client.View;
 public class DataShieldPackageAdministrationPresenter
     extends PresenterWidget<DataShieldPackageAdministrationPresenter.Display> {
 
-//  private static final String AGGREGATE = "aggregate";
-//
-//  private static final String ASSIGN = "assign";
-
   private Runnable removePackageConfirmation;
 
   private Runnable publishMethodsConfirmation;
