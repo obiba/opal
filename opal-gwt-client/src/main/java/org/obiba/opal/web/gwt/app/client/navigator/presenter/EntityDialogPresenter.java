@@ -17,17 +17,22 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -58,6 +63,8 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
   private Map<String, VariableDto> variablesMap = new HashMap<String, VariableDto>();
 
   private final ValueSequencePopupPresenter valueSequencePopupPresenter;
+
+  private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   @Inject
   public EntityDialogPresenter(EventBus eventBus, Display display,
@@ -123,7 +130,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseErrorCallback(getEventBus(), "InternalError"))
         .withCallback(Response.SC_NOT_FOUND,
-            new ResponseErrorCallback(getEventBus(), "NoTablesForEntityIdType", entityId, entityType))
+            new ResponseErrorCallback(getEventBus(), "NoTablesForEntityIdType", entityId, entityType))//
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
@@ -180,6 +187,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
                 .withCallback(Response.SC_INTERNAL_SERVER_ERROR,
                     new ResponseErrorCallback(getEventBus(), "InternalError"))
                 .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariableValuesFound"))
+                .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback())//
                 .withCallback(new ResourceCallback<ValueSetsDto>() {
                   @Override
                   public void onResource(Response response, ValueSetsDto resource) {
@@ -250,6 +258,39 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
       }
 
       eventBus.fireEvent(notificationBuilder.build());
+    }
+  }
+
+  private class BadRequestCallback implements ResponseCodeCallback {
+
+    @SuppressWarnings("unchecked")
+    private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
+      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
+
+      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
+          .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+      if(errors != null) {
+        for(int i = 0; i < errors.length(); i++) {
+          javaScriptErrors.add(errors.get(i));
+        }
+      }
+      return javaScriptErrors;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+      if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
+        List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
+        for(JavaScriptErrorDto error : errors) {
+          getEventBus().fireEvent(NotificationEvent.newBuilder()
+              .error(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()))
+              .build());
+        }
+      } else {
+        getEventBus().fireEvent(
+            NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
+      }
     }
   }
 
