@@ -188,8 +188,15 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
               deleteDataShieldMethod(dto);
             }
           };
-          getEventBus().fireEvent(ConfirmationRequiredEvent
-              .createWithKeys(removeMethodConfirmation, "deleteDataShieldMethod", "confirmDeleteDataShieldMethod"));
+          if(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
+            getEventBus().fireEvent(ConfirmationRequiredEvent
+                .createWithKeys(removeMethodConfirmation, "deleteDataShieldAssignMethod",
+                    "confirmDeleteDataShieldAssignMethod"));
+          } else {
+            getEventBus().fireEvent(ConfirmationRequiredEvent
+                .createWithKeys(removeMethodConfirmation, "deleteDataShieldAggregateMethod",
+                    "confirmDeleteDataShieldAggregateMethod"));
+          }
         }
       });
 

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
@@ -154,7 +155,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
 
   @Override
   public void setEnvironment(String env) {
-    if("assign".equals(env)) {
+    if(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
       assignMethods.setVisible(true);
       aggregateMethods.setVisible(false);
     } else {

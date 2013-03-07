@@ -80,8 +80,8 @@ public class DataShieldConfigPresenter
     this.packagePresenter = packagePresenter;
     aggregatePresenter = adminPresenterProvider.get();
     assignPresenter = adminPresenterProvider.get();
-    aggregatePresenter.setEnvironment("aggregate");
-    assignPresenter.setEnvironment("assign");
+    aggregatePresenter.setEnvironment(DataShieldEnvironment.AGGREGATE);
+    assignPresenter.setEnvironment(DataShieldEnvironment.ASSIGN);
     this.authorizationPresenter = authorizationPresenter;
   }
 
@@ -164,4 +164,10 @@ public class DataShieldConfigPresenter
     }
   }
 
+  public final class DataShieldEnvironment {
+
+    public static final String ASSIGN = "assign";
+
+    public static final String AGGREGATE = "aggregate";
+  }
 }

@@ -40,9 +40,9 @@ import com.gwtplatform.mvp.client.View;
 public class DataShieldPackageAdministrationPresenter
     extends PresenterWidget<DataShieldPackageAdministrationPresenter.Display> {
 
-  private static final String AGGREGATE = "aggregate";
-
-  private static final String ASSIGN = "assign";
+//  private static final String AGGREGATE = "aggregate";
+//
+//  private static final String ASSIGN = "assign";
 
   private Runnable removePackageConfirmation;
 
@@ -259,17 +259,22 @@ public class DataShieldPackageAdministrationPresenter
               // For each method, delete and post
               for(int i = 0; i < resource.getAggregateCount(); i++) {
                 DataShieldMethodDto aggregate = resource.getAggregate(i);
-                ResourceRequestBuilderFactory.newBuilder()
-                    .forResource(environmentMethod(AGGREGATE, aggregate.getName())).delete() //
-                    .withCallback(new DeleteMethodCallback(aggregate, AGGREGATE), Response.SC_OK,
-                        Response.SC_NOT_FOUND) //
+                ResourceRequestBuilderFactory.newBuilder().forResource(
+                    environmentMethod(DataShieldConfigPresenter.DataShieldEnvironment.AGGREGATE, aggregate.getName()))
+                    .delete() //
+                    .withCallback(
+                        new DeleteMethodCallback(aggregate, DataShieldConfigPresenter.DataShieldEnvironment.AGGREGATE),
+                        Response.SC_OK, Response.SC_NOT_FOUND) //
                     .send();
               }
               for(int i = 0; i < resource.getAssignCount(); i++) {
                 DataShieldMethodDto assign = resource.getAssign(i);
-                ResourceRequestBuilderFactory.newBuilder().forResource(environmentMethod(ASSIGN, assign.getName()))
+                ResourceRequestBuilderFactory.newBuilder().forResource(
+                    environmentMethod(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN, assign.getName()))
                     .delete() //
-                    .withCallback(new DeleteMethodCallback(assign, ASSIGN), Response.SC_OK, Response.SC_NOT_FOUND) //
+                    .withCallback(
+                        new DeleteMethodCallback(assign, DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN),
+                        Response.SC_OK, Response.SC_NOT_FOUND) //
                     .send();
               }
             } else {
