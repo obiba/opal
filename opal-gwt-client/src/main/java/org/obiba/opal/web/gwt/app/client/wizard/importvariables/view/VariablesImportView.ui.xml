@@ -36,10 +36,19 @@
             <g:SimplePanel ui:field="fileSelectionPanel"/>
           </g:FlowPanel>
           <g:FlowPanel styleName="input" ui:field="charsetPanel">
-            <g:Label addStyleNames="key">
-              <ui:msg description="Character set label">Character Set</ui:msg>
-            </g:Label>
-            <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
+            <g:DisclosurePanel ui:field="options" addStyleNames="full-width">
+              <g:customHeader>
+                <g:Label>
+                  <ui:msg description="Options title">Advanced Options</ui:msg>
+                </g:Label>
+              </g:customHeader>
+              <g:FlowPanel styleName="input">
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Character set label">Character Set</ui:msg>
+                </g:Label>
+                <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
+              </g:FlowPanel>
+            </g:DisclosurePanel>
           </g:FlowPanel>
           <g:FlowPanel>
             <g:Label ui:field="failed" addStyleNames="p">
