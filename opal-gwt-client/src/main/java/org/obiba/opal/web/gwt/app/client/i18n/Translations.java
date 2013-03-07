@@ -514,7 +514,8 @@ public interface Translations extends Constants {
       "createView", "Create View",//
       "removeView", "Remove View",//
       "removeTable", "Remove Table",//
-      "deleteDataShieldMethod", "Delete Aggregating Method",//
+      "deleteDataShieldAggregateMethod", "Delete Aggregating Method",//
+      "deleteDataShieldAssignMethod", "Delete Assigning Method",//
       "deleteDataShieldPackage", "Delete Package",//
       "publishDataShieldMethods", "Publish Package Methods",//
       "deleteDatabase", "Delete Database" })
@@ -556,8 +557,8 @@ public interface Translations extends Constants {
       "confirmRemoveTable",
       "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",
 //
-//
-      "confirmDeleteDataShieldMethod", "Please confirm that you want to remove this aggregating method.",//
+      "confirmDeleteDataShieldAssignMethod", "Please confirm that you want to remove this assigning method.",//
+      "confirmDeleteDataShieldAggregateMethod", "Please confirm that you want to remove this aggregating method.",//
       "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package and all its methods.",//
       "confirmPublishDataShieldMethods", "Please confirm that you want to publish this package methods.",//
       "confirmDeleteDatabase", "Please confirm that you want to remove this database." })
@@ -768,10 +769,15 @@ public interface Translations extends Constants {
       "CsvCannotObtainWriter", "Can not get csv writer", //
       "CsvCannotObtainReader", "Can not get csv reader", //
       "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
-      "InvalidCharsetCharacter", "File contains invalid characters at row '{0}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",//
-      "SpssFailedToLoadMetadata", "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
-      "SpssFailedToLoadData", "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
-      "SpssDuplicateEntity", "Duplicate entity identifier '{0}'. Please make sure you have chosen the correct character set.",//
+      "InvalidCharsetCharacter",
+      "File contains invalid characters at row '{0}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
+//
+      "SpssFailedToLoadMetadata",
+      "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
+      "SpssFailedToLoadData",
+      "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
+      "SpssDuplicateEntity",
+      "Duplicate entity identifier '{0}'. Please make sure you have chosen the correct character set.",//
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set." })
   Map<String, String> datasourceParsingErrorMap();
 
