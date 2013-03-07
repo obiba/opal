@@ -1,29 +1,41 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel ui:field="methodsPanel" addStyleNames="panel">
-    <g:FlowPanel addStyleNames="title">
-      <g:InlineLabel><ui:msg description="Aggregation Methods label" >Aggregation Methods</ui:msg></g:InlineLabel>
+    <g:FlowPanel addStyleNames="title" ui:field="aggregateMethods">
+      <g:InlineLabel>
+        <ui:msg description="Aggregation Methods label">Aggregation Methods</ui:msg>
+      </g:InlineLabel>
       <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
         <g:HTMLPanel>
-          <g:Label addStyleNames="title"><ui:msg description="Aggregation Methods label">Aggregation Methods</ui:msg></g:Label>
+          <g:Label addStyleNames="title">
+            <ui:msg description="Aggregation Methods label">Aggregation Methods</ui:msg>
+          </g:Label>
           <p>
             <ui:msg description="Aggregation Methods information">
-              The aggregation methods are used by DataShield in order to compile individual data. The same aggregation methods must be defined in each DataShield server that will be involved in a computation process. Each aggregation method is identified by a name that will be used from the R-DataShield client. 
+              The aggregation methods are used by DataShield in order to compile individual data. The same aggregation
+              methods must be defined in each DataShield server that will be involved in a computation process. Each
+              aggregation method is identified by a name that will be used from the R-DataShield client.
             </ui:msg>
           </p>
-          <g:Label addStyleNames="title"><ui:msg description="R Function label">R Function</ui:msg></g:Label>
+          <g:Label addStyleNames="title">
+            <ui:msg description="R Function label">R Function</ui:msg>
+          </g:Label>
           <p>
             <ui:msg description="R Function information">
-              Some aggregation methods are already defined in R as functions. For security reasons, R functions should be fully named, i.e. including package name space. This way the aggregating function to be used can be unambiguously identified. For example use "base::summary" in place of "summary". 
+              Some aggregation methods are already defined in R as functions. For security reasons, R functions should
+              be fully named, i.e. including package name space. This way the aggregating function to be used can be
+              unambiguously identified. For example use "base::summary" in place of "summary".
             </ui:msg>
           </p>
-          <g:Label addStyleNames="title"><ui:msg description="R Script label">R Script</ui:msg></g:Label>
+          <g:Label addStyleNames="title">
+            <ui:msg description="R Script label">R Script</ui:msg>
+          </g:Label>
           <p>
             <ui:msg description="R Script information">
               Any R script that does not return any individual data.
@@ -32,9 +44,51 @@
         </g:HTMLPanel>
       </o:HelpImage>
     </g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="title" ui:field="assignMethods">
+      <g:InlineLabel>
+        <ui:msg description="Assign Methods label">Assign Methods</ui:msg>
+      </g:InlineLabel>
+      <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
+        <g:HTMLPanel>
+          <g:Label addStyleNames="title">
+            <ui:msg description="Assign Methods label">Assign Methods</ui:msg>
+          </g:Label>
+          <p>
+            <ui:msg description="Assign Methods information">
+              The assign methods are used by DataShield in order to transform individual data on server side. The same
+              assign methods must be defined in each DataShield server that will be involved in a computation process.
+              Each assign method is identified by a name that will be used from the R-DataShield client.
+            </ui:msg>
+          </p>
+          <g:Label addStyleNames="title">
+            <ui:msg description="R Function label">R Function</ui:msg>
+          </g:Label>
+          <p>
+            <ui:msg description="R Function information">
+              Some assign methods are already defined in R as functions. For security reasons, R functions should be
+              fully
+              named, i.e. including package name space. This way the assigning function to be used can be unambiguously
+              identified. For example use "base::data.frame" in place of "data.frame".
+            </ui:msg>
+          </p>
+          <g:Label addStyleNames="title">
+            <ui:msg description="R Script label">R Script</ui:msg>
+          </g:Label>
+          <p>
+            <ui:msg description="R Script information">
+              Any R script that transforms individual data.
+            </ui:msg>
+          </p>
+        </g:HTMLPanel>
+      </o:HelpImage>
+    </g:FlowPanel>
+
     <g:VerticalPanel width="100%" addStyleNames="content">
-      <g:Button ui:field="addMethodButton" styleName="btn"><ui:msg description="Add DataShield method label" >Add Method</ui:msg></g:Button>
-      <c:SimplePager ui:field="methodsTablePager" location="CENTER" addStyleNames="right-aligned" visible="false" />
+      <g:Button ui:field="addMethodButton" styleName="btn">
+        <ui:msg description="Add DataShield method label">Add Method</ui:msg>
+      </g:Button>
+      <c:SimplePager ui:field="methodsTablePager" location="CENTER" addStyleNames="right-aligned" visible="false"/>
       <o:Table width="100%" ui:field="methodsTable" addStyleNames="gwt-CellTable" visible="false"/>
     </g:VerticalPanel>
   </g:FlowPanel>

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
@@ -31,6 +32,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -49,7 +51,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
   @UiTemplate("DataShieldAdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DataShieldAdministrationView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Translations translations;
 
@@ -66,6 +68,12 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
 
   @UiField
   SimplePager methodsTablePager;
+
+  @UiField
+  FlowPanel aggregateMethods;
+
+  @UiField
+  FlowPanel assignMethods;
 
   private JsArrayDataProvider<DataShieldMethodDto> methodsDataProvider = new JsArrayDataProvider<DataShieldMethodDto>();
 
@@ -145,4 +153,14 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
     return new WidgetAuthorizer(methodsPanel);
   }
 
+  @Override
+  public void setEnvironment(String env) {
+    if(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
+      assignMethods.setVisible(true);
+      aggregateMethods.setVisible(false);
+    } else {
+      assignMethods.setVisible(false);
+      aggregateMethods.setVisible(true);
+    }
+  }
 }

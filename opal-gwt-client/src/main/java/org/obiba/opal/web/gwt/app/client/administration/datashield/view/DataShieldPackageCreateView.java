@@ -37,9 +37,10 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   @UiTemplate("DataShieldPackageCreateView.ui.xml")
   interface DataShieldPackageCreateViewUiBinder extends UiBinder<DialogBox, DataShieldPackageCreateView> {}
 
-  private static DataShieldPackageCreateViewUiBinder uiBinder = GWT.create(DataShieldPackageCreateViewUiBinder.class);
+  private static final DataShieldPackageCreateViewUiBinder uiBinder = GWT
+      .create(DataShieldPackageCreateViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -131,6 +132,8 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   public void clear() {
     name.setText("");
     reference.setText("");
+    installButton.setEnabled(true);
+    cancelButton.setEnabled(true);
   }
 
   @Override
