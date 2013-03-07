@@ -87,7 +87,7 @@ public class TableChooser extends Chooser {
 
   public void selectTable(TableDto table) {
     for(int i = 0; i < getItemCount(); i++) {
-      if(getItemText(i).equals(table.getName())) {
+      if(getValue(i).equals(table.getDatasourceName() + "." + table.getName())) {
         setSelectedIndex(i);
         break;
       }
