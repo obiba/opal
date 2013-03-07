@@ -44,7 +44,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   private DataShieldMethodPresenter dataShieldMethodPresenter;
 
   @Inject
-  public DataShieldAdministrationPresenter(final Display display, final EventBus eventBus,
+  public DataShieldAdministrationPresenter(Display display, EventBus eventBus,
       DataShieldMethodPresenter dataShieldMethodPresenter) {
     super(eventBus, display);
     this.dataShieldMethodPresenter = dataShieldMethodPresenter;
@@ -52,6 +52,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
   void setEnvironment(String env) {
     this.env = env;
+    getView().setEnvironment(env);
     dataShieldMethodPresenter.setEnvironement(env);
   }
 
@@ -196,7 +197,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void deleteDataShieldMethod(final DataShieldMethodDto dto) {
+  private void deleteDataShieldMethod(DataShieldMethodDto dto) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
@@ -265,6 +266,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
     HasAuthorization getMethodsAuthorizer();
 
+    void setEnvironment(String env);
   }
 
 }
