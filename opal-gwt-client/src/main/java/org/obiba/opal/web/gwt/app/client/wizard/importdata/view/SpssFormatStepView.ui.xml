@@ -40,20 +40,13 @@
       </g:FlowPanel>
     </g:DisclosurePanel>
 
-    <!--<g:FlowPanel styleName="input block">-->
-    <!--<g:Label addStyleNames="key">-->
-    <!--<ui:msg description="Character set label">Character Set</ui:msg>-->
-    <!--</g:Label>-->
-    <!--<w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>-->
-    <!--</g:FlowPanel>-->
-
     <g:HTMLPanel ui:field="help">
       <g:Label addStyleNames="title">
         <ui:msg description="Data File label">Data File</ui:msg>
       </g:Label>
       <p>
-        <ui:msg description="SPSS data file information">The SPSS file to use must be on the server. Use the file ex
-          plorer to upload it if it's not already there.
+        <ui:msg description="SPSS data file information">The SPSS file to use must be on the server. Use the file
+          explorer to upload it if it's not already there.
         </ui:msg>
       </p>
     </g:HTMLPanel>
