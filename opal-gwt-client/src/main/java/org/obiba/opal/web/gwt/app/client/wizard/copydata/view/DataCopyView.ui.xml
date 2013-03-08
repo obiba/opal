@@ -33,7 +33,7 @@
             <g:CheckBox ui:field="copyNullValues" addStyleNames="block">
               <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
             </g:CheckBox>
-            <g:CheckBox ui:field="useAlias" addStyleNames="small-top-margin block">
+            <g:CheckBox ui:field="useAlias" addStyleNames="block">
               <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
                 variables
               </ui:msg>
