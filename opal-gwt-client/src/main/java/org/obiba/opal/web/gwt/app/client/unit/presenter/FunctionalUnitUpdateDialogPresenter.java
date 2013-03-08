@@ -24,7 +24,10 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -189,7 +192,7 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     @Override
     public void onResponseCode(Request request, Response response) {
       FunctionalUnitDto functionalUnit = getFunctionalUnitDto();
-      CreateOrUpdateFunctionalUnitCallBack callbackHandler = new CreateOrUpdateFunctionalUnitCallBack(functionalUnit);
+      ResponseCodeCallback callbackHandler = new CreateOrUpdateFunctionalUnitCallBack(functionalUnit);
       ResourceRequestBuilderFactory.newBuilder().forResource("/functional-units/").post()
           .withResourceBody(FunctionalUnitDto.stringify(functionalUnit))
           .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
@@ -214,8 +217,8 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
 
     FunctionalUnitDto functionalUnit;
 
-    public CreateOrUpdateFunctionalUnitCallBack(FunctionalUnitDto FunctionalUnit) {
-      this.functionalUnit = FunctionalUnit;
+    private CreateOrUpdateFunctionalUnitCallBack(FunctionalUnitDto FunctionalUnit) {
+      functionalUnit = FunctionalUnit;
     }
 
     @Override
@@ -226,7 +229,16 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         getEventBus().fireEvent(new FunctionalUnitCreatedEvent(functionalUnit));
       } else {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        NotificationEvent.Builder builder = NotificationEvent.newBuilder();
+        try {
+          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          GWT.log(errorDto.getStatus());
+          GWT.log(errorDto.getArgumentsArray().join());
+          builder.error(errorDto.getStatus()).args(errorDto.getArgumentsArray());
+        } catch(Exception e) {
+          builder.error(response.getText());
+        }
+        getEventBus().fireEvent(builder.build());
       }
 
     }
