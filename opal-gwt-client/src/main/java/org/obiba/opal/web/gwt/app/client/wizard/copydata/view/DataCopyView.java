@@ -9,13 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.copydata.view;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
@@ -41,11 +37,9 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
-import com.watopi.chosen.client.gwt.ChosenListBox;
 
 /**
  * View of the dialog used to export data from Opal.
@@ -55,10 +49,9 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiTemplate("DataCopyView.ui.xml")
-  interface DataCopyUiBinder extends UiBinder<DialogBox, DataCopyView> {
-  }
+  interface DataCopyUiBinder extends UiBinder<DialogBox, DataCopyView> {}
 
-  private static DataCopyUiBinder uiBinder = GWT.create(DataCopyUiBinder.class);
+  private static final DataCopyUiBinder uiBinder = GWT.create(DataCopyUiBinder.class);
 
   private final Widget widget;
 
@@ -78,13 +71,16 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   Anchor jobLink;
 
   @UiField(provided = true)
-  TableChooser tableChooser;
+  final TableChooser tableChooser;
 
   @UiField
   ListBox datasources;
 
   @UiField
   CheckBox incremental;
+
+  @UiField
+  CheckBox copyNullValues;
 
   @UiField
   HTMLPanel destinationHelpPanel;
@@ -102,7 +98,7 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   public DataCopyView(EventBus eventBus) {
     super(eventBus);
     tableChooser = new TableChooser(true);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
   }
 
@@ -123,6 +119,13 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
           public void onReset() {
             clearTablesStep();
           }
+
+          private void clearTablesStep() {
+            tablesStep.setVisible(true);
+            dialog.setHelpEnabled(false);
+            tableChooser.clear();
+          }
+
         })//
         .append(destinationStep, destinationHelpPanel)//
         .title(translations.dataCopyDestination())//
@@ -138,6 +141,12 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
           @Override
           public void onReset() {
             clearDestinationStep();
+          }
+
+          private void clearDestinationStep() {
+            // TODO datasources
+            datasources.setSelectedIndex(0);
+            incremental.setValue(true);
           }
         })//
         .append(conclusionStep)//
@@ -159,14 +168,14 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
 
   @Override
   public String getSelectedDatasource() {
-    return this.datasources.getValue(this.datasources.getSelectedIndex());
+    return datasources.getValue(datasources.getSelectedIndex());
   }
 
   @Override
   public void setDatasources(List<DatasourceDto> datasources) {
     this.datasources.clear();
-    for(int i = 0; i < datasources.size(); i++) {
-      this.datasources.addItem(datasources.get(i).getName());
+    for(DatasourceDto datasource : datasources) {
+      this.datasources.addItem(datasource.getName());
     }
   }
 
@@ -189,6 +198,11 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   @Override
   public boolean isIncremental() {
     return incremental.getValue();
+  }
+
+  @Override
+  public boolean isCopyNullValues() {
+    return copyNullValues.getValue();
   }
 
   @Override
@@ -229,18 +243,6 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
     super.show();
   }
 
-  private void clearTablesStep() {
-    tablesStep.setVisible(true);
-    dialog.setHelpEnabled(false);
-    tableChooser.clear();
-  }
-
-  private void clearDestinationStep() {
-    // TODO datasources
-    datasources.setSelectedIndex(0);
-    incremental.setValue(true);
-  }
-
   @Override
   public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
     return dialog.addCancelClickHandler(handler);
@@ -253,12 +255,12 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
 
   @Override
   public void setTablesValidator(ValidationHandler handler) {
-    this.tablesValidator = handler;
+    tablesValidator = handler;
   }
 
   @Override
   public void setDestinationValidator(ValidationHandler handler) {
-    this.destinationValidator = handler;
+    destinationValidator = handler;
   }
 
   @Override

@@ -31,8 +31,8 @@ public interface CopyCommandOptions extends HelpOption {
 
   boolean isDestination();
 
-  @Option(shortName = "o",
-      description = "Copy to file: CSV if file is a directory or file has suffix csv, Excel if file has suffix xls or xlsx, XML if file has suffix zip.")
+  @Option(shortName = "o", description = "Copy to file: CSV if file is a directory or file has suffix csv, " +
+      "Excel if file has suffix xls or xlsx, XML if file has suffix zip.")
   String getOut();
 
   boolean isOut();
@@ -50,6 +50,9 @@ public interface CopyCommandOptions extends HelpOption {
 
   @Option(longName = "no-variables", shortName = "v", description = "Do not copy the variables.")
   boolean getNoVariables();
+
+  @Option(longName = "copy-null", shortName = "n", description = "Copy null values.")
+  boolean getCopyNullValues();
 
   //
   // Variable transformations

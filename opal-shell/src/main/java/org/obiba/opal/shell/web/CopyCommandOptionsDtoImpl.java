@@ -34,7 +34,7 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   // Instance Variables
   //
 
-  protected CopyCommandOptionsDto dto;
+  protected final CopyCommandOptionsDto dto;
 
   private final OpalRuntime opalRuntime;
 
@@ -118,6 +118,11 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   }
 
   @Override
+  public boolean getCopyNullValues() {
+    return dto.getCopyNullValues();
+  }
+
+  @Override
   public boolean isMultiplex() {
     return dto.hasMultiplex();
   }
@@ -182,13 +187,14 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   private String addExtension(String outputFileFormat, String outputFilePath) {
     if("csv".equals(outputFileFormat) && !outputFilePath.endsWith(".csv")) {
       return outputFilePath + ".csv";
-    } else if("excel".equals(outputFileFormat) && !outputFilePath.endsWith(".xls") &&
+    }
+    if("excel".equals(outputFileFormat) && !outputFilePath.endsWith(".xls") &&
         !outputFilePath.endsWith(".xlsx")) {
       return outputFilePath + ".xlsx"; // prefer .xlsx over .xls
-    } else if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
+    }
+    if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
       return outputFilePath + ".zip";
     }
-
     return outputFilePath;
   }
 }

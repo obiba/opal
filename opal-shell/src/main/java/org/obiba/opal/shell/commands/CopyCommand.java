@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.vfs2.FileObject;
@@ -46,18 +47,21 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Provides ability to copy Magma tables to an existing datasource or a file based datasource.
  */
-@SuppressWarnings("ClassTooDeepInInheritanceTree")
 @CommandUsage(
-    description = "Copy tables to an existing destination datasource or to a specified file. The tables can be explicitly named and/or be the ones from a specified source datasource. The variables can be optionally processed: dispatched in another table and/or renamed.",
-    syntax = "Syntax: copy [--unit UNIT] [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] [--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [TABLE_NAME...]")
+    description = "Copy tables to an existing destination datasource or to a specified file. " +
+        "The tables can be explicitly named and/or be the ones from a specified source datasource. " +
+        "The variables can be optionally processed: dispatched in another table and/or renamed.",
+    syntax = "Syntax: copy [--unit UNIT] [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] " +
+        "[--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [--copy-null] [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
+
+  private static final Logger log = LoggerFactory.getLogger(CopyCommand.class);
 
   @Autowired
   private ExportService exportService;
 
-  private FileDatasourceFactory fileDatasourceFactory;
-
-  private static final Logger log = LoggerFactory.getLogger(CopyCommand.class);
+  @Nonnull
+  private final FileDatasourceFactory fileDatasourceFactory;
 
   public void setExportService(ExportService exportService) {
     this.exportService = exportService;
@@ -65,15 +69,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   public CopyCommand() {
     fileDatasourceFactory = new MultipleFileCsvDatasourceFactory();
-    fileDatasourceFactory.setNext(new SingleFileCsvDatasourceFactory())//
-        .setNext(new ExcelDatasourceFactory())//
+    fileDatasourceFactory.setNext(new SingleFileCsvDatasourceFactory()) //
+        .setNext(new ExcelDatasourceFactory()) //
         .setNext(new FsDatasourceFactory()) //
         .setNext(new NullDatasourceFactory());
   }
 
   @Override
   public int execute() {
-    int errorCode = 1; // initialize as non-zero (error)
+    int errorCode = CommandResultCode.CRITICAL_ERROR; // initialize as non-zero (error)
 
     if(validateOptions()) {
       Datasource destinationDatasource = null;
@@ -86,7 +90,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
             .exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource,
                 buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
         getShell().printf("Successfully copied all tables.\n");
-        errorCode = 0; // success!
+        errorCode = CommandResultCode.SUCCESS;
       } catch(Exception e) {
         getShell().printf("%s\n", e.getMessage());
         //noinspection UseOfSystemOutOrSystemErr
@@ -116,6 +120,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       appendFlag(sb, "non-incremental", options.getNonIncremental());
       appendFlag(sb, "no-values", options.getNoValues());
       appendFlag(sb, "no-variables", options.getNoVariables());
+      appendFlag(sb, "copy-null", options.getCopyNullValues());
       appendUnparsedList(sb, options.getTables());
     }
 
@@ -140,6 +145,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if(options.isTransform()) {
       builder.withVariableTransformer(new JavascriptVariableTransformer(options.getTransform()));
     }
+
+    builder.copyNullValues(options.getCopyNullValues());
+
     return builder;
   }
 

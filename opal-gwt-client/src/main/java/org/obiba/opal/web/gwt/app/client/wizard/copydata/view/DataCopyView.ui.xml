@@ -1,10 +1,9 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
-
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
     <g:caption>
@@ -30,6 +29,9 @@
             </g:Label>
             <g:CheckBox ui:field="incremental" addStyleNames="block">
               <ui:msg description="Incremental checkbox label">incremental</ui:msg>
+            </g:CheckBox>
+            <g:CheckBox ui:field="copyNullValues" addStyleNames="block">
+              <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
             </g:CheckBox>
             <g:CheckBox ui:field="useAlias" addStyleNames="small-top-margin block">
               <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename

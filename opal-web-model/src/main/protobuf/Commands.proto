@@ -53,6 +53,7 @@ message CopyCommandOptionsDto {
   optional string transform = 9;
   repeated string tables = 10;
   optional string format = 11;
+  optional bool copyNullValues = 12;
 }
 
 message ReportCommandOptionsDto {
