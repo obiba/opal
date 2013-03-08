@@ -392,7 +392,9 @@ public interface Translations extends Constants {
       "NoVariablesFound", "Failed to retrieve the list of variables",//
       "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
       "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
-      "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}"//
+      "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
+//
+      "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}"//
   })
   Map<String, String> userMessageMap();
 
