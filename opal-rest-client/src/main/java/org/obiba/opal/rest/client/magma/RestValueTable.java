@@ -90,6 +90,7 @@ class RestValueTable extends AbstractValueTable {
           return ((LazyValueSet) valueSet).get(v);
         }
 
+        @Nonnull
         @Override
         public ValueType getValueType() {
           return v.getValueType();

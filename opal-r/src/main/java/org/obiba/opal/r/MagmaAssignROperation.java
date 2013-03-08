@@ -231,6 +231,7 @@ public class MagmaAssignROperation extends AbstractROperation {
         return Variable.Builder.newVariable(ENTITY_ID_SYMBOL, TextType.get(), table.getEntityType()).build();
       }
 
+      @Nonnull
       @Override
       public ValueType getValueType() {
         return TextType.get();
