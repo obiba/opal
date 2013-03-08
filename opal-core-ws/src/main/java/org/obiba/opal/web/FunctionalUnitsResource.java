@@ -73,6 +73,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -405,8 +406,10 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     for(FunctionalUnit functionalUnit : getUnitsFromIdentifiersMap(reader)) {
       Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
           setName(functionalUnit.getName()). //
-          setDescription(functionalUnit.getDescription()). //
           setKeyVariableName(functionalUnit.getKeyVariableName());
+      if(!Strings.isNullOrEmpty(functionalUnit.getDescription())) {
+        fuBuilder.setDescription(functionalUnit.getDescription());
+      }
       unitDtos.add(fuBuilder.build());
     }
 
