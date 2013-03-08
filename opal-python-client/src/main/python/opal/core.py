@@ -83,12 +83,15 @@ class OpalRequest:
   def __init__(self, opal_client):
     self.client = opal_client
     self.curl_options = {}
-    self.headers = { 'Accept': 'application/json' }
+    self.headers = { 'Accept': 'application/json', 'Expect': '' }
     self._verbose = False
 
   def curl_option(self, opt, value):
     self.curl_options[opt] = value
     return self
+
+  def post_option(self):
+      self.curl_options[pycurl.HTTPPOST] = [('userfile', (pycurl.FORM_FILE, '/home/emorency/Documents/data_etienne_upload.csv'))]
 
   def timeout(self, value):
     return self.curl_option(pycurl.TIMEOUT, value)
@@ -112,7 +115,7 @@ class OpalRequest:
     return self.header('Accept', value)
 
   def content_type(self, value):
-    return self.header('Content-Type', value)
+    return self.header('Content-Type', value + "; boundary=--my-unique-boundary")
 
   def accept_json(self):
     return self.accept('application/json')
@@ -324,3 +327,4 @@ class MagmaNameResolver:
 
   def get_variable_ws(self):
     return '/datasource/' + self.datasource + '/table/' + self.table + '/variable/' + self.variable
+

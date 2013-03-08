@@ -56,7 +56,8 @@ def do_command(args):
       #content = content + open(args.upload,'rb').read()
       #content = content + '\n--' + boundary
       #request.content(content)
-      request.content_upload(args.upload).accept('text/html')
+      request.content_upload(args.upload).accept('text/html').content_type('multipart/form-data').content_file('/home/emorency/Documents/data_etienne_upload.csv')
+
       response = request.post().resource(file.get_ws()).send()
     elif args.delete:
       # confirm
@@ -79,11 +80,13 @@ def do_command(args):
       res = response.pretty_json()
 
     # output to stdout
+    print response
     print res
   except Exception,e :
     print >> sys.stderr, e
     sys.exit(2)
   except pycurl.error, error:
+    print response
     errno, errstr = error
     print >> sys.stderr, 'An error occurred: ', errstr
     sys.exit(2)
