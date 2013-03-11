@@ -5,7 +5,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <g:DialogBox ui:field="dialogBox" modal="false">
+  <g:DialogBox ui:field="dialogBox" modal="true">
     <g:DockLayoutPanel styleName="main" ui:field="content" unit="EM" height="35em" width="45em">
       <g:south size="4">
         <g:FlowPanel addStyleNames="footer">
