@@ -398,5 +398,6 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     helpOpalXml.setVisible(false);
     helpLimeSurvey.setVisible(false);
     helpOpalRest.setVisible(false);
+    helpSpss.setVisible(false);
   }
 }
