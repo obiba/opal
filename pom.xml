@@ -1136,7 +1136,7 @@
               <excludeRoot>target/generated-sources/jjtree</excludeRoot>
             </excludeRoots>
             <rulesets>
-              <ruleset>${pmd.ruleset.dir}/opal-pmd-ruleset.xml</ruleset>
+              <ruleset>https://github.com/obiba/conventions/raw/master/obiba-pmd-ruleset.xml</ruleset>
             </rulesets>
           </configuration>
         </plugin>
@@ -1360,8 +1360,6 @@
     <maven.compiler.source>1.6</maven.compiler.source>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
-    <pmd.ruleset.dir>${basedir}</pmd.ruleset.dir>
-
     <birt.version>2.6.2</birt.version>
     <bouncycastle.version>1.46</bouncycastle.version>
     <cglib-nodep.version>2.2</cglib-nodep.version>
@@ -1437,7 +1435,7 @@
     <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
     <maven-javacc-plugin.version>2.6</maven-javacc-plugin.version>
     <maven-javadoc-plugin.version>2.9</maven-javadoc-plugin.version>
-    <maven-pmd-plugin.version>2.7.1</maven-pmd-plugin.version>
+    <maven-pmd-plugin.version>3.0</maven-pmd-plugin.version>
     <maven-release-plugin.version>2.3.2</maven-release-plugin.version>
     <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
     <maven-source-plugin.version>2.2</maven-source-plugin.version>
