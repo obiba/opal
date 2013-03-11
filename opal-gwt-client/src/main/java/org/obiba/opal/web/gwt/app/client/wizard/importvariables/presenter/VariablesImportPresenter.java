@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -39,6 +40,7 @@ import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -56,6 +58,8 @@ import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
 public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display> {
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   public static final WizardType WIZARD_TYPE = new WizardType();
 
@@ -200,7 +204,11 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
         return false;
       }
 
-      return DatasourceFileType.INVALID != DatasourceFileType.getFileType(getView().getSelectedFile());
+      if(DatasourceFileType.INVALID != DatasourceFileType.getFileType(getView().getSelectedFile())) {
+        return true;
+      }
+      getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("InvalidFileType").build());
+      return false;
     }
   }
 
@@ -297,6 +305,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
           return createSpssDatasourceFactoryDto(tmpFilePath);
       }
 
+      GWT.log(type.toString());
       return createStaticDatasourceFactoryDto(tmpFilePath);
     }
 
