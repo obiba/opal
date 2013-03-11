@@ -77,7 +77,7 @@ public class FunctionalUnitView extends View {
    * @param identifierGenerator strategy for generating missing identifiers. can be null, in which case, identifiers
    * will not be generated
    */
-  @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod", "PMD.NcssMethodCount", "AssignmentToMethodParameter" })
+  @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod", "PMD.NcssMethodCount" })
   public FunctionalUnitView(@Nonnull FunctionalUnit unit, @Nonnull Policy policy, @Nonnull ValueTable dataTable,
       @Nonnull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
       boolean ignoreUnknownIdentifier) {
