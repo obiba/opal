@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -58,8 +57,6 @@ import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
 public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display> {
-
-  private static final Translations translations = GWT.create(Translations.class);
 
   public static final WizardType WIZARD_TYPE = new WizardType();
 
