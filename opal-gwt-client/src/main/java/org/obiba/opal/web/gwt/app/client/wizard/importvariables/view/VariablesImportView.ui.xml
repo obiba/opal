@@ -15,8 +15,7 @@
       <o:WizardStep ui:field="fileSelectionStep">
         <g:FlowPanel>
           <g:InlineLabel>
-            <ui:msg description="Supported variables file format btn-information">The following file format is supported
-              for describing the variables:
+            <ui:msg description="Supported variables file format btn-information">Use the following Excel template to add new variables or update existing ones:
             </ui:msg>
           </g:InlineLabel>
           <g:Button ui:field="downloadExcelTemplateButton" styleName="btn btn-info small-indent">
@@ -34,6 +33,9 @@
               <ui:msg description="Variables File label">Variables File</ui:msg>
             </g:Label>
             <g:SimplePanel ui:field="fileSelectionPanel"/>
+            <g:Label styleName="help-block">
+              <ui:msg description="Supported file formats">Valid file extensions: xls, sav</ui:msg>
+            </g:Label>
           </g:FlowPanel>
           <g:FlowPanel styleName="input" ui:field="charsetPanel">
             <g:DisclosurePanel ui:field="options" addStyleNames="full-width">
