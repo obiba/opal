@@ -56,8 +56,7 @@ def do_command(args):
       #content = content + open(args.upload,'rb').read()
       #content = content + '\n--' + boundary
       #request.content(content)
-      request.content_upload(args.upload).accept('text/html').content_type('multipart/form-data').content_file('/home/emorency/Documents/data_etienne_upload.csv')
-
+      request.content_upload(args.upload).accept('text/html').content_type('multipart/form-data')
       response = request.post().resource(file.get_ws()).send()
     elif args.delete:
       # confirm
@@ -74,7 +73,7 @@ def do_command(args):
     else:
       response = request.get().resource(file.get_meta_ws()).send()
 
-    # format response    
+    # format response
     res = response.content
     if args.json and not args.download and not args.upload:
       res = response.pretty_json()

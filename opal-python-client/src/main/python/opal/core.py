@@ -115,7 +115,7 @@ class OpalRequest:
     return self.header('Accept', value)
 
   def content_type(self, value):
-    return self.header('Content-Type', value + "; boundary=--my-unique-boundary")
+    return self.header('Content-Type', value)
 
   def accept_json(self):
     return self.accept('application/json')
@@ -197,7 +197,7 @@ class OpalRequest:
     if self._verbose:
       print '* File Content:'
       print '[file=' + filename + ', size=' + str(os.path.getsize(filename)) + ']'
-    self.curl_option(pycurl.POST,1)
+    # self.curl_option(pycurl.POST,1)
     self.curl_option(pycurl.HTTPPOST, [("file1", (pycurl.FORM_FILE, filename))])
     return self
 
