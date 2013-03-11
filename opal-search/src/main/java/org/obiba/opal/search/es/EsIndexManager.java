@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
+import javax.annotation.Nonnull;
+
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -381,11 +383,13 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
           meta = readMapping().meta();
         }
 
+        @Nonnull
         @Override
         public Value getLastUpdate() {
           return DateTimeType.get().valueOf(meta.getString("_updated"));
         }
 
+        @Nonnull
         @Override
         public Value getCreated() {
           return DateTimeType.get().valueOf(meta.getString("_created"));
@@ -443,7 +447,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
       try {
         IndexMetaData indexMetaData = getIndexMetaData();
 
-        if (indexMetaData != null) {
+        if(indexMetaData != null) {
           MappingMetaData metaData = indexMetaData.mapping(name);
           if(metaData != null) {
             byte[] mappingSource = metaData.source().uncompressed();

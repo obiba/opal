@@ -222,6 +222,7 @@ class RestValueTable extends AbstractValueTable {
         this.tsDto = tsDto;
       }
 
+      @Nonnull
       @Override
       public Value getLastUpdate() {
         if(tsDto != null && tsDto.hasLastUpdate()) {
@@ -230,6 +231,7 @@ class RestValueTable extends AbstractValueTable {
         return RestValueTable.this.getTimestamps().getLastUpdate();
       }
 
+      @Nonnull
       @Override
       public Value getCreated() {
         if(tsDto != null && tsDto.hasCreated()) {
@@ -247,6 +249,7 @@ class RestValueTable extends AbstractValueTable {
       final Magma.TimestampsDto tsDto = tableDto.getTimestamps();
       tableTimestamps = new Timestamps() {
 
+        @Nonnull
         @Override
         public Value getLastUpdate() {
           if(tsDto.hasLastUpdate()) {
@@ -255,6 +258,7 @@ class RestValueTable extends AbstractValueTable {
           return DateTimeType.get().nullValue();
         }
 
+        @Nonnull
         @Override
         public Value getCreated() {
           if(tsDto.hasCreated()) {
