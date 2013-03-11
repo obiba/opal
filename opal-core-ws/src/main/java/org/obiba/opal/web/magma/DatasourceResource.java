@@ -55,6 +55,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 @SuppressWarnings("OverlyCoupledClass")
 @Component
 @Scope("request")
@@ -181,13 +183,15 @@ public class DatasourceResource {
   @POST
   @Path("/views")
   public Response createView(ViewDto viewDto, @Context UriInfo uriInfo) {
-    if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
+    if(!viewDto.hasName()) return Response.status(BAD_REQUEST).build();
 
     if(datasourceHasTable(viewDto.getName())) {
-      return Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
-    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
+    View view = viewDtos.fromDto(viewDto);
+
+    viewManager.addView(getDatasource().getName(), view);
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());

@@ -13,12 +13,15 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.js.views.VariablesClause;
 import org.obiba.magma.support.ValueTableReference;
+import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.View.Builder;
@@ -39,12 +42,12 @@ import org.springframework.stereotype.Component;
 public class VariableListViewDtoExtension implements ViewDtoExtension {
 
   @Override
-  public boolean isExtensionOf(final ViewDto viewDto) {
+  public boolean isExtensionOf(@Nonnull ViewDto viewDto) {
     return viewDto.hasExtension(VariableListViewDto.view);
   }
 
   @Override
-  public boolean isDtoOf(View view) {
+  public boolean isDtoOf(@Nonnull View view) {
     return !(view.getListClause() instanceof NoneClause);
   }
 
@@ -90,7 +93,7 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
     return viewDtoBuilder.build();
   }
 
-  private void setFromTables(View view, ViewDto.Builder viewDtoBuilder) {
+  private void setFromTables(ValueTableWrapper view, ViewDto.Builder viewDtoBuilder) {
     ValueTable from = view.getWrappedValueTable();
     if(from instanceof JoinTable) {
       List<ValueTable> fromTables = ((JoinTable) from).getTables();

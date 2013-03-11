@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -12,6 +12,8 @@ package org.obiba.opal.web.magma.view;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -37,9 +39,11 @@ public final class ViewDtos {
     this.extensions = ImmutableSet.copyOf(extensions);
   }
 
-  public View fromDto(ViewDto viewDto) {
+  @Nonnull
+  public View fromDto(@Nonnull ViewDto viewDto) {
     List<ValueTable> fromTables = getFromTables(viewDto);
-    View.Builder builder = View.Builder.newView(viewDto.getName(), (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
+    View.Builder builder = View.Builder
+        .newView(viewDto.getName(), (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
     for(ViewDtoExtension extension : extensions) {
       if(extension.isExtensionOf(viewDto)) {
         return extension.fromDto(viewDto, builder);
@@ -48,7 +52,8 @@ public final class ViewDtos {
     throw new IllegalStateException("Unknown view type");
   }
 
-  public TableDto asTableDto(ViewDto viewDto) {
+  @Nonnull
+  public TableDto asTableDto(@Nonnull ViewDto viewDto) {
     TableDto.Builder builder = TableDto.newBuilder().setName(viewDto.getName());
     for(ViewDtoExtension extension : extensions) {
       if(extension.isExtensionOf(viewDto)) {
@@ -58,7 +63,8 @@ public final class ViewDtos {
     throw new IllegalStateException("Unknown view type");
   }
 
-  public ViewDto asDto(View view) {
+  @Nonnull
+  public ViewDto asDto(@Nonnull View view) {
     for(ViewDtoExtension extension : extensions) {
       if(extension.isDtoOf(view)) {
         return extension.asDto(view);
@@ -67,7 +73,8 @@ public final class ViewDtos {
     throw new IllegalStateException("Unknown view type");
   }
 
-  private List<ValueTable> getFromTables(ViewDto viewDto) {
+  @Nonnull
+  private List<ValueTable> getFromTables(@Nonnull ViewDto viewDto) {
     List<ValueTable> fromTables = new ArrayList<ValueTable>();
     for(int i = 0; i < viewDto.getFromCount(); i++) {
       String fromTable = viewDto.getFrom(i);

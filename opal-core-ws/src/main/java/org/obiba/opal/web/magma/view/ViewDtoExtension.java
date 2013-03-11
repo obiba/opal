@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.view;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.views.View;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -18,9 +20,9 @@ import org.obiba.opal.web.model.Magma.ViewDto;
  */
 public interface ViewDtoExtension {
 
-  boolean isExtensionOf(ViewDto viewDto);
+  boolean isExtensionOf(@Nonnull ViewDto viewDto);
 
-  boolean isDtoOf(View view);
+  boolean isDtoOf(@Nonnull View view);
 
   View fromDto(ViewDto viewDto, View.Builder viewBuilder);
 

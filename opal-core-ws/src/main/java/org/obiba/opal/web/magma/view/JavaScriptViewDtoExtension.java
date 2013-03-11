@@ -11,16 +11,20 @@ package org.obiba.opal.web.magma.view;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.ValueTableReference;
+import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.View.Builder;
 import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.support.NoneClause;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -32,14 +36,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class JavaScriptViewDtoExtension implements ViewDtoExtension {
 
-  public boolean isExtensionOf(final ViewDto viewDto) {
+  @Override
+  public boolean isExtensionOf(@Nonnull ViewDto viewDto) {
     return viewDto.hasExtension(JavaScriptViewDto.view);
   }
 
-  public boolean isDtoOf(View view) {
-    return (view.getListClause() instanceof NoneClause);
+  @Override
+  public boolean isDtoOf(@Nonnull View view) {
+    return view.getListClause() instanceof NoneClause;
   }
 
+  @Override
   public View fromDto(ViewDto viewDto, Builder viewBuilder) {
     JavaScriptViewDto jsDto = viewDto.getExtension(JavaScriptViewDto.view);
 
@@ -55,6 +62,7 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     return viewBuilder.build();
   }
 
+  @Override
   public ViewDto asDto(View view) {
     ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
@@ -75,7 +83,7 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     return viewDtoBuilder.build();
   }
 
-  private void setFromTables(View view, ViewDto.Builder viewDtoBuilder) {
+  private void setFromTables(ValueTableWrapper view, ViewDto.Builder viewDtoBuilder) {
     ValueTable from = view.getWrappedValueTable();
     if(from instanceof JoinTable) {
       List<ValueTable> fromTables = ((JoinTable) from).getTables();
@@ -95,7 +103,7 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public TableDto asTableDto(ViewDto viewDto, org.obiba.opal.web.model.Magma.TableDto.Builder tableDtoBuilder) {
+  public TableDto asTableDto(ViewDto viewDto, Magma.TableDto.Builder tableDtoBuilder) {
     throw new UnsupportedOperationException();
   }
 
