@@ -194,7 +194,7 @@ class OpalRequest:
     if self._verbose:
       print '* File Content:'
       print '[file=' + filename + ', size=' + str(os.path.getsize(filename)) + ']'
-    self.curl_option(pycurl.POST,1)
+    # self.curl_option(pycurl.POST,1)
     self.curl_option(pycurl.HTTPPOST, [("file1", (pycurl.FORM_FILE, filename))])
     return self
 
@@ -324,3 +324,4 @@ class MagmaNameResolver:
 
   def get_variable_ws(self):
     return '/datasource/' + self.datasource + '/table/' + self.table + '/variable/' + self.variable
+
