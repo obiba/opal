@@ -1029,7 +1029,7 @@ public interface Translations extends Constants {
 
   @Description("Variables Import File Selection Step")
   @DefaultStringValue(
-      "Select the variables file for batch edition of tables and variables.")
+      "Select an Excel or SPSS variables file for batch edition of tables and variables.")
   String variablesImportFileSelectionStep();
 
   @Description("Variables Import Compare Step")
