@@ -39,7 +39,6 @@ import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -302,7 +301,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
           return createSpssDatasourceFactoryDto(tmpFilePath);
       }
 
-      GWT.log(type.toString());
       return createStaticDatasourceFactoryDto(tmpFilePath);
     }
 
