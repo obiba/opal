@@ -83,15 +83,12 @@ class OpalRequest:
   def __init__(self, opal_client):
     self.client = opal_client
     self.curl_options = {}
-    self.headers = { 'Accept': 'application/json', 'Expect': '' }
+    self.headers = { 'Accept': 'application/json' }
     self._verbose = False
 
   def curl_option(self, opt, value):
     self.curl_options[opt] = value
     return self
-
-  def post_option(self):
-      self.curl_options[pycurl.HTTPPOST] = [('userfile', (pycurl.FORM_FILE, '/home/emorency/Documents/data_etienne_upload.csv'))]
 
   def timeout(self, value):
     return self.curl_option(pycurl.TIMEOUT, value)
