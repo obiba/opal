@@ -102,7 +102,7 @@ public class ValueTableIndexResource extends IndexResource {
 
       if(!isInProgress(table)) {
 
-        synchroManager.synchronizeIndex(valueTable);
+        synchroManager.synchronizeIndex(valueTable, 0);
       }
 
       return Response.ok().build();

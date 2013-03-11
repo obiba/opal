@@ -72,8 +72,12 @@ public class IndexSynchronizationManager {
     }
   }
 
+  public void synchronizeIndex(ValueTable vt, int gracePeriod) {
+    syncProducer.index(vt, gracePeriod);
+  }
+
   public void synchronizeIndex(ValueTable vt) {
-    syncProducer.index(vt);
+    syncProducer.index(vt, GRACE_PERIOD);
   }
 
   public boolean hasTask() {
@@ -120,16 +124,16 @@ public class IndexSynchronizationManager {
 
       // Check that the index is older than the ValueTable
       if(index.requiresUpgrade() || !index.isUpToDate()) {
-        index(vt);
+        index(vt, GRACE_PERIOD);
       }
     }
 
-    private void index(ValueTable vt) {
+    private void index(ValueTable vt, int seconds) {
       // The index needs to be updated
       Value value = vt.getTimestamps().getLastUpdate();
       // Check that the last modification to the ValueTable is older than the gracePeriod
       // If we don't know (null value), reindex
-      if(value.isNull() || value.compareTo(gracePeriod()) < 0) {
+      if(value.isNull() || value.compareTo(gracePeriod(seconds)) < 0) {
         submitTask(vt, indexManager.getIndex(vt));
       }
     }
@@ -139,11 +143,11 @@ public class IndexSynchronizationManager {
      *
      * @return value
      */
-    private Value gracePeriod() {
+    private Value gracePeriod(int seconds) {
       // Now
       Calendar gracePeriod = Calendar.getInstance();
       // Move back in time by GRACE_PERIOD seconds
-      gracePeriod.add(Calendar.SECOND, -GRACE_PERIOD);
+      gracePeriod.add(Calendar.SECOND, -seconds);
       // Things modified before this value can be reindexed
       return DateTimeType.get().valueOf(gracePeriod);
     }
