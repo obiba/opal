@@ -67,8 +67,4 @@
     </plugins>
   </build>
 
-  <properties>
-    <pmd.ruleset.dir>${basedir}/..</pmd.ruleset.dir>
-  </properties>
-
 </project>
