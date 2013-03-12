@@ -115,6 +115,9 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     table = tableDto;
     variable = variableDto;
 
+    if(variable.getLink().isEmpty()) {
+      variable.setLink(variable.getParentLink().getLink() + "/variable/" + variable.getName());
+    }
     updateVariableDisplay();
     updateMenuDisplay(previous, next);
     updateDerivedVariableDisplay();
