@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2012(c) OBiBa. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -63,13 +63,14 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
       }
     }));
 
-    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>> newBuilder().forResource(Resources.drivers()).withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>>newBuilder().forResource(Resources.drivers())
+        .withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<JdbcDriverDto> resource) {
-        getView().setAvailableDrivers(resource);
-      }
-    }).get().send();
+          @Override
+          public void onResource(Response response, JsArray<JdbcDriverDto> resource) {
+            getView().setAvailableDrivers(resource);
+          }
+        }).get().send();
 
     this.methodValidationHandler = new MethodValidationHandler(getEventBus());
   }
@@ -88,6 +89,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
 
   /**
    * Setup the dialog for updating an existing method
+   *
    * @param dto method to update
    */
   public void updateDatabase(JdbcDataSourceDto dto) {
@@ -114,28 +116,29 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     if(methodValidationHandler.validate()) {
       CreateMethodCallBack createCallback = new CreateMethodCallBack();
       AlreadyExistMethodCallBack alreadyExistCallback = new AlreadyExistMethodCallBack();
-      ResourceRequestBuilderFactory.<JdbcDataSourceDto> newBuilder().forResource(Resources.database(getView().getName().getText())).get()//
-      .withCallback(alreadyExistCallback)//
-      .withCallback(Response.SC_NOT_FOUND, createCallback).send();
+      ResourceRequestBuilderFactory.<JdbcDataSourceDto>newBuilder()
+          .forResource(Resources.database(getView().getName().getText())).get()//
+          .withCallback(alreadyExistCallback)//
+          .withCallback(Response.SC_NOT_FOUND, createCallback).send();
     }
   }
 
   private void postDatabase(JdbcDataSourceDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()//
-    .withResourceBody(JdbcDataSourceDto.stringify(dto))//
-    .withCallback(Response.SC_OK, callbackHandler)//
-    .withCallback(Response.SC_CREATED, callbackHandler)//
-    .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+        .withResourceBody(JdbcDataSourceDto.stringify(dto))//
+        .withCallback(Response.SC_OK, callbackHandler)//
+        .withCallback(Response.SC_CREATED, callbackHandler)//
+        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
   private void putDatabase(JdbcDataSourceDto dto) {
     CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(Resources.database(getView().getName().getText())).put()//
-    .withResourceBody(JdbcDataSourceDto.stringify(dto))//
-    .withCallback(Response.SC_OK, callbackHandler)//
-    .withCallback(Response.SC_CREATED, callbackHandler)//
-    .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+        .withResourceBody(JdbcDataSourceDto.stringify(dto))//
+        .withCallback(Response.SC_OK, callbackHandler)//
+        .withCallback(Response.SC_CREATED, callbackHandler)//
+        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
   private JdbcDataSourceDto getJdbcDataSourceDto() {

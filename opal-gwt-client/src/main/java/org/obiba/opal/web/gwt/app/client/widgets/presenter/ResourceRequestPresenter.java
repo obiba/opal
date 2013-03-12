@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -29,7 +29,8 @@ import com.google.gwt.http.client.Response;
 /**
  *
  */
-public class ResourceRequestPresenter<T extends JavaScriptObject> extends WidgetPresenter<ResourceRequestPresenter.Display> {
+public class ResourceRequestPresenter<T extends JavaScriptObject>
+    extends WidgetPresenter<ResourceRequestPresenter.Display> {
   //
   // Instance Variables
   //
@@ -42,7 +43,8 @@ public class ResourceRequestPresenter<T extends JavaScriptObject> extends Widget
   // Constructors
   //
 
-  public ResourceRequestPresenter(Display display, EventBus eventBus, ResourceRequestBuilder<T> requestBuilder, ResponseCodeCallback callback) {
+  public ResourceRequestPresenter(Display display, EventBus eventBus, ResourceRequestBuilder<T> requestBuilder,
+      ResponseCodeCallback callback) {
     super(display, eventBus);
 
     this.requestBuilder = requestBuilder;

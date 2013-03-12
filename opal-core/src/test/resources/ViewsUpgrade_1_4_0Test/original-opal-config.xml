@@ -3,31 +3,31 @@
 
   <functionalUnits>
     <org.obiba.opal.core.unit.FunctionalUnit>
-     <name>OHS-unit</name>
-     <keyVariableName>my-key</keyVariableName>
-     <!--
-     <select class="org.obiba.magma.js.views.JavascriptClause">
-       <script>name().matches(/BoneDensity.InstrumentRun.Contraindication.code/).or(attribute('identifier').isNull().not().and(attribute('identifier').matches(/true/)))</script>
-     </select>
-     -->
-   </org.obiba.opal.core.unit.FunctionalUnit>
+      <name>OHS-unit</name>
+      <keyVariableName>my-key</keyVariableName>
+      <!--
+      <select class="org.obiba.magma.js.views.JavascriptClause">
+        <script>name().matches(/BoneDensity.InstrumentRun.Contraindication.code/).or(attribute('identifier').isNull().not().and(attribute('identifier').matches(/true/)))</script>
+      </select>
+      -->
+    </org.obiba.opal.core.unit.FunctionalUnit>
 
     <org.obiba.opal.core.unit.FunctionalUnit>
-     <name>CAG-unit</name>
-     <keyVariableName>my-key</keyVariableName>
-   </org.obiba.opal.core.unit.FunctionalUnit>
+      <name>CAG-unit</name>
+      <keyVariableName>my-key</keyVariableName>
+    </org.obiba.opal.core.unit.FunctionalUnit>
   </functionalUnits>
 
   <magmaEngineFactory>
-<!--
-    <engineClass>org.obiba.magma.MagmaEngine</engineClass>
--->
+    <!--
+        <engineClass>org.obiba.magma.MagmaEngine</engineClass>
+    -->
 
     <extensions>
-      <org.obiba.magma.js.MagmaJsExtension />
-      <org.obiba.magma.xstream.MagmaXStreamExtension />
+      <org.obiba.magma.js.MagmaJsExtension/>
+      <org.obiba.magma.xstream.MagmaXStreamExtension/>
     </extensions>
-    
+
     <factories>
 
       <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
@@ -47,10 +47,10 @@
       <org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory>
         <name>cpt-mart</name>
         <jdbcProperties>
-          <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-          <property name="url" value="jdbc:mysql://localhost:3306/opal10jdbc" />
-          <property name="username" value="user" />
-          <property name="password" value="abc123" />
+          <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+          <property name="url" value="jdbc:mysql://localhost:3306/opal10jdbc"/>
+          <property name="username" value="user"/>
+          <property name="password" value="abc123"/>
         </jdbcProperties>
         <settings>
           <defaultEntityType>Participant</defaultEntityType>
@@ -62,10 +62,10 @@
       <org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory>
         <name>jdbc2</name>
         <jdbcProperties>
-          <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-          <property name="url" value="jdbc:mysql://localhost:3306/opal10jdbc2" />
-          <property name="username" value="user" />
-          <property name="password" value="abc123" />
+          <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+          <property name="url" value="jdbc:mysql://localhost:3306/opal10jdbc2"/>
+          <property name="username" value="user"/>
+          <property name="password" value="abc123"/>
         </jdbcProperties>
         <settings>
           <defaultEntityType>Participant</defaultEntityType>
@@ -167,54 +167,65 @@
           <views>
             <view class="org.obiba.magma.views.View">
               <name>DerivedView</name>
-                <variables class="org.obiba.magma.js.views.VariablesClause">
-		  <variables>
+              <variables class="org.obiba.magma.js.views.VariablesClause">
+                <variables>
 
 
-		    <variable name="GENERIC_128" valueType="integer" entityType="Participant">
-		      <attributes>
-			<attribute name="label" valueType="text" locale="en">Appointment Year</attribute>
-			<attribute name="URI" valueType="text">http://www.datashaper.org/owl/2009/10/generic.owl#GENERIC_128</attribute>
-			<attribute name="script" valueType="text">$('Admin.Participant.appointmentDate').year()</attribute>
-		      </attributes>
-		    </variable>
+                  <variable name="GENERIC_128" valueType="integer" entityType="Participant">
+                    <attributes>
+                      <attribute name="label" valueType="text" locale="en">Appointment Year</attribute>
+                      <attribute name="URI" valueType="text">
+                        http://www.datashaper.org/owl/2009/10/generic.owl#GENERIC_128
+                      </attribute>
+                      <attribute name="script" valueType="text">$('Admin.Participant.appointmentDate').year()
+                      </attribute>
+                    </attributes>
+                  </variable>
 
 
-		    <variable name="GENERIC_GENDER" valueType="text" entityType="Participant">
-		      <attributes>
-			<attribute name="label" valueType="text" locale="en">Gender</attribute>
-			<attribute name="URI" valueType="text">http://www.datashaper.org/owl/2009/10/generic.owl#GENERIC_GENDER</attribute>
-			<attribute name="script" valueType="text">$('Admin.Participant.gender')</attribute>
-		      </attributes>
-		    </variable>
+                  <variable name="GENERIC_GENDER" valueType="text" entityType="Participant">
+                    <attributes>
+                      <attribute name="label" valueType="text" locale="en">Gender</attribute>
+                      <attribute name="URI" valueType="text">
+                        http://www.datashaper.org/owl/2009/10/generic.owl#GENERIC_GENDER
+                      </attribute>
+                      <attribute name="script" valueType="text">$('Admin.Participant.gender')</attribute>
+                    </attributes>
+                  </variable>
 
-		    <variable name="DOUBLE_YEAR" valueType="integer" entityType="Participant">
-		      <attributes>
-			<attribute name="label" valueType="text" locale="en">Double Year</attribute>
-			<attribute name="URI" valueType="text">http://www.datashaper.org/owl/2009/10/generic.owl#BIG_YEAR</attribute>
-			<attribute name="script" valueType="text">$('Admin.Participant.birthYear').plus($('Admin.Participant.birthYear'))</attribute>
-		      </attributes>
-		    </variable>
+                  <variable name="DOUBLE_YEAR" valueType="integer" entityType="Participant">
+                    <attributes>
+                      <attribute name="label" valueType="text" locale="en">Double Year</attribute>
+                      <attribute name="URI" valueType="text">
+                        http://www.datashaper.org/owl/2009/10/generic.owl#BIG_YEAR
+                      </attribute>
+                      <attribute name="script" valueType="text">
+                        $('Admin.Participant.birthYear').plus($('Admin.Participant.birthYear'))
+                      </attribute>
+                    </attributes>
+                  </variable>
 
-		    <variable name="GENERIC_BIRTH_YEAR" valueType="integer" entityType="Participant">
-		      <attributes>
-			<attribute name="sameAs" valueType="text">Admin.Participant.birthYear</attribute>
-		      </attributes>
-		    </variable>
+                  <variable name="GENERIC_BIRTH_YEAR" valueType="integer" entityType="Participant">
+                    <attributes>
+                      <attribute name="sameAs" valueType="text">Admin.Participant.birthYear</attribute>
+                    </attributes>
+                  </variable>
 
 
-		    <variable name="AGE_AT_APPOINTMENT" valueType="integer" entityType="Participant">
-		      <attributes>
-			<attribute name="sameAs" valueType="text">Admin.Participant.birthYear</attribute>
-			<attribute name="script" valueType="text">$('Admin.Participant.appointmentDate').year().minus($('Admin.Participant.birthYear'))</attribute>
-		      </attributes>
-		    </variable>
+                  <variable name="AGE_AT_APPOINTMENT" valueType="integer" entityType="Participant">
+                    <attributes>
+                      <attribute name="sameAs" valueType="text">Admin.Participant.birthYear</attribute>
+                      <attribute name="script" valueType="text">
+                        $('Admin.Participant.appointmentDate').year().minus($('Admin.Participant.birthYear'))
+                      </attribute>
+                    </attributes>
+                  </variable>
 
-		    <variable name="AGE_CATEGORY_WITH_ELSE" valueType="integer" entityType="Participant">
-		      <attributes>
-			<attribute name="script" valueType="text">
+                  <variable name="AGE_CATEGORY_WITH_ELSE" valueType="integer" entityType="Participant">
+                    <attributes>
+                      <attribute name="script" valueType="text">
 
-<![CDATA[
+                        <![CDATA[
 function ageCategory() {
         var appDate = $('Admin.Participant.appointmentDate');
         var appDateBool = appDate.type('boolean');
@@ -232,16 +243,16 @@ function ageCategory() {
 ageCategory();
 ]]>
 
-</attribute>
-		      </attributes>
-		    </variable>
+                      </attribute>
+                    </attributes>
+                  </variable>
 
 
-		    <variable name="GENDER_COMMENT" valueType="text" entityType="Participant">
-		      <attributes>
-			<attribute name="script" valueType="text">
+                  <variable name="GENDER_COMMENT" valueType="text" entityType="Participant">
+                    <attributes>
+                      <attribute name="script" valueType="text">
 
-<![CDATA[
+                        <![CDATA[
 log('gender {}', $('Admin.Participant.gender'));
 function genderComment() {
    switch($('Admin.Participant.gender').value) {
@@ -257,13 +268,12 @@ log('genderComment() {}', genderComment());
 genderComment();
 ]]>
 
-</attribute>
-		      </attributes>
-		    </variable>
+                      </attribute>
+                    </attributes>
+                  </variable>
 
 
-
-                  </variables>
+                </variables>
               </variables>
               <from class="org.obiba.magma.support.ValueTableReference">
                 <reference>foo.Participants</reference>
@@ -272,8 +282,6 @@ genderComment();
           </views>
         </transformer>
       </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-
-
 
 
     </factories>

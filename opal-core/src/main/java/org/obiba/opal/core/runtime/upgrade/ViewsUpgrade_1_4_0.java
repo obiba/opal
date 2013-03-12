@@ -79,7 +79,8 @@ public class ViewsUpgrade_1_4_0 extends AbstractUpgradeStep {
       @SuppressWarnings("deprecation")
       DatasourceTransformer datasourceTransformer = datasourceFactory.getDatasourceTransformer();
       if(datasourceTransformer instanceof ViewAwareDatasourceTransformer) {
-        ViewAwareDatasourceTransformer viewAwareDatasourceTransformer = (ViewAwareDatasourceTransformer) datasourceTransformer;
+        ViewAwareDatasourceTransformer viewAwareDatasourceTransformer
+            = (ViewAwareDatasourceTransformer) datasourceTransformer;
         try {
           new MagmaEngine().extend(new MagmaJsExtension()).extend(new MagmaXStreamExtension());
           viewPersistenceStrategy.writeViews(datasourceFactory.getName(), viewAwareDatasourceTransformer.getViews());

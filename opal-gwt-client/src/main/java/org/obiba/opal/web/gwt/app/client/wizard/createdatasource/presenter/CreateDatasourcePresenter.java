@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -47,7 +47,8 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatasourcePresenter.Display> implements HasDatasourceForms {
+public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatasourcePresenter.Display>
+    implements HasDatasourceForms {
 
   private final Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
 
@@ -108,14 +109,15 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatasourceNameRequired").build());
     } else {
       // check datasource name does not already exist
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-        @Override
-        public void onResource(Response response, JsArray<DatasourceDto> datasources) {
-          if(validateDatasourceNameUnicity(datasourceName, datasources) && validateDatasourceForm()) {
-            createDatasource();
-          }
-        }
-      }).send();
+      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+          .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<DatasourceDto> datasources) {
+              if(validateDatasourceNameUnicity(datasourceName, datasources) && validateDatasourceForm()) {
+                createDatasource();
+              }
+            }
+          }).send();
     }
   }
 
@@ -154,9 +156,10 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
   private void launchDatasourceCreation(final DatasourceFactoryDto dto) {
     ResponseCodeCallback callback = new CreateDatasourceResponseCallback();
 
-    ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource("/datasources").post()//
-    .withResourceBody(DatasourceFactoryDto.stringify(dto))//
-    .withCallback(201, callback).withCallback(400, callback).withCallback(405, callback).withCallback(500, callback).send();
+    ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource("/datasources").post()//
+        .withResourceBody(DatasourceFactoryDto.stringify(dto))//
+        .withCallback(201, callback).withCallback(400, callback).withCallback(405, callback).withCallback(500, callback)
+        .send();
   }
 
   private void updateDatasourceFormDisplay() {
@@ -198,7 +201,9 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
         getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasourceDto));
       } else if(response.getText() != null && response.getText().length() != 0) {
         ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatasourceCreationFailed").args(errorDto.getArgumentsArray()).build());
+        getEventBus().fireEvent(
+            NotificationEvent.newBuilder().error("DatasourceCreationFailed").args(errorDto.getArgumentsArray())
+                .build());
       } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.datasourceCreationFailed()).build());
       }
@@ -227,7 +232,8 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       validators.add(new RequiredTextValidator(getView().getDatasourceName(), "DatasourceNameRequired"));
-      validators.add(new DisallowedCharactersValidator(getView().getDatasourceName(), new char[] { '.', ':' }, "DatasourceNameDisallowedChars"));
+      validators.add(new DisallowedCharactersValidator(getView().getDatasourceName(), new char[] { '.', ':' },
+          "DatasourceNameDisallowedChars"));
       return validators;
     }
   }

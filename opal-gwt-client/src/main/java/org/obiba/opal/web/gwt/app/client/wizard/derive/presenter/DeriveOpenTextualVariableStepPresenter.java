@@ -43,8 +43,8 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;
 
-public class DeriveOpenTextualVariableStepPresenter extends
-    DerivationPresenter<DeriveOpenTextualVariableStepPresenter.Display> {
+public class DeriveOpenTextualVariableStepPresenter
+    extends DerivationPresenter<DeriveOpenTextualVariableStepPresenter.Display> {
 
   public static final NumberFormat FREQ_FORMAT = NumberFormat.getFormat("#,##0");
 

@@ -31,8 +31,8 @@ import com.gwtplatform.mvp.client.View;
 /**
  *
  */
-public class DeriveTemporalVariableStepPresenter extends
-    DerivationPresenter<DeriveTemporalVariableStepPresenter.Display> {
+public class DeriveTemporalVariableStepPresenter
+    extends DerivationPresenter<DeriveTemporalVariableStepPresenter.Display> {
 
   private TemporalVariableDerivationHelper derivationHelper;
 
@@ -91,9 +91,8 @@ public class DeriveTemporalVariableStepPresenter extends
           || !derivationHelper.getGroupMethod().toString().equalsIgnoreCase(getView().getGroupMethod()) //
           || !derivationHelper.getFromDate().equals(getView().getFromDate()) //
           || !derivationHelper.getToDate().equals(getView().getToDate())) {
-        derivationHelper =
-            new TemporalVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(), getView()
-                .getGroupMethod(), getView().getFromDate(), getView().getToDate());
+        derivationHelper = new TemporalVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
+            getView().getGroupMethod(), getView().getFromDate(), getView().getToDate());
         getView().populateValues(derivationHelper.getValueMapEntries(),
             DerivationHelper.getDestinationCategories(getDerivedVariable()));
       }

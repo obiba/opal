@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -56,6 +56,7 @@ public class OpalRSessionManager implements SessionListener {
 
   /**
    * Get the R session identifiers (for the invoking Opal user session).
+   *
    * @return
    */
   public List<OpalRSession> getSubjectRSessions() {
@@ -64,6 +65,7 @@ public class OpalRSessionManager implements SessionListener {
 
   /**
    * Get if a current R session is defined (for the invoking Opal user session).
+   *
    * @return
    */
   public boolean hasSubjectCurrentRSession() {
@@ -79,6 +81,7 @@ public class OpalRSessionManager implements SessionListener {
 
   /**
    * Remove the R session with the provided identifier (for the invoking Opal user session).
+   *
    * @param rSessionId
    */
   public void removeSubjectRSession(String rSessionId) {
@@ -87,6 +90,7 @@ public class OpalRSessionManager implements SessionListener {
 
   /**
    * Set the current R session with the provided identifier (for the invoking Opal user session).
+   *
    * @param rSessionId
    */
   public void setSubjectCurrentRSession(String rSessionId) {
@@ -96,6 +100,7 @@ public class OpalRSessionManager implements SessionListener {
   /**
    * Stores a new R session from the provided R connection and set it as the current one (for the invoking Opal user
    * session).
+   *
    * @param connection
    * @return R session
    */
@@ -106,6 +111,7 @@ public class OpalRSessionManager implements SessionListener {
   /**
    * Creates a new R connection, stores the corresponding R session and set it as the current one (for the invoking Opal
    * user session).
+   *
    * @return R session
    */
   public OpalRSession newSubjectCurrentRSession() {
@@ -114,6 +120,7 @@ public class OpalRSessionManager implements SessionListener {
 
   /**
    * Get the current R session (for the invoking Opal user session).
+   *
    * @return
    */
   public OpalRSession getSubjectCurrentRSession() {
@@ -122,6 +129,7 @@ public class OpalRSessionManager implements SessionListener {
 
   /**
    * Get the R session with the provided identifier (for the invoking Opal user session).
+   *
    * @param rSessionId
    * @return
    */

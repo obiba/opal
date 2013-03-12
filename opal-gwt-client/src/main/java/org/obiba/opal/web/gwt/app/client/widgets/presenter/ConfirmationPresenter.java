@@ -125,12 +125,12 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
     @Override
     public void onConfirmationRequired(ConfirmationRequiredEvent event) {
       confirmationRequiredSource = event.getSource();
-      getDisplay().setConfirmationTitle(
-          event.getTitleKey() == null ? event.getTitle() : translations.confirmationTitleMap()
-              .get(event.getTitleKey()));
-      getDisplay().setConfirmationMessage(
-          event.getMessageKey() == null ? event.getMessage() : translations.confirmationMessageMap()
-              .get(event.getMessageKey()));
+      getDisplay().setConfirmationTitle(event.getTitleKey() == null
+          ? event.getTitle()
+          : translations.confirmationTitleMap().get(event.getTitleKey()));
+      getDisplay().setConfirmationMessage(event.getMessageKey() == null
+          ? event.getMessage()
+          : translations.confirmationMessageMap().get(event.getMessageKey()));
       revealDisplay();
     }
   }

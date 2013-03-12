@@ -1,14 +1,14 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-  <import resource="classpath:org/obiba/security/crowd-context.xml" />
+  <import resource="classpath:org/obiba/security/crowd-context.xml"/>
 
   <bean id="crowdRealm" class="org.apache.shiro.realm.crowd.CrowdRealm" autowire="byType">
     <property name="roleSources">
       <bean class="java.util.EnumSet" factory-method="of">
         <constructor-arg>
           <bean class="org.apache.shiro.realm.crowd.RoleSource" factory-method="valueOf">
-            <constructor-arg value="ROLES_FROM_CROWD_GROUPS" />
+            <constructor-arg value="ROLES_FROM_CROWD_GROUPS"/>
           </bean>
         </constructor-arg>
       </bean>

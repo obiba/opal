@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -57,7 +57,8 @@ public class CopyCommandTest extends AbstractMagmaTest {
     EasyMock.expect(mockOptions.getNoValues()).andReturn(false).anyTimes();
     EasyMock.expect(mockOptions.getNonIncremental()).andReturn(true).anyTimes();
 
-    EasyMock.expect(mockService.newCopier((Datasource) EasyMock.anyObject())).andReturn(DatasourceCopier.Builder.newCopier()).anyTimes();
+    EasyMock.expect(mockService.newCopier((Datasource) EasyMock.anyObject()))
+        .andReturn(DatasourceCopier.Builder.newCopier()).anyTimes();
 
     MagmaEngine.get().addDatasource(createMockDatasource("ds", "table1", "table2"));
 

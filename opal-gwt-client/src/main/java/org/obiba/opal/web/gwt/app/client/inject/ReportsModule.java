@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -24,9 +24,13 @@ public class ReportsModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    bindPresenter(ReportTemplatePresenter.class, ReportTemplatePresenter.Display.class, ReportTemplateView.class, ReportTemplatePresenter.Proxy.class);
-    bindPresenterWidget(ReportTemplateListPresenter.class, ReportTemplateListPresenter.Display.class, ReportTemplateListView.class);
-    bindPresenterWidget(ReportTemplateDetailsPresenter.class, ReportTemplateDetailsPresenter.Display.class, ReportTemplateDetailsView.class);
-    bindPresenterWidget(ReportTemplateUpdateDialogPresenter.class, ReportTemplateUpdateDialogPresenter.Display.class, ReportTemplateUpdateDialogView.class);
+    bindPresenter(ReportTemplatePresenter.class, ReportTemplatePresenter.Display.class, ReportTemplateView.class,
+        ReportTemplatePresenter.Proxy.class);
+    bindPresenterWidget(ReportTemplateListPresenter.class, ReportTemplateListPresenter.Display.class,
+        ReportTemplateListView.class);
+    bindPresenterWidget(ReportTemplateDetailsPresenter.class, ReportTemplateDetailsPresenter.Display.class,
+        ReportTemplateDetailsView.class);
+    bindPresenterWidget(ReportTemplateUpdateDialogPresenter.class, ReportTemplateUpdateDialogPresenter.Display.class,
+        ReportTemplateUpdateDialogView.class);
   }
 }

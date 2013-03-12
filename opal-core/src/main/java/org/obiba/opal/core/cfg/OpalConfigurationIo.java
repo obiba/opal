@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -55,7 +55,8 @@ public class OpalConfigurationIo {
       isr = new InputStreamReader(new FileInputStream(configFile), UTF8);
       return (OpalConfiguration) doCreateXStreamInstance(applicationContext).fromXML(isr);
     } catch(FileNotFoundException e) {
-      throw new InvalidConfigurationException("Opal configuration file '" + this.configFile.getAbsolutePath() + "' cannot be found.", e);
+      throw new InvalidConfigurationException(
+          "Opal configuration file '" + this.configFile.getAbsolutePath() + "' cannot be found.", e);
     } catch(XStreamException e) {
       throw new InvalidConfigurationException("Error reading Opal configuration file.", e);
     } finally {
@@ -72,7 +73,8 @@ public class OpalConfigurationIo {
       StreamUtil.silentSafeClose(writer);
       FileUtil.moveFile(tmpConfig, configFile);
     } catch(FileNotFoundException e) {
-      throw new InvalidConfigurationException("Opal configuration file '" + this.configFile.getAbsolutePath() + "' is not a regular file.", e);
+      throw new InvalidConfigurationException(
+          "Opal configuration file '" + this.configFile.getAbsolutePath() + "' is not a regular file.", e);
     } catch(IOException e) {
       throw new InvalidConfigurationException("Cannot write Opal configuration file.", e);
     } catch(XStreamException e) {
@@ -83,7 +85,8 @@ public class OpalConfigurationIo {
   }
 
   protected XStream doCreateXStreamInstance(ApplicationContext applicationContext) {
-    return MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream(new InjectingReflectionProviderWrapper(new PureJavaReflectionProvider(), applicationContext));
+    return MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory()
+        .createXStream(new InjectingReflectionProviderWrapper(new PureJavaReflectionProvider(), applicationContext));
   }
 
 }

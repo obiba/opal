@@ -1,18 +1,14 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.client.presenter;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import net.customware.gwt.presenter.client.EventBus;
 
 import org.easymock.EasyMock;
@@ -33,6 +29,11 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.gwt.user.client.Command;
 import com.google.inject.Provider;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 public class VariablePresenterTest extends AbstractGwtTestSetup {
 
@@ -57,14 +58,13 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
-    variablePresenter =
-        new VariablePresenter(displayMock, new CountingEventBus(), createMock(VariablePresenter.Proxy.class), null,
-            new SummaryTabPresenter(summaryTabMock, eventBusMock) {
-              @Override
-              public void bind() {
-                // noop for testing
-              }
-            }, mockProvider);
+    variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(),
+        createMock(VariablePresenter.Proxy.class), null, new SummaryTabPresenter(summaryTabMock, eventBusMock) {
+      @Override
+      public void bind() {
+        // noop for testing
+      }
+    }, mockProvider);
   }
 
   @SuppressWarnings("unchecked")
@@ -72,9 +72,8 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
   @Ignore
   public void testThatEventHandlersAreAddedToUIComponents() throws Exception {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
-    expect(
-        eventBusMock.addHandler((Type<VariableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
-            (VariableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
+    expect(eventBusMock.addHandler((Type<VariableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
+        (VariableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     displayMock.setNextCommand((Command) EasyMock.anyObject());
     displayMock.setPreviousCommand((Command) EasyMock.anyObject());

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -29,7 +29,8 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
   private final DataShieldEnvironment environment;
 
   @SuppressWarnings("null")
-  public AbstractRestrictedRScriptROperation(String script, DataShieldEnvironment environment, DataShieldScriptValidator validator) throws ParseException, InvalidScriptException {
+  public AbstractRestrictedRScriptROperation(String script, DataShieldEnvironment environment,
+      DataShieldScriptValidator validator) throws ParseException, InvalidScriptException {
     super();
     Preconditions.checkArgument(script != null, "script cannot be null");
     Preconditions.checkArgument(environment != null, "environment cannot be null");

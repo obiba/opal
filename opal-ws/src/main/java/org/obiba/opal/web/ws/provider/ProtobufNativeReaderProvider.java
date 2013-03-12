@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -35,9 +35,9 @@ import com.google.protobuf.Message.Builder;
 @Provider
 @Consumes({ "application/x-protobuf" })
 public class ProtobufNativeReaderProvider extends AbstractProtobufProvider implements MessageBodyReader<Object> {
-  
-  private final int messageSizeLimit; 
-  
+
+  private final int messageSizeLimit;
+
   @Autowired
   public ProtobufNativeReaderProvider(@Value("${org.obiba.opal.ws.messageSizeLimit}") int messageSizeLimit) {
     this.messageSizeLimit = messageSizeLimit;
@@ -49,7 +49,9 @@ public class ProtobufNativeReaderProvider extends AbstractProtobufProvider imple
   }
 
   @Override
-  public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+  public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+      MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+      throws IOException, WebApplicationException {
     Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
     final ExtensionRegistry extensionRegistry = protobuf().extensions().forMessage(messageType);
     final Builder builder = protobuf().builders().forMessage(messageType);

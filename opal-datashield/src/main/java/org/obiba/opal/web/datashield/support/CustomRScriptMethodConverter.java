@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -40,8 +40,10 @@ public class CustomRScriptMethodConverter extends AbstractDataShieldMethodConver
   @Override
   public DataShieldMethodDto asDto(DataShieldMethod method) {
     CustomRScriptMethod rScriptMethod = (CustomRScriptMethod) method;
-    DataShield.RScriptDataShieldMethodDto methodDto = DataShield.RScriptDataShieldMethodDto.newBuilder().setScript(rScriptMethod.getScript()).build();
-    return getDataShieldMethodDtoBuilder(method).setExtension(DataShield.RScriptDataShieldMethodDto.method, methodDto).build();
+    DataShield.RScriptDataShieldMethodDto methodDto = DataShield.RScriptDataShieldMethodDto.newBuilder()
+        .setScript(rScriptMethod.getScript()).build();
+    return getDataShieldMethodDtoBuilder(method).setExtension(DataShield.RScriptDataShieldMethodDto.method, methodDto)
+        .build();
   }
 
 }

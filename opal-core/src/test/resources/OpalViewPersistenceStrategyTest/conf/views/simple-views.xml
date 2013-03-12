@@ -1,8 +1,8 @@
 <set>
   <org.obiba.magma.views.View>
-    <name>aView</name>                                                                                      
-    <from class="org.obiba.magma.support.ValueTableReference">                                      
-      <reference>opal-data.Participants</reference>                                                          
+    <name>aView</name>
+    <from class="org.obiba.magma.support.ValueTableReference">
+      <reference>opal-data.Participants</reference>
     </from>
     <select class="org.obiba.magma.views.support.AllClause"/>
     <where class="org.obiba.magma.views.support.AllClause"/>

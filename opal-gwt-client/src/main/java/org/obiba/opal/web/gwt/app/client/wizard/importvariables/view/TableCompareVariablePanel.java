@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -51,7 +51,8 @@ public class TableCompareVariablePanel extends FlowPanel {
     properties.addProperty(translations.referencedEntityTypeLabel(), variableDto.getReferencedEntityType(), 1);
     properties.addProperty(translations.valueTypeLabel(), variableDto.getValueType());
     properties.addProperty(translations.mimeTypeLabel(), variableDto.getMimeType(), 1);
-    properties.addProperty(translations.repeatableLabel(), variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
+    properties.addProperty(translations.repeatableLabel(),
+        variableDto.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
     properties.addProperty(translations.occurrenceGroupLabel(), variableDto.getOccurrenceGroup(), 1);
     properties.addProperty(translations.unitLabel(), variableDto.getUnit(), 0, 2);
 

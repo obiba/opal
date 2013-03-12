@@ -93,7 +93,8 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   public boolean containsClearableJobs(JsArray<CommandStateDto> jobs) {
     for(int i = 0; i < jobs.length(); i++) {
       CommandStateDto job = jobs.get(i);
-      if(job.getStatus().toString().equals("SUCCEEDED") || job.getStatus().toString().equals("FAILED") || job.getStatus().toString().equals("CANCELED")) {
+      if(job.getStatus().toString().equals("SUCCEEDED") || job.getStatus().toString().equals("FAILED") ||
+          job.getStatus().toString().equals("CANCELED")) {
         return true;
       }
     }
@@ -101,18 +102,20 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   }
 
   private void updateTable() {
-    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands").get().withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<CommandStateDto> resource) {
-        getView().renderRows(resource);
-        getView().showClearJobsButton(containsClearableJobs(resource));
-      }
+    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder().forResource("/shell/commands").get()
+        .withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<CommandStateDto> resource) {
+            getView().renderRows(resource);
+            getView().showClearJobsButton(containsClearableJobs(resource));
+          }
 
-    }).send();
+        }).send();
   }
 
   private void authorizeCancelJob(CommandStateDto dto, Authorizer authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/command/" + dto.getId() + "/status").put().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/command/" + dto.getId() + "/status")
+        .put().authorize(authorizer).send();
   }
 
   private void doActionImpl(final CommandStateDto dto, String actionName) {
@@ -147,11 +150,14 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
         };
         UriBuilder uriBuilder = UriBuilder.create();
         uriBuilder.segment("shell", "command", dto.getId() + "", "status");
-        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource(uriBuilder.build()).put().withBody("text/plain", "CANCELED").withCallback(400, callbackHandler).withCallback(404, callbackHandler).withCallback(200, callbackHandler).send();
+        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder().forResource(uriBuilder.build()).put()
+            .withBody("text/plain", "CANCELED").withCallback(400, callbackHandler).withCallback(404, callbackHandler)
+            .withCallback(200, callbackHandler).send();
       }
     };
 
-    getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
+    getEventBus().fireEvent(
+        ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
   }
 
   private void deleteCompletedJobs() {
@@ -165,11 +171,13 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
           }
         };
 
-        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>> newBuilder().forResource("/shell/commands/completed").delete().withCallback(200, callbackHandler).send();
+        ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder().forResource("/shell/commands/completed")
+            .delete().withCallback(200, callbackHandler).send();
       }
     };
 
-    getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
+    getEventBus().fireEvent(
+        ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
   }
 
   //
@@ -193,8 +201,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   @ProxyStandard
   @NameToken(Places.jobs)
-  public interface Proxy extends ProxyPlace<JobListPresenter> {
-  }
+  public interface Proxy extends ProxyPlace<JobListPresenter> {}
 
   class ClearButtonHandler implements ClickHandler {
 
@@ -213,7 +220,8 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+          event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }

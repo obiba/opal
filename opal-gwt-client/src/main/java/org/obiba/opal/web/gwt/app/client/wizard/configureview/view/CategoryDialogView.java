@@ -30,8 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class CategoryDialogView extends Composite implements CategoryDialogPresenter.Display {
 
   @UiTemplate("CategoryDialogView.ui.xml")
-  interface CategoryDialogUiBinder extends UiBinder<DialogBox, CategoryDialogView> {
-  }
+  interface CategoryDialogUiBinder extends UiBinder<DialogBox, CategoryDialogView> {}
 
   private static final CategoryDialogUiBinder uiBinder = GWT.create(CategoryDialogUiBinder.class);
 
@@ -115,7 +114,7 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
     return isMissing;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;

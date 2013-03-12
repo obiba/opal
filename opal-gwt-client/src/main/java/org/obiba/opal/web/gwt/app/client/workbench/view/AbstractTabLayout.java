@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -28,7 +28,8 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSelectionHandlers<Integer>, HasBeforeSelectionHandlers<Integer> {
+public class AbstractTabLayout extends FlowPanel
+    implements IndexedPanel, HasSelectionHandlers<Integer>, HasBeforeSelectionHandlers<Integer> {
 
   private final UList menu;
 
@@ -149,6 +150,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
   /**
    * Make a tab visible or not. In the case of the tab to hide is the selected one, make sure one of its visible
    * neighbour is selected in place of it.
+   *
    * @param index
    * @param visible
    */
@@ -175,6 +177,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   /**
    * Select the closest visible tab with lower index.
+   *
    * @param index
    * @return true if selection changed
    */
@@ -194,6 +197,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   /**
    * Select the closest visible tab with higher index.
+   *
    * @param index
    * @return true if selection changed
    */
@@ -213,6 +217,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   /**
    * Is the tab at provided index is visible.
+   *
    * @param index
    * @return
    */
@@ -227,7 +232,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   /**
    * Programmatically selects the specified tab and fires events.
-   * 
+   *
    * @param child the child whose tab is to be selected
    */
   public void selectTab(Widget child) {
@@ -236,7 +241,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   /**
    * Programmatically selects the specified tab.
-   * 
+   *
    * @param child the child whose tab is to be selected
    * @param fireEvents true to fire events, false not to
    */
@@ -246,7 +251,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   /**
    * Programmatically selects the specified tab and fires events.
-   * 
+   *
    * @param index the index of the tab to be selected
    */
   public void selectTab(int index) {
@@ -255,7 +260,7 @@ public class AbstractTabLayout extends FlowPanel implements IndexedPanel, HasSel
 
   /**
    * Programmatically selects the specified tab.
-   * 
+   *
    * @param index the index of the tab to be selected
    * @param fireEvents true to fire events, false not to
    */

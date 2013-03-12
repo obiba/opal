@@ -39,8 +39,8 @@ public class ServiceConfigurationHandlerRegistry {
    * @return a {@code Opal.ServiceCfgdto}
    * @throws org.obiba.opal.core.runtime.NoSuchServiceConfigurationException when no {@code OpalConfigurationExtension} is available
    */
-  public Opal.ServiceCfgDto get(OpalConfigurationExtension configExtension,
-      String name) throws NoSuchServiceConfigurationException {
+  public Opal.ServiceCfgDto get(OpalConfigurationExtension configExtension, String name)
+      throws NoSuchServiceConfigurationException {
     if(configExtension == null) throw new IllegalArgumentException("configExtension cannot be null");
     for(ServiceConfigurationHandler handler : handlers) {
       if(handler.canGet(configExtension)) {

@@ -17,7 +17,7 @@ import com.google.gwt.i18n.client.Messages;
  * in the {@code com.google.gwt.i18n.client} package.
  */
 @LocalizableResource.GenerateKeys
-@LocalizableResource.Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = {"default"})
+@LocalizableResource.Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = { "default" })
 public interface TranslationMessages extends Messages {
 
   @Description("Existing derived category not mapped label")

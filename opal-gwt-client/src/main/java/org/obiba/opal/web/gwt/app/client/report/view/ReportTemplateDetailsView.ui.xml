@@ -1,55 +1,72 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel ui:field="reportTemplateDetails" addStyleNames="item-details">
 
     <g:Label ui:field="noReportTemplatesLabel" addStyleNames="small-top-margin small-indent">
       <ui:msg description="No report templates">No report templates</ui:msg>
     </g:Label>
-    
+
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
-    <o:PropertiesTable ui:field="reportTemplatePanel" condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
+    <o:PropertiesTable ui:field="reportTemplatePanel" condensed="true" borderedCell="false" zebra="true"
+        addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
       <g:FlowPanel>
-        <g:Label><ui:msg description="BIRT Report Design label">BIRT Report Design:</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="BIRT Report Design label">BIRT Report Design:</ui:msg>
+        </g:Label>
         <g:Anchor ui:field="design"/>
       </g:FlowPanel>
       <g:FlowPanel>
-        <g:Label><ui:msg description="Schedule label">Schedule:</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Schedule label">Schedule:</ui:msg>
+        </g:Label>
         <g:Label ui:field="schedule"/>
       </g:FlowPanel>
       <g:FlowPanel>
-        <g:Label><ui:msg description="Format label">Format:</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Format label">Format:</ui:msg>
+        </g:Label>
         <g:Label ui:field="format"/>
       </g:FlowPanel>
       <g:FlowPanel>
-        <g:Label><ui:msg description="Parameters label">Parameters:</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Parameters label">Parameters:</ui:msg>
+        </g:Label>
         <g:Label ui:field="parameters"/>
       </g:FlowPanel>
       <g:FlowPanel>
-        <g:Label><ui:msg description="Notification emails label">Notifications Emails:</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Notification emails label">Notifications Emails:</ui:msg>
+        </g:Label>
         <g:Label ui:field="emails"/>
       </g:FlowPanel>
     </o:PropertiesTable>
-    
+
     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
-	  <g:Anchor><ui:msg description="Reports title">Reports</ui:msg></g:Anchor>
+      <g:Anchor>
+        <ui:msg description="Reports title">Reports</ui:msg>
+      </g:Anchor>
       <g:VerticalPanel width="100%">
-        <g:InlineLabel ui:field="noReports"><ui:msg description="No Reports label">No Reports</ui:msg></g:InlineLabel>
-        <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
+        <g:InlineLabel ui:field="noReports">
+          <ui:msg description="No Reports label">No Reports</ui:msg>
+        </g:InlineLabel>
+        <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
         <o:Table ui:field="producedReportsTable" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
       </g:VerticalPanel>
-      
-      <g:Anchor><ui:msg description="Permissions label" >Permissions</ui:msg></g:Anchor>
+
+      <g:Anchor>
+        <ui:msg description="Permissions label">Permissions</ui:msg>
+      </g:Anchor>
       <g:SimplePanel ui:field="permissions"></g:SimplePanel>
-      
+
     </o:HorizontalTabLayout>
-    
+
   </g:FlowPanel>
 
 </ui:UiBinder>

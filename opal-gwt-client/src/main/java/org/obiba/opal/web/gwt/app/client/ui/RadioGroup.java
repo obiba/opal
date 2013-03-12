@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -22,10 +22,10 @@ import com.google.gwt.user.client.ui.HasValue;
 /**
  * Combines several {@code RadioButton} into a group for exposing a specific value per choice. For example, this allows
  * working with a group of radio buttons in terms of an {@code Enum} value instead of several boolean values.
- * <p>
+ * <p/>
  * By default, this implementation uses {@code equals} to compare values. A {@code Comparator} instance can be provided
  * to override this behaviour.
- * 
+ *
  * @param <T>
  */
 public class RadioGroup<T> implements HasValue<T> {

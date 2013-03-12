@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A panel that displays all of its child widgets in a 'deck', where only one can be visible at a time. It is used by
  * {@link AbstractTabLayout}.
- * 
+ * <p/>
  * <p>
  * Once a widget has been added to a DeckPanel, its visibility, width, and height attributes will be manipulated. When
  * the widget is removed from the DeckPanel, it will be visible, and its width and height attributes will be cleared.
@@ -75,7 +75,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
 
     /**
      * Switch to a new {@link Widget}.
-     * 
+     *
      * @param oldWidget the {@link Widget} to hide
      * @param newWidget the {@link Widget} to show
      * @param animate true to animate, false to switch instantly
@@ -250,7 +250,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
 
   /**
    * The the container {@link Element} around a {@link Widget}.
-   * 
+   *
    * @param w the {@link Widget}
    * @return the container {@link Element}
    */
@@ -289,7 +289,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
 
   /**
    * Gets the index of the currently-visible widget.
-   * 
+   *
    * @return the visible widget's index
    */
   public int getVisibleWidget() {
@@ -339,7 +339,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
 
   /**
    * Shows the widget at the specified index. This causes the currently- visible widget to be hidden.
-   * 
+   *
    * @param index the index of the widget to be shown
    */
   public void showWidget(int index) {

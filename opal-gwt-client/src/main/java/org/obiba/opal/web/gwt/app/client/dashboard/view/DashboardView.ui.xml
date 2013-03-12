@@ -1,57 +1,80 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <o:WorkbenchLayout>
-    <g:Label><ui:msg description="Dashboard title" >Study Dashboard</ui:msg></g:Label>
+    <g:Label>
+      <ui:msg description="Dashboard title">Study Dashboard</ui:msg>
+    </g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
       <o:HelpImage page="Opal+Web+Application+User+Guide"></o:HelpImage>
     </g:FlowPanel>
-  <g:FlowPanel addStyleNames="dashboard">
-    <g:FlowPanel>
-      <g:Label>
-        <ui:msg description="Participant count label">Number of Participants:</ui:msg>
-      </g:Label>
-      <g:Label addStyleNames="count small-indent" ui:field="participantCount" />
+    <g:FlowPanel addStyleNames="dashboard">
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="Participant count label">Number of Participants:</ui:msg>
+        </g:Label>
+        <g:Label addStyleNames="count small-indent" ui:field="participantCount"/>
+      </g:FlowPanel>
+      <g:FlowPanel addStyleNames="shortcuts">
+        <g:FlowPanel ui:field="datasources">
+          <g:Anchor ui:field="exploreVariablesLink">
+            <img src="image/48/table.png" align="middle"/>
+            <ui:msg description="Explore variables link label">Explore Variables</ui:msg>
+          </g:Anchor>
+          <g:InlineLabel addStyleNames="help-block">
+            <ui:msg description="Explore variables link description">browse tables and variables, create views,
+              import/export data and dictionaries.
+            </ui:msg>
+          </g:InlineLabel>
+        </g:FlowPanel>
+        <g:FlowPanel ui:field="units">
+          <g:Anchor ui:field="unitsLink">
+            <img src="image/48/units.png" align="middle"/>
+            <ui:msg description="Units link label">Manage Participant Identifiers</ui:msg>
+          </g:Anchor>
+          <g:InlineLabel addStyleNames="help-block">
+            <ui:msg description="Units link description">create and map identifiers of participants in different units,
+              manage encryption keys.
+            </ui:msg>
+          </g:InlineLabel>
+        </g:FlowPanel>
+        <g:FlowPanel ui:field="reports">
+          <g:Anchor ui:field="reportsLink">
+            <img src="image/48/report.png" align="middle"/>
+            <ui:msg description="Reports link label">Run Reports</ui:msg>
+          </g:Anchor>
+          <g:InlineLabel addStyleNames="help-block">
+            <ui:msg description="Reports link description">design reports with BIRT over Opal data and schedule their
+              execution.
+            </ui:msg>
+          </g:InlineLabel>
+        </g:FlowPanel>
+        <g:FlowPanel ui:field="files">
+          <g:Anchor ui:field="exploreFilesLink">
+            <img src="image/48/folder.png" align="middle"/>
+            <ui:msg description="Manage Files link label">Manage Files</ui:msg>
+          </g:Anchor>
+          <g:InlineLabel addStyleNames="help-block">
+            <ui:msg description="Manage Files link description">browse, upload and download files on the server.
+            </ui:msg>
+          </g:InlineLabel>
+        </g:FlowPanel>
+        <g:FlowPanel ui:field="jobs">
+          <g:Anchor ui:field="jobsLink">
+            <img src="image/48/job.png" align="middle"/>
+            <ui:msg description="Manage Jobs link label">Manage Jobs</ui:msg>
+          </g:Anchor>
+          <g:InlineLabel addStyleNames="help-block">
+            <ui:msg description="Manage Jobs link description">list and manage jobs that were launched on the server.
+            </ui:msg>
+          </g:InlineLabel>
+        </g:FlowPanel>
+      </g:FlowPanel>
     </g:FlowPanel>
-    <g:FlowPanel addStyleNames="shortcuts">
-	    <g:FlowPanel ui:field="datasources">
-	      <g:Anchor ui:field="exploreVariablesLink">
-	        <img src="image/48/table.png" align="middle"/>
-	        <ui:msg description="Explore variables link label">Explore Variables</ui:msg>
-	      </g:Anchor>
-	      <g:InlineLabel addStyleNames="help-block"><ui:msg description="Explore variables link description">browse tables and variables, create views, import/export data and dictionaries.</ui:msg></g:InlineLabel>
-	    </g:FlowPanel>
-	    <g:FlowPanel ui:field="units">
-	      <g:Anchor ui:field="unitsLink">
-	        <img src="image/48/units.png" align="middle"/>
-	        <ui:msg description="Units link label">Manage Participant Identifiers</ui:msg>
-	      </g:Anchor>
-	      <g:InlineLabel addStyleNames="help-block"><ui:msg description="Units link description">create and map identifiers of participants in different units, manage encryption keys.</ui:msg></g:InlineLabel>
-	    </g:FlowPanel>
-	    <g:FlowPanel ui:field="reports">
-	      <g:Anchor ui:field="reportsLink">
-	        <img src="image/48/report.png" align="middle"/>
-	        <ui:msg description="Reports link label">Run Reports</ui:msg>
-	      </g:Anchor>
-	      <g:InlineLabel addStyleNames="help-block"><ui:msg description="Reports link description">design reports with BIRT over Opal data and schedule their execution.</ui:msg></g:InlineLabel>
-	    </g:FlowPanel>
-	    <g:FlowPanel ui:field="files">
-	      <g:Anchor ui:field="exploreFilesLink">
-	        <img src="image/48/folder.png" align="middle"/>
-	        <ui:msg description="Manage Files link label">Manage Files</ui:msg>
-	      </g:Anchor>
-	      <g:InlineLabel addStyleNames="help-block"><ui:msg description="Manage Files link description">browse, upload and download files on the server.</ui:msg></g:InlineLabel>
-	    </g:FlowPanel>
-	    <g:FlowPanel ui:field="jobs">
-	      <g:Anchor ui:field="jobsLink"><img src="image/48/job.png" align="middle"/><ui:msg description="Manage Jobs link label">Manage Jobs</ui:msg></g:Anchor>
-	      <g:InlineLabel addStyleNames="help-block"><ui:msg description="Manage Jobs link description">list and manage jobs that were launched on the server.</ui:msg></g:InlineLabel>
-	    </g:FlowPanel>
-    </g:FlowPanel>
-  </g:FlowPanel> 
   </o:WorkbenchLayout>
 </ui:UiBinder>

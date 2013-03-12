@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -60,7 +60,8 @@ public class ReportResource {
     }
     File reportLocalFile = fileSystem.getLocalFile(reportFile);
     String mimeType = mimeTypes.getContentType(reportLocalFile);
-    return Response.ok(reportLocalFile, MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(reportLocalFile.getName())).build();
+    return Response.ok(reportLocalFile, MediaType.valueOf(mimeType))
+        .header("Content-Disposition", getContentDispositionOfAttachment(reportLocalFile.getName())).build();
   }
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {

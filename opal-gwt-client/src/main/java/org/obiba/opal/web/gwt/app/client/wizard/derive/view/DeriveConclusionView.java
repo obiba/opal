@@ -43,8 +43,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPresenter.Display {
 
   @UiTemplate("DeriveConclusionView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveConclusionView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, DeriveConclusionView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 

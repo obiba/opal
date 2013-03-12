@@ -1,11 +1,13 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
-  
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
   <ui:style>
-    .right-aligned { float: right; }
+    .right-aligned {
+      float: right;
+    }
   </ui:style>
-  
+
   <g:DockLayoutPanel unit="EM">
     <g:center>
       <g:HTML ui:field="message" addStyleNames="main p">Confirmation message.</g:HTML>
@@ -21,7 +23,7 @@
           </g:Button>
         </span>
       </g:HTMLPanel>
-    </g:south> 
+    </g:south>
   </g:DockLayoutPanel>
-  
+
 </ui:UiBinder>

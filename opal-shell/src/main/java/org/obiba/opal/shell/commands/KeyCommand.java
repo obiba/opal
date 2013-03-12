@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -39,7 +39,8 @@ import com.google.common.io.Closeables;
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
-@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.", syntax = "Syntax: keystore [--unit NAME] (--action list | --alias NAME (--action create --algo NAME --size INT | --action delete | --action import --private FILE [--certificate FILE] | --action export --certificate FILE))")
+@CommandUsage(description = "Creates, deletes, imports and exports keypairs/certificates.",
+    syntax = "Syntax: keystore [--unit NAME] (--action list | --alias NAME (--action create --algo NAME --size INT | --action delete | --action import --private FILE [--certificate FILE] | --action export --certificate FILE))")
 public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOptions> {
 
   private static final String CREATE_ACTION = "create";
@@ -111,7 +112,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       try {
         if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
           String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
-          unitKeyStoreService.createOrUpdateKey(unit, options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
+          unitKeyStoreService
+              .createOrUpdateKey(unit, options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
           getShell().printf("Key generated with alias '%s'.\n", options.getAlias());
         }
       } catch(NoSuchFunctionalUnitException ex) {
@@ -136,7 +138,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
         unitKeyStoreService.deleteKey(unit, options.getAlias());
         getShell().printf("Deleted key with alias '%s' from keystore '%s'.\n", options.getAlias(), unit);
       } else {
-        getShell().printf("The alias '%s' does not exist in keystore '%s'. No key deleted.\n", options.getAlias(), unit);
+        getShell()
+            .printf("The alias '%s' does not exist in keystore '%s'. No key deleted.\n", options.getAlias(), unit);
         errorCode = 1;
       }
     } catch(NoSuchFunctionalUnitException ex) {
@@ -199,7 +202,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     if(options.isCertificate()) {
       unitKeyStoreService.importKey(unit, alias, getFile(options.getPrivate()), getFile(options.getCertificate()));
     } else {
-      unitKeyStoreService.importKey(unit, alias, getFile(options.getPrivate()), new CertificateInfo(getShell()).getCertificateInfoAsString());
+      unitKeyStoreService.importKey(unit, alias, getFile(options.getPrivate()),
+          new CertificateInfo(getShell()).getCertificateInfoAsString());
     }
     getShell().printf("Key imported with alias '%s'.\n", alias);
   }
@@ -222,7 +226,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       certificateWriter = getCertificateWriter();
       writeCertificate(unitKeyStore, options.getAlias(), certificateWriter);
     } catch(FileSystemException e) {
-      getShell().printf("%s is an invalid output file.  Please make sure that you have specified a valid path.\n", options.getCertificate());
+      getShell().printf("%s is an invalid output file.  Please make sure that you have specified a valid path.\n",
+          options.getCertificate());
       errorCode = 2;
     } catch(IOException e) {
       throw new RuntimeException(e);
@@ -271,7 +276,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     if(options.isCertificate()) {
       getShell().printf("Certificate written to file [%s]\n", options.getCertificate());
     } else {
-      getShell().printf("Certificate will be printed to console. You may then copy-paste it elsewhere:\n", options.getCertificate());
+      getShell().printf("Certificate will be printed to console. You may then copy-paste it elsewhere:\n",
+          options.getCertificate());
       getShell().printf(((StringWriter) certificateWriter).getBuffer().toString());
     }
   }
@@ -308,7 +314,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private boolean confirmKeyOverWrite() {
     if(confirm("A key already exists for the alias [" + options.getAlias() + "]. Would you like to overwrite it?")) {
-      return confirm("Please confirm a second time. Are you sure you want to overwrite the key with the alias [" + options.getAlias() + "]?");
+      return confirm("Please confirm a second time. Are you sure you want to overwrite the key with the alias [" +
+          options.getAlias() + "]?");
     }
     return false;
   }
@@ -321,7 +328,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       if(answer != null && !answer.equals("")) {
         ans = answer;
       }
-    } while(!(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("no") || ans.equalsIgnoreCase("y") || ans.equalsIgnoreCase("n")));
+    } while(!(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("no") || ans.equalsIgnoreCase("y") ||
+        ans.equalsIgnoreCase("n")));
     if(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("y")) {
       return true;
     }
@@ -349,12 +357,16 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private int unrecognizedOptionsHelp() {
     getShell().printf("This combination of options was unrecognized." + "\nSyntax:" //
-        + "\n  keystore --unit NAME (--action list | --alias NAME (--action create --algo NAME --size INT | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--certificate FILE]))" //
+        +
+        "\n  keystore --unit NAME (--action list | --alias NAME (--action create --algo NAME --size INT | --action delete | --action import [--private FILE] [--certificate FILE] | --action export [--certificate FILE]))"
+        //
         + "\nExamples:" //
         + "\n  keystore --unit someUnit --action list" //
         + "\n  keystore --unit someUnit --alias someAlias --action create --algo RSA --size 2048" //
         + "\n  keystore --unit someUnit --alias someAlias --action delete" //
-        + "\n  keystore --unit someUnit --alias someAlias --action import --private private_key.pem --certificate public_key.pem" //
+        +
+        "\n  keystore --unit someUnit --alias someAlias --action import --private private_key.pem --certificate public_key.pem"
+        //
         + "\n  keystore --unit someUnit --alias someAlias --action export --certificate public_key.pem\n"); //
     return 1; // error!
   }

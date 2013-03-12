@@ -1,9 +1,9 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
     <g:caption>
@@ -25,7 +25,7 @@
               </ui:msg>
             </g:Label>
             <g:RadioButton name="variablesGroup" ui:field="addingVariablesOneByOneRadioButton"
-                           addStyleNames="block small-top-margin">
+                addStyleNames="block small-top-margin">
               <ui:msg description="Add each variable one by one label">Add each variable one by one</ui:msg>
             </g:RadioButton>
             <g:RadioButton name="variablesGroup" ui:field="useAnExistingView" addStyleNames="block small-top-margin">

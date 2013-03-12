@@ -8,11 +8,11 @@ import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CommandUsage;
 
+import com.google.common.collect.Sets;
+
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException.ValidationError;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
-
-import com.google.common.collect.Sets;
 
 /**
  * Implements {@code OpalShell} but does not specify how user interactions are implemented. Extending classes must

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -68,7 +68,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     this(name, configService, null);
   }
 
-  ReportTemplateResource(String name, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService) {
+  ReportTemplateResource(String name, OpalConfigurationService configService,
+      CommandSchedulerService commandSchedulerService) {
     super();
     this.name = name;
     this.configService = configService;
@@ -77,7 +78,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   @Autowired
-  public ReportTemplateResource(ReportService reportService, OpalConfigurationService configService, CommandSchedulerService commandSchedulerService, OpalRuntime opalRuntime) {
+  public ReportTemplateResource(ReportService reportService, OpalConfigurationService configService,
+      CommandSchedulerService commandSchedulerService, OpalRuntime opalRuntime) {
     super();
     this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
@@ -96,7 +98,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   @DELETE
   public Response deleteReportTemplate() {
-    ReportTemplate reportTemplateToRemove = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
+    ReportTemplate reportTemplateToRemove = getOpalConfigurationService().getOpalConfiguration()
+        .getReportTemplate(name);
     if(reportTemplateToRemove == null || authzReadReportTemplate(name) == false) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
@@ -113,17 +116,19 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   @PUT
-  public Response updateReportTemplate(@Context
-  UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
+  public Response updateReportTemplate(@Context UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
     if(reportTemplateExists() == false) return Response.status(Status.NOT_FOUND).build();
 
     try {
-      Assert.isTrue(reportTemplateDto.getName().equals(name), "The report template name in the URI does not match the name given in the request body DTO.");
+      Assert.isTrue(reportTemplateDto.getName().equals(name),
+          "The report template name in the URI does not match the name given in the request body DTO.");
 
       updateOpalConfiguration(reportTemplateDto);
       updateSchedule(reportTemplateDto);
     } catch(Exception e) {
-      return Response.status(Response.Status.BAD_REQUEST).entity(ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode()).setStatus("CouldNotUpdateTheReportTemplate").build()).build();
+      return Response.status(Response.Status.BAD_REQUEST).entity(
+          ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
+              .setStatus("CouldNotUpdateTheReportTemplate").build()).build();
     }
 
     return Response.ok().build();
@@ -175,11 +180,11 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   private ReportDto getReportDto(FileObject reportFile) throws FileSystemException {
     return ReportDto.newBuilder()//
-    .setName(reportFile.getName().getBaseName())//
-    .setLink("/files" + reportFile.getName().getPath())//
-    .setSize(reportFile.getContent().getSize())//
-    .setLastModifiedTime(reportFile.getContent().getLastModifiedTime())//
-    .setPublicLink("/report/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile)).build();
+        .setName(reportFile.getName().getBaseName())//
+        .setLink("/files" + reportFile.getName().getPath())//
+        .setSize(reportFile.getContent().getSize())//
+        .setLastModifiedTime(reportFile.getContent().getLastModifiedTime())//
+        .setPublicLink("/report/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile)).build();
   }
 
   private FileObject getReportFolder() throws FileSystemException {

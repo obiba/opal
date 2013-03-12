@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -45,8 +45,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyncPresenter.Display {
 
   @UiTemplate("IdentifiersSyncView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, IdentifiersSyncView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, IdentifiersSyncView> {}
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -98,8 +97,8 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
     tableSyncsProvider.addDataDisplay(table);
     table.setEmptyTableWidget(table.getLoadingIndicator());
 
-    SelectionModel<TableIdentifiersSync> selectionModel =
-        new MultiSelectionModel<TableIdentifiersSync>(new ProvidesKey<TableIdentifiersSync>() {
+    SelectionModel<TableIdentifiersSync> selectionModel = new MultiSelectionModel<TableIdentifiersSync>(
+        new ProvidesKey<TableIdentifiersSync>() {
 
           @Override
           public Object getKey(TableIdentifiersSync item) {
@@ -203,7 +202,7 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
 
   @Override
   public List<String> getSelectedTables() {
-    ImmutableList.Builder<String> builder = ImmutableList.<String> builder();
+    ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
     for(TableIdentifiersSync ts : tableSyncs) {
       if(tableList.getSelectionModel().isSelected(ts)) {
         builder.add(ts.getTable());

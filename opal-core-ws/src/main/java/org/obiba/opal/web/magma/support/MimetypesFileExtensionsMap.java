@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -25,16 +25,16 @@ import com.google.common.collect.Multimap;
 /**
  * This class allows reverse mapping from a mime-type to a collection of file extensions. the first file extension is
  * considered to be the preferred one.
- * 
+ * <p/>
  * <p>
  * <b>MIME types file search order:</b>
  * </p>
- * 
+ * <p/>
  * <ol>
  * <li>The file or resources named META-INF/mime.types.</li>
  * <li>The file or resource named META-INF/mimetypes.default (usually found only in the activation.jar file).</li>
  * </ol>
- * 
+ *
  * @see MimetypesFileTypeMap
  */
 public class MimetypesFileExtensionsMap {
@@ -59,8 +59,7 @@ public class MimetypesFileExtensionsMap {
 
     Collection<String> exts = mimetypes.get(mimetype);
     if(exts.size() == 0) return DEFAULT_FILE_EXTENSION;
-    else
-      return exts.iterator().next();
+    else return exts.iterator().next();
   }
 
   public boolean containsMimetype(String mimetype) {

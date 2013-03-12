@@ -1,22 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.shell.service.impl.quartz;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -30,6 +21,15 @@ import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Unit tests for {@link QuartzCommandSchedulerServiceImpl}.
@@ -82,7 +82,8 @@ public class QuartzCommandSchedulerServiceImplTest {
   public void testScheduleCommand() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    CronTrigger expectedCronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting", "0 * * * * ?");
+    CronTrigger expectedCronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting",
+        "0 * * * * ?");
     expect(schedulerMock.scheduleJob(eqCronTrigger(expectedCronTrigger))).andReturn(null).once();
 
     replay(schedulerMock);
@@ -99,7 +100,8 @@ public class QuartzCommandSchedulerServiceImplTest {
   public void testUnscheduleCommand() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    CronTrigger cronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting", "0 * * * * ?");
+    CronTrigger cronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting",
+        "0 * * * * ?");
     expect(schedulerMock.getTriggersOfJob("commandName", "reporting")).andReturn(new Trigger[] { cronTrigger }).once();
     expect(schedulerMock.unscheduleJob("commandName-trigger", "reporting")).andReturn(true).once();
 
@@ -118,7 +120,8 @@ public class QuartzCommandSchedulerServiceImplTest {
   public void testGetCommandSchedule() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    CronTrigger cronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting", "0 * * * * ?");
+    CronTrigger cronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting",
+        "0 * * * * ?");
     expect(schedulerMock.getTriggersOfJob("commandName", "reporting")).andReturn(new Trigger[] { cronTrigger }).once();
 
     replay(schedulerMock);
@@ -136,9 +139,12 @@ public class QuartzCommandSchedulerServiceImplTest {
   public void testGetCommandSchedule_ReturnsFirstScheduleIfCommandHasMultipleSchedules() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    CronTrigger cronTrigger1 = new CronTrigger("commandName-trigger1", "reporting", "commandName", "reporting", "0 * * * * ?");
-    CronTrigger cronTrigger2 = new CronTrigger("commandName-trigger2", "reporting", "commandName", "reporting", "0 0/2 * * * ?");
-    expect(schedulerMock.getTriggersOfJob("commandName", "reporting")).andReturn(new Trigger[] { cronTrigger1, cronTrigger2 }).once();
+    CronTrigger cronTrigger1 = new CronTrigger("commandName-trigger1", "reporting", "commandName", "reporting",
+        "0 * * * * ?");
+    CronTrigger cronTrigger2 = new CronTrigger("commandName-trigger2", "reporting", "commandName", "reporting",
+        "0 0/2 * * * ?");
+    expect(schedulerMock.getTriggersOfJob("commandName", "reporting"))
+        .andReturn(new Trigger[] { cronTrigger1, cronTrigger2 }).once();
 
     replay(schedulerMock);
 
@@ -155,7 +161,7 @@ public class QuartzCommandSchedulerServiceImplTest {
   public void testGetCommandSchedule_ReturnsNullIfCommandNotScheduled() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    expect(schedulerMock.getTriggersOfJob("commandName", "reporting")).andReturn(new Trigger[] {}).once();
+    expect(schedulerMock.getTriggersOfJob("commandName", "reporting")).andReturn(new Trigger[] { }).once();
 
     replay(schedulerMock);
 
@@ -223,7 +229,8 @@ public class QuartzCommandSchedulerServiceImplTest {
         matches &= actualJobDetail.getName().equals(expected.getName());
         matches &= actualJobDetail.getGroup().equals(expected.getGroup());
         matches &= actualJobDetail.getJobClass().getName().equals(expected.getJobClass().getName());
-        matches &= actualJobDetail.getJobDataMap().getString("command").equals(expected.getJobDataMap().getString("command"));
+        matches &= actualJobDetail.getJobDataMap().getString("command")
+            .equals(expected.getJobDataMap().getString("command"));
 
         return matches;
       } else {

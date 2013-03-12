@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -175,18 +175,18 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     @Override
     public int compare(ValueMapEntry o1, ValueMapEntry o2) {
       switch(o1.getType()) {
-      case RANGE:
-        return o2.getType() == ValueMapEntryType.RANGE ? compareRanges(o1, o2) : -1;
-      case CATEGORY_NAME:
-      case DISTINCT_VALUE:
-        if(o2.getType() == ValueMapEntryType.CATEGORY_NAME || o2.getType() == ValueMapEntryType.DISTINCT_VALUE) {
-          return compareDistincts(o1, o2);
-        }
-        return o2.getType() == ValueMapEntryType.EMPTY_VALUES ? -1 : 1;
-      case EMPTY_VALUES:
-        return o2.getType() == ValueMapEntryType.OTHER_VALUES ? -1 : 1;
-      case OTHER_VALUES:
-        return 1;
+        case RANGE:
+          return o2.getType() == ValueMapEntryType.RANGE ? compareRanges(o1, o2) : -1;
+        case CATEGORY_NAME:
+        case DISTINCT_VALUE:
+          if(o2.getType() == ValueMapEntryType.CATEGORY_NAME || o2.getType() == ValueMapEntryType.DISTINCT_VALUE) {
+            return compareDistincts(o1, o2);
+          }
+          return o2.getType() == ValueMapEntryType.EMPTY_VALUES ? -1 : 1;
+        case EMPTY_VALUES:
+          return o2.getType() == ValueMapEntryType.OTHER_VALUES ? -1 : 1;
+        case OTHER_VALUES:
+          return 1;
       }
       return 0;
     }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -38,7 +38,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class AuthenticationInterceptor extends AbstractSecurityComponent implements RequestCyclePreProcess, RequestCyclePostProcess {
+public class AuthenticationInterceptor extends AbstractSecurityComponent
+    implements RequestCyclePreProcess, RequestCyclePostProcess {
 
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(AuthenticationInterceptor.class);
@@ -74,7 +75,8 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent impleme
     }
 
     // Not authorized: method requires proper authentication, and no user is authenticated
-    return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
+    return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED)
+        .header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
   }
 
   @Override
@@ -84,12 +86,14 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent impleme
       Session session = SecurityUtils.getSubject().getSession();
       session.touch();
       int timeout = (int) (session.getTimeout() / 1000);
-      response.getMetadata().add(HttpHeaderNames.SET_COOKIE, new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), "/", null, null, timeout, false));
+      response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
+          new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), "/", null, null, timeout, false));
     } else {
       // Remove the cookie if the user is not/no longer authenticated
       if(isWebServiceAuthenticated(response.getAnnotations())) {
         // Only web service calls that require authentication will lose their opalsid cookie
-        response.getMetadata().add(HttpHeaderNames.SET_COOKIE, new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, "/", null, "Opal session deleted", 0, false));
+        response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
+            new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, "/", null, "Opal session deleted", 0, false));
       }
     }
   }

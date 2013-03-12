@@ -138,8 +138,8 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
         return null;
       }
     });
-    validators.add(new ConditionalValidator(getView().isScheduled(), new RequiredTextValidator(getView().getShedule(),
-        "CronExpressionIsRequired")));
+    validators.add(new ConditionalValidator(getView().isScheduled(),
+        new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired")));
     validators.add(new FieldValidator() {
 
       @Override
@@ -173,8 +173,8 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getView().getUpdateReportTemplateButton().addClickHandler(
-        new CreateOrUpdateReportTemplateClickHandler()));
+    super.registerHandler(
+        getView().getUpdateReportTemplateButton().addClickHandler(new CreateOrUpdateReportTemplateClickHandler()));
 
     super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
@@ -204,7 +204,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
       AlreadyExistReportTemplateCallBack alreadyExistReportTemplateCallback = new AlreadyExistReportTemplateCallBack();
       UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
 
-      ResourceRequestBuilderFactory.<ReportTemplateDto> newBuilder().forResource(ub.build()).get()
+      ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder().forResource(ub.build()).get()
           .withCallback(alreadyExistReportTemplateCallback)
           .withCallback(Response.SC_NOT_FOUND, createReportTemplateCallback).send();
     }
@@ -281,8 +281,8 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
     @Override
     public void onResource(Response response, ReportTemplateDto resource) {
-      getEventBus().fireEvent(
-          NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
+      getEventBus()
+          .fireEvent(NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
     }
 
   }
@@ -362,15 +362,14 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     getView().setFormat(reportTemplate.getFormat());
     getView().setName(reportTemplate.getName());
     emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
-    parametersSelectorPresenter.getView().setItems(
-        Iterables.transform(JsArrays.toIterable(reportTemplate.getParametersArray()),
-            new Function<ParameterDto, String>() {
+    parametersSelectorPresenter.getView().setItems(Iterables
+        .transform(JsArrays.toIterable(reportTemplate.getParametersArray()), new Function<ParameterDto, String>() {
 
-              @Override
-              public String apply(ParameterDto input) {
-                return input.getKey() + "=" + input.getValue();
-              }
-            }));
+          @Override
+          public String apply(ParameterDto input) {
+            return input.getKey() + "=" + input.getValue();
+          }
+        }));
     getView().setSchedule(reportTemplate.getCron());
   }
 

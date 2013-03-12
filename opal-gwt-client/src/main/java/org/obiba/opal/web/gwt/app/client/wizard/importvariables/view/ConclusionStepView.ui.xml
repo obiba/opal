@@ -1,10 +1,8 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <ui:style>
     .label {
@@ -12,10 +10,12 @@
       margin-top: 1em;
     }
   </ui:style>
-      
+
   <g:FlowPanel>
-    <g:Label ui:field="tableListLabel" addStyleNames="{style.label}"><ui:msg description="Created/updated table list header">Importing variables to the following tables:</ui:msg></g:Label>
-    <g:FlowPanel ui:field="tableListPanel" />
-  </g:FlowPanel> 
+    <g:Label ui:field="tableListLabel" addStyleNames="{style.label}">
+      <ui:msg description="Created/updated table list header">Importing variables to the following tables:</ui:msg>
+    </g:Label>
+    <g:FlowPanel ui:field="tableListPanel"/>
+  </g:FlowPanel>
 
 </ui:UiBinder>

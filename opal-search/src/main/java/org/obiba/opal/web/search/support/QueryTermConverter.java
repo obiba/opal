@@ -51,21 +51,19 @@ public class QueryTermConverter {
       Search.QueryTermDto dtoQuery = iterator.next();
       JSONObject jsonFacet = new JSONObject();
 
-      if (dtoQuery.hasExtension(Search.LogicalTermDto.filter)) {
+      if(dtoQuery.hasExtension(Search.LogicalTermDto.filter)) {
         convertLogicalFilter("filter", dtoQuery.getExtension(Search.LogicalTermDto.filter), jsonFacet);
-      }
-      else {
-        if (dtoQuery.hasExtension(Search.VariableTermDto.field))
-        {
+      } else {
+        if(dtoQuery.hasExtension(Search.VariableTermDto.field)) {
           convertField(dtoQuery.getExtension(Search.VariableTermDto.field), jsonFacet);
         }
 
-        if (dtoQuery.hasExtension(Search.LogicalTermDto.facetFilter)) {
+        if(dtoQuery.hasExtension(Search.LogicalTermDto.facetFilter)) {
           convertLogicalFilter("facet_filter", dtoQuery.getExtension(Search.LogicalTermDto.facetFilter), jsonFacet);
         }
       }
 
-      if (dtoQuery.hasGlobal()) {
+      if(dtoQuery.hasGlobal()) {
         jsonFacet.put("global", dtoQuery.getGlobal());
       }
 
@@ -77,27 +75,27 @@ public class QueryTermConverter {
     return jsonQuery;
   }
 
-  private void convertLogicalFilter(String filterName, Search.LogicalTermDto dtoLogicalFilter, JSONObject jsonFacet) throws JSONException {
+  private void convertLogicalFilter(String filterName, Search.LogicalTermDto dtoLogicalFilter, JSONObject jsonFacet)
+      throws JSONException {
     Search.TermOperator operator = dtoLogicalFilter.getOperator();
     String operatorName = operator == Search.TermOperator.AND_OP ? "and" : "or";
     JSONObject jsonOperator = new JSONObject();
 
     List<Search.FilterDto> filters = dtoLogicalFilter.getExtension(Search.FilterDto.filters);
 
-    if (filters.size() > 1) {
+    if(filters.size() > 1) {
       for(Iterator<Search.FilterDto> iterator = filters.iterator(); iterator.hasNext(); ) {
         jsonOperator.accumulate(operatorName, convertFilterType(iterator.next()));
       }
 
       jsonFacet.put(filterName, jsonOperator);
-    }
-    else {
+    } else {
       jsonFacet.put(filterName, convertFilterType(filters.get(0)));
     }
   }
 
-  private void convertField(Search.VariableTermDto dtoVariable, JSONObject jsonFacet) throws JSONException,
-      UnsupportedOperationException {
+  private void convertField(Search.VariableTermDto dtoVariable, JSONObject jsonFacet)
+      throws JSONException, UnsupportedOperationException {
 
     String variable = dtoVariable.getVariable();
     JSONObject jsonField = new JSONObject();
@@ -122,41 +120,39 @@ public class QueryTermConverter {
 
     String variable = dtoFilter.getVariable();
 
-    if (dtoFilter.hasExtension(Search.InTermDto.terms)) {
+    if(dtoFilter.hasExtension(Search.InTermDto.terms)) {
       convertTermFilter(dtoFilter.getExtension(Search.InTermDto.terms), jsonFilter, variable);
-    }
-    else if (dtoFilter.hasExtension(Search.RangeTermDto.range)) {
+    } else if(dtoFilter.hasExtension(Search.RangeTermDto.range)) {
       convertRangeFilter(dtoFilter.getExtension(Search.RangeTermDto.range), jsonFilter, variable);
-    }
-    else {
+    } else {
       convertExistFilter(jsonFilter, variable);
     }
 
-    if (dtoFilter.hasNot()) {
+    if(dtoFilter.hasNot()) {
       jsonFilter = new JSONObject().put("not", jsonFilter);
     }
 
     return jsonFilter;
   }
 
-  private void convertRangeFilter(Search.RangeTermDto dtoRange, JSONObject jsonFilter,
-      String variable) throws JSONException {
+  private void convertRangeFilter(Search.RangeTermDto dtoRange, JSONObject jsonFilter, String variable)
+      throws JSONException {
 
     JSONObject jsonRange = new JSONObject();
 
-    if (dtoRange.hasFrom()) {
+    if(dtoRange.hasFrom()) {
       jsonRange.put("from", dtoRange.getFrom());
     }
 
-    if (dtoRange.hasIncludeLower()) {
+    if(dtoRange.hasIncludeLower()) {
       jsonRange.put("include_lower", dtoRange.getIncludeLower());
     }
 
-    if (dtoRange.hasTo()) {
+    if(dtoRange.hasTo()) {
       jsonRange.put("to", dtoRange.getTo());
     }
 
-    if (dtoRange.hasIncludeUpper()) {
+    if(dtoRange.hasIncludeUpper()) {
       jsonRange.put("include_upper", dtoRange.getIncludeUpper());
     }
 
@@ -167,16 +163,15 @@ public class QueryTermConverter {
     jsonFilter.put("exists", new JSONObject().put("field", fullyQualifyVariableName(variable)));
   }
 
-  private void convertTermFilter(Search.InTermDto dtoTerms, JSONObject jsonFilter,
-      String variable) throws JSONException {
+  private void convertTermFilter(Search.InTermDto dtoTerms, JSONObject jsonFilter, String variable)
+      throws JSONException {
 
     // see if we're dealing a 'term' or 'terms' elastic search facet type
     List<String> values = dtoTerms.getValuesList();
 
-    if (values.size() == 1) {
+    if(values.size() == 1) {
       jsonFilter.put("term", new JSONObject().put(fullyQualifyVariableName(variable), values.get(0).toString()));
-    }
-    else {
+    } else {
       jsonFilter.put("terms", new JSONObject().put(fullyQualifyVariableName(variable), values));
     }
   }

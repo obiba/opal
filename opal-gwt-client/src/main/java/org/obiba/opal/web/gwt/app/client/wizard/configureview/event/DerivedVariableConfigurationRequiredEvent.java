@@ -17,8 +17,8 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  * Signals that a derived variable has been selected by the user.
  */
-public class DerivedVariableConfigurationRequiredEvent extends
-    GwtEvent<DerivedVariableConfigurationRequiredEvent.Handler> {
+public class DerivedVariableConfigurationRequiredEvent
+    extends GwtEvent<DerivedVariableConfigurationRequiredEvent.Handler> {
   //
   // Static Variables
   //

@@ -21,7 +21,8 @@ public interface KeyCommandOptions extends HelpOption {
   @Option(shortName = "x", description = "The action to perform: list, create, delete, import or export.")
   public String getAction();
 
-  @Option(shortName = "g", longName = "algo", description = "The algorithm for creating a key pair. RSA is recommended.")
+  @Option(shortName = "g", longName = "algo",
+      description = "The algorithm for creating a key pair. RSA is recommended.")
   public String getAlgorithm();
 
   public boolean isAlgorithm();
@@ -36,7 +37,8 @@ public interface KeyCommandOptions extends HelpOption {
 
   public boolean isPrivate();
 
-  @Option(shortName = "c", description = "When action is 'import', indicates the certificate file to import (if omitted, user is prompted to create one). When action is 'export', indicates the file to which the exported certficate will be saved.")
+  @Option(shortName = "c",
+      description = "When action is 'import', indicates the certificate file to import (if omitted, user is prompted to create one). When action is 'export', indicates the file to which the exported certficate will be saved.")
   public String getCertificate();
 
   public boolean isCertificate();

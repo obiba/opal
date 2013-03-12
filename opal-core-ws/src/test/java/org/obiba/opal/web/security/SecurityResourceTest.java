@@ -9,11 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-
 import java.net.URISyntaxException;
 
 import javax.ws.rs.core.Response;
@@ -33,8 +28,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.SubjectAclService;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 public class SecurityResourceTest {
 

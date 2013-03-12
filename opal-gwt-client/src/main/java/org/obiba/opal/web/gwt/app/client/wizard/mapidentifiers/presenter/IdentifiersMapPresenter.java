@@ -14,18 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -49,6 +37,19 @@ import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMapPresenter.Display> {
 
@@ -122,15 +123,15 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
   protected void onFinish() {
     UriBuilder ub = UriBuilder.create()
         .segment("functional-unit", getView().getSelectedUnitName(), "entities", "identifiers", "map");
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ub.build()).put().authorize(new Authorizer(getEventBus()) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
+        .authorize(new Authorizer(getEventBus()) {
 
-      @Override
-      public void authorized() {
-        getView().renderPendingConclusion();
-        mapIdentifiers();
-      }
-    }).send();
+          @Override
+          public void authorized() {
+            getView().renderPendingConclusion();
+            mapIdentifiers();
+          }
+        }).send();
   }
 
   private void getIdentifiersTable() {

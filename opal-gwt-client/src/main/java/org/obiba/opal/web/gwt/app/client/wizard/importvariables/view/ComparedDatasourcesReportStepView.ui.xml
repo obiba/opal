@@ -1,23 +1,40 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:HTMLPanel addStyleNames="ignoreAllModifications">
-      <g:CheckBox ui:field="ignoreAllModifications"><ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg></g:CheckBox>
+      <g:CheckBox ui:field="ignoreAllModifications">
+        <ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg>
+      </g:CheckBox>
     </g:HTMLPanel>
     <o:BreadCrumbTabLayout ui:field="tableTabs">
-      <g:Anchor><ui:msg description="Tables label">Tables</ui:msg></g:Anchor>
+      <g:Anchor>
+        <ui:msg description="Tables label">Tables</ui:msg>
+      </g:Anchor>
       <o:Table ui:field="tableList" width="100%"/>
     </o:BreadCrumbTabLayout>
-    
+
     <g:HTMLPanel ui:field="help">
-      <g:Label addStyleNames="title"><ui:msg description="Variables creation modification review label">Variable Creation/Modification Review</ui:msg></g:Label>
-      <p><ui:msg description="Variables creation modification review information"><p>Review the modifications before they are applied to the datasource.</p><p>Affected tables are displayed to the left.  For each of them, a report shows which variables are going to be created and which are going to be modified.</p><p>Modifications to variables can be ignored by ticking checkbox above the report. This will affect all tables.</p></ui:msg></p>
+      <g:Label addStyleNames="title">
+        <ui:msg description="Variables creation modification review label">Variable Creation/Modification Review
+        </ui:msg>
+      </g:Label>
+      <p>
+        <ui:msg description="Variables creation modification review information">
+          <p>Review the modifications before they are applied to the datasource.</p>
+          <p>Affected tables are displayed to the left. For each of them, a report shows which variables are going to be
+            created and which are going to be modified.
+          </p>
+          <p>Modifications to variables can be ignored by ticking checkbox above the report. This will affect all
+            tables.
+          </p>
+        </ui:msg>
+      </p>
     </g:HTMLPanel>
-  </g:FlowPanel>      
-  
+  </g:FlowPanel>
+
 </ui:UiBinder>

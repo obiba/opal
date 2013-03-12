@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -39,7 +39,8 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplorerPresenter.Display, FileExplorerPresenter.Proxy> {
+public class FileExplorerPresenter
+    extends SplitPaneWorkbenchPresenter<FileExplorerPresenter.Display, FileExplorerPresenter.Proxy> {
 
   public interface Display extends View {
 
@@ -65,8 +66,7 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
 
   @ProxyStandard
   @NameToken(Places.files)
-  public interface Proxy extends ProxyPlace<FileExplorerPresenter> {
-  }
+  public interface Proxy extends ProxyPlace<FileExplorerPresenter> {}
 
   FileSystemTreePresenter fileSystemTreePresenter;
 
@@ -80,7 +80,9 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public FileExplorerPresenter(Display display, EventBus eventBus, Proxy proxy, FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter, FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
+  public FileExplorerPresenter(Display display, EventBus eventBus, Proxy proxy,
+      FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter,
+      FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
     super(eventBus, display, proxy);
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
@@ -89,12 +91,13 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
   }
 
   @Override
-  protected PresenterWidget<?> getDefaultPresenter(org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter.Slot slot) {
+  protected PresenterWidget<?> getDefaultPresenter(
+      org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter.Slot slot) {
     switch(slot) {
-    case CENTER:
-      return folderDetailsPresenter;
-    case LEFT:
-      return fileSystemTreePresenter;
+      case CENTER:
+        return folderDetailsPresenter;
+      case LEFT:
+        return fileSystemTreePresenter;
     }
     return null;
   }
@@ -107,19 +110,23 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
 
   private void authorizeFile(FileDto dto) {
     // download
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(getView().getFileDownloadAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get()
+        .authorize(getView().getFileDownloadAuthorizer()).send();
     // delete
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).delete().authorize(getView().getFileDeleteAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).delete()
+        .authorize(getView().getFileDeleteAuthorizer()).send();
   }
 
   private void authorizeFolder(FileDto dto) {
     // create folder and upload
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).post()//
-    .authorize(new CompositeAuthorizer(getView().getCreateFolderAuthorizer(), getView().getFileUploadAuthorizer())).send();
+        .authorize(new CompositeAuthorizer(getView().getCreateFolderAuthorizer(), getView().getFileUploadAuthorizer()))
+        .send();
 
     if(!folderDetailsPresenter.hasSelection()) {
       // download
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get().authorize(getView().getFileDownloadAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get()
+          .authorize(getView().getFileDownloadAuthorizer()).send();
       // delete
       setEnableFileDeleteButton();
     }
@@ -130,16 +137,20 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
     if(folder.getPath().equals("/") || folder.getChildrenCount() > 0) {
       getView().setEnabledFileDeleteButton(false);
     } else {
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + folder.getPath()).delete().authorize(getView().getFileDeleteAuthorizer()).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + folder.getPath()).delete()
+          .authorize(getView().getFileDeleteAuthorizer()).send();
     }
   }
 
   /**
    * Returns the file currently selected or the current folder if no file is selected.
+   *
    * @return
    */
   private FileDto getCurrentSelectionOrFolder() {
-    return folderDetailsPresenter.hasSelection() ? folderDetailsPresenter.getSelectedFile() : folderDetailsPresenter.getCurrentFolder();
+    return folderDetailsPresenter.hasSelection()
+        ? folderDetailsPresenter.getSelectedFile()
+        : folderDetailsPresenter.getCurrentFolder();
   }
 
   private void addEventHandlers() {
@@ -155,7 +166,8 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
           }
         };
 
-        getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+        getEventBus().fireEvent(
+            ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
       }
     }));
 
@@ -185,25 +197,27 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
       }
     }));
 
-    super.registerHandler(getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
+    super.registerHandler(
+        getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
 
-      @Override
-      public void onFileSelectionChange(FileSelectionChangeEvent event) {
-        getView().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
-        if(folderDetailsPresenter.hasSelection()) {
-          authorizeFile(event.getFile());
-        }
-      }
-    }));
+          @Override
+          public void onFileSelectionChange(FileSelectionChangeEvent event) {
+            getView().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
+            if(folderDetailsPresenter.hasSelection()) {
+              authorizeFile(event.getFile());
+            }
+          }
+        }));
 
-    super.registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(), new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
+        new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
-      @Override
-      public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-        setEnableFileDeleteButton();
-      }
+          @Override
+          public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
+            setEnableFileDeleteButton();
+          }
 
-    }));
+        }));
 
     super.registerHandler(getEventBus().addHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
 
@@ -220,7 +234,8 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+          event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }
@@ -240,7 +255,10 @@ public class FileExplorerPresenter extends SplitPaneWorkbenchPresenter<FileExplo
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete().withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler).withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete()
+        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
+        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private void downloadFile(final FileDto file) {

@@ -28,11 +28,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/theme/merbivore', ['require', 'exports', 'module' , 'ace/lib/dom'], function(require, exports, module) {
+define('ace/theme/merbivore', ['require', 'exports', 'module' , 'ace/lib/dom'], function (require, exports, module) {
 
-exports.isDark = true;
-exports.cssClass = "ace-merbivore";
-exports.cssText = ".ace-merbivore .ace_gutter {\
+    exports.isDark = true;
+    exports.cssClass = "ace-merbivore";
+    exports.cssText = ".ace-merbivore .ace_gutter {\
 background: #202020;\
 color: #E6E1DC\
 }\
@@ -130,6 +130,6 @@ text-decoration: underline\
 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWMQExP7zzBz5sz/AA50BAyDznYhAAAAAElFTkSuQmCC) right repeat-y\
 }";
 
-var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+    var dom = require("../lib/dom");
+    dom.importCssString(exports.cssText, exports.cssClass);
 });

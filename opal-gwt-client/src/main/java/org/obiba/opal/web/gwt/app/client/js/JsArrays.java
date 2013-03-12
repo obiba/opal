@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -161,16 +161,18 @@ public class JsArrays {
    * Creates a {@code List} that is a view of a portion of the supplied array. This method does not copy the supplied
    * array. As such, any modifications made to the array will be reflected in the sub-list. The returned list is
    * immutable.
+   *
    * @param <T> the type of element in the array
    * @param array the array used to back the returned list
    * @param start the index within the array that will become the 0th element in the returned list
    * @param length the size of the returned list
    * @return a view of the array as a {@code List} that contains elements array[start] to array[start + length] (or
-   * array[array.length] if start + lenght > array.length)
+   *         array[array.length] if start + lenght > array.length)
    */
   public static <T extends JavaScriptObject> List<T> toList(final JsArray<T> array, final int start, final int length) {
     if(array == null) throw new IllegalArgumentException("array cannot be null");
-    if(start < 0 || start > array.length()) throw new IndexOutOfBoundsException("start index '" + start + "'is invalid");
+    if(start < 0 || start > array.length())
+      throw new IndexOutOfBoundsException("start index '" + start + "'is invalid");
     if(length < 0) throw new IndexOutOfBoundsException("length '" + length + "'is invalid");
     return new AbstractList<T>() {
 
@@ -213,6 +215,8 @@ public class JsArrays {
     return array;
   }
 
-  private static native <T extends JavaScriptObject> T[] reinterpretCast(JsArray<T> value) /*-{ return value; }-*/;
+  private static native <T extends JavaScriptObject> T[] reinterpretCast(JsArray<T> value) /*-{
+      return value;
+  }-*/;
 
 }

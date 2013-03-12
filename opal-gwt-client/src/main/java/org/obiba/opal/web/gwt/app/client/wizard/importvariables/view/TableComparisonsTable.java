@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -166,7 +166,8 @@ public abstract class TableComparisonsTable extends Table<TableComparison> {
       public void render(Context context, SafeHtml value, SafeHtmlBuilder sb) {
         if(value != null) {
           TableComparison tc = (TableComparison) context.getKey();
-          sb.appendHtmlConstant("<a class=\"" + tc.getStatusStyle() + "\" title=\"" + translations.comparisonResultMap().get(tc.getStatus()) + "\">").append(value).appendHtmlConstant("</a>");
+          sb.appendHtmlConstant("<a class=\"" + tc.getStatusStyle() + "\" title=\"" +
+              translations.comparisonResultMap().get(tc.getStatus()) + "\">").append(value).appendHtmlConstant("</a>");
         }
       }
     }) {

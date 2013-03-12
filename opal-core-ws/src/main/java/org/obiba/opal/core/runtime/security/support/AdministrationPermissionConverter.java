@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -37,7 +37,6 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
 
   enum Permission {
     DATABASES_ALL {
-
       @Override
       public Iterable<String> convert(String node) {
         return Lists.newArrayList(magmaConvert("/jdbc/databases", "*:POST/*"));
@@ -45,7 +44,6 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
 
     },
     R_SESSION_ALL {
-
       @Override
       public Iterable<String> convert(String node) {
         return Lists.newArrayList(magmaConvert("/r/session", "*:GET/*"));
@@ -53,7 +51,6 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
 
     },
     DATASHIELD_ALL {
-
       @Override
       public Iterable<String> convert(String node) {
         return Lists.newArrayList(magmaConvert("/datashield", "*:GET/*"));
@@ -61,7 +58,6 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
 
     },
     DATASHIELD_SESSION_ALL {
-
       @Override
       public Iterable<String> convert(String node) {
         return Lists.newArrayList(magmaConvert("/datashield/session", "*:GET/*"));

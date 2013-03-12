@@ -47,8 +47,8 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @POST
   @Path("/sessions")
   @NotAuthenticated
-  public Response createSession(@FormParam("username") String username,
-      @FormParam("password") String password) throws FileSystemException {
+  public Response createSession(@FormParam("username") String username, @FormParam("password") String password)
+      throws FileSystemException {
     try {
       SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password));
     } catch(AuthenticationException e) {

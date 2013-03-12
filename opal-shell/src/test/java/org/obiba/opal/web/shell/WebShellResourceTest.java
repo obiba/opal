@@ -1,22 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.shell;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,6 +35,15 @@ import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.obiba.opal.web.model.Commands.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.Commands.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.Commands.ReportCommandOptionsDto;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link WebShellResource}.
@@ -329,10 +329,12 @@ public class WebShellResourceTest {
     Integer jobId = 1;
     CommandRegistry mockCommandRegistry = createMockCommandRegistry();
     ImportCommand importCommand = createImportCommand();
-    expect(mockCommandRegistry.<ImportCommandOptions> newCommand(importCommand.getName())).andReturn(importCommand).atLeastOnce();
+    expect(mockCommandRegistry.<ImportCommandOptions>newCommand(importCommand.getName())).andReturn(importCommand)
+        .atLeastOnce();
 
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
-    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, importCommand, null)))).andReturn(jobId).atLeastOnce();
+    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, importCommand, null))))
+        .andReturn(jobId).atLeastOnce();
 
     WebShellResource sut = new WebShellResource(null, mockCommandJobService, mockCommandRegistry);
 
@@ -366,10 +368,12 @@ public class WebShellResourceTest {
     Integer jobId = 1;
     CommandRegistry mockCommandRegistry = createMockCommandRegistry();
     CopyCommand copyCommand = createCopyCommand();
-    expect(mockCommandRegistry.<CopyCommandOptions> newCommand(copyCommand.getName())).andReturn(copyCommand).atLeastOnce();
+    expect(mockCommandRegistry.<CopyCommandOptions>newCommand(copyCommand.getName())).andReturn(copyCommand)
+        .atLeastOnce();
 
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
-    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, copyCommand, null)))).andReturn(jobId).atLeastOnce();
+    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, copyCommand, null))))
+        .andReturn(jobId).atLeastOnce();
 
     WebShellResource sut = new WebShellResource(null, mockCommandJobService, mockCommandRegistry);
 
@@ -400,10 +404,12 @@ public class WebShellResourceTest {
     Integer jobId = 1;
     CommandRegistry mockCommandRegistry = createMockCommandRegistry();
     ReportCommand reportCommand = createReportCommand();
-    expect(mockCommandRegistry.<ReportCommandOptions> newCommand(reportCommand.getName())).andReturn(reportCommand).atLeastOnce();
+    expect(mockCommandRegistry.<ReportCommandOptions>newCommand(reportCommand.getName())).andReturn(reportCommand)
+        .atLeastOnce();
 
     CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
-    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, reportCommand, null)))).andReturn(jobId).atLeastOnce();
+    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, reportCommand, null))))
+        .andReturn(jobId).atLeastOnce();
 
     WebShellResource sut = new WebShellResource(null, mockCommandJobService, mockCommandRegistry);
 
@@ -488,7 +494,8 @@ public class WebShellResourceTest {
     return new ArrayList<CommandJob>();
   }
 
-  private ImportCommandOptionsDto createImportCommandOptionsDto(String unit, String destination, String archive, String... files) {
+  private ImportCommandOptionsDto createImportCommandOptionsDto(String unit, String destination, String archive,
+      String... files) {
     ImportCommandOptionsDto.Builder dtoBuilder = ImportCommandOptionsDto.newBuilder();
 
     dtoBuilder.setUnit(unit);
@@ -513,7 +520,8 @@ public class WebShellResourceTest {
     return dtoBuilder.build();
   }
 
-  private CopyCommandOptionsDto createCopyCommandOptionsDto(String source, String destination, String out, String multiplex, String transform, String... tables) {
+  private CopyCommandOptionsDto createCopyCommandOptionsDto(String source, String destination, String out,
+      String multiplex, String transform, String... tables) {
     CopyCommandOptionsDto.Builder dtoBuilder = CopyCommandOptionsDto.newBuilder();
 
     if(source != null) {
@@ -631,7 +639,9 @@ public class WebShellResourceTest {
     if(entity != null) {
       if(entity instanceof CommandStateDto) {
         CommandStateDto dto = (CommandStateDto) entity;
-        return (dto.getId() == job.getId() && dto.getCommand().equals(job.getCommand().getName()) && dto.getCommandArgs().equals(job.getCommand().toString()) && dto.getOwner().equals(job.getOwner()) && dto.getStatus().equals(job.getStatus().toString()));
+        return (dto.getId() == job.getId() && dto.getCommand().equals(job.getCommand().getName()) &&
+            dto.getCommandArgs().equals(job.getCommand().toString()) && dto.getOwner().equals(job.getOwner()) &&
+            dto.getStatus().equals(job.getStatus().toString()));
       } else {
         return false;
       }
@@ -655,7 +665,8 @@ public class WebShellResourceTest {
     public boolean matches(Object actual) {
       if(actual instanceof CommandJob) {
         CommandJob actualJob = (CommandJob) actual;
-        return (actualJob.getCommand().getName().equals(expected.getCommand().getName()) && actualJob.getCommand().toString().equals(expected.getCommand().toString()));
+        return (actualJob.getCommand().getName().equals(expected.getCommand().getName()) &&
+            actualJob.getCommand().toString().equals(expected.getCommand().toString()));
       } else {
         return false;
       }

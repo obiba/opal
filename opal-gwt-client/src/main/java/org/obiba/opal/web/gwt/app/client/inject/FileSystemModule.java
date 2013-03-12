@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -33,11 +33,14 @@ public class FileSystemModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    bindPresenter(FileExplorerPresenter.class, FileExplorerPresenter.Display.class, FileExplorerView.class, FileExplorerPresenter.Proxy.class);
+    bindPresenter(FileExplorerPresenter.class, FileExplorerPresenter.Display.class, FileExplorerView.class,
+        FileExplorerPresenter.Proxy.class);
     bindPresenterWidget(FolderDetailsPresenter.class, FolderDetailsPresenter.Display.class, FolderDetailsView.class);
     bindPresenterWidget(FileSystemTreePresenter.class, FileSystemTreePresenter.Display.class, FileSystemTreeView.class);
-    bindPresenterWidget(CreateFolderDialogPresenter.class, CreateFolderDialogPresenter.Display.class, CreateFolderDialogView.class);
-    bindPresenterWidget(FileUploadDialogPresenter.class, FileUploadDialogPresenter.Display.class, FileUploadDialogView.class);
+    bindPresenterWidget(CreateFolderDialogPresenter.class, CreateFolderDialogPresenter.Display.class,
+        CreateFolderDialogView.class);
+    bindPresenterWidget(FileUploadDialogPresenter.class, FileUploadDialogPresenter.Display.class,
+        FileUploadDialogView.class);
     bindPresenterWidget(FileSelectorPresenter.class, FileSelectorPresenter.Display.class, FileSelectorView.class);
 
     bind(FileSelectionPresenter.Display.class).to(FileSelectionView.class);

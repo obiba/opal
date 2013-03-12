@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -122,7 +122,8 @@ public class NumericTextBox extends TextBox {
   public void setValue(String value, boolean fireEvents) {
     try {
       Number newValue = numberType.parseValue(value);
-      if(newValue == null || (maxConstrained && (newValue.intValue() > max)) || (minConstrained && (newValue.intValue() < min))) {
+      if(newValue == null || (maxConstrained && (newValue.intValue() > max)) ||
+          (minConstrained && (newValue.intValue() < min))) {
         return;
       }
       String prevText = getValue();
@@ -152,20 +153,22 @@ public class NumericTextBox extends TextBox {
       }
 
       switch(event.getNativeEvent().getKeyCode()) {
-      case KeyCodes.KEY_LEFT:
-      case KeyCodes.KEY_RIGHT:
-      case KeyCodes.KEY_BACKSPACE:
-      case KeyCodes.KEY_DELETE:
-      case KeyCodes.KEY_UP:
-      case KeyCodes.KEY_PAGEUP:
-      case KeyCodes.KEY_DOWN:
-      case KeyCodes.KEY_PAGEDOWN:
-      case KeyCodes.KEY_TAB:
-        return;
+        case KeyCodes.KEY_LEFT:
+        case KeyCodes.KEY_RIGHT:
+        case KeyCodes.KEY_BACKSPACE:
+        case KeyCodes.KEY_DELETE:
+        case KeyCodes.KEY_UP:
+        case KeyCodes.KEY_PAGEUP:
+        case KeyCodes.KEY_DOWN:
+        case KeyCodes.KEY_PAGEDOWN:
+        case KeyCodes.KEY_TAB:
+          return;
       }
 
       String newText = getNewText(event.getCharCode());
-      if(newText.equals("-") || (numberType.equals(NumberType.DECIMAL) && newText.endsWith(".") && newText.length() > 1 && !newText.substring(0, newText.length() - 1).contains("."))) {
+      if(newText.equals("-") ||
+          (numberType.equals(NumberType.DECIMAL) && newText.endsWith(".") && newText.length() > 1 &&
+              !newText.substring(0, newText.length() - 1).contains("."))) {
         return;
       }
 
@@ -178,7 +181,8 @@ public class NumericTextBox extends TextBox {
       String previousText = getText();
       String newText;
       if(getSelectionLength() > 0) {
-        newText = previousText.substring(0, getCursorPos()) + code + previousText.substring(getCursorPos() + getSelectionLength(), previousText.length());
+        newText = previousText.substring(0, getCursorPos()) + code +
+            previousText.substring(getCursorPos() + getSelectionLength(), previousText.length());
       } else {
         newText = previousText.substring(0, index) + code + previousText.substring(index, previousText.length());
       }
@@ -204,20 +208,20 @@ public class NumericTextBox extends TextBox {
     @SuppressWarnings({ "unchecked", "PMD.NcssMethodCount" })
     private boolean processKeyCode(int keyCode) {
       switch(keyCode) {
-      case KeyCodes.KEY_UP:
-        increaseValue(step);
-        break;
-      case KeyCodes.KEY_PAGEUP:
-        increaseValue(step * 10);
-        break;
-      case KeyCodes.KEY_DOWN:
-        decreaseValue(step);
-        break;
-      case KeyCodes.KEY_PAGEDOWN:
-        decreaseValue(step * 10);
-        break;
-      default:
-        return false;
+        case KeyCodes.KEY_UP:
+          increaseValue(step);
+          break;
+        case KeyCodes.KEY_PAGEUP:
+          increaseValue(step * 10);
+          break;
+        case KeyCodes.KEY_DOWN:
+          decreaseValue(step);
+          break;
+        case KeyCodes.KEY_PAGEDOWN:
+          decreaseValue(step * 10);
+          break;
+        default:
+          return false;
       }
       return true;
     }

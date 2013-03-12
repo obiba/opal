@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -74,7 +74,8 @@ public class ProtobufProviderHelper {
       Class<?> enclosingType = messageType.getEnclosingClass();
       if(registryCache.containsKey(enclosingType) == false) {
         ExtensionRegistry registry = ExtensionRegistry.newInstance();
-        invokeStaticMethod(extractStaticMethod("registerAllExtensions", methodCache, messageType.getEnclosingClass(), ExtensionRegistry.class), registry);
+        invokeStaticMethod(extractStaticMethod("registerAllExtensions", methodCache, messageType.getEnclosingClass(),
+            ExtensionRegistry.class), registry);
         registryCache.put(enclosingType, registry);
       }
       return registryCache.get(enclosingType);
@@ -111,7 +112,8 @@ public class ProtobufProviderHelper {
     }
   }
 
-  private static Method extractStaticMethod(final String methodName, final Map<Class<?>, Method> methodCache, final Class<?> type, Class<?>... arguments) {
+  private static Method extractStaticMethod(final String methodName, final Map<Class<?>, Method> methodCache,
+      final Class<?> type, Class<?>... arguments) {
     if(methodName == null) throw new IllegalArgumentException("methodName cannot be null");
     if(methodCache == null) throw new IllegalArgumentException("methodCache cannot be null");
     if(type == null) throw new IllegalArgumentException("type cannot be null");
@@ -123,7 +125,8 @@ public class ProtobufProviderHelper {
         log.error("Error getting '" + methodName + "' method from type " + type.getName(), e);
         throw new WebApplicationException(500);
       } catch(NoSuchMethodException e) {
-        throw new IllegalStateException("The type " + type.getName() + " does not define a '" + methodName + "' static method.");
+        throw new IllegalStateException(
+            "The type " + type.getName() + " does not define a '" + methodName + "' static method.");
       }
     }
     return methodCache.get(type);

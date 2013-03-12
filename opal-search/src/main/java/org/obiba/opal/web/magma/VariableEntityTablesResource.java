@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.core.Response;
 
 import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
@@ -93,8 +92,8 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
     }
   }
 
-  public static class EntityTablesFinder extends
-      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+  public static class EntityTablesFinder
+      extends AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
     @Override
     public void find(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
@@ -119,8 +118,8 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   }
 
   @SuppressWarnings("ClassTooDeepInInheritanceTree")
-  public static class EntityTablesElasticSearchFinder extends
-      AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+  public static class EntityTablesElasticSearchFinder
+      extends AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
     private final IndexManager indexManager;
 
@@ -222,8 +221,8 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   }
 
   @SuppressWarnings("ClassTooDeepInInheritanceTree")
-  public static class EntityTablesMagmaFinder extends
-      AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+  public static class EntityTablesMagmaFinder
+      extends AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
     private int limit = 0;
 
@@ -250,8 +249,8 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
 
   }
 
-  public class VariableEntityTablesFinder extends
-      AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+  public class VariableEntityTablesFinder
+      extends AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
     private int limit = 0;
 

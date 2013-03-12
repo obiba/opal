@@ -1,17 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.ws.util;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -20,6 +16,10 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -66,14 +66,16 @@ public class JsonIoUtilTest {
 
   @Test
   public void test_mergeCollectionSingleElement() throws IOException {
-    Collection<DatasourceDto> msgs = JsonIoUtil.mergeCollection(new StringReader(createJs("singleton")), DatasourceDto.newBuilder());
+    Collection<DatasourceDto> msgs = JsonIoUtil
+        .mergeCollection(new StringReader(createJs("singleton")), DatasourceDto.newBuilder());
     assertThat(msgs, notNullValue());
     assertThat(msgs, is(createDtos("singleton")));
   }
 
   @Test
   public void test_mergeCollectionMultipleElements() throws IOException {
-    Collection<DatasourceDto> msgs = JsonIoUtil.mergeCollection(new StringReader(createJs("first", "second")), DatasourceDto.newBuilder());
+    Collection<DatasourceDto> msgs = JsonIoUtil
+        .mergeCollection(new StringReader(createJs("first", "second")), DatasourceDto.newBuilder());
     assertThat(msgs, notNullValue());
     assertThat(msgs, is(createDtos("first", "second")));
   }
@@ -103,23 +105,23 @@ public class JsonIoUtilTest {
 
   /**
    * Creates the expected JSON string for a list of names. Each element in the {@code names} array will produce this:
-   * 
+   * <p/>
    * <pre>
    * {"name": "names[i]","link": "http://localhost/names[i]"}
    * </pre>
-   * 
+   * <p/>
    * They are all wrapped in a JSON array:
-   * 
+   * <p/>
    * <pre>
    * [{...},{...},...]
    * </pre>
-   * 
+   * <p/>
    * An empty array produces an empty JSON array:
-   * 
+   * <p/>
    * <pre>
    * []
    * </pre>
-   * 
+   *
    * @param names
    * @return
    */
@@ -128,7 +130,8 @@ public class JsonIoUtilTest {
     sb.append('[');
     for(int i = 0; i < names.length; i++) {
       if(i > 0) sb.append(',');
-      sb.append("{\"name\": \"").append(names[i]).append("\",\"link\": \"").append("http://localhost/").append(names[i]).append("\",\"type\": \"type\"}");
+      sb.append("{\"name\": \"").append(names[i]).append("\",\"link\": \"").append("http://localhost/").append(names[i])
+          .append("\",\"type\": \"type\"}");
     }
     sb.append(']');
     return sb.toString();

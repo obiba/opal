@@ -44,8 +44,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class VariablesListTabView extends ViewImpl implements VariablesListTabPresenter.Display {
 
   @UiTemplate("VariablesListTabView.ui.xml")
-  interface VariablesListTabViewUiBinder extends UiBinder<Widget, VariablesListTabView> {
-  }
+  interface VariablesListTabViewUiBinder extends UiBinder<Widget, VariablesListTabView> {}
 
   private static final VariablesListTabViewUiBinder uiBinder = GWT.create(VariablesListTabViewUiBinder.class);
 

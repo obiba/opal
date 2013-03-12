@@ -157,21 +157,22 @@ public class FilesResourceTest {
     replay(opalRuntimeMock);
 
     checkGetFileDetailsResponse("/",
-        new String[] {"folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt", "folder11", "file11.txt", "file21.txt", "folder31", "folder41", "file41.txt", "file42.txt", "file43.txt", "file51.txt"});
+        new String[] { "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt", "folder11", "file11.txt",
+            "file21.txt", "folder31", "folder41", "file41.txt", "file42.txt", "file43.txt", "file51.txt" });
     checkGetFileDetailsResponse("/folder1/folder11",
-        new String[] {"folder111", "file111.txt", "file1111.txt", "file1112.txt"});
-    checkGetFileDetailsResponse("/folder1/folder11/folder111", new String[] {"file1111.txt", "file1112.txt"});
-    checkGetFileDetailsResponse("/folder2", new String[] {"file21.txt"});
-    checkGetFileDetailsResponse("/folder3", new String[] {"folder31", "file311.txt"});
-    checkGetFileDetailsResponse("/folder4", new String[] {"folder41", "file41.txt", "file42.txt", "file43.txt"});
-    checkGetFileDetailsResponse("/folder5", new String[] {"file51.txt"});
+        new String[] { "folder111", "file111.txt", "file1111.txt", "file1112.txt" });
+    checkGetFileDetailsResponse("/folder1/folder11/folder111", new String[] { "file1111.txt", "file1112.txt" });
+    checkGetFileDetailsResponse("/folder2", new String[] { "file21.txt" });
+    checkGetFileDetailsResponse("/folder3", new String[] { "folder31", "file311.txt" });
+    checkGetFileDetailsResponse("/folder4", new String[] { "folder41", "file41.txt", "file42.txt", "file43.txt" });
+    checkGetFileDetailsResponse("/folder5", new String[] { "file51.txt" });
 
     verify(opalRuntimeMock);
 
   }
 
-  private void checkGetFileDetailsResponse(String path,
-      String[] expectedFolderContentArray) throws FileSystemException {
+  private void checkGetFileDetailsResponse(String path, String[] expectedFolderContentArray)
+      throws FileSystemException {
 
     Set<String> expectedFolderContent = new HashSet<String>(Arrays.asList(expectedFolderContentArray));
     Response response = filesResource.getFileDetails(path);
@@ -207,14 +208,21 @@ public class FilesResourceTest {
     replay(opalRuntimeMock);
 
     checkCompressedFolder("/folder1",
-        new String[] {"folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111", "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt", "folder1/folder11/folder111/file1112.txt"});
-    checkCompressedFolder("/folder2", new String[] {"folder2", "folder2/file21.txt"});
-    checkCompressedFolder("/folder3", new String[] {"folder3", "folder3/folder31", "folder3/folder31/file311.txt"});
+        new String[] { "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111",
+            "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt",
+            "folder1/folder11/folder111/file1112.txt" });
+    checkCompressedFolder("/folder2", new String[] { "folder2", "folder2/file21.txt" });
+    checkCompressedFolder("/folder3", new String[] { "folder3", "folder3/folder31", "folder3/folder31/file311.txt" });
     checkCompressedFolder("/folder4",
-        new String[] {"folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt", "folder4/file43.txt"});
-    checkCompressedFolder("/folder5", new String[] {"folder5", "folder5/file51.txt"});
+        new String[] { "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt",
+            "folder4/file43.txt" });
+    checkCompressedFolder("/folder5", new String[] { "folder5", "folder5/file51.txt" });
     checkCompressedFolder("/",
-        new String[] {"/", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111", "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt", "folder1/folder11/folder111/file1112.txt", "folder2", "folder2/file21.txt", "folder3", "folder3/folder31", "folder3/folder31/file311.txt", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt", "folder4/file43.txt", "folder5", "folder5/file51.txt", "file2.txt"});
+        new String[] { "/", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111",
+            "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt",
+            "folder1/folder11/folder111/file1112.txt", "folder2", "folder2/file21.txt", "folder3", "folder3/folder31",
+            "folder3/folder31/file311.txt", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt",
+            "folder4/file43.txt", "folder5", "folder5/file51.txt", "file2.txt" });
 
     verify(opalRuntimeMock);
 
@@ -341,7 +349,8 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist() throws IOException, FileSystemException, FileUploadException, URISyntaxException {
+  public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist()
+      throws IOException, FileSystemException, FileUploadException, URISyntaxException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {

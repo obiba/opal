@@ -2,10 +2,17 @@
   border-bottom: 1px solid #B4A291;
 }
 
-.dataGridLastColumnFooter{}
-.dataGridFirstColumnFooter{}
-.dataGridLastColumnHeader{}
-.dataGridLoading{}
+.dataGridLastColumnFooter {
+}
+
+.dataGridFirstColumnFooter {
+}
+
+.dataGridLastColumnHeader {
+}
+
+.dataGridLoading {
+}
 
 .dataGridHeader {
   background-color: #F3F4EB;
@@ -15,21 +22,22 @@
   color: #333333;
 }
 
-.dataGridFirstColumnHeader{}
+.dataGridFirstColumnHeader {
+}
 
-.dataGridFooter{
+.dataGridFooter {
   border-top: 1px solid #B4A291;
 }
 
-.dataGridOddRow{
+.dataGridOddRow {
   background-color: #EEEEEE;
 }
 
-.dataGridOddRow .dataGridFirstColumn  {
+.dataGridOddRow .dataGridFirstColumn {
   background-color: #DDDDDD;
 }
 
-.dataGridEvenRow{
+.dataGridEvenRow {
   background-color: #FFFFFF;
 }
 
@@ -37,38 +45,51 @@
   background-color: #EEEEEE;
 }
 
-.dataGridHoveredRow{}
+.dataGridHoveredRow {
+}
 
 .dataGridSelectedRow, .dataGridSelectedRow .dataGridFirstColumn {
   background-color: #B1B1B1;
-    color: #ffffff;
+  color: #ffffff;
 }
 
-.dataGrid{}
+.dataGrid {
+}
 
-.dataGridCell{
+.dataGridCell {
   padding: 4px 15px;
   height: 20px;
 }
 
-.dataGridFirstColumn{}
-.dataGridLastColumn{}
+.dataGridFirstColumn {
+}
 
-.dataGridWidget{}
+.dataGridLastColumn {
+}
 
-.dataGridSelectedRowCell{}
+.dataGridWidget {
+}
 
-.dataGridHoveredRowCell{}
+.dataGridSelectedRowCell {
+}
 
-.dataGridOddRowCell{}
+.dataGridHoveredRowCell {
+}
 
-.dataGridKeyboardSelectedRowCell{}
+.dataGridOddRowCell {
+}
 
- .dataGridEvenRowCell{}
- 
- .dataGridKeyboardSelectedCell{}
- 
- .dataGridKeyboardSelectedRow{}
+.dataGridKeyboardSelectedRowCell {
+}
+
+.dataGridEvenRowCell {
+}
+
+.dataGridKeyboardSelectedCell {
+}
+
+.dataGridKeyboardSelectedRow {
+}
 
 /* Specific tables */
 
@@ -84,9 +105,13 @@
   background-color: #B1B1B1;
 }
 
-.dataGridSortedHeaderAscending{}
-.dataGridSortedHeaderDescending{}
-.dataGridSortableHeader{
+.dataGridSortedHeaderAscending {
+}
+
+.dataGridSortedHeaderDescending {
+}
+
+.dataGridSortableHeader {
   cursor: pointer;
   cursor: hand;
   text-decoration: underline;

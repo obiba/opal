@@ -34,11 +34,11 @@ import com.gwtplatform.mvp.client.ViewImpl;
 /**
  *
  */
-public class DeriveCategoricalVariableStepView extends ViewImpl implements DeriveCategoricalVariableStepPresenter.Display {
+public class DeriveCategoricalVariableStepView extends ViewImpl
+    implements DeriveCategoricalVariableStepPresenter.Display {
 
   @UiTemplate("DeriveCategoricalVariableStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveCategoricalVariableStepView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, DeriveCategoricalVariableStepView> {}
 
   interface Template extends SafeHtmlTemplates {
 
@@ -55,9 +55,11 @@ public class DeriveCategoricalVariableStepView extends ViewImpl implements Deriv
 
   private final Widget widget;
 
-  @UiField WizardStep mapStep;
+  @UiField
+  WizardStep mapStep;
 
-  @UiField(provided = true) ValueMapGrid valuesMapGrid;
+  @UiField(provided = true)
+  ValueMapGrid valuesMapGrid;
 
   //
   // Constructors

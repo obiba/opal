@@ -1,50 +1,95 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .title { font-size: small; margin-right: 1em; }
-    .title-light { color: gray; font-size: small; }
-    .plot { width:400px;float:left;margin-right:2em }
+    .title {
+      font-size: small;
+      margin-right: 1em;
+    }
+
+    .title-light {
+      color: gray;
+      font-size: small;
+    }
+
+    .plot {
+      width: 400px;
+      float: left;
+      margin-right: 2em
+    }
   </ui:style>
 
   <g:HTMLPanel>
     <table>
       <tr>
-        <td class="{style.title-light}"><ui:msg description="N (number of observations)">N</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="obs">N</g:Label></td>
+        <td class="{style.title-light}"><ui:msg description="N (number of observations)">N</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="obs">N</g:Label>
+        </td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td class="{style.title-light}"><ui:msg description="Min">Min</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="min">Min</g:Label></td>
-        <td class="{style.title-light}"><ui:msg description="Max">Max</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="max">Max</g:Label></td>
+        <td class="{style.title-light}"><ui:msg description="Min">Min</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="min">Min</g:Label>
+        </td>
+        <td class="{style.title-light}"><ui:msg description="Max">Max</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="max">Max</g:Label>
+        </td>
       </tr>
       <tr>
-        <td class="{style.title-light}"><ui:msg description="Mean">Mean</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="mean">Mean</g:Label></td>
-        <td class="{style.title-light}"><ui:msg description="Median">Median</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="median">Median</g:Label></td>
+        <td class="{style.title-light}"><ui:msg description="Mean">Mean</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="mean">Mean</g:Label>
+        </td>
+        <td class="{style.title-light}"><ui:msg description="Median">Median</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="median">Median</g:Label>
+        </td>
       </tr>
       <tr>
-        <td class="{style.title-light}"><ui:msg description="Standard Deviation">Std. Dev.</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="stdDev">StdDev</g:Label></td>
-        <td class="{style.title-light}"><ui:msg description="Variance">Variance</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="variance">variance</g:Label></td>
+        <td class="{style.title-light}"><ui:msg description="Standard Deviation">Std. Dev.</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="stdDev">StdDev</g:Label>
+        </td>
+        <td class="{style.title-light}"><ui:msg description="Variance">Variance</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="variance">variance</g:Label>
+        </td>
       </tr>
       <tr>
-        <td class="{style.title-light}"><ui:msg description="Skewness">Skewness</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="skewness">Skewness</g:Label></td>
-        <td class="{style.title-light}"><ui:msg description="Kurtosis">Kurtosis</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="kurtosis">kurtosis</g:Label></td>
+        <td class="{style.title-light}"><ui:msg description="Skewness">Skewness</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="skewness">Skewness</g:Label>
+        </td>
+        <td class="{style.title-light}"><ui:msg description="Kurtosis">Kurtosis</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="kurtosis">kurtosis</g:Label>
+        </td>
       </tr>
       <tr>
-        <td class="{style.title-light}"><ui:msg description="Sum">Sum</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="sum">Sum</g:Label></td>
-        <td class="{style.title-light}"><ui:msg description="Sum of squares">Sum of squares</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="sumsq">sumsq</g:Label></td>
+        <td class="{style.title-light}"><ui:msg description="Sum">Sum</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="sum">Sum</g:Label>
+        </td>
+        <td class="{style.title-light}"><ui:msg description="Sum of squares">Sum of squares</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="sumsq">sumsq</g:Label>
+        </td>
       </tr>
     </table>
     <div id="plot-container">

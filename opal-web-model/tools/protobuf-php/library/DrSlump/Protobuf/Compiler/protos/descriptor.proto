@@ -41,6 +41,7 @@
 package google.protobuf;
 
 option java_package = "com.google.protobuf";
+
 option java_outer_classname = "DescriptorProtos";
 
 // descriptor.proto must be optimized for speed because reflection-based
@@ -55,8 +56,8 @@ message FileDescriptorSet {
 
 // Describes a complete .proto file.
 message FileDescriptorProto {
-  optional string name = 1;       // file name, relative to root of source tree
-  optional string package = 2;    // e.g. "foo", "foo.bar", etc.
+  optional string name = 1; // file name, relative to root of source tree
+  optional string package = 2; // e.g. "foo", "foo.bar", etc.
 
   // Names of files imported by this file.
   repeated string dependency = 3;
@@ -100,39 +101,41 @@ message FieldDescriptorProto {
   enum Type {
     // 0 is reserved for errors.
     // Order is weird for historical reasons.
-    TYPE_DOUBLE         = 1;
-    TYPE_FLOAT          = 2;
-    TYPE_INT64          = 3;   // Not ZigZag encoded.  Negative numbers
-                               // take 10 bytes.  Use TYPE_SINT64 if negative
-                               // values are likely.
-    TYPE_UINT64         = 4;
-    TYPE_INT32          = 5;   // Not ZigZag encoded.  Negative numbers
-                               // take 10 bytes.  Use TYPE_SINT32 if negative
-                               // values are likely.
-    TYPE_FIXED64        = 6;
-    TYPE_FIXED32        = 7;
-    TYPE_BOOL           = 8;
-    TYPE_STRING         = 9;
-    TYPE_GROUP          = 10;  // Tag-delimited aggregate.
-    TYPE_MESSAGE        = 11;  // Length-delimited aggregate.
+    TYPE_DOUBLE = 1;
+    TYPE_FLOAT = 2;
+    TYPE_INT64 = 3; // Not ZigZag encoded.  Negative numbers
+    // take 10 bytes.  Use TYPE_SINT64 if negative
+    // values are likely.
+    TYPE_UINT64 = 4;
+    TYPE_INT32 = 5; // Not ZigZag encoded.  Negative numbers
+    // take 10 bytes.  Use TYPE_SINT32 if negative
+    // values are likely.
+    TYPE_FIXED64 = 6;
+    TYPE_FIXED32 = 7;
+    TYPE_BOOL = 8;
+    TYPE_STRING = 9;
+    TYPE_GROUP = 10; // Tag-delimited aggregate.
+    TYPE_MESSAGE = 11; // Length-delimited aggregate.
 
     // New in version 2.
-    TYPE_BYTES          = 12;
-    TYPE_UINT32         = 13;
-    TYPE_ENUM           = 14;
-    TYPE_SFIXED32       = 15;
-    TYPE_SFIXED64       = 16;
-    TYPE_SINT32         = 17;  // Uses ZigZag encoding.
-    TYPE_SINT64         = 18;  // Uses ZigZag encoding.
-  };
+    TYPE_BYTES = 12;
+    TYPE_UINT32 = 13;
+    TYPE_ENUM = 14;
+    TYPE_SFIXED32 = 15;
+    TYPE_SFIXED64 = 16;
+    TYPE_SINT32 = 17; // Uses ZigZag encoding.
+    TYPE_SINT64 = 18; // Uses ZigZag encoding.
+  }
+  ;
 
   enum Label {
     // 0 is reserved for errors
-    LABEL_OPTIONAL      = 1;
-    LABEL_REQUIRED      = 2;
-    LABEL_REPEATED      = 3;
+    LABEL_OPTIONAL = 1;
+    LABEL_REQUIRED = 2;
+    LABEL_REPEATED = 3;
     // TODO(sanjay): Should we add LABEL_MAP?
-  };
+  }
+  ;
 
   optional string name = 1;
   optional int32 number = 3;
@@ -250,22 +253,22 @@ message FileOptions {
   // named by java_outer_classname.  However, the outer class will still be
   // generated to contain the file's getDescriptor() method as well as any
   // top-level extensions defined in the file.
-  optional bool java_multiple_files = 10 [default=false];
+  optional bool java_multiple_files = 10 [default = false];
 
   // If set true, then the Java code generator will generate equals() and
   // hashCode() methods for all messages defined in the .proto file. This is
   // purely a speed optimization, as the AbstractMessage base class includes
   // reflection-based implementations of these methods.
-  optional bool java_generate_equals_and_hash = 20 [default=false];
+  optional bool java_generate_equals_and_hash = 20 [default = false];
 
   // Generated classes can be optimized for speed or code size.
   enum OptimizeMode {
-    SPEED = 1;        // Generate complete code for parsing, serialization,
-                      // etc.
-    CODE_SIZE = 2;    // Use ReflectionOps to implement these methods.
+    SPEED = 1; // Generate complete code for parsing, serialization,
+    // etc.
+    CODE_SIZE = 2; // Use ReflectionOps to implement these methods.
     LITE_RUNTIME = 3; // Generate code using MessageLite and the lite runtime.
   }
-  optional OptimizeMode optimize_for = 9 [default=SPEED];
+  optional OptimizeMode optimize_for = 9 [default = SPEED];
 
 
 
@@ -280,9 +283,9 @@ message FileOptions {
   // that generate code specific to your particular RPC system.  Therefore,
   // these default to false.  Old code which depends on generic services should
   // explicitly set them to true.
-  optional bool cc_generic_services = 16 [default=false];
-  optional bool java_generic_services = 17 [default=false];
-  optional bool py_generic_services = 18 [default=false];
+  optional bool cc_generic_services = 16 [default = false];
+  optional bool java_generic_services = 17 [default = false];
+  optional bool py_generic_services = 18 [default = false];
 
   // The parser stores options it doesn't recognize here. See above.
   repeated UninterpretedOption uninterpreted_option = 999;
@@ -310,12 +313,12 @@ message MessageOptions {
   //
   // Because this is an option, the above two restrictions are not enforced by
   // the protocol compiler.
-  optional bool message_set_wire_format = 1 [default=false];
+  optional bool message_set_wire_format = 1 [default = false];
 
   // Disables the generation of the standard "descriptor()" accessor, which can
   // conflict with a field of the same name.  This is meant to make migration
   // from proto1 easier; new code should avoid fields named "descriptor".
-  optional bool no_standard_descriptor_accessor = 2 [default=false];
+  optional bool no_standard_descriptor_accessor = 2 [default = false];
 
   // The parser stores options it doesn't recognize here. See above.
   repeated UninterpretedOption uninterpreted_option = 999;
@@ -349,7 +352,7 @@ message FieldOptions {
   // Depending on the target platform, this can emit Deprecated annotations
   // for accessors, or it will be completely ignored; in the very least, this
   // is a formalization for deprecating fields.
-  optional bool deprecated = 3 [default=false];
+  optional bool deprecated = 3 [default = false];
 
   // EXPERIMENTAL.  DO NOT USE.
   // For "map" fields, the name of the field in the enclosed type that
@@ -519,14 +522,14 @@ message SourceCodeInfo {
     //   [ 4, 3, 2, 7 ]
     // this path refers to the whole field declaration (from the beginning
     // of the label to the terminating semicolon).
-    repeated int32 path = 1 [packed=true];
+    repeated int32 path = 1 [packed = true];
 
     // Always has exactly three or four elements: start line, start column,
     // end line (optional, otherwise assumed same as start line), end column.
     // These are packed into a single field for efficiency.  Note that line
     // and column numbers are zero-based -- typically you will want to add
     // 1 to each before displaying to a user.
-    repeated int32 span = 2 [packed=true];
+    repeated int32 span = 2 [packed = true];
 
     // TODO(kenton):  Record comments appearing before and after the
     // declaration.

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -137,6 +137,7 @@ public enum VectorType {
 
   /**
    * Build R vector.
+   *
    * @param vvs
    * @param entities
    * @return
@@ -147,21 +148,20 @@ public enum VectorType {
     Iterable<Value> values = vvs.asVectorSource().getValues(entities);
     if(variable.isRepeatable()) {
       return asValueSequencesVector(variable, size, values);
-    } else
-      return asValuesVector(variable, size, values);
+    } else return asValuesVector(variable, size, values);
   }
 
   /**
    * Build a type specific R vector. Default behaviour is to check the variable if it defines categories
-   * 
+   *
    * @param size
    * @param values
    * @return
    */
   protected REXP asValuesVector(Variable variable, int size, Iterable<Value> values) {
     switch(VariableNature.getNature(variable)) {
-    case CATEGORICAL:
-      return asFactors(variable, size, values);
+      case CATEGORICAL:
+        return asFactors(variable, size, values);
     }
     return asContinuousVector(variable, size, values);
   }
@@ -172,6 +172,7 @@ public enum VectorType {
 
   /**
    * Build a list of R vectors.
+   *
    * @param size
    * @param values
    * @return
@@ -214,6 +215,7 @@ public enum VectorType {
 
   /**
    * Build a R vector of strings.
+   *
    * @param size
    * @param values
    * @return

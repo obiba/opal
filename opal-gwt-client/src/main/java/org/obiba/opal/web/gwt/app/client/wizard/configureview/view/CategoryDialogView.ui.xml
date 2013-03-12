@@ -1,18 +1,30 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+    ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <ui:style>
-    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
-    .right-aligned { float: right; }
-    .top-margin { margin-top: 0.5em; }
-    .inline {diplay: inline;}
+    .optionsPanelMsg td {
+      margin: 0.5em 0.5em 0.5em 0.5em;
+    }
+
+    .right-aligned {
+      float: right;
+    }
+
+    .top-margin {
+      margin-top: 0.5em;
+    }
+
+    .inline {
+      diplay: inline;
+    }
   </ui:style>
 
-  <g:DialogBox ui:field="dialog" addStyleNames="categoryDialog" autoHide="false" modal="true" height="15em" width="35em">
+  <g:DialogBox ui:field="dialog" addStyleNames="categoryDialog" autoHide="false" modal="true" height="15em"
+      width="35em">
     <g:caption>
-      <ui:msg description="Add new category title" >Add New Category</ui:msg>
+      <ui:msg description="Add new category title">Add New Category</ui:msg>
     </g:caption>
     <g:DockLayoutPanel unit="EM" height="16em" width="35em">
       <g:center>
@@ -20,16 +32,25 @@
           <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
             <table class="gwt-KeyValue full-width" cellspacing="10">
               <tr>
-                <td><ui:msg description="Name label">Name</ui:msg>:</td>
-                <td><g:TextBox ui:field="categoryName" addStyleNames="not-so-full-width"/></td>
+                <td><ui:msg description="Name label">Name</ui:msg>:
+                </td>
+                <td>
+                  <g:TextBox ui:field="categoryName" addStyleNames="not-so-full-width"/>
+                </td>
               </tr>
               <tr>
-                <td><ui:msg description="Missing label">Missing</ui:msg>:</td>
-                <td><g:CheckBox ui:field="isMissing"/></td>
+                <td><ui:msg description="Missing label">Missing</ui:msg>:
+                </td>
+                <td>
+                  <g:CheckBox ui:field="isMissing"/>
+                </td>
               </tr>
               <tr>
-                <td valign="top"><ui:msg description="Label label">Label</ui:msg>:</td>
-                <td><g:SimplePanel ui:field="simplePanel"/></td>
+                <td valign="top"><ui:msg description="Label label">Label</ui:msg>:
+                </td>
+                <td>
+                  <g:SimplePanel ui:field="simplePanel"/>
+                </td>
               </tr>
             </table>
           </g:HTMLPanel>
@@ -46,7 +67,7 @@
             </g:Button>
           </span>
         </g:HTMLPanel>
-      </g:south> 
+      </g:south>
     </g:DockLayoutPanel>
   </g:DialogBox>
 

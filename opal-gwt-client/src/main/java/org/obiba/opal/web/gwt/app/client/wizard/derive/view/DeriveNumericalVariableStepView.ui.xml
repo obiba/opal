@@ -1,160 +1,191 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-  xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
-  
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
   <ui:style>
     .space {
-    	margin: 0 5px;
+      margin: 0 5px;
     }
   </ui:style>
 
   <g:FlowPanel>
-     <o:WizardStep ui:field="methodStep">
+    <o:WizardStep ui:field="methodStep">
       <o:HorizontalTabLayout ui:field="tabs" addStyleNames="top-margin">
-        <g:Anchor><ui:msg description="Options title">Options</ui:msg></g:Anchor>
+        <g:Anchor>
+          <ui:msg description="Options title">Options</ui:msg>
+        </g:Anchor>
         <g:FlowPanel>
-      
+
           <g:FlowPanel styleName="input">
-          <g:RadioButton name="method" ui:field="rangeRadio">
-            <ui:msg description="Group by ranges of values label">Group by ranges of values</ui:msg>
-          </g:RadioButton>
-          <g:Label addStyleNames="small-top-margin indent">
-            <ui:msg description="Range mapping description label">Each range of values will be mapped to a category.</ui:msg>
-          </g:Label>
-          
-          <g:Grid>
-            <g:row>
-              <g:customCell styleName="top">
-              <g:FlowPanel styleName="input block">
-                <g:Label addStyleNames="key"><ui:msg description="Value limits label">Value limits</ui:msg></g:Label>
-                <g:FlowPanel>
-                  <g:FlowPanel addStyleNames="inline">
-                    <o:NumericTextBox ui:field="fromBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
-                    <g:Label styleName="help-block"><ui:msg description="From label">From</ui:msg></g:Label>  
-                  </g:FlowPanel>
-                  <g:FlowPanel addStyleNames="inline">
-                    <o:NumericTextBox ui:field="toBox" width="6em" minConstrained="false" maxConstrained="false"></o:NumericTextBox>
-                    <g:Label styleName="help-block"><ui:msg description="To label">To</ui:msg></g:Label>
-                  </g:FlowPanel>
-                </g:FlowPanel>
-              </g:FlowPanel>
-              </g:customCell>
-            
-              <g:customCell styleName="top">
-              <g:FlowPanel styleName="input block">
-                <g:Label addStyleNames="key"><ui:msg description="Ranges definition label">Ranges definition</ui:msg></g:Label>
-                <g:Grid>
-                  <g:row>
-                    <g:customCell>
-                      <g:RadioButton name="range" ui:field="lengthRadio">
-                        <ui:msg description="Ranges length label">Ranges length</ui:msg>
-                      </g:RadioButton>
-                    </g:customCell>
-                    <g:customCell>
-                      <o:NumericTextBox ui:field="lengthBox" width="6em" value="10" maxConstrained="false"></o:NumericTextBox>
-                    </g:customCell>
-                  </g:row>
-                  <g:row>
-                    <g:customCell>
-                      <g:RadioButton name="range" ui:field="countRadio">
-                        <ui:msg description="Number of ranges label">Number of ranges</ui:msg>
-                      </g:RadioButton>
-                    </g:customCell>
-                    <g:customCell>
-                      <o:NumericTextBox ui:field="countBox" width="6em" value="10" maxConstrained="false"></o:NumericTextBox>
-                    </g:customCell>
-                  </g:row>
-                </g:Grid>
-              </g:FlowPanel>                        
-              </g:customCell>
-            </g:row>
-            </g:Grid>
-           </g:FlowPanel>
-        
-           <g:FlowPanel styleName="input">
-             <g:RadioButton name="method" ui:field="discreteRadio">
-               <ui:msg description="Map discrete values label">Map discrete values</ui:msg>
-             </g:RadioButton>
-             <g:Label addStyleNames="small-top-margin indent">
-               <ui:msg description="Discrete value mapping description label">Each value will be mapped to a category.</ui:msg>
-             </g:Label>
-           </g:FlowPanel>
-           
-           <g:FlowPanel styleName="input">
-      	     <g:RadioButton name="method" ui:field="manualRadio"><ui:msg description="Manually label">Manually</ui:msg></g:RadioButton>
-      	     <g:Label addStyleNames="small-top-margin indent">
-               <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
-             </g:Label>
-           </g:FlowPanel>
-      
-         </g:FlowPanel>
-         
-         <g:Anchor><ui:msg description="Summary tab title">Summary</ui:msg></g:Anchor>
-         <g:SimplePanel ui:field="summary" width="100%" />
-       </o:HorizontalTabLayout>
-     </o:WizardStep>
-     <o:WizardStep ui:field="mapStep">
-      <g:FlowPanel>
-         <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
-           <g:customHeader>
-             <g:Label><ui:msg description="Add Value Mapping label">Add a value mapping</ui:msg></g:Label>
-            </g:customHeader>
-   
+            <g:RadioButton name="method" ui:field="rangeRadio">
+              <ui:msg description="Group by ranges of values label">Group by ranges of values</ui:msg>
+            </g:RadioButton>
+            <g:Label addStyleNames="small-top-margin indent">
+              <ui:msg description="Range mapping description label">Each range of values will be mapped to a category.
+              </ui:msg>
+            </g:Label>
+
             <g:Grid>
               <g:row>
                 <g:customCell styleName="top">
                   <g:FlowPanel styleName="input block">
-                    <g:Label addStyleNames="key"><ui:msg description="Original Value label">Original Value</ui:msg></g:Label>
+                    <g:Label addStyleNames="key">
+                      <ui:msg description="Value limits label">Value limits</ui:msg>
+                    </g:Label>
+                    <g:FlowPanel>
+                      <g:FlowPanel addStyleNames="inline">
+                        <o:NumericTextBox ui:field="fromBox" width="6em" minConstrained="false"
+                            maxConstrained="false"></o:NumericTextBox>
+                        <g:Label styleName="help-block">
+                          <ui:msg description="From label">From</ui:msg>
+                        </g:Label>
+                      </g:FlowPanel>
+                      <g:FlowPanel addStyleNames="inline">
+                        <o:NumericTextBox ui:field="toBox" width="6em" minConstrained="false"
+                            maxConstrained="false"></o:NumericTextBox>
+                        <g:Label styleName="help-block">
+                          <ui:msg description="To label">To</ui:msg>
+                        </g:Label>
+                      </g:FlowPanel>
+                    </g:FlowPanel>
+                  </g:FlowPanel>
+                </g:customCell>
+
+                <g:customCell styleName="top">
+                  <g:FlowPanel styleName="input block">
+                    <g:Label addStyleNames="key">
+                      <ui:msg description="Ranges definition label">Ranges definition</ui:msg>
+                    </g:Label>
                     <g:Grid>
                       <g:row>
                         <g:customCell>
-                          <g:RadioButton name="add" ui:field="addRangeRadio">
-                            <ui:msg description="Range label">Range</ui:msg>
+                          <g:RadioButton name="range" ui:field="lengthRadio">
+                            <ui:msg description="Ranges length label">Ranges length</ui:msg>
                           </g:RadioButton>
                         </g:customCell>
                         <g:customCell>
-                          <g:HorizontalPanel>
-                              <o:NumericTextBox ui:field="addFromBox" width="6em" minConstrained="false" maxConstrained="false"/>
-                              <g:InlineLabel addStyleNames="{style.space}">-</g:InlineLabel>
-                              <o:NumericTextBox ui:field="addToBox" width="6em" minConstrained="false" maxConstrained="false"/>
-                          </g:HorizontalPanel>
+                          <o:NumericTextBox ui:field="lengthBox" width="6em" value="10"
+                              maxConstrained="false"></o:NumericTextBox>
                         </g:customCell>
                       </g:row>
                       <g:row>
                         <g:customCell>
-                          <g:RadioButton name="add" ui:field="addDiscreteRadio">
-                            <ui:msg description="Value label">Value</ui:msg>
+                          <g:RadioButton name="range" ui:field="countRadio">
+                            <ui:msg description="Number of ranges label">Number of ranges</ui:msg>
                           </g:RadioButton>
                         </g:customCell>
                         <g:customCell>
-                          <o:NumericTextBox ui:field="valueBox" width="8em" enabled="false" minConstrained="false" maxConstrained="false"/>
+                          <o:NumericTextBox ui:field="countBox" width="6em" value="10"
+                              maxConstrained="false"></o:NumericTextBox>
                         </g:customCell>
                       </g:row>
                     </g:Grid>
-                  </g:FlowPanel>        
-                </g:customCell>
-                <g:customCell styleName="top small-indent">
-                  <g:FlowPanel styleName="input block">
-                    <g:Label addStyleNames="key"><ui:msg description="New Value label">New Value</ui:msg></g:Label>
-                    <g:TextBox ui:field="newValueBox" width="8em"/>
-                  </g:FlowPanel>        
-                </g:customCell>
-              </g:row>
-              <g:row>
-                <g:customCell>
-                  <g:Button styleName="btn btn-info" ui:field="addButton"><ui:msg description="Add label">Add</ui:msg></g:Button>      
+                  </g:FlowPanel>
                 </g:customCell>
               </g:row>
             </g:Grid>
-                  
-         </g:DisclosurePanel>
+          </g:FlowPanel>
+
+          <g:FlowPanel styleName="input">
+            <g:RadioButton name="method" ui:field="discreteRadio">
+              <ui:msg description="Map discrete values label">Map discrete values</ui:msg>
+            </g:RadioButton>
+            <g:Label addStyleNames="small-top-margin indent">
+              <ui:msg description="Discrete value mapping description label">Each value will be mapped to a category.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+
+          <g:FlowPanel styleName="input">
+            <g:RadioButton name="method" ui:field="manualRadio">
+              <ui:msg description="Manually label">Manually</ui:msg>
+            </g:RadioButton>
+            <g:Label addStyleNames="small-top-margin indent">
+              <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+
+        </g:FlowPanel>
+
+        <g:Anchor>
+          <ui:msg description="Summary tab title">Summary</ui:msg>
+        </g:Anchor>
+        <g:SimplePanel ui:field="summary" width="100%"/>
+      </o:HorizontalTabLayout>
+    </o:WizardStep>
+    <o:WizardStep ui:field="mapStep">
+      <g:FlowPanel>
+        <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
+          <g:customHeader>
+            <g:Label>
+              <ui:msg description="Add Value Mapping label">Add a value mapping</ui:msg>
+            </g:Label>
+          </g:customHeader>
+
+          <g:Grid>
+            <g:row>
+              <g:customCell styleName="top">
+                <g:FlowPanel styleName="input block">
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="Original Value label">Original Value</ui:msg>
+                  </g:Label>
+                  <g:Grid>
+                    <g:row>
+                      <g:customCell>
+                        <g:RadioButton name="add" ui:field="addRangeRadio">
+                          <ui:msg description="Range label">Range</ui:msg>
+                        </g:RadioButton>
+                      </g:customCell>
+                      <g:customCell>
+                        <g:HorizontalPanel>
+                          <o:NumericTextBox ui:field="addFromBox" width="6em" minConstrained="false"
+                              maxConstrained="false"/>
+                          <g:InlineLabel addStyleNames="{style.space}">-</g:InlineLabel>
+                          <o:NumericTextBox ui:field="addToBox" width="6em" minConstrained="false"
+                              maxConstrained="false"/>
+                        </g:HorizontalPanel>
+                      </g:customCell>
+                    </g:row>
+                    <g:row>
+                      <g:customCell>
+                        <g:RadioButton name="add" ui:field="addDiscreteRadio">
+                          <ui:msg description="Value label">Value</ui:msg>
+                        </g:RadioButton>
+                      </g:customCell>
+                      <g:customCell>
+                        <o:NumericTextBox ui:field="valueBox" width="8em" enabled="false" minConstrained="false"
+                            maxConstrained="false"/>
+                      </g:customCell>
+                    </g:row>
+                  </g:Grid>
+                </g:FlowPanel>
+              </g:customCell>
+              <g:customCell styleName="top small-indent">
+                <g:FlowPanel styleName="input block">
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="New Value label">New Value</ui:msg>
+                  </g:Label>
+                  <g:TextBox ui:field="newValueBox" width="8em"/>
+                </g:FlowPanel>
+              </g:customCell>
+            </g:row>
+            <g:row>
+              <g:customCell>
+                <g:Button styleName="btn btn-info" ui:field="addButton">
+                  <ui:msg description="Add label">Add</ui:msg>
+                </g:Button>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+
+        </g:DisclosurePanel>
         <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="100" addStyleNames="top-margin"/>
       </g:FlowPanel>
-     </o:WizardStep>
+    </o:WizardStep>
   </g:FlowPanel>
-  
+
 </ui:UiBinder>

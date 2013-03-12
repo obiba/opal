@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2012(c) OBiBa. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,7 +19,8 @@ import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 @SuppressWarnings("rawtypes")
-public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Proxy<? extends SplitPaneWorkbenchPresenter>> extends Presenter<D, P> {
+public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Proxy<? extends SplitPaneWorkbenchPresenter>>
+    extends Presenter<D, P> {
 
   public enum Slot {
     CENTER, LEFT;

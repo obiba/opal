@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -58,13 +58,16 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   private Cache<Subject, Collection<Permission>> rolePermissionCache;
 
   @Autowired
-  public SpatialRealm(SubjectAclService subjectAclService, SubjectPermissionsConverterRegistry subjectPermissionsConverterRegistry) {
+  public SpatialRealm(SubjectAclService subjectAclService,
+      SubjectPermissionsConverterRegistry subjectPermissionsConverterRegistry) {
     super();
     if(subjectAclService == null) throw new IllegalArgumentException("subjectAclService cannot be null");
     this.subjectAclService = subjectAclService;
     this.subjectPermissionsConverterRegistry = subjectPermissionsConverterRegistry;
 
-    super.setPermissionResolver(new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(), new SingleSpaceRelationProvider(new NodeRelationProvider())));
+    super.setPermissionResolver(
+        new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(),
+            new SingleSpaceRelationProvider(new NodeRelationProvider())));
     rolePermissionResolver = new GroupPermissionResolver();
   }
 
@@ -96,13 +99,13 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   /**
    * Overriden because the OpalSecurityManager sets {@code this} as the {@code RolePermissionResolver} on all configured
    * realms. This results the following object graph:
-   * 
+   * <p/>
    * <pre>
    * AuthorizingReam.rolePermissionResolver -> SpatialRealm (this)
    *      ^
    *      |
    * SpatialRealm.rolePermissionResolver -> GroupPermissionResolver
-   * 
+   *
    * <pre>
    * By overriding this method, we prevent an infinite loop from occurring when
    * {@code getRolePermissionResolver().resolvePermissionsInRole()} is called.
@@ -177,22 +180,23 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
     }
 
     private Collection<Permission> doGetGroupPermissions(Subject group) {
-      return ImmutableList.copyOf(Iterables.transform(loadSubjectPermissions(group), new Function<String, Permission>() {
+      return ImmutableList
+          .copyOf(Iterables.transform(loadSubjectPermissions(group), new Function<String, Permission>() {
 
-        @Override
-        public Permission apply(String from) {
-          return getPermissionResolver().resolvePermission(from);
-        }
-      }));
+            @Override
+            public Permission apply(String from) {
+              return getPermissionResolver().resolvePermission(from);
+            }
+          }));
     }
 
   }
 
   /**
    * Overriden to make plural form resources part of non-plural form resources.
-   * <p>
+   * <p/>
    * That is, this space considers plural form sub-resources as related to non-plural form sub-resources:
-   * 
+   * <p/>
    * <pre>
    * /parent/kids
    * /parent/kid/1
@@ -227,7 +231,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
     /**
      * Returns true when lhs is the plural form of rhs (or vice-versa), that is their node element text is identical
      * except for an additional 's' in the other node.
-     * 
+     *
      * @param lhs
      * @param rhs
      */

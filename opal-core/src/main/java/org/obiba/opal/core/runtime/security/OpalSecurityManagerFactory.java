@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -45,7 +45,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
   private SecurityManager securityManager;
 
   @Autowired
-  public OpalSecurityManagerFactory(Set<Realm> securityRealms, Set<SessionListener> sessionListeners, RolePermissionResolver rolePermissionResolver) {
+  public OpalSecurityManagerFactory(Set<Realm> securityRealms, Set<SessionListener> sessionListeners,
+      RolePermissionResolver rolePermissionResolver) {
     this.realms = securityRealms;
     this.sessionListeners = sessionListeners;
     this.rolePermissionResolver = rolePermissionResolver;
@@ -109,7 +110,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
     @Override
     protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, SecurityManager securityManager) {
-      super.applyRealmsToSecurityManager(ImmutableList.<Realm> builder().addAll(realms).addAll(shiroRealms).build(), securityManager);
+      super.applyRealmsToSecurityManager(ImmutableList.<Realm>builder().addAll(realms).addAll(shiroRealms).build(),
+          securityManager);
     }
 
     @Override

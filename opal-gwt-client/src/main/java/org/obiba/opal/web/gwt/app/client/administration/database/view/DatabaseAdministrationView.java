@@ -41,8 +41,7 @@ import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.
 public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdministrationPresenter.Display {
 
   @UiTemplate("DatabaseAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DatabaseAdministrationView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, DatabaseAdministrationView> {}
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -68,9 +67,9 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   ActionsColumn<JdbcDataSourceDto> actionsColumn = new ActionsColumn<JdbcDataSourceDto>(
       new ActionsProvider<JdbcDataSourceDto>() {
 
-        private final String[] all = new String[] {TEST_ACTION, EDIT_ACTION, DELETE_ACTION};
+        private final String[] all = new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
 
-        private final String[] immutable = new String[] {TEST_ACTION};
+        private final String[] immutable = new String[] { TEST_ACTION };
 
         @Override
         public String[] allActions() {

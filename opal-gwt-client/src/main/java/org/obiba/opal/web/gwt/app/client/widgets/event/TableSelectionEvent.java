@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -75,13 +75,13 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
 
   /**
    * Get the first selected table.
+   *
    * @return null if none
    */
   public TableDto getSelectedTable() {
     if(selectedTables != null && selectedTables.size() > 0) {
       return selectedTables.get(0);
-    } else
-      return null;
+    } else return null;
   }
 
   //

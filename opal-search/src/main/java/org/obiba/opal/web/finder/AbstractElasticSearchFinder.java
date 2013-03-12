@@ -14,8 +14,8 @@ import org.obiba.opal.search.service.OpalSearchService;
 /**
  *
  */
-public abstract class AbstractElasticSearchFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
-    AbstractFinder<TQuery, TResult> {
+public abstract class AbstractElasticSearchFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>>
+    extends AbstractFinder<TQuery, TResult> {
 
   private final OpalSearchService opalSearchService;
 

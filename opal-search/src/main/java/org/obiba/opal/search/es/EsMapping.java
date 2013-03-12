@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -33,7 +33,7 @@ class EsMapping {
 
   EsMapping(String name) throws IOException {
     this.name = name;
-    mapping = Maps.<String, Object> newHashMap();
+    mapping = Maps.<String, Object>newHashMap();
   }
 
   XContentBuilder toXContent() throws IOException {
@@ -68,7 +68,7 @@ class EsMapping {
   private Map<String, Object> newIfAbsent(Map<String, Object> map, String key) {
     Map<String, Object> inner = (Map<String, Object>) map.get(key);
     if(inner == null) {
-      inner = Maps.<String, Object> newHashMap();
+      inner = Maps.<String, Object>newHashMap();
       map.put(key, inner);
     }
     return inner;

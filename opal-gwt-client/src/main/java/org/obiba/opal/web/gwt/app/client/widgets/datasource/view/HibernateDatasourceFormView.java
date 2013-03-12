@@ -18,7 +18,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -29,8 +28,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class HibernateDatasourceFormView extends ViewImpl implements HibernateDatasourceFormPresenter.Display {
 
   @UiTemplate("HibernateDatasourceFormView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, HibernateDatasourceFormView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, HibernateDatasourceFormView> {}
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 

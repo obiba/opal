@@ -1,10 +1,9 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <ui:style>
     .resizable-s {
@@ -13,11 +12,14 @@
     }
   </ui:style>
 
-  <g:PopupPanel ui:field="dialog" autoHideEnabled="true" modal="true" animationEnabled="false" addStyleNames="notification alert">
+  <g:PopupPanel ui:field="dialog" autoHideEnabled="true" modal="true" animationEnabled="false"
+      addStyleNames="notification alert">
     <g:DockLayoutPanel ui:field="contentLayout" unit="PX" height="100px" width="300px">
       <g:north size="20">
         <g:HTMLPanel addStyleNames="header">
-          <g:InlineLabel ui:field="caption"><ui:msg description="Error dialog title">Errors</ui:msg></g:InlineLabel>
+          <g:InlineLabel ui:field="caption">
+            <ui:msg description="Error dialog title">Errors</ui:msg>
+          </g:InlineLabel>
           <g:Anchor ui:field="okay" addStyleNames="close">x</g:Anchor>
         </g:HTMLPanel>
       </g:north>
@@ -27,9 +29,10 @@
         </g:ScrollPanel>
       </g:center>
       <g:south size="9">
-        <o:ResizeHandle ui:field="resizeHandleSouth" resizeDirection="SOUTH" addStyleNames="{style.resizable-s}">=</o:ResizeHandle>
-      </g:south>     
-    </g:DockLayoutPanel> 
+        <o:ResizeHandle ui:field="resizeHandleSouth" resizeDirection="SOUTH" addStyleNames="{style.resizable-s}">=
+        </o:ResizeHandle>
+      </g:south>
+    </g:DockLayoutPanel>
   </g:PopupPanel>
 
 </ui:UiBinder>

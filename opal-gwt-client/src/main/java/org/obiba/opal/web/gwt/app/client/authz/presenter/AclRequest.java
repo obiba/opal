@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -19,7 +19,6 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
@@ -63,33 +62,37 @@ public class AclRequest {
   }
 
   public void add(final Subject subject) {
-    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + resource + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType() + "&perm=" + action.getName()).post()//
-    .withCallback(new ResourceCallback<Acl>() {
+    ResourceRequestBuilderFactory.<Acl>newBuilder().forResource(
+        "/authz" + resource + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType() + "&perm=" +
+            action.getName()).post()//
+        .withCallback(new ResourceCallback<Acl>() {
 
-      @Override
-      public void onResource(Response response, Acl acl) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          aclAddCallback.onAdd(acl);
-        } else {
-          aclAddCallback.onAddFailed(response, subject, resource, action);
-        }
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, Acl acl) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              aclAddCallback.onAdd(acl);
+            } else {
+              aclAddCallback.onAddFailed(response, subject, resource, action);
+            }
+          }
+        }).send();
   }
 
   public void delete(final Subject subject) {
-    ResourceRequestBuilderFactory.<Acl> newBuilder().forResource("/authz" + resource + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType() + "&perm=" + action.getName()).delete()//
-    .withCallback(new ResourceCallback<Acl>() {
+    ResourceRequestBuilderFactory.<Acl>newBuilder().forResource(
+        "/authz" + resource + "?subject=" + subject.getPrincipal() + "&type=" + subject.getType() + "&perm=" +
+            action.getName()).delete()//
+        .withCallback(new ResourceCallback<Acl>() {
 
-      @Override
-      public void onResource(Response response, Acl resource) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          aclDeleteCallback.onDelete(subject);
-        } else {
-          aclDeleteCallback.onDeleteFailed(response, subject);
-        }
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, Acl resource) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              aclDeleteCallback.onDelete(subject);
+            } else {
+              aclDeleteCallback.onDeleteFailed(response, subject);
+            }
+          }
+        }).send();
   }
 
   public boolean hasPermission(Acls acls) {

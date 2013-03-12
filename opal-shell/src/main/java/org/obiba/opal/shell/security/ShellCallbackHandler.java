@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -28,7 +28,7 @@ import org.obiba.opal.shell.OpalShellHolder;
  * <p>
  * OpalShell-based <code>CallbackHandler</code>.
  * </p>
- * 
+ * <p/>
  * <p>
  * Supports
  * <ul>
@@ -61,7 +61,7 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
 
   /**
    * Handles the specified callbacks.
-   * 
+   *
    * @param callbacks the callbacks to handle
    * @throws IOException if a console is not available
    * @throws UnsupportedCallbackException if a callback is of a type not supported (only <code>TextInputCallback</code>
@@ -95,7 +95,8 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
       if(cacheablePasswordCallback.isConfirmationPrompt()) {
         cacheablePasswordCallback.setPassword(promptAndConfirmPassword(cacheablePasswordCallback));
       } else {
-        cacheablePasswordCallback.setPassword(getCurrentShell().passwordPrompt(" %s", cacheablePasswordCallback.getPrompt()));
+        cacheablePasswordCallback
+            .setPassword(getCurrentShell().passwordPrompt(" %s", cacheablePasswordCallback.getPrompt()));
       }
       passwordCache.put(passwordKey, cacheablePasswordCallback.getPassword());
     }

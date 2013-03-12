@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -46,7 +46,8 @@ public class Dtos {
   }
 
   public static ReportTemplateDto asDto(ReportTemplate reportTemplate) {
-    ReportTemplateDto.Builder dtoBuilder = ReportTemplateDto.newBuilder().setName(reportTemplate.getName()).setDesign(reportTemplate.getDesign()).setFormat(reportTemplate.getFormat());
+    ReportTemplateDto.Builder dtoBuilder = ReportTemplateDto.newBuilder().setName(reportTemplate.getName())
+        .setDesign(reportTemplate.getDesign()).setFormat(reportTemplate.getFormat());
     for(Map.Entry<String, String> param : reportTemplate.getParameters().entrySet()) {
       dtoBuilder.addParameters(ParameterDto.newBuilder().setKey(param.getKey()).setValue(param.getValue()));
     }

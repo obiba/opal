@@ -15,11 +15,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class UnhandledResponseNotificationView extends PopupViewImpl implements
-    UnhandledResponseNotificationPresenter.Display {
+public class UnhandledResponseNotificationView extends PopupViewImpl
+    implements UnhandledResponseNotificationPresenter.Display {
   @UiTemplate("UnhandledResponseNotificationView.ui.xml")
-  interface UnhandledResponseNotificationViewUiBinder extends UiBinder<Widget, UnhandledResponseNotificationView> {
-  }
+  interface UnhandledResponseNotificationViewUiBinder extends UiBinder<Widget, UnhandledResponseNotificationView> {}
 
   private static UnhandledResponseNotificationViewUiBinder uiBinder = GWT
       .create(UnhandledResponseNotificationViewUiBinder.class);

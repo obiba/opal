@@ -1,8 +1,5 @@
 package org.obiba.opal.core.runtime.upgrade;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
@@ -14,6 +11,9 @@ import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.opal.core.cfg.OpalViewPersistenceStrategy;
 
 import com.google.common.collect.ImmutableSet;
+
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 public class ViewsUpgrade_1_4_0Test {
 
@@ -36,10 +36,10 @@ public class ViewsUpgrade_1_4_0Test {
   @After
   public void tearDown() throws Exception {
     // Delete view files.
-    viewPersistenceStrategy.writeViews("starbucks", ImmutableSet.<View> of());
-    viewPersistenceStrategy.writeViews("two words", ImmutableSet.<View> of());
-    viewPersistenceStrategy.writeViews("robin", ImmutableSet.<View> of());
-    viewPersistenceStrategy.writeViews("dylan", ImmutableSet.<View> of());
+    viewPersistenceStrategy.writeViews("starbucks", ImmutableSet.<View>of());
+    viewPersistenceStrategy.writeViews("two words", ImmutableSet.<View>of());
+    viewPersistenceStrategy.writeViews("robin", ImmutableSet.<View>of());
+    viewPersistenceStrategy.writeViews("dylan", ImmutableSet.<View>of());
     workingOpalConfigFile.delete();
   }
 

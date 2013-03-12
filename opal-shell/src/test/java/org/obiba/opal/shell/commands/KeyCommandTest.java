@@ -1,18 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -36,6 +31,11 @@ import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.KeyCommandOptions;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+
 /**
  * Unit tests for {@link KeyCommand}.
  */
@@ -44,7 +44,8 @@ public class KeyCommandTest {
   // Constants
   //
 
-  private static final String[] CERTIFICATE_INFO = { "Bob Friendly", "Department of Bob", "Bob Inc.", "Montreal", "Quebec", "CA" };
+  private static final String[] CERTIFICATE_INFO = { "Bob Friendly", "Department of Bob", "Bob Inc.", "Montreal",
+      "Quebec", "CA" };
 
   //
   // Test Methods
@@ -61,7 +62,8 @@ public class KeyCommandTest {
 
     UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
     expect(mockUnitKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
-    mockUnitKeyStoreService.createOrUpdateKey("my-unit", "my-alias", "RSA", 2048, getCertificateInfoAsString(CERTIFICATE_INFO));
+    mockUnitKeyStoreService
+        .createOrUpdateKey("my-unit", "my-alias", "RSA", 2048, getCertificateInfoAsString(CERTIFICATE_INFO));
     expectLastCall().atLeastOnce();
 
     replay(mockOptions, mockRuntime, mockShell, mockUnitService, mockUnitKeyStoreService);
@@ -98,7 +100,8 @@ public class KeyCommandTest {
 
   @Test
   public void testImportActionImportsKey() throws FileSystemException {
-    KeyCommandOptions mockOptions = createMockOptionsForImportAction("my-unit", "my-alias", "private.pem", "certificate.pem");
+    KeyCommandOptions mockOptions = createMockOptionsForImportAction("my-unit", "my-alias", "private.pem",
+        "certificate.pem");
 
     FileObject privateFile = createMockFile("private.pem", true, true);
     FileObject certificateFile = createMockFile("certificate.pem", true, true);
@@ -121,7 +124,8 @@ public class KeyCommandTest {
     mockUnitKeyStoreService.importKey("my-unit", "my-alias", privateFile, certificateFile);
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockUnitKeyStoreService, mockUnitService);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockUnitKeyStoreService,
+        mockUnitService);
 
     KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
@@ -151,7 +155,8 @@ public class KeyCommandTest {
 
     UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
     expect(mockUnitKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
-    expect(mockUnitKeyStoreService.getOrCreateUnitKeyStore("my-unit")).andReturn(new UnitKeyStore("my-unit", getKeyStore())).atLeastOnce();
+    expect(mockUnitKeyStoreService.getOrCreateUnitKeyStore("my-unit"))
+        .andReturn(new UnitKeyStore("my-unit", getKeyStore())).atLeastOnce();
 
     FunctionalUnit unit = new FunctionalUnit("my-unit", null);
     unit.setUnitKeyStoreService(mockUnitKeyStoreService);
@@ -160,7 +165,8 @@ public class KeyCommandTest {
     OpalRuntime mockRuntime = createMockRuntime();
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, certificateFile, mockFileContent, mockRuntime, mockShell, mockUnitKeyStoreService, mockUnitService);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, certificateFile, mockFileContent, mockRuntime, mockShell,
+        mockUnitKeyStoreService, mockUnitService);
 
     KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
@@ -192,7 +198,8 @@ public class KeyCommandTest {
     };
   }
 
-  private KeyCommandOptions createMockOptionsForCreateAction(String unitName, String alias, String algorithm, int size) {
+  private KeyCommandOptions createMockOptionsForCreateAction(String unitName, String alias, String algorithm,
+      int size) {
     KeyCommandOptions mockOptions = createMock(KeyCommandOptions.class);
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
@@ -239,7 +246,8 @@ public class KeyCommandTest {
     expect(mockShell.prompt("  [Unknown]:  ")).andReturn(CERTIFICATE_INFO[4]);
     mockShell.printf(" %s\n", "What is the two-letter country code for this unit?");
     expect(mockShell.prompt("  [Unknown]:  ")).andReturn(CERTIFICATE_INFO[5]);
-    mockShell.printf(" %s\n", "Is CN=Bob Friendly, OU=Department of Bob, O=Bob Inc., L=Montreal, ST=Quebec, C=CA correct?");
+    mockShell
+        .printf(" %s\n", "Is CN=Bob Friendly, OU=Department of Bob, O=Bob Inc., L=Montreal, ST=Quebec, C=CA correct?");
     expect(mockShell.prompt("  [no]:  ")).andReturn("yes");
     mockShell.printf("Key generated with alias '%s'.\n", alias);
 
@@ -282,7 +290,8 @@ public class KeyCommandTest {
     return mockShell;
   }
 
-  private KeyCommandOptions createMockOptionsForImportAction(String unitName, String alias, String privateFile, String certificateFile) {
+  private KeyCommandOptions createMockOptionsForImportAction(String unitName, String alias, String privateFile,
+      String certificateFile) {
     KeyCommandOptions mockOptions = createMock(KeyCommandOptions.class);
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();

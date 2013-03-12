@@ -25,7 +25,6 @@ import org.obiba.magma.VectorSource;
 import org.obiba.magma.support.NullTimestamps;
 import org.obiba.magma.support.Values;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.web.math.CategoricalSummaryStatisticsResource;
 import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 

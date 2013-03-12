@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 
+import org.obiba.opal.shell.AbstractOpalShell;
+import org.obiba.opal.shell.CommandRegistry;
+
 import jline.ConsoleReader;
 import jline.Terminal;
 import jline.UnixTerminal;
-
-import org.obiba.opal.shell.AbstractOpalShell;
-import org.obiba.opal.shell.CommandRegistry;
 
 /**
  * Implements {@code OpalShell} using {@code JLine}

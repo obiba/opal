@@ -1,35 +1,61 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .title { font-size: small; margin-right: 1em; }
-    .title-light { color: gray; font-size: small; }
-    .plot { float:left;margin-right:2em }
-    .details { min-width: 8em; }
+    .title {
+      font-size: small;
+      margin-right: 1em;
+    }
+
+    .title-light {
+      color: gray;
+      font-size: small;
+    }
+
+    .plot {
+      float: left;
+      margin-right: 2em
+    }
+
+    .details {
+      min-width: 8em;
+    }
   </ui:style>
 
   <g:HTMLPanel>
     <table>
       <tr>
-        <td class="{style.title-light}"><ui:msg description="N (number of observations)">N</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="obs">N</g:Label></td>
-        <td class="{style.title-light}"><ui:msg description="Mode">Mode</ui:msg>:</td>
-        <td><g:Label addStyleNames="small-indent {style.title}" ui:field="mode">mode</g:Label></td>
+        <td class="{style.title-light}"><ui:msg description="N (number of observations)">N</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="obs">N</g:Label>
+        </td>
+        <td class="{style.title-light}"><ui:msg description="Mode">Mode</ui:msg>:
+        </td>
+        <td>
+          <g:Label addStyleNames="small-indent {style.title}" ui:field="mode">mode</g:Label>
+        </td>
       </tr>
     </table>
     <g:DisclosurePanel ui:field="details" addStyleNames="full-width">
       <g:customHeader>
-        <g:Label><ui:msg description="Details label">Details</ui:msg></g:Label>
+        <g:Label>
+          <ui:msg description="Details label">Details</ui:msg>
+        </g:Label>
       </g:customHeader>
       <g:FlowPanel>
         <g:Grid ui:field="grid">
           <g:row>
             <g:customCell styleName="top {style.details}">
-              <g:Label addStyleNames="key"><ui:msg description="Category label">Category</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Category label">Category</ui:msg>
+              </g:Label>
             </g:customCell>
             <g:customCell styleName="top {style.details}">
-              <g:Label addStyleNames="key"><ui:msg description="Frequency label">Frequency</ui:msg></g:Label>
+              <g:Label addStyleNames="key">
+                <ui:msg description="Frequency label">Frequency</ui:msg>
+              </g:Label>
             </g:customCell>
             <g:customCell styleName="top {style.details}">
               <g:Label addStyleNames="key">%</g:Label>

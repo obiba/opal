@@ -9,14 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.DataTabPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -33,13 +30,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
-import com.watopi.chosen.client.gwt.ChosenListBox;
 
 public class DataTabView extends Composite implements DataTabPresenter.Display {
 
   @UiTemplate("DataTabView.ui.xml")
-  interface myUiBinder extends UiBinder<Widget, DataTabView> {
-  }
+  interface myUiBinder extends UiBinder<Widget, DataTabView> {}
 
   private static myUiBinder uiBinder = GWT.create(myUiBinder.class);
 

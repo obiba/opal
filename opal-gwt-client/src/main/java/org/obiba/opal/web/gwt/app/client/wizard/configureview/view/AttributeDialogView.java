@@ -102,7 +102,7 @@ public class AttributeDialogView extends Composite implements AttributeDialogPre
     return saveButton;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public HasCloseHandlers getDialog() {
     return dialog;

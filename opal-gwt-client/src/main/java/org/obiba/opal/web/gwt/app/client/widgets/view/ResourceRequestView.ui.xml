@@ -1,33 +1,35 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
-    
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
   <ui:style>
     .resource-name {
-    	display: inline;
-    	margin-left: 3em;
-    	margin-top: 1em;
-    	vertical-align: middle;
-    	width: 90%;
+      display: inline;
+      margin-left: 3em;
+      margin-top: 1em;
+      vertical-align: middle;
+      width: 90%;
     }
+
     .request-status {
-    	display: inline;
-    	margin-left: 1.5em;
-    	vertical-align: middle;
+      display: inline;
+      margin-left: 1.5em;
+      vertical-align: middle;
     }
+
     .error-message {
-        color:red;
-        display: inline;
-        padding-left:1em;
-    }    
+      color: red;
+      display: inline;
+      padding-left: 1em;
+    }
   </ui:style>
-  
+
   <g:HTMLPanel>
     <span>
       <g:Anchor ui:field="resourceName" addStyleNames="{style.resource-name}">Resource</g:Anchor>
       <g:Image ui:field="requestStatus" addStyleNames="{style.request-status}"></g:Image>
-      <g:Label ui:field="errorMessage" addStyleNames="{style.error-message}"/>      
+      <g:Label ui:field="errorMessage" addStyleNames="{style.error-message}"/>
     </span>
   </g:HTMLPanel>
-  
+
 </ui:UiBinder>

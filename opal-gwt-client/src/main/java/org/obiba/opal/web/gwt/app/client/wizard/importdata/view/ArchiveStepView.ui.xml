@@ -1,21 +1,26 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel>
-      <g:Label><ui:msg description="Archive files label">Once a file has been successfully imported:</ui:msg></g:Label>
+      <g:Label>
+        <ui:msg description="Archive files label">Once a file has been successfully imported:</ui:msg>
+      </g:Label>
       <g:FlowPanel styleName="input">
-        <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true" addStyleNames="small-indent"><ui:msg description="Leave file label">leave it where it is</ui:msg></g:RadioButton>
+        <g:RadioButton name="archiveGroup" ui:field="archiveLeave" checked="true" addStyleNames="small-indent">
+          <ui:msg description="Leave file label">leave it where it is</ui:msg>
+        </g:RadioButton>
       </g:FlowPanel>
       <g:FlowPanel styleName="input">
-        <g:RadioButton name="archiveGroup" ui:field="archiveMove" addStyleNames="small-indent"><ui:msg description="Move file label">move it to another folder</ui:msg>:</g:RadioButton>
+        <g:RadioButton name="archiveGroup" ui:field="archiveMove" addStyleNames="small-indent"><ui:msg
+            description="Move file label">move it to another folder</ui:msg>:
+        </g:RadioButton>
         <g:SimplePanel ui:field="archivePanel" addStyleNames="small-top-margin indent"/>
       </g:FlowPanel>
     </g:FlowPanel>
-  </g:FlowPanel>    
-  
+  </g:FlowPanel>
+
 </ui:UiBinder>

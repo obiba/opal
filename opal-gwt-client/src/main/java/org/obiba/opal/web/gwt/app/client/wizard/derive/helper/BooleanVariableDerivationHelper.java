@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -28,8 +28,10 @@ public class BooleanVariableDerivationHelper extends DerivationHelper {
   @Override
   protected void initializeValueMapEntries() {
     valueMapEntries = new ArrayList<ValueMapEntry>();
-    valueMapEntries.add(ValueMapEntry.fromDistinct(Boolean.TRUE.toString()).label(translations.trueLabel()).newValue("1").build());
-    valueMapEntries.add(ValueMapEntry.fromDistinct(Boolean.FALSE.toString()).label(translations.falseLabel()).newValue("0").build());
+    valueMapEntries
+        .add(ValueMapEntry.fromDistinct(Boolean.TRUE.toString()).label(translations.trueLabel()).newValue("1").build());
+    valueMapEntries.add(
+        ValueMapEntry.fromDistinct(Boolean.FALSE.toString()).label(translations.falseLabel()).newValue("0").build());
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).build());
   }
 

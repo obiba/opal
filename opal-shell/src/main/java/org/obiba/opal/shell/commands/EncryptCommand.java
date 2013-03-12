@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -35,7 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Command to decrypt an Onyx data file.
  */
-@CommandUsage(description = "Decrypts one or more Onyx data files.", syntax = "Syntax: decrypt [--unit NAME] [--out FILE] _FILE_...")
+@CommandUsage(description = "Decrypts one or more Onyx data files.",
+    syntax = "Syntax: decrypt [--unit NAME] [--out FILE] _FILE_...")
 public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptCommandOptions> {
 
   public static final String DECRYPT_DATASOURCE_NAME = "decrypt-datasource";
@@ -100,7 +101,8 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
       @Override
       public PublicKey getPublicKey(Datasource datasource) throws NoSuchKeyException {
         try {
-          return keystoreService.getUnitKeyStore(options.getUnit()).getKeyStore().getCertificate(options.getAlias()).getPublicKey();
+          return keystoreService.getUnitKeyStore(options.getUnit()).getKeyStore().getCertificate(options.getAlias())
+              .getPublicKey();
         } catch(KeyStoreException e) {
           throw new MagmaCryptRuntimeException(e);
         } catch(NoSuchFunctionalUnitException e) {
@@ -133,10 +135,10 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
 
   /**
    * Given the name/path of a directory, returns that directory (creating it if necessary).
-   * 
+   *
    * @param outputDirPath the name/path of the directory.
    * @return the directory, as a <code>FileObject</code> object (or <code>null</code> if the directory could not be
-   * created.
+   *         created.
    */
   private FileObject getOutputDir(String outputDirPath) {
     FileObject outputDir = null;

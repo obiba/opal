@@ -12,20 +12,6 @@ package org.obiba.opal.web.gwt.app.client.unit.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -43,6 +29,21 @@ import org.obiba.opal.web.model.client.opal.KeyType;
 import org.obiba.opal.web.model.client.opal.PrivateKeyForm;
 import org.obiba.opal.web.model.client.opal.PublicKeyForm;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogPresenter.Display> {
 
@@ -151,9 +152,8 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
         CreateKeyPairCallBack callbackHandler = new CreateKeyPairCallBack(form);
         UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "keys");
         ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).post()
-            .withResourceBody(KeyForm.stringify(form))
-            .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
-            .send();
+            .withResourceBody(KeyForm.stringify(form)).withCallback(Response.SC_CREATED, callbackHandler)
+            .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
       }
 
     }));

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -42,7 +42,8 @@ public class AbstractProtobufProvider {
   }
 
   @SuppressWarnings("unchecked")
-  protected Class<Message> extractMessageType(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+  protected Class<Message> extractMessageType(Class<?> type, Type genericType, Annotation[] annotations,
+      MediaType mediaType) {
     if(isWrapped(type, genericType, annotations, mediaType)) {
       return Types.getCollectionBaseType(type, genericType);
     } else {
@@ -65,9 +66,9 @@ public class AbstractProtobufProvider {
    * <li>{@code sortField} : the name of the field to sort on</li>
    * <li>{@code sortDir} : the direction (ASC or DESC)</li>
    * </ul>
-   * 
+   * <p/>
    * This method does nothing if the {@code sortField} parameter is missing.
-   * 
+   *
    * @param messageType the type of {@code Message} to sort
    * @param msgs the {@code Iterable} to sort
    * @return sorted {@code Iterable} or the original instance untouched when the sort parameters are missing or invalid
@@ -79,12 +80,15 @@ public class AbstractProtobufProvider {
 
     String fieldName = query.getFirst("sortField");
     if(Strings.isNullOrEmpty(fieldName)) return msgs;
-    SortDir sortDir = Strings.isNullOrEmpty(query.getFirst("sortDir")) ? SortDir.ASC : SortDir.valueOf(query.getFirst("sortDir"));
+    SortDir sortDir = Strings.isNullOrEmpty(query.getFirst("sortDir"))
+        ? SortDir.ASC
+        : SortDir.valueOf(query.getFirst("sortDir"));
 
     return sortMessages(protobuf().descriptors().forMessage(messageType), msgs, fieldName, sortDir);
   }
 
-  private Iterable<Message> sortMessages(Descriptor descriptor, Iterable<Message> msgs, final String field, SortDir sortDir) {
+  private Iterable<Message> sortMessages(Descriptor descriptor, Iterable<Message> msgs, final String field,
+      SortDir sortDir) {
     Preconditions.checkNotNull(sortDir);
     Preconditions.checkNotNull(field);
 
@@ -93,8 +97,8 @@ public class AbstractProtobufProvider {
     if(sortField.isRepeated()) return msgs;
     // Can't sort on complex types
     switch(sortField.getJavaType()) {
-    case MESSAGE:
-      return msgs;
+      case MESSAGE:
+        return msgs;
     }
 
     // Default ordering is natural order with null values last
@@ -103,7 +107,8 @@ public class AbstractProtobufProvider {
     return sortMessages(msgs, sortField, ordering);
   }
 
-  private Iterable<Message> sortMessages(Iterable<Message> msgs, final FieldDescriptor field, final Ordering<Comparable<?>> ordering) {
+  private Iterable<Message> sortMessages(Iterable<Message> msgs, final FieldDescriptor field,
+      final Ordering<Comparable<?>> ordering) {
     return ordering.onResultOf(new Function<Message, Comparable<?>>() {
       @Override
       public Comparable<?> apply(Message input) {

@@ -9,12 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security.support;
 
-import java.util.List;
-
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**

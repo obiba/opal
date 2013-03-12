@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -42,13 +42,13 @@ public class NormalProbabilityPlot extends JqPlot {
     plotData.push(getXequalsY());
     plotData.push(data);
     JavaScriptObject p = JsonUtils.unsafeEval("{" + //
-    "  title:'Normal Probability Plot'," + //
-    "  axesDefaults:{pad:0, min:" + min + ", max:" + max + "}," + //
-    "  series:[" + //
-    "    {showMarker:false}," + //
-    "    {showLine:false, markerOptions:{style:'x'}}" + //
-    "  ]" + // 
-    "}");
+        "  title:'Normal Probability Plot'," + //
+        "  axesDefaults:{pad:0, min:" + min + ", max:" + max + "}," + //
+        "  series:[" + //
+        "    {showMarker:false}," + //
+        "    {showLine:false, markerOptions:{style:'x'}}" + //
+        "  ]" + //
+        "}");
 
     plot(plotData, p);
   }

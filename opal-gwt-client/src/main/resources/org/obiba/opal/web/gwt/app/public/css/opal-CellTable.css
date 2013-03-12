@@ -2,10 +2,17 @@
   border-bottom: 1px solid #B4A291;
 }
 
-.cellTableLastColumnFooter{}
-.cellTableFirstColumnFooter{}
-.cellTableLastColumnHeader{}
-.cellTableLoading{}
+.cellTableLastColumnFooter {
+}
+
+.cellTableFirstColumnFooter {
+}
+
+.cellTableLastColumnHeader {
+}
+
+.cellTableLoading {
+}
 
 .cellTableHeader {
   background-color: #F3F4EB;
@@ -19,21 +26,22 @@
   text-align: left;
 }
 
-.cellTableFirstColumnHeader{}
+.cellTableFirstColumnHeader {
+}
 
-.cellTableFooter{
+.cellTableFooter {
   border-top: 1px solid #B4A291;
 }
 
-.cellTableOddRow{
+.cellTableOddRow {
   background-color: #EEEEEE;
 }
 
-.cellTableOddRow .cellTableFirstColumn  {
+.cellTableOddRow .cellTableFirstColumn {
   background-color: #DDDDDD;
 }
 
-.cellTableEvenRow{
+.cellTableEvenRow {
   background-color: #FFFFFF;
 }
 
@@ -41,7 +49,8 @@
   background-color: #EEEEEE;
 }
 
-.cellTableHoveredRow{}
+.cellTableHoveredRow {
+}
 
 .cellTableSelectedRow, .cellTableSelectedRow .cellTableFirstColumn, .cellTableSelectedRow a {
   background-color: #B4A291;
@@ -56,27 +65,37 @@
   color: #DCDCDC;
 }
 
-.cellTableCell{
+.cellTableCell {
   padding: 4px 15px;
   height: 20px;
 }
 
-.cellTableFirstColumn{}
-.cellTableLastColumn{}
+.cellTableFirstColumn {
+}
 
-.cellTableSelectedRowCell{}
+.cellTableLastColumn {
+}
 
-.cellTableHoveredRowCell{}
+.cellTableSelectedRowCell {
+}
 
-.cellTableOddRowCell{}
+.cellTableHoveredRowCell {
+}
 
-.cellTableKeyboardSelectedRowCell{}
+.cellTableOddRowCell {
+}
 
- .cellTableEvenRowCell{}
- 
- .cellTableKeyboardSelectedCell{}
- 
- .cellTableKeyboardSelectedRow{}
+.cellTableKeyboardSelectedRowCell {
+}
+
+.cellTableEvenRowCell {
+}
+
+.cellTableKeyboardSelectedCell {
+}
+
+.cellTableKeyboardSelectedRow {
+}
 
 .cellTableOddRowCell div.progress, .cellTableEvenRowCell div.progress {
   margin-bottom: 0;
@@ -97,9 +116,13 @@
   background-color: #B1B1B1;
 }
 
-.cellTableSortedHeaderAscending{}
-.cellTableSortedHeaderDescending{}
-.cellTableSortableHeader{
+.cellTableSortedHeaderAscending {
+}
+
+.cellTableSortedHeaderDescending {
+}
+
+.cellTableSortableHeader {
   cursor: pointer;
   cursor: hand;
   text-decoration: underline;

@@ -1,2 +1,3 @@
 import "php.proto";
+
 import "__PROTO_FILE__.proto";

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -33,7 +33,8 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
-@CommandUsage(description = "Generate a report based on the specified report template.", syntax = "Syntax: report --name TEMPLATE")
+@CommandUsage(description = "Generate a report based on the specified report template.",
+    syntax = "Syntax: report --name TEMPLATE")
 public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCommandOptions> {
   //
   // Constants
@@ -43,7 +44,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   private static final String DATE_FORMAT_PATTERN = "yyyyMMdd_HHmm";
 
-  private static final Map<String, String> formatFileExtension = ImmutableMap.of("HTML", "html", "PDF", "pdf", "EXCEL", "xls");
+  private static final Map<String, String> formatFileExtension = ImmutableMap
+      .of("HTML", "html", "PDF", "pdf", "EXCEL", "xls");
 
   //
   // Instance Variables
@@ -85,7 +87,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       FileObject reportOutput = getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate);
       return renderAndSendEmail(reportTemplate, reportOutput);
     } catch(FileSystemException e) {
-      getShell().printf("Cannot create report output: '/reports/%s/%s'", reportTemplateName, getReportFileName(reportTemplateName, reportTemplate.getFormat(), reportDate));
+      getShell().printf("Cannot create report output: '/reports/%s/%s'", reportTemplateName,
+          getReportFileName(reportTemplateName, reportTemplate.getFormat(), reportDate));
       return 1;
     }
 
@@ -118,7 +121,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   private int renderAndSendEmail(ReportTemplate reportTemplate, FileObject reportOutput) throws FileSystemException {
     try {
-      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(), getLocalFile(getReportDesign(reportTemplate.getDesign())).getPath(), getLocalFile(reportOutput).getPath());
+      reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(),
+          getLocalFile(getReportDesign(reportTemplate.getDesign())).getPath(), getLocalFile(reportOutput).getPath());
     } catch(ReportException ex) {
       getShell().printf("Error rendering report: '%s'\n", ex.getMessage());
       deleteFileSilently(reportOutput);
@@ -136,7 +140,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     return getFile(reportDesign);
   }
 
-  private FileObject getReportOutput(String reportTemplateName, String reportFormat, Date reportDate) throws FileSystemException {
+  private FileObject getReportOutput(String reportTemplateName, String reportFormat, Date reportDate)
+      throws FileSystemException {
     String reportFileName = getReportFileName(reportTemplateName, reportFormat, reportDate);
 
     FileObject reportDir = getFile("/reports/" + reportTemplateName);
@@ -149,7 +154,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   private String getReportFileName(String reportTemplateName, String reportFormat, Date reportDate) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
     String reportDateText = dateFormat.format(reportDate);
-    return String.format("%s-%s.%s", reportTemplateName, reportDateText, formatFileExtension.get(reportFormat.toUpperCase()));
+    return String
+        .format("%s-%s.%s", reportTemplateName, reportDateText, formatFileExtension.get(reportFormat.toUpperCase()));
   }
 
   private void deleteFileSilently(FileObject file) {
@@ -184,14 +190,16 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   private String getEmailNotificationText(String reportTemplateName, FileObject reportOutput) {
     Map<String, String> model = new HashMap<String, String>();
     model.put("report_template", reportTemplateName);
-    model.put("report_public_link", opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput));
+    model.put("report_public_link",
+        opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput));
 
     return getMergedVelocityTemplate(model);
   }
 
   @VisibleForTesting
   String getMergedVelocityTemplate(Map<String, String> model) {
-    return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "velocity/opal-reporting/report-email-notification.vm", model);
+    return VelocityEngineUtils
+        .mergeTemplateIntoString(velocityEngine, "velocity/opal-reporting/report-email-notification.vm", model);
   }
 
   @VisibleForTesting

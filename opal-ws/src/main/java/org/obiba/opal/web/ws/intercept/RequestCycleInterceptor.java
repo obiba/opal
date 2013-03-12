@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -45,7 +45,8 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
   private final List<RequestCyclePostProcess> postProcesses;
 
   @Autowired
-  public RequestCycleInterceptor(RequestAttributesProvider provider, Set<RequestCyclePreProcess> preProcesses, Set<RequestCyclePostProcess> postProcesses) {
+  public RequestCycleInterceptor(RequestAttributesProvider provider, Set<RequestCyclePreProcess> preProcesses,
+      Set<RequestCyclePostProcess> postProcesses) {
     this.requestAttributesProvider = provider;
     this.preProcesses = new ArrayList<RequestCyclePreProcess>(preProcesses);
     this.postProcesses = new ArrayList<RequestCyclePostProcess>(postProcesses);
@@ -78,7 +79,8 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
   }
 
   RequestCycle getCurrentCycle() {
-    return (RequestCycle) requestAttributesProvider.currentRequestAttributes().getAttribute(REQ_ATTR, RequestAttributes.SCOPE_REQUEST);
+    return (RequestCycle) requestAttributesProvider.currentRequestAttributes()
+        .getAttribute(REQ_ATTR, RequestAttributes.SCOPE_REQUEST);
   }
 
   private final class RequestCycle {
@@ -90,7 +92,8 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
     private RequestCycle(HttpRequest request, ResourceMethod method) {
       this.request = request;
       this.resourceMethod = method;
-      requestAttributesProvider.currentRequestAttributes().setAttribute(REQ_ATTR, this, RequestAttributes.SCOPE_REQUEST);
+      requestAttributesProvider.currentRequestAttributes()
+          .setAttribute(REQ_ATTR, this, RequestAttributes.SCOPE_REQUEST);
     }
 
   }

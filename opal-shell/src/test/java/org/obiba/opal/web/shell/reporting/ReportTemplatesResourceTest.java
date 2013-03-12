@@ -1,27 +1,19 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.shell.reporting;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
-
-import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -39,6 +31,14 @@ import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.reporting.Dtos;
 
 import com.google.common.collect.Maps;
+
+import junit.framework.Assert;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 public class ReportTemplatesResourceTest {
 
@@ -84,7 +84,8 @@ public class ReportTemplatesResourceTest {
   public void testGetReportTemplates_RetrieveSetOfTemplates() {
     replay(opalConfigurationServiceMock);
 
-    ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
+    ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource(opalConfigurationServiceMock,
+        commandSchedulerServiceMock, commandRegistry);
     Set<ReportTemplateDto> reportTemplatesDtos = reportTemplateResource.getReportTemplates();
 
     Assert.assertEquals(4, reportTemplates.size());
@@ -118,7 +119,8 @@ public class ReportTemplatesResourceTest {
 
     replay(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
 
-    ReportTemplatesResource reportTemplatesResource = new ReportTemplatesResource(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
+    ReportTemplatesResource reportTemplatesResource = new ReportTemplatesResource(opalConfigurationServiceMock,
+        commandSchedulerServiceMock, commandRegistry);
     Response response = reportTemplatesResource.createReportTemplate(Dtos.asDto(getReportTemplate("template9")));
 
     Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());

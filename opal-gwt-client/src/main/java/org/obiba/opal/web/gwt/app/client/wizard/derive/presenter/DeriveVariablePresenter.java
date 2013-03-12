@@ -97,7 +97,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   private String destinationView;
 
   @Inject
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters"})
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public DeriveVariablePresenter(EventBus eventBus, Display view, Translations translations,
       DeriveTemporalVariableStepPresenter temporalPresenter, //
       DeriveCategoricalVariableStepPresenter categoricalPresenter, //
@@ -207,8 +207,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       public boolean apply() {
         VariableDto originalVariable = deriveFromVariablePresenter.getOriginalVariable();
         String valueType = originalVariable.getValueType();
-        return hasCategories(originalVariable) && ("text".equals(valueType) || "integer"
-            .equals(valueType) && allCategoriesMissing(originalVariable) == false);
+        return hasCategories(originalVariable) && ("text".equals(valueType) ||
+            "integer".equals(valueType) && allCategoriesMissing(originalVariable) == false);
       }
     });
   }
@@ -401,12 +401,12 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     @SuppressWarnings("AssignmentToNull")
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(viewCreationConfirmation != null && event.getSource().equals(viewCreationConfirmation) && event
-          .isConfirmed()) {
+      if(viewCreationConfirmation != null && event.getSource().equals(viewCreationConfirmation) &&
+          event.isConfirmed()) {
         viewCreationConfirmation.run();
         viewCreationConfirmation = null;
-      } else if(overwriteConfirmation != null && event.getSource().equals(overwriteConfirmation) && event
-          .isConfirmed()) {
+      } else if(overwriteConfirmation != null && event.getSource().equals(overwriteConfirmation) &&
+          event.isConfirmed()) {
         overwriteConfirmation.run();
         overwriteConfirmation = null;
       }

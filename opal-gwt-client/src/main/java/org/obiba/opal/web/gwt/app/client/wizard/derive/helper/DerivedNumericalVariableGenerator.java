@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -26,7 +26,8 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
 
   private final Map<ValueMapEntry, Range<N>> entryRangeMap;
 
-  public DerivedNumericalVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries, Map<ValueMapEntry, Range<N>> entryRangeMap) {
+  public DerivedNumericalVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries,
+      Map<ValueMapEntry, Range<N>> entryRangeMap) {
     super(originalVariable, valueMapEntries);
     this.entryRangeMap = entryRangeMap;
   }
@@ -114,8 +115,8 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
     scriptBuilder.append(".map({");
     boolean first = true;
     for(ValueMapEntry entry : valueMapEntries) {
-      if(entry.getType() == ValueMapEntryType.CATEGORY_NAME || entry
-          .getType() == ValueMapEntryType.DISTINCT_VALUE || entry.getType() == ValueMapEntryType.RANGE) {
+      if(entry.getType() == ValueMapEntryType.CATEGORY_NAME || entry.getType() == ValueMapEntryType.DISTINCT_VALUE ||
+          entry.getType() == ValueMapEntryType.RANGE) {
         if(first) {
           first = false;
         } else {

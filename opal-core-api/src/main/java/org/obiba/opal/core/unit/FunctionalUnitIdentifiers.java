@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -97,7 +97,8 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
       {
         TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
         if(identifiersTable.hasVariable(unit.getKeyVariableName())) {
-          this.unitIdentifiers = identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource().getValues(opalEntities).iterator();
+          this.unitIdentifiers = identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource()
+              .getValues(opalEntities).iterator();
         } else {
           // Make sure not to loop on iterators reuturned by this method call, or an infinite loop will happen
           this.unitIdentifiers = Iterables.cycle(TextType.get().nullValue()).iterator();

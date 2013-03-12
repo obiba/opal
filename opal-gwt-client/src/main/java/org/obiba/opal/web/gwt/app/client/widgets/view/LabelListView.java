@@ -67,7 +67,7 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
     this.useTextArea = useTextArea;
   }
 
-  @SuppressWarnings({"PMD.NcssMethodCount", "OverlyLongMethod"})
+  @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   @Override
   public void setLanguages(JsArray<LocaleDto> languages) {
     int nbLanguages = languages.length();
@@ -128,8 +128,8 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
     JsArray<AttributeDto> nonNullAttributes = JsArrays.toSafeArray(attributes);
     for(int i = 0; i < nonNullAttributes.length(); i++) {
       AttributeDto dto = nonNullAttributes.get(i);
-      if(Objects.equal(safeNamespace, dto.getNamespace()) && Objects.equal(name, dto.getName()) && languageLabelMap
-          .containsKey(dto.getLocale())) {
+      if(Objects.equal(safeNamespace, dto.getNamespace()) && Objects.equal(name, dto.getName()) &&
+          languageLabelMap.containsKey(dto.getLocale())) {
         TextBoxBase textBox = languageLabelMap.get(dto.getLocale());
         textBox.setValue(dto.getValue());
       }

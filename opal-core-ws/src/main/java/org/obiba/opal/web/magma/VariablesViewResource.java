@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -50,12 +50,14 @@ public class VariablesViewResource extends VariablesResource {
       } else if(viewManager != null || viewDtos == null) {
         vw = addOrUpdateViewVariables(variables);
       } else {
-        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView")).build();
+        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView"))
+            .build();
       }
 
       return Response.ok().build();
     } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
     } finally {
       StreamUtil.silentSafeClose(vw);
     }

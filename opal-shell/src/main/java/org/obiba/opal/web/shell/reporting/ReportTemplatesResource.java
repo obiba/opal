@@ -73,8 +73,8 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
 
   @POST
   public Response createReportTemplate(ReportTemplateDto reportTemplateDto) {
-    if(reportTemplateDto == null || reportTemplateDto.getName().isEmpty() || reportTemplateExists(
-        reportTemplateDto.getName())) {
+    if(reportTemplateDto == null || reportTemplateDto.getName().isEmpty() ||
+        reportTemplateExists(reportTemplateDto.getName())) {
       return Response.status(Status.BAD_REQUEST).build();
     }
 

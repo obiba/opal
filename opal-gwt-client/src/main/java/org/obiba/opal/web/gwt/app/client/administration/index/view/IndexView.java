@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.model.client.opal.Day;
@@ -30,7 +29,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -43,8 +41,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
 
   @UiTemplate("IndexView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, IndexView> {
-  }
+  interface ViewUiBinder extends UiBinder<DialogBox, IndexView> {}
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -186,16 +183,16 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
       if(i < 10) {
         h += "0";
       }
-      hour.addItem(h + i + ":00", i +":0");
-      hour.addItem(h + i + ":15", i +":15");
-      hour.addItem(h + i + ":30", i +":30");
-      hour.addItem(h + i + ":45", i +":45");
+      hour.addItem(h + i + ":00", i + ":0");
+      hour.addItem(h + i + ":15", i + ":15");
+      hour.addItem(h + i + ":30", i + ":30");
+      hour.addItem(h + i + ":45", i + ":45");
     }
     hour.setWidth("80px");
   }
 
   private void initMinutesWidget() {
-    for(int i = 0; i < 60; i=i+5) {
+    for(int i = 0; i < 60; i = i + 5) {
       String m = "";
       if(i < 10) {
         m += "0";
@@ -210,10 +207,10 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
     String typeValue = type.getSelectedValue();
     on.setVisible(typeValue.equals(ScheduleType.WEEKLY.getName()));
     day.setVisible(on.isVisible());
-    at.setVisible(typeValue.equals(ScheduleType.HOURLY.getName()) || typeValue.equals(ScheduleType.DAILY.getName())
-        || typeValue.equals(ScheduleType.WEEKLY.getName()));
-    hour.setVisible(at.isVisible() && (typeValue.equals(ScheduleType.DAILY.getName())
-        || typeValue.equals(ScheduleType.WEEKLY.getName())));
+    at.setVisible(typeValue.equals(ScheduleType.HOURLY.getName()) || typeValue.equals(ScheduleType.DAILY.getName()) ||
+        typeValue.equals(ScheduleType.WEEKLY.getName()));
+    hour.setVisible(at.isVisible() &&
+        (typeValue.equals(ScheduleType.DAILY.getName()) || typeValue.equals(ScheduleType.WEEKLY.getName())));
     minutes.setVisible(at.isVisible() && typeValue.equals(ScheduleType.HOURLY.getName()));
   }
 

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -44,9 +44,11 @@ public class TemplateResource {
     URL templateURL = getClass().getResource("/META-INF/templates/" + templateFilename);
     if(templateURL != null) {
       String mimeType = mimeTypes.getContentType(new File(templateFilename));
-      return Response.ok(templateURL.getContent(), MediaType.valueOf(mimeType)).header("Content-Disposition", getContentDispositionOfAttachment(templateFilename)).build();
+      return Response.ok(templateURL.getContent(), MediaType.valueOf(mimeType))
+          .header("Content-Disposition", getContentDispositionOfAttachment(templateFilename)).build();
     } else {
-      return Response.status(Status.NOT_FOUND).entity("The template specified does not exist: " + templateFilename).build();
+      return Response.status(Status.NOT_FOUND).entity("The template specified does not exist: " + templateFilename)
+          .build();
     }
   }
 

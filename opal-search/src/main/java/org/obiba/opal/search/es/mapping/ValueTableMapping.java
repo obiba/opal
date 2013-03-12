@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -30,7 +30,8 @@ public class ValueTableMapping {
   public XContentBuilder createMapping(Version opalVersion, String name, ValueTable valueTable) {
     try {
       XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(name);
-      mapping.startObject("_all").field("enabled", false).endObject().startObject("_parent").field("type", valueTable.getEntityType()).endObject();
+      mapping.startObject("_all").field("enabled", false).endObject().startObject("_parent")
+          .field("type", valueTable.getEntityType()).endObject();
       mapping.startObject("properties");
       for(Variable variable : valueTable.getVariables()) {
         variableMappings.map(name, variable, mapping);
@@ -38,12 +39,12 @@ public class ValueTableMapping {
       mapping.endObject();// properties
 
       mapping.startObject("_meta")//
-      .field("_created", DateTimeType.get().valueOf(new Date()).toString())//
-      .field("_opalversion", opalVersion.toString())//
-      .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()).endObject();
+          .field("_created", DateTimeType.get().valueOf(new Date()).toString())//
+          .field("_opalversion", opalVersion.toString())//
+          .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()).endObject();
 
       mapping.endObject() // type
-      .endObject(); // mapping
+          .endObject(); // mapping
       return mapping;
     } catch(IOException e) {
       throw new RuntimeException(e);
@@ -57,7 +58,7 @@ public class ValueTableMapping {
       mapping.startObject("_meta").field("_updated", DateTimeType.get().valueOf(new Date()).toString()).endObject();
 
       mapping.endObject() // type
-      .endObject(); // mapping
+          .endObject(); // mapping
       return mapping;
     } catch(IOException e) {
       throw new RuntimeException(e);

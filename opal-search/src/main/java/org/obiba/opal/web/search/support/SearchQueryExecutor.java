@@ -19,21 +19,23 @@ public interface SearchQueryExecutor {
 
   /**
    * Execute a query terms search query.
+   *
    * @param indexManagerHelper
    * @param dtoQueries
    * @return
    * @throws JSONException
    */
-  Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
-      Search.QueryTermsDto dtoQueries) throws JSONException;
+  Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper, Search.QueryTermsDto dtoQueries)
+      throws JSONException;
 
   /**
    * Execute a query term search query.
+   *
    * @param indexManagerHelper
    * @param dtoQuery
    * @return
    * @throws JSONException
    */
-  Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
-      Search.QueryTermDto dtoQuery) throws JSONException;
+  Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper, Search.QueryTermDto dtoQuery)
+      throws JSONException;
 }

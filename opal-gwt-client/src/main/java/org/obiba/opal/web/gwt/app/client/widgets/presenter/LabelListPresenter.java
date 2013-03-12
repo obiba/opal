@@ -64,8 +64,8 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
           @Override
           public void onResource(Response response, JsArray<LocaleDto> resource) {
             @SuppressWarnings(
-                "unchecked") JsArray<LocaleDto> languages = resource == null ? (JsArray<LocaleDto>) JsArray
-                .createArray() : resource;
+                "unchecked")
+            JsArray<LocaleDto> languages = resource == null ? (JsArray<LocaleDto>) JsArray.createArray() : resource;
 
             // Add the 'no locale' locale to the list of locales.
             LocaleDto noLocaleDto = LocaleDto.create();

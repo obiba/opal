@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -38,21 +38,22 @@ public class FrequencyPlot extends JqPlot {
     JsArray<JsArrayNumber> plotData = JsArray.createArray().cast();
     plotData.push(this.data);
     JavaScriptObject p = JsonUtils.unsafeEval("{" + //
-    "  title:'Frequency Plot'," + //
-    "  seriesDefaults:{renderer:$wnd.jQuery.jqplot.BarRenderer,rendererOptions:{varyBarColor: true},pointLabels:{show:true,hideZeros:true,ypadding:3,edgeTolerance:-5}}," + //
-    "  axes:{" + //
-    "    xaxis:{" + //
-    "      tickRenderer: $wnd.jQuery.jqplot.CanvasAxisTickRenderer," + //
-    "      tickOptions: {angle: -30}," + //
-    "      renderer:$wnd.jQuery.jqplot.CategoryAxisRenderer," + // 
-    "      ticks:" + stringify(labels) + //
-    "    }," + //
-    "    yaxis:{" + //
-    "      min:0,max:100,pad:0," + // 
-    "      tickOptions:{formatString:'%d%%'} " + //
-    "    }" + //
-    "  } " + //
-    "}");
+        "  title:'Frequency Plot'," + //
+        "  seriesDefaults:{renderer:$wnd.jQuery.jqplot.BarRenderer,rendererOptions:{varyBarColor: true},pointLabels:{show:true,hideZeros:true,ypadding:3,edgeTolerance:-5}}," +
+        //
+        "  axes:{" + //
+        "    xaxis:{" + //
+        "      tickRenderer: $wnd.jQuery.jqplot.CanvasAxisTickRenderer," + //
+        "      tickOptions: {angle: -30}," + //
+        "      renderer:$wnd.jQuery.jqplot.CategoryAxisRenderer," + //
+        "      ticks:" + stringify(labels) + //
+        "    }," + //
+        "    yaxis:{" + //
+        "      min:0,max:100,pad:0," + //
+        "      tickOptions:{formatString:'%d%%'} " + //
+        "    }" + //
+        "  } " + //
+        "}");
     plot(plotData, p);
   }
 

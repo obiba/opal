@@ -59,8 +59,8 @@ public class AttributeDtos {
   public static AttributeDto findAttribute(Collection<AttributeDto> attributes, String namespace, String name,
       String value) {
     for(AttributeDto attribute : attributes) {
-      if(Objects.equal(namespace, attribute.getNamespace()) && Objects.equal(name, attribute.getName()) && Objects
-          .equal(value, attribute.getValue())) {
+      if(Objects.equal(namespace, attribute.getNamespace()) && Objects.equal(name, attribute.getName()) &&
+          Objects.equal(value, attribute.getValue())) {
         return attribute;
       }
     }

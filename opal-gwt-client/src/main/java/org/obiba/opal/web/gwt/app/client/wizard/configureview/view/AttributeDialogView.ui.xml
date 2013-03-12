@@ -7,31 +7,45 @@
     ui:generateLocales="default">
 
   <ui:style>
-    .optionsPanelMsg td { margin: 0.5em 0.5em 0.5em 0.5em; }
-    .right-aligned { float: right; }
+    .optionsPanelMsg td {
+      margin: 0.5em 0.5em 0.5em 0.5em;
+    }
+
+    .right-aligned {
+      float: right;
+    }
   </ui:style>
 
   <g:DialogBox ui:field="dialog" autoHide="false" modal="true" height="38em" width="45em">
     <g:caption>
-      <ui:msg description="Add new attribute title" >Add New Attribute</ui:msg>
+      <ui:msg description="Add new attribute title">Add New Attribute</ui:msg>
     </g:caption>
     <g:DockLayoutPanel unit="EM" height="38em" width="45em">
       <g:center>
-      <g:ScrollPanel>
-        <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
+        <g:ScrollPanel>
+          <g:HTMLPanel addStyleNames="main {style.optionsPanelMsg}">
             <table class="gwt-KeyValue full-width" cellspacing="10">
               <tbody>
                 <tr>
-                  <td valign="top"><ui:msg description="Namespace label">Namespace</ui:msg>:</td>
-                  <td><o:DropdownSuggestBox ui:field="namespaceBox"/></td>
+                  <td valign="top"><ui:msg description="Namespace label">Namespace</ui:msg>:
+                  </td>
+                  <td>
+                    <o:DropdownSuggestBox ui:field="namespaceBox"/>
+                  </td>
                 </tr>
                 <tr>
-                  <td valign="top"><ui:msg description="Name label">Name</ui:msg>:</td>
-                  <td><o:DropdownSuggestBox ui:field="nameBox"/></td>
+                  <td valign="top"><ui:msg description="Name label">Name</ui:msg>:
+                  </td>
+                  <td>
+                    <o:DropdownSuggestBox ui:field="nameBox"/>
+                  </td>
                 </tr>
                 <tr>
-                  <td valign="top"><ui:msg description="Value label">Value</ui:msg>:</td>
-                  <td><g:SimplePanel ui:field="simplePanel"/></td>
+                  <td valign="top"><ui:msg description="Value label">Value</ui:msg>:
+                  </td>
+                  <td>
+                    <g:SimplePanel ui:field="simplePanel"/>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -49,7 +63,7 @@
             </g:Button>
           </span>
         </g:HTMLPanel>
-      </g:south> 
+      </g:south>
     </g:DockLayoutPanel>
   </g:DialogBox>
 

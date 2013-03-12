@@ -141,8 +141,8 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
-  public Response uploadFile(@Context UriInfo uriInfo,
-      @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
+  public Response uploadFile(@Context UriInfo uriInfo, @Context HttpServletRequest request)
+      throws FileSystemException, FileUploadException {
     return uploadFile("/", uriInfo, request);
   }
 
@@ -174,8 +174,8 @@ public class FilesResource {
     return doUploadFile(folderPath, folder, uploadedFile, uriInfo);
   }
 
-  private Response doUploadFile(String folderPath, FileObject folder, FileItem uploadedFile,
-      UriInfo uriInfo) throws FileSystemException {
+  private Response doUploadFile(String folderPath, FileObject folder, FileItem uploadedFile, UriInfo uriInfo)
+      throws FileSystemException {
     String fileName = uploadedFile.getName();
     FileObject file = folder.resolveFile(fileName);
     boolean overwrite = file.exists();
@@ -204,8 +204,8 @@ public class FilesResource {
   @POST
   @Path("/{path:.*}")
   @Consumes("text/plain")
-  public Response createFolder(@PathParam("path") String path, String folderName,
-      @Context UriInfo uriInfo) throws FileSystemException {
+  public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo)
+      throws FileSystemException {
     if(folderName == null || folderName.trim().length() == 0) return Response.status(Status.BAD_REQUEST).build();
 
     String folderPath = getPathOfFileToWrite(path);
@@ -303,7 +303,7 @@ public class FilesResource {
   @Path("/charsets/default")
   @NoAuthorization
   public Response getDefaultCharset() {
-    return Response.ok(new JSONArray(Arrays.asList(new String[] {defaultCharset})).toString()).build();
+    return Response.ok(new JSONArray(Arrays.asList(new String[] { defaultCharset })).toString()).build();
   }
 
   //
@@ -326,8 +326,8 @@ public class FilesResource {
     SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
     String folderName = folder.getName().getBaseName();
     File compressedFolder = new File(System.getProperty("java.io.tmpdir"),
-        (folderName.equals("") ? "filesystem" : folderName) + "_" + dateTimeFormatter
-            .format(System.currentTimeMillis()) + ".zip");
+        (folderName.equals("") ? "filesystem" : folderName) + "_" +
+            dateTimeFormatter.format(System.currentTimeMillis()) + ".zip");
     compressedFolder.deleteOnExit();
     String mimeType = mimeTypes.getContentType(compressedFolder);
 
@@ -378,8 +378,8 @@ public class FilesResource {
     return fileBuilder;
   }
 
-  private void addChildren(Opal.FileDto.Builder folderBuilder, FileObject parentFolder,
-      int level) throws FileSystemException {
+  private void addChildren(Opal.FileDto.Builder folderBuilder, FileObject parentFolder, int level)
+      throws FileSystemException {
     Opal.FileDto.Builder fileBuilder;
 
     // Get the children for the current folder (list of files & folders).

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -31,7 +31,8 @@ public final class TimestampedResponses {
     if(lastModified.isNull() == false) {
       Date d = (Date) lastModified.getValue();
       // Don't compare milliseconds because HTTP headers don't have that precision
-      Response.ResponseBuilder builder = request.evaluatePreconditions(new Date(d.getYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
+      Response.ResponseBuilder builder = request.evaluatePreconditions(
+          new Date(d.getYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
       if(builder != null) {
         // Hijack the normal flow.
         throw new UnsatisfiedPreconditionException(builder);

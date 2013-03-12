@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -64,7 +64,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
     for(DataShieldEnvironment environment : this.environments) {
       if(environment.getEnvironment() == env) return environment;
     }
-    DataShieldEnvironment e = new DataShieldEnvironment(env, Lists.<DataShieldMethod> newArrayList());
+    DataShieldEnvironment e = new DataShieldEnvironment(env, Lists.<DataShieldMethod>newArrayList());
     this.environments.add(e);
     return e;
   }

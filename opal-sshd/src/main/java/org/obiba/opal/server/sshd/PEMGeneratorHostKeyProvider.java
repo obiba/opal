@@ -31,7 +31,7 @@ import org.obiba.core.util.StreamUtil;
 
 /**
  * TODO Add javadoc
- * 
+ *
  * @author <a href="mailto:dev@mina.apache.org">Apache MINA SSHD Project</a>
  */
 public class PEMGeneratorHostKeyProvider extends AbstractGeneratorHostKeyProvider {

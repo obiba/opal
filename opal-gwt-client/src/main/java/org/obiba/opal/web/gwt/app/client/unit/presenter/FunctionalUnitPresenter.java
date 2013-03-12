@@ -32,8 +32,8 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class FunctionalUnitPresenter extends
-    SplitPaneWorkbenchPresenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
+public class FunctionalUnitPresenter
+    extends SplitPaneWorkbenchPresenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
 
   public interface Display extends View {
 
@@ -56,8 +56,7 @@ public class FunctionalUnitPresenter extends
 
   @ProxyStandard
   @NameToken(Places.units)
-  public interface Proxy extends ProxyPlace<FunctionalUnitPresenter> {
-  }
+  public interface Proxy extends ProxyPlace<FunctionalUnitPresenter> {}
 
   final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
 

@@ -1,20 +1,22 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel addStyleNames="input">
       <g:InlineLabel ui:field="typeLabel" addStyleNames="key"/>
       <g:SuggestBox ui:field="principal"/>
-      <g:Button ui:field="add" styleName="btn btn-primary xsmall-indent"><ui:msg description="Add button label">Add</ui:msg></g:Button>
+      <g:Button ui:field="add" styleName="btn btn-primary xsmall-indent">
+        <ui:msg description="Add button label">Add</ui:msg>
+      </g:Button>
     </g:FlowPanel>
     <g:FlowPanel addStyleNames="top-margin">
       <c:SimplePager ui:field="pager" location="CENTER"/>
-      <o:Table ui:field="table" addStyleNames="full-width" />
+      <o:Table ui:field="table" addStyleNames="full-width"/>
     </g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>

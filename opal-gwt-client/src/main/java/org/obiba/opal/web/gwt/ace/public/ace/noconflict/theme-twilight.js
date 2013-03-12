@@ -28,11 +28,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-ace.define('ace/theme/twilight', ['require', 'exports', 'module' , 'ace/lib/dom'], function(require, exports, module) {
+ace.define('ace/theme/twilight', ['require', 'exports', 'module' , 'ace/lib/dom'], function (require, exports, module) {
 
-exports.isDark = true;
-exports.cssClass = "ace-twilight";
-exports.cssText = ".ace-twilight .ace_gutter {\
+    exports.isDark = true;
+    exports.cssClass = "ace-twilight";
+    exports.cssText = ".ace-twilight .ace_gutter {\
 background: #232323;\
 color: #E2E2E2\
 }\
@@ -142,6 +142,6 @@ text-decoration: underline\
 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWMQERH5zzBz5sz/AA5EBAYqeZXWAAAAAElFTkSuQmCC) right repeat-y\
 }";
 
-var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+    var dom = require("../lib/dom");
+    dom.importCssString(exports.cssText, exports.cssClass);
 });

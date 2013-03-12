@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -57,6 +57,7 @@ public class CertificateInfo {
 
   /**
    * Builds Certificate attributes interactively with user.
+   *
    * @return the attributes as a String (e.g. CN=Administrator, OU=Bioinformatics, O=GQ, L=Montreal, ST=Quebec, C=CA)
    */
   public String getCertificateInfoAsString() {
@@ -86,7 +87,8 @@ public class CertificateInfo {
       if(answer != null && !answer.equals("")) {
         ans = answer;
       }
-    } while(!(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("no") || ans.equalsIgnoreCase("y") || ans.equalsIgnoreCase("n")));
+    } while(!(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("no") || ans.equalsIgnoreCase("y") ||
+        ans.equalsIgnoreCase("n")));
     if(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("y")) {
       return true;
     }

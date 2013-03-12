@@ -53,7 +53,8 @@ public class DatasourceParsingErrorPanel extends FlowPanel {
   private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
     List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
 
-    JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto.getExtension(ClientErrorDtoExtensions.errors);
+    JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto
+        .getExtension(ClientErrorDtoExtensions.errors);
     if(errors != null) {
       for(int i = 0; i < errors.length(); i++) {
         datasourceParsingErrors.add(errors.get(i));
@@ -67,7 +68,8 @@ public class DatasourceParsingErrorPanel extends FlowPanel {
     if(translations.datasourceParsingErrorMap().containsKey(dto.getKey()) == false) {
       return dto.getDefaultMessage();
     }
-    return TranslationsUtils.replaceArguments(translations.datasourceParsingErrorMap().get(dto.getKey()), dto.getArgumentsArray());
+    return TranslationsUtils
+        .replaceArguments(translations.datasourceParsingErrorMap().get(dto.getKey()), dto.getArgumentsArray());
   }
 
 }

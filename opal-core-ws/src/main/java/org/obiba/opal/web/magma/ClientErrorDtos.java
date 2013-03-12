@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -30,11 +30,14 @@ public class ClientErrorDtos {
   private static final Logger log = LoggerFactory.getLogger(ClientErrorDtos.class);
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus != null ? errorStatus : "");
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode())
+        .setStatus(errorStatus != null ? errorStatus : "");
   }
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, String... args) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus != null ? errorStatus : "").addAllArguments(args != null ? Arrays.asList(args) : Collections.<String> emptyList());
+    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode())
+        .setStatus(errorStatus != null ? errorStatus : "")
+        .addAllArguments(args != null ? Arrays.asList(args) : Collections.<String>emptyList());
   }
 
   public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, Exception e) {
@@ -58,7 +61,8 @@ public class ClientErrorDtos {
     return clientError;
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, DatasourceParsingException pe) {
+  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus,
+      DatasourceParsingException pe) {
     ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
     clientError.addArguments(pe.getMessage());
     // build a parsing error dto list
@@ -72,7 +76,8 @@ public class ClientErrorDtos {
     return clientError;
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, RhinoException exception) {
+  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus,
+      RhinoException exception) {
     ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
     clientError.addArguments(exception.getMessage());
     clientError.addExtension(JavaScriptErrorDto.errors, newJavaScriptErrorDto(exception).build());
@@ -92,9 +97,9 @@ public class ClientErrorDtos {
 
   private static JavaScriptErrorDto.Builder newJavaScriptErrorDto(RhinoException exception) {
     JavaScriptErrorDto.Builder javaScriptErrorDtoBuilder = JavaScriptErrorDto.newBuilder() //
-    .setMessage(exception.details()) //
-    .setSourceName(exception.sourceName()) //
-    .setLineNumber(exception.lineNumber()); //
+        .setMessage(exception.details()) //
+        .setSourceName(exception.sourceName()) //
+        .setLineNumber(exception.lineNumber()); //
 
     if(exception.lineSource() != null) {
       javaScriptErrorDtoBuilder.setLineSource(exception.lineSource());

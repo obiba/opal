@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.watopi.chosen.client.ChosenOptions;
 import com.watopi.chosen.client.gwt.ChosenListBox;

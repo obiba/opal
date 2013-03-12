@@ -1,9 +1,9 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <ui:style>
     .progress {
@@ -36,7 +36,7 @@
         <ui:msg description="Save changes button label">Save Changes</ui:msg>
       </g:Button>
       <g:Image ui:field="inProgressImg" url="image/in-progress.gif" visible="false"
-               addStyleNames="right-aligned small-indent {style.progress}"/>
+          addStyleNames="right-aligned small-indent {style.progress}"/>
     </g:FlowPanel>
 
     <g:FlowPanel addStyleNames="form">

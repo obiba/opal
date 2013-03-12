@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -87,9 +87,8 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
   //
 
   public SubjectAuthorizationView() {
-    principal =
-        new SuggestBox(suggestions = new MultiWordSuggestOracle(), new TextBox(), suggestionDisplay =
-            new SubjectSuggestionDisplay());
+    principal = new SuggestBox(suggestions = new MultiWordSuggestOracle(), new TextBox(),
+        suggestionDisplay = new SubjectSuggestionDisplay());
     widget = uiBinder.createAndBindUi(this);
     initAclsTable();
   }
@@ -111,8 +110,7 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
   }
 
   @UiTemplate("SubjectAuthorizationView.ui.xml")
-  interface AuthorizationViewUiBinder extends UiBinder<Widget, SubjectAuthorizationView> {
-  }
+  interface AuthorizationViewUiBinder extends UiBinder<Widget, SubjectAuthorizationView> {}
 
   @Override
   public String getPrincipal() {
@@ -214,8 +212,9 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
     };
 
     column.setFieldUpdater(fieldUpdater);
-    String headerStr =
-        translations.permissionMap().containsKey(header) ? translations.permissionMap().get(header) : header;
+    String headerStr = translations.permissionMap().containsKey(header)
+        ? translations.permissionMap().get(header)
+        : header;
     table.addColumn(column, headerStr);
 
   }

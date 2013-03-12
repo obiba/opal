@@ -22,7 +22,7 @@ public class UpgradeCommand {
   // Constants
   //
 
-  private static final String[] CONTEXT_PATHS = {"classpath:/META-INF/spring/opal-server/upgrade.xml"};
+  private static final String[] CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade.xml" };
 
   //
   // AbstractContextLoadingCommand Methods

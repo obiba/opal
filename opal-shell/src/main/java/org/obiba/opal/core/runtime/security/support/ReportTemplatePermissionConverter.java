@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -40,7 +40,6 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
 
   enum Permission {
     REPORT_TEMPLATE_ALL {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/report-template/(.+)");
@@ -51,7 +50,6 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
 
     },
     REPORT_TEMPLATE_READ {
-
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/report-template/(.+)");

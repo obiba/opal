@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -32,7 +32,8 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
 
   private final Date toDate;
 
-  public TemporalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination, String groupMethod, Date fromDate, Date toDate) {
+  public TemporalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination, String groupMethod,
+      Date fromDate, Date toDate) {
     super(originalVariable, destination);
     this.groupMethod = GroupMethod.valueOf(groupMethod);
     this.fromDate = new Date(fromDate.getTime());
@@ -185,7 +186,6 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       }
     },
     WEEK_OF_YEAR {
-
       @Override
       public void initializeValueMapEntries(List<ValueMapEntry> valueMapEntries, Date fromDate, Date toDate) {
         String week = translateTime("Week") + " ";
@@ -209,7 +209,9 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       @Override
       public void initializeValueMapEntries(List<ValueMapEntry> valueMapEntries, Date fromDate, Date toDate) {
         for(int i = 1; i < 13; i++) {
-          valueMapEntries.add(ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(translateMonth(i)).newValue(Integer.toString(i)).build());
+          valueMapEntries.add(
+              ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(translateMonth(i)).newValue(Integer.toString(i))
+                  .build());
         }
       }
 
@@ -224,13 +226,13 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       }
     },
     QUARTER_OF_YEAR {
-
       @Override
       public void initializeValueMapEntries(List<ValueMapEntry> valueMapEntries, Date fromDate, Date toDate) {
         String quarter = translateTime("Quarter") + " ";
         for(int i = 1; i < 5; i++) {
           String str = Integer.toString(i);
-          valueMapEntries.add(ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(quarter + str).newValue(str).build());
+          valueMapEntries
+              .add(ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(quarter + str).newValue(str).build());
         }
       }
 
@@ -250,7 +252,8 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         String semester = translateTime("Semester") + " ";
         for(int i = 1; i < 3; i++) {
           String str = Integer.toString(i);
-          valueMapEntries.add(ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(semester + str).newValue(str).build());
+          valueMapEntries
+              .add(ValueMapEntry.fromDistinct(Integer.toString(i - 1)).label(semester + str).newValue(str).build());
         }
       }
 
@@ -277,7 +280,9 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
           int lastMonth = i == toYear ? toMonth : 12;
           for(int j = firstMonth; j <= lastMonth; j++) {
             String value = i + "-" + (j < 10 ? "0" : "") + j;
-            valueMapEntries.add(ValueMapEntry.fromDistinct(value).label(translateMonth(j) + ", " + i).newValue(Integer.toString(idx++)).build());
+            valueMapEntries.add(
+                ValueMapEntry.fromDistinct(value).label(translateMonth(j) + ", " + i).newValue(Integer.toString(idx++))
+                    .build());
           }
         }
       }
@@ -293,7 +298,6 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       }
     },
     QUARTER {
-
       @Override
       public void initializeValueMapEntries(List<ValueMapEntry> valueMapEntries, Date fromDate, Date toDate) {
         int fromYear = getYear(fromDate);
@@ -307,7 +311,9 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
           int lastQuarter = i == toYear ? monthToQuarter(toMonth) : 4;
           for(int j = firstQuarter; j <= lastQuarter; j++) {
             String value = i + "-" + j;
-            valueMapEntries.add(ValueMapEntry.fromDistinct(value).label(quarter + j + ", " + i).newValue(Integer.toString(idx++)).build());
+            valueMapEntries.add(
+                ValueMapEntry.fromDistinct(value).label(quarter + j + ", " + i).newValue(Integer.toString(idx++))
+                    .build());
           }
         }
       }
@@ -352,7 +358,6 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
       }
     },
     SEMESTER {
-
       @Override
       public void initializeValueMapEntries(List<ValueMapEntry> valueMapEntries, Date fromDate, Date toDate) {
         String quarter = translateTime("Semester") + " ";
@@ -366,7 +371,9 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
           int lastSemester = i == toYear ? monthToSemester(toMonth) : 4;
           for(int j = firstSemester; j <= lastSemester; j++) {
             String value = i + "-" + j;
-            valueMapEntries.add(ValueMapEntry.fromDistinct(value).label(quarter + j + ", " + i).newValue(Integer.toString(idx++)).build());
+            valueMapEntries.add(
+                ValueMapEntry.fromDistinct(value).label(quarter + j + ", " + i).newValue(Integer.toString(idx++))
+                    .build());
           }
         }
       }
@@ -387,7 +394,8 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
           int lastMonth = i == toYear ? toMonth : 12;
           for(int j = firstMonth; j <= lastMonth; j++) {
             String value = i + "-" + (j < 10 ? "0" : "") + j;
-            builder.append("'").append(value).append("':'").append(i).append("-").append(monthToSemester(j)).append("'");
+            builder.append("'").append(value).append("':'").append(i).append("-").append(monthToSemester(j))
+                .append("'");
             if(j < lastMonth || i < toYear) {
               builder.append(", ");
             }
@@ -412,7 +420,8 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         int toYear = getYear(toDate);
         for(long i = fromYear; i <= toYear; i++) {
           String str = Long.toString(i);
-          valueMapEntries.add(ValueMapEntry.fromDistinct(str).label(year + str).newValue(Integer.toString(idx++)).build());
+          valueMapEntries
+              .add(ValueMapEntry.fromDistinct(str).label(year + str).newValue(Integer.toString(idx++)).build());
         }
       }
 
@@ -436,7 +445,8 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         long i = fromYear;
         while(i < toYear) {
           String str = Long.toString(i) + "-" + Long.toString(i + 5);
-          valueMapEntries.add(ValueMapEntry.fromDistinct(str).label(lustrum + str).newValue(Integer.toString(idx++)).build());
+          valueMapEntries
+              .add(ValueMapEntry.fromDistinct(str).label(lustrum + str).newValue(Integer.toString(idx++)).build());
           i = i + 5;
         }
       }
@@ -475,7 +485,8 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
         long i = fromYear;
         while(i < toYear) {
           String str = Long.toString(i) + "-" + Long.toString(i + 10);
-          valueMapEntries.add(ValueMapEntry.fromDistinct(str).label(year + str).newValue(Integer.toString(idx++)).build());
+          valueMapEntries
+              .add(ValueMapEntry.fromDistinct(str).label(year + str).newValue(Integer.toString(idx++)).build());
           i = i + 10;
         }
       }
@@ -525,32 +536,32 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
     @SuppressWarnings("PMD.NcssMethodCount")
     protected String translateMonth(int i) {
       switch(i) {
-      case 1:
-        return translateTime("January");
-      case 2:
-        return translateTime("February");
-      case 3:
-        return translateTime("March");
-      case 4:
-        return translateTime("April");
-      case 5:
-        return translateTime("May");
-      case 6:
-        return translateTime("June");
-      case 7:
-        return translateTime("July");
-      case 8:
-        return translateTime("August");
-      case 9:
-        return translateTime("September");
-      case 10:
-        return translateTime("October");
-      case 11:
-        return translateTime("November");
-      case 12:
-        return translateTime("December");
-      default:
-        return "";
+        case 1:
+          return translateTime("January");
+        case 2:
+          return translateTime("February");
+        case 3:
+          return translateTime("March");
+        case 4:
+          return translateTime("April");
+        case 5:
+          return translateTime("May");
+        case 6:
+          return translateTime("June");
+        case 7:
+          return translateTime("July");
+        case 8:
+          return translateTime("August");
+        case 9:
+          return translateTime("September");
+        case 10:
+          return translateTime("October");
+        case 11:
+          return translateTime("November");
+        case 12:
+          return translateTime("December");
+        default:
+          return "";
       }
     }
 

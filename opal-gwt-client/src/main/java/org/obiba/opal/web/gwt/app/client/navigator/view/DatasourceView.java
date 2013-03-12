@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -46,8 +46,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class DatasourceView extends ViewImpl implements DatasourcePresenter.Display {
 
   @UiTemplate("DatasourceView.ui.xml")
-  interface DatasourceViewUiBinder extends UiBinder<Widget, DatasourceView> {
-  }
+  interface DatasourceViewUiBinder extends UiBinder<Widget, DatasourceView> {}
 
   private static DatasourceViewUiBinder uiBinder = GWT.create(DatasourceViewUiBinder.class);
 
@@ -298,7 +297,8 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public HasAuthorization getRemoveDatasourceAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(removeMenuItem), new UIObjectAuthorizer(removeMenuItemSeparator));
+    return new CompositeAuthorizer(new MenuItemAuthorizer(removeMenuItem),
+        new UIObjectAuthorizer(removeMenuItemSeparator));
   }
 
   @Override

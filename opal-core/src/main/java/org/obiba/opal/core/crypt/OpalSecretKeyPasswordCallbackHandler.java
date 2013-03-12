@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -29,7 +29,8 @@ public class OpalSecretKeyPasswordCallbackHandler implements CallbackHandler {
   private final String customPassword;
 
   @Autowired
-  public OpalSecretKeyPasswordCallbackHandler(OpalConfigurationService configService, @Value("${org.obiba.opal.keystore.password}") String customPassword) {
+  public OpalSecretKeyPasswordCallbackHandler(OpalConfigurationService configService,
+      @Value("${org.obiba.opal.keystore.password}") String customPassword) {
     this.configService = configService;
     this.customPassword = customPassword;
   }
@@ -44,7 +45,7 @@ public class OpalSecretKeyPasswordCallbackHandler implements CallbackHandler {
 
   @Override
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-    for(int i = 0; i < callbacks.length;) {
+    for(int i = 0; i < callbacks.length; ) {
       if(callbacks[i] instanceof PasswordCallback) {
         PasswordCallback callback = (PasswordCallback) callbacks[i];
         callback.setPassword(getPassword());

@@ -31,33 +31,33 @@ public class GWTMockUtilities {
    * This is to allow JUnit tests to mock classes that make GWT.create() calls in their static initializers. This is not
    * for use with GWTTestCase, and is not for use testing widgets themselves. Rather, it is to allow pure java unit
    * tests of classes that need to manipulate widgets.
-   * 
-   * <p>
+   * <p/>
+   * <p/>
    * <b>NOTE:</b> Be sure to call {@link #restore} in your tearDown method, to avoid confusing downstream tests.
-   * 
-   * <p>
+   * <p/>
+   * <p/>
    * Sample use:
-   * 
+   * <p/>
    * <pre>
    * &#064;Override
    * public void setUp() throws Exception {
    *   super.setUp();
    *   GWTMockUtilities.disarm();
    * }
-   * 
+   *
    * &#064;Override
    * public void tearDown() {
    *   GWTMockUtilities.restore();
    * }
-   * 
+   *
    * public void testSomething() {
    *   MyStatusWidget mock = EasyMock.createMock(MyStatusWidget.class);
    *   EasyMock.expect(mock.setText(&quot;expected text&quot;));
    *   EasyMock.replay(mock);
-   * 
+   *
    *   StatusController controller = new StatusController(mock);
    *   controller.setStatus(&quot;expected text&quot;);
-   * 
+   *
    *   EasyMock.verify(mock);
    * }
    * </pre>

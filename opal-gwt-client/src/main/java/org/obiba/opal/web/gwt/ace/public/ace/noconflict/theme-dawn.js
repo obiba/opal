@@ -28,11 +28,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-ace.define('ace/theme/dawn', ['require', 'exports', 'module' , 'ace/lib/dom'], function(require, exports, module) {
+ace.define('ace/theme/dawn', ['require', 'exports', 'module' , 'ace/lib/dom'], function (require, exports, module) {
 
-exports.isDark = false;
-exports.cssClass = "ace-dawn";
-exports.cssText = ".ace-dawn .ace_gutter {\
+    exports.isDark = false;
+    exports.cssClass = "ace-dawn";
+    exports.cssText = ".ace-dawn .ace_gutter {\
 background: #ebebeb;\
 color: #333\
 }\
@@ -141,6 +141,6 @@ color: #19356D\
 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4+fPnf4ZVq1b9BwAkVQboFQv98gAAAABJRU5ErkJggg==) right repeat-y\
 }";
 
-var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+    var dom = require("../lib/dom");
+    dom.importCssString(exports.cssText, exports.cssClass);
 });

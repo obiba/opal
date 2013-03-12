@@ -23,11 +23,14 @@ public class QueryTermJsonBuilder {
   private static final int DEFAULT_MAX_FIELDS = 9999;
 
   private List<String> fieldNames = new ArrayList<String>();
-  private String termFieldName;
-  private String termFieldValue;
-  private int size = DEFAULT_MAX_FIELDS;
-  private JSONObject termFilters;
 
+  private String termFieldName;
+
+  private String termFieldValue;
+
+  private int size = DEFAULT_MAX_FIELDS;
+
+  private JSONObject termFilters;
 
   public QueryTermJsonBuilder addFieldName(String name) {
     fieldNames.add(name);
@@ -65,11 +68,10 @@ public class QueryTermJsonBuilder {
     return jsonQuery;
   }
 
-
   public static class QueryTermsFiltersBuilder {
     private List<String> filterValues = new ArrayList<String>();
-    private String fieldName;
 
+    private String fieldName;
 
     public QueryTermsFiltersBuilder setFieldName(String name) {
       fieldName = name;
@@ -99,6 +101,5 @@ public class QueryTermJsonBuilder {
     }
 
   }
-
 
 }

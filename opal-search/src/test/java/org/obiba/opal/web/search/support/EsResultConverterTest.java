@@ -16,7 +16,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.EsResultConverter;
 
 import junit.framework.Assert;
 
@@ -66,7 +65,8 @@ public class EsResultConverterTest {
   public void testConvert_InvalidJsonQuery() throws Exception {
     // missing a colon
     JSONObject jsonQuery = new JSONObject(
-        "{\"took\" 38, \"timed_out\":false, \"_shards\":{\"total\":5, \"successful\":5, " + "\"failed\":0 }, \"hits\":{\"total\":20, \"max_score\":1.0, \"hits\":[] }, \"facets\":{\"0\":{\"_type\":\"terms\", \"missing\":0, \"total\":20, \"other\":0, \"terms\":[{\"term\":\"TIME_24\", \"count\":20 } ] } } }");
+        "{\"took\" 38, \"timed_out\":false, \"_shards\":{\"total\":5, \"successful\":5, " +
+            "\"failed\":0 }, \"hits\":{\"total\":20, \"max_score\":1.0, \"hits\":[] }, \"facets\":{\"0\":{\"_type\":\"terms\", \"missing\":0, \"total\":20, \"other\":0, \"terms\":[{\"term\":\"TIME_24\", \"count\":20 } ] } } }");
 
     EsResultConverter converter = new EsResultConverter();
     Search.QueryResultDto dtoResult = converter.convert(jsonQuery);

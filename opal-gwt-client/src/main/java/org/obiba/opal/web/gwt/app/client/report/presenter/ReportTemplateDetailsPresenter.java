@@ -113,8 +113,8 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       }
     });
 
-    super.registerHandler(getEventBus().addHandler(ReportTemplateSelectedEvent.getType(),
-        new ReportTemplateSelectedEvent.Handler() {
+    super.registerHandler(
+        getEventBus().addHandler(ReportTemplateSelectedEvent.getType(), new ReportTemplateSelectedEvent.Handler() {
 
           @Override
           public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
@@ -129,10 +129,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     super.registerHandler(getView().addReportDesignClickHandler(new ReportDesignClickHandler()));
     super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(getEventBus().addHandler(ReportTemplateUpdatedEvent.getType(),
-        new ReportTemplateUpdatedHandler()));
-    super.registerHandler(getEventBus().addHandler(ReportTemplateListReceivedEvent.getType(),
-        new ReportTemplateListReceivedEventHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
+    super.registerHandler(getEventBus()
+        .addHandler(ReportTemplateListReceivedEvent.getType(), new ReportTemplateListReceivedEventHandler()));
   }
 
   private void setCommands() {
@@ -237,7 +237,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private void refreshProducedReports(ReportTemplateDto reportTemplate) {
     UriBuilder ub = UriBuilder.create().segment("report-template", reportTemplate.getName(), "reports");
-    ResourceRequestBuilderFactory.<JsArray<ReportDto>> newBuilder().forResource(ub.build()).get()
+    ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder().forResource(ub.build()).get()
         .withCallback(new ProducedReportsResourceCallback()).withCallback(404, new NoProducedReportsResourceCallback())
         .send();
   }
@@ -245,7 +245,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   private void refreshReportTemplateDetails(ReportTemplateDto reportTemplate) {
     String reportTemplateName = reportTemplate.getName();
     UriBuilder ub = UriBuilder.create().segment("report-template", reportTemplateName);
-    ResourceRequestBuilderFactory.<ReportTemplateDto> newBuilder().forResource(ub.build()).get()
+    ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder().forResource(ub.build()).get()
         .withCallback(new ReportTemplateFoundCallBack())
         .withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
   }
@@ -296,9 +296,8 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
               .withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
         }
       };
-      getEventBus().fireEvent(
-          ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "removeReportTemplate",
-              "confirmDeleteReportTemplate"));
+      getEventBus().fireEvent(ConfirmationRequiredEvent
+          .createWithKeys(actionRequiringConfirmation, "removeReportTemplate", "confirmDeleteReportTemplate"));
     }
 
   }
@@ -315,8 +314,8 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation)
-          && event.isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+          event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }
@@ -380,8 +379,8 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(
-          NotificationEvent.newBuilder().error("ReportTemplateCannotBeFound").args(templateName).build());
+      getEventBus()
+          .fireEvent(NotificationEvent.newBuilder().error("ReportTemplateCannotBeFound").args(templateName).build());
     }
   }
 

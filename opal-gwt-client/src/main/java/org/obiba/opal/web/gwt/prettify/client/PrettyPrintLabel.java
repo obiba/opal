@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A label widget that pretty-prints its content.
- * <p>
+ * <p/>
  * Uses <a href="http://google-code-prettify.googlecode.com">google-code-prettify<a/>
  */
 public class PrettyPrintLabel extends Widget {
@@ -43,7 +43,7 @@ public class PrettyPrintLabel extends Widget {
 
   private final native void prettyPrint()
   /*-{
-     $wnd.prettyPrint();
-   }-*/;
+      $wnd.prettyPrint();
+  }-*/;
 
 }

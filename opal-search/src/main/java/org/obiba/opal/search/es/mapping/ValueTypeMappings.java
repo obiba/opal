@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -30,15 +30,15 @@ public class ValueTypeMappings {
   private final Map<? extends ValueType, ValueTypeMapping> mapping;
 
   public ValueTypeMappings() {
-    mapping = ImmutableMap.<ValueType, ValueTypeMapping> builder()//
-    .put(TextType.get(), forType("string"))//
-    .put(IntegerType.get(), forType("long"))//
-    .put(DecimalType.get(), forType("double"))//
-    .put(BooleanType.get(), forType("boolean"))//
-    .put(DateType.get(), forTypeWithFormat("date", "date"))//
-    .put(DateTimeType.get(), forTypeWithFormat("date", "date_time"))//
-    .put(LocaleType.get(), forType("string"))//
-    .put(BinaryType.get(), forType("binary")).build();
+    mapping = ImmutableMap.<ValueType, ValueTypeMapping>builder()//
+        .put(TextType.get(), forType("string"))//
+        .put(IntegerType.get(), forType("long"))//
+        .put(DecimalType.get(), forType("double"))//
+        .put(BooleanType.get(), forType("boolean"))//
+        .put(DateType.get(), forTypeWithFormat("date", "date"))//
+        .put(DateTimeType.get(), forTypeWithFormat("date", "date_time"))//
+        .put(LocaleType.get(), forType("string"))//
+        .put(BinaryType.get(), forType("binary")).build();
   }
 
   public ValueTypeMapping forType(ValueType type) {

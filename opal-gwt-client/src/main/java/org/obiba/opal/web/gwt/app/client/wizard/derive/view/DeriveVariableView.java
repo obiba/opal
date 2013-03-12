@@ -36,8 +36,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 public class DeriveVariableView extends PopupViewImpl implements DeriveVariablePresenter.Display {
 
   @UiTemplate("DeriveVariableView.ui.xml")
-  interface ViewUiBinder extends UiBinder<WizardDialogBox, DeriveVariableView> {
-  }
+  interface ViewUiBinder extends UiBinder<WizardDialogBox, DeriveVariableView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 

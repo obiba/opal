@@ -1,25 +1,34 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client" xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat' ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-  ui:generateLocales="default">
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
-        <g:InlineLabel><ui:msg description="Databases label" >Databases</ui:msg></g:InlineLabel>
+        <g:InlineLabel>
+          <ui:msg description="Databases label">Databases</ui:msg>
+        </g:InlineLabel>
         <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
           <g:HTMLPanel>
-            <g:Label addStyleNames="title"><ui:msg description="Databases label">Databases</ui:msg></g:Label>
+            <g:Label addStyleNames="title">
+              <ui:msg description="Databases label">Databases</ui:msg>
+            </g:Label>
             <p>
               <ui:msg description="Databases information">
-                Databases can be registered within Opal so it can later access them. Opal Datasources are connected to these databases.
+                Databases can be registered within Opal so it can later access them. Opal Datasources are connected to
+                these databases.
               </ui:msg>
             </p>
           </g:HTMLPanel>
         </o:HelpImage>
       </g:FlowPanel>
       <g:VerticalPanel width="100%" addStyleNames="content">
-        <g:Button ui:field="addDatabaseButton" styleName="btn"><ui:msg description="Add Database label" >Add Database</ui:msg></g:Button>
+        <g:Button ui:field="addDatabaseButton" styleName="btn">
+          <ui:msg description="Add Database label">Add Database</ui:msg>
+        </g:Button>
         <c:SimplePager ui:field="databaseTablePager" location="CENTER" addStyleNames="right-aligned"/>
         <o:Table width="100%" ui:field="databaseTable" addStyleNames="gwt-CellTable"/>
       </g:VerticalPanel>
@@ -27,16 +36,22 @@
 
     <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
-        <g:InlineLabel><ui:msg description="Permissions label">Permissions</ui:msg></g:InlineLabel>
+        <g:InlineLabel>
+          <ui:msg description="Permissions label">Permissions</ui:msg>
+        </g:InlineLabel>
         <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
           <g:HTMLPanel>
-            <g:Label addStyleNames="title"><ui:msg description="Database Permissions label">Database Permissions</ui:msg></g:Label>
+            <g:Label addStyleNames="title">
+              <ui:msg description="Database Permissions label">Database Permissions</ui:msg>
+            </g:Label>
             <p>
               <ui:msg description="Database Permissions information">
-                 Permissions for creating new databases that Opal can then connect to.
+                Permissions for creating new databases that Opal can then connect to.
               </ui:msg>
             </p>
-            <g:Label addStyleNames="title"><ui:msg description="Database Administrators label">Administrators</ui:msg></g:Label>
+            <g:Label addStyleNames="title">
+              <ui:msg description="Database Administrators label">Administrators</ui:msg>
+            </g:Label>
             <p>
               <ui:msg description="Database Administrators information">
                 Database Administrators are allowed to create new and edit existing databases.

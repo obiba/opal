@@ -1,21 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
-
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -34,6 +26,14 @@ import org.junit.Test;
 import org.obiba.core.service.PersistenceManager;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.unit.UnitKeyStore;
+
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Unit tests for {@link DefaultUnitKeyStoreServiceImpl}.
@@ -85,7 +85,8 @@ public class DefaultUnitKeyStoreServiceImplTest {
     UnitKeyStoreState matchedUnitKeyStoreState = new UnitKeyStoreState();
     matchedUnitKeyStoreState.setUnit("my-unit");
     matchedUnitKeyStoreState.setKeyStore(getTestKeyStoreByteArray());
-    expect(mockPersistenceManager.matchOne(eqUnitKeyStoreState(expectedUnitKeyStoreStateTemplate))).andReturn(matchedUnitKeyStoreState);
+    expect(mockPersistenceManager.matchOne(eqUnitKeyStoreState(expectedUnitKeyStoreStateTemplate)))
+        .andReturn(matchedUnitKeyStoreState);
 
     replay(mockPersistenceManager);
 
@@ -98,10 +99,12 @@ public class DefaultUnitKeyStoreServiceImplTest {
   }
 
   @Test
-  public void testGetOrCreateUnitKeyStoreCreatesTheKeyStoreIfItDoesNotExist() throws IOException, UnsupportedCallbackException {
+  public void testGetOrCreateUnitKeyStoreCreatesTheKeyStoreIfItDoesNotExist()
+      throws IOException, UnsupportedCallbackException {
     UnitKeyStoreState expectedUnitKeyStoreStateTemplate = new UnitKeyStoreState();
     expectedUnitKeyStoreStateTemplate.setUnit("my-unit");
-    expect(mockPersistenceManager.matchOne(eqUnitKeyStoreState(expectedUnitKeyStoreStateTemplate))).andReturn(null).atLeastOnce();
+    expect(mockPersistenceManager.matchOne(eqUnitKeyStoreState(expectedUnitKeyStoreStateTemplate))).andReturn(null)
+        .atLeastOnce();
     expect(mockPersistenceManager.save((UnitKeyStoreState) anyObject())).andReturn(new UnitKeyStoreState());
 
     replay(mockPersistenceManager);

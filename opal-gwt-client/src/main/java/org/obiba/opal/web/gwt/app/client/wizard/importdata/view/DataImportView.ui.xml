@@ -27,7 +27,7 @@
           </g:Label>
           <o:Chooser ui:field="formatChooser"/>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpCsv" visible="true">
-            <g:Label styleName="help-block" >
+            <g:Label styleName="help-block">
               <ui:msg description="CSV format information">This format expects the file to use a "delimiter
                 separated values" format (default delimiter being comma). The first column should represent the
                 participant identifiers and the subsequent column names identify variables.

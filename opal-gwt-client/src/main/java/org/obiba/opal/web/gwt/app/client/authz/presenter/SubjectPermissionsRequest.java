@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -54,31 +54,34 @@ public class SubjectPermissionsRequest {
       }
     }
 
-    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?domain=opal&type=" + type + query.toString()).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
+    ResourceRequestBuilderFactory.<JsArray<Acls>>newBuilder()
+        .forResource("/authz/query?domain=opal&type=" + type + query.toString()).get()
+        .withCallback(new ResourceCallback<JsArray<Acls>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<Acls> resource) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          aclGetCallback.onGet(JsArrays.toSafeArray(resource));
-        } else {
-          aclGetCallback.onGetFailed(response);
-        }
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArray<Acls> resource) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              aclGetCallback.onGet(JsArrays.toSafeArray(resource));
+            } else {
+              aclGetCallback.onGetFailed(response);
+            }
+          }
+        }).send();
   }
 
   public void getSubjects(final AclGetCallback callback) {
-    ResourceRequestBuilderFactory.<JsArray<Acls>> newBuilder().forResource("/authz/query?domain=opal&type=" + type).get().withCallback(new ResourceCallback<JsArray<Acls>>() {
+    ResourceRequestBuilderFactory.<JsArray<Acls>>newBuilder().forResource("/authz/query?domain=opal&type=" + type).get()
+        .withCallback(new ResourceCallback<JsArray<Acls>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<Acls> resource) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          callback.onGet(JsArrays.toSafeArray(resource));
-        } else {
-          callback.onGetFailed(response);
-        }
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArray<Acls> resource) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              callback.onGet(JsArrays.toSafeArray(resource));
+            } else {
+              callback.onGetFailed(response);
+            }
+          }
+        }).send();
   }
 
   private AclRequest getMainAclRequest() {

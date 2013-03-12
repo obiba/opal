@@ -27,7 +27,8 @@ import com.gwtplatform.mvp.client.View;
 /**
  *
  */
-public class DeriveBooleanVariableStepPresenter extends DerivationPresenter<DeriveBooleanVariableStepPresenter.Display> {
+public class DeriveBooleanVariableStepPresenter
+    extends DerivationPresenter<DeriveBooleanVariableStepPresenter.Display> {
 
   private BooleanVariableDerivationHelper derivationHelper;
 

@@ -9,6 +9,4 @@
  */
 package org.obiba.opal.web.magma;
 
-
-public class AbstractTablesResource {
-}
+public class AbstractTablesResource {}

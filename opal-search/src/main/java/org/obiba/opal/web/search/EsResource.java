@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -109,7 +109,8 @@ public class EsResource {
       this.params = Maps.newHashMap();
 
       // Remove the opal-ws part of the requested uri
-      rawPath = servletRequest.getRequestURI().replaceFirst(servletRequest.getContextPath(), "").replaceFirst(servletRequest.getServletPath(), "").replaceFirst("/es", "");
+      rawPath = servletRequest.getRequestURI().replaceFirst(servletRequest.getContextPath(), "")
+          .replaceFirst(servletRequest.getServletPath(), "").replaceFirst("/es", "");
 
       // Reconstruct the uri
       String queryString = servletRequest.getQueryString();

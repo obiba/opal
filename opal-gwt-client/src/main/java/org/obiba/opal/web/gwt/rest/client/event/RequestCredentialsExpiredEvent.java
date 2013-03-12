@@ -16,6 +16,7 @@ import com.google.gwt.event.shared.GwtEvent;
 
 /**
  * An event fired when {@code RequestCredentials} are absent after receiving a {@code Response}.
+ *
  * @see RequestCredentials#hasExpired(com.google.gwt.http.client.RequestBuilder)
  */
 public class RequestCredentialsExpiredEvent extends GwtEvent<RequestCredentialsExpiredEvent.Handler> {

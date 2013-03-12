@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -45,15 +45,15 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
   }
 
   private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
-    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>> newBuilder().forResource("/report-templates").get()
+    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder().forResource("/report-templates").get()
         .withCallback(new ReportTemplatesResourceCallback(templateToSelect)).send();
   }
 
   private void addHandlers() {
-    super.registerHandler(getEventBus().addHandler(ReportTemplateCreatedEvent.getType(),
-        new ReportTemplateCreatedHandler()));
-    super.registerHandler(getEventBus().addHandler(ReportTemplateDeletedEvent.getType(),
-        new ReportTemplateDeletedHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
     super.registerHandler(getView().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
   }
 

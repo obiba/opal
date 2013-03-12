@@ -1,11 +1,5 @@
 package org.obiba.opal.core.cfg;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.util.Set;
 
@@ -23,6 +17,12 @@ import org.obiba.magma.xstream.MagmaXStreamExtension;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.thoughtworks.xstream.io.StreamException;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class OpalViewPersistenceStrategyTest {
 
@@ -44,7 +44,8 @@ public class OpalViewPersistenceStrategyTest {
 
   @Test
   public void testReadWithNonExistentDirectory() throws Exception {
-    System.setProperty(OpalViewPersistenceStrategy.OPAL_HOME_SYSTEM_PROPERTY_NAME, getTestFilesRoot() + File.separator + EMPTY_DIRECTORY);
+    System.setProperty(OpalViewPersistenceStrategy.OPAL_HOME_SYSTEM_PROPERTY_NAME,
+        getTestFilesRoot() + File.separator + EMPTY_DIRECTORY);
     // Re-initialise to pick up the the OPAL_HOME specified for this test.
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
     Set<View> result = viewPersistenceStrategy.readViews("datasourceName");
@@ -82,7 +83,7 @@ public class OpalViewPersistenceStrategyTest {
     replay(datasourceMock, valueTableMock);
 
     // Write a temporary views file with a single view.
-    Set<View> views = Sets.<View> newHashSet();
+    Set<View> views = Sets.<View>newHashSet();
     View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("temporary-views", views);
@@ -90,7 +91,7 @@ public class OpalViewPersistenceStrategyTest {
     Set<View> singleViewResult = viewPersistenceStrategy.readViews("temporary-views");
     assertThat(singleViewResult.size(), is(1));
     // Write the temporary views file with an empty views set. This will remove the file.
-    viewPersistenceStrategy.writeViews("temporary-views", ImmutableSet.<View> of());
+    viewPersistenceStrategy.writeViews("temporary-views", ImmutableSet.<View>of());
     // Verify that the temporary file has been removed, by ensuring that an empty set has been returned.
     Set<View> noViewsResult = viewPersistenceStrategy.readViews("temporary-views");
     assertThat(noViewsResult.isEmpty(), is(true));
@@ -108,7 +109,7 @@ public class OpalViewPersistenceStrategyTest {
 
     replay(datasourceMock, valueTableMock);
 
-    Set<View> views = Sets.<View> newHashSet();
+    Set<View> views = Sets.<View>newHashSet();
     View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("single-views", views);

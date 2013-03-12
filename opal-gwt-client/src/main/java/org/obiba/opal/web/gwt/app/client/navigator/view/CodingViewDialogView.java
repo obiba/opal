@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -35,8 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class CodingViewDialogView extends Composite implements Display {
 
   @UiTemplate("CodingViewDialogView.ui.xml")
-  interface CodingViewDialogUiBinder extends UiBinder<DialogBox, CodingViewDialogView> {
-  }
+  interface CodingViewDialogUiBinder extends UiBinder<DialogBox, CodingViewDialogView> {}
 
   private static CodingViewDialogUiBinder uiBinder = GWT.create(CodingViewDialogUiBinder.class);
 
@@ -137,8 +136,7 @@ public class CodingViewDialogView extends Composite implements Display {
   public void showProgress(boolean progress) {
 
     if(progress) dialog.addStyleName("progress");
-    else
-      dialog.removeStyleName("progress");
+    else dialog.removeStyleName("progress");
     datasourceNameBox.setEnabled(!progress);
     viewNameBox.setEnabled(!progress);
     duplicateCheck.setEnabled(!progress);

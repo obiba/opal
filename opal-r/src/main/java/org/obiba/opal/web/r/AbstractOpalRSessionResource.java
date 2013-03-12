@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -26,6 +26,7 @@ public abstract class AbstractOpalRSessionResource {
 
   /**
    * Executes a R script and set the REXP result in its serialized form in the Response.
+   *
    * @param script
    * @return
    */
@@ -37,7 +38,8 @@ public abstract class AbstractOpalRSessionResource {
     if(rop.hasResult() && rop.hasRawResult()) {
       return Response.ok().entity(rop.getRawResult().asBytes()).build();
     } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}", new Object[] { script, rop.hasResult(), rop.hasRawResult() });
+      log.error("R Script '{}' has result: {}, has raw result: {}",
+          new Object[] { script, rop.hasResult(), rop.hasRawResult() });
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }

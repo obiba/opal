@@ -1,18 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.magma;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Locale;
 
@@ -29,6 +24,11 @@ import org.obiba.opal.web.magma.view.ViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtos;
 
 import com.google.common.collect.ImmutableSet;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for {@link ViewResource}.
@@ -78,6 +78,7 @@ public class ViewResourceTest {
   }
 
   private ViewDtos newViewDtos() {
-    return new ViewDtos(ImmutableSet.<ViewDtoExtension> of(new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension()));
+    return new ViewDtos(
+        ImmutableSet.<ViewDtoExtension>of(new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension()));
   }
 }

@@ -142,8 +142,8 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
       dataCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().dontCopyNullValues().withLoggingListener()
           .withThroughtputListener().build();
       File localInputFile = getOpalRuntime().getFileSystem().getLocalFile(bigFile);
-      inputDatasource =
-          new FsDatasource(bigFile.getName().getBaseName(), localInputFile, unit.getDatasourceEncryptionStrategy());
+      inputDatasource = new FsDatasource(bigFile.getName().getBaseName(), localInputFile,
+          unit.getDatasourceEncryptionStrategy());
     }
 
     public void split() throws IOException {

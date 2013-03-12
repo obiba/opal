@@ -40,8 +40,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTemporalVariableStepPresenter.Display {
 
   @UiTemplate("DeriveTemporalVariableStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveTemporalVariableStepView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, DeriveTemporalVariableStepView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -49,25 +48,35 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
 
   private final Widget widget;
 
-  @UiField WizardStep methodStep;
+  @UiField
+  WizardStep methodStep;
 
-  @UiField WizardStep mapStep;
+  @UiField
+  WizardStep mapStep;
 
-  @UiField RadioButton spanRadio;
+  @UiField
+  RadioButton spanRadio;
 
-  @UiField ListBox spanBox;
+  @UiField
+  ListBox spanBox;
 
-  @UiField RadioButton rangeRadio;
+  @UiField
+  RadioButton rangeRadio;
 
-  @UiField ListBox rangeBox;
+  @UiField
+  ListBox rangeBox;
 
-  @UiField ValueMapGrid valuesMapGrid;
+  @UiField
+  ValueMapGrid valuesMapGrid;
 
-  @UiField Panel dates;
+  @UiField
+  Panel dates;
 
-  @UiField FlowPanel from;
+  @UiField
+  FlowPanel from;
 
-  @UiField FlowPanel to;
+  @UiField
+  FlowPanel to;
 
   private final DateBox fromDate;
 

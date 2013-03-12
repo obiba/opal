@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -62,7 +62,8 @@ public class DefaultDecryptService implements DecryptService {
   // DecryptService Methods
   //
 
-  public void decryptData(String unitName, String datasourceName, FileObject file) throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void decryptData(String unitName, String datasourceName, FileObject file)
+      throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     Assert.notNull(file, "file is null");
     Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
 
@@ -74,7 +75,9 @@ public class DefaultDecryptService implements DecryptService {
       throw new NoSuchFunctionalUnitException(unitName);
     }
     // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file), unit != null ? getDatasourceEncryptionStrategy(unit) : getOpalInstanceEncryptionStrategy());
+    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(),
+        opalRuntime.getFileSystem().getLocalFile(file),
+        unit != null ? getDatasourceEncryptionStrategy(unit) : getOpalInstanceEncryptionStrategy());
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource);
@@ -83,7 +86,8 @@ public class DefaultDecryptService implements DecryptService {
     }
   }
 
-  public void decryptData(String datasourceName, FileObject file) throws NoSuchDatasourceException, IllegalArgumentException, IOException {
+  public void decryptData(String datasourceName, FileObject file)
+      throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file);
   }
 

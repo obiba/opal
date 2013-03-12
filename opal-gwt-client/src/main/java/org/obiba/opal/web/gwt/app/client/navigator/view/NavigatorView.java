@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -30,8 +30,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   public static final int PAGE_SIZE = 100;
 
   @UiTemplate("NavigatorView.ui.xml")
-  interface NavigatorViewUiBinder extends UiBinder<Widget, NavigatorView> {
-  }
+  interface NavigatorViewUiBinder extends UiBinder<Widget, NavigatorView> {}
 
   private static NavigatorViewUiBinder uiBinder = GWT.create(NavigatorViewUiBinder.class);
 
@@ -78,7 +77,9 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
     } else {
       navigatorDisplayPanel.remove(content);
     }
-  };
+  }
+
+  ;
 
   @Override
   public void setInSlot(Object slot, Widget content) {

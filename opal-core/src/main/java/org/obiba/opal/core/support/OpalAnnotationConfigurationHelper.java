@@ -13,7 +13,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class OpalAnnotationConfigurationHelper implements FactoryBean {
-  private final Set<Class<?>> annotatedClasses = new ImmutableSet.Builder<Class<?>>().add(UnitKeyStoreState.class, SubjectAcl.class).build();
+  private final Set<Class<?>> annotatedClasses = new ImmutableSet.Builder<Class<?>>()
+      .add(UnitKeyStoreState.class, SubjectAcl.class).build();
 
   private final List<Class<?>> additionalClasses = Lists.newArrayList();
 

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -60,8 +60,8 @@ public abstract class TableIdentifiersSyncTable extends Table<TableIdentifiersSy
   }
 
   private void initCheckColumn() {
-    Column<TableIdentifiersSync, Boolean> checkColumn =
-        new Column<TableIdentifiersSync, Boolean>(new CheckboxCell(true, true) {
+    Column<TableIdentifiersSync, Boolean> checkColumn = new Column<TableIdentifiersSync, Boolean>(
+        new CheckboxCell(true, true) {
           @Override
           public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
             // check if forbidden or has conflict
@@ -74,13 +74,13 @@ public abstract class TableIdentifiersSyncTable extends Table<TableIdentifiersSy
           }
         }) {
 
-          @Override
-          public Boolean getValue(TableIdentifiersSync object) {
-            // Get the value from the selection model.
-            return getSelectionModel().isSelected(object);
-          }
+      @Override
+      public Boolean getValue(TableIdentifiersSync object) {
+        // Get the value from the selection model.
+        return getSelectionModel().isSelected(object);
+      }
 
-        };
+    };
     checkColumn.setFieldUpdater(new FieldUpdater<TableIdentifiersSync, Boolean>() {
 
       @Override

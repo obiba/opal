@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -27,7 +27,8 @@ public class DataShieldSymbolResource extends RSymbolResource {
 
   private final Supplier<DatashieldConfiguration> configSupplier;
 
-  public DataShieldSymbolResource(Supplier<DatashieldConfiguration> configSupplier, OpalRSession rSession, String name) {
+  public DataShieldSymbolResource(Supplier<DatashieldConfiguration> configSupplier, OpalRSession rSession,
+      String name) {
     super(rSession, name);
     this.configSupplier = configSupplier;
   }
@@ -42,10 +43,10 @@ public class DataShieldSymbolResource extends RSymbolResource {
   public Response putRScript(UriInfo uri, String script) {
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
     switch(configSupplier.get().getLevel()) {
-    case RESTRICTED:
-      return putRestrictedRScript(uri, script);
-    case UNRESTRICTED:
-      return super.putRScript(uri, script);
+      case RESTRICTED:
+        return putRestrictedRScript(uri, script);
+      case UNRESTRICTED:
+        return super.putRScript(uri, script);
     }
     throw new IllegalStateException("Unknown script interpretation level: " + configSupplier.get().getLevel());
   }
@@ -72,7 +73,8 @@ public class DataShieldSymbolResource extends RSymbolResource {
 
   protected Response putRestrictedRScript(UriInfo uri, String content) {
     try {
-      getRSession().execute(new RestrictedAssignmentROperation(getName(), content, this.configSupplier.get().getAssignEnvironment()));
+      getRSession().execute(
+          new RestrictedAssignmentROperation(getName(), content, this.configSupplier.get().getAssignEnvironment()));
       return Response.created(getSymbolURI(uri)).build();
     } catch(ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();

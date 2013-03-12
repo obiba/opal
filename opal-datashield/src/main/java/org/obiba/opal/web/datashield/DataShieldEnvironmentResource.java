@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -44,7 +44,9 @@ public class DataShieldEnvironmentResource {
 
   private final DataShieldMethodConverterRegistry methodConverterRegistry;
 
-  DataShieldEnvironmentResource(DatashieldConfiguration.Environment environment, DatashieldConfigurationSupplier configurationSupplier, DataShieldMethodConverterRegistry methodConverterRegistry) {
+  DataShieldEnvironmentResource(DatashieldConfiguration.Environment environment,
+      DatashieldConfigurationSupplier configurationSupplier,
+      DataShieldMethodConverterRegistry methodConverterRegistry) {
     this.environment = environment;
     this.configurationSupplier = configurationSupplier;
     this.methodConverterRegistry = methodConverterRegistry;
@@ -93,7 +95,8 @@ public class DataShieldEnvironmentResource {
       }
     });
     DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), this.environment);
-    UriBuilder ub = UriBuilder.fromUri(uri.getRequestUri().resolve("")).path(DataShieldEnvironmentResource.class, "getDataShieldMethod");
+    UriBuilder ub = UriBuilder.fromUri(uri.getRequestUri().resolve(""))
+        .path(DataShieldEnvironmentResource.class, "getDataShieldMethod");
     return Response.created(ub.build(dto.getName())).build();
   }
 

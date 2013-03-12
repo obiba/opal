@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -66,7 +66,8 @@ public class NumericalVariableDerivationHelperGwtTest extends GWTTestCase {
 
     entries.add(ValueMapEntry.fromDistinct(888d).newValue("5").build());
 
-    DerivedNumericalVariableGenerator<Double> generator = new DerivedNumericalVariableGenerator<Double>(variable, entries, entryRangeMap);
+    DerivedNumericalVariableGenerator<Double> generator = new DerivedNumericalVariableGenerator<Double>(variable,
+        entries, entryRangeMap);
     VariableDto derived = generator.generate(null);
 
     assertEquals("$('numerical-variable').group([150.0, 160.0, 170.0, 180.0], [888]).map({\n" //

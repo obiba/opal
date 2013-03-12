@@ -1,14 +1,15 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:LayoutPanel>
     <g:layer top="0" height="2.5em" right="0" left="0">
       <g:FlowPanel addStyleNames="top">
-          <g:FlowPanel  ui:field="topBar" addStyleNames="topbar">
-            <g:Image url="image/logo-opal-white.png"></g:Image>
-            <g:MenuBar ui:field="menuBar" autoOpen="true">
-            <g:MenuItem  ui:field="dashboardItem">
-              <ui:msg description="Dashboard menu item">Dashboard</ui:msg>              
+        <g:FlowPanel ui:field="topBar" addStyleNames="topbar">
+          <g:Image url="image/logo-opal-white.png"></g:Image>
+          <g:MenuBar ui:field="menuBar" autoOpen="true">
+            <g:MenuItem ui:field="dashboardItem">
+              <ui:msg description="Dashboard menu item">Dashboard</ui:msg>
             </g:MenuItem>
             <g:MenuItem ui:field="datasourcesItem">
               <ui:msg description="Datasources label">Datasources</ui:msg>
@@ -18,25 +19,33 @@
             </g:MenuItem>
             <g:MenuItem ui:field="reportsItem">
               <ui:msg description="Reports menu item">Reports</ui:msg>
-            </g:MenuItem>            
+            </g:MenuItem>
             <g:MenuItem ui:field="fileExplorer">
               <ui:msg description="Files menu item">Files</ui:msg>
-            </g:MenuItem>            
+            </g:MenuItem>
             <g:MenuItem ui:field="listJobsItem">
               <ui:msg description="Jobs menu item">Jobs</ui:msg>
             </g:MenuItem>
           </g:MenuBar>
-            <g:Anchor ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></g:Anchor>
-            <g:Anchor ui:field="help"><ui:msg description="Help link text">Help</ui:msg></g:Anchor>
-            <g:Anchor ui:field="administration"><ui:msg description="Administration link text">Administration</ui:msg></g:Anchor>
-            <g:InlineLabel ui:field="username"></g:InlineLabel>
-          </g:FlowPanel>
+          <g:Anchor ui:field="quit">
+            <ui:msg description="Quit link text">Quit</ui:msg>
+          </g:Anchor>
+          <g:Anchor ui:field="help">
+            <ui:msg description="Help link text">Help</ui:msg>
+          </g:Anchor>
+          <g:Anchor ui:field="administration">
+            <ui:msg description="Administration link text">Administration</ui:msg>
+          </g:Anchor>
+          <g:InlineLabel ui:field="username"></g:InlineLabel>
+        </g:FlowPanel>
       </g:FlowPanel>
     </g:layer>
-    <g:layer top="2.5em" bottom="1.5em"  right="0" left="0">
+    <g:layer top="2.5em" bottom="1.5em" right="0" left="0">
       <g:LayoutPanel ui:field="workbench" addStyleNames="main-content ui-corner-all">
         <g:layer>
-          <g:Label><ui:msg description="Workbench label">The Workbench</ui:msg></g:Label>
+          <g:Label>
+            <ui:msg description="Workbench label">The Workbench</ui:msg>
+          </g:Label>
         </g:layer>
       </g:LayoutPanel>
     </g:layer>

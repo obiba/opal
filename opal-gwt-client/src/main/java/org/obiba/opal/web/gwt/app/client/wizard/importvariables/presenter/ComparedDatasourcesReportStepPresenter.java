@@ -49,8 +49,8 @@ import com.google.inject.Inject;
 
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
-public class ComparedDatasourcesReportStepPresenter extends
-    WidgetPresenter<ComparedDatasourcesReportStepPresenter.Display> {
+public class ComparedDatasourcesReportStepPresenter
+    extends WidgetPresenter<ComparedDatasourcesReportStepPresenter.Display> {
 
   private String targetDatasourceName;
 
@@ -257,8 +257,8 @@ public class ComparedDatasourcesReportStepPresenter extends
       if(!tableComparison.hasWithTable()) {
         return ComparisonResult.CREATION;
       }
-      if(JsArrays.toSafeArray(tableComparison.getModifiedVariablesArray()).length() > 0 || JsArrays
-          .toSafeArray(tableComparison.getNewVariablesArray()).length() > 0) {
+      if(JsArrays.toSafeArray(tableComparison.getModifiedVariablesArray()).length() > 0 ||
+          JsArrays.toSafeArray(tableComparison.getNewVariablesArray()).length() > 0) {
         return ComparisonResult.MODIFICATION;
       }
       return ComparisonResult.SAME;

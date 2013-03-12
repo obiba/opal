@@ -2,7 +2,7 @@
   <fileSystemRoot>somewhere</fileSystemRoot>
   <extensions>
     <org.obiba.opal.datashield.cfg.DatashieldConfiguration>
-      
+
     </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
   </extensions>
 </org.obiba.opal.core.cfg.OpalConfiguration>

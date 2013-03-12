@@ -44,6 +44,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Set the title of the last appended step.
+     *
      * @param text
      * @return
      */
@@ -54,6 +55,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Set a provider of help for the last appended step.
+     *
      * @param provider
      * @return
      */
@@ -65,6 +67,7 @@ public class DefaultWizardStepController implements WizardStepController {
     /**
      * Set if the last appended step is a conclusion: when entering this step the navigation buttons
      * (next/previous/finish) will be hidden and close/cancel will be available.
+     *
      * @return
      */
     public Builder conclusion() {
@@ -74,6 +77,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback that validates the current step before switching to the next step.
+     *
      * @param validator
      * @return
      */
@@ -84,6 +88,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback to ask for the step to reset its display.
+     *
      * @param handler
      * @return
      */
@@ -94,6 +99,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
     /**
      * Callback to execute some code before steping into this step
+     *
      * @param handler
      * @return
      */

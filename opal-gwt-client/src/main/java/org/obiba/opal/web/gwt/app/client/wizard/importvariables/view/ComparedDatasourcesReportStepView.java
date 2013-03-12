@@ -38,8 +38,8 @@ import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SelectionModel;
 
-public class ComparedDatasourcesReportStepView extends Composite implements
-    ComparedDatasourcesReportStepPresenter.Display {
+public class ComparedDatasourcesReportStepView extends Composite
+    implements ComparedDatasourcesReportStepPresenter.Display {
   //
   // Static Variables
   //
@@ -205,8 +205,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements
   }
 
   @UiTemplate("ComparedDatasourcesReportStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, ComparedDatasourcesReportStepView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, ComparedDatasourcesReportStepView> {}
 
   @Override
   public Widget getStepHelp() {
@@ -248,8 +247,8 @@ public class ComparedDatasourcesReportStepView extends Composite implements
     }
 
     public boolean isSelectable() {
-      return result != ComparisonResult.FORBIDDEN && (ignoreAllModifications
-          .getValue() || result != ComparisonResult.CONFLICT);
+      return result != ComparisonResult.FORBIDDEN &&
+          (ignoreAllModifications.getValue() || result != ComparisonResult.CONFLICT);
     }
 
     public TableCompareDto getTableCompareDto() {
@@ -281,7 +280,7 @@ public class ComparedDatasourcesReportStepView extends Composite implements
     }
 
     private int[] getConflictsCounts(JsArray<ConflictDto> conflicts) {
-      int conflictsCount[] = {0, 0};
+      int conflictsCount[] = { 0, 0 };
       for(int i = 0; i < conflicts.length(); i++) {
         if(conflicts.get(i).getVariable().getIsNewVariable()) {
           conflictsCount[0]++;

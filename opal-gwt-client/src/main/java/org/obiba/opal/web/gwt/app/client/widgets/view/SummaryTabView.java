@@ -32,8 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class SummaryTabView implements SummaryTabPresenter.Display {
 
   @UiTemplate("SummaryTabView.ui.xml")
-  interface SummaryTabViewUiBinder extends UiBinder<Widget, SummaryTabView> {
-  }
+  interface SummaryTabViewUiBinder extends UiBinder<Widget, SummaryTabView> {}
 
   private static final SummaryTabViewUiBinder uiBinder = GWT.create(SummaryTabViewUiBinder.class);
 

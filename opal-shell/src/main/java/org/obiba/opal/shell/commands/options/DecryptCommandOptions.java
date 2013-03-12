@@ -8,11 +8,10 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 
 /**
  * This interface declares the options that may be used with the decrypt command.
- * 
+ * <p/>
  * Note that the <code>getFiles</code> method is used to access unparsed file arguments at the end of the command line.
- * 
+ *
  * @author cag-dspathis
- * 
  */
 @CommandLineInterface(application = "decrypt")
 public interface DecryptCommandOptions extends HelpOption {
@@ -22,7 +21,8 @@ public interface DecryptCommandOptions extends HelpOption {
 
   public boolean isUnit();
 
-  @Option(shortName = "o", longName = "out", description = "The directory into which the decrypted files are written. Default is current directory.")
+  @Option(shortName = "o", longName = "out",
+      description = "The directory into which the decrypted files are written. Default is current directory.")
   public String getOutput();
 
   public boolean isOutput();

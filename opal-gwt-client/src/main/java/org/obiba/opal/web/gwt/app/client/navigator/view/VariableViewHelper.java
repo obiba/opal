@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -25,6 +25,7 @@ public class VariableViewHelper {
 
   /**
    * Get the 'label' attribute value in current language.
+   *
    * @param attributes
    * @return
    * @see #getAttributeValue(JsArray, String)
@@ -36,6 +37,7 @@ public class VariableViewHelper {
   /**
    * Get the attribute value for the current language. If no attribute is defined for this language, get the value from
    * the attribute with no locale defined.
+   *
    * @param attributes
    * @param name the attribute name
    * @return empty string if attribute was not found
@@ -62,6 +64,7 @@ public class VariableViewHelper {
 
   /**
    * Get current language of the application.
+   *
    * @return
    */
   public static String getCurrentLanguage() {

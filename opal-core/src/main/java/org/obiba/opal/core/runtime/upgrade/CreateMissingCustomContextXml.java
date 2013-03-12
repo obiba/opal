@@ -9,9 +9,7 @@
  */
 package org.obiba.opal.core.runtime.upgrade;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.obiba.runtime.Version;
@@ -19,8 +17,6 @@ import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

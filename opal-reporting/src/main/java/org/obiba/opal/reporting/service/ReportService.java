@@ -6,6 +6,7 @@ import org.obiba.opal.core.runtime.Service;
 
 public interface ReportService extends Service {
 
-  public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput) throws ReportException;
+  public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput)
+      throws ReportException;
 
 }

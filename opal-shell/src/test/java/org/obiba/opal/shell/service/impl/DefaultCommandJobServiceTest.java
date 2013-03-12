@@ -1,23 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.shell.service.impl;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +28,16 @@ import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.impl.DefaultCommandJobService.FutureCommandJob;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link DefaultCommandJobService}.
@@ -275,9 +275,11 @@ public class DefaultCommandJobServiceTest {
     // Test-specific setup
 
     // Create some completed/terminated commands -- these SHOULD be deleted.
-    FutureCommandJob succeededJob = new FutureCommandJob(mockSubject, createCommandJob(1, new Date(1), Status.SUCCEEDED));
+    FutureCommandJob succeededJob = new FutureCommandJob(mockSubject,
+        createCommandJob(1, new Date(1), Status.SUCCEEDED));
     FutureCommandJob failedJob = new FutureCommandJob(mockSubject, createCommandJob(1, new Date(1), Status.FAILED));
-    FutureCommandJob cancelledJob = new FutureCommandJob(mockSubject, createCommandJob(1, new Date(1), Status.CANCELED));
+    FutureCommandJob cancelledJob = new FutureCommandJob(mockSubject,
+        createCommandJob(1, new Date(1), Status.CANCELED));
 
     // Put them in the list of future command jobs.
     futureCommandJobs = new ArrayList<FutureCommandJob>();

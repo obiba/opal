@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.LimesurveyStepPresenter;
+import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -20,9 +24,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.LimesurveyStepPresenter;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 
 public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresenter.Display {
 
@@ -38,8 +39,7 @@ public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresen
   HTMLPanel help;
 
   @UiTemplate("LimesurveyStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, LimesurveyStepView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, LimesurveyStepView> {}
 
   @Override
   public void setDatabases(JsArray<JdbcDataSourceDto> resource) {

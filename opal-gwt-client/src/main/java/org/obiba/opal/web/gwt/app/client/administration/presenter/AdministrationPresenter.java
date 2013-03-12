@@ -22,7 +22,8 @@ import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import com.gwtplatform.mvp.client.proxy.TabContentProxy;
 
-public class AdministrationPresenter extends TabContainerPresenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy> {
+public class AdministrationPresenter
+    extends TabContainerPresenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy> {
 
   @RequestTabs
   public static final Type<RequestTabsHandler> RequestTabs = new Type<RequestTabsHandler>();
@@ -35,7 +36,8 @@ public class AdministrationPresenter extends TabContainerPresenter<Administratio
   private TabContentProxy<?> defaultTab;
 
   @Inject
-  public AdministrationPresenter(final Display display, final EventBus eventBus, final Proxy proxy, PlaceManager placeManager) {
+  public AdministrationPresenter(final Display display, final EventBus eventBus, final Proxy proxy,
+      PlaceManager placeManager) {
     super(eventBus, display, proxy, TabSlot, RequestTabs);
     this.placeManager = placeManager;
   }
@@ -60,12 +62,10 @@ public class AdministrationPresenter extends TabContainerPresenter<Administratio
     placeManager.revealPlace(new PlaceRequest(defaultTab.getTargetHistoryToken()));
   }
 
-  public interface Display extends View, TabPanel {
-  }
+  public interface Display extends View, TabPanel {}
 
   @ProxyStandard
   @NameToken(Places.administration)
-  public interface Proxy extends ProxyPlace<AdministrationPresenter> {
-  }
+  public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
 
 }

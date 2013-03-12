@@ -3,10 +3,10 @@
     <engineClass>org.obiba.magma.MagmaEngine</engineClass>
 
     <extensions>
-      <org.obiba.magma.js.MagmaJsExtension />
-      <org.obiba.magma.xstream.MagmaXStreamExtension />
+      <org.obiba.magma.js.MagmaJsExtension/>
+      <org.obiba.magma.xstream.MagmaXStreamExtension/>
     </extensions>
-    
+
     <factories>
       <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
         <name>my-datasource</name>

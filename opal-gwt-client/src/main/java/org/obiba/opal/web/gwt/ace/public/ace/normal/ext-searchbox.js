@@ -28,13 +28,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/ext/searchbox', ['require', 'exports', 'module' , 'ace/lib/dom', 'ace/lib/lang', 'ace/lib/event', 'ace/keyboard/hash_handler', 'ace/lib/keys'], function(require, exports, module) {
+define('ace/ext/searchbox', ['require', 'exports', 'module' , 'ace/lib/dom', 'ace/lib/lang', 'ace/lib/event', 'ace/keyboard/hash_handler', 'ace/lib/keys'], function (require, exports, module) {
 
 
-var dom = require("../lib/dom");
-var lang = require("../lib/lang");
-var event = require("../lib/event");
-var searchboxCss = "\
+    var dom = require("../lib/dom");
+    var lang = require("../lib/lang");
+    var event = require("../lib/event");
+    var searchboxCss = "\
 /* ------------------------------------------------------------------------------------------\
 * Editor Search Form\
 * --------------------------------------------------------------------------------------- */\
@@ -145,12 +145,12 @@ width: 54px\
 .ace_replacebtn.next {\
 width: 27px\
 }";
-var HashHandler = require("../keyboard/hash_handler").HashHandler;
-var keyUtil = require("../lib/keys");
+    var HashHandler = require("../keyboard/hash_handler").HashHandler;
+    var keyUtil = require("../lib/keys");
 
-dom.importCssString(searchboxCss, "ace_searchbox");
+    dom.importCssString(searchboxCss, "ace_searchbox");
 
-var html = '<div class="ace_search right">\
+    var html = '<div class="ace_search right">\
     <button action="hide" class="ace_searchbtn_close"></button>\
     <div class="ace_search_form">\
         <input class="ace_search_field" placeholder="Search for" spellcheck="false">\
@@ -164,190 +164,194 @@ var html = '<div class="ace_search right">\
     </div>\
 </div>'.replace(/>\s+/g, ">");
 
-var SearchBox = function(editor, range, showReplaceForm) {
-    var div = dom.createElement("div");
-    div.innerHTML = html;
-    this.element = div.firstChild;
+    var SearchBox = function (editor, range, showReplaceForm) {
+        var div = dom.createElement("div");
+        div.innerHTML = html;
+        this.element = div.firstChild;
 
-    this.$init();
-    this.setEditor(editor);
-};
-
-(function() {
-    this.setEditor = function(editor) {
-        editor.searchBox = this;
-        editor.container.appendChild(this.element);
-        this.editor = editor;
+        this.$init();
+        this.setEditor(editor);
     };
 
-    this.$init = function() {
-        var sb = this.element;
+    (function () {
+        this.setEditor = function (editor) {
+            editor.searchBox = this;
+            editor.container.appendChild(this.element);
+            this.editor = editor;
+        };
 
-        this.searchBox = sb.querySelector(".ace_search_form");
-        this.replaceBox = sb.querySelector(".ace_replace_form");
-        this.searchInput = this.searchBox.querySelector(".ace_search_field");
-        this.replaceInput = this.replaceBox.querySelector(".ace_search_field");
+        this.$init = function () {
+            var sb = this.element;
 
-        var _this = this;
-        event.addListener(sb, "mousedown", function(e) {
-            setTimeout(function(){
-                _this.activeInput.focus();
-            }, 0);
-            event.stopPropagation(e);
-        });
-        event.addListener(sb, "click", function(e) {
-            var t = e.target;
-            var action = t.getAttribute("action");
-            if (action && _this[action])
-                _this[action]();
-            event.stopPropagation(e);
-        });
+            this.searchBox = sb.querySelector(".ace_search_form");
+            this.replaceBox = sb.querySelector(".ace_replace_form");
+            this.searchInput = this.searchBox.querySelector(".ace_search_field");
+            this.replaceInput = this.replaceBox.querySelector(".ace_search_field");
 
-        event.addCommandKeyListener(sb, function(e, hashId, keyCode) {
-            var keyString = keyUtil.keyCodeToString(keyCode);
-            var command = _this.$searchBarKb.findKeyCommand(hashId, keyString);
-            if (command && command.exec) {
-                command.exec(_this);
-                event.stopEvent(e);
+            var _this = this;
+            event.addListener(sb, "mousedown", function (e) {
+                setTimeout(function () {
+                    _this.activeInput.focus();
+                }, 0);
+                event.stopPropagation(e);
+            });
+            event.addListener(sb, "click", function (e) {
+                var t = e.target;
+                var action = t.getAttribute("action");
+                if (action && _this[action])
+                    _this[action]();
+                event.stopPropagation(e);
+            });
+
+            event.addCommandKeyListener(sb, function (e, hashId, keyCode) {
+                var keyString = keyUtil.keyCodeToString(keyCode);
+                var command = _this.$searchBarKb.findKeyCommand(hashId, keyString);
+                if (command && command.exec) {
+                    command.exec(_this);
+                    event.stopEvent(e);
+                }
+            });
+
+            this.$onChange = lang.delayedCall(function () {
+                _this.find(false, false);
+            });
+
+            event.addListener(this.searchInput, "input", function () {
+                _this.$onChange.schedule(20);
+            });
+            event.addListener(this.searchInput, "focus", function () {
+                _this.activeInput = _this.searchInput;
+            });
+            event.addListener(this.replaceInput, "focus", function () {
+                _this.activeInput = _this.replaceInput;
+            });
+        };
+        this.$closeSearchBarKb = new HashHandler([
+            {
+                bindKey: "Esc",
+                name: "closeSearchBar",
+                exec: function (editor) {
+                    editor.searchBox.hide();
+                }
+            }
+        ]);
+        this.$searchBarKb = new HashHandler();
+        this.$searchBarKb.bindKeys({
+            "Ctrl-f|Command-f|Ctrl-H|Command-Option-F": function (sb) {
+                var isReplace = sb.isReplace = !sb.isReplace;
+                sb.replaceBox.style.display = isReplace ? "" : "none";
+                sb[isReplace ? "replaceInput" : "searchInput"].focus();
+            },
+            "esc": function (sb) {
+                setTimeout(function () {
+                    sb.hide();
+                });
+            },
+            "Return": function (sb) {
+                if (sb.activeInput == sb.replaceInput)
+                    sb.replace();
+                sb.findNext();
+            },
+            "Shift-Return": function (sb) {
+                if (sb.activeInput == sb.replaceInput)
+                    sb.replace();
+                sb.findPrev();
+            },
+            "Tab": function (sb) {
+                (sb.activeInput == sb.replaceInput ? sb.searchInput : sb.replaceInput).focus();
             }
         });
 
-        this.$onChange = lang.delayedCall(function() {
-            _this.find(false, false);
-        });
 
-        event.addListener(this.searchInput, "input", function() {
-            _this.$onChange.schedule(20);
-        });
-        event.addListener(this.searchInput, "focus", function() {
-            _this.activeInput = _this.searchInput;
-        });
-        event.addListener(this.replaceInput, "focus", function() {
-            _this.activeInput = _this.replaceInput;
-        });
-    };
-    this.$closeSearchBarKb = new HashHandler([{
-        bindKey: "Esc",
-        name: "closeSearchBar",
-        exec: function(editor) {
-            editor.searchBox.hide();
-        }
-    }]);
-    this.$searchBarKb = new HashHandler();
-    this.$searchBarKb.bindKeys({
-        "Ctrl-f|Command-f|Ctrl-H|Command-Option-F": function(sb) {
-            var isReplace = sb.isReplace = !sb.isReplace;
-            sb.replaceBox.style.display = isReplace ? "" : "none";
-            sb[isReplace ? "replaceInput" : "searchInput"].focus();
-        },
-        "esc": function(sb) {
-            setTimeout(function() { sb.hide();});
-        },
-        "Return": function(sb) {
-            if (sb.activeInput == sb.replaceInput)
-                sb.replace();
-            sb.findNext();
-        },
-        "Shift-Return": function(sb) {
-            if (sb.activeInput == sb.replaceInput)
-                sb.replace();
-            sb.findPrev();
-        },
-        "Tab": function(sb) {
-            (sb.activeInput == sb.replaceInput ? sb.searchInput : sb.replaceInput).focus();
-        }
-    });
+        this.find = function (skipCurrent, backwards) {
+            this.editor.find(this.searchInput.value, {
+                skipCurrent: skipCurrent,
+                backwards: backwards,
+                wrap: true
+            });
+            this.editor.session.highlight(this.editor.$search.$options.re);
+        };
+        this.findNext = function () {
+            this.find(true, false);
+        };
+        this.findPrev = function () {
+            this.find(true, true);
+        };
+        this.replace = function () {
+            this.editor.replace(this.replaceInput.value);
+            this.findNext();
+        };
+        this.replaceAll = function () {
+            this.editor.replaceAll(this.replaceInput.value);
+        };
 
+        this.hide = function () {
+            this.element.style.display = "none";
+            this.editor.keyBinding.removeKeyboardHandler(this.$searchKeybingin);
+            this.editor.focus();
+        };
+        this.show = function (value, isReplace) {
+            this.element.style.display = "";
+            this.replaceBox.style.display = isReplace ? "" : "none";
 
-    this.find = function(skipCurrent, backwards) {
-        this.editor.find(this.searchInput.value, {
-            skipCurrent: skipCurrent,
-            backwards: backwards,
-            wrap: true
-        });
-        this.editor.session.highlight(this.editor.$search.$options.re);
-    };
-    this.findNext = function() {
-        this.find(true, false);
-    };
-    this.findPrev = function() {
-        this.find(true, true);
-    };
-    this.replace = function() {
-        this.editor.replace(this.replaceInput.value);
-        this.findNext();
-    };
-    this.replaceAll = function() {
-        this.editor.replaceAll(this.replaceInput.value);
+            this.isReplace = isReplace;
+
+            if (value)
+                this.searchInput.value = value;
+            this.searchInput.focus();
+            this.searchInput.select();
+
+            this.editor.keyBinding.addKeyboardHandler(this.$closeSearchBarKb);
+        };
+
+    }).call(SearchBox.prototype);
+
+    exports.SearchBox = SearchBox;
+
+    exports.Search = function (editor, isReplace) {
+        var sb = editor.searchBox || new SearchBox(editor);
+        sb.show(editor.session.getTextRange(), isReplace);
     };
 
-    this.hide = function () {
-        this.element.style.display = "none";
-        this.editor.keyBinding.removeKeyboardHandler(this.$searchKeybingin);
-        this.editor.focus();
-    };
-    this.show = function(value, isReplace) {
-        this.element.style.display = "";
-        this.replaceBox.style.display = isReplace ? "" : "none";
 
-        this.isReplace = isReplace;
-
-        if (value)
-            this.searchInput.value = value;
-        this.searchInput.focus();
-        this.searchInput.select();
-
-        this.editor.keyBinding.addKeyboardHandler(this.$closeSearchBarKb);
+    exports.ISearch = function (session, options) {
+        this.$changeListener = this.$changeListener.bind(this);
+        this.startRange = session.selection.toOrientedRange();
+        this.options = options || {};
     };
 
-}).call(SearchBox.prototype);
+    (function () {
+        this.setSession = function (session) {
+            if (this.session) {
+                this.session.removeListener(this.$changeListener);
+            }
+            this.session = session;
+            this.session.addListener(this.$changeListener);
+        };
+        this.setSearchString = function () {
 
-exports.SearchBox = SearchBox;
+        };
+        this.getValue = function () {
+            if (this.value == null)
+                this.value = this.session.getValue();
+            return this.value;
+        };
+        this.$changeListener = function () {
+            this.value = null;
+        };
+        this.find = function () {
 
-exports.Search = function(editor, isReplace) {
-    var sb = editor.searchBox || new SearchBox(editor);
-    sb.show(editor.session.getTextRange(), isReplace);
-};
+        };
+        this.$edgeBefore = function () {
+            this.cursor = this.startRange[this.options.backwards ? "start" : "end"];
+        };
+        this.$edgeAfter = function () {
 
+        };
+        this.next = function (dir) {
 
-exports.ISearch = function(session, options) {
-    this.$changeListener = this.$changeListener.bind(this);
-    this.startRange = session.selection.toOrientedRange();
-    this.options = options || {};
-};
-
-(function(){
-    this.setSession = function(session) {
-        if (this.session) {
-            this.session.removeListener(this.$changeListener);
-        }
-        this.session = session;
-        this.session.addListener(this.$changeListener);
-    };
-    this.setSearchString = function() {
-
-    };
-    this.getValue = function() {
-        if (this.value == null)
-            this.value = this.session.getValue();
-        return this.value;
-    };
-    this.$changeListener = function() {
-        this.value = null;
-    };
-    this.find = function() {
-
-    };
-    this.$edgeBefore = function() {
-        this.cursor = this.startRange[this.options.backwards ? "start" : "end"];
-    };
-    this.$edgeAfter = function() {
-
-    };
-    this.next = function(dir) {
-
-    };
-}).call(exports.ISearch.prototype);
+        };
+    }).call(exports.ISearch.prototype);
 
 
 });

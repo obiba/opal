@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -18,25 +18,25 @@ import com.google.common.collect.ImmutableMap;
 
 public class DataShieldExprTest {
 
-  private static final Map<String, String> tests = ImmutableMap.<String, String> builder() //
-  .put("A symbol", "A")//
-  .put("A number", "1.0")//
-  .put("An integer", "5L")//
-  .put("A negative number", "-0.43151402098822")//
-  .put("An embedded symbol", "A$B$C.D")//
-  .put("A formula", "A ~ B")//
-  .put("A function invocation", "A()")//
-  .put("An operator on symbols", "A + B")//
-  .put("Operator chaining", "A + B * C")//
-  .put("Operator on functions", "A() + B * C")//
-  .put("A formula with operators", "A ~ B + (C * D)^4 : E %in% F")//
-  .put("Grouping", "(A + B) * (C - D)")//
-  .put("Function with a single parameter", "A(B)")//
-  .put("Function with a function invocation as parameter", "A(B())")//
-  .put("Function with multiple parameters", "A(B, C)")//
-  .put("Function with multiple kinds of parameters", "A(B, C(), D, E(F(G/H)), A + B * C())")//
-  .put("Function with forumla as argument", "glm(A ~ B + C:D, poisson)")//
-  .build();
+  private static final Map<String, String> tests = ImmutableMap.<String, String>builder() //
+      .put("A symbol", "A")//
+      .put("A number", "1.0")//
+      .put("An integer", "5L")//
+      .put("A negative number", "-0.43151402098822")//
+      .put("An embedded symbol", "A$B$C.D")//
+      .put("A formula", "A ~ B")//
+      .put("A function invocation", "A()")//
+      .put("An operator on symbols", "A + B")//
+      .put("Operator chaining", "A + B * C")//
+      .put("Operator on functions", "A() + B * C")//
+      .put("A formula with operators", "A ~ B + (C * D)^4 : E %in% F")//
+      .put("Grouping", "(A + B) * (C - D)")//
+      .put("Function with a single parameter", "A(B)")//
+      .put("Function with a function invocation as parameter", "A(B())")//
+      .put("Function with multiple parameters", "A(B, C)")//
+      .put("Function with multiple kinds of parameters", "A(B, C(), D, E(F(G/H)), A + B * C())")//
+      .put("Function with forumla as argument", "glm(A ~ B + C:D, poisson)")//
+      .build();
 
   @Test
   public void test_testCases() throws ParseException {

@@ -31,8 +31,8 @@ import com.gwtplatform.mvp.client.View;
 /**
  *
  */
-public class DeriveCategoricalVariableStepPresenter extends
-    DerivationPresenter<DeriveCategoricalVariableStepPresenter.Display> {
+public class DeriveCategoricalVariableStepPresenter
+    extends DerivationPresenter<DeriveCategoricalVariableStepPresenter.Display> {
 
   private CategoricalVariableDerivationHelper derivationHelper;
 
@@ -50,13 +50,13 @@ public class DeriveCategoricalVariableStepPresenter extends
       final VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     // TODO use uribuilder
-    ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder()
+    ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
         .forResource(getOriginalVariable().getLink() + "/summary?nature=categorical&distinct=true").get()
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
           public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
-            derivationHelper =
-                new CategoricalVariableDerivationHelper(originalVariable, derivedVariable, statisticsDto);
+            derivationHelper = new CategoricalVariableDerivationHelper(originalVariable, derivedVariable,
+                statisticsDto);
             derivationHelper.initializeValueMapEntries();
             getView().enableFrequencyColumn(true);
             getView().setMaxFrequency(derivationHelper.getMaxFrequency());

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -59,7 +59,7 @@ public class ResteasyDeploymentConfiguration {
   /**
    * Required because the normal SpringBeanProcessor does not pickup classes annotated with {@code ServerInterceptor}.
    * This
-   * 
+   * <p/>
    * https://jira.jboss.org/browse/RESTEASY-394
    */
   private static class ServerInterceptorSpringBeanProcessor implements BeanPostProcessor {
@@ -78,11 +78,13 @@ public class ResteasyDeploymentConfiguration {
       if(beanClass.isAnnotationPresent(ServerInterceptor.class)) {
         if(PreProcessInterceptor.class.isAssignableFrom(beanClass)) {
           log.info("Registring bean '{}' as pre-process interceptor.", beanName);
-          dispatcher.getProviderFactory().getServerPreProcessInterceptorRegistry().register((PreProcessInterceptor) bean);
+          dispatcher.getProviderFactory().getServerPreProcessInterceptorRegistry()
+              .register((PreProcessInterceptor) bean);
         }
         if(PostProcessInterceptor.class.isAssignableFrom(beanClass)) {
           log.info("Registring bean '{}' as post-process interceptor.", beanName);
-          dispatcher.getProviderFactory().getServerPostProcessInterceptorRegistry().register((PostProcessInterceptor) bean);
+          dispatcher.getProviderFactory().getServerPostProcessInterceptorRegistry()
+              .register((PostProcessInterceptor) bean);
         }
       }
       if(ExceptionMapper.class.isAssignableFrom(beanClass)) {

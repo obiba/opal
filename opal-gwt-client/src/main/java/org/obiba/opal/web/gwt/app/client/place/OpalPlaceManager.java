@@ -1,6 +1,5 @@
 package org.obiba.opal.web.gwt.app.client.place;
 
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
@@ -13,7 +12,8 @@ public class OpalPlaceManager extends PlaceManagerImpl {
   private final PlaceRequest defaultPlaceRequest;
 
   @Inject
-  public OpalPlaceManager(final EventBus eventBus, final TokenFormatter tokenFormatter, @DefaultPlace String defaultNameToken) {
+  public OpalPlaceManager(final EventBus eventBus, final TokenFormatter tokenFormatter,
+      @DefaultPlace String defaultNameToken) {
     super(eventBus, tokenFormatter);
     this.defaultPlaceRequest = new PlaceRequest(defaultNameToken);
   }

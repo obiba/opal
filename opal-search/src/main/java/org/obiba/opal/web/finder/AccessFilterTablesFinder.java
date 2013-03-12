@@ -12,8 +12,8 @@ package org.obiba.opal.web.finder;
 /**
  *
  */
-public class AccessFilterTablesFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
-    AbstractFinder<TQuery, TResult> {
+public class AccessFilterTablesFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>>
+    extends AbstractFinder<TQuery, TResult> {
 
   @Override
   public void find(TQuery query, TResult result) {

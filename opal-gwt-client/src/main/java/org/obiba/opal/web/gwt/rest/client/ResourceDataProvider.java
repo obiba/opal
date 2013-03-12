@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -26,7 +26,7 @@ public class ResourceDataProvider<T extends JavaScriptObject> extends AsyncDataP
   private final ResourceRequestBuilder<JsArray<T>> resourceRequestBuilder;
 
   public ResourceDataProvider(String resource) {
-    this(ResourceRequestBuilderFactory.<JsArray<T>> newBuilder().forResource(resource).get());
+    this(ResourceRequestBuilderFactory.<JsArray<T>>newBuilder().forResource(resource).get());
   }
 
   public ResourceDataProvider(ResourceRequestBuilder<JsArray<T>> resourceRequestBuilder) {

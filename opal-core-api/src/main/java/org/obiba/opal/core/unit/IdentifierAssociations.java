@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -90,11 +90,14 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
     boolean set(String unitName, String identifier) {
       Value currentIdentifier = this.unitIdentifiers.get(unitName);
       if(currentIdentifier.isNull() == false && currentIdentifier.getValue().equals(identifier) == false) {
-        throw new IllegalIdentifierAssociationException("Cannot override current unit identifier: " + unitName + ":" + currentIdentifier + " <--> opal:" + opalIdentifier);
+        throw new IllegalIdentifierAssociationException(
+            "Cannot override current unit identifier: " + unitName + ":" + currentIdentifier + " <--> opal:" +
+                opalIdentifier);
       }
       // Check duplicates
       if(index.get(unitName).unitIdentifierIsNewOrFor(identifier, opalIdentifier) == false) {
-        throw new IllegalIdentifierAssociationException("Cannot create duplicate unit identifier: " + unitName + ":" + identifier + " <--> opal:" + opalIdentifier);
+        throw new IllegalIdentifierAssociationException(
+            "Cannot create duplicate unit identifier: " + unitName + ":" + identifier + " <--> opal:" + opalIdentifier);
       }
 
       if(currentIdentifier.isNull()) {
@@ -121,7 +124,8 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
      * @return
      */
     public boolean unitIdentifierIsNewOrFor(String unitIdentifier, String opalIdentifier) {
-      return unitIdentifierToOpalIdentifier.containsKey(unitIdentifier) == false || unitIdentifierToOpalIdentifier.get(unitIdentifier).equals(opalIdentifier);
+      return unitIdentifierToOpalIdentifier.containsKey(unitIdentifier) == false ||
+          unitIdentifierToOpalIdentifier.get(unitIdentifier).equals(opalIdentifier);
     }
 
     /**
@@ -180,7 +184,8 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       Iterator<Value> idIterator;
       for(FunctionalUnit unit : units) {
         if(identifiersTable.hasVariable(unit.getKeyVariableName())) {
-          idIterator = identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource().getValues(opalEntities).iterator();
+          idIterator = identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource()
+              .getValues(opalEntities).iterator();
         } else if(unit.isOpal()) {
           idIterator = Iterables.transform(opalEntities, new Function<VariableEntity, Value>() {
 
@@ -214,6 +219,8 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       throw new UnsupportedOperationException();
     }
 
-  };
+  }
+
+  ;
 
 }

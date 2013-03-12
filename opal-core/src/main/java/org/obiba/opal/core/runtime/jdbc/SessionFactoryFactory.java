@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -56,12 +56,13 @@ public class SessionFactoryFactory {
     asfb.setJtaTransactionManager(txmgr);
     asfb.setHibernateProperties(hibernateProperties);
     asfb.getHibernateProperties().setProperty(Environment.DIALECT, determineDialect(dataSource).getClass().getName());
-    asfb.setAnnotatedClasses(new AnnotationConfigurationHelper().getAnnotatedTypes().toArray(new Class[] {}));
+    asfb.setAnnotatedClasses(new AnnotationConfigurationHelper().getAnnotatedTypes().toArray(new Class[] { }));
     asfb.setNamingStrategy(new MagmaNamingStrategy());
     asfb.setExposeTransactionAwareSessionFactory(false);
 
     // Inject dependencies
-    asfb = (AnnotationSessionFactoryBean) ac.getAutowireCapableBeanFactory().initializeBean(asfb, dataSource.hashCode() + "-session");
+    asfb = (AnnotationSessionFactoryBean) ac.getAutowireCapableBeanFactory()
+        .initializeBean(asfb, dataSource.hashCode() + "-session");
 
     onSessionFactoryBeanCreated(asfb);
 

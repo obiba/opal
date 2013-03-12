@@ -13,6 +13,7 @@ public interface CommandRegistry {
 
   /**
    * Returns true if this registry has a command with the specified name.
+   *
    * @param name
    * @return
    */
@@ -20,19 +21,19 @@ public interface CommandRegistry {
 
   /**
    * Returns the set of available command names.
+   *
    * @return
    */
   Set<String> getAvailableCommands();
 
   /**
    * Retrieves the CommandUsage annotation for a command name.
-   * 
+   *
    * @param commandName The command name.
    */
   CommandUsage getCommandUsage(String commandName);
 
   /**
-   * 
    * @param commandName the name of the command
    * @return the Class annotated with {@code CommandLineInterface} that defines the command's options
    */
@@ -40,7 +41,7 @@ public interface CommandRegistry {
 
   /**
    * Returns a new instance of the specified command using the specified arguments.
-   * 
+   *
    * @param name
    * @param arguments
    * @return

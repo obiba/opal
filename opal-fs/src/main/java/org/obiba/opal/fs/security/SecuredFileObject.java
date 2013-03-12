@@ -38,8 +38,8 @@ class SecuredFileObject extends DecoratedFileObject {
   }
 
   @Override
-  public void findFiles(FileSelector selector, boolean depthwise,
-      List<FileObject> selected) throws FileSystemException {
+  public void findFiles(FileSelector selector, boolean depthwise, List<FileObject> selected)
+      throws FileSystemException {
     super.findFiles(selector, depthwise,
         Arrays.asList(toSecuredFileObjects(selected.toArray(new FileObject[selected.size()]))));
   }

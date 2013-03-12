@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -40,8 +40,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 public class IdentifiersMapView extends PopupViewImpl implements IdentifiersMapPresenter.Display {
 
   @UiTemplate("IdentifiersMapView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, IdentifiersMapView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, IdentifiersMapView> {}
 
   private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -88,16 +87,16 @@ public class IdentifiersMapView extends PopupViewImpl implements IdentifiersMapP
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
 
-    .append(formatStep)//
-    .title(translations.identifiersMapFileStep())//
+        .append(formatStep)//
+        .title(translations.identifiersMapFileStep())//
 
-    .append(unitStep)//
-    .title(translations.identifiersMapUnitStep())//
+        .append(unitStep)//
+        .title(translations.identifiersMapUnitStep())//
 
-    .append(conclusionStep)//
-    .conclusion()//
+        .append(conclusionStep)//
+        .conclusion()//
 
-    .onPrevious().build();
+        .onPrevious().build();
   }
 
   @Override
@@ -144,8 +143,7 @@ public class IdentifiersMapView extends PopupViewImpl implements IdentifiersMapP
             dialog.setNextEnabled(false);
             dialog.setCancelEnabled(false);
           }
-        } else
-          stepChain.onNext();
+        } else stepChain.onNext();
       }
     });
   }

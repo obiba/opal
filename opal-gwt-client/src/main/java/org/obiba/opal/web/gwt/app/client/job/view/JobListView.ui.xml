@@ -1,33 +1,47 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <o:WorkbenchLayout>
-    <g:Label><ui:msg description="Jobs label">Jobs</ui:msg></g:Label>
+    <g:Label>
+      <ui:msg description="Jobs label">Jobs</ui:msg>
+    </g:Label>
     <g:Label></g:Label>
     <g:FlowPanel>
-      <g:Button ui:field="refreshButton" styleName="btn iconb i-sync"><ui:msg description="Refresh jobs list">Refresh</ui:msg></g:Button>
-      <g:Button ui:field="clearButton" styleName="btn iconb i-disapprove"><ui:msg description="Clear jobs list">Clear</ui:msg></g:Button>
+      <g:Button ui:field="refreshButton" styleName="btn iconb i-sync">
+        <ui:msg description="Refresh jobs list">Refresh</ui:msg>
+      </g:Button>
+      <g:Button ui:field="clearButton" styleName="btn iconb i-disapprove">
+        <ui:msg description="Clear jobs list">Clear</ui:msg>
+      </g:Button>
       <o:HelpImage page="Working+with+Jobs"></o:HelpImage>
     </g:FlowPanel>
-    
+
     <g:FlowPanel>
-	  <g:Label addStyleNames="p"><ui:msg description="Jobs list instructions">Check the status of the jobs that are currently running or that were completed.</ui:msg></g:Label>
-	    
-	  <o:HorizontalTabLayout addStyleNames="small-dual-indent top-margin">
-		<g:Anchor><ui:msg description="Jobs label">Jobs</ui:msg></g:Anchor>
-	    <g:VerticalPanel width="100%">
-	      <g:InlineLabel ui:field="noJobs"><ui:msg description="No Jobs label">No Jobs</ui:msg></g:InlineLabel>
-          <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned" />
-	      <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
-	    </g:VerticalPanel>
-	  </o:HorizontalTabLayout>
+      <g:Label addStyleNames="p">
+        <ui:msg description="Jobs list instructions">Check the status of the jobs that are currently running or that
+          were completed.
+        </ui:msg>
+      </g:Label>
+
+      <o:HorizontalTabLayout addStyleNames="small-dual-indent top-margin">
+        <g:Anchor>
+          <ui:msg description="Jobs label">Jobs</ui:msg>
+        </g:Anchor>
+        <g:VerticalPanel width="100%">
+          <g:InlineLabel ui:field="noJobs">
+            <ui:msg description="No Jobs label">No Jobs</ui:msg>
+          </g:InlineLabel>
+          <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
+          <o:Table ui:field="table" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
+        </g:VerticalPanel>
+      </o:HorizontalTabLayout>
     </g:FlowPanel>
-    
-  </o:WorkbenchLayout>  
-  
+
+  </o:WorkbenchLayout>
+
 </ui:UiBinder>

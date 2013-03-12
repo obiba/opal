@@ -13,7 +13,6 @@ import org.junit.Test;
 
 public class QueryTermJsonBuilderTest {
 
-
   @Test
   public void testBuild_QueryTerm() throws Exception {
 
@@ -46,13 +45,8 @@ public class QueryTermJsonBuilderTest {
     filtersBuilder.addFilterValue("opal-data.weight");
     filtersBuilder.setFieldName("_type");
 
-
-    QueryTermJsonBuilder queryBuilder =
-      new QueryTermJsonBuilder()
-        .setTermFieldName("_id")
-        .setTermFieldValue("6436175")
+    QueryTermJsonBuilder queryBuilder = new QueryTermJsonBuilder().setTermFieldName("_id").setTermFieldValue("6436175")
         .setTermFilters(filtersBuilder.build());
-
 
     System.out.println(">>>>> " + queryBuilder.build().toString());
 

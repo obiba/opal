@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -55,13 +55,13 @@ import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
 
-public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
+public class DatabaseAdministrationPresenter extends
+    ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
 
   @ProxyStandard
   @NameToken("!admin.databases")
   @TabInfo(container = AdministrationPresenter.class, label = "Databases", priority = 1)
-  public interface Proxy extends TabContentProxyPlace<DatabaseAdministrationPresenter> {
-  }
+  public interface Proxy extends TabContentProxyPlace<DatabaseAdministrationPresenter> {}
 
   public interface Display extends View {
 
@@ -85,12 +85,14 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
 
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider = new ResourceDataProvider<JdbcDataSourceDto>(Resources.databases());
+  private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider
+      = new ResourceDataProvider<JdbcDataSourceDto>(Resources.databases());
 
   private Command confirmedCommand;
 
   @Inject
-  public DatabaseAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, Provider<DatabasePresenter> jdbcDataSourcePresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
+  public DatabaseAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
+      Provider<DatabasePresenter> jdbcDataSourcePresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display, proxy);
     this.jdbcDataSourcePresenter = jdbcDataSourcePresenter;
     this.authorizationPresenter = authorizationPresenter.get();
@@ -99,7 +101,8 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post().authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
+        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
   }
 
   @Override
@@ -116,12 +119,14 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
   protected void onReveal() {
     refresh();
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder()
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
+        .authorize(authorizer).send();
   }
 
   @Override
@@ -172,17 +177,20 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
             @Override
             public void onResponseCode(Request request, Response response) {
               if(response.getStatusCode() == 200) {
-                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
+                getEventBus()
+                    .fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
               } else {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray()).build());
+                getEventBus().fireEvent(
+                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                        .build());
               }
             }
 
           };
-          ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>> newBuilder()//
-          .forResource(Resources.database(object.getName(), "connections")).accept("application/json")//
-          .withCallback(200, callback).withCallback(503, callback).post().send();
+          ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder()//
+              .forResource(Resources.database(object.getName(), "connections")).accept("application/json")//
+              .withCallback(200, callback).withCallback(503, callback).post().send();
         }
       }
 
@@ -203,7 +211,8 @@ public class DatabaseAdministrationPresenter extends ItemAdministrationPresenter
   }
 
   private void deleteDatabase(JdbcDataSourceDto database) {
-    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>> newBuilder().forResource(Resources.database(database.getName())).withCallback(200, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder()
+        .forResource(Resources.database(database.getName())).withCallback(200, new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {

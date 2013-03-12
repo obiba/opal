@@ -66,19 +66,21 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
         return now.get(Calendar.MINUTE) % 30 <= 1;
 
       case HOURLY:
-        return now.get(Calendar.MINUTE) == schedule.getMinutes() || now.get(Calendar.MINUTE) - 1 == schedule
-            .getMinutes();
+        return now.get(Calendar.MINUTE) == schedule.getMinutes() ||
+            now.get(Calendar.MINUTE) - 1 == schedule.getMinutes();
 
       case DAILY:
         // must be the exact time of the day (+ 1 min).
-        return now.get(Calendar.HOUR_OF_DAY) == schedule.getHours() && (now.get(Calendar.MINUTE) == schedule
-            .getMinutes() || now.get(Calendar.MINUTE) - 1 == schedule.getMinutes());
+        return now.get(Calendar.HOUR_OF_DAY) == schedule.getHours() &&
+            (now.get(Calendar.MINUTE) == schedule.getMinutes() ||
+                now.get(Calendar.MINUTE) - 1 == schedule.getMinutes());
 
       case WEEKLY:
         // must be the exact day at the exact time
-        return now.get(Calendar.DAY_OF_WEEK) == schedule.getDay().getNumber() && now
-            .get(Calendar.HOUR_OF_DAY) == schedule.getHours() && (now.get(Calendar.MINUTE) == schedule
-            .getMinutes() || now.get(Calendar.MINUTE) - 1 == schedule.getMinutes());
+        return now.get(Calendar.DAY_OF_WEEK) == schedule.getDay().getNumber() &&
+            now.get(Calendar.HOUR_OF_DAY) == schedule.getHours() &&
+            (now.get(Calendar.MINUTE) == schedule.getMinutes() ||
+                now.get(Calendar.MINUTE) - 1 == schedule.getMinutes());
 
       default:
         return false;

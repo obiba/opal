@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -56,13 +56,16 @@ public class FunctionalUnitListPresenter extends PresenterWidget<FunctionalUnitL
   }
 
   private void refreshFunctionalUnits() {
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>> newBuilder().forResource("/functional-units").get().withCallback(new FunctionalUnitsResourceCallback()).send();
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units").get()
+        .withCallback(new FunctionalUnitsResourceCallback()).send();
   }
 
   private void addHandlers() {
     super.registerHandler(getView().addSelectFunctionalUnitHandler(new FunctionalUnitSelectionChangeHandler()));
-    super.registerHandler(getEventBus().addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
-    super.registerHandler(getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
+    super.registerHandler(
+        getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
   }
 
   private class FunctionalUnitCreatedHandler implements FunctionalUnitCreatedEvent.Handler {

@@ -1,53 +1,68 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-  xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
-  
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.wizard.derive.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
   <g:FlowPanel>
-     <o:WizardStep ui:field="methodStep">
+    <o:WizardStep ui:field="methodStep">
       <g:FlowPanel styleName="input">
-      	<g:RadioButton ui:field="auto"><ui:msg description="Automatically label">Automatically</ui:msg></g:RadioButton>
-      	<g:Label addStyleNames="small-top-margin indent"><ui:msg description="Automatically description label">Similar distinct values will be grouped together.</ui:msg></g:Label>
+        <g:RadioButton ui:field="auto">
+          <ui:msg description="Automatically label">Automatically</ui:msg>
+        </g:RadioButton>
+        <g:Label addStyleNames="small-top-margin indent">
+          <ui:msg description="Automatically description label">Similar distinct values will be grouped together.
+          </ui:msg>
+        </g:Label>
       </g:FlowPanel>
       <g:FlowPanel styleName="input">
-      	<g:RadioButton ui:field="manual"><ui:msg description="Manually label">Manually</ui:msg></g:RadioButton>
-      	<g:Label addStyleNames="small-top-margin indent"><ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg></g:Label>
+        <g:RadioButton ui:field="manual">
+          <ui:msg description="Manually label">Manually</ui:msg>
+        </g:RadioButton>
+        <g:Label addStyleNames="small-top-margin indent">
+          <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
+        </g:Label>
       </g:FlowPanel>
-     </o:WizardStep>
-     <o:WizardStep ui:field="mapStep">
-      	<g:FlowPanel>
-      	  <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
-            <g:customHeader>
-             <g:Label><ui:msg description="Add Value Mapping label">Add a value mapping</ui:msg></g:Label>
-            </g:customHeader>
-            <g:Grid>
-              <g:row>
-                <g:customCell styleName="top">
-                  <g:FlowPanel styleName="input block">
-                    <g:Label addStyleNames="key"><ui:msg description="Original Value label">Original Value</ui:msg></g:Label>
-                    <g:SuggestBox ui:field="value"/>
-                  </g:FlowPanel>
-                    </g:customCell>
-                    <g:customCell styleName="top small-indent">
-                  <g:FlowPanel styleName="input block">
-                    <g:Label addStyleNames="key"><ui:msg description="New Value label">New Value</ui:msg></g:Label>
-                    <g:TextBox ui:field="newValue"/>
-                  </g:FlowPanel>
-                </g:customCell>
-              </g:row>
-              <g:row>
-                <g:customCell>
-                  <g:Button ui:field="addButton" styleName="btn btn-info"/>
-                </g:customCell>
-              </g:row>
-            </g:Grid>
-          </g:DisclosurePanel>
-     	  <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="100" addStyleNames="top-margin"/>
-     	</g:FlowPanel>
-     	
-     </o:WizardStep>
+    </o:WizardStep>
+    <o:WizardStep ui:field="mapStep">
+      <g:FlowPanel>
+        <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
+          <g:customHeader>
+            <g:Label>
+              <ui:msg description="Add Value Mapping label">Add a value mapping</ui:msg>
+            </g:Label>
+          </g:customHeader>
+          <g:Grid>
+            <g:row>
+              <g:customCell styleName="top">
+                <g:FlowPanel styleName="input block">
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="Original Value label">Original Value</ui:msg>
+                  </g:Label>
+                  <g:SuggestBox ui:field="value"/>
+                </g:FlowPanel>
+              </g:customCell>
+              <g:customCell styleName="top small-indent">
+                <g:FlowPanel styleName="input block">
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="New Value label">New Value</ui:msg>
+                  </g:Label>
+                  <g:TextBox ui:field="newValue"/>
+                </g:FlowPanel>
+              </g:customCell>
+            </g:row>
+            <g:row>
+              <g:customCell>
+                <g:Button ui:field="addButton" styleName="btn btn-info"/>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+        </g:DisclosurePanel>
+        <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="100" addStyleNames="top-margin"/>
+      </g:FlowPanel>
+
+    </o:WizardStep>
   </g:FlowPanel>
 </ui:UiBinder>

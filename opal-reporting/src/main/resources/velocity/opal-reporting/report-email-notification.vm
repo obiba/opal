@@ -1,6 +1,6 @@
 A new report about "${report_template}" is available for download:
 
-  ${report_public_link}
+${report_public_link}
 
 ---
 You received this email because you are one of the people to be notified when a report about "${report_template}" is produced.

@@ -29,7 +29,6 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.QueryTermConverter;
 
 import junit.framework.Assert;
 

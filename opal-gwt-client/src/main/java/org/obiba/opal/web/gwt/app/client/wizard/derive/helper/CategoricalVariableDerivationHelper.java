@@ -127,8 +127,9 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
       List<ValueMapEntry> missingValueMapEntries, int index) {
     int newIndex = index;
     for(CategoryDto category : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
-      double count = countByCategoryName.containsKey(category.getName()) ? countByCategoryName
-          .get(category.getName()) : 0;
+      double count = countByCategoryName.containsKey(category.getName())
+          ? countByCategoryName.get(category.getName())
+          : 0;
       ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(category, count);
       if(estimateIsMissing(category)) {
         builder.missing();
@@ -180,6 +181,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   /**
    * Process non-missing categories.
+   *
    * @param index
    * @param value
    * @param builder
@@ -220,6 +222,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   /**
    * Recode each missing values with indexes like 8s and 9s.
+   *
    * @param missingValueMapEntries
    * @param indexMax
    */

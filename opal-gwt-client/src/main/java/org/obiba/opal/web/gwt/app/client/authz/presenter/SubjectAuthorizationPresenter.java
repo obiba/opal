@@ -1,16 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.authz.presenter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest.AclGetCallback;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -19,7 +16,6 @@ import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
 import org.obiba.opal.web.model.client.opal.Subject.SubjectType;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
@@ -130,14 +126,14 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
     @Override
     public void onGet(JsArray<Acls> resource) {
       subjectPermissions = JsArrays.create();
-      JsArrays.pushAll(subjectPermissions,subjects);
-      for (Acls acls : JsArrays.toIterable(resource)) {
-         for (int i=0; i<subjectPermissions.length(); i++) {
-           if (subjectPermissions.get(i).getSubject().getPrincipal().equals(acls.getSubject().getPrincipal())) {
-             subjectPermissions.set(i,acls);
-             break;
-           }
-         }
+      JsArrays.pushAll(subjectPermissions, subjects);
+      for(Acls acls : JsArrays.toIterable(resource)) {
+        for(int i = 0; i < subjectPermissions.length(); i++) {
+          if(subjectPermissions.get(i).getSubject().getPrincipal().equals(acls.getSubject().getPrincipal())) {
+            subjectPermissions.set(i, acls);
+            break;
+          }
+        }
       }
       getView().renderPermissions(subjectPermissions);
     }

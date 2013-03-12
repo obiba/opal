@@ -30,11 +30,13 @@ public final class JsonIoUtil {
   private JsonIoUtil() {
   }
 
-  public static <T extends Message> ArrayList<T> mergeCollection(final Reader reader, final Builder builder) throws IOException {
+  public static <T extends Message> ArrayList<T> mergeCollection(final Reader reader, final Builder builder)
+      throws IOException {
     return mergeCollection(reader, ExtensionRegistry.getEmptyRegistry(), builder);
   }
 
-  public static <T extends Message> ArrayList<T> mergeCollection(final Reader reader, final ExtensionRegistry extensionRegistry, final Builder builder) throws IOException {
+  public static <T extends Message> ArrayList<T> mergeCollection(final Reader reader,
+      final ExtensionRegistry extensionRegistry, final Builder builder) throws IOException {
     if(reader == null) throw new IllegalArgumentException("reader cannot be null");
     if(extensionRegistry == null) throw new IllegalArgumentException("extensionRegistry cannot be null");
     if(builder == null) throw new IllegalArgumentException("builder cannot be null");
@@ -51,7 +53,8 @@ public final class JsonIoUtil {
     return messages;
   }
 
-  public static void printCollection(final Iterable<? extends Message> messages, final Appendable appendable) throws IOException {
+  public static void printCollection(final Iterable<? extends Message> messages, final Appendable appendable)
+      throws IOException {
     if(messages == null) throw new IllegalArgumentException("messages cannot be null");
     if(appendable == null) throw new IllegalArgumentException("messages cannot be null");
 
@@ -78,6 +81,7 @@ public final class JsonIoUtil {
     /**
      * Called when a Message has been read from a stream of Messages. Note that this method may never be called if the
      * stream contains 0 Messages.
+     *
      * @param builder
      */
     public void onMerge(Builder builder);
@@ -88,7 +92,8 @@ public final class JsonIoUtil {
    */
   private static final class InnerJsonFormat extends JsonFormat {
 
-    static void mergeCollection(final Reader reader, final ExtensionRegistry extensionRegistry, final Builder builder, final MergeCallback callback) throws IOException {
+    static void mergeCollection(final Reader reader, final ExtensionRegistry extensionRegistry, final Builder builder,
+        final MergeCallback callback) throws IOException {
       CharSequence input = toStringBuilder(reader);
       Tokenizer tokenizer = new Tokenizer(input.subSequence(0, input.length()));
       tokenizer.consume(JS_ARRAY_OPEN_STR);

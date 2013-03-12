@@ -84,7 +84,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private void updateDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
         .withCallback(new DatasourcesCallback()).send();
   }
 
@@ -125,17 +125,15 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private ViewDto getViewDto() {
-    ViewDto view =
-        ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table)
-            .defaultVariableListView().build();
-    VariableListViewDto derivedVariables =
-        (VariableListViewDto) view.getExtension(VariableListViewDto.ViewDtoExtensions.view);
+    ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table)
+        .defaultVariableListView().build();
+    VariableListViewDto derivedVariables = (VariableListViewDto) view
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
     for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
       DerivationHelper derivator = null;
-      if(VariableDtos.hasCategories(variable)
-          && (variable.getValueType().equals("text") || (variable.getValueType().equals("integer") && VariableDtos
-              .allCategoriesMissing(variable) == false))) {
+      if(VariableDtos.hasCategories(variable) && (variable.getValueType().equals("text") ||
+          (variable.getValueType().equals("integer") && VariableDtos.allCategoriesMissing(variable) == false))) {
         CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
         d.initializeValueMapEntries();
         derivator = d;
@@ -186,7 +184,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
         uriBuilder
             .segment("datasource", getDisplay().getDatasourceName(), "view", getDisplay().getViewName().getText());
 
-        ResourceRequestBuilderFactory.<ViewDto> newBuilder().forResource(uriBuilder.build()).get()
+        ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(uriBuilder.build()).get()
             .withCallback(alreadyExistCodingViewCallback).withCallback(Response.SC_NOT_FOUND, createCodingViewCallback)
             .send();
       }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -90,32 +90,32 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
 
-    .append(selectTypeStep, helpPanel)//
-    .title(translations.createDatasourceStepSummary())//
-    .onValidate(new ValidationHandler() {
+        .append(selectTypeStep, helpPanel)//
+        .title(translations.createDatasourceStepSummary())//
+        .onValidate(new ValidationHandler() {
 
-      @Override
-      public boolean validate() {
-        return selectTypeValidator.validate();
-      }
-    })//
-    .onReset(new ResetHandler() {
+          @Override
+          public boolean validate() {
+            return selectTypeValidator.validate();
+          }
+        })//
+        .onReset(new ResetHandler() {
 
-      @Override
-      public void onReset() {
-        datasourceName.setText("");
-        datasourceType.setSelectedIndex(0);
-      }
-    })//
+          @Override
+          public void onReset() {
+            datasourceName.setText("");
+            datasourceType.setSelectedIndex(0);
+          }
+        })//
 
-    .append(datasourceFormStep)//
-    .title(translations.datasourceOptionsLabel())//
+        .append(datasourceFormStep)//
+        .title(translations.datasourceOptionsLabel())//
 
-    .append(conclusionStep)//
-    .title(translations.createDatasourceProcessSummary())//
-    .conclusion()//
+        .append(conclusionStep)//
+        .title(translations.createDatasourceProcessSummary())//
+        .conclusion()//
 
-    .onNext().onPrevious().build();
+        .onNext().onPrevious().build();
   }
 
   //
@@ -164,8 +164,7 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   //
 
   @UiTemplate("CreateDatasourceView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, CreateDatasourceView> {
-  }
+  interface ViewUiBinder extends UiBinder<DialogBox, CreateDatasourceView> {}
 
   @Override
   public void show() {

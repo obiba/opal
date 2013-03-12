@@ -93,8 +93,9 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
 
   /**
    * Creates a {@link ConfirmationRequiredEvent}.
-   * @param source     the source of the event
-   * @param titleKey   the unlocalized confirmation title
+   *
+   * @param source the source of the event
+   * @param titleKey the unlocalized confirmation title
    * @param messageKey the unlocalized confirmation message
    */
   public static ConfirmationRequiredEvent createWithKeys(Object source, String titleKey, String messageKey) {
@@ -103,8 +104,9 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
 
   /**
    * Creates a {@link ConfirmationRequiredEvent}.
-   * @param source  the source of the event
-   * @param title   the localized confirmation title
+   *
+   * @param source the source of the event
+   * @param title the localized confirmation title
    * @param message the localized confirmation message
    */
   public static ConfirmationRequiredEvent createWithMessages(Object source, String title, String message) {

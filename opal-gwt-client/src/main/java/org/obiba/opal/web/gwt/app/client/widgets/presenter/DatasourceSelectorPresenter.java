@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -60,17 +60,20 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
 
   @Override
   public void refreshDisplay() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get().withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
 
-      public void onResource(Response response, JsArray<DatasourceDto> resource) {
-        JsArray<DatasourceDto> datasources = resource != null ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
-        getDisplay().setDatasources(datasources);
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            JsArray<DatasourceDto> datasources = resource != null
+                ? resource
+                : (JsArray<DatasourceDto>) JsArray.createArray();
+            getDisplay().setDatasources(datasources);
 
-        if(datasourcesRefreshedCallback != null) {
-          datasourcesRefreshedCallback.onDatasourcesRefreshed();
-        }
-      }
-    }).send();
+            if(datasourcesRefreshedCallback != null) {
+              datasourcesRefreshedCallback.onDatasourcesRefreshed();
+            }
+          }
+        }).send();
   }
 
   @Override

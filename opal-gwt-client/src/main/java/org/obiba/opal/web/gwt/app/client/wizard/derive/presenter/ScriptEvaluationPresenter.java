@@ -109,6 +109,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   /**
    * Set the variable to be evaluated. Value type and script are extracted from the variable dto.
+   *
    * @param originalVariable
    */
   public void setOriginalVariable(VariableDto originalVariable) {
@@ -136,10 +137,10 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
     String script = VariableDtos.getScript(originalVariable);
-    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder =
-        ResourceRequestBuilderFactory.<SummaryStatisticsDto> newBuilder() //
-            .forResource(link).withFormBody("script", script).post() //
-            .accept("application/x-protobuf+json");
+    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory
+        .<SummaryStatisticsDto>newBuilder() //
+        .forResource(link).withFormBody("script", script).post() //
+        .accept("application/x-protobuf+json");
 
     if(originalVariable != null) {
       JsArray<CategoryDto> cats = originalVariable.getCategoriesArray();
@@ -233,7 +234,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
       ResponseCodeCallback callback = new ValuesRequestCallback(offset);
 
-      ResourceRequestBuilder<ValueSetsDto> requestBuilder = ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder() //
+      ResourceRequestBuilder<ValueSetsDto> requestBuilder = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder() //
           .forResource(link.toString()).post().withFormBody("script", script) //
           .withCallback(Response.SC_OK, callback)//
           .withCallback(Response.SC_BAD_REQUEST, callback)//
@@ -255,24 +256,24 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     @Override
     public void onResponseCode(Request request, Response response) {
       switch(response.getStatusCode()) {
-      case Response.SC_OK:
-        if(response.getText() != null) {
+        case Response.SC_OK:
+          if(response.getText() != null) {
+            getView().setValuesVisible(true);
+            getView().getValueSetsProvider()
+                .populateValues(offset, (ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
+          }
+          break;
+        case Response.SC_FORBIDDEN:
+          getView().setValuesVisible(false);
+          break;
+        case Response.SC_BAD_REQUEST:
           getView().setValuesVisible(true);
-          getView().getValueSetsProvider().populateValues(offset,
-              (ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
-        }
-        break;
-      case Response.SC_FORBIDDEN:
-        getView().setValuesVisible(false);
-        break;
-      case Response.SC_BAD_REQUEST:
-        getView().setValuesVisible(true);
-        scriptInterpretationFail(response);
-        break;
-      default:
-        getView().setValuesVisible(true);
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
-        break;
+          scriptInterpretationFail(response);
+          break;
+        default:
+          getView().setValuesVisible(true);
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
+          break;
       }
     }
 
@@ -281,12 +282,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
         for(JavaScriptErrorDto error : errors) {
-          getEventBus().fireEvent(
-              NotificationEvent
-                  .newBuilder()
-                  .error(
-                      translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()))
-                  .build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder()
+              .error(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()))
+              .build());
         }
       }
     }
@@ -295,8 +293,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
       List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
 
-      JsArray<JavaScriptErrorDto> errors =
-          (JsArray<JavaScriptErrorDto>) errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
+      JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
+          .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
       if(errors != null) {
         for(int i = 0; i < errors.length(); i++) {
           javaScriptErrors.add(errors.get(i));

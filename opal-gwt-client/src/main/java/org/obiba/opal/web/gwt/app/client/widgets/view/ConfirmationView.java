@@ -29,8 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class ConfirmationView extends DialogBox implements Display {
 
   @UiTemplate("ConfirmationView.ui.xml")
-  interface ConfirmationViewUiBinder extends UiBinder<DockLayoutPanel, ConfirmationView> {
-  }
+  interface ConfirmationViewUiBinder extends UiBinder<DockLayoutPanel, ConfirmationView> {}
 
   //
   // Constants

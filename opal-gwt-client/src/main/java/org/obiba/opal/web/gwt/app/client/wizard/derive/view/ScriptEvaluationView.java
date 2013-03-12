@@ -55,8 +55,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPresenter.Display {
 
   @UiTemplate("ScriptEvaluationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -213,8 +212,8 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   // Inner classes
   //
 
-  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto> implements
-      ValueSetsProvider {
+  private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto>
+      implements ValueSetsProvider {
 
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {

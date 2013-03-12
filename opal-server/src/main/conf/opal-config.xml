@@ -10,9 +10,9 @@
   <magmaEngineFactory>
 
     <extensions>
-      <org.obiba.magma.js.MagmaJsExtension />
-      <org.obiba.magma.xstream.MagmaXStreamExtension />
-      <org.obiba.magma.security.MagmaSecurityExtension />
+      <org.obiba.magma.js.MagmaJsExtension/>
+      <org.obiba.magma.xstream.MagmaXStreamExtension/>
+      <org.obiba.magma.security.MagmaSecurityExtension/>
     </extensions>
 
     <factories>

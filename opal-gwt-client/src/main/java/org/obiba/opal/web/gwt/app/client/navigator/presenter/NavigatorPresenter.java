@@ -62,8 +62,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
   public static final GwtEvent.Type<RevealContentHandler<?>> CENTER_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ProxyStandard
-  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<NavigatorPresenter> {
-  }
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<NavigatorPresenter> {}
 
   @Inject
   public NavigatorPresenter(final Display display, final Proxy proxy, final EventBus eventBus) {

@@ -1,10 +1,10 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
 
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -51,8 +51,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
   private static final long GB = MB * KB;
 
   @UiTemplate("FolderDetailsView.ui.xml")
-  interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {
-  }
+  interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {}
 
   private static FolderDetailsUiBinder uiBinder = GWT.create(FolderDetailsUiBinder.class);
 
@@ -87,7 +86,9 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
   @SuppressWarnings("unchecked")
   public void renderRows(final FileDto folder) {
-    JsArray<FileDto> children = (folder.getChildrenCount() != 0) ? filterChildren(folder.getChildrenArray()) : (JsArray<FileDto>) JsArray.createArray();
+    JsArray<FileDto> children = (folder.getChildrenCount() != 0)
+        ? filterChildren(folder.getChildrenArray())
+        : (JsArray<FileDto>) JsArray.createArray();
 
     if(!folder.getName().equals("root")) {
       FileDto parent = FileDtos.getParent(folder);
@@ -178,9 +179,9 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
   /**
    * Returns a sorted copy of the specified file list.
-   * 
+   * <p/>
    * This method simply puts folders ahead of regular files; no additional sorting is performed.
-   * 
+   *
    * @param fileList the list to be sorted
    * @return the sorted list
    */
@@ -211,7 +212,8 @@ public class FolderDetailsView extends ViewImpl implements Display {
       super(new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
         @Override
         public SafeHtml render(String object) {
-          return new SafeHtmlBuilder().appendHtmlConstant("<a>").appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
+          return new SafeHtmlBuilder().appendHtmlConstant("<a>").appendEscaped(object).appendHtmlConstant("</a>")
+              .toSafeHtml();
         }
       }));
 
@@ -233,7 +235,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
         return "folder-up";
       }
       String styles = dto.getType().getName().toLowerCase();
-      if (dto.getReadable() == false) {
+      if(dto.getReadable() == false) {
         styles += " forbidden";
       }
       return styles;

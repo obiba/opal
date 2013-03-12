@@ -4,10 +4,10 @@ package json;
 
 extend google.protobuf.FileOptions {
 
-    // Set the namespace (overrides package)
-    optional string namespace   = 50102;
-    // Suffix for file names
-    optional string suffix      = 50103 [default = ".pb.js"];
+  // Set the namespace (overrides package)
+  optional string namespace = 50102;
+  // Suffix for file names
+  optional string suffix = 50103 [default = ".pb.js"];
 
 }
 

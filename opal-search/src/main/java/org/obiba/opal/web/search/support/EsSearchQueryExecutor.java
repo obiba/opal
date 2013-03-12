@@ -54,8 +54,8 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
    * @return
    * @throws JSONException
    */
-  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
-      Search.QueryTermsDto dtoQueries) throws JSONException {
+  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper, Search.QueryTermsDto dtoQueries)
+      throws JSONException {
 
     Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
     Assert.notNull(dtoQueries, "Query dto request is null!");
@@ -65,24 +65,23 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
     String body = build(dtoQueries, indexManagerHelper);
 
-    esProvider.getRest()
-        .dispatchRequest(new EsRestRequest(indexManagerHelper.getValueTableIndex(), body, "_search"),
-            new RestChannel() {
+    esProvider.getRest().dispatchRequest(new EsRestRequest(indexManagerHelper.getValueTableIndex(), body, "_search"),
+        new RestChannel() {
 
-              @Override
-              public void sendResponse(RestResponse response) {
-                log.info(response.toString());
+          @Override
+          public void sendResponse(RestResponse response) {
+            log.info(response.toString());
 
-                try {
-                  ref.set(convert(response));
-                } catch(IOException e) {
-                  // Not gonna happen
-                } finally {
-                  latch.countDown();
-                }
-              }
+            try {
+              ref.set(convert(response));
+            } catch(IOException e) {
+              // Not gonna happen
+            } finally {
+              latch.countDown();
+            }
+          }
 
-            });
+        });
 
     try {
 
@@ -110,8 +109,8 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
    * @return
    * @throws JSONException
    */
-  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper,
-      Search.QueryTermDto dtoQuery) throws JSONException {
+  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper, Search.QueryTermDto dtoQuery)
+      throws JSONException {
 
     Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
     Assert.notNull(dtoQuery, "Query dto request is null!");
@@ -148,10 +147,10 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
     private final String esUri;
 
-    private final Map<String, String> headers = ImmutableMap.of("Content-Type","application/json");
+    private final Map<String, String> headers = ImmutableMap.of("Content-Type", "application/json");
 
     EsRestRequest(ValueTableIndex tableIndex, String body, String path) {
-      this(tableIndex,body, path, new HashMap<String, String>());
+      this(tableIndex, body, path, new HashMap<String, String>());
     }
 
     EsRestRequest(ValueTableIndex tableIndex, String body, String path, Map<String, String> params) {

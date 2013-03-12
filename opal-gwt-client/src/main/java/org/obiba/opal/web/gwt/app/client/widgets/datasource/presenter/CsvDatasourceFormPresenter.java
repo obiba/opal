@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -15,7 +15,6 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
-import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -33,7 +32,8 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDatasourceFormPresenter.Display>
+    implements DatasourceFormPresenter {
 
   public static class Subscriber extends DatasourceFormPresenterSubscriber {
 
@@ -63,7 +63,8 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
   //
 
   @Inject
-  public CsvDatasourceFormPresenter(final Display display, final EventBus eventBus, FileSelectionPresenter csvFileSelectionPresenter) {
+  public CsvDatasourceFormPresenter(final Display display, final EventBus eventBus,
+      FileSelectionPresenter csvFileSelectionPresenter) {
     super(eventBus, display);
     this.csvFileSelectionPresenter = csvFileSelectionPresenter;
 
@@ -132,7 +133,8 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
 
   @SuppressWarnings("unchecked")
   private JsArray<CsvDatasourceTableBundleDto> createCsvDatasourceTableBundleDtoArray() {
-    JsArray<CsvDatasourceTableBundleDto> tableBundleDtoArray = (JsArray<CsvDatasourceTableBundleDto>) JsArray.createArray();
+    JsArray<CsvDatasourceTableBundleDto> tableBundleDtoArray = (JsArray<CsvDatasourceTableBundleDto>) JsArray
+        .createArray();
 
     CsvDatasourceTableBundleDto csvDatasourceTableBundleDto = CsvDatasourceTableBundleDto.create();
     csvDatasourceTableBundleDto.setName(DEFAULT_TABLE_NAME);
@@ -148,26 +150,28 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
   }
 
   private void getDefaultCharset() {
-    ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/default").get().withCallback(new ResourceCallback<JsArrayString>() {
+    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
+        .withCallback(new ResourceCallback<JsArrayString>() {
 
-      @Override
-      public void onResource(Response response, JsArrayString resource) {
-        String charset = resource.get(0);
-        getView().setDefaultCharset(charset);
-      }
-    }).send();
+          @Override
+          public void onResource(Response response, JsArrayString resource) {
+            String charset = resource.get(0);
+            getView().setDefaultCharset(charset);
+          }
+        }).send();
 
   }
 
   private void getAvailableCharsets() {
-    ResourceRequestBuilderFactory.<JsArrayString> newBuilder().forResource("/files/charsets/available").get().withCallback(new ResourceCallback<JsArrayString>() {
-      @Override
-      public void onResource(Response response, JsArrayString datasources) {
-        for(int i = 0; i < datasources.length(); i++) {
-          availableCharsets.add(datasources.get(i));
-        }
-      }
-    }).send();
+    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/available").get()
+        .withCallback(new ResourceCallback<JsArrayString>() {
+          @Override
+          public void onResource(Response response, JsArrayString datasources) {
+            for(int i = 0; i < datasources.length(); i++) {
+              availableCharsets.add(datasources.get(i));
+            }
+          }
+        }).send();
   }
 
   private HasText getSelectedFile() {

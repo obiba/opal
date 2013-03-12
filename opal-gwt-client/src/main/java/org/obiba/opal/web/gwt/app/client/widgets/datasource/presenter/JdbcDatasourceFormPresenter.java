@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -26,7 +26,8 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<JdbcDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<JdbcDatasourceFormPresenter.Display>
+    implements DatasourceFormPresenter {
 
   public static class Subscriber extends DatasourceFormPresenterSubscriber {
 
@@ -42,7 +43,9 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
   public JdbcDatasourceFormPresenter(final Display display, final EventBus eventBus) {
     super(eventBus, display);
 
-    addValidator(new RequiredOptionValidator(RequiredOptionValidator.asSet(getView().getUseMetadataTablesOption(), getView().getDoNotUseMetadataTablesOption()), "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables"));
+    addValidator(new RequiredOptionValidator(RequiredOptionValidator
+        .asSet(getView().getUseMetadataTablesOption(), getView().getDoNotUseMetadataTablesOption()),
+        "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables"));
   }
 
   @Override
@@ -52,13 +55,14 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
   @Override
   protected void onReveal() {
-    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>> newBuilder().forResource("/jdbc/databases").withCallback(new ResourceCallback<JsArray<JdbcDataSourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder().forResource("/jdbc/databases")
+        .withCallback(new ResourceCallback<JsArray<JdbcDataSourceDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<JdbcDataSourceDto> resource) {
-        getView().setDatabases(resource);
-      }
-    }).get().send();
+          @Override
+          public void onResource(Response response, JsArray<JdbcDataSourceDto> resource) {
+            getView().setDatabases(resource);
+          }
+        }).get().send();
   }
 
   @Override

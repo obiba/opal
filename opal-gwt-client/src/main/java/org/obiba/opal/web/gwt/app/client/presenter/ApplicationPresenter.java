@@ -84,8 +84,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   public static final GwtEvent.Type<RevealContentHandler<?>> WORKBENCH = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ProxyStandard
-  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<ApplicationPresenter> {
-  }
+  public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<ApplicationPresenter> {}
 
   private final RequestCredentials credentials;
 

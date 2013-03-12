@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -21,20 +21,20 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
 /**
  * A cell that renders a button and takes a delegate to perform actions on mouseUp.
- * 
+ *
  * @param <C> the type that this Cell represents
  */
 public class IconActionCell<C> extends AbstractCell<C> {
 
   /**
    * The delegate that will handle events from the cell.
-   * 
+   *
    * @param <T> the type that this delegate acts on
    */
   public static interface Delegate<T> {
     /**
      * Perform the desired action on the given object.
-     * 
+     *
      * @param value the value to be acted upon
      */
     void executeClick(NativeEvent event, T value);
@@ -50,7 +50,7 @@ public class IconActionCell<C> extends AbstractCell<C> {
 
   /**
    * Construct a new {@link ActionCell}.
-   * 
+   *
    * @param iconClass the css class of the icon to display
    * @param delegate the delegate that will handle events
    */
@@ -70,7 +70,8 @@ public class IconActionCell<C> extends AbstractCell<C> {
   }
 
   @Override
-  public void onBrowserEvent(Context context, Element parent, C value, NativeEvent event, ValueUpdater<C> valueUpdater) {
+  public void onBrowserEvent(Context context, Element parent, C value, NativeEvent event,
+      ValueUpdater<C> valueUpdater) {
     super.onBrowserEvent(context, parent, value, event, valueUpdater);
     if(isEnabled() == false) return;
     if("click".equals(event.getType()) || "mousedown".equals(event.getType())) {
@@ -87,6 +88,7 @@ public class IconActionCell<C> extends AbstractCell<C> {
 
   /**
    * Method to be overridden in order to enable dynamically the icon. Default is enabled.
+   *
    * @return
    */
   public boolean isEnabled() {
@@ -97,21 +99,26 @@ public class IconActionCell<C> extends AbstractCell<C> {
   public void render(Context context, C value, SafeHtmlBuilder sb) {
     if(isEnabled()) {
       if(iconClass.isEmpty()) {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
+        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon\">")).append(message)
+            .append(SafeHtmlUtils.fromSafeConstant("</a>"));
       } else {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"iconb " + iconClass + "\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
+        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"iconb " + iconClass + "\">")).append(message)
+            .append(SafeHtmlUtils.fromSafeConstant("</a>"));
       }
     } else {
       if(iconClass.isEmpty()) {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
+        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon disabled\">")).append(message)
+            .append(SafeHtmlUtils.fromSafeConstant("</span>"));
       } else {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"iconb " + iconClass + " disabled\">")).append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
+        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"iconb " + iconClass + " disabled\">")).append(message)
+            .append(SafeHtmlUtils.fromSafeConstant("</span>"));
       }
     }
   }
 
   @Override
-  protected void onEnterKeyDown(Context context, Element parent, C value, NativeEvent event, ValueUpdater<C> valueUpdater) {
+  protected void onEnterKeyDown(Context context, Element parent, C value, NativeEvent event,
+      ValueUpdater<C> valueUpdater) {
     if("click".equals(event.getType())) {
       delegate.executeClick(event, value);
     } else {

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -23,7 +23,8 @@ public class AuthorizationPresenter extends PresenterWidget<AuthorizationPresent
   private final SubjectAuthorizationPresenter groupAuthzPresenter;
 
   @Inject
-  public AuthorizationPresenter(Display display, EventBus eventBus, SubjectAuthorizationPresenter userAuthzPresenter, SubjectAuthorizationPresenter groupAuthzPresenter) {
+  public AuthorizationPresenter(Display display, EventBus eventBus, SubjectAuthorizationPresenter userAuthzPresenter,
+      SubjectAuthorizationPresenter groupAuthzPresenter) {
     super(eventBus, display);
     this.userAuthzPresenter = userAuthzPresenter;
     this.groupAuthzPresenter = groupAuthzPresenter;

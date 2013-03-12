@@ -29,7 +29,7 @@ import org.springframework.context.event.SmartApplicationListener;
 
 /**
  * Original class copied from Yoga : https://github.com/sduskis/yoga (Apache License 2.0)
- * <p>
+ * <p/>
  * Modified to support RESTEasy property injection (now implements BeanPostProcessor). This allows getting rid of the
  * SpringBeanPostProcessor completely.
  */
@@ -41,7 +41,8 @@ public class ResteasySpringListener implements SmartApplicationListener, BeanFac
 
   private final ResteasyProviderFactory providerFactory;
 
-  private final Map<String, SpringResourceFactory> springResourceFactories = new HashMap<String, SpringResourceFactory>();
+  private final Map<String, SpringResourceFactory> springResourceFactories
+      = new HashMap<String, SpringResourceFactory>();
 
   private final List<String> providers = new ArrayList<String>();
 

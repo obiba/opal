@@ -9,6 +9,11 @@
  */
 package org.obiba.opal.web.search.support;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -19,15 +24,7 @@ import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.support.AbstractRestRequest;
 import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class EsQueryExecutor {
 
@@ -45,8 +42,7 @@ public class EsQueryExecutor {
     final AtomicReference<byte[]> ref = new AtomicReference<byte[]>();
 
     elasticSearchProvider.getRest()
-      .dispatchRequest(new EsRestRequest(jsonBody.toString(), "_search"),
-        new RestChannel() {
+        .dispatchRequest(new EsRestRequest(jsonBody.toString(), "_search"), new RestChannel() {
 
           @Override
           public void sendResponse(RestResponse response) {

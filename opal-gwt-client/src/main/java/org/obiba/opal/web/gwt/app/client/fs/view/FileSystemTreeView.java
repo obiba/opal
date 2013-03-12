@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -80,7 +80,9 @@ public class FileSystemTreeView extends ViewImpl implements Display {
   @SuppressWarnings("unchecked")
   public void addBranch(TreeItem treeItem, FileDto folderToAdd) {
     FileDto file;
-    JsArray<FileDto> children = (folderToAdd.getChildrenCount() != 0) ? folderToAdd.getChildrenArray() : (JsArray<FileDto>) JsArray.createArray();
+    JsArray<FileDto> children = (folderToAdd.getChildrenCount() != 0)
+        ? folderToAdd.getChildrenArray()
+        : (JsArray<FileDto>) JsArray.createArray();
     for(int i = 0; i < children.length(); i++) {
       file = children.get(i);
 

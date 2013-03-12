@@ -21,11 +21,11 @@
  * IN THE SOFTWARE.
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/theme/chaos', ['require', 'exports', 'module' , 'ace/lib/dom'], function(require, exports, module) {
+define('ace/theme/chaos', ['require', 'exports', 'module' , 'ace/lib/dom'], function (require, exports, module) {
 
-exports.isDark = true;
-exports.cssClass = "ace-chaos";
-exports.cssText = ".ace-chaos .ace_gutter {\
+    exports.isDark = true;
+    exports.cssClass = "ace-chaos";
+    exports.cssText = ".ace-chaos .ace_gutter {\
 background: #141414;\
 color: #595959;\
 border-right: 1px solid #282828;\
@@ -161,7 +161,7 @@ content: '▴'\
 content: '‣'\
 }";
 
-var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+    var dom = require("../lib/dom");
+    dom.importCssString(exports.cssText, exports.cssClass);
 
 });

@@ -69,5 +69,4 @@ public class VariableEntityResource {
     return new VariableEntityBean(entityType, entityId);
   }
 
-
 }

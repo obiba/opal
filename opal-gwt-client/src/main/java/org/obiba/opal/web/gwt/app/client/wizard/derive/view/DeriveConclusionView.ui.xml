@@ -1,11 +1,11 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-             ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-             ui:generateLocales="default">
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
-   <g:FlowPanel>
+  <g:FlowPanel>
     <o:WizardStep ui:field="conclusionStep">
       <g:FlowPanel>
         <g:FlowPanel ui:field="derivedNameInput" styleName="input">
@@ -16,7 +16,9 @@
         </g:FlowPanel>
 
         <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key"><ui:msg description="Datasource label">Datasource</ui:msg></g:Label>
+          <g:Label addStyleNames="key">
+            <ui:msg description="Datasource label">Datasource</ui:msg>
+          </g:Label>
           <o:Chooser ui:field="datasourceNameBox"/>
         </g:FlowPanel>
 
@@ -26,13 +28,16 @@
           </g:Label>
           <o:DropdownSuggestBox ui:field="viewNameBox"/>
           <g:Label styleName="help-block">
-            <ui:msg description="Destination View Name help label">Select an existing view or provide a name for a new view</ui:msg>
+            <ui:msg description="Destination View Name help label">Select an existing view or provide a name for a new
+              view
+            </ui:msg>
           </g:Label>
         </g:FlowPanel>
 
         <g:FlowPanel styleName="input">
           <g:CheckBox value="true" ui:field="openEditor">
-            <ui:msg description="Open New Derived Variable Editor label">Open editor for this new derived variable</ui:msg>
+            <ui:msg description="Open New Derived Variable Editor label">Open editor for this new derived variable
+            </ui:msg>
           </g:CheckBox>
         </g:FlowPanel>
       </g:FlowPanel>

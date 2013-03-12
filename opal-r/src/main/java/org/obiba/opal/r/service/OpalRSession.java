@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -42,6 +42,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
 
   /**
    * Build a R session reference from a R connection.
+   *
    * @param connection
    */
   OpalRSession(RConnection connection) {
@@ -57,6 +58,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
 
   /**
    * Get the unique identifier of the R session.
+   *
    * @return
    */
   public String getId() {
@@ -85,6 +87,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
   /**
    * Executes the R operation on the current R session of the invoking Opal user. If no current R session is defined, a
    * {@link NoSuchRSessionException} is thrown.
+   *
    * @see #hasSubjectCurrentRSession(), {@link #setSubjectCurrentRSession(String)}
    */
   @Override
@@ -102,6 +105,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
 
   /**
    * Executes a batch of {@code ROperation} within a single connection to the R environment.
+   *
    * @param rops
    */
   public void execute(Iterable<ROperation> rops) {
@@ -132,6 +136,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
 
   /**
    * Creates a new R connection from the last R session state.
+   *
    * @return
    */
   private RConnection newConnection() {
@@ -145,6 +150,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
 
   /**
    * Detach the R connection and updates the R session.
+   *
    * @param connection
    */
   private void close(RConnection connection) {

@@ -31,7 +31,7 @@ public class BackgroundJobService implements Service {
 
   private boolean isRunning;
 
-  private final Map<String,Thread> jobThreads = new HashMap<String, Thread>();
+  private final Map<String, Thread> jobThreads = new HashMap<String, Thread>();
 
   private final Set<BackgroundJob> jobs;
 
@@ -59,9 +59,9 @@ public class BackgroundJobService implements Service {
   @Override
   public void stop() {
     if(isRunning) {
-      for(Map.Entry<String,Thread> background : jobThreads.entrySet()) {
+      for(Map.Entry<String, Thread> background : jobThreads.entrySet()) {
         try {
-          if (background.getValue().isAlive()) {
+          if(background.getValue().isAlive()) {
             log.info("Interrupting job [{}]", background.getKey());
             background.getValue().interrupt();
           }

@@ -22,7 +22,6 @@ public class TableIndicesRefreshEvent extends GwtEvent<TableIndicesRefreshEvent.
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-
   public TableIndicesRefreshEvent() {
   }
 

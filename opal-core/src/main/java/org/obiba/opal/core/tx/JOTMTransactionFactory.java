@@ -16,14 +16,16 @@ import org.hibernate.transaction.TransactionManagerLookupFactory;
  * {@code TransactionManager} instead of issuing a JNDI lookup. This class depends on having the {@code
  * TransactionManagerLookup} that returns a the JOTM {@code Current} instance (such as the {@code
  * JOTMTransactionManagerLookup}).
- * 
- * <p>
+ * <p/>
+ * <p/>
  * As described in the {@code JTATransactionFactory}, this class overrides the {@code getUserTransaction} method to
  * prevent JNDI lookup. The method returns the
  */
 public class JOTMTransactionFactory extends JTATransactionFactory {
 
-  /** A reference to JOTM's UserTransaction */
+  /**
+   * A reference to JOTM's UserTransaction
+   */
   private UserTransaction ut;
 
   @Override
@@ -31,7 +33,9 @@ public class JOTMTransactionFactory extends JTATransactionFactory {
     super.configure(props);
     TransactionManagerLookup lookup = TransactionManagerLookupFactory.getTransactionManagerLookup(props);
     if(lookup == null) {
-      throw new HibernateException("Could not obtain an instance of TransactionManagerLookup. Make sure the property '" + Environment.TRANSACTION_MANAGER_STRATEGY + "' is set.");
+      throw new HibernateException(
+          "Could not obtain an instance of TransactionManagerLookup. Make sure the property '" +
+              Environment.TRANSACTION_MANAGER_STRATEGY + "' is set.");
     }
 
     // JOTM implements both UserTransaction and TransactionManager in same class. If we find the TransactionManager, we

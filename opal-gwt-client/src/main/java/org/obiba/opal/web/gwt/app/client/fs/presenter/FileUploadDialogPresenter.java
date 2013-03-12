@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -58,7 +58,8 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
   private final RequestUrlBuilder urlBuilder;
 
   @Inject
-  public FileUploadDialogPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder, Translations translations) {
+  public FileUploadDialogPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder,
+      Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     this.urlBuilder = urlBuilder;
@@ -102,7 +103,8 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) && event.isConfirmed()) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+          event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
       }
@@ -140,7 +142,8 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
     if(fileName.equals("")) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
     } else if(fileExist(fileName)) {
-      getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
+      getEventBus().fireEvent(ConfirmationRequiredEvent
+          .createWithKeys(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
     } else {
       submitFile();
     }

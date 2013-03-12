@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -60,15 +60,15 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   @ProxyStandard
   @NameToken("login")
   @NoGatekeeper
-  public interface Proxy extends ProxyPlace<LoginPresenter> {
-  }
+  public interface Proxy extends ProxyPlace<LoginPresenter> {}
 
   private final RequestCredentials credentials;
 
   private final ResourceAuthorizationCache authorizationCache;
 
   @Inject
-  public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials, ResourceAuthorizationCache authorizationCache) {
+  public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
+      ResourceAuthorizationCache authorizationCache) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.authorizationCache = authorizationCache;
@@ -125,7 +125,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post().withCallback(403, authError).withCallback(401, authError).withCallback(201, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post().withCallback(403, authError)
+        .withCallback(401, authError).withCallback(201, new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {

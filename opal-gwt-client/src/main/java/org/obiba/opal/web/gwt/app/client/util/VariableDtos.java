@@ -9,14 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.util;
 
-import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.COMMENT_ATTRIBUTE;
-import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.DERIVED_FROM_ATTRIBUTE;
-import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.DESCRIPTION_ATTRIBUTE;
-import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.MAELSTROM_NAMESPACE;
-import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.OPAL_NAMESPACE;
-import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.SCRIPT_ATTRIBUTE;
-import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.STATUS_ATTRIBUTE;
-
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -29,6 +21,14 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.JsArray;
 
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.COMMENT_ATTRIBUTE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.DERIVED_FROM_ATTRIBUTE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.DESCRIPTION_ATTRIBUTE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.MAELSTROM_NAMESPACE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.OPAL_NAMESPACE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.SCRIPT_ATTRIBUTE;
+import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.STATUS_ATTRIBUTE;
+
 public class VariableDtos {
 
   private VariableDtos() {
@@ -36,6 +36,7 @@ public class VariableDtos {
 
   /**
    * True if variable has at least one category defined.
+   *
    * @param variable
    * @return
    */
@@ -45,6 +46,7 @@ public class VariableDtos {
 
   /**
    * Return false if variableDto contains at least one non-missing category, otherwise true
+   *
    * @param variable
    * @return
    */
@@ -59,6 +61,7 @@ public class VariableDtos {
 
   /**
    * Get the script value if it exists (otherwise returns 'null' script).
+   *
    * @param variable
    * @return
    */
@@ -69,6 +72,7 @@ public class VariableDtos {
 
   /**
    * Set the script value in an attribute.
+   *
    * @param variable
    * @param script
    */
@@ -124,6 +128,7 @@ public class VariableDtos {
 
   /**
    * Set the attribute value of a variable (create attribute if it does not exist).
+   *
    * @param variable
    * @param name
    * @param value
@@ -134,6 +139,7 @@ public class VariableDtos {
 
   /**
    * Set the attribute value of a variable (create attribute if it does not exist).
+   *
    * @param variable
    * @param namespace
    * @param name
@@ -150,6 +156,7 @@ public class VariableDtos {
 
   /**
    * Get first attribute with the given name from the provided variable.
+   *
    * @param variable
    * @param name
    * @return
@@ -161,14 +168,14 @@ public class VariableDtos {
 
   /**
    * Get the first attribute with the given name from the provided variable.
+   *
    * @param variable
    * @param namespace
    * @param name
    * @return
    */
   @Nullable
-  public static AttributeDto getAttribute(VariableDto variable, @Nullable
-  String namespace, String name) {
+  public static AttributeDto getAttribute(VariableDto variable, @Nullable String namespace, String name) {
     // make sure attributes array is defined
     variable.setAttributesArray(JsArrays.toSafeArray(variable.getAttributesArray()));
     String safeNamespace = namespace == null ? "" : namespace;
@@ -182,6 +189,7 @@ public class VariableDtos {
 
   /**
    * Get all attributes with the given name from the provided variable.
+   *
    * @param variable
    * @param name
    * @return
@@ -192,14 +200,14 @@ public class VariableDtos {
 
   /**
    * Get the all attributes with the given name from the provided variable.
+   *
    * @param variable
    * @param namespace
    * @param name
    * @return
    */
-  public static List<AttributeDto> getAttributes(VariableDto variable, @Nullable
-  String namespace, String name) {
-    ImmutableList.Builder<AttributeDto> builder = ImmutableList.<AttributeDto> builder();
+  public static List<AttributeDto> getAttributes(VariableDto variable, @Nullable String namespace, String name) {
+    ImmutableList.Builder<AttributeDto> builder = ImmutableList.<AttributeDto>builder();
     // make sure attributes array is defined
     variable.setAttributesArray(JsArrays.toSafeArray(variable.getAttributesArray()));
     String safeNamespace = namespace == null ? "" : namespace;
@@ -211,8 +219,8 @@ public class VariableDtos {
     return builder.build();
   }
 
-  public static AttributeDto createAttribute(VariableDto variable, @Nullable
-  String namespace, String name, String value) {
+  public static AttributeDto createAttribute(VariableDto variable, @Nullable String namespace, String name,
+      String value) {
     AttributeDto attribute = AttributeDto.create();
     attribute.setNamespace(namespace);
     attribute.setName(name);

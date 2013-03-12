@@ -1,20 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.shell.commands;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.Calendar;
@@ -40,6 +33,13 @@ import org.springframework.mail.SimpleMailMessage;
 
 import com.google.common.collect.ImmutableSet;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+
 /**
  * Unit tests for {@link ReportCommand}.
  */
@@ -58,7 +58,8 @@ public class ReportCommandTest {
     ReportCommandOptions mockOptions = createMock(ReportCommandOptions.class);
     expect(mockOptions.getName()).andReturn(reportTemplateName).atLeastOnce();
 
-    OpalShell opalShellMock = OpalShellMockBuilder.newBuilder().printf("Report template '%s' does not exist.\n", reportTemplateName).build();
+    OpalShell opalShellMock = OpalShellMockBuilder.newBuilder()
+        .printf("Report template '%s' does not exist.\n", reportTemplateName).build();
 
     OpalConfiguration opalConfiguration = new OpalConfiguration();
 
@@ -82,7 +83,7 @@ public class ReportCommandTest {
 
   @Test
   public void testExecute_RendersReportWithoutEmailNotification() throws FileSystemException, ReportException {
-    testExecute(ImmutableSet.<String> of());
+    testExecute(ImmutableSet.<String>of());
   }
 
   @Test
@@ -96,7 +97,8 @@ public class ReportCommandTest {
 
   private void testExecute(Set<String> emailNotificationAddresses) throws FileSystemException, ReportException {
     // Setup
-    ReportTemplate reportTemplate = createReportTemplate("testTemplate", "/testDesign.rptdesign", "pdf", emailNotificationAddresses);
+    ReportTemplate reportTemplate = createReportTemplate("testTemplate", "/testDesign.rptdesign", "pdf",
+        emailNotificationAddresses);
     String reportDir = "/reports/" + reportTemplate.getName();
     String reportFileName = reportTemplate.getName() + "-" + "20100101_1300" + "." + reportTemplate.getFormat();
     String opalPublicUrl = "http://opal.obiba.org";
@@ -110,18 +112,29 @@ public class ReportCommandTest {
     opalConfiguration.addReportTemplate(reportTemplate);
 
     String localOpalRoot = System.getProperty("user.dir");
-    OpalFileSystem opalFileSystemMock = OpalFileSystemMockBuilder.newBuilder().resolveFile(reportTemplate.getDesign()).getLocalFile(reportTemplate.getDesign(), localOpalRoot + reportTemplate.getDesign().replace('/', File.separatorChar)).resolveFile(reportDir).createFolder(reportDir).once().resolveFile(reportDir, reportFileName).getLocalFile(reportDir + "/" + reportFileName, localOpalRoot + (reportDir + "/" + reportFileName).replace('/', File.separatorChar)).getObfuscatedPath(reportDir + "/" + reportFileName).build();
+    OpalFileSystem opalFileSystemMock = OpalFileSystemMockBuilder.newBuilder().resolveFile(reportTemplate.getDesign())
+        .getLocalFile(reportTemplate.getDesign(),
+            localOpalRoot + reportTemplate.getDesign().replace('/', File.separatorChar)).resolveFile(reportDir)
+        .createFolder(reportDir).once().resolveFile(reportDir, reportFileName)
+        .getLocalFile(reportDir + "/" + reportFileName,
+            localOpalRoot + (reportDir + "/" + reportFileName).replace('/', File.separatorChar))
+        .getObfuscatedPath(reportDir + "/" + reportFileName).build();
 
-    OpalRuntime opalRuntimeMock = OpalRuntimeMockBuilder.newBuilder().withOpalConfiguration(opalConfiguration).withOpalFileSystem(opalFileSystemMock).build();
+    OpalRuntime opalRuntimeMock = OpalRuntimeMockBuilder.newBuilder().withOpalConfiguration(opalConfiguration)
+        .withOpalFileSystem(opalFileSystemMock).build();
 
     ReportService reportServiceMock = createMock(ReportService.class);
-    reportServiceMock.render(reportTemplate.getFormat(), reportTemplate.getParameters(), localOpalRoot + reportTemplate.getDesign().replace('/', File.separatorChar), localOpalRoot + (reportDir + "/" + reportFileName).replace('/', File.separatorChar));
+    reportServiceMock.render(reportTemplate.getFormat(), reportTemplate.getParameters(),
+        localOpalRoot + reportTemplate.getDesign().replace('/', File.separatorChar),
+        localOpalRoot + (reportDir + "/" + reportFileName).replace('/', File.separatorChar));
     expectLastCall().once();
 
     MailSender mailSenderMock = createMock(MailSender.class);
     if(!emailNotificationAddresses.isEmpty()) {
       for(String emailAddress : reportTemplate.getEmailNotificationAddresses()) {
-        mailSenderMock.send(createEmailNotification(reportTemplate.getName(), opalPublicUrl + "/ws/report/public/" + "OBFUSCATED[" + reportDir + "/" + reportFileName + "]", emailAddress));
+        mailSenderMock.send(createEmailNotification(reportTemplate.getName(),
+            opalPublicUrl + "/ws/report/public/" + "OBFUSCATED[" + reportDir + "/" + reportFileName + "]",
+            emailAddress));
       }
     }
 
@@ -172,7 +185,8 @@ public class ReportCommandTest {
     };
   }
 
-  private ReportTemplate createReportTemplate(String name, String design, String format, Set<String> emailNotificationAddresses) {
+  private ReportTemplate createReportTemplate(String name, String design, String format,
+      Set<String> emailNotificationAddresses) {
     ReportTemplate reportTemplate = new ReportTemplate();
 
     reportTemplate.setName(name);
@@ -183,7 +197,8 @@ public class ReportCommandTest {
     return reportTemplate;
   }
 
-  private SimpleMailMessage createEmailNotification(String reportTemplateName, String reportObfuscatedPath, String emailAddress) {
+  private SimpleMailMessage createEmailNotification(String reportTemplateName, String reportObfuscatedPath,
+      String emailAddress) {
     SimpleMailMessage msg = new SimpleMailMessage();
     msg.setFrom(FROM);
     msg.setTo(emailAddress);

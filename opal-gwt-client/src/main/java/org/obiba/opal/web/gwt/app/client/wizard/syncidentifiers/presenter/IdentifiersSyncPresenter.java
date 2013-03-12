@@ -77,7 +77,7 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
       public void onStepIn() {
         UriBuilder ub = getDatasourceEntitiesUri();
 
-        ResourceRequestBuilderFactory.<JsArray<TableIdentifiersSync>> newBuilder().forResource(ub.build()).get()
+        ResourceRequestBuilderFactory.<JsArray<TableIdentifiersSync>>newBuilder().forResource(ub.build()).get()
             .withCallback(new ResourceCallback<JsArray<TableIdentifiersSync>>() {
 
               @Override
@@ -93,7 +93,7 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
 
   @Override
   protected void onReveal() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
         .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {

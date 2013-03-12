@@ -77,8 +77,8 @@ public class SearchServiceResource extends IndexResource {
 
   private Opal.TableIndexStatusDto getTableStatusDto(Datasource datasource, ValueTable valueTable) {
     float progress = 0f;
-    if(synchroManager.getCurrentTask() != null && synchroManager.getCurrentTask().getValueTable().getName()
-        .equals(valueTable.getName())) {
+    if(synchroManager.getCurrentTask() != null &&
+        synchroManager.getCurrentTask().getValueTable().getName().equals(valueTable.getName())) {
       progress = synchroManager.getCurrentTask().getProgress();
     }
 

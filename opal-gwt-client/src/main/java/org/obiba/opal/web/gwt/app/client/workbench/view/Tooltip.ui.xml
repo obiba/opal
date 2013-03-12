@@ -1,16 +1,17 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:g2="urn:import:com.google.gwt.user.cellview.client" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:PopupPanel ui:field="dialog" autoHideEnabled="true" modal="true" animationEnabled="false" addStyleNames="tooltip">
     <g:DockLayoutPanel ui:field="contentLayout" unit="PX" height="100px" width="300px">
       <g:north size="20">
         <g:HTMLPanel addStyleNames="header">
-          <g:InlineLabel ui:field="caption"><ui:msg description="Information label">Information</ui:msg></g:InlineLabel>
+          <g:InlineLabel ui:field="caption">
+            <ui:msg description="Information label">Information</ui:msg>
+          </g:InlineLabel>
           <span style="float: right;">
             <g:Anchor ui:field="okay" addStyleNames="icon">'</g:Anchor>
           </span>
@@ -22,10 +23,10 @@
       </g:center>
       <g:south size="16">
         <g:FlowPanel addStyleNames="footer">
-        <o:ResizeHandle ui:field="resizeHandle" resizeDirection="SOUTH_EAST"></o:ResizeHandle>
+          <o:ResizeHandle ui:field="resizeHandle" resizeDirection="SOUTH_EAST"></o:ResizeHandle>
         </g:FlowPanel>
-      </g:south>     
-    </g:DockLayoutPanel> 
+      </g:south>
+    </g:DockLayoutPanel>
   </g:PopupPanel>
 
 </ui:UiBinder>

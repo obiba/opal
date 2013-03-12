@@ -61,8 +61,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   private static final int PAGE_SIZE = 20;
 
   @UiTemplate("EntityDialogView.ui.xml")
-  interface EntityViewUiBinder extends UiBinder<DialogBox, EntityDialogView> {
-  }
+  interface EntityViewUiBinder extends UiBinder<DialogBox, EntityDialogView> {}
 
   private static final EntityViewUiBinder uiBinder = GWT.create(EntityViewUiBinder.class);
 
@@ -109,7 +108,8 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   private Translations translations = GWT.create(Translations.class);
 
-  private ListDataProvider<EntityDialogPresenter.VariableValueRow> dataProvider = new ListDataProvider<EntityDialogPresenter.VariableValueRow>();
+  private ListDataProvider<EntityDialogPresenter.VariableValueRow> dataProvider
+      = new ListDataProvider<EntityDialogPresenter.VariableValueRow>();
 
   private ValueSelectionHandlerImpl valueSelectionHandler;
 
@@ -220,6 +220,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
     filter.setText("");
     lastFilter = "";
   }
+
   private void clear() {
     tableChooser.clear();
 
@@ -291,8 +292,8 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   /**
    * Specialized column class using ClickableValueCell
    */
-  private class VariableValueRowClickableColumn extends
-      Column<EntityDialogPresenter.VariableValueRow, EntityDialogPresenter.VariableValueRow> {
+  private class VariableValueRowClickableColumn
+      extends Column<EntityDialogPresenter.VariableValueRow, EntityDialogPresenter.VariableValueRow> {
 
     private VariableValueRowClickableColumn() {
       super(new ClickableValueCell());

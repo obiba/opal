@@ -1,22 +1,23 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"  
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
-  
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
   <g:HTMLPanel>
     <table class="gwt-KeyValue">
-          <tbody>
-            <tr>
-              <td>
-                <g:Label><ui:msg description="File label">File</ui:msg>:</g:Label>          
-              </td>
-              <td>
-                <g:SimplePanel addStyleNames="small-indent" ui:field="fileSelectionPanel"/>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <tbody>
+        <tr>
+          <td>
+            <g:Label><ui:msg description="File label">File</ui:msg>:
+            </g:Label>
+          </td>
+          <td>
+            <g:SimplePanel addStyleNames="small-indent" ui:field="fileSelectionPanel"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </g:HTMLPanel>
-  
+
 </ui:UiBinder>

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -97,14 +97,15 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     private void requestVariablesAndValueSet(final String filter) {
       StringBuilder link = new StringBuilder(table.getLink());
       link.append("/variables").append("?script=").append(URL.encodePathSegment(filter));
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>> newBuilder().forResource(link.toString()).get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link.toString()).get()
+          .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
-        @Override
-        public void onResource(Response response, JsArray<VariableDto> resource) {
-          requestValueSet(JsArrays.toList(JsArrays.toSafeArray(resource)), filter);
-        }
+            @Override
+            public void onResource(Response response, JsArray<VariableDto> resource) {
+              requestValueSet(JsArrays.toList(JsArrays.toSafeArray(resource)), filter);
+            }
 
-      }).send();
+          }).send();
     }
 
     private void requestValueSet(final List<VariableDto> variables, String filter) {
@@ -115,19 +116,21 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
       } else {
         link.append(URL.encodePathSegment(filter));
       }
-      ResourceRequestBuilderFactory.<ValueSetsDto> newBuilder().forResource(link.toString()).get().withCallback(new ResourceCallback<ValueSetsDto>() {
+      ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link.toString()).get()
+          .withCallback(new ResourceCallback<ValueSetsDto>() {
 
-        @Override
-        public void onResource(Response response, ValueSetsDto resource) {
-          getView().populate(variables, resource);
-        }
-      }).send();
+            @Override
+            public void onResource(Response response, ValueSetsDto resource) {
+              getView().populate(variables, resource);
+            }
+          }).send();
     }
 
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier, int index) {
       StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName()).append("/value").append("?pos=").append(index);
+      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName())
+          .append("/value").append("?pos=").append(index);
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
   }

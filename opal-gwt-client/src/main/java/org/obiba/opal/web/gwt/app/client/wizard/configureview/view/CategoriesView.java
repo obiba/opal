@@ -37,8 +37,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class CategoriesView extends ViewImpl implements CategoriesPresenter.Display {
 
   @UiTemplate("CategoriesView.ui.xml")
-  interface MyUiBinder extends UiBinder<Widget, CategoriesView> {
-  }
+  interface MyUiBinder extends UiBinder<Widget, CategoriesView> {}
 
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 

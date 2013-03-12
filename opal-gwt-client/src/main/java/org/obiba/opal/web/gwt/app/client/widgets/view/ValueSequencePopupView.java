@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -55,8 +55,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 public class ValueSequencePopupView extends PopupViewImpl implements ValueSequencePopupPresenter.Display {
 
   @UiTemplate("ValueSequencePopupView.ui.xml")
-  interface ValueSequencePopupViewUiBinder extends UiBinder<Widget, ValueSequencePopupView> {
-  }
+  interface ValueSequencePopupViewUiBinder extends UiBinder<Widget, ValueSequencePopupView> {}
 
   private static ValueSequencePopupViewUiBinder uiBinder = GWT.create(ValueSequencePopupViewUiBinder.class);
 

@@ -213,7 +213,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   }
 
   private void enableDatasourceRemoval(DatasourceDto datasourceDto) {
-    if (datasourceDto == null) {
+    if(datasourceDto == null) {
       return;
     }
 

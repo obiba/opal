@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -42,24 +42,31 @@ public class AuthorizationResource {
   }
 
   @GET
-  public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String domain, @QueryParam("type") SubjectAclService.SubjectType type) {
-    return Iterables.transform(subjectAclService.getNodePermissions(domain, getNode(), type), PermissionsToAclFunction.INSTANCE);
+  public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String domain,
+      @QueryParam("type") SubjectAclService.SubjectType type) {
+    return Iterables
+        .transform(subjectAclService.getNodePermissions(domain, getNode(), type), PermissionsToAclFunction.INSTANCE);
   }
 
   @POST
-  public Opal.Acl add(@QueryParam("domain") @DefaultValue("opal") String domain, @QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
+  public Opal.Acl add(@QueryParam("domain") @DefaultValue("opal") String domain, @QueryParam("subject") String subject,
+      @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
     subjectAclService.addSubjectPermission(domain, getNode(), type.subjectFor(subject), permission);
-    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions(domain, getNode(), type.subjectFor(subject)));
+    return PermissionsToAclFunction.INSTANCE
+        .apply(subjectAclService.getSubjectPermissions(domain, getNode(), type.subjectFor(subject)));
   }
 
   @DELETE
-  public Opal.Acl delete(@QueryParam("domain") @DefaultValue("opal") String domain, @QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
+  public Opal.Acl delete(@QueryParam("domain") @DefaultValue("opal") String domain,
+      @QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type,
+      @QueryParam("perm") String permission) {
     if(Strings.isNullOrEmpty(permission)) {
       subjectAclService.deleteSubjectPermissions(domain, getNode(), type.subjectFor(subject));
     } else {
       subjectAclService.deleteSubjectPermissions(domain, getNode(), type.subjectFor(subject), permission);
     }
-    return PermissionsToAclFunction.INSTANCE.apply(subjectAclService.getSubjectPermissions(domain, getNode(), type.subjectFor(subject)));
+    return PermissionsToAclFunction.INSTANCE
+        .apply(subjectAclService.getSubjectPermissions(domain, getNode(), type.subjectFor(subject)));
   }
 
   private String getNode() {

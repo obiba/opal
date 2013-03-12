@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -45,6 +45,7 @@ public class DataShieldEnvironment {
 
   /**
    * Get the registered methods.
+   *
    * @return
    */
   public List<DataShieldMethod> getMethods() {
@@ -53,6 +54,7 @@ public class DataShieldEnvironment {
 
   /**
    * Add or replace the provide method.
+   *
    * @param method
    */
   public void addMethod(DataShieldMethod method) {
@@ -67,6 +69,7 @@ public class DataShieldEnvironment {
 
   /**
    * Remove the method with the given name.
+   *
    * @param name
    * @throws NoSuchDataShieldMethodException
    */
@@ -76,6 +79,7 @@ public class DataShieldEnvironment {
 
   /**
    * Check if there is a method with the given name.
+   *
    * @param name
    * @return
    */
@@ -90,9 +94,10 @@ public class DataShieldEnvironment {
 
   /**
    * Get the method with from its name.
+   *
    * @param name
-   * @throws NoSuchDataShieldMethodException
    * @return
+   * @throws NoSuchDataShieldMethodException
    */
   public DataShieldMethod getMethod(String name) {
     for(DataShieldMethod method : methods) {
@@ -108,23 +113,25 @@ public class DataShieldEnvironment {
    * methods defined by this {@code DataShieldEnvironment}. Once the operations are executed, an environment is setup
    * and the method {@code DataShieldMethod#invoke(Environment)} will allow obtaining the signature to invoke the
    * method.
-   * 
+   *
    * @return a sequence of {@code ROperation} that will create a protected R environment for executing methods defined.
    */
   public Iterable<ROperation> prepareOps() {
-    return ImmutableList.<ROperation> builder()//
-    .add(ROperations.eval(String.format("base::rm(%s)", environment.symbol()), null))//
-    .add(ROperations.assign(environment.symbol(), "base::new.env()"))//
-    .addAll(Iterables.transform(getMethods(), new Function<DataShieldMethod, ROperation>() {
+    return ImmutableList.<ROperation>builder()//
+        .add(ROperations.eval(String.format("base::rm(%s)", environment.symbol()), null))//
+        .add(ROperations.assign(environment.symbol(), "base::new.env()"))//
+        .addAll(Iterables.transform(getMethods(), new Function<DataShieldMethod, ROperation>() {
 
-      @Override
-      public ROperation apply(DataShieldMethod input) {
-        return input.assign(environment);
-      }
-    }))//
-    // Protect the contents of the environment
-    .add(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", environment.symbol()), null))//
-    // Protect the contents of the environment
-    .add(ROperations.eval(String.format("base::lockBinding('%s', base::environment())", environment.symbol()), null)).build();
+          @Override
+          public ROperation apply(DataShieldMethod input) {
+            return input.assign(environment);
+          }
+        }))//
+            // Protect the contents of the environment
+        .add(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", environment.symbol()), null))//
+            // Protect the contents of the environment
+        .add(
+            ROperations.eval(String.format("base::lockBinding('%s', base::environment())", environment.symbol()), null))
+        .build();
   }
 }

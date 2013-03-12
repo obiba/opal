@@ -1,6 +1,6 @@
 <!DOCTYPE web-app PUBLIC
- "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+    "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
   <display-name>GWT-Maven-Archetype</display-name>
@@ -9,14 +9,16 @@
     <servlet-name>OpalProxy</servlet-name>
     <servlet-class>org.mortbay.servlet.ProxyServlet$Transparent</servlet-class>
     <init-param>
-      <param-name>ProxyTo</param-name><param-value>http://localhost:8080/ws</param-value>
+      <param-name>ProxyTo</param-name>
+      <param-value>http://localhost:8080/ws</param-value>
     </init-param>
     <init-param>
-      <param-name>Prefix</param-name><param-value>/ws</param-value>
+      <param-name>Prefix</param-name>
+      <param-value>/ws</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>OpalProxy</servlet-name>
     <url-pattern>/ws/*</url-pattern>
@@ -24,5 +26,5 @@
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
-  </welcome-file-list>  
+  </welcome-file-list>
 </web-app>

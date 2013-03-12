@@ -17,7 +17,8 @@
 
     <!-- Configure BIRT with default jdbc drivers -->
     <dependencySet>
-      <outputDirectory>birt-runtime-2_6_2/ReportEngine/plugins/org.eclipse.birt.report.data.oda.jdbc_2.6.2.r262_v20110127/drivers
+      <outputDirectory>
+        birt-runtime-2_6_2/ReportEngine/plugins/org.eclipse.birt.report.data.oda.jdbc_2.6.2.r262_v20110127/drivers
       </outputDirectory>
       <includes>
         <include>mysql:mysql-connector-java:*</include>
@@ -40,7 +41,7 @@
       <scope>provided</scope>
       <unpack>true</unpack>
     </dependencySet>
-    
+
     <dependencySet>
       <outputDirectory>birt-runtime-2_6_2/ReportEngine/lib</outputDirectory>
       <includes>

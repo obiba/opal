@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -41,8 +41,7 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   ScrollPanel reportTemplateListPanel;
 
   @UiTemplate("ReportTemplateView.ui.xml")
-  interface ReportTemplateViewUiBinder extends UiBinder<Widget, ReportTemplateView> {
-  }
+  interface ReportTemplateViewUiBinder extends UiBinder<Widget, ReportTemplateView> {}
 
   private static ReportTemplateViewUiBinder uiBinder = GWT.create(ReportTemplateViewUiBinder.class);
 
@@ -68,12 +67,12 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
     HasWidgets panel = null;
     SplitPaneWorkbenchPresenter.Slot splitSlot = (SplitPaneWorkbenchPresenter.Slot) slot;
     switch(splitSlot) {
-    case LEFT:
-      panel = reportTemplateListPanel;
-      break;
-    case CENTER:
-      panel = reportTemplateDetailsPanel;
-      break;
+      case LEFT:
+        panel = reportTemplateListPanel;
+        break;
+      case CENTER:
+        panel = reportTemplateDetailsPanel;
+        break;
     }
     if(panel != null) {
       panel.clear();

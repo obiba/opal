@@ -35,11 +35,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/theme/kr_theme', ['require', 'exports', 'module', 'ace/lib/dom'], function(require, exports, module) {
+define('ace/theme/kr_theme', ['require', 'exports', 'module', 'ace/lib/dom'], function (require, exports, module) {
 
-exports.isDark = true;
-exports.cssClass = "ace-kr-theme";
-exports.cssText = "\
+    exports.isDark = true;
+    exports.cssClass = "ace-kr-theme";
+    exports.cssText = "\
 .ace-kr-theme .ace_editor {\
   border: 2px solid rgb(159, 159, 159);\
 }\

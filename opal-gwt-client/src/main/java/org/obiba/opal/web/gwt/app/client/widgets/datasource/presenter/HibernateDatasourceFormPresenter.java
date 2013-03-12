@@ -24,8 +24,8 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 /**
  *
  */
-public class HibernateDatasourceFormPresenter extends
-    PresenterWidget<HibernateDatasourceFormPresenter.Display> implements DatasourceFormPresenter {
+public class HibernateDatasourceFormPresenter extends PresenterWidget<HibernateDatasourceFormPresenter.Display>
+    implements DatasourceFormPresenter {
 
   public static class Subscriber extends DatasourceFormPresenterSubscriber {
 

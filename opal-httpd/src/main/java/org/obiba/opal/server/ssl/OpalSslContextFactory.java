@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -38,7 +38,8 @@ public class OpalSslContextFactory implements SslContextFactory {
   private final String publicUrl;
 
   @Autowired
-  public OpalSslContextFactory(FunctionalUnitService functionalUnitService, UnitKeyStoreService unitKeystoreService, @Value("${org.obiba.opal.public.url}") String publicUrl) {
+  public OpalSslContextFactory(FunctionalUnitService functionalUnitService, UnitKeyStoreService unitKeystoreService,
+      @Value("${org.obiba.opal.public.url}") String publicUrl) {
     this.functionalUnitService = functionalUnitService;
     this.unitKeystoreService = unitKeystoreService;
     this.publicUrl = publicUrl;
@@ -50,7 +51,8 @@ public class OpalSslContextFactory implements SslContextFactory {
 
     try {
       SSLContext ctx = SSLContext.getInstance("TLSv1");
-      ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) }, new TrustManager[] { new UnitTrustManager(functionalUnitService) }, null);
+      ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) },
+          new TrustManager[] { new UnitTrustManager(functionalUnitService) }, null);
       return ctx;
     } catch(Exception e) {
       throw new RuntimeException(e);
@@ -60,6 +62,7 @@ public class OpalSslContextFactory implements SslContextFactory {
   /**
    * Prepares the Opal keystore for serving HTTPs requests. This method will create the keystore if it does not exist
    * and generate a self-signed certificate. If the keystore already exists, it is not modified in any way.
+   *
    * @return a prepared keystore
    */
   private UnitKeyStore prepareServerKeystore() {

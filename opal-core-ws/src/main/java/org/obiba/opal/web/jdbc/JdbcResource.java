@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2012(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -61,10 +61,10 @@ public class JdbcResource {
       @Override
       public JdbcDriverDto apply(Driver input) {
         return JdbcDriverDto.newBuilder()//
-        .setDriverName(jdbcDriverRegistry.getDriverName(input))//
-        .setDriverClass(input.getClass().getName())//
-        .setJdbcUrlTemplate(jdbcDriverRegistry.getJdbcUrlTemplate(input))//
-        .setVersion(input.getMajorVersion() + "." + input.getMinorVersion()).build();
+            .setDriverName(jdbcDriverRegistry.getDriverName(input))//
+            .setDriverClass(input.getClass().getName())//
+            .setJdbcUrlTemplate(jdbcDriverRegistry.getJdbcUrlTemplate(input))//
+            .setVersion(input.getMajorVersion() + "." + input.getMinorVersion()).build();
       }
 
     });
@@ -76,7 +76,8 @@ public class JdbcResource {
   @Produces("text/html")
   @AuthenticatedByCookie
   @Path("/drivers")
-  public Response addDriver(@Context UriInfo uriInfo, @Context HttpServletRequest request) throws FileUploadException, IOException {
+  public Response addDriver(@Context UriInfo uriInfo, @Context HttpServletRequest request)
+      throws FileUploadException, IOException {
     ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
     for(FileItem fileItem : (List<FileItem>) upload.parseRequest(request)) {
       if(!fileItem.isFormField()) {

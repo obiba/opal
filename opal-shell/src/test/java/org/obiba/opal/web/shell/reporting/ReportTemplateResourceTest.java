@@ -1,19 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.shell.reporting;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -21,8 +15,6 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
@@ -41,6 +33,14 @@ import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
+
+import junit.framework.Assert;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 public class ReportTemplateResourceTest {
 
@@ -81,7 +81,8 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template3", opalConfigurationServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template3",
+        opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.getReportTemplate();
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -98,7 +99,8 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9", opalConfigurationServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9",
+        opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.getReportTemplate();
     Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -117,7 +119,8 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template2", opalConfigurationServiceMock, commandSchedulerServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template2",
+        opalConfigurationServiceMock, commandSchedulerServiceMock);
     Response response = reportTemplateResource.deleteReportTemplate();
 
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -133,7 +136,8 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9", opalConfigurationServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9",
+        opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.deleteReportTemplate();
     Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -160,8 +164,10 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, uriInfoMock, commandSchedulerServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9", opalConfigurationServiceMock, commandSchedulerServiceMock);
-    Response response = reportTemplateResource.updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template9")));
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9",
+        opalConfigurationServiceMock, commandSchedulerServiceMock);
+    Response response = reportTemplateResource
+        .updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template9")));
 
     Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     Assert.assertEquals(BASE_URI, response.getMetadata().get("location").get(0).toString());
@@ -180,8 +186,10 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1", opalConfigurationServiceMock, commandSchedulerServiceMock);
-    Response response = reportTemplateResource.updateReportTemplate(createMock(UriInfo.class), Dtos.asDto(getReportTemplate("template1")));
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1",
+        opalConfigurationServiceMock, commandSchedulerServiceMock);
+    Response response = reportTemplateResource
+        .updateReportTemplate(createMock(UriInfo.class), Dtos.asDto(getReportTemplate("template1")));
 
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
@@ -195,8 +203,10 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1", opalConfigurationServiceMock);
-    Response response = reportTemplateResource.updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template2")));
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1",
+        opalConfigurationServiceMock);
+    Response response = reportTemplateResource
+        .updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template2")));
 
     Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     Assert.assertEquals("CouldNotUpdateTheReportTemplate", ((ClientErrorDto) response.getEntity()).getStatus());

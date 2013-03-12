@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -70,18 +70,20 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
   }
 
   private void insertMissingEntities(SimpleJdbcTemplate keyTemplate, Iterable<VariableEntityStateDao> missingEntities) {
-    List<SqlParameterSource> parameters = ImmutableList.<SqlParameterSource> builder().addAll(Iterables.transform(missingEntities, new Function<VariableEntityStateDao, SqlParameterSource>() {
+    List<SqlParameterSource> parameters = ImmutableList.<SqlParameterSource>builder()
+        .addAll(Iterables.transform(missingEntities, new Function<VariableEntityStateDao, SqlParameterSource>() {
 
-      @Override
-      public SqlParameterSource apply(VariableEntityStateDao input) {
-        return new BeanPropertySqlParameterSource(input);
-      }
+          @Override
+          public SqlParameterSource apply(VariableEntityStateDao input) {
+            return new BeanPropertySqlParameterSource(input);
+          }
 
-    })).build();
+        })).build();
 
     if(parameters.size() > 0) {
       log.info("Inserting {} entities in opal-key database...", parameters.size());
-      String sql = "insert into variable_entity (type,identifier,created,updated) values (:type,:identifier,:created,:updated)";
+      String sql
+          = "insert into variable_entity (type,identifier,created,updated) values (:type,:identifier,:created,:updated)";
       keyTemplate.batchUpdate(sql, parameters.toArray(new SqlParameterSource[parameters.size()]));
 
       insertMissingEntitiesValueSets(keyTemplate);
@@ -99,21 +101,24 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
     if(tableId != null) {
       // join the missing entities to keys value table value sets
       log.info("Looking for missing value sets in opal-key database...");
-      sql = "select * from variable_entity where id not in (select vs.variable_entity_id from value_set vs where vs.value_table_id=?)";
+      sql
+          = "select * from variable_entity where id not in (select vs.variable_entity_id from value_set vs where vs.value_table_id=?)";
       List<VariableEntityStateDao> missingEntities = keyTemplate.query(sql, new VariableEntityMapper(), tableId);
 
       if(missingEntities.size() > 0) {
-        List<SqlParameterSource> parameters = ImmutableList.<SqlParameterSource> builder().addAll(Iterables.transform(missingEntities, new Function<VariableEntityStateDao, SqlParameterSource>() {
+        List<SqlParameterSource> parameters = ImmutableList.<SqlParameterSource>builder()
+            .addAll(Iterables.transform(missingEntities, new Function<VariableEntityStateDao, SqlParameterSource>() {
 
-          @Override
-          public SqlParameterSource apply(VariableEntityStateDao input) {
-            return new BeanPropertySqlParameterSource(input);
-          }
+              @Override
+              public SqlParameterSource apply(VariableEntityStateDao input) {
+                return new BeanPropertySqlParameterSource(input);
+              }
 
-        })).build();
+            })).build();
 
         log.info("Inserting {} value sets for missing entities in opal-key database...", parameters.size());
-        sql = "insert into value_set (created,updated,value_table_id,variable_entity_id) values (:created,:updated," + tableId + ",:id)";
+        sql = "insert into value_set (created,updated,value_table_id,variable_entity_id) values (:created,:updated," +
+            tableId + ",:id)";
         keyTemplate.batchUpdate(sql, parameters.toArray(new SqlParameterSource[parameters.size()]));
       }
     }
@@ -135,7 +140,8 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
 
     @Override
     public VariableEntityStateDao mapRow(ResultSet rs, int rowNum) throws SQLException {
-      return new VariableEntityStateDao(rs.getLong("id"), rs.getString("type"), rs.getString("identifier"), rs.getTimestamp("created"), rs.getTimestamp("updated"));
+      return new VariableEntityStateDao(rs.getLong("id"), rs.getString("type"), rs.getString("identifier"),
+          rs.getTimestamp("created"), rs.getTimestamp("updated"));
     }
 
   }
@@ -148,7 +154,8 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
 
     private Timestamp updated;
 
-    public VariableEntityStateDao(long id, String entityType, String entityIdentifier, Timestamp created, Timestamp updated) {
+    public VariableEntityStateDao(long id, String entityType, String entityIdentifier, Timestamp created,
+        Timestamp updated) {
       super(entityType, entityIdentifier);
       this.id = id;
       this.created = created;

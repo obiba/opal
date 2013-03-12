@@ -59,8 +59,8 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
     super.onBind();
     super.registerHandler(getView().getTree().addSelectionHandler(new TreeSelectionHandler()));
 
-    super.registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(),
-        new TableSelectionChangeEvent.Handler() {
+    super.registerHandler(
+        getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
           @Override
           public void onTableSelectionChanged(TableSelectionChangeEvent event) {
@@ -69,8 +69,8 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
         }));
 
-    super.registerHandler(getEventBus().addHandler(DatasourceSelectionChangeEvent.getType(),
-        new DatasourceSelectionChangeEvent.Handler() {
+    super.registerHandler(getEventBus()
+        .addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
 
           @Override
           public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
@@ -83,8 +83,8 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
         }));
 
-    super.registerHandler(getEventBus().addHandler(DatasourceUpdatedEvent.getType(),
-        new DatasourceUpdatedEvent.Handler() {
+    super.registerHandler(
+        getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEvent.Handler() {
 
           @Override
           public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
@@ -93,8 +93,8 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
         }));
 
-    super.registerHandler(getEventBus().addHandler(DatasourcesRefreshEvent.getType(),
-        new DatasourcesRefreshEvent.Handler() {
+    super.registerHandler(
+        getEventBus().addHandler(DatasourcesRefreshEvent.getType(), new DatasourcesRefreshEvent.Handler() {
 
           @Override
           public void onRefresh(DatasourcesRefreshEvent event) {
@@ -112,7 +112,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
   }
 
   private void updateTree(final String datasourceName, final boolean keepCurrentSelection) {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>> newBuilder().forResource("/datasources").get()
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
         .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> datasources) {
@@ -184,7 +184,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
     private void fireDatasourceSelectionChangeEvent(final TreeItem item) {
       UriBuilder ub = UriBuilder.create().segment("datasource", item.getText());
-      ResourceRequestBuilderFactory.<DatasourceDto> newBuilder().forResource(ub.build()).get()
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<DatasourceDto>() {
             @Override
             public void onResource(Response response, DatasourceDto resource) {
@@ -195,7 +195,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
     private void fireTableSelectionChangeEvent(final TreeItem item) {
       UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}");
-      ResourceRequestBuilderFactory.<TableDto> newBuilder()
+      ResourceRequestBuilderFactory.<TableDto>newBuilder()
           .forResource(ub.build(item.getParentItem().getText(), item.getText())).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
@@ -210,8 +210,8 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
               if(index < parentItem.getChildCount() - 1) {
                 next = item.getParentItem().getChild(index + 1).getText();
               }
-              getEventBus().fireEvent(
-                  new TableSelectionChangeEvent(NavigatorTreePresenter.this, resource, previous, next));
+              getEventBus()
+                  .fireEvent(new TableSelectionChangeEvent(NavigatorTreePresenter.this, resource, previous, next));
             }
           }).send();
     }

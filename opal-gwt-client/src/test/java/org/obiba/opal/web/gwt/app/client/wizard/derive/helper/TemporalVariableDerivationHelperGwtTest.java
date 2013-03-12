@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -603,23 +603,27 @@ public class TemporalVariableDerivationHelperGwtTest extends GWTTestCase {
   }
 
   public void testDerivedVariableGenerator_QUARTER() {
-    testGroupMethod("$('temporal-variable').format('yyyy-MM').map({'2011-11':'2011-4', '2011-12':'2011-4', '2012-01':'2012-1'},null).map({\n" //
-        + "    '2011-4': '1',\n" //
-        + "    '2012-1': '2'\n" //
-        + "  },\n" //
-        + "  null,\n" //
-        + "  null);", GroupMethod.QUARTER);
+    testGroupMethod(
+        "$('temporal-variable').format('yyyy-MM').map({'2011-11':'2011-4', '2011-12':'2011-4', '2012-01':'2012-1'},null).map({\n"
+            //
+            + "    '2011-4': '1',\n" //
+            + "    '2012-1': '2'\n" //
+            + "  },\n" //
+            + "  null,\n" //
+            + "  null);", GroupMethod.QUARTER);
   }
 
   public void testDerivedVariableGenerator_SEMESTER() {
-    testGroupMethod("$('temporal-variable').format('yyyy-MM').map({'2011-11':'2011-2', '2011-12':'2011-2', '2012-01':'2012-1'},null).map({\n" //
-        + "    '2011-2': '1',\n" //
-        + "    '2011-3': '2',\n" //
-        + "    '2011-4': '3',\n" //
-        + "    '2012-1': '4'\n" //
-        + "  },\n" //
-        + "  null,\n" //
-        + "  null);", GroupMethod.SEMESTER);
+    testGroupMethod(
+        "$('temporal-variable').format('yyyy-MM').map({'2011-11':'2011-2', '2011-12':'2011-2', '2012-01':'2012-1'},null).map({\n"
+            //
+            + "    '2011-2': '1',\n" //
+            + "    '2011-3': '2',\n" //
+            + "    '2011-4': '3',\n" //
+            + "    '2012-1': '4'\n" //
+            + "  },\n" //
+            + "  null,\n" //
+            + "  null);", GroupMethod.SEMESTER);
   }
 
   public void testDerivedVariableGenerator_YEAR() {
@@ -632,19 +636,23 @@ public class TemporalVariableDerivationHelperGwtTest extends GWTTestCase {
   }
 
   public void testDerivedVariableGenerator_LUSTRUM() {
-    testGroupMethod("$('temporal-variable').year().map({'2011':'2011-2016', '2012':'2011-2016', '2013':'2011-2016', '2014':'2011-2016', '2015':'2011-2016'}).map({\n" //
-        + "    '2011-2016': '1'\n" //
-        + "  },\n" //
-        + "  null,\n" //
-        + "  null);", GroupMethod.LUSTRUM);
+    testGroupMethod(
+        "$('temporal-variable').year().map({'2011':'2011-2016', '2012':'2011-2016', '2013':'2011-2016', '2014':'2011-2016', '2015':'2011-2016'}).map({\n"
+            //
+            + "    '2011-2016': '1'\n" //
+            + "  },\n" //
+            + "  null,\n" //
+            + "  null);", GroupMethod.LUSTRUM);
   }
 
   public void testDerivedVariableGenerator_DECADE() {
-    testGroupMethod("$('temporal-variable').year().map({'2011':'2011-2021', '2012':'2011-2021', '2013':'2011-2021', '2014':'2011-2021', '2015':'2011-2021', '2016':'2011-2021', '2017':'2011-2021', '2018':'2011-2021', '2019':'2011-2021', '2020':'2011-2021'}).map({\n" //
-        + "    '2011-2021': '1'\n" //
-        + "  },\n" //
-        + "  null,\n" //
-        + "  null);", GroupMethod.DECADE);
+    testGroupMethod(
+        "$('temporal-variable').year().map({'2011':'2011-2021', '2012':'2011-2021', '2013':'2011-2021', '2014':'2011-2021', '2015':'2011-2021', '2016':'2011-2021', '2017':'2011-2021', '2018':'2011-2021', '2019':'2011-2021', '2020':'2011-2021'}).map({\n"
+            //
+            + "    '2011-2021': '1'\n" //
+            + "  },\n" //
+            + "  null,\n" //
+            + "  null);", GroupMethod.DECADE);
   }
 
   private void testGroupMethod(String expectedScript, GroupMethod groupMethod) {
@@ -657,7 +665,8 @@ public class TemporalVariableDerivationHelperGwtTest extends GWTTestCase {
     Date toDate = dateFormat.parse("2012-01-22");
 
     List<ValueMapEntry> entries = new ArrayList<ValueMapEntry>();
-    DerivedTemporalVariableGenerator generator = new DerivedTemporalVariableGenerator(variable, entries, groupMethod, fromDate, toDate);
+    DerivedTemporalVariableGenerator generator = new DerivedTemporalVariableGenerator(variable, entries, groupMethod,
+        fromDate, toDate);
     groupMethod.initializeValueMapEntries(entries, fromDate, toDate);
     VariableDto derived = generator.generate(null);
 

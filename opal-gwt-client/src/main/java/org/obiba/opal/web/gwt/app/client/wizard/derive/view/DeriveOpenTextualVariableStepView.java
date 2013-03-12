@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -38,11 +38,11 @@ import com.gwtplatform.mvp.client.ViewImpl;
 /**
  *
  */
-public class DeriveOpenTextualVariableStepView extends ViewImpl implements DeriveOpenTextualVariableStepPresenter.Display {
+public class DeriveOpenTextualVariableStepView extends ViewImpl
+    implements DeriveOpenTextualVariableStepPresenter.Display {
 
   @UiTemplate("DeriveOpenTextualVariableStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveOpenTextualVariableStepView> {
-  }
+  interface ViewUiBinder extends UiBinder<Widget, DeriveOpenTextualVariableStepView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -108,7 +108,8 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl implements Deriv
 
   @Override
   public DefaultWizardStepController.Builder getMethodStepController() {
-    return DefaultWizardStepController.Builder.create(methodStep).title(translations.recodeOpenTextualMethodStepTitle());
+    return DefaultWizardStepController.Builder.create(methodStep)
+        .title(translations.recodeOpenTextualMethodStepTitle());
   }
 
   @Override

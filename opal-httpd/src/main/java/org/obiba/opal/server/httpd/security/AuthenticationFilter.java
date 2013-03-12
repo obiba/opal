@@ -68,8 +68,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
     if(ThreadContext.getSubject() != null) {
       log.warn("Previous executing subject was not properly unbound from executing thread. Unbinding now.");
       ThreadContext.unbindSubject();

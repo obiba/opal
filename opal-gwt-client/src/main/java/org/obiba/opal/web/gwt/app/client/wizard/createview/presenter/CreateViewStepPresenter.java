@@ -162,14 +162,14 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     } else {
       throw new IllegalArgumentException("Datasource name is expected as first wizard argument.");
     }
-    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(
-        "/datasources/tables").get().withCallback(new ResourceCallback<JsArray<TableDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<TableDto> resource) {
-        getView().addTableSelections(JsArrays.toSafeArray((JsArray<TableDto>) resource));
-      }
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            getView().addTableSelections(JsArrays.toSafeArray((JsArray<TableDto>) resource));
+          }
 
-    }).send();
+        }).send();
   }
 
   private void createViewIfDoesNotExist() {
@@ -355,8 +355,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
       validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired"));
-      validators.add(
-          new DisallowedCharactersValidator(getView().getViewName(), new char[] {'.', ':'}, "ViewNameDisallowedChars"));
+      validators.add(new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' },
+          "ViewNameDisallowedChars"));
       validators.add(new RequiredOptionValidator(RequiredOptionValidator
           .asSet(getView().getAddVariablesOneByOneOption(), getView().getFileViewOption(),
               getView().getExcelFileOption()), "VariableDefinitionMethodRequired"));

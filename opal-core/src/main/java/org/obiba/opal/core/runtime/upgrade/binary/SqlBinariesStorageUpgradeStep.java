@@ -93,7 +93,7 @@ public class SqlBinariesStorageUpgradeStep extends AbstractUpgradeStep {
   static boolean hasHibernateDatasource(DataSource dataSource) {
     try {
       DatabaseMetaData meta = dataSource.getConnection().getMetaData();
-      ResultSet res = meta.getTables(null, null, null, new String[] {"TABLE"});
+      ResultSet res = meta.getTables(null, null, null, new String[] { "TABLE" });
       while(res.next()) {
         if("value_set_value".equalsIgnoreCase(res.getString("TABLE_NAME"))) return true;
       }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -22,11 +22,10 @@ import com.google.gwt.dev.About;
 /**
  * A mock implementation of {@code GWTBridge} that allow to return mock implementations of types passed-in to
  * GWT.create() calls.
- * <p>
+ * <p/>
  * To use this class, first extend the {@code AbstractGwtTestSetup} class to setup this instance during test runtime.
  * Then invoke the {@code #addMock(Class)} method to obtain a mock instance of the specified type. The returned instance
  * is ready for expectation setup using EasyMock expectations.
- * 
  */
 public class MockGWTBridge extends GWTBridge {
 

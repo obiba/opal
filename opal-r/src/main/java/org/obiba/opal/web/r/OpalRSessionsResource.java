@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2011 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -52,7 +52,8 @@ public class OpalRSessionsResource {
     OpalRSession rSession = opalRSessionManager.newSubjectCurrentRSession();
     onNewSession(rSession);
     List<URI> locations = getLocations(info, rSession.getId());
-    return Response.created(locations.get(0)).header("X-Alt-Location", locations.get(1)).entity(Dtos.asDto(rSession)).build();
+    return Response.created(locations.get(0)).header("X-Alt-Location", locations.get(1)).entity(Dtos.asDto(rSession))
+        .build();
   }
 
   protected void onNewSession(OpalRSession rSession) {
@@ -68,6 +69,7 @@ public class OpalRSessionsResource {
     }
     root.append("/session");
 
-    return ImmutableList.of(info.getBaseUriBuilder().path(root.toString()).path(id).build(), info.getBaseUriBuilder().path(root.toString()).path("current").build());
+    return ImmutableList.of(info.getBaseUriBuilder().path(root.toString()).path(id).build(),
+        info.getBaseUriBuilder().path(root.toString()).path("current").build());
   }
 }

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -85,21 +85,22 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
     if(authorizationCache.contains(resource)) {
       apply(authorizationCache.get(resource));
     } else {
-      ResourceRequestBuilderFactory.newBuilder().forResource(resource).options().withAuthorizationCallback(new AuthorizationCallback() {
+      ResourceRequestBuilderFactory.newBuilder().forResource(resource).options()
+          .withAuthorizationCallback(new AuthorizationCallback() {
 
-        @Override
-        public void onResponseCode(Request request, Response response, Set<HttpMethod> allowed) {
-          apply(allowed);
-        }
+            @Override
+            public void onResponseCode(Request request, Response response, Set<HttpMethod> allowed) {
+              apply(allowed);
+            }
 
-      })//
-      .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+          })//
+          .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
 
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          unauthorized();
-        }
-      }).send();
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              unauthorized();
+            }
+          }).send();
     }
   }
 

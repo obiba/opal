@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -42,7 +42,9 @@ public class ProtobufNativeWriterProvider extends AbstractProtobufProvider imple
 
   @Override
   @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
-  public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+  public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+      MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
+      throws IOException, WebApplicationException {
     if(isWrapped(type, genericType, annotations, mediaType)) {
       Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
       for(Message m : sort(messageType, (Iterable<Message>) t)) {

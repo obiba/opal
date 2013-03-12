@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -27,7 +27,8 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportTemplatePresenter.Display, ReportTemplatePresenter.Proxy> {
+public class ReportTemplatePresenter
+    extends SplitPaneWorkbenchPresenter<ReportTemplatePresenter.Display, ReportTemplatePresenter.Proxy> {
 
   ReportTemplateDetailsPresenter reportTemplateDetailsPresenter;
 
@@ -46,11 +47,13 @@ public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportT
 
   @ProxyStandard
   @NameToken(Places.reportTemplates)
-  public interface Proxy extends ProxyPlace<ReportTemplatePresenter> {
-  }
+  public interface Proxy extends ProxyPlace<ReportTemplatePresenter> {}
 
   @Inject
-  public ReportTemplatePresenter(final Display display, final EventBus eventBus, Proxy proxy, ReportTemplateDetailsPresenter reportTemplateDetailsPresenter, ReportTemplateListPresenter reportTemplateListPresenter, Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter) {
+  public ReportTemplatePresenter(final Display display, final EventBus eventBus, Proxy proxy,
+      ReportTemplateDetailsPresenter reportTemplateDetailsPresenter,
+      ReportTemplateListPresenter reportTemplateListPresenter,
+      Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter) {
     super(eventBus, display, proxy);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateListPresenter = reportTemplateListPresenter;
@@ -60,10 +63,10 @@ public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportT
   @Override
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
     switch(slot) {
-    case LEFT:
-      return reportTemplateListPresenter;
-    case CENTER:
-      return reportTemplateDetailsPresenter;
+      case LEFT:
+        return reportTemplateListPresenter;
+      case CENTER:
+        return reportTemplateDetailsPresenter;
     }
     return null;
   }
@@ -83,7 +86,8 @@ public class ReportTemplatePresenter extends SplitPaneWorkbenchPresenter<ReportT
   @Override
   protected void authorize() {
     // create report templates
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").post().authorize(getView().getAddReportTemplateAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").post()
+        .authorize(getView().getAddReportTemplateAuthorizer()).send();
   }
 
   public class AddReportTemplateClickHandler implements ClickHandler {

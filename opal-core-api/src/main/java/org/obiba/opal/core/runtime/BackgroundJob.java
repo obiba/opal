@@ -16,30 +16,35 @@ public interface BackgroundJob extends Runnable {
 
   /**
    * Name identifying the job.
+   *
    * @return
    */
   String getName();
 
   /**
    * description of the job.
+   *
    * @return
    */
   String getDescription();
 
   /**
    * Get the thread priority for this job.
+   *
    * @return
    */
   int getPriority();
 
   /**
    * Percentage of the progress of the job.
+   *
    * @return
    */
   int getProgress();
 
   /**
    * Description of the current state of the job.
+   *
    * @return
    */
   String getProgressStatus();

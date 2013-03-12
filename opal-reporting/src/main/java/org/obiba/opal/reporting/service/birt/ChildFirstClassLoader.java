@@ -16,7 +16,7 @@ import java.net.URLClassLoader;
 
 /**
  * An almost trivial no-fuss implementation of a class loader following the child-first delegation model.
- * 
+ *
  * @author <a href="http://www.qos.ch/log4j/">Ceki Gulcu</a>
  */
 public class ChildFirstClassLoader extends URLClassLoader {
@@ -39,7 +39,7 @@ public class ChildFirstClassLoader extends URLClassLoader {
 
   /**
    * We override the parent-first behavior established by java.lang.Classloader.
-   * <p>
+   * <p/>
    * The implementation is surprisingly straightforward.
    */
   protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {

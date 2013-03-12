@@ -3,12 +3,14 @@ package org.obiba.opal.shell;
 /**
  * The {@code OpalShell} is used to interact with the user through input and output streams. Consider extending {@code
  * AbstractOpalShell} instead of implementing this interface directly.
+ *
  * @see AbstractOpalShell
  */
 public interface OpalShell extends Runnable {
 
   /**
    * Prints a message to the shell
+   *
    * @param format message format as per {@code String#format(String, Object...)}
    * @param args message arguments
    */
@@ -16,7 +18,7 @@ public interface OpalShell extends Runnable {
 
   /**
    * Prompts the shell for a password.
-   * 
+   *
    * @param format prompt message format
    * @param args prompt message arguments
    * @return the password as entered on the shell
@@ -25,7 +27,7 @@ public interface OpalShell extends Runnable {
 
   /**
    * Prompts the shell for an input.
-   * 
+   *
    * @param format prompt message format
    * @param args prompt message arguments
    * @return the text as entered on the shell
@@ -44,6 +46,7 @@ public interface OpalShell extends Runnable {
 
   /**
    * Adds a callback instance to be notified when the shell exists.
+   *
    * @param callback
    */
   public void addExitCallback(OpalShellExitCallback callback);

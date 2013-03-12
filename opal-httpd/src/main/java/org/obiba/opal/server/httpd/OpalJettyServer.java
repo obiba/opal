@@ -78,7 +78,7 @@ public class OpalJettyServer implements Service {
   private ConfigurableApplicationContext webApplicationContext;
 
   @Autowired
-  @SuppressWarnings({"unchecked", "PMD.ExcessiveParameterList"})
+  @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
   public OpalJettyServer(ApplicationContext ctx, SecurityManager securityMgr, final SslContextFactory sslContextFactory,
       PlatformTransactionManager txmgr, OpalRuntime opalRuntime, SubjectAclService subjectAclService,
       @Value("${org.obiba.opal.http.port}") Integer httpPort, @Value("${org.obiba.opal.https.port}") Integer httpsPort,
@@ -240,8 +240,8 @@ public class OpalJettyServer implements Service {
   public class OpalVersionFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-        FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
       try {
         if(opalVersion != null) {
           response.addHeader("X-Opal-Version", opalVersion.toString());

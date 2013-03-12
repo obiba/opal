@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -33,7 +33,8 @@ public abstract class AbstractHttpAuthenticatingRealm extends AuthorizingRealm {
     Session session = getSession(getSessionId(token));
     if(session != null) {
       // Extract the principals from the session
-      PrincipalCollection principals = (PrincipalCollection) session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+      PrincipalCollection principals = (PrincipalCollection) session
+          .getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
       if(principals != null) {
         return createtAuthenticationInfo(token, principals);
       }
@@ -48,7 +49,8 @@ public abstract class AbstractHttpAuthenticatingRealm extends AuthorizingRealm {
     return null;
   }
 
-  abstract protected AuthenticationInfo createtAuthenticationInfo(AuthenticationToken token, PrincipalCollection principals);
+  abstract protected AuthenticationInfo createtAuthenticationInfo(AuthenticationToken token,
+      PrincipalCollection principals);
 
   abstract protected String getSessionId(AuthenticationToken token);
 

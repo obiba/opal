@@ -12,8 +12,8 @@ package org.obiba.opal.web.finder;
 /**
  *
  */
-public abstract class AbstractMagmaFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>> extends
-    AbstractFinder<TQuery, TResult> {
+public abstract class AbstractMagmaFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>>
+    extends AbstractFinder<TQuery, TResult> {
 
   public abstract void executeQuery(TQuery query, TResult result);
 

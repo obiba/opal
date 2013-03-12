@@ -28,14 +28,16 @@ import com.gwtplatform.mvp.client.annotations.TabInfo;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
-public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy> {
+public class RAdministrationPresenter
+    extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy> {
 
   public static final Object PermissionSlot = new Object();
 
   private final AuthorizationPresenter authorizationPresenter;
 
   @Inject
-  public RAdministrationPresenter(final Display display, final EventBus eventBus, final Proxy proxy, AuthorizationPresenter authorizationPresenter) {
+  public RAdministrationPresenter(final Display display, final EventBus eventBus, final Proxy proxy,
+      AuthorizationPresenter authorizationPresenter) {
     super(eventBus, display, proxy);
     this.authorizationPresenter = authorizationPresenter;
   }
@@ -66,7 +68,8 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   protected void onReveal() {
     super.onReveal();
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder().authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    AclRequest.newResourceAuthorizationRequestBuilder()
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void addEventHandlers() {
@@ -75,8 +78,8 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
       @Override
       public void onClick(ClickEvent event) {
         ResourceRequestBuilderFactory.newBuilder().forResource("/r/sessions").post()//
-        .withCallback(Response.SC_CREATED, new RSessionCreatedCallback())//
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
+            .withCallback(Response.SC_CREATED, new RSessionCreatedCallback())//
+            .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
       }
     }));
   }
@@ -84,7 +87,8 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   @Override
   public void authorize(HasAuthorization authorizer) {
     // test r
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/r/sessions").post().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/r/sessions").post().authorize(authorizer)
+        .send();
   }
 
   private final class PermissionsUpdate implements HasAuthorization {
@@ -117,7 +121,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
         }
       };
       ResourceRequestBuilderFactory.newBuilder().forResource("/r/session/current").delete()//
-      .withCallback(Response.SC_OK, ignore).withCallback(Response.SC_INTERNAL_SERVER_ERROR, ignore).send();
+          .withCallback(Response.SC_OK, ignore).withCallback(Response.SC_INTERNAL_SERVER_ERROR, ignore).send();
     }
   }
 
@@ -131,8 +135,7 @@ public class RAdministrationPresenter extends ItemAdministrationPresenter<RAdmin
   @ProxyStandard
   @NameToken("!admin.r")
   @TabInfo(container = AdministrationPresenter.class, label = "R", priority = 2)
-  public interface Proxy extends TabContentProxyPlace<RAdministrationPresenter> {
-  }
+  public interface Proxy extends TabContentProxyPlace<RAdministrationPresenter> {}
 
   public interface Display extends View {
 

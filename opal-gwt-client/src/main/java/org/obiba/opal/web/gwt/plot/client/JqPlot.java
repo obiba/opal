@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -24,7 +24,7 @@ public abstract class JqPlot {
 
   protected static native String stringify(JavaScriptObject obj)
   /*-{
-    return $wnd.JSON.stringify(obj);
+      return $wnd.JSON.stringify(obj);
   }-*/;
 
   protected JqPlot(String id) {
@@ -43,18 +43,19 @@ public abstract class JqPlot {
 
   public native final void redraw()
   /*-{
-    this.@org.obiba.opal.web.gwt.plot.client.JqPlot::plot.redraw();
+      this.@org.obiba.opal.web.gwt.plot.client.JqPlot::plot.redraw();
   }-*/;
 
   /**
    * Creates a [x,y] coordinate. Useful when ploting points.
+   *
    * @param x the x value
    * @param y the y value
    * @return an array as [x,y]
    */
   protected native final JsArrayNumber point(double x, double y)
   /*-{
-    return [x,y];
+      return [x, y];
   }-*/;
 
   protected void plot(JsArray<?> data, JavaScriptObject options) {
@@ -63,6 +64,6 @@ public abstract class JqPlot {
 
   protected native final JavaScriptObject innerplot(String id, JsArray<?> data, JavaScriptObject options)
   /*-{
-     return $wnd.jQuery.jqplot(id, data, options);
-   }-*/;
+      return $wnd.jQuery.jqplot(id, data, options);
+  }-*/;
 }

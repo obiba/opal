@@ -1,16 +1,13 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.job.view;
-
-import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.CANCEL_ACTION;
-import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.LOG_ACTION;
 
 import java.util.Date;
 
@@ -41,14 +38,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionModel;
 
+import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.CANCEL_ACTION;
+import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.LOG_ACTION;
+
 /**
  *
  */
 public class JobListView extends Composite implements Display {
 
   @UiTemplate("JobListView.ui.xml")
-  interface JobListViewUiBinder extends UiBinder<WorkbenchLayout, JobListView> {
-  }
+  interface JobListViewUiBinder extends UiBinder<WorkbenchLayout, JobListView> {}
 
   private static JobListViewUiBinder uiBinder = GWT.create(JobListViewUiBinder.class);
 

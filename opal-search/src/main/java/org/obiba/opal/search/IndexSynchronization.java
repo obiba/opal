@@ -13,7 +13,7 @@ import org.obiba.magma.ValueTable;
 
 /**
  * A {@code Runnable} that will synchronize an index when its {@code run} method is invoked.
- * <p>
+ * <p/>
  * Provides syncrhonization state through other methods.
  */
 public interface IndexSynchronization extends Runnable {

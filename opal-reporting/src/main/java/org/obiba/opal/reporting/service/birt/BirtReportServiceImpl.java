@@ -38,8 +38,8 @@ public class BirtReportServiceImpl implements ReportService {
   private BirtEngine engine;
 
   @Override
-  public void render(String formatName, Map<String, String> parameters, String reportDesign,
-      String reportOutput) throws ReportException {
+  public void render(String formatName, Map<String, String> parameters, String reportDesign, String reportOutput)
+      throws ReportException {
     try {
       if(isRunning()) {
         engine.render(formatName, parameters, reportDesign, reportOutput);
@@ -159,8 +159,9 @@ public class BirtReportServiceImpl implements ReportService {
       @Override
       protected Class<?> findClass(String name) throws ClassNotFoundException {
         // Anything in the common package should use the already loaded class so we can cast instances
-        return name.startsWith("org.obiba.opal.reporting.service.birt.common") ? getParent().loadClass(name) : super
-            .findClass(name);
+        return name.startsWith("org.obiba.opal.reporting.service.birt.common")
+            ? getParent().loadClass(name)
+            : super.findClass(name);
       }
     };
   }

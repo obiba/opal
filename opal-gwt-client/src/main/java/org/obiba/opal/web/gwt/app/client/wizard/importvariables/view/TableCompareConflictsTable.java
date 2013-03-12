@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -51,7 +51,8 @@ public class TableCompareConflictsTable extends Table<ConflictDto> {
         if(translations.datasourceComparisonErrorMap().containsKey(conflict.getCode()) == false) {
           return conflict.getCode();
         }
-        return TranslationsUtils.replaceArguments(translations.datasourceComparisonErrorMap().get(conflict.getCode()), conflict.getArgumentsArray());
+        return TranslationsUtils.replaceArguments(translations.datasourceComparisonErrorMap().get(conflict.getCode()),
+            conflict.getArgumentsArray());
       }
     }, translations.messageLabel());
   }

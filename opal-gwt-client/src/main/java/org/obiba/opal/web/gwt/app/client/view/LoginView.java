@@ -19,8 +19,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class LoginView extends ViewImpl implements LoginPresenter.Display {
   @UiTemplate("LoginView.ui.xml")
-  interface LoginViewUiBinder extends UiBinder<Widget, LoginView> {
-  }
+  interface LoginViewUiBinder extends UiBinder<Widget, LoginView> {}
 
   private static LoginViewUiBinder uiBinder = GWT.create(LoginViewUiBinder.class);
 

@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2012 OBiBa. All rights reserved.
- *  
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -39,7 +39,8 @@ public class TableComparePanel extends FlowPanel {
 
   private final FieldUpdater<ConflictDto, String> conflictFieldUpdater;
 
-  public TableComparePanel(TableCompareDto tableCompareDto, FieldUpdater<VariableDto, String> variableFieldUpdater, FieldUpdater<ConflictDto, String> conflictFieldUpdater) {
+  public TableComparePanel(TableCompareDto tableCompareDto, FieldUpdater<VariableDto, String> variableFieldUpdater,
+      FieldUpdater<ConflictDto, String> conflictFieldUpdater) {
     super();
     this.tableCompareDto = tableCompareDto;
     this.variableFieldUpdater = variableFieldUpdater;
@@ -102,7 +103,8 @@ public class TableComparePanel extends FlowPanel {
     dataProvider.setArray(conflicts);
   }
 
-  private void addVariablesTab(JsArray<VariableDto> variables, HorizontalTabLayout variableChangesPanel, String tabTitle) {
+  private void addVariablesTab(JsArray<VariableDto> variables, HorizontalTabLayout variableChangesPanel,
+      String tabTitle) {
     TableCompareVariablesTable variablesDetails = new TableCompareVariablesTable();
     variablesDetails.getVariableNameColumn().setFieldUpdater(variableFieldUpdater);
 
@@ -113,7 +115,8 @@ public class TableComparePanel extends FlowPanel {
     dataProvider.setArray(variables);
   }
 
-  private <T extends JavaScriptObject> SimplePager addTab(HorizontalTabLayout tabs, String tabTitle, CellTable<T> table) {
+  private <T extends JavaScriptObject> SimplePager addTab(HorizontalTabLayout tabs, String tabTitle,
+      CellTable<T> table) {
     FlowPanel panel = new FlowPanel();
     SimplePager pager = new SimplePager();
     pager.addStyleName("right-aligned");

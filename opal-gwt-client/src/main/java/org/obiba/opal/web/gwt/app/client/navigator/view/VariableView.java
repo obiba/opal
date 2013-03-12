@@ -50,8 +50,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class VariableView extends ViewImpl implements VariablePresenter.Display {
 
   @UiTemplate("VariableView.ui.xml")
-  interface VariableViewUiBinder extends UiBinder<Widget, VariableView> {
-  }
+  interface VariableViewUiBinder extends UiBinder<Widget, VariableView> {}
 
   private static final int SCRIPT_TAB_INDEX = 2;
 

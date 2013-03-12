@@ -20,8 +20,8 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class UnhandledResponseNotificationPresenter extends
-    PresenterWidget<UnhandledResponseNotificationPresenter.Display> {
+public class UnhandledResponseNotificationPresenter
+    extends PresenterWidget<UnhandledResponseNotificationPresenter.Display> {
 
   public interface Display extends PopupView {
 

@@ -1,22 +1,33 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-  xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view" 
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" 
-  ui:generateLocales="default">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
-      <g:SimplePanel ui:field="selectXmlFilePanel" />
-      <g:Label styleName="help-block"><ui:msg description="Opal XML File Description label">Data in Opal XML format are packaged in an archive file (.zip)</ui:msg></g:Label>
+      <g:Label addStyleNames="key">
+        <ui:msg description="Data File label">Data File</ui:msg>
+      </g:Label>
+      <g:SimplePanel ui:field="selectXmlFilePanel"/>
+      <g:Label styleName="help-block">
+        <ui:msg description="Opal XML File Description label">Data in Opal XML format are packaged in an archive file
+          (.zip)
+        </ui:msg>
+      </g:Label>
     </g:FlowPanel>
-      
+
     <g:HTMLPanel ui:field="help">
-      <g:Label addStyleNames="title"><ui:msg description="Data File label">Data File</ui:msg></g:Label>
-      <p><ui:msg description="Xml data file information">The Opal XML file to use must be on the server. Use the file explorer to upload it if it's not already there.</ui:msg></p>    
+      <g:Label addStyleNames="title">
+        <ui:msg description="Data File label">Data File</ui:msg>
+      </g:Label>
+      <p>
+        <ui:msg description="Xml data file information">The Opal XML file to use must be on the server. Use the file
+          explorer to upload it if it's not already there.
+        </ui:msg>
+      </p>
     </g:HTMLPanel>
-      
+
   </g:FlowPanel>
-  
+
 </ui:UiBinder>

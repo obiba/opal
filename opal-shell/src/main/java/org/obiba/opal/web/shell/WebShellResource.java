@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -65,7 +65,8 @@ public class WebShellResource extends AbstractCommandsResource {
   //
 
   @Autowired
-  public WebShellResource(OpalRuntime opalRuntime, CommandJobService commandJobService, @Qualifier("web") CommandRegistry commandRegistry) {
+  public WebShellResource(OpalRuntime opalRuntime, CommandJobService commandJobService,
+      @Qualifier("web") CommandRegistry commandRegistry) {
     super(opalRuntime, commandJobService);
     this.commandRegistry = commandRegistry;
   }
@@ -140,7 +141,8 @@ public class WebShellResource extends AbstractCommandsResource {
         return Response.ok().build();
       } else {
         // Status may only be updated to CANCELED.
-        log.info("setCommandStatus called with newStatus '{}' (only '{}' is allowed)", newStatus, CommandStateDto.Status.CANCELED);
+        log.info("setCommandStatus called with newStatus '{}' (only '{}' is allowed)", newStatus,
+            CommandStateDto.Status.CANCELED);
         return Response.status(Status.BAD_REQUEST).entity("SetCommandStatus_BadRequest_IllegalStatus").build();
       }
     } catch(NoSuchCommandJobException ex) {
@@ -186,17 +188,19 @@ public class WebShellResource extends AbstractCommandsResource {
 
   @Override
   protected Response buildLaunchCommandResponse(Integer jobId) {
-    return Response.created(UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId)).build();
+    return Response.created(
+        UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId))
+        .build();
   }
 
   private CommandStateDto toCommandStateDto(CommandJob commandJob) {
     CommandStateDto.Builder dtoBuilder = CommandStateDto.newBuilder() //
-    .setId(commandJob.getId()) //
-    .setCommand(commandJob.getCommand().getName()) //
-    .setCommandArgs(commandJob.getCommand().toString()) //
-    .setOwner(commandJob.getOwner()) //
-    .setStatus(commandJob.getStatus().toString()) //
-    .addAllMessages(commandJob.getMessages());
+        .setId(commandJob.getId()) //
+        .setCommand(commandJob.getCommand().getName()) //
+        .setCommandArgs(commandJob.getCommand().toString()) //
+        .setOwner(commandJob.getOwner()) //
+        .setStatus(commandJob.getStatus().toString()) //
+        .addAllMessages(commandJob.getMessages());
 
     if(commandJob.getStartTime() != null) {
       dtoBuilder.setStartTime(commandJob.getStartTime().getTime());

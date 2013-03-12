@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- * 
+ *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -34,7 +34,7 @@ public class DatasourceFactoryRegistry {
    * Parses the provided {@code DatasourceFactoryDto} instance using one of the registered {@code
    * DatasourceFactoryDtoParser} instance. If none of the registered {@code DatasourceFactoryDtoParser} is able to parse
    * the given {@code DatasourceFactoryDto} this method will throw a {@code NoSuchDatasourceFactoryException}
-   * 
+   *
    * @param dto the {@code DatasourceFactoryDto} to parse
    * @return an instance of {@code DatasourceFactory} for the given {@code dto}
    * @throws NoSuchDatasourceFactoryException when no {@code DatasourceFactoryDtoParser} is available to parse the given

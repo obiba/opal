@@ -1,28 +1,35 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:g2="urn:import:com.google.gwt.user.cellview.client" ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
-  
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
   <g:FlowPanel>
-  <g:FlowPanel addStyleNames="login">
-    <g:FlowPanel addStyleNames="content">
-      <g:Label ui:field="applicationName" addStyleNames="title">
-        <ui:msg description="Opal application name">Opal</ui:msg>
-      </g:Label>
-      <g:FlowPanel addStyleNames="form">
-        <g:Label ui:field="errorMessage" addStyleNames="alert-message block-message error">
-          <ui:msg description="Authentication failed error message">Authentication Failed</ui:msg>
+    <g:FlowPanel addStyleNames="login">
+      <g:FlowPanel addStyleNames="content">
+        <g:Label ui:field="applicationName" addStyleNames="title">
+          <ui:msg description="Opal application name">Opal</ui:msg>
         </g:Label>
-        <g:FlowPanel addStyleNames="input">
-          <g:Label addStyleNames="key"><ui:msg description="User name field label">User Name</ui:msg></g:Label>
-          <g:TextBox ui:field="userName"/>
+        <g:FlowPanel addStyleNames="form">
+          <g:Label ui:field="errorMessage" addStyleNames="alert-message block-message error">
+            <ui:msg description="Authentication failed error message">Authentication Failed</ui:msg>
+          </g:Label>
+          <g:FlowPanel addStyleNames="input">
+            <g:Label addStyleNames="key">
+              <ui:msg description="User name field label">User Name</ui:msg>
+            </g:Label>
+            <g:TextBox ui:field="userName"/>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="input">
+            <g:Label addStyleNames="key">
+              <ui:msg description="Password field label">Password</ui:msg>
+            </g:Label>
+            <g:PasswordTextBox ui:field="password"/>
+          </g:FlowPanel>
+          <g:Button ui:field="login" styleName="btn btn-info">
+            <ui:msg description="Sign in button label">Sign In</ui:msg>
+          </g:Button>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="input">
-          <g:Label addStyleNames="key"><ui:msg description="Password field label">Password</ui:msg></g:Label>
-          <g:PasswordTextBox ui:field="password"/>
-        </g:FlowPanel>
-        <g:Button ui:field="login" styleName="btn btn-info"><ui:msg description="Sign in button label">Sign In</ui:msg></g:Button>
       </g:FlowPanel>
     </g:FlowPanel>
   </g:FlowPanel>
-  </g:FlowPanel>
-  
+
 </ui:UiBinder>
