@@ -1039,6 +1039,12 @@
         <version>${jsr305.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>xmlunit</groupId>
+        <artifactId>xmlunit</artifactId>
+        <version>${xmlunit.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -1421,6 +1427,7 @@
     <sshd.version>0.8.0</sshd.version>
     <velocity.version>1.6.4</velocity.version>
     <xfire.version>1.2.6</xfire.version>
+    <xmlunit.version>1.4</xmlunit.version>
     <xstream.version>1.4.2</xstream.version>
 
     <!-- maven plugins -->

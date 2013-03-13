@@ -21,10 +21,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.runtime.Version;
+import org.obiba.runtime.upgrade.UpgradeStep;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -37,7 +40,7 @@ public class CreateDataShieldEnvironmentsUpgradeStepTest {
 
   @Test
   public void test_appliesToOpal1dot7dot0() {
-    CreateDataShieldEnvironmentsUpgradeStep step = new CreateDataShieldEnvironmentsUpgradeStep();
+    UpgradeStep step = new CreateDataShieldEnvironmentsUpgradeStep();
     Assert.assertThat(step.getAppliesTo(), is(new Version(1, 7, 0)));
   }
 
@@ -56,29 +59,33 @@ public class CreateDataShieldEnvironmentsUpgradeStepTest {
     assertTransformResult("hasMethods");
   }
 
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
   private void assertTransformResult(String testName) {
     CreateDataShieldEnvironmentsUpgradeStep step = new CreateDataShieldEnvironmentsUpgradeStep();
-    Document orig = loadTestConfig(testName + ".xml");
-    step.doWithConfig(orig);
+    Document actual = loadTestConfig(testName + ".xml");
+    step.doWithConfig(actual);
+    String actualStr = printDocument(actual);
+    Document expected = loadTestConfig(testName + "-result.xml");
+    String expectedStr = printDocument(expected);
     try {
-      Assert.assertThat(printDocument(orig), is(printDocument(loadTestConfig(testName + "-result.xml"))));
+      XMLUnit.setIgnoreWhitespace(true);
+      XMLAssert.assertXMLEqual(expected, actual);
     } catch(AssertionError e) {
-      System.out.println(printDocument(orig));
-      System.out.println(printDocument(loadTestConfig(testName + "-result.xml")));
+      System.out.println("\n ---- Expected -----");
+      System.out.println("'" + expectedStr + "'");
+      System.out.println("\n ---- Actual -----");
+      System.out.println("'" + actualStr + "'");
       throw e;
     }
   }
 
-  /**
-   * @param orig
-   */
   private String printDocument(Document doc) {
     try {
       StringWriter sw = new StringWriter();
       TransformerFactory.newInstance().newTransformer().transform(new DOMSource(doc), new StreamResult(sw));
       return sw.toString();
     } catch(TransformerException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Cannot print XML document", e);
     }
   }
 
@@ -102,6 +109,6 @@ public class CreateDataShieldEnvironmentsUpgradeStepTest {
     } finally {
       StreamUtil.silentSafeClose(inputStream);
     }
-
   }
+
 }
