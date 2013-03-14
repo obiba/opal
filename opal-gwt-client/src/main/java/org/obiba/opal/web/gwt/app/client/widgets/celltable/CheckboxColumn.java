@@ -15,6 +15,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.client.ui.Anchor;
@@ -45,7 +46,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
       }
     });
     this.display = display;
-//    this.table = table;
 
     selectionModel = new MultiSelectionModel<T>(new ProvidesKey<T>() {
 
@@ -100,11 +100,13 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
         for(T tc : display.getDataProvider().getList()) {
           selectionModel.setSelected(tc, true);
         }
-        updateSelectAllStatus(translations.allItemsSelected(), display.getDataProvider().getList().size());
-        display.getSelectAll().setVisible(false);
-        display.getClearSelection().setVisible(true);
+        updateStatusAlert(true, display.getDataProvider().getList().size());
       }
     });
+  }
+
+  public MultiSelectionModel<T> getSelectionModel() {
+    return selectionModel;
   }
 
   @Override
@@ -114,7 +116,17 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
   }
 
   public Header<Boolean> getTableListCheckColumnHeader() {
-    Header<Boolean> checkHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
+    Header<Boolean> checkHeader = new Header<Boolean>(new CheckboxCell(true, true) {
+      @Override
+      public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
+        if(display.getDataProvider().getList().isEmpty()) {
+          sb.append(SafeHtmlUtils.fromSafeConstant("<input type=\"checkbox\" tabindex=\"-1\" disabled=\"disabled\"/>"));
+        } else {
+          super.render(context, value, sb);
+        }
+
+      }
+    }) {
 
       @Override
       public Boolean getValue() {
@@ -122,6 +134,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
           return false;
         }
 
+        // Value of the header checkbox for the current page
         for(T tc : display.getTable().getVisibleItems()) {
           if(!selectionModel.isSelected(tc)) {
             // hide status message
@@ -129,7 +142,18 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
             return false;
           }
         }
-        display.getSelectAllWidget().setVisible(true);
+        //display.getSelectAllWidget().setVisible(true);
+        // Check if all items are selected
+        boolean allSelected = true;
+        for(T tc : display.getDataProvider().getList()) {
+          if(!selectionModel.isSelected(tc)) {
+            allSelected = false;
+            break;
+          }
+        }
+
+        updateStatusAlert(allSelected, display.getTable().getVisibleItems().size());
+
         return true;
       }
     };
@@ -137,38 +161,61 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
 
       @Override
       public void update(Boolean value) {
+
+        if(display.getDataProvider().getList().isEmpty()) return;
+
         for(T tc : display.getTable().getVisibleItems()) {
           selectionModel.setSelected(tc, value);
         }
-        if(display.getTable().getVisibleItemCount() < display.getDataProvider().getList().size()) {
-          displaySelectAllItemsAction(display.getTable().getVisibleItemCount(),
-              display.getDataProvider().getList().size(), value);
+
+        if(value) {
+          // Check if all items are selected
+          boolean allSelected = true;
+          for(T tc : display.getDataProvider().getList()) {
+            if(!selectionModel.isSelected(tc)) {
+              allSelected = false;
+              break;
+            }
+          }
+
+          updateStatusAlert(allSelected, display.getTable().getVisibleItems().size());
+        } else {
+          display.getSelectAllWidget().setVisible(false);
         }
+
         display.getTable().redraw();
       }
 
-      private void displaySelectAllItemsAction(int visibleCount, int totalCount, Boolean value) {
-        if(value) {
-          updateSelectAllStatus(translations.allNItemsSelected(), visibleCount);
-
-          List<String> args = new ArrayList<String>();
-          args.add(String.valueOf(totalCount));
-          args.add(display.getItemNamePlural());
-          display.getSelectAll().setVisible(true);
-          display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
-        }
-        display.getSelectAllWidget().setVisible(value);
-
-      }
     });
+
     return checkHeader;
   }
 
-  private void updateSelectAllStatus(String message, int count) {
-    List<String> args = new ArrayList<String>();
-    args.add(String.valueOf(count));
-    args.add(display.getItemNamePlural());
-    display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(message, args));
+  private void updateStatusAlert(boolean allSelected, int currentSelectedCount) {
+
+    if(allSelected) {
+      List<String> args = new ArrayList<String>();
+      args.add(String.valueOf(display.getDataProvider().getList().size()));
+      args.add(display.getItemNamePlural());
+      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allItemsSelected(), args));
+      display.getClearSelection().setVisible(true);
+      display.getSelectAll().setVisible(false);
+      display.getSelectAllWidget().setVisible(true);
+    } else {
+      List<String> args = new ArrayList<String>();
+      args.add(String.valueOf(currentSelectedCount));
+      args.add(display.getItemNamePlural());
+      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allNItemsSelected(), args));
+      display.getSelectAll().setVisible(true);
+
+      args.clear();
+      args.add(String.valueOf(display.getDataProvider().getList().size()));
+      args.add(display.getItemNamePlural());
+      display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
+      display.getClearSelection().setVisible(false);
+    }
+
+    display.getSelectAllWidget().setVisible(true);
   }
 
   public interface Display<T> {

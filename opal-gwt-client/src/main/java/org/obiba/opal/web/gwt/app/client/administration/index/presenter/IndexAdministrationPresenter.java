@@ -18,12 +18,12 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministra
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceDataProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -35,6 +35,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -67,6 +68,8 @@ public class IndexAdministrationPresenter
   @TabInfo(container = AdministrationPresenter.class, label = "Search", priority = 4)
   public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {}
 
+  private static final Translations translations = GWT.create(Translations.class);
+
   public interface Display extends View {
 
     String INDEX_ACTION = "Index now";
@@ -93,6 +96,10 @@ public class IndexAdministrationPresenter
 
     HasClickHandlers getRefreshButton();
 
+    void renderRows(JsArray<TableIndexStatusDto> rows);
+
+    void clear();
+
     MultiSelectionModel<TableIndexStatusDto> getSelectedIndices();
 
     DropdownButton getActionsDropdown();
@@ -107,9 +114,6 @@ public class IndexAdministrationPresenter
   private final Provider<IndexConfigurationPresenter> indexConfigurationPresenter;
 
   private final AuthorizationPresenter authorizationPresenter;
-
-  private final ResourceDataProvider<TableIndexStatusDto> resourceDataProvider
-      = new ResourceDataProvider<TableIndexStatusDto>(Resources.indices());
 
   private Command confirmedCommand;
 
@@ -137,7 +141,7 @@ public class IndexAdministrationPresenter
 
   @Override
   public String getName() {
-    return "Indices";
+    return translations.indicesLabel();
   }
 
   @Override
@@ -313,8 +317,9 @@ public class IndexAdministrationPresenter
           public void onResponseCode(Request request, Response response) {
             if(response.getStatusCode() == Response.SC_OK) {
               getView().serviceStartable();
-              refresh();
+              getView().clear();
             } else {
+              getView().clear();
               getView().serviceStoppable();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
@@ -345,7 +350,7 @@ public class IndexAdministrationPresenter
           public void onResponseCode(Request request, Response response) {
             if(response.getStatusCode() == Response.SC_OK) {
               getView().serviceStoppable();
-              refresh();
+              getEventBus().fireEvent(new RequestAdministrationPermissionEvent(new ListIndicesAuthorization()));
             } else {
               getView().serviceStartable();
               getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
@@ -386,10 +391,22 @@ public class IndexAdministrationPresenter
 
     @Override
     public void authorized() {
-      // Only bind the table to its data provider if we're authorized
-      if(resourceDataProvider.getDataDisplays().isEmpty()) {
-        resourceDataProvider.addDataDisplay(getView().getIndexTable());
-      }
+
+      // Fetch all indices
+      ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+          .forResource(Resources.indices()).withCallback(new ResourceCallback<JsArray<TableIndexStatusDto>>() {
+        @Override
+        public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
+          getView().renderRows(resource);
+        }
+      })//
+          .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              // nothing
+            }
+          }).get().send();
+
     }
 
     @Override
