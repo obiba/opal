@@ -784,7 +784,7 @@ public interface Translations extends Constants {
       "SpssFailedToLoadData",
       "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
       "SpssDuplicateEntity",
-      "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",//
+      "Duplicate entity identifier '{0}'. Please make sure you have chosen the correct character set.",//
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set." })
   Map<String, String> datasourceParsingErrorMap();
 
@@ -1557,14 +1557,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Elastic search configuration")
   String esConfigurationLabel();
 
-  @Description("Specify Generate Functional Unit Identifier")
-  @Constants.DefaultStringValue(
-      "{0} new identifier will be generated for this unit. To customize the identifier format modify the settings below.")
-  String specifyGenerateFunctionalUnitIdentifier();
-
   @Description("Specify Generate Functional Unit Identifiers")
   @Constants.DefaultStringValue(
-      "{0} new identifiers will be generated for this unit. To customize the identifier format modify the settings below.")
+      "{0} new identifier{1} will be generated for this unit. To customize the identifier format modify the settings below.")
   String specifyGenerateFunctionalUnitIdentifiers();
 
   @Description("Generate Identifiers button label")
@@ -1582,20 +1577,4 @@ public interface Translations extends Constants {
   @Description("Version label")
   @DefaultStringValue("Version")
   String versionLabel();
-
-  @Description("Index Action Index Now")
-  @Constants.DefaultStringValue("Index now")
-  String indexActionIndexNow();
-
-  @Description("Index Action Clear")
-  @Constants.DefaultStringValue("Clear")
-  String indexActionClear();
-
-  @Description("Index Action Schedule Indexing")
-  @Constants.DefaultStringValue("Schedule indexing")
-  String indexActionScheduleIndexing();
-
-  @Description("Summary Frequency Plot")
-  @Constants.DefaultStringValue("Frequency Plot")
-  String summaryFrequencyPlot();
 }
