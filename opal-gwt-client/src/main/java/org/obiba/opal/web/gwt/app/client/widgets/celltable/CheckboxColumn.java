@@ -31,14 +31,12 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
 
   private final Display<T> display;
 
-//  private final Table<T> table;
-
   /**
    * Construct a new Column with a given {@link com.google.gwt.cell.client.Cell}.
    *
    * @param cell the Cell used by this Column
    */
-  public CheckboxColumn(final Display display) {
+  public CheckboxColumn(final Display<T> display) {
     super(new CheckboxCell(true, true) {
       @Override
       public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
@@ -57,7 +55,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
       }
     });
 
-    this.setFieldUpdater(new FieldUpdater<T, Boolean>() {
+    setFieldUpdater(new FieldUpdater<T, Boolean>() {
       @SuppressWarnings("unchecked")
       @Override
       public void update(int index, T object, Boolean value) {
@@ -66,7 +64,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
         //hide status message when deselecting an element
         // only redraw when the first checkbox is deselected
         int nbDeselected = 0;
-        for(T v : ((Table<T>) display.getTable()).getVisibleItems()) {
+        for(T v : display.getTable().getVisibleItems()) {
           if(!selectionModel.isSelected(v)) {
             nbDeselected++;
           }
@@ -148,22 +146,22 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
         }
         display.getTable().redraw();
       }
+
+      private void displaySelectAllItemsAction(int visibleCount, int totalCount, Boolean value) {
+        if(value) {
+          updateSelectAllStatus(translations.allNItemsSelected(), visibleCount);
+
+          List<String> args = new ArrayList<String>();
+          args.add(String.valueOf(totalCount));
+          args.add(display.getItemNamePlural());
+          display.getSelectAll().setVisible(true);
+          display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
+        }
+        display.getSelectAllWidget().setVisible(value);
+
+      }
     });
     return checkHeader;
-  }
-
-  private void displaySelectAllItemsAction(int visibleCount, int totalCount, Boolean value) {
-    if(value) {
-      updateSelectAllStatus(translations.allNItemsSelected(), visibleCount);
-
-      List<String> args = new ArrayList<String>();
-      args.add(String.valueOf(totalCount));
-      args.add(display.getItemNamePlural());
-      display.getSelectAll().setVisible(true);
-      display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
-    }
-    display.getSelectAllWidget().setVisible(value);
-
   }
 
   private void updateSelectAllStatus(String message, int count) {
