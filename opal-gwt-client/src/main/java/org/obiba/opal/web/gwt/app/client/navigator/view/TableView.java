@@ -243,7 +243,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       }
     }, translations.unitLabel());
 
-//    table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(NavigatorView.PAGE_SIZE);
     table.setEmptyTableWidget(noVariables);
     table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
