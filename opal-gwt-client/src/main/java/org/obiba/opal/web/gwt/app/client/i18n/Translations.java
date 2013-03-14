@@ -1558,7 +1558,7 @@ public interface Translations extends Constants {
 
   @Description("Specify Generate Functional Unit Identifiers")
   @Constants.DefaultStringValue(
-      "{0} new identifiers will be generated for this unit. To customize the identifier format modify the settings below.")
+      "{0} new identifier{1} will be generated for this unit. To customize the identifier format modify the settings below.")
   String specifyGenerateFunctionalUnitIdentifiers();
 
   @Description("Generate Identifiers button label")

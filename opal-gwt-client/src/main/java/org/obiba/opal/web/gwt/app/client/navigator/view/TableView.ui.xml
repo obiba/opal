@@ -89,6 +89,24 @@
           <ui:msg description="No Variables label">No Variables</ui:msg>
         </g:InlineLabel>
         <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
+        <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
+            addStyleNames="block clear select-all-variables">
+          <g:Grid>
+            <g:row>
+              <g:customCell styleName="top-aligned">
+                <g:Label ui:field="selectAllStatus" addStyleNames="inline"></g:Label>
+              </g:customCell>
+              <g:customCell styleName="top-aligned">
+                <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent action"></g:Anchor>
+              </g:customCell>
+              <g:customCell styleName="top-aligned">
+                <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent action">
+                  <ui:msg description="Clear selection label">Clear selection</ui:msg>
+                </g:Anchor>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+        </b:Alert>
         <o:Table ui:field="table" width="100%" addStyleNames="left-aligned"/>
       </g:FlowPanel>
 
