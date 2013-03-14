@@ -350,7 +350,7 @@ public class IndexAdministrationPresenter
           public void onResponseCode(Request request, Response response) {
             if(response.getStatusCode() == Response.SC_OK) {
               getView().serviceStoppable();
-              getEventBus().fireEvent(new RequestAdministrationPermissionEvent(new ListIndicesAuthorization()));
+              refresh();
             } else {
               getView().serviceStartable();
               getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
@@ -378,9 +378,32 @@ public class IndexAdministrationPresenter
   }
 
   private void refresh() {
-    Range r = getView().getIndexTable().getVisibleRange();
-    getView().getIndexTable().setVisibleRangeAndClearData(r, true);
-    getView().getSelectedIndices().clear();
+    // Fetch all indices
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(Resources.indices())//
+        .withCallback(new TableIndexStatusResourceCallback(getView().getIndexTable().getVisibleRange()))//
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // nothing
+          }
+        })//
+        .get().send();
+  }
+
+  private class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
+    private final Range r;
+
+    private TableIndexStatusResourceCallback(Range r) {
+      this.r = r;
+    }
+
+    @Override
+    public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
+      getView().renderRows(resource);
+      getView().getIndexTable().setVisibleRangeAndClearData(r, true);
+      getView().getSelectedIndices().clear();
+    }
   }
 
   private final class ListIndicesAuthorization implements HasAuthorization {
