@@ -1532,6 +1532,10 @@ public interface Translations extends Constants {
   String indexStatusNotIndexed();
 
   @Description("Table index is up-to-date")
+  @DefaultStringValue("Indices")
+  String indicesLabel();
+
+  @Description("Indices label")
   @DefaultStringValue("Table index is up-to-date")
   String indexAlertUpToDate();
 
