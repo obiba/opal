@@ -55,9 +55,13 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   public void start() {
     ElasticSearchConfiguration esConfig = configService.getConfig();
     if(!isRunning() && esConfig.isEnabled()) {
-      esNode = NodeBuilder.nodeBuilder().client(true).settings(
-          ImmutableSettings.settingsBuilder().put("http.enabled", false).loadFromSource(esConfig.getEsSettings()))
-          .clusterName(esConfig.getClusterName()).client(esConfig.isDataNode() == false).node();
+      esNode = NodeBuilder.nodeBuilder().client(true) //
+          .settings(ImmutableSettings.settingsBuilder() //
+              .put("http.enabled", false) //
+              .put("discovery.zen.ping.multicast.enabled", false) //
+              .loadFromSource(esConfig.getEsSettings())) //
+          .clusterName(esConfig.getClusterName()) //
+          .client(esConfig.isDataNode() == false).node();
       client = esNode.client();
     }
   }
