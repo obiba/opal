@@ -35,6 +35,13 @@ public interface ValueTableIndex extends Timestamped {
   String getName();
 
   /**
+   * Name of the index of the dictionary.
+   *
+   * @return
+   */
+  String getDictionaryName();
+
+  /**
    * Name of the field for the given variable.
    *
    * @param variable Variable name
