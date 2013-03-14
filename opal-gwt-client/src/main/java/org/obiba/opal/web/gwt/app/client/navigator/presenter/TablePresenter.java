@@ -285,6 +285,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
       }
     });
+
   }
 
   private void showWaitCursor() {RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.WAIT);}

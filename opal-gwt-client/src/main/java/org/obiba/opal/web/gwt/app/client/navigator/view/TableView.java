@@ -16,10 +16,12 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultSuggestBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
@@ -46,7 +48,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
@@ -64,9 +65,9 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
 import com.gwtplatform.mvp.client.ViewImpl;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiTemplate("TableView.ui.xml")
@@ -141,7 +142,19 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   HorizontalTabLayout tabs;
 
   @UiField
-  CellTable<VariableDto> table;
+  Alert selectAllItemsAlert;
+
+  @UiField
+  Label selectAllStatus;
+
+  @UiField
+  Anchor selectAllAnchor;
+
+  @UiField
+  Anchor clearSelectionAnchor;
+
+  @UiField
+  Table<VariableDto> table;
 
   @UiField
   Panel values;
@@ -202,6 +215,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     table.setColumnWidth(variableIndexColumn, 1, Unit.PX);
     variableIndexColumn.setSortable(true);
 
+    addCheckColumn();
+
     table.addColumn(variableNameColumn = new VariableClickableColumn("name") {
       @Override
       public String getValue(VariableDto object) {
@@ -227,12 +242,21 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       }
     }, translations.unitLabel());
 
-    table.setSelectionModel(new SingleSelectionModel<VariableDto>());
+//    table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(NavigatorView.PAGE_SIZE);
     table.setEmptyTableWidget(noVariables);
     table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
+  }
+
+  @SuppressWarnings({ "unchecked" })
+  private void addCheckColumn() {
+    CheckboxColumn<VariableDto> checkColumn = new CheckboxColumn<VariableDto>(new VariableDtoDisplay());
+
+    table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
+    table.setColumnWidth(checkColumn, 1, Unit.PX);
+
   }
 
   @Override
@@ -512,13 +536,13 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       @Override
       public void authorized() {
         super.authorized();
-        TableView.this.hasLinkAuthorization = true;
+        hasLinkAuthorization = true;
       }
 
       @Override
       public void unauthorized() {
         super.unauthorized();    //To change body of overridden methods use File | Settings | File Templates.
-        TableView.this.hasLinkAuthorization = false;
+        hasLinkAuthorization = false;
       }
     };
   }
@@ -617,5 +641,47 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public HasClickHandlers getScheduleIndexing() {
     return scheduleLink;
+  }
+
+  private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {
+    @Override
+    public Table<VariableDto> getTable() {
+      return table;
+    }
+
+    @Override
+    public Object getItemKey(VariableDto item) {
+      return item.getName();
+    }
+
+    @Override
+    public Anchor getClearSelection() {
+      return clearSelectionAnchor;
+    }
+
+    @Override
+    public Anchor getSelectAll() {
+      return selectAllAnchor;
+    }
+
+    @Override
+    public ListDataProvider<VariableDto> getDataProvider() {
+      return dataProvider;
+    }
+
+    @Override
+    public Alert getSelectAllWidget() {
+      return selectAllItemsAlert;
+    }
+
+    @Override
+    public Label getSelectAllStatus() {
+      return selectAllStatus;
+    }
+
+    @Override
+    public String getItemNamePlural() {
+      return translations.variableLabel().toLowerCase();
+    }
   }
 }
