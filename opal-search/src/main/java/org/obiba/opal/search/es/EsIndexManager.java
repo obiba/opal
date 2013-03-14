@@ -138,7 +138,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private String indexName(ValueTable vt) {
-    return tableReference(vt).toLowerCase().replaceAll(" ", "_");
+    return tableReference(vt).replace(' ','_').replace('.','-');
   }
 
   private String tableReference(ValueTable vt) {
@@ -243,7 +243,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
           try {
             XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
             for(int i = 0; i < variables.length; i++) {
-              String fieldName = index.getName() + ":" + variables[i].getName();
+              String fieldName = index.getFieldName(variables[i].getName());
               if(values[i].isSequence() && !values[i].isNull()) {
                 for(Value v : values[i].asSequence().getValue()) {
                   xcb.field(fieldName, esValue(variables[i], v));
@@ -348,6 +348,11 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
     @Override
     public String getName() {
       return name;
+    }
+
+    @Override
+    public String getFieldName(String variable) {
+      return name + "-" + variable;
     }
 
     @Override

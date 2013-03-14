@@ -28,7 +28,7 @@ public class VariableMappings {
 
   public XContentBuilder map(String tableName, Variable variable, XContentBuilder builder) {
     try {
-      builder.startObject(tableName + ":" + variable.getName());
+      builder.startObject(tableName + "-" + variable.getName());
 
       valueTypeMappings.forType(variable.getValueType()).map(builder);
 

@@ -177,7 +177,7 @@ public class ValueTableIndexResource extends IndexResource {
 
     for(Variable variable : index.getVariables()) {
       map.addKeys(variable.getName());
-      map.addValues(index.getName() + ":" + variable.getName());
+      map.addValues(index.getFieldName(variable.getName()));
     }
     return Response.ok(map.build()).build();
   }

@@ -16,11 +16,8 @@ import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class EsMapping {
-  private static final Logger log = LoggerFactory.getLogger(EsMapping.class);
 
   private final String name;
 
@@ -33,7 +30,7 @@ class EsMapping {
 
   EsMapping(String name) throws IOException {
     this.name = name;
-    mapping = Maps.<String, Object>newHashMap();
+    mapping = Maps.newHashMap();
   }
 
   XContentBuilder toXContent() throws IOException {
@@ -68,7 +65,7 @@ class EsMapping {
   private Map<String, Object> newIfAbsent(Map<String, Object> map, String key) {
     Map<String, Object> inner = (Map<String, Object>) map.get(key);
     if(inner == null) {
-      inner = Maps.<String, Object>newHashMap();
+      inner = Maps.newHashMap();
       map.put(key, inner);
     }
     return inner;
