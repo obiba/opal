@@ -1133,8 +1133,7 @@
             <minimumTokens>30</minimumTokens>
             <targetJdk>${maven.compiler.target}</targetJdk>
             <excludeRoots>
-              <excludeRoot>target/generated-sources/javacc</excludeRoot>
-              <excludeRoot>target/generated-sources/jjtree</excludeRoot>
+              <excludeRoot>target/generated-sources</excludeRoot>              
             </excludeRoots>
             <rulesets>
               <ruleset>https://github.com/obiba/conventions/raw/master/obiba-pmd-ruleset.xml</ruleset>
