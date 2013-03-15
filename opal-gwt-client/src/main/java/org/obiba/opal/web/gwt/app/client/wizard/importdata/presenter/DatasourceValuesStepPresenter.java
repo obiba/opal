@@ -42,9 +42,6 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   }
 
   public void setDatasource(String datasource, final Collection<String> tableNames) {
-
-    // TODO: support incremental
-
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
         .forResource(UriBuilder.create().segment("datasource", datasource, "tables").build()) //
         .get() //

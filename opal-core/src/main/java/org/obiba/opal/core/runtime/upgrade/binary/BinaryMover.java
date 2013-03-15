@@ -33,9 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BinaryMover {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(BinaryMover.class);
 
-  @SuppressWarnings("MagicNumber")
+  @SuppressWarnings({ "MagicNumber", "ConstantConditions" })
   public void move(BinaryToMove binary) {
 
     TimedExecution timedExecution = new TimedExecution().start();
