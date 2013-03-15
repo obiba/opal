@@ -10,15 +10,21 @@
 package org.obiba.opal.search.es;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadFactory;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.obiba.core.util.StringUtil;
 import org.obiba.magma.Attribute;
+import org.obiba.magma.Category;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.search.IndexManagerConfigurationService;
@@ -33,6 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @Component
 public class EsVariablesIndexManager extends EsIndexManager implements VariablesIndexManager {
@@ -87,7 +98,8 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     @Override
     protected void index() {
 
-      XContentBuilder b = new ValueTableVariablesMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
+      XContentBuilder b = new ValueTableVariablesMapping()
+          .createMapping(runtimeVersion, index.getIndexName(), valueTable);
       esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName()).setSource(b)
           .execute().actionGet();
 
@@ -100,27 +112,19 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
           XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
           xcb.field("datasource", valueTable.getDatasource().getName());
           xcb.field("table", valueTable.getName());
-          xcb.field("name", variable.getName());
           xcb.field("fullName", fullName);
-          xcb.field("entityType", variable.getEntityType());
-          xcb.field("valueType", variable.getValueType().getName());
-          xcb.field("occurrenceGroup", variable.getOccurrenceGroup());
-          xcb.field("repeatable", variable.isRepeatable());
-          xcb.field("mimeType", variable.getMimeType());
-          xcb.field("unit", variable.getUnit());
+          indexVariableParameters(variable, xcb);
 
           if(variable.hasAttributes()) {
-            for(Attribute attribute : variable.getAttributes()) {
-              if(!attribute.getValue().isNull()) {
-                xcb.field(AttributeMapping.getFieldName(attribute), attribute.getValue());
-              }
-            }
+            indexVariableAttributes(variable, xcb);
           }
 
-          // TODO categories
+          if(variable.hasCategories()) {
+            indexVariableCategories(variable, xcb);
+          }
 
-          bulkRequest.add(
-              esProvider.getClient().prepareIndex(getName(), index.getIndexName(), fullName).setSource(xcb.endObject()));
+          bulkRequest.add(esProvider.getClient().prepareIndex(getName(), index.getIndexName(), fullName)
+              .setSource(xcb.endObject()));
           if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
             bulkRequest = sendAndCheck(bulkRequest);
           }
@@ -133,6 +137,45 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       index.updateTimestamps();
     }
 
+    private void indexVariableParameters(Variable variable, XContentBuilder xcb) throws IOException {
+      xcb.field("name", variable.getName());
+      xcb.field("entityType", variable.getEntityType());
+      xcb.field("valueType", variable.getValueType().getName());
+      xcb.field("occurrenceGroup", variable.getOccurrenceGroup());
+      xcb.field("repeatable", variable.isRepeatable());
+      xcb.field("mimeType", variable.getMimeType());
+      xcb.field("unit", variable.getUnit());
+      xcb.field("referencedEntityType", variable.getReferencedEntityType());
+    }
+
+    private void indexVariableAttributes(Variable variable, XContentBuilder xcb) throws IOException {
+      for(Attribute attribute : variable.getAttributes()) {
+        if(!attribute.getValue().isNull()) {
+          xcb.field(AttributeMapping.getFieldName(attribute), attribute.getValue());
+        }
+      }
+    }
+
+    private void indexVariableCategories(Variable variable, XContentBuilder xcb) throws IOException {
+      List<String> names = Lists.newArrayList();
+      Map<String, List<Object>> attributeFields = Maps.newHashMap();
+      for(Category category : variable.getCategories()) {
+        names.add(category.getName());
+        if (category.hasAttributes()) {
+          for (Attribute attribute : category.getAttributes()) {
+            String field = "category-" + AttributeMapping.getFieldName(attribute);
+            if (!attributeFields.containsKey(field)) {
+              attributeFields.put(field,new ArrayList<Object>());
+            }
+            attributeFields.get(field).add(attribute.getValue().getValue());
+          }
+        }
+      }
+      xcb.field("category", names);
+      for (String field : attributeFields.keySet()) {
+        xcb.field(field, attributeFields.get(field));
+      }
+    }
   }
 
   private class EsValueTableVariablesIndex extends EsValueTableIndex implements ValueTableVariablesIndex {
