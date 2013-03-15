@@ -13,20 +13,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.managed.BasicManagedDataSource;
 import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.BackgroundJob;
-import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
-import org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry;
-import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
-import org.obiba.opal.core.runtime.support.OpalConfigurationProvider;
+import org.obiba.opal.core.runtime.upgrade.support.UpgradeUtils;
 import org.obiba.opal.core.support.TimedExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +34,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-@SuppressWarnings("MagicNumber")
+@SuppressWarnings({ "MagicNumber", "MethodReturnAlwaysConstant" })
 @Component
 public class BinariesStorageUpgradeJob implements BackgroundJob {
 
@@ -51,45 +44,22 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
 
   private int progress;
 
-  private final Map<DataSource, String> dataSourceNames = new LinkedHashMap<DataSource, String>();
-
-  @Qualifier("opalConfigurationProvider")
   @Autowired
-  private OpalConfigurationProvider opalConfigurationProvider;
-
-  @Autowired
-  private BasicManagedDataSource opalDataSource;
-
-  @Autowired
-  private BasicManagedDataSource keyDataSource;
-
-  @Qualifier("dataSourceFactory")
-  @Autowired
-  private DataSourceFactory dataSourceFactory;
+  @Qualifier("upgradeUtils")
+  private UpgradeUtils upgradeUtils;
 
   @Autowired
   private BinaryMover binaryMover;
 
   @Override
   public void run() {
-    dataSourceNames.put(opalDataSource, "Default");
-    dataSourceNames.put(keyDataSource, "Key");
 
-    OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration(false);
-    try {
-      DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig dataSourcesConfig = configuration
-          .getExtension(DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig.class);
-      for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
-        dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
-      }
-    } catch(NoSuchElementException e) {
-      // ignore
-    }
+    Map<DataSource, String> dataSourceNames = upgradeUtils.getConfiguredDatasources();
 
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
       DataSource dataSource = entry.getKey();
       String dataSourceName = entry.getValue();
-      if(SqlBinariesStorageUpgradeStep.hasHibernateDatasource(dataSource)) {
+      if(UpgradeUtils.hasHibernateDatasource(dataSource)) {
         processAndRetryDatasource(dataSource, dataSourceName);
       }
     }
@@ -142,7 +112,6 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
     return String.format(format.toString(), args.toArray(new Object[args.size()]));
   }
 
-  @SuppressWarnings("OverlyNestedMethod")
   private void processDataSource(DataSource dataSource, String name) {
     TimedExecution timedExecution = new TimedExecution().start();
     Collection<BinaryToMove> binaries = findBinaries(dataSource);
