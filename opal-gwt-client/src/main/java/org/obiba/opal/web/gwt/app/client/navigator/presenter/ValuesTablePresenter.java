@@ -212,12 +212,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       StringBuilder link = getLinkBuilder(offset, limit);
       if(table.getVariableCount() > variables.size()) {
         link.append("&select=");
-        StringBuilder script = new StringBuilder();
-        script.append("name().matches(/");
+        StringBuilder script = new StringBuilder("name().matches(/");
         for(int i = 0; i < variables.size(); i++) {
-          if(i > 0) {
-            script.append("|");
-          }
+          if(i > 0) script.append("|");
           script.append("^").append(escape(variables.get(i).getName())).append("$");
         }
         script.append("/)");

@@ -412,10 +412,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
       DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importConfig);
 
+      String factoryStr = DatasourceFactoryDto.stringify(factory);
       transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
           .forResource("/transient-datasources") //
           .post() //
-          .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
+          .withResourceBody(factoryStr) //
           .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
               SC_INTERNAL_SERVER_ERROR) //
           .send();

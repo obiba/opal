@@ -33,7 +33,7 @@ public class CreateDataShieldEnvironmentsUpgradeStep extends AbstractConfigurati
     Node datashieldConfig = aggregatingMethods.getParentNode();
 
     // Special case of empty list
-    if(aggregatingMethods.hasChildNodes() == false) {
+    if(!aggregatingMethods.hasChildNodes()) {
       // no need to create environment
       datashieldConfig.removeChild(aggregatingMethods);
       return;

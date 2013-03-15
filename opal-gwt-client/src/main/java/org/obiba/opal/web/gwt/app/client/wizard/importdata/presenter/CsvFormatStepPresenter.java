@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -51,6 +53,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     super(display, eventBus);
   }
 
+  @Nullable
   @Override
   public Place getPlace() {
     return null;
