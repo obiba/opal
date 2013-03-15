@@ -76,10 +76,6 @@ public class IndexSynchronizationManager {
     syncProducer.index(vt, gracePeriod);
   }
 
-  public void synchronizeIndex(ValueTable vt) {
-    syncProducer.index(vt, GRACE_PERIOD);
-  }
-
   public boolean hasTask() {
     return currentTask != null;
   }
@@ -90,6 +86,8 @@ public class IndexSynchronizationManager {
 
   public void stopTask() {
     currentTask.stop();
+    syncProducer.deleteCurrentTaskFromQueue();
+
   }
 
   private Subject getSubject() {
@@ -174,6 +172,12 @@ public class IndexSynchronizationManager {
         indexSyncQueue.offer(sync);
       }
     }
+
+    private void deleteCurrentTaskFromQueue() {
+      if(indexSyncQueue.contains(currentTask)) {
+        indexSyncQueue.remove(currentTask);
+      }
+    }
   }
 
   private class SyncConsumer implements Runnable {
@@ -181,6 +185,7 @@ public class IndexSynchronizationManager {
     @Override
     public void run() {
       log.debug("Starting indexing consumer");
+      indexSyncQueue.clear();
       try {
         //noinspection InfiniteLoopStatement
         while(true) {

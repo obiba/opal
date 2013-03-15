@@ -87,6 +87,24 @@
       </g:HorizontalPanel>
       <g:VerticalPanel width="100%" addStyleNames="content">
         <c:SimplePager ui:field="indexTablePager" location="CENTER" addStyleNames="right-aligned"/>
+        <b:Alert ui:field="selectAllAlert" close="false" visible="false"
+            addStyleNames="block clear select-all-variables">
+          <g:Grid>
+            <g:row>
+              <g:customCell styleName="top-aligned">
+                <g:Label ui:field="selectAllStatus" addStyleNames="inline"></g:Label>
+              </g:customCell>
+              <g:customCell styleName="top-aligned">
+                <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent action"></g:Anchor>
+              </g:customCell>
+              <g:customCell styleName="top-aligned">
+                <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent action">
+                  <ui:msg description="Clear selection label">Clear selection</ui:msg>
+                </g:Anchor>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+        </b:Alert>
         <o:Table width="100%" ui:field="indexTable" addStyleNames="gwt-CellTable"/>
       </g:VerticalPanel>
     </g:FlowPanel>
