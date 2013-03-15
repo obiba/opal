@@ -243,6 +243,7 @@ public class MagmaAssignROperation extends AbstractROperation {
         return TextType.get().valueOf(valueSet.getVariableEntity().getIdentifier());
       }
 
+      @Nullable
       @Override
       public VectorSource asVectorSource() {
         return new VectorSource() {
@@ -255,7 +256,7 @@ public class MagmaAssignROperation extends AbstractROperation {
           public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
             return Iterables.transform(holder.getEntities(), new Function<VariableEntity, Value>() {
               @Override
-              public Value apply(@Nullable VariableEntity input) {
+              public Value apply(@Nonnull VariableEntity input) {
                 return TextType.get().valueOf(input.getIdentifier());
               }
             });

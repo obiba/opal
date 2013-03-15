@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Initialisable;
@@ -96,6 +97,7 @@ class RestValueTable extends AbstractValueTable {
           return v.getValueType();
         }
 
+        @Nullable
         @Override
         public VectorSource asVectorSource() {
           return null;

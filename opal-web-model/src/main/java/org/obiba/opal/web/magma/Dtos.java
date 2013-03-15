@@ -46,7 +46,7 @@ import com.google.common.collect.Lists;
 /**
  * Utilities for manipulating Magma Dto instances
  */
-@SuppressWarnings("OverlyCoupledClass")
+@SuppressWarnings({ "OverlyCoupledClass", "UnusedDeclaration" })
 public final class Dtos {
 
   public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc
@@ -82,7 +82,7 @@ public final class Dtos {
     };
   }
 
-  public static VariableDto.Builder asDto(LinkDto tableLink, Variable from, @Nullable Integer index) {
+  public static VariableDto.Builder asDto(@Nullable LinkDto tableLink, Variable from, @Nullable Integer index) {
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType())
         .setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
     if(from.getOccurrenceGroup() != null) {
@@ -128,6 +128,7 @@ public final class Dtos {
     return c;
   }
 
+  @SuppressWarnings("ConstantConditions")
   public static AttributeDto.Builder asDto(Attribute from) {
     AttributeDto.Builder a = AttributeDto.newBuilder().setName(from.getName()).setValue(from.getValue().toString());
     if(from.isLocalised()) {
@@ -235,6 +236,7 @@ public final class Dtos {
     return builder;
   }
 
+  @SuppressWarnings("ConstantConditions")
   public static Magma.TimestampsDto.Builder asDto(Timestamps ts) {
     Magma.TimestampsDto.Builder tsBuilder = Magma.TimestampsDto.newBuilder();
     if(!ts.getCreated().isNull()) {
@@ -293,26 +295,28 @@ public final class Dtos {
     return asDto(null, value);
   }
 
-  public static ValueSetsDto.ValueDto.Builder asDto(String link, Value value) {
+  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, Value value) {
     return asDto(link, value, false);
   }
 
-  public static ValueSetsDto.ValueDto.Builder asDto(String link, Value value, boolean filterBinary) {
-    Function<Object, String> toString = filterBinary ? filteredToString() : Functions.toStringFunction();
+  @SuppressWarnings("ConstantConditions")
+  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, Value value, boolean filterBinary) {
+    Function<Object, String> toString = filterBinary ? FilteredToStringFunction.INSTANCE : Functions.toStringFunction();
 
     ValueSetsDto.ValueDto.Builder valueDto = ValueSetsDto.ValueDto.newBuilder();
-    if(!value.isNull() && !value.isSequence()) {
-      if(filterBinary && value.getValueType() == BinaryType.get()) {
-        valueDto.setLink(link);
-      }
-      valueDto.setValue(toString.apply(value));
-    }
-
-    if(!value.isNull() && value.isSequence()) {
-      int i = 0;
-      for(Value v : value.asSequence().getValue()) {
-        valueDto.addValues(asDto(link + "?pos=" + i, v, filterBinary));
-        i++;
+    if(!value.isNull()) {
+      if(value.isSequence()) {
+        int i = 0;
+        for(Value v : value.asSequence().getValue()) {
+          valueDto.addValues(asDto(link + "?pos=" + i, v, filterBinary));
+          i++;
+        }
+      } else {
+        if(filterBinary && value.getValueType() == BinaryType.get()) {
+          valueDto.setLink(link);
+        }
+        String valueStr = toString.apply(value);
+        valueDto.setValue(valueStr);
       }
     }
 
@@ -343,19 +347,15 @@ public final class Dtos {
     return builder.build();
   }
 
-  private static Function<Object, String> filteredToString() {
-    return FilteredToStringFunction.INSTANCE;
-  }
-
   private static final class FilteredToStringFunction implements Function<Object, String> {
-    private static final FilteredToStringFunction INSTANCE = new FilteredToStringFunction();
+
+    private static final Function<Object, String> INSTANCE = new FilteredToStringFunction();
 
     @Override
     public String apply(Object o) {
       Value input = (Value) o;
       if(input.getValueType() == BinaryType.get()) {
-        int length = input.isNull() ? 0 : 1;
-        return "byte[" + length + "]";
+        return "byte[" + (input.isNull() ? 0 : 1) + "]";
       }
       return input.toString();
     }

@@ -98,9 +98,9 @@ public class ValueSetsResource extends AbstractValueTableResource {
     return TimestampedResponses.ok(getValueTable(), vs).build();
   }
 
-  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, String select, @SuppressWarnings(
-      "ParameterHidesMemberVariable") Iterable<VariableEntity> entities, final boolean filterBinary) {
-    final Iterable<Variable> variables = filterVariables(select, 0, null);
+  private ValueSetsDto getValueSetsDto(UriInfo uriInfo, String select, Iterable<VariableEntity> variableEntities,
+      boolean filterBinary) {
+    Iterable<Variable> variables = filterVariables(select, 0, null);
 
     ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType());
 
@@ -115,7 +115,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
 
     ImmutableList.Builder<ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
     for(ValueSetDto dto : Iterables
-        .transform(entities, new VariableEntityValueSetDtoFunction(variables, uriInfo, filterBinary))) {
+        .transform(variableEntities, new VariableEntityValueSetDtoFunction(variables, uriInfo, filterBinary))) {
       valueSetDtoBuilder.add(dto);
     }
 
@@ -124,15 +124,16 @@ public class ValueSetsResource extends AbstractValueTableResource {
     return builder.build();
   }
 
-  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo,
-      @SuppressWarnings("ParameterHidesMemberVariable") Iterable<VariableEntity> entities, final boolean filterBinary) {
+  @SuppressWarnings("ConstantConditions")
+  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, Iterable<VariableEntity> variableEntities,
+      final boolean filterBinary) {
     final Variable variable = vvs.getVariable();
     ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(variable.getEntityType())
-        .addVariables(vvs.getVariable().getName());
+        .addVariables(variable.getName());
 
     VectorSource vector = vvs.asVectorSource();
     if(vector == null) {
-      builder.addAllValueSets(Iterables.transform(entities, new Function<VariableEntity, ValueSetDto>() {
+      builder.addAllValueSets(Iterables.transform(variableEntities, new Function<VariableEntity, ValueSetDto>() {
         @Override
         public ValueSetDto apply(VariableEntity fromEntity) {
           ValueSet valueSet = getValueTable().getValueSet(fromEntity);
@@ -141,16 +142,16 @@ public class ValueSetsResource extends AbstractValueTableResource {
         }
       }));
     } else {
-      addValueSetDtosFromVectorSource(uriInfo, entities, variable, filterBinary, vector, builder);
+      addValueSetDtosFromVectorSource(uriInfo, variableEntities, variable, filterBinary, vector, builder);
     }
 
     return builder.build();
   }
 
-  private void addValueSetDtosFromVectorSource(UriInfo uriInfo, Iterable<VariableEntity> entities, Variable variable,
-      boolean filterBinary, VectorSource vector, ValueSetsDto.Builder builder) {
+  private void addValueSetDtosFromVectorSource(UriInfo uriInfo, Iterable<VariableEntity> variableEntities,
+      Variable variable, boolean filterBinary, VectorSource vector, ValueSetsDto.Builder builder) {
     ImmutableSortedSet<VariableEntity> sortedEntities = ImmutableSortedSet.<VariableEntity>naturalOrder()
-        .addAll(entities).build();
+        .addAll(variableEntities).build();
     Iterable<Value> values = vector.getValues(sortedEntities);
 
     HashMap<VariableEntity, Value> results = new LinkedHashMap<VariableEntity, Value>();
@@ -160,7 +161,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
       results.put(entity, value);
     }
 
-    for(VariableEntity entity : entities) {
+    for(VariableEntity entity : variableEntities) {
       builder.addValueSets(getValueSetDto(uriInfo, entity, variable, filterBinary, results.get(entity)));
     }
   }
@@ -182,7 +183,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
 
     private final boolean filterBinary;
 
-    public VariableEntityValueSetDtoFunction(Iterable<Variable> variables, UriInfo uriInfo, boolean filterBinary) {
+    private VariableEntityValueSetDtoFunction(Iterable<Variable> variables, UriInfo uriInfo, boolean filterBinary) {
       this.variables = variables;
       this.uriInfo = uriInfo;
       this.filterBinary = filterBinary;

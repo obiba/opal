@@ -11,6 +11,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.mozilla.javascript.Scriptable;
 import org.obiba.magma.Datasource;
@@ -58,7 +59,7 @@ abstract class AbstractValueTableResource {
     return new LocalesResource(locales);
   }
 
-  protected Iterable<Variable> filterVariables(String script, Integer offset, Integer limit) {
+  protected Iterable<Variable> filterVariables(String script, Integer offset, @Nullable Integer limit) {
     List<Variable> filteredVariables = null;
 
     if(script != null) {
@@ -87,7 +88,8 @@ abstract class AbstractValueTableResource {
     return filterEntities(script, null, null);
   }
 
-  protected Iterable<VariableEntity> filterEntities(String script, Integer offset, Integer limit) {
+  protected Iterable<VariableEntity> filterEntities(@Nullable String script, @Nullable Integer offset,
+      @Nullable Integer limit) {
     Iterable<VariableEntity> entities;
     entities = script == null ? valueTable.getVariableEntities() : getFilteredEntities(script);
     // Apply offset then limit (in that order)
