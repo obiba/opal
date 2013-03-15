@@ -58,16 +58,6 @@
     <plugins>
 
       <plugin>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <configuration>
-          <excludeRoots>
-            <excludeRoot>target/generated-sources/protobuf-server</excludeRoot>
-            <excludeRoot>target/generated-sources/protobuf-gwt</excludeRoot>
-          </excludeRoots>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
