@@ -32,22 +32,7 @@ public interface ValueTableIndex extends Timestamped {
    *
    * @return
    */
-  String getName();
-
-  /**
-   * Name of the index of the dictionary.
-   *
-   * @return
-   */
-  String getDictionaryName();
-
-  /**
-   * Name of the field for the given variable.
-   *
-   * @param variable Variable name
-   * @return
-   */
-  String getFieldName(String variable);
+  String getIndexName();
 
   /**
    * Returns true if the the lastUpdate timestamp of this index is more recent than that of its corresponding
@@ -68,13 +53,6 @@ public interface ValueTableIndex extends Timestamped {
    * Delete the index.
    */
   void delete();
-
-  /**
-   * Get the variables being indexed.
-   *
-   * @return
-   */
-  Iterable<Variable> getVariables();
 
   /**
    * For testing purposes, we need to be able to mock the current datetime

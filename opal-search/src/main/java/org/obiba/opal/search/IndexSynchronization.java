@@ -18,6 +18,8 @@ import org.obiba.magma.ValueTable;
  */
 public interface IndexSynchronization extends Runnable {
 
+  IndexManager getIndexManager();
+
   ValueTableIndex getValueTableIndex();
 
   ValueTable getValueTable();

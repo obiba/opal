@@ -26,7 +26,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.opal.search.IndexManager;
+import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.finder.AbstractElasticSearchFinder;
@@ -50,12 +50,12 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
 
   private final VariableEntityBean variableEntity;
 
-  private final IndexManager indexManager;
+  private final ValuesIndexManager indexManager;
 
   private final ElasticSearchProvider esProvider;
 
   public VariableEntityTablesResource(VariableEntityBean variableEntity, OpalSearchService opalSearchService,
-      IndexManager indexManager, ElasticSearchProvider esProvider) {
+      ValuesIndexManager indexManager, ElasticSearchProvider esProvider) {
     this.variableEntity = variableEntity;
     this.opalSearchService = opalSearchService;
     this.indexManager = indexManager;
@@ -121,7 +121,7 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   public static class EntityTablesElasticSearchFinder
       extends AbstractElasticSearchFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
-    private final IndexManager indexManager;
+    private final ValuesIndexManager indexManager;
 
     private final ElasticSearchProvider esProvider;
 
@@ -130,7 +130,7 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
      */
     private int limit = 0;
 
-    public EntityTablesElasticSearchFinder(OpalSearchService opalSearchService, IndexManager indexManager,
+    public EntityTablesElasticSearchFinder(OpalSearchService opalSearchService, ValuesIndexManager indexManager,
         ElasticSearchProvider esProvider) {
       super(opalSearchService);
       this.indexManager = indexManager;
@@ -199,7 +199,7 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
       while(iterator.hasNext()) {
         ValueTable valueTable = iterator.next();
 
-        if(indexManager.isIndexable(valueTable) && indexManager.getIndex(valueTable).isUpToDate()) {
+        if(indexManager.isReady() && indexManager.getIndex(valueTable).isUpToDate()) {
           String tableIndexName = indexManagerHelper.setDatasource(valueTable.getDatasource().getName())
               .setTable(valueTable.getName()).getIndexName();
 

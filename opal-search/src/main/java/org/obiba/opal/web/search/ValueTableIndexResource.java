@@ -36,12 +36,13 @@ import org.elasticsearch.rest.support.AbstractRestRequest;
 import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.Schedule;
 import org.obiba.opal.search.SearchServiceException;
 import org.obiba.opal.search.ValueTableIndex;
+import org.obiba.opal.search.ValueTableValuesIndex;
+import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.OpalMap;
@@ -61,7 +62,7 @@ public class ValueTableIndexResource extends IndexResource {
   private String table;
 
   @Autowired
-  public ValueTableIndexResource(IndexManager indexManager, ElasticSearchProvider esProvider,
+  public ValueTableIndexResource(ValuesIndexManager indexManager, ElasticSearchProvider esProvider,
       IndexManagerConfigurationService configService, IndexSynchronizationManager synchroManager) {
     super(indexManager, configService, esProvider, synchroManager);
   }
@@ -102,7 +103,7 @@ public class ValueTableIndexResource extends IndexResource {
 
       if(!isInProgress(table)) {
 
-        synchroManager.synchronizeIndex(valueTable, 0);
+        synchroManager.synchronizeIndex(indexManager, valueTable, 0);
       }
 
       return Response.ok().build();
@@ -172,7 +173,7 @@ public class ValueTableIndexResource extends IndexResource {
   @GET
   @Path("_schema")
   public Response search(@Context HttpServletRequest servletRequest) {
-    ValueTableIndex index = getValueTableIndex(datasource, table);
+    ValueTableValuesIndex index = getValueTableIndex(datasource, table);
     OpalMap.Builder map = OpalMap.newBuilder();
 
     for(Variable variable : index.getVariables()) {

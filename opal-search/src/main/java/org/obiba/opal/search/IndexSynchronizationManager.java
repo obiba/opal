@@ -10,6 +10,7 @@
 package org.obiba.opal.search;
 
 import java.util.Calendar;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -44,40 +45,34 @@ public class IndexSynchronizationManager {
   private static final int GRACE_PERIOD = 300;
 
   @Autowired
-  private IndexManager indexManager;
+  private Set<IndexManager> indexManagers;
 
   private final SyncProducer syncProducer = new SyncProducer();
 
-  private boolean consumerStarted;
+  private SyncConsumer syncConsumer;
 
   private IndexSynchronization currentTask;
 
-  private final BlockingQueue<IndexSynchronization> indexSyncQueue;
+  private final BlockingQueue<IndexSynchronization> indexSyncQueue =  new LinkedBlockingQueue<IndexSynchronization>();
 
   public IndexSynchronizationManager() {
-    consumerStarted = false;
-    indexSyncQueue = new LinkedBlockingQueue<IndexSynchronization>();
   }
 
   // Every minute
   @Scheduled(fixedDelay = 60 * 1000)
   public void synchronizeIndices() {
-    getSubject().execute(syncProducer);
-    if(!consumerStarted) {
-      // start one IndexSynchronization consumer thread
-      Thread consumer = new Thread(getSubject().associateWith(new SyncConsumer()));
+    if(syncConsumer == null) {
+      // start one IndexSynchronization consumer thread per index manager
+      syncConsumer = new SyncConsumer();
+      Thread consumer = new Thread(getSubject().associateWith(syncConsumer));
       consumer.setPriority(Thread.MIN_PRIORITY);
       consumer.start();
-      consumerStarted = true;
     }
+    getSubject().execute(syncProducer);
   }
 
-  public void synchronizeIndex(ValueTable vt, int gracePeriod) {
-    syncProducer.index(vt, gracePeriod);
-  }
-
-  public void synchronizeIndex(ValueTable vt) {
-    syncProducer.index(vt, GRACE_PERIOD);
+  public void synchronizeIndex(IndexManager indexManager, ValueTable vt, int gracePeriod) {
+    syncProducer.index(indexManager, vt, gracePeriod);
   }
 
   public boolean hasTask() {
@@ -108,33 +103,33 @@ public class IndexSynchronizationManager {
 
     @Override
     public void run() {
-
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
           log.debug("Check index for table: {}.{}", ds.getName(), vt.getName());
-          if(indexManager.isIndexable(vt) && indexManager.isReadyForIndexing(vt)) {
-            maybeUpdateIndex(vt);
+          for(IndexManager indexManager : indexManagers) {
+            checkIndexable(indexManager, vt);
           }
         }
       }
     }
 
-    private void maybeUpdateIndex(ValueTable vt) {
-      ValueTableIndex index = indexManager.getIndex(vt);
-
-      // Check that the index is older than the ValueTable
-      if(index.requiresUpgrade() || !index.isUpToDate()) {
-        index(vt, GRACE_PERIOD);
+    private void checkIndexable(IndexManager indexManager, ValueTable vt) {
+      if(indexManager.isReady() && indexManager.isIndexable(vt)) {
+        ValueTableIndex index = indexManager.getIndex(vt);
+        // Check that the index is older than the ValueTable
+        if(index.requiresUpgrade() || !index.isUpToDate()) {
+          index(indexManager, vt, GRACE_PERIOD);
+        }
       }
     }
 
-    private void index(ValueTable vt, int seconds) {
+    private void index(IndexManager indexManager, ValueTable vt, int seconds) {
       // The index needs to be updated
       Value value = vt.getTimestamps().getLastUpdate();
       // Check that the last modification to the ValueTable is older than the gracePeriod
       // If we don't know (null value), reindex
       if(value.isNull() || value.compareTo(gracePeriod(seconds)) < 0) {
-        submitTask(vt, indexManager.getIndex(vt));
+        submitTask(indexManager, vt);
       }
     }
 
@@ -155,23 +150,23 @@ public class IndexSynchronizationManager {
     /**
      * Check if the index is not the current task, or in the queue before adding it to the indexation queue.
      *
+     * @param indexManager
      * @param vt
-     * @param index
      */
-    private void submitTask(ValueTable vt, ValueTableIndex index) {
-      if(currentTask != null && currentTask.getValueTableIndex().getName().equals(index.getName())) return;
+    private void submitTask(IndexManager indexManager, ValueTable vt) {
+      ValueTableIndex index = indexManager.getIndex(vt);
+      if(currentTask != null && currentTask.getValueTableIndex().getIndexName().equals(index.getIndexName())) return;
 
       boolean alreadyQueued = false;
       for(IndexSynchronization s : indexSyncQueue) {
-        if(s.getValueTableIndex().getName().equals(index.getName())) {
+        if(s.getValueTableIndex().getIndexName().equals(index.getIndexName()) && s.getIndexManager().getName().equals(indexManager.getName())) {
           alreadyQueued = true;
           break;
         }
       }
       if(!alreadyQueued) {
-        log.trace("Queueing for indexing {}", index.getName());
-        IndexSynchronization sync = indexManager.createSyncTask(vt, index);
-        indexSyncQueue.offer(sync);
+        log.trace("Queueing for indexing {} in {}", index.getIndexName(), indexManager.getName());
+        indexSyncQueue.offer(indexManager.createSyncTask(vt, index));
       }
     }
   }
@@ -191,11 +186,11 @@ public class IndexSynchronizationManager {
     }
 
     private void consume(IndexSynchronization sync) {
-      log.trace("Prepare indexing {}", sync.getValueTableIndex().getName());
+      log.trace("Prepare indexing {} in {}", sync.getValueTableIndex().getIndexName(), sync.getIndexManager().getName());
       currentTask = sync;
       try {
         // check if still indexable: indexation config could have changed
-        if(indexManager.isIndexable(sync.getValueTable())) {
+        if(sync.getIndexManager().isReady()) {
           getSubject().execute(sync);
         }
       } finally {

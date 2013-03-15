@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.IndexManager;
+import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.obiba.opal.web.search.support.QueryTermDtoBuilder;
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Path("/datasource/{ds}/table/{table}/facet")
 public class ValueTableFacetResource {
 
-  private final IndexManager indexManager;
+  private final ValuesIndexManager indexManager;
 
   private final SearchQueryExecutorFactory searchQueryFactory;
 
@@ -44,7 +45,7 @@ public class ValueTableFacetResource {
   private String table;
 
   @Autowired
-  public ValueTableFacetResource(IndexManager indexManager, SearchQueryExecutorFactory searchQueryFactory) {
+  public ValueTableFacetResource(ValuesIndexManager indexManager, SearchQueryExecutorFactory searchQueryFactory) {
     this.indexManager = indexManager;
     this.searchQueryFactory = searchQueryFactory;
   }
