@@ -131,10 +131,10 @@ public class DatasourceDtos {
   }
 
   private static DatasourceFactoryDto createSpssDatasourceFactoryDto(ImportConfig importConfig) {
-
     SpssDatasourceFactoryDto factoryDto = SpssDatasourceFactoryDto.create();
     factoryDto.setFile(importConfig.getSpssFile());
     factoryDto.setCharacterSet(importConfig.getCharacterSet());
+    factoryDto.setEntityType(importConfig.getEntityType());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     configureIncremental(importConfig, dto);

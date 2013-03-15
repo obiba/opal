@@ -32,11 +32,19 @@
           <ui:msg description="Options title">Advanced Options</ui:msg>
         </g:Label>
       </g:customHeader>
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Character set label">Character Set</ui:msg>
-        </g:Label>
-        <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
+      <g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key">
+            <ui:msg description="Character set label">Character Set</ui:msg>
+          </g:Label>
+          <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
+        </g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key">
+            <ui:msg description="Spss Entity type">Entity type</ui:msg>
+          </g:Label>
+          <g:TextBox name="entity" ui:field="entityType"/>
+        </g:FlowPanel>
       </g:FlowPanel>
     </g:DisclosurePanel>
 

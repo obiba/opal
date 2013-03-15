@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 
 public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPresenter.Display>
@@ -75,6 +76,7 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
     importData.setFormat(ImportFormat.SPSS);
     importData.setSpssFile(getDisplay().getSelectedFile());
     importData.setCharacterSet(getDisplay().getCharsetText().getText());
+    importData.setDestinationEntityType(getDisplay().getEntityType().getText());
 
     return importData;
   }
@@ -94,6 +96,7 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
 
     String getSelectedFile();
 
+    HasText getEntityType();
   }
 
   private void setDefaultCharset() {

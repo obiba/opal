@@ -48,6 +48,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -93,7 +94,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       @Override
       public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
         String selectedFile = ((FileSelectionPresenter) event.getSource()).getSelectedFile();
-        getView().showCharacterSetPanel(DatasourceFileType.isSpssFile(selectedFile));
+        getView().showSpssSpecificPanel(DatasourceFileType.isSpssFile(selectedFile));
       }
     });
   }
@@ -218,7 +219,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
     void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
 
-    void showCharacterSetPanel(boolean show);
+    void showSpssSpecificPanel(boolean show);
 
     HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler);
 
@@ -231,6 +232,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     void hideErrors();
 
     String getSelectedDatasource();
+
+    HasText getSpssEntityType();
 
     void setSelectedDatasource(String dsName);
 
@@ -319,6 +322,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       SpssDatasourceFactoryDto spssDto = SpssDatasourceFactoryDto.create();
       spssDto.setFile(tmpFilePath);
       spssDto.setCharacterSet(getView().getCharsetText().getText());
+      spssDto.setEntityType(getView().getSpssEntityType().getText());
 
       DatasourceFactoryDto dto = DatasourceFactoryDto.create();
       dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, spssDto);
