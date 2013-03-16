@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.inject;
 
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.view.VariablesToViewView;
 
 /**
  * Bind concrete implementations to interfaces within the Create View wizard.
@@ -21,5 +23,8 @@ public class CreateViewWizardModule extends AbstractOpalModule {
   protected void configure() {
     bindWizardPresenterWidget(CreateViewStepPresenter.class, CreateViewStepPresenter.Display.class,
         CreateViewStepView.class, CreateViewStepPresenter.Wizard.class);
+
+    bindPresenterWidget(VariablesToViewPresenter.class, VariablesToViewPresenter.Display.class,
+        VariablesToViewView.class);
   }
 }

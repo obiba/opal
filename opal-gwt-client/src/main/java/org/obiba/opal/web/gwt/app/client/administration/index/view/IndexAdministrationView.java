@@ -338,5 +338,10 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     public String getItemNamePlural() {
       return translations.indicesLabel().toLowerCase();
     }
+
+//    @Override
+//    public ClickHandler getSelectClickHandler(){
+//      return null;
+//    }
   }
 }
