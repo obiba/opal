@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
@@ -18,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.CopyVariablesToViewEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
@@ -33,6 +35,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEve
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -111,6 +114,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private Provider<IndexPresenter> indexPresenter;
 
+  private Provider<VariablesToViewPresenter> variablesToViewPresenter;
+
   private Runnable removeConfirmation;
 
   private Boolean sortAscending;
@@ -123,11 +128,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
    */
   @Inject
   public TablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter,
-      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
+      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
+      Provider<VariablesToViewPresenter> variablesToViewPresenter) {
     super(eventBus, display, proxy);
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.indexPresenter = indexPresenter;
+    this.variablesToViewPresenter = variablesToViewPresenter;
   }
 
   @Override
@@ -167,6 +174,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().setPreviousCommand(new PreviousCommand());
     getView().setNextCommand(new NextCommand());
     getView().setValuesTabCommand(new ValuesCommand());
+
+    getView().getCopyVariables().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
+      }
+
+    });
 
     FieldUpdater<VariableDto, String> updater = new VariableNameFieldUpdater();
     getView().setVariableNameFieldUpdater(updater);
@@ -951,6 +966,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     void setFromTables(JsArrayString tables);
 
     List<Anchor> getFromTablesAnchor();
+
+    HasClickHandlers getCopyVariables();
+
+    Set<VariableDto> getSelectedItems();
   }
 
 }

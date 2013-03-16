@@ -107,6 +107,7 @@ public class IndexAdministrationPresenter
     HasActionHandler<TableIndexStatusDto> getActions();
 
     HasData<TableIndexStatusDto> getIndexTable();
+
   }
 
   private final Provider<IndexPresenter> indexPresenter;

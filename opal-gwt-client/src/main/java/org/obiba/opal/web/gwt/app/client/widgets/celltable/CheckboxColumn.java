@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
 import java.util.ArrayList;
@@ -103,6 +113,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
         updateStatusAlert(true, display.getDataProvider().getList().size());
       }
     });
+
+//    if (display.getSelectClickHandler() != null){
+//      display.getSelectAll().addClickHandler(display.getSelectClickHandler());
+//    }
   }
 
   public MultiSelectionModel<T> getSelectionModel() {
@@ -259,5 +273,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
      * @return The type name of items
      */
     String getItemNamePlural();
+
+//    ClickHandler getSelectClickHandler();
   }
 }

@@ -239,3 +239,9 @@ message ScheduleDto {
   optional int32 hours = 3;
   optional int32 minutes = 4;
 }
+
+message VariableCopyDto {
+  required string variable = 1;
+  required string table = 2;
+  required string datasource = 3;
+}

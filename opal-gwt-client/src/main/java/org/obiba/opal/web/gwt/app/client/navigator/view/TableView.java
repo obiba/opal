@@ -649,6 +649,16 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     return scheduleLink;
   }
 
+  @Override
+  public HasClickHandlers getCopyVariables() {
+    return copyVariables;
+  }
+
+  @Override
+  public Set<VariableDto> getSelectedItems() {
+    return checkColumn.getSelectionModel().getSelectedSet();
+  }
+
   private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {
     @Override
     public Table<VariableDto> getTable() {
@@ -687,7 +697,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
     @Override
     public String getItemNamePlural() {
-      return translations.variableLabel().toLowerCase();
+      return translations.variablesLabel().toLowerCase();
     }
   }
 }

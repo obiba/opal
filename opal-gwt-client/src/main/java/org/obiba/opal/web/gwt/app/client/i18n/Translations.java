@@ -773,12 +773,18 @@ public interface Translations extends Constants {
       "CsvCannotObtainWriter", "Can not get csv writer", //
       "CsvCannotObtainReader", "Can not get csv reader", //
       "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
-      "InvalidCharsetCharacter", "File contains invalid characters at row '{0}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.", //
-      "InvalidCategoryCharsetCharacter", "File contains invalid characters at row '{0}' for variable category {1}. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.", //
-      "SpssFailedToLoadMetadata", "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
-      "SpssFailedToLoadData", "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
-      "SpssDuplicateEntity", "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",//
-      "SpssEmptyIdentifier", "Invalid empty entity identifier. Please make sure that the variable '{0}' at row '{1}' has a valid value in the SPSS file. In addition, be advised that numerical variables having a value greater than their width are subject to value elimination.",//
+      "InvalidCharsetCharacter",
+      "File contains invalid characters at row '{0}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
+//
+      "InvalidCategoryCharsetCharacter",
+      "File contains invalid characters at row '{0}' for variable category {1}. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
+//
+      "SpssFailedToLoadMetadata",
+      "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
+      "SpssFailedToLoadData",
+      "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
+      "SpssDuplicateEntity",
+      "Duplicate entity identifier '{0}'. Please make sure you have chosen the correct character set.",//
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set." })
   Map<String, String> datasourceParsingErrorMap();
 
@@ -1555,11 +1561,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Elastic search configuration")
   String esConfigurationLabel();
 
-  @Description("Specify Generate Functional Unit Identifier")
-  @Constants.DefaultStringValue(
-      "{0} new identifier will be generated for this unit. To customize the identifier format modify the settings below.")
-  String specifyGenerateFunctionalUnitIdentifier();
-
   @Description("Specify Generate Functional Unit Identifiers")
   @Constants.DefaultStringValue(
       "{0} new identifier{1} will be generated for this unit. To customize the identifier format modify the settings below.")
@@ -1580,6 +1581,30 @@ public interface Translations extends Constants {
   @Description("Version label")
   @DefaultStringValue("Version")
   String versionLabel();
+
+  @Description("All N items on this page are selected label")
+  @DefaultStringValue("All {0} {1} on this page are selected.")
+  String allNItemsSelected();
+
+  @Description("Select all N items label")
+  @DefaultStringValue("Select all {0} {1}")
+  String selectAllNItems();
+
+  @Description("Clear selection label")
+  @DefaultStringValue("Clear selection")
+  String clearSelection();
+
+  @Description("All N items are selected label")
+  @DefaultStringValue("All {0} {1} are selected.")
+  String allItemsSelected();
+
+  @Description("Add variables to view label")
+  @DefaultStringValue("Add variables to view")
+  String addVariablesToView();
+
+  @Description("Original variable label")
+  @DefaultStringValue("Original variable")
+  String originalVariable();
 
   @Description("Index Action Index Now")
   @Constants.DefaultStringValue("Index now")
