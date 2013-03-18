@@ -28,7 +28,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 
 /**
  *
@@ -97,7 +96,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   //
   // Inner classes and interfaces
   //
-  public interface Display extends View {
+  public interface Display extends com.gwtplatform.mvp.client.View {
 
     enum Slots {
       Values
