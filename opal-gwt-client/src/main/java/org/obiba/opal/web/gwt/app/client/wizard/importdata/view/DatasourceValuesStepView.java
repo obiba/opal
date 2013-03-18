@@ -11,7 +11,10 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.TableSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -20,6 +23,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,6 +48,12 @@ public class DatasourceValuesStepView extends ViewImpl implements Display {
 
   @UiField
   SimplePanel tableValuesPanel;
+
+  @UiField
+  Label failed;
+
+  @UiField
+  DatasourceParsingErrorPanel datasourceParsingErrors;
 
   private JsArray<TableDto> tables;
 
@@ -89,4 +99,20 @@ public class DatasourceValuesStepView extends ViewImpl implements Display {
   public void setTableSelectionHandler(TableSelectionHandler tableSelectionHandler) {
     this.tableSelectionHandler = tableSelectionHandler;
   }
+
+  @Override
+  public void showErrors(ClientErrorDto errorDto) {
+    if(errorDto != null && errorDto.getExtension(DatasourceParsingErrorDto.ClientErrorDtoExtensions.errors) != null) {
+      failed.setVisible(true);
+      datasourceParsingErrors.setErrors(errorDto);
+      datasourceParsingErrors.setVisible(true);
+    }
+  }
+
+  @Override
+  public void hideErrors() {
+    failed.setVisible(false);
+    datasourceParsingErrors.setVisible(false);
+  }
+
 }

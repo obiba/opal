@@ -783,7 +783,7 @@ public interface Translations extends Constants {
       "SpssFailedToLoadData",
       "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
       "SpssDuplicateEntity",
-      "Duplicate entity identifier '{0}'. Please make sure you have chosen the correct character set.",//
+      "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",//
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set." })
   Map<String, String> datasourceParsingErrorMap();
 
