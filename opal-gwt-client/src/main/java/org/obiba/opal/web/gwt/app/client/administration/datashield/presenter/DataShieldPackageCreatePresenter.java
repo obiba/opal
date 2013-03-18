@@ -97,6 +97,7 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
       ResourceRequestBuilderFactory.newBuilder().forResource(packagesR(getView().getName().getText())).post()//
           .withResourceBody(RPackageDto.stringify(dto))//
           .withCallback(Response.SC_OK, callbackHandler)//
+          .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
           .withCallback(Response.SC_CREATED, callbackHandler)//
           .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
     } else {
@@ -105,6 +106,7 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
           .withResourceBody(RPackageDto.stringify(dto))//
           .withCallback(Response.SC_OK, callbackHandler)//
           .withCallback(Response.SC_CREATED, callbackHandler)//
+          .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
           .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
     }
   }
