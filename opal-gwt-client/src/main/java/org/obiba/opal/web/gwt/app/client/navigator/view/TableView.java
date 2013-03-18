@@ -10,12 +10,12 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
@@ -67,7 +67,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-@SuppressWarnings("OverlyCoupledClass")
 public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiTemplate("TableView.ui.xml")
@@ -206,6 +205,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   private void addTableColumns() {
+    addCheckColumn();
+
     variableIndexColumn = new VariableClickableColumn("index") {
       @Override
       public String getValue(VariableDto object) {
@@ -215,8 +216,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     table.addColumn(variableIndexColumn, "#");
     table.setColumnWidth(variableIndexColumn, 1, Unit.PX);
     variableIndexColumn.setSortable(true);
-
-    addCheckColumn();
 
     table.addColumn(variableNameColumn = new VariableClickableColumn("name") {
       @Override
@@ -298,6 +297,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @SuppressWarnings("unchecked")
   public void clear() {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
+    checkColumn.getSelectionModel().clear();
   }
 
   @Override
@@ -509,11 +509,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void setValuesDisplay(Display display) {
-    values.add(display.asWidget());
-  }
-
-  @Override
   public HasAuthorization getValuesAuthorizer() {
     return new TabAuthorizer(tabs, VALUES_TAB_INDEX);
   }
@@ -655,8 +650,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public Set<VariableDto> getSelectedItems() {
-    return checkColumn.getSelectionModel().getSelectedSet();
+  public List<VariableDto> getSelectedItems() {
+    return new LinkedList<VariableDto>(checkColumn.getSelectionModel().getSelectedSet());
   }
 
   private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {

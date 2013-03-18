@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
@@ -35,7 +34,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEve
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -89,6 +87,7 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
   private static final int DELAY_MILLIS = 1000;
@@ -114,8 +113,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private Provider<IndexPresenter> indexPresenter;
 
-  private Provider<VariablesToViewPresenter> variablesToViewPresenter;
-
   private Runnable removeConfirmation;
 
   private Boolean sortAscending;
@@ -128,13 +125,11 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
    */
   @Inject
   public TablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter,
-      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
-      Provider<VariablesToViewPresenter> variablesToViewPresenter) {
+      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
     super(eventBus, display, proxy);
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.indexPresenter = indexPresenter;
-    this.variablesToViewPresenter = variablesToViewPresenter;
   }
 
   @Override
@@ -160,7 +155,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     addEventHandlers();
   }
 
-  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+  @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
     registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     registerHandler(
@@ -175,6 +170,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().setNextCommand(new NextCommand());
     getView().setValuesTabCommand(new ValuesCommand());
 
+    // Copy variables handler
     getView().getCopyVariables().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -357,7 +353,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateDisplay(TableDto tableDto, String previous, String next) {
     table = tableDto;
     this.previous = previous;
@@ -704,7 +699,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
+  private class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
 
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
@@ -875,8 +870,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setVariableSelection(VariableDto variable, int index);
 
-    void setValuesDisplay(ValuesTablePresenter.Display display);
-
     void beforeRenderRows();
 
     void renderRows(JsArray<VariableDto> rows);
@@ -969,7 +962,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     HasClickHandlers getCopyVariables();
 
-    Set<VariableDto> getSelectedItems();
+    List<VariableDto> getSelectedItems();
   }
 
 }

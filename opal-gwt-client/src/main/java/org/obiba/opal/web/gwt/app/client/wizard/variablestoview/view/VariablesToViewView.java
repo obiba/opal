@@ -10,10 +10,13 @@
 package org.obiba.opal.web.gwt.app.client.wizard.variablestoview.view;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsVariableCopyColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.EditableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.view.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
@@ -21,7 +24,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.opal.VariableCopyDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -39,6 +42,7 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ProvidesKey;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
@@ -75,8 +79,8 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   @UiField
   InlineLabel noVariables;
 
-  @UiField
-  Table<VariableCopyDto> table;
+  @UiField(provided = true)
+  Table<VariableDto> table;
 
   @UiField
   SimplePager pager;
@@ -89,14 +93,23 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
 
   private JsArray<DatasourceDto> datasources;
 
-  private final ListDataProvider<VariableCopyDto> dataProvider = new ListDataProvider<VariableCopyDto>();
+  private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 //  private VariableClickableColumn variableNameColumn;
+
+  private ActionsVariableCopyColumn<VariableDto> actionsColumn;
 
   private final int PAGE_SIZE = 10;
 
   @Inject
   public VariablesToViewView(EventBus eventBus) {
     super(eventBus);
+    this.table = new Table<VariableDto>(PAGE_SIZE, new ProvidesKey<VariableDto>() {
+      @Override
+      public Object getKey(VariableDto item) {
+        return item.getName();
+      }
+    });
+
     widget = uiBinder.createAndBindUi(this);
     initWidgets();
     addHandlers();
@@ -116,46 +129,45 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
         displayViewsFor(datasourceListBox.getSelectedValue());
       }
     });
-
-//    tableListBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-//
-//      @Override
-//      public void onValueChange(ValueChangeEvent<String> event) {
-//        boolean knownTable = tableListBox.hasItem(tableListBox.getText());
-//        entityTypeListBox.setEnabled(knownTable == false);
-//        if(knownTable) {
-//          tableSelectionHandler.onTableSelected(getSelectedDatasource(), getSelectedTable());
-//        }
-//      }
-//    });
   }
 
   private void addTableColumns() {
 
     table.addColumn(new VariableCopyEditableNameColumn("name") {
       @Override
-      public String getValue(VariableCopyDto object) {
-        return object.getVariable();
+      public String getValue(VariableDto object) {
+        return object.getName();
       }
     }, translations.nameLabel());
 
-    table.addColumn(new TextColumn<VariableCopyDto>() {
+    table.addColumn(new TextColumn<VariableDto>() {
       @Override
-      public String getValue(VariableCopyDto object) {
-        return object.getDatasource() + "." + object.getTable() + ":" + object.getVariable();
+      public String getValue(VariableDto object) {
+        for(int i = 0; i < JsArrays.toSafeArray(object.getAttributesArray()).length(); i++) {
+          if("script".equals(object.getAttributesArray().get(i).getName())) {
+            return object.getAttributesArray().get(i).getValue();
+          }
+        }
+        return "";
       }
-    }, translations.originalVariable());
+    }, translations.scriptLabel());
+
+    actionsColumn = new ActionsVariableCopyColumn<VariableDto>(
+        new ConstantActionsProvider<VariableDto>(ActionsVariableCopyColumn.REMOVE_ACTION));
+    table.addColumn(actionsColumn, translations.actionsLabel());
 
     table.setPageSize(PAGE_SIZE);
     table.setEmptyTableWidget(noVariables);
-//    table.getColumnSortList().push(new ColumnSortList.ColumnSortInfo(variableIndexColumn, true));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
   }
 
   @Override
-  public void renderRows(JsArray<VariableCopyDto> rows) {
+  public void renderRows(JsArray<VariableDto> rows) {
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
+    if(JsArrays.toSafeArray(rows).length() == 0) {
+      saveButton.setEnabled(false);
+    }
     pager.firstPage();
     dataProvider.refresh();
   }
@@ -165,9 +177,7 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
 
     DatasourceDto datasource = getDatasource(datasourceName);
     if(datasource != null) {
-//      List<String> tables = toList(datasource.getTableArray());
       List<String> views = toList(datasource.getViewArray());
-//      views.removeAll(tables);
 
       for(String name : views) {
         viewListBox.addItem(name);
@@ -230,9 +240,47 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
     return cancelButton;
   }
 
+  @Override
+  public ActionsVariableCopyColumn<VariableDto> getActions() {
+    return actionsColumn;
+  }
+
+  @Override
+  public void removeVariable(VariableDto object) {
+    List<VariableDto> list = new LinkedList<VariableDto>(dataProvider.getList());
+    for(int i = 0; i < list.size(); i++) {
+      if(list.get(i).getName().equals(object.getName())) {
+        list.remove(i);
+        break;
+      }
+    }
+
+    if(list.isEmpty()) {
+      saveButton.setEnabled(false);
+    }
+
+    dataProvider.setList(list);
+    dataProvider.refresh();
+  }
+
+  @Override
+  public String getViewName() {
+    return viewListBox.getText();
+  }
+
+  @Override
+  public List<VariableDto> getVariables() {
+    return dataProvider.getList();
+  }
+
+  @Override
+  public String getDatasourceName() {
+    return datasourceListBox.getSelectedValue();
+  }
+
   // Inner classes
 
-  private abstract static class VariableCopyEditableNameColumn extends EditableColumn<VariableCopyDto> {
+  private abstract static class VariableCopyEditableNameColumn extends EditableColumn<VariableDto> {
 
     private final String name;
 

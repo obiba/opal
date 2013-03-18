@@ -13,7 +13,6 @@ import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.EditTextCell;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.user.cellview.client.Column;
 
 public abstract class EditableColumn<T> extends Column<T, String> implements HasFieldUpdater<T, String> {
@@ -22,18 +21,5 @@ public abstract class EditableColumn<T> extends Column<T, String> implements Has
     super(cell);
   }
 
-  @Override
-  public FieldUpdater<T, String> getFieldUpdater() {
-    return super.getFieldUpdater();
-  }
-
-  @Override
-  public void setFieldUpdater(FieldUpdater<T, String> fieldUpdater) {
-    super.setFieldUpdater(fieldUpdater);
-  }
-
-  private static final Cell<String> cell = new EditTextCell() {
-
-  };
-
+  private static final Cell<String> cell = new EditTextCell();
 }

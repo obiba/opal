@@ -66,7 +66,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
     });
 
     setFieldUpdater(new FieldUpdater<T, Boolean>() {
-      @SuppressWarnings("unchecked")
+
       @Override
       public void update(int index, T object, Boolean value) {
         selectionModel.setSelected(object, value);
@@ -113,10 +113,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
         updateStatusAlert(true, display.getDataProvider().getList().size());
       }
     });
-
-//    if (display.getSelectClickHandler() != null){
-//      display.getSelectAll().addClickHandler(display.getSelectClickHandler());
-//    }
   }
 
   public MultiSelectionModel<T> getSelectionModel() {
