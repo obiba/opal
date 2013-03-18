@@ -187,7 +187,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     @Override
     public String getIndexName() {
       // type name is unique in ES (even though in different ES indices)
-      return super.getIndexName() + "_";
+      return super.getIndexName() + "-variables";
     }
 
     @Override
