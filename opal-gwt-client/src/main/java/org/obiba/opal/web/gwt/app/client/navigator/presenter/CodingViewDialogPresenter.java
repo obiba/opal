@@ -112,9 +112,9 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getDisplay().addSaveHandler(new CreateCodingViewHandler()));
+    registerHandler(getDisplay().addSaveHandler(new CreateCodingViewHandler()));
 
-    super.registerHandler(getDisplay().addCloseHandler(new CloseHandler<PopupPanel>() {
+    registerHandler(getDisplay().addCloseHandler(new CloseHandler<PopupPanel>() {
 
       @Override
       public void onClose(CloseEvent<PopupPanel> event) {
@@ -122,31 +122,6 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
       }
     }));
 
-  }
-
-  private ViewDto getViewDto() {
-    ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table)
-        .defaultVariableListView().build();
-    VariableListViewDto derivedVariables = (VariableListViewDto) view
-        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
-
-    for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
-      DerivationHelper derivator = null;
-      if(VariableDtos.hasCategories(variable) && (variable.getValueType().equals("text") ||
-          (variable.getValueType().equals("integer") && VariableDtos.allCategoriesMissing(variable) == false))) {
-        CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
-        d.initializeValueMapEntries();
-        derivator = d;
-      } else if(getDisplay().getDuplicate()) {
-        derivator = new VariableDuplicationHelper(variable);
-      }
-
-      if(derivator != null) {
-        derivedVariables.getVariablesArray().push(derivator.getDerivedVariable());
-      }
-    }
-
-    return view;
   }
 
   //
@@ -170,7 +145,6 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
       getDisplay().showProgress(false);
       eventBus.fireEvent(NotificationEvent.newBuilder().error("ViewAlreadyExists").build());
     }
-
   }
 
   private final class CreateCodingViewHandler implements ClickHandler {
@@ -178,8 +152,8 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
     public void onClick(ClickEvent event) {
       if(validCodingView()) {
         getDisplay().showProgress(true);
-        CreateCodingViewCallBack createCodingViewCallback = new CreateCodingViewCallBack();
-        AlreadyExistViewCallBack alreadyExistCodingViewCallback = new AlreadyExistViewCallBack();
+        ResponseCodeCallback createCodingViewCallback = new CreateCodingViewCallBack();
+        ResourceCallback<ViewDto> alreadyExistCodingViewCallback = new AlreadyExistViewCallBack();
         UriBuilder uriBuilder = UriBuilder.create();
         uriBuilder
             .segment("datasource", getDisplay().getDatasourceName(), "view", getDisplay().getViewName().getText());
@@ -211,11 +185,36 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
   private class CreateCodingViewCallBack implements ResponseCodeCallback {
 
+    private ViewDto getViewDto() {
+      ViewDto view = ViewDtoBuilder.newBuilder().setName(getDisplay().getViewName().getText()).fromTables(table)
+          .defaultVariableListView().build();
+      VariableListViewDto derivedVariables = (VariableListViewDto) view
+          .getExtension(VariableListViewDto.ViewDtoExtensions.view);
+
+      for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
+        DerivationHelper derivator = null;
+        if(VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
+            variable.getValueType().equals("integer") && VariableDtos.allCategoriesMissing(variable) == false)) {
+          CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
+          d.initializeValueMapEntries();
+          derivator = d;
+        } else if(getDisplay().getDuplicate()) {
+          derivator = new VariableDuplicationHelper(variable);
+        }
+
+        if(derivator != null) {
+          derivedVariables.getVariablesArray().push(derivator.getDerivedVariable());
+        }
+      }
+
+      return view;
+    }
+
     @Override
     public void onResponseCode(Request request, Response response) {
 
       ViewDto codingView = getViewDto();
-      CreatedCodingViewCallBack callbackHandler = new CreatedCodingViewCallBack(codingView);
+      ResponseCodeCallback callbackHandler = new CreatedCodingViewCallBack(codingView);
       UriBuilder uriBuilder = UriBuilder.create();
       uriBuilder.segment("datasource", getDisplay().getDatasourceName(), "views");
       ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post()
@@ -229,7 +228,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
     ViewDto view;
 
-    public CreatedCodingViewCallBack(ViewDto view) {
+    private CreatedCodingViewCallBack(ViewDto view) {
       this.view = view;
     }
 
@@ -237,9 +236,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
     public void onResponseCode(Request request, Response response) {
       getDisplay().showProgress(false);
       getDisplay().hideDialog();
-      if(response.getStatusCode() == Response.SC_OK) {
-        eventBus.fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
-      } else if(response.getStatusCode() == Response.SC_CREATED) {
+      if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
         eventBus.fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
       } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
         eventBus.fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());

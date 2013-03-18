@@ -1057,6 +1057,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("View successfully created.")
   String addViewSuccess();
 
+  @Description("Update View Success")
+  @DefaultStringValue("View successfully updated.")
+  String updateViewSuccess();
+
   @Description("Add View Failed")
   @DefaultStringValue("View creation failed.")
   String addViewFailed();

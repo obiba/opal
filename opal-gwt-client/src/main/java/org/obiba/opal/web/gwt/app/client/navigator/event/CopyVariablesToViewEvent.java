@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.event;
 
-import java.util.Set;
+import java.util.List;
 
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -33,23 +33,21 @@ public class CopyVariablesToViewEvent extends GwtEvent<CopyVariablesToViewEvent.
 
   private final TableDto table;
 
-  private final Set<VariableDto> selection;
+  private final List<VariableDto> selection;
 
   /**
    * @param selectedItem
    */
-  public CopyVariablesToViewEvent(TableDto table, Set<VariableDto> selectedItems) {
+  public CopyVariablesToViewEvent(TableDto table, List<VariableDto> selectedItems) {
     this.table = table;
-    this.selection = selectedItems;
-
-    GWT.log("Created event");
+    selection = selectedItems;
   }
 
   public TableDto getTable() {
     return table;
   }
 
-  public Set<VariableDto> getSelection() {
+  public List<VariableDto> getSelection() {
     return selection;
   }
 
