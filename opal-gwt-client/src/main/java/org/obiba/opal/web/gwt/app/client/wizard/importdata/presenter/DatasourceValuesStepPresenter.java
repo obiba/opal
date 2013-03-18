@@ -97,7 +97,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   //
   // Inner classes and interfaces
   //
-  public interface Display extends View {
+  public interface Display extends  com.gwtplatform.mvp.client.View {
 
     enum Slots {
       Values
