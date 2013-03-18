@@ -1543,7 +1543,7 @@ div.variablesListTabContent .form table {
   margin-left: 0.8em;
 }
 
-.progress, .progress .gwt-Button {
+.progress, .progress .gwt-Button, .progress .btn {
   cursor: wait;
 }
 

@@ -132,13 +132,19 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   public void clear() {
     name.setText("");
     reference.setText("");
-    installButton.setEnabled(true);
-    cancelButton.setEnabled(true);
+    setInstallButtonEnabled(true);
+    setCancelButtonEnabled(true);
   }
 
   @Override
   public void setInstallButtonEnabled(boolean b) {
     installButton.setEnabled(b);
+    if (b) {
+      dialog.removeStyleName("progress");
+    } else {
+      dialog.addStyleName("progress");
+    }
+    GWT.log(dialog.getStyleName());
   }
 
   @Override
