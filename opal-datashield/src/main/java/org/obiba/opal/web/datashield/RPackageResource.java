@@ -79,6 +79,7 @@ public abstract class RPackageResource {
 
   protected RScriptROperation installDatashieldPackage(String name, String ref) {
     String cmd;
+    execute(getInstallOpenMxPackageCommand());
     if(Strings.isNullOrEmpty(ref)) {
       cmd = getInstallPackagesCommand(name);
     } else {
@@ -96,6 +97,15 @@ public abstract class RPackageResource {
   private String getInstallDevtoolsPackageCommand() {
     return "if (!require('devtools', character.only=TRUE)) { " + getInstallPackagesCommand("devtools") + " }";
   }
+
+  /**
+   * Install OpenMx package with default settings (multithreaded).
+   * @return
+   */
+  private String getInstallOpenMxPackageCommand() {
+    return "if (!require('OpenMx', character.only=TRUE)) { source('http://openmx.psyc.virginia.edu/getOpenMx.R') }";
+  }
+
 
   private String getInstallGitHubCommand(String name, String username, String ref) {
     return "devtools::install_github('" + name + "', username='" + username + "', ref='" + ref + "')";
