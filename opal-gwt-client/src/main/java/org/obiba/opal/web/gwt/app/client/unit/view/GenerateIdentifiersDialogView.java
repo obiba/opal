@@ -226,9 +226,10 @@ public class GenerateIdentifiersDialogView extends PopupViewImpl implements Disp
   private void updateDescriptionText() {
     List<String> args = new ArrayList<String>();
     args.add(String.valueOf(affectedEntities));
-    args.add(affectedEntities > 1 ? "s" : "");
-    confirmationMessage
-        .setText(TranslationsUtils.replaceArguments(translations.specifyGenerateFunctionalUnitIdentifiers(), args));
+    String rawMessage = affectedEntities > 1
+        ? translations.specifyGenerateFunctionalUnitIdentifiers()
+        : translations.specifyGenerateFunctionalUnitIdentifier();
+    confirmationMessage.setText(TranslationsUtils.replaceArguments(rawMessage, args));
   }
 
   private String generateSampleIdentifier() {
