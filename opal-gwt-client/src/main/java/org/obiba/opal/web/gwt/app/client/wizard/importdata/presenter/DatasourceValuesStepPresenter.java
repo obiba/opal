@@ -16,14 +16,19 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresente
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display.Slots;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
@@ -63,6 +68,12 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
             }
           }
 
+        })
+        .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().showErrors((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
+          }
         }).send();
   }
 
@@ -86,7 +97,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   //
   // Inner classes and interfaces
   //
-  public interface Display extends com.gwtplatform.mvp.client.View {
+  public interface Display extends View {
 
     enum Slots {
       Values
@@ -95,6 +106,10 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
     void setTables(JsArray<TableDto> resource);
 
     void setTableSelectionHandler(TableSelectionHandler handler);
+
+    void showErrors(ClientErrorDto errorDto);
+
+    void hideErrors();
 
   }
 
