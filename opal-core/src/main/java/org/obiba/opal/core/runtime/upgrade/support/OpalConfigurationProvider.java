@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.runtime.support;
+package org.obiba.opal.core.runtime.upgrade.support;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,7 +39,8 @@ public class OpalConfigurationProvider {
   private File configFile;
 
   public OpalConfiguration readOpalConfiguration(boolean initMagma) {
-    if(initMagma) {
+    boolean instanciated = MagmaEngine.isInstanciated();
+    if(initMagma && !instanciated) {
       new MagmaEngine().extend(new MagmaJsExtension()).extend(new MagmaXStreamExtension());
     }
     Reader reader = null;
@@ -51,7 +52,7 @@ public class OpalConfigurationProvider {
       throw new RuntimeException("Could not read Opal configuration file.", e);
     } finally {
       StreamUtil.silentSafeClose(reader);
-      if(initMagma) {
+      if(initMagma && !instanciated) {
         MagmaEngine.get().shutdown();
       }
     }

@@ -38,18 +38,26 @@
               <ui:msg description="Supported file formats">Valid file extensions: xls, xlsx and sav</ui:msg>
             </g:Label>
           </g:FlowPanel>
-          <g:FlowPanel styleName="input" ui:field="charsetPanel">
+          <g:FlowPanel styleName="input" ui:field="spssPanel">
             <g:DisclosurePanel ui:field="options" addStyleNames="full-width">
               <g:customHeader>
                 <g:Label>
                   <ui:msg description="Options title">Advanced Options</ui:msg>
                 </g:Label>
               </g:customHeader>
-              <g:FlowPanel styleName="input">
-                <g:Label addStyleNames="key">
-                  <ui:msg description="Character set label">Character Set</ui:msg>
-                </g:Label>
-                <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
+              <g:FlowPanel>
+                <g:FlowPanel styleName="input">
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="Character set label">Character Set</ui:msg>
+                  </g:Label>
+                  <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
+                </g:FlowPanel>
+                <g:FlowPanel styleName="input">
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="Spss Entity type">Entity type</ui:msg>
+                  </g:Label>
+                  <g:TextBox name="entity" ui:field="spssEntityType"/>
+                </g:FlowPanel>
               </g:FlowPanel>
             </g:DisclosurePanel>
           </g:FlowPanel>

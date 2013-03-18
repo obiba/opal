@@ -10,27 +10,17 @@
 package org.obiba.opal.core.runtime.upgrade.binary;
 
 import java.io.IOException;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import javax.sql.DataSource;
 
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
-import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
-import org.obiba.opal.core.runtime.support.OpalConfigurationProvider;
+import org.obiba.opal.core.runtime.upgrade.support.UpgradeUtils;
 import org.obiba.opal.core.support.TimedExecution;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig;
 
 /**
  *
@@ -39,38 +29,19 @@ public class SqlBinariesStorageUpgradeStep extends AbstractUpgradeStep {
 
   private final static Logger log = LoggerFactory.getLogger(SqlBinariesStorageUpgradeStep.class);
 
-  private OpalConfigurationProvider opalConfigurationProvider;
-
-  private DataSource opalDataSource;
-
-  private DataSource keyDataSource;
-
-  private DataSourceFactory dataSourceFactory;
+  private UpgradeUtils upgradeUtils;
 
   private SqlScriptUpgradeStep sqlScriptUpgradeStep;
-
-  private final Map<DataSource, String> dataSourceNames = new LinkedHashMap<DataSource, String>();
 
   @Override
   public void execute(Version currentVersion) {
 
-    dataSourceNames.put(opalDataSource, "Default");
-    dataSourceNames.put(keyDataSource, "Key");
-
-    OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration(true);
-    try {
-      JdbcDataSourcesConfig dataSourcesConfig = configuration.getExtension(JdbcDataSourcesConfig.class);
-      for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
-        dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
-      }
-    } catch(NoSuchElementException e) {
-      // ignore
-    }
+    Map<DataSource, String> dataSourceNames = upgradeUtils.getConfiguredDatasources();
 
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
       DataSource dataSource = entry.getKey();
       String dataSourceName = entry.getValue();
-      if(hasHibernateDatasource(dataSource)) {
+      if(UpgradeUtils.hasHibernateDatasource(dataSource)) {
         upgradeSchema(currentVersion, dataSource, dataSourceName);
       }
     }
@@ -90,37 +61,11 @@ public class SqlBinariesStorageUpgradeStep extends AbstractUpgradeStep {
     log.info("Database {}: schema upgraded in {}", name, timedExecution.end().formatExecutionTime());
   }
 
-  static boolean hasHibernateDatasource(DataSource dataSource) {
-    try {
-      DatabaseMetaData meta = dataSource.getConnection().getMetaData();
-      ResultSet res = meta.getTables(null, null, null, new String[] { "TABLE" });
-      while(res.next()) {
-        if("value_set_value".equalsIgnoreCase(res.getString("TABLE_NAME"))) return true;
-      }
-    } catch(SQLException e) {
-      log.error("Cannot check if database has an HibernateDatasource", e);
-    }
-    return false;
-  }
-
-  public void setOpalDataSource(DataSource opalDataSource) {
-    this.opalDataSource = opalDataSource;
-  }
-
-  public void setOpalConfigurationProvider(OpalConfigurationProvider opalConfigurationProvider) {
-    this.opalConfigurationProvider = opalConfigurationProvider;
-  }
-
-  public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
-    this.dataSourceFactory = dataSourceFactory;
-  }
-
   public void setSqlScriptUpgradeStep(SqlScriptUpgradeStep sqlScriptUpgradeStep) {
     this.sqlScriptUpgradeStep = sqlScriptUpgradeStep;
   }
 
-  public void setKeyDataSource(DataSource keyDataSource) {
-    this.keyDataSource = keyDataSource;
+  public void setUpgradeUtils(UpgradeUtils upgradeUtils) {
+    this.upgradeUtils = upgradeUtils;
   }
-
 }

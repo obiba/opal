@@ -9,16 +9,11 @@
  */
 package org.obiba.opal.core.runtime.upgrade.binary;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import javax.sql.DataSource;
 
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
-import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
-import org.obiba.opal.core.runtime.support.OpalConfigurationProvider;
+import org.obiba.opal.core.runtime.upgrade.support.UpgradeUtils;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.jdbc.DatabaseProduct;
 import org.obiba.runtime.jdbc.DatabaseProductRegistry;
@@ -28,8 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import static org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig;
-
 /**
  *
  */
@@ -37,31 +30,12 @@ public class SqlBinariesTableEngineUpgradeStep extends AbstractUpgradeStep {
 
   private final static Logger log = LoggerFactory.getLogger(SqlBinariesTableEngineUpgradeStep.class);
 
-  private OpalConfigurationProvider opalConfigurationProvider;
-
-  private DataSource opalDataSource;
-
-  private DataSource keyDataSource;
-
-  private DataSourceFactory dataSourceFactory;
-
-  private final Map<DataSource, String> dataSourceNames = new LinkedHashMap<DataSource, String>();
+  private UpgradeUtils upgradeUtils;
 
   @Override
   public void execute(Version currentVersion) {
 
-    dataSourceNames.put(opalDataSource, "Default");
-    dataSourceNames.put(keyDataSource, "Key");
-
-    OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration(true);
-    try {
-      JdbcDataSourcesConfig dataSourcesConfig = configuration.getExtension(JdbcDataSourcesConfig.class);
-      for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
-        dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
-      }
-    } catch(NoSuchElementException e) {
-      // ignore
-    }
+    Map<DataSource, String> dataSourceNames = upgradeUtils.getConfiguredDatasources();
 
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
       DataSource dataSource = entry.getKey();
@@ -91,20 +65,7 @@ public class SqlBinariesTableEngineUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
-  public void setOpalDataSource(DataSource opalDataSource) {
-    this.opalDataSource = opalDataSource;
+  public void setUpgradeUtils(UpgradeUtils upgradeUtils) {
+    this.upgradeUtils = upgradeUtils;
   }
-
-  public void setOpalConfigurationProvider(OpalConfigurationProvider opalConfigurationProvider) {
-    this.opalConfigurationProvider = opalConfigurationProvider;
-  }
-
-  public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
-    this.dataSourceFactory = dataSourceFactory;
-  }
-
-  public void setKeyDataSource(DataSource keyDataSource) {
-    this.keyDataSource = keyDataSource;
-  }
-
 }

@@ -46,6 +46,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
@@ -92,10 +93,13 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   Label destinationLabel;
 
   @UiField
-  FlowPanel charsetPanel;
+  FlowPanel spssPanel;
 
   @UiField
   CharacterSetView charsetView;
+
+  @UiField
+  TextBox spssEntityType;
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -117,7 +121,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   }
 
   private void initWizardDialog() {
-    charsetPanel.setVisible(false);
+    spssPanel.setVisible(false);
 
     stepChain = WizardStepChain.Builder.create(dialog)//
         .append(fileSelectionStep, fileSelectionHelp)//
@@ -317,13 +321,18 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   }
 
   @Override
+  public HasText getSpssEntityType() {
+    return spssEntityType;
+  }
+
+  @Override
   public void setDefaultCharset(String defaultCharset) {
     charsetView.setDefaultCharset(defaultCharset);
   }
 
   @Override
-  public void showCharacterSetPanel(boolean show) {
-    charsetPanel.setVisible(show);
+  public void showSpssSpecificPanel(boolean show) {
+    spssPanel.setVisible(show);
   }
 
   //

@@ -20,6 +20,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -42,6 +43,9 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
 
   @UiField
   CharacterSetView charsetView;
+
+  @UiField
+  TextBox entityType;
 
   public SpssFormatStepView() {
     widget = uiBinder.createAndBindUi(this);
@@ -87,6 +91,12 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
   public void setDefaultCharset(String defaultCharset) {
     charsetView.setDefaultCharset(defaultCharset);
   }
+
+  @Override
+  public HasText getEntityType() {
+    return entityType;
+  }
+
 
 }
 

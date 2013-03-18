@@ -37,7 +37,14 @@
     <constructor-arg ref="jotm"/>
   </bean>
 
-  <bean id="opalConfigurationProvider" class="org.obiba.opal.core.runtime.support.OpalConfigurationProvider"/>
+  <bean id="opalConfigurationProvider" class="org.obiba.opal.core.runtime.upgrade.support.OpalConfigurationProvider"/>
+
+  <bean id="upgradeUtils" class="org.obiba.opal.core.runtime.upgrade.support.UpgradeUtils">
+    <constructor-arg index="0" ref="opalConfigurationProvider"/>
+    <constructor-arg index="1" ref="dataSourceFactory"/>
+    <constructor-arg index="2" ref="opalDataSource"/>
+    <constructor-arg index="3" ref="keyDataSource"/>
+  </bean>
 
   <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
     <property name="currentVersionProvider">
@@ -202,10 +209,7 @@
         <!-- 1.11.0 / alter schema binaries storage -->
         <bean class="org.obiba.opal.core.runtime.upgrade.binary.SqlBinariesStorageUpgradeStep">
           <property name="description" value="Add new table for binaries storage."/>
-          <property name="opalConfigurationProvider" ref="opalConfigurationProvider"/>
-          <property name="opalDataSource" ref="opalDataSource"/>
-          <property name="keyDataSource" ref="keyDataSource"/>
-          <property name="dataSourceFactory" ref="dataSourceFactory"/>
+          <property name="upgradeUtils" ref="upgradeUtils"/>
           <property name="appliesTo" value="1.11.0"/>
           <property name="sqlScriptUpgradeStep">
             <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
@@ -235,11 +239,15 @@
         <!-- 1.11.2 / alter binaries table engine -->
         <bean class="org.obiba.opal.core.runtime.upgrade.binary.SqlBinariesTableEngineUpgradeStep">
           <property name="description" value="Change binary value table engine to InnoDB."/>
-          <property name="opalConfigurationProvider" ref="opalConfigurationProvider"/>
-          <property name="opalDataSource" ref="opalDataSource"/>
-          <property name="keyDataSource" ref="keyDataSource"/>
-          <property name="dataSourceFactory" ref="dataSourceFactory"/>
+          <property name="upgradeUtils" ref="upgradeUtils"/>
           <property name="appliesTo" value="1.11.2"/>
+        </bean>
+
+        <!-- 1.13.0 / Escape backslashes -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.BackslashEscapeUpgradeStep">
+          <property name="description" value="Change binary value table engine to InnoDB."/>
+          <property name="upgradeUtils" ref="upgradeUtils"/>
+          <property name="appliesTo" value="1.13.0"/>
         </bean>
 
       </list>
