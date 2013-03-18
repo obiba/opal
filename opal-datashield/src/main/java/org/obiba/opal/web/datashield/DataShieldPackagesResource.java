@@ -71,7 +71,11 @@ public class DataShieldPackagesResource extends RPackageResource {
       getDatashieldPackage(name);
     } catch(NoSuchRPackageException e) {
       // maybe it was not specifically a Datashield package, so do some clean up
-      removePackage(name);
+      try {
+        removePackage(name);
+      } catch(Exception ex) {
+        // ignore
+      }
       throw e;
     }
 
