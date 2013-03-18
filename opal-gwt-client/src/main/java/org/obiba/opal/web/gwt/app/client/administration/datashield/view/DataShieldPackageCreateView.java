@@ -101,6 +101,8 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   @Override
   public void hideDialog() {
     dialog.hide();
+    setInstallButtonEnabled(true);
+    setCancelButtonEnabled(true);
   }
 
   @Override

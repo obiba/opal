@@ -143,6 +143,8 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
 
     @Override
     public void onResource(Response response, RPackageDto resource) {
+      getView().setInstallButtonEnabled(true);
+      getView().setCancelButtonEnabled(true);
       getEventBus()
           .fireEvent(NotificationEvent.newBuilder().error("DataShieldPackageAlreadyExistWithTheSpecifiedName").build());
     }
