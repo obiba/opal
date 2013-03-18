@@ -131,6 +131,8 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   private StepInHandler unitSelectionStepInHandler;
 
+  private StepInHandler datasourceValuesStepInHandler;
+
   private Widget comparedDatasourcesReportHelp;
 
   private ImportDataInputsHandler importDataInputsHandler;
@@ -209,6 +211,12 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         })//
 
         .append(valuesStep)//
+        .onStepIn(new StepInHandler() {
+          @Override
+          public void onStepIn() {
+            datasourceValuesStepInHandler.onStepIn();
+          }
+        })
         .title(translations.dataImportValuesStep())//
 
         .append(archiveStep, archiveHelp, new Skippable() {
@@ -306,6 +314,11 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   @Override
   public void setComparedDatasourcesReportStepInHandler(StepInHandler handler) {
     comparedDatasourcesReportStepInHandler = handler;
+  }
+
+  @Override
+  public void setDatasourceValuesStepInHandler(StepInHandler handler) {
+    datasourceValuesStepInHandler = handler;
   }
 
   @Override

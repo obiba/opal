@@ -22,6 +22,14 @@
       <o:Chooser ui:field="tableList"/>
     </g:FlowPanel>
     <g:SimplePanel ui:field="tableValuesPanel"/>
+    <g:FlowPanel>
+      <g:Label ui:field="failed" addStyleNames="p">
+        <ui:msg description="Variables file validation failed">Some errors have been detected. You should fix them
+          before importing data.
+        </ui:msg>
+      </g:Label>
+      <o:DatasourceParsingErrorPanel ui:field="datasourceParsingErrors" addStyleNames="p full-width"/>
+    </g:FlowPanel>
   </g:FlowPanel>
 
 </ui:UiBinder>

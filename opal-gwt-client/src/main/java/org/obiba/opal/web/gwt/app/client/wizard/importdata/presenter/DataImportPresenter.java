@@ -130,6 +130,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     getView().setUnitSelectionStepInHandler(new UnitSelectionStepInHandler());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
+    getView().setDatasourceValuesStepInHandler(new DatasourceValuesHandler());
 
     addEventHandlers();
   }
@@ -467,6 +468,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   }
 
+  private final class DatasourceValuesHandler implements StepInHandler {
+    @Override
+    public void onStepIn() {
+      datasourceValuesStepPresenter.getView().hideErrors();
+    }
+  }
+
+
   public interface Display extends WizardView {
 
     enum Slots {
@@ -490,6 +499,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     void setComparedDatasourcesReportStepInHandler(StepInHandler handler);
 
     void setComparedDatasourcesReportDisplay(WizardStepDisplay display);
+
+    void setDatasourceValuesStepInHandler(StepInHandler handler);
 
     HandlerRegistration addFormatChangeHandler(ChangeHandler handler);
 
