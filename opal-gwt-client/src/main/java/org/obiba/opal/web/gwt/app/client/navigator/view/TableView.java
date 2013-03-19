@@ -173,6 +173,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
+    initializeAnchorTexts();
   }
 
   @Override
@@ -597,6 +598,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     } else {
       progress.setVisible(false);
     }
+  }
+
+  private void initializeAnchorTexts() {
+    clearIndexLink.setText(translations.indexActionClear());
+    indexNowLink.setText(translations.indexActionIndexNow());
+    scheduleLink.setText(translations.indexActionScheduleIndexing());
   }
 
   @Override

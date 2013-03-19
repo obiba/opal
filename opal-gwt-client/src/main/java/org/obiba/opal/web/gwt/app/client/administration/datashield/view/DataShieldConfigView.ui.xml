@@ -51,10 +51,8 @@
           </g:HTMLPanel>
         </o:HelpImage>
       </g:FlowPanel>
-      <g:RadioButton ui:field="restricted" name="level" addStyleNames="block small-top-margin">Restricted
-      </g:RadioButton>
-      <g:RadioButton ui:field="unrestricted" name="level" addStyleNames="block small-top-margin">Unrestricted
-      </g:RadioButton>
+      <g:RadioButton ui:field="restricted" name="level" addStyleNames="block small-top-margin"><ui:msg description="DataShield Restricted Method">Restricted</ui:msg></g:RadioButton>
+      <g:RadioButton ui:field="unrestricted" name="level" addStyleNames="block small-top-margin"><ui:msg description="DataShield Unrestricted Method">Unrestricted</ui:msg></g:RadioButton>
     </g:FlowPanel>
 
     <o:HorizontalTabLayout ui:field="environments" addStyleNames="panel"/>

@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.plot.client;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
@@ -24,6 +27,8 @@ public class FrequencyPlot extends JqPlot {
 
   private final JsArrayString labels = JsArrayString.createArray().cast();
 
+  private static final Translations translations = GWT.create(Translations.class);
+
   public FrequencyPlot(String id) {
     super(id);
   }
@@ -35,10 +40,11 @@ public class FrequencyPlot extends JqPlot {
   }
 
   public void plot() {
+    String title = translations.summaryFrequencyPlot();
     JsArray<JsArrayNumber> plotData = JsArray.createArray().cast();
     plotData.push(this.data);
     JavaScriptObject p = JsonUtils.unsafeEval("{" + //
-        "  title:'Frequency Plot'," + //
+        "  title:'" + title + "'," + //
         "  seriesDefaults:{renderer:$wnd.jQuery.jqplot.BarRenderer,rendererOptions:{varyBarColor: true},pointLabels:{show:true,hideZeros:true,ypadding:3,edgeTolerance:-5}}," +
         //
         "  axes:{" + //
