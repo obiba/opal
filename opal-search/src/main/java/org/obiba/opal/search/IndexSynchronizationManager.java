@@ -48,14 +48,13 @@ public class IndexSynchronizationManager {
 
   private final SyncProducer syncProducer = new SyncProducer();
 
-  private boolean consumerStarted;
+  private SyncConsumer syncConsumer;
 
   private IndexSynchronization currentTask;
 
   private final BlockingQueue<IndexSynchronization> indexSyncQueue;
 
   public IndexSynchronizationManager() {
-    consumerStarted = false;
     indexSyncQueue = new LinkedBlockingQueue<IndexSynchronization>();
   }
 
@@ -63,12 +62,11 @@ public class IndexSynchronizationManager {
   @Scheduled(fixedDelay = 60 * 1000)
   public void synchronizeIndices() {
     getSubject().execute(syncProducer);
-    if(!consumerStarted) {
+    if(syncConsumer == null) {
       // start one IndexSynchronization consumer thread
-      Thread consumer = new Thread(getSubject().associateWith(new SyncConsumer()));
+      Thread consumer = new Thread(getSubject().associateWith(syncConsumer = new SyncConsumer()));
       consumer.setPriority(Thread.MIN_PRIORITY);
       consumer.start();
-      consumerStarted = true;
     }
   }
 
@@ -108,12 +106,15 @@ public class IndexSynchronizationManager {
 
     @Override
     public void run() {
-
       for(Datasource ds : MagmaEngine.get().getDatasources()) {
         for(ValueTable vt : ds.getValueTables()) {
-          log.debug("Check index for table: {}.{}", ds.getName(), vt.getName());
-          if(indexManager.isIndexable(vt) && indexManager.isReadyForIndexing(vt)) {
-            maybeUpdateIndex(vt);
+          try {
+            log.debug("Check index for table: {}.{}", ds.getName(), vt.getName());
+            if(indexManager.isIndexable(vt) && indexManager.isReadyForIndexing(vt)) {
+              maybeUpdateIndex(vt);
+            }
+          } catch(Exception e) {
+            // ignore
           }
         }
       }
@@ -191,9 +192,9 @@ public class IndexSynchronizationManager {
     }
 
     private void consume(IndexSynchronization sync) {
-      log.trace("Prepare indexing {}", sync.getValueTableIndex().getName());
       currentTask = sync;
       try {
+        log.trace("Prepare indexing {}", sync.getValueTableIndex().getName());
         // check if still indexable: indexation config could have changed
         if(indexManager.isIndexable(sync.getValueTable())) {
           getSubject().execute(sync);
