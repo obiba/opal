@@ -395,7 +395,8 @@ public interface Translations extends Constants {
       "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
 //
-      "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}"//
+      "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",
+      "RPackageInstalledButNotFound", "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue."//
   })
   Map<String, String> userMessageMap();
 

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -182,6 +183,8 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
       getView().hideDialog();
       if(response.getStatusCode() == Response.SC_CREATED) {
         getEventBus().fireEvent(new DataShieldPackageCreatedEvent(dto));
+      } else if(response.getStatusCode() == Response.SC_NOT_FOUND) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("RPackageInstalledButNotFound").build());
       } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
