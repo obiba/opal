@@ -1582,4 +1582,20 @@ public interface Translations extends Constants {
   @Description("Version label")
   @DefaultStringValue("Version")
   String versionLabel();
+
+  @Description("Index Action Index Now")
+  @Constants.DefaultStringValue("Index now")
+  String indexActionIndexNow();
+
+  @Description("Index Action Clear")
+  @Constants.DefaultStringValue("Clear")
+  String indexActionClear();
+
+  @Description("Index Action Schedule Indexing")
+  @Constants.DefaultStringValue("Schedule indexing")
+  String indexActionScheduleIndexing();
+
+  @Description("Summary Frequency Plot")
+  @Constants.DefaultStringValue("Frequency Plot")
+  String summaryFrequencyPlot();
 }
