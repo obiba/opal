@@ -242,6 +242,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Provide a label for the this category.")
   String categoryLabelRequired();
 
+  @Description("Category dialog name required label")
+  @DefaultStringValue("A category name is required.")
+  String categoryDialogNameRequired();
+
   @Description("User message map")
   @DefaultStringMapValue({ //
       "VariableNameNotUnique", "The specified variable name already exists.", //
@@ -392,18 +396,15 @@ public interface Translations extends Constants {
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
 //
       "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",//
-      "RPackageInstalledButNotFound", "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue."//
+      "RPackageInstalledButNotFound",
+      "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
+//
       "CopyVariableNameRequired", "Variable name cannot be empty.",//
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
-      "RPackageInstalledButNotFound", "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue."//
       "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}"//
-      })
+  })
   Map<String, String> userMessageMap();
-
-  @Description("Category dialog name required label")
-  @DefaultStringValue("A category name is required.")
-  String categoryDialogNameRequired();
 
   @Description("You must select a file message")
   @DefaultStringValue("You must select a file.")
@@ -789,7 +790,8 @@ public interface Translations extends Constants {
       "SpssFailedToLoadData",
       "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
       "SpssDuplicateEntity",
-      "Duplicate entity identifier '{0}'. Please make sure you have chosen the correct character set.",//
+      "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
+//
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set." })
   Map<String, String> datasourceParsingErrorMap();
 
@@ -1550,6 +1552,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Indices")
   String indicesLabel();
 
+  @Description("Indice label")
+  @DefaultStringValue("Indice")
+  String indiceLabel();
+
   @Description("Indices label")
   @DefaultStringValue("Table index is up-to-date")
   String indexAlertUpToDate();
@@ -1570,9 +1576,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Elastic search configuration")
   String esConfigurationLabel();
 
+  @Description("Specify Generate Functional Unit Identifier")
+  @Constants.DefaultStringValue(
+      "{0} new identifier will be generated for this unit. To customize the identifier format modify the settings below.")
+  String specifyGenerateFunctionalUnitIdentifier();
+
   @Description("Specify Generate Functional Unit Identifiers")
   @Constants.DefaultStringValue(
-      "{0} new identifier{1} will be generated for this unit. To customize the identifier format modify the settings below.")
+      "{0} new identifiers will be generated for this unit. To customize the identifier format modify the settings below.")
   String specifyGenerateFunctionalUnitIdentifiers();
 
   @Description("Generate Identifiers button label")
@@ -1594,6 +1605,14 @@ public interface Translations extends Constants {
   @Description("All N items on this page are selected label")
   @DefaultStringValue("All {0} {1} on this page are selected.")
   String allNItemsSelected();
+
+  @Description("N item this page is selected label")
+  @DefaultStringValue("{0} {1} on this page is selected.")
+  String NItemSelected();
+
+  @Description("N items on this page are selected label")
+  @DefaultStringValue("{0} {1} on this page are selected.")
+  String NItemsSelected();
 
   @Description("Select all N items label")
   @DefaultStringValue("Select all {0} {1}")
