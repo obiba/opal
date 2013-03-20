@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -143,11 +142,11 @@
           <tasks>
             <!-- Run python mergelocales.py script using "mvn antrun:run" -->
             <exec executable="java" failonerror="true">
-              <arg value="-jar"/>
-              <arg value="${basedir}/tools/jython-2.5.1-standalone.jar"/>
-              <arg value="${basedir}/tools/mergelocales.py"/>
-              <arg value="${basedir}/target/extra/opal/"/>
-              <arg value="${basedir}/src/main/java/com/google/gwt/i18n/client/"/>
+              <arg value="-jar" />
+              <arg value="${basedir}/tools/jython-2.5.1-standalone.jar" />
+              <arg value="${basedir}/tools/mergelocales.py" />
+              <arg value="${basedir}/target/extra/opal/" />
+              <arg value="${basedir}/src/main/java/com/google/gwt/i18n/client/" />
             </exec>
           </tasks>
         </configuration>
