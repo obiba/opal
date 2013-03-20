@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -48,7 +47,6 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.ProvidesKey;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
@@ -93,8 +91,8 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   @UiField
   SimplePager pager;
 
-  @UiField(provided = true)
-  Table<VariableDto> table;
+  @UiField
+  VariableEditableTable table;
 
   @UiField
   Panel singleVariablePanel;
@@ -122,22 +120,22 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   @Inject
   public VariablesToViewView(EventBus eventBus) {
     super(eventBus);
-    initTable();
 
     widget = uiBinder.createAndBindUi(this);
+//    initTable();
     initWidgets();
     addHandlers();
   }
 
-  private void initTable() {
-    // Needed to prevent the problem of JSON object having a $H attribute
-    table = new Table<VariableDto>(PAGE_SIZE, new ProvidesKey<VariableDto>() {
-      @Override
-      public Object getKey(VariableDto item) {
-        return item.getName();
-      }
-    });
-  }
+//  private void initTable() {
+//    // Needed to prevent the problem of JSON object having a $H attribute
+//    table = new Table<VariableDto>(PAGE_SIZE, new ProvidesKey<VariableDto>() {
+//      @Override
+//      public Object getKey(VariableDto item) {
+//        return item.getName();
+//      }
+//    });
+//  }
 
   private void initWidgets() {
     dialog.setText(translations.addVariablesToView());
@@ -205,8 +203,11 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
 //    for(int i = 0; i < rows.length(); i++) {
 //      GWT.log("RENDER: " + rows.get(i).getName());
 //    }
+    // clear
+//    dataProvider.setList(JsArrays.create());
 
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
+    pager.setVisible(dataProvider.getList().size() > PAGE_SIZE);
     if(dataProvider.getList().size() > 1) {
       singleVariablePanel.setVisible(false);
       multipleVariablePanel.setVisible(true);
@@ -214,7 +215,7 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
       if(dataProvider.getList().isEmpty()) {
         saveButton.setEnabled(false);
       }
-      pager.firstPage();
+//      pager.firstPage();
 //      table.redraw();
       dataProvider.refresh();
     } else {
@@ -277,8 +278,6 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   public void showDialog() {
     show();
     center();
-    initTable();
-    initWidgets();
 
     renameWithNumber.setValue(false);
     saveButton.setEnabled(true);
