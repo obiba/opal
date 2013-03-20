@@ -45,6 +45,8 @@ public class ValueTableVariablesMapping {
       mapString("occurrenceGroup", mapping);
       mapString("unit", mapping);
       mapString("mimeType", mapping);
+      mapString("referencedEntityType", mapping);
+      mapString("category", mapping);
 
       mapping.startObject("repeatable");
       valueTypeMappings.forType(BooleanType.get()).map(mapping);
