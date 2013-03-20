@@ -53,6 +53,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -174,6 +175,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().getCopyVariables().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
+        for(VariableDto v : getView().getSelectedItems()) {
+          GWT.log("Send event : " + v.getName());
+        }
         getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
       }
 
