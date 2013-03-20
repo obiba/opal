@@ -33,6 +33,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.indices.TypeMissingException;
+import org.obiba.magma.Attribute;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -49,7 +50,9 @@ import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
+import org.obiba.opal.search.es.mapping.AttributeMapping;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
+import org.obiba.opal.search.es.mapping.ValueTableVariablesMapping;
 import org.obiba.opal.web.magma.ValueTableUpdateListener;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
@@ -138,7 +141,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private String indexName(ValueTable vt) {
-    return tableReference(vt).replace(' ','_').replace('.','-');
+    return tableReference(vt).replace(' ', '_').replace('.', '-');
   }
 
   private String tableReference(ValueTable vt) {
@@ -196,25 +199,76 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
     @Override
     public void run() {
       log.info("Updating ValueTable index {}", index.valueTableReference);
-      IndicesAdminClient idxAdmin = esProvider.getClient().admin().indices();
-      if(idxAdmin.exists(new IndicesExistsRequest(esIndexName())).actionGet().exists()) {
-        try {
-          idxAdmin.prepareDeleteMapping(esIndexName()).setType(index.name).execute().actionGet();
-        } catch(TypeMissingException e) {
-          // ignored
-        }
-      } else {
-        createIndex();
-      }
+      index.delete();
+      createIndex();
+      indexDictionary();
       index();
+    }
+
+    private void indexDictionary() {
+
+      XContentBuilder b = new ValueTableVariablesMapping()
+          .createMapping(runtimeVersion, index.getDictionaryName(), valueTable);
+      esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.getDictionaryName())
+          .setSource(b).execute().actionGet();
+
+      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+
+      String fullNamePrefix = valueTable.getDatasource().getName() + "." + valueTable.getName();
+      for(Variable variable : valueTable.getVariables()) {
+        String fullName = fullNamePrefix + ":" + variable.getName();
+        try {
+          XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
+          xcb.field("datasource", valueTable.getDatasource().getName());
+          xcb.field("table", valueTable.getName());
+          xcb.field("name", variable.getName());
+          xcb.field("fullName", fullName);
+          xcb.field("entityType", variable.getEntityType());
+          xcb.field("valueType", variable.getValueType().getName());
+          xcb.field("occurrenceGroup", variable.getOccurrenceGroup());
+          xcb.field("repeatable", variable.isRepeatable());
+          xcb.field("mimeType", variable.getMimeType());
+          xcb.field("unit", variable.getUnit());
+
+          if(variable.hasAttributes()) {
+            for(Attribute attribute : variable.getAttributes()) {
+              if(!attribute.getValue().isNull()) {
+                xcb.field(AttributeMapping.getFieldName(attribute), attribute.getValue());
+              }
+            }
+          }
+
+          bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.getDictionaryName(), fullName)
+              .setSource(xcb.endObject()));
+          if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
+            bulkRequest = sendAndCheck(bulkRequest);
+          }
+        } catch(IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+
+      sendAndCheck(bulkRequest);
+    }
+
+    private BulkRequestBuilder sendAndCheck(BulkRequestBuilder bulkRequest) {
+      if(bulkRequest.numberOfActions() > 0) {
+        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+        if(bulkResponse.hasFailures()) {
+          // process failures by iterating through each bulk response item
+          throw new RuntimeException(bulkResponse.buildFailureMessage());
+        }
+        return esProvider.getClient().prepareBulk();
+      }
+      return bulkRequest;
     }
 
     @SuppressWarnings("OverlyComplexAnonymousInnerClass")
     private void index() {
 
-      XContentBuilder b = new ValueTableMapping().createMapping(runtimeVersion, index.name, valueTable);
+      XContentBuilder b = new ValueTableMapping().createMapping(runtimeVersion, index.getName(), valueTable);
 
-      esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.name).setSource(b)
+      esProvider.getClient().admin().indices().preparePutMapping(esIndexName()).setType(index.getName()).setSource(b)
           .execute().actionGet();
 
       ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).ignoreReadErrors().from(valueTable)
@@ -252,7 +306,7 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
                 xcb.field(fieldName, esValue(variables[i], values[i]));
               }
             }
-            bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.name, entity.getIdentifier())
+            bulkRequest.add(esProvider.getClient().prepareIndex(esIndexName(), index.getName(), entity.getIdentifier())
                 .setParent(entity.getIdentifier()).setSource(xcb.endObject()));
             done++;
             if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
@@ -351,6 +405,11 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
     }
 
     @Override
+    public String getDictionaryName() {
+      return name + "-dictionary";
+    }
+
+    @Override
     public String getFieldName(String variable) {
       return name + "-" + variable;
     }
@@ -434,11 +493,16 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
     @Override
     public void delete() {
+      if(esProvider.isEnabled()) {
+       deleteMapping(getName());
+       deleteMapping(getDictionaryName());
+      }
+    }
+
+    private void deleteMapping(String mapping) {
       try {
-        if(esProvider.isEnabled()) {
-          esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(name).execute()
-              .actionGet();
-        }
+        esProvider.getClient().admin().indices().prepareDeleteMapping(esIndexName()).setType(mapping).execute()
+            .actionGet();
       } catch(TypeMissingException e) {
         // ignored
       }
