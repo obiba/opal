@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 
-import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -34,13 +33,15 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
 
-public class CheckboxColumn<T> extends Column<T, Boolean> {
+public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHandler<Integer> {
 
   private final Translations translations = GWT.create(Translations.class);
 
   private final MultiSelectionModel<T> selectionModel;
 
   private final Display<T> display;
+
+  private ActionHandler<Integer> actionHandler;
 
   /**
    * Construct a new Column with a given {@link com.google.gwt.cell.client.Cell}.
@@ -71,8 +72,8 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
       public void update(int index, T object, Boolean value) {
         selectionModel.setSelected(object, value);
 
-        //hide status message when deselecting an element
-        // only redraw when the first checkbox is deselected
+//        //hide status message when deselecting an element
+//        // only redraw when the first checkbox is deselected
         int nbDeselected = 0;
         for(T v : display.getTable().getVisibleItems()) {
           if(!selectionModel.isSelected(v)) {
@@ -84,6 +85,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
         if(nbDeselected <= 1) {
           display.getTable().redraw();
         }
+
+        updateStatusAlert();
+        doAction();
+
       }
     });
 
@@ -98,7 +103,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
           selectionModel.setSelected(tc, false);
         }
         display.getTable().redraw();
-        display.getSelectAllWidget().setVisible(false);
         display.getClearSelection().setVisible(false);
       }
     });
@@ -110,7 +114,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
         for(T tc : display.getDataProvider().getList()) {
           selectionModel.setSelected(tc, true);
         }
-        updateStatusAlert(true, display.getDataProvider().getList().size());
+
+        display.getTable().redraw();
+        updateStatusAlert();
+        doAction();
       }
     });
   }
@@ -140,6 +147,9 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
 
       @Override
       public Boolean getValue() {
+        doAction();
+
+        updateStatusAlert();
         if(display.getDataProvider().getList().isEmpty()) {
           return false;
         }
@@ -147,22 +157,9 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
         // Value of the header checkbox for the current page
         for(T tc : display.getTable().getVisibleItems()) {
           if(!selectionModel.isSelected(tc)) {
-            // hide status message
-            display.getSelectAllWidget().setVisible(false);
             return false;
           }
         }
-        //display.getSelectAllWidget().setVisible(true);
-        // Check if all items are selected
-        boolean allSelected = true;
-        for(T tc : display.getDataProvider().getList()) {
-          if(!selectionModel.isSelected(tc)) {
-            allSelected = false;
-            break;
-          }
-        }
-
-        updateStatusAlert(allSelected, display.getTable().getVisibleItems().size());
 
         return true;
       }
@@ -178,20 +175,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
           selectionModel.setSelected(tc, value);
         }
 
-        if(value) {
-          // Check if all items are selected
-          boolean allSelected = true;
-          for(T tc : display.getDataProvider().getList()) {
-            if(!selectionModel.isSelected(tc)) {
-              allSelected = false;
-              break;
-            }
-          }
-
-          updateStatusAlert(allSelected, display.getTable().getVisibleItems().size());
-        } else {
-          display.getSelectAllWidget().setVisible(false);
-        }
+        doAction();
 
         display.getTable().redraw();
       }
@@ -201,21 +185,64 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
     return checkHeader;
   }
 
-  private void updateStatusAlert(boolean allSelected, int currentSelectedCount) {
+  @SuppressWarnings("OverlyLongMethod")
+  private void updateStatusAlert() {
+
+    int currentSelected = 0;
+    for(int i = 0; i < display.getTable().getVisibleItemCount(); i++) {
+      if(selectionModel.isSelected(display.getTable().getVisibleItem(i))) {
+        currentSelected++;
+      }
+    }
+
+    int selectedSize = selectionModel.getSelectedSet().size();
+    boolean allSelected = selectedSize == display.getDataProvider().getList().size();
+    boolean allPageSelected = currentSelected == display.getTable().getVisibleItemCount();
 
     if(allSelected) {
       List<String> args = new ArrayList<String>();
       args.add(String.valueOf(display.getDataProvider().getList().size()));
-      args.add(display.getItemNamePlural());
-      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allItemsSelected(), args));
+
+      if(currentSelected > 1) {
+        args.add(display.getItemNamePlural());
+        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allItemsSelected(), args));
+      } else {
+        args.add(display.getItemNameSingular());
+        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
+      }
+
       display.getClearSelection().setVisible(true);
       display.getSelectAll().setVisible(false);
-      display.getSelectAllWidget().setVisible(true);
+    } else if(allPageSelected) {
+      List<String> args = new ArrayList<String>();
+      args.add(String.valueOf(currentSelected));
+
+      if(currentSelected > 1) {
+        args.add(display.getItemNamePlural());
+        display.getSelectAllStatus()
+            .setText(TranslationsUtils.replaceArguments(translations.allNItemsSelected(), args));
+      } else {
+        args.add(display.getItemNameSingular());
+        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
+      }
+      display.getSelectAll().setVisible(true);
+
+      args.clear();
+      args.add(String.valueOf(display.getDataProvider().getList().size()));
+      args.add(display.getItemNamePlural());
+      display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
+      display.getClearSelection().setVisible(false);
     } else {
       List<String> args = new ArrayList<String>();
-      args.add(String.valueOf(currentSelectedCount));
-      args.add(display.getItemNamePlural());
-      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allNItemsSelected(), args));
+      args.add(String.valueOf(currentSelected));
+
+      if(currentSelected > 1) {
+        args.add(display.getItemNamePlural());
+        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemsSelected(), args));
+      } else {
+        args.add(display.getItemNameSingular());
+        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
+      }
       display.getSelectAll().setVisible(true);
 
       args.clear();
@@ -224,8 +251,25 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
       display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
       display.getClearSelection().setVisible(false);
     }
+  }
 
-    display.getSelectAllWidget().setVisible(true);
+  private void doAction() {
+    // Count the number of selected items on the current page.
+    Integer nbSelected = 0;
+    for(int i = 0; i < display.getTable().getVisibleItemCount(); i++) {
+      if(selectionModel.isSelected(display.getTable().getVisibleItem(i))) {
+        nbSelected++;
+      }
+    }
+
+    if(actionHandler != null) {
+      actionHandler.doAction(nbSelected, "SELECT");
+    }
+  }
+
+  @Override
+  public void setActionHandler(ActionHandler<Integer> handler) {
+    actionHandler = handler;
   }
 
   public interface Display<T> {
@@ -261,14 +305,14 @@ public class CheckboxColumn<T> extends Column<T, Boolean> {
     ListDataProvider<T> getDataProvider();
 
     /**
-     * @return The alert that will be shown/hide when selecting/deselecting all items
-     */
-    Alert getSelectAllWidget();
-
-    /**
      * @return The type name of items
      */
     String getItemNamePlural();
+
+    /**
+     * @return The type name of item
+     */
+    String getItemNameSingular();
 
 //    ClickHandler getSelectClickHandler();
   }

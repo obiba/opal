@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsVariableCopyColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.EditableColumn;
@@ -26,6 +27,8 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -37,9 +40,12 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
@@ -52,12 +58,14 @@ import com.watopi.chosen.client.event.ChosenChangeEvent;
  */
 public class VariablesToViewView extends PopupViewImpl implements VariablesToViewPresenter.Display {
 
+  private static final int SCRIPT_MAX_LENGTH = 150;
+
   @UiTemplate("VariablesToViewView.ui.xml")
   interface ViewUiBinder extends UiBinder<DialogBox, VariablesToViewView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -79,11 +87,23 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   @UiField
   InlineLabel noVariables;
 
+  @UiField
+  Panel multipleVariablePanel;
+
+  @UiField
+  SimplePager pager;
+
   @UiField(provided = true)
   Table<VariableDto> table;
 
   @UiField
-  SimplePager pager;
+  Panel singleVariablePanel;
+
+  @UiField
+  TextBox singleVariable;
+
+  @UiField
+  CheckBox renameWithNumber;
 
   @UiField
   Button saveButton;
@@ -94,7 +114,6 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   private JsArray<DatasourceDto> datasources;
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
-//  private VariableClickableColumn variableNameColumn;
 
   private ActionsVariableCopyColumn<VariableDto> actionsColumn;
 
@@ -103,21 +122,27 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   @Inject
   public VariablesToViewView(EventBus eventBus) {
     super(eventBus);
-    this.table = new Table<VariableDto>(PAGE_SIZE, new ProvidesKey<VariableDto>() {
-      @Override
-      public Object getKey(VariableDto item) {
-        return item.getName();
-      }
-    });
+    initTable();
 
     widget = uiBinder.createAndBindUi(this);
     initWidgets();
     addHandlers();
   }
 
+  private void initTable() {
+    // Needed to prevent the problem of JSON object having a $H attribute
+    table = new Table<VariableDto>(PAGE_SIZE, new ProvidesKey<VariableDto>() {
+      @Override
+      public Object getKey(VariableDto item) {
+        return item.getName();
+      }
+    });
+  }
+
   private void initWidgets() {
     dialog.setText(translations.addVariablesToView());
     resizeHandle.makeResizable(contentLayout);
+
     addTableColumns();
   }
 
@@ -132,23 +157,36 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   }
 
   private void addTableColumns() {
-
-    table.addColumn(new VariableCopyEditableNameColumn("name") {
+    VariableCopyEditableNameColumn editColumn = new VariableCopyEditableNameColumn("name") {
       @Override
       public String getValue(VariableDto object) {
         return object.getName();
       }
-    }, translations.nameLabel());
+    };
+
+    editColumn.setFieldUpdater(new FieldUpdater<VariableDto, String>() {
+      @Override
+      public void update(int index, VariableDto object, String value) {
+        object.setName(value);
+      }
+
+    });
+    table.addColumn(editColumn, translations.nameLabel());
 
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
       public String getValue(VariableDto object) {
+        String script = "";
         for(int i = 0; i < JsArrays.toSafeArray(object.getAttributesArray()).length(); i++) {
           if("script".equals(object.getAttributesArray().get(i).getName())) {
-            return object.getAttributesArray().get(i).getValue();
+            script = object.getAttributesArray().get(i).getValue();
+            if(script.length() > SCRIPT_MAX_LENGTH) {
+              script = script.substring(0, Math.min(script.length(), SCRIPT_MAX_LENGTH)) + " ...";
+            }
+            break;
           }
         }
-        return "";
+        return script;
       }
     }, translations.scriptLabel());
 
@@ -163,13 +201,40 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   }
 
   @Override
-  public void renderRows(JsArray<VariableDto> rows) {
+  public void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows) {
+//    for(int i = 0; i < rows.length(); i++) {
+//      GWT.log("RENDER: " + rows.get(i).getName());
+//    }
+
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
-    if(JsArrays.toSafeArray(rows).length() == 0) {
-      saveButton.setEnabled(false);
+    if(dataProvider.getList().size() > 1) {
+      singleVariablePanel.setVisible(false);
+      multipleVariablePanel.setVisible(true);
+
+      if(dataProvider.getList().isEmpty()) {
+        saveButton.setEnabled(false);
+      }
+      pager.firstPage();
+//      table.redraw();
+      dataProvider.refresh();
+    } else {
+      singleVariablePanel.setVisible(true);
+      multipleVariablePanel.setVisible(false);
+      singleVariable.setText(dataProvider.getList().get(0).getName());
     }
-    pager.firstPage();
-    dataProvider.refresh();
+
+    // Show rename categories to number only if there is at least one variable with categories
+    boolean isRenameEnabled = false;
+    for(int i = 0; i < rows.length(); i++) {
+      if(VariableDtos.hasCategories(originalVariables.get(i)) &&
+          ("text".equals(originalVariables.get(i).getValueType()) ||
+              "integer".equals(originalVariables.get(i).getValueType()) &&
+                  !VariableDtos.allCategoriesMissing(originalVariables.get(i)))) {
+        isRenameEnabled = true;
+        break;
+      }
+    }
+    renameWithNumber.setEnabled(isRenameEnabled);
   }
 
   private void displayViewsFor(String datasourceName) {
@@ -212,6 +277,12 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   public void showDialog() {
     show();
     center();
+    initTable();
+    initWidgets();
+
+    renameWithNumber.setValue(false);
+    saveButton.setEnabled(true);
+    cancelButton.setEnabled(true);
   }
 
   @Override
@@ -227,7 +298,7 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
     }
     datasourceListBox.setSelectedValue(name);
     this.datasources = datasources;
-    if(datasources.length() > 0) displayViewsFor(datasources.get(0).getName());
+    if(datasources.length() > 0) displayViewsFor(name);
   }
 
   @Override
@@ -264,18 +335,35 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   }
 
   @Override
-  public String getViewName() {
-    return viewListBox.getText();
+  public HasText getViewName() {
+    return viewListBox;
   }
 
   @Override
   public List<VariableDto> getVariables() {
+    if(dataProvider.getList().size() == 1) {
+      // Update variable name
+      List<VariableDto> list = new LinkedList<VariableDto>(dataProvider.getList());
+      list.get(0).setName(singleVariable.getText());
+      dataProvider.setList(list);
+
+    }
     return dataProvider.getList();
   }
 
   @Override
   public String getDatasourceName() {
     return datasourceListBox.getSelectedValue();
+  }
+
+  @Override
+  public boolean isRenameSelected() {
+    return renameWithNumber.getValue();
+  }
+
+  @Override
+  public HasClickHandlers getRenameButton() {
+    return renameWithNumber;
   }
 
   // Inner classes

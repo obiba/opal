@@ -14,7 +14,6 @@ import java.util.List;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -57,7 +56,6 @@ public class CopyVariablesToViewEvent extends GwtEvent<CopyVariablesToViewEvent.
 
   @Override
   protected void dispatch(Handler handler) {
-    GWT.log("dispatch");
     handler.onVariableCopy(this);
   }
 

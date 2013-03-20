@@ -242,10 +242,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Provide a label for the this category.")
   String categoryLabelRequired();
 
-  @Description("Category dialog name required label")
-  @DefaultStringValue("A category name is required.")
-  String categoryDialogNameRequired();
-
   @Description("User message map")
   @DefaultStringMapValue({ //
       "VariableNameNotUnique", "The specified variable name already exists.", //
@@ -395,10 +391,19 @@ public interface Translations extends Constants {
       "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
 //
-      "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",
+      "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",//
       "RPackageInstalledButNotFound", "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue."//
-  })
+      "CopyVariableNameRequired", "Variable name cannot be empty.",//
+      "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
+      "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
+      "RPackageInstalledButNotFound", "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue."//
+      "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}"//
+      })
   Map<String, String> userMessageMap();
+
+  @Description("Category dialog name required label")
+  @DefaultStringValue("A category name is required.")
+  String categoryDialogNameRequired();
 
   @Description("You must select a file message")
   @DefaultStringValue("You must select a file.")
