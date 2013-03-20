@@ -632,6 +632,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     }
   }
 
+  private void initializeAnchorTexts() {
+    clearIndexLink.setText(translations.indexActionClear());
+    indexNowLink.setText(translations.indexActionIndexNow());
+    scheduleLink.setText(translations.indexActionScheduleIndexing());
+  }
+
   @Override
   public HasClickHandlers getClear() {
     return clearIndexLink;
