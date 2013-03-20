@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -26,7 +28,9 @@ import javax.ws.rs.core.Response.Status;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
+import org.obiba.opal.web.model.Ws;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -56,6 +60,22 @@ public class ViewResource extends AbstractValueTableResource {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
     if(!viewDto.getName().equals(getValueTable().getName())) return Response.status(Status.BAD_REQUEST).build();
 
+    // Validate that all variable entity types are the same as the base value table
+    Magma.VariableListViewDto derivedVariables = viewDto.getExtension(Magma.VariableListViewDto.view);
+
+    for(Magma.VariableDto variable : derivedVariables.getVariablesList()) {
+      if(!variable.getEntityType().equals(getValueTable().getEntityType())) {
+
+        List<String> args = new ArrayList<String>();
+        args.add(variable.getEntityType());
+        args.add(getValueTable().getEntityType());
+
+        return Response.status(Response.Status.BAD_REQUEST).entity(
+            Ws.ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
+                .setStatus("CopyVariableIncompatibleEntityType").addAllArguments(args).build()).build();
+
+      }
+    }
     viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
 
     return Response.ok().build();
