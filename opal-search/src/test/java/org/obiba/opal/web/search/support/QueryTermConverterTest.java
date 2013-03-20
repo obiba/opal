@@ -54,13 +54,13 @@ public class QueryTermConverterTest {
 
     String variableName = "LAST_MEAL_WHEN";
     IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "CIPreliminaryQuestionnaire",
-        "opal-data.cipreliminaryquestionnaire", variableName, createCategoricalVariable(variableName));
+        "opal-data-cipreliminaryquestionnaire", variableName, createCategoricalVariable(variableName));
 
     QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
-        "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data.cipreliminaryquestionnaire:LAST_MEAL_WHEN\" } } } }");
+        "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data-cipreliminaryquestionnaire-LAST_MEAL_WHEN\" } } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
     Assert.assertNotNull(jsonResult);
@@ -71,14 +71,14 @@ public class QueryTermConverterTest {
   public void testConvert_ValidStatisticalQueryJson() throws Exception {
     String variableName = "RES_FIRST_HEIGHT";
     IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "StandingHeight",
-        "opal-data.standingheight", variableName, createContinuousVariable(variableName));
+        "opal-data-standingheight", variableName, createContinuousVariable(variableName));
 
     QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
         "\"facets\":{\"0\":{\"statistical\":{\"field\":\"opal-data" + //
-        ".standingheight:RES_FIRST_HEIGHT\"} } } }");
+        "-standingheight-RES_FIRST_HEIGHT\"} } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
     Assert.assertNotNull(jsonResult);
@@ -112,6 +112,8 @@ public class QueryTermConverterTest {
     reset(mockTable);
     ValueTableIndex mockTableIndex = createMock(ValueTableIndex.class);
     expect(mockTableIndex.getName()).andReturn(indexName).anyTimes();
+    expect(mockTableIndex.getFieldName("LAST_MEAL_WHEN")).andReturn(indexName + "-LAST_MEAL_WHEN").anyTimes();
+    expect(mockTableIndex.getFieldName("RES_FIRST_HEIGHT")).andReturn(indexName + "-RES_FIRST_HEIGHT").anyTimes();
     replay(mockTableIndex);
 
     expect(mockTable.getVariable(variableName)).andReturn(variable).anyTimes();

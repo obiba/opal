@@ -35,6 +35,14 @@ public interface ValueTableIndex extends Timestamped {
   String getName();
 
   /**
+   * Name of the field for the given variable.
+   *
+   * @param variable Variable name
+   * @return
+   */
+  String getFieldName(String variable);
+
+  /**
    * Returns true if the the lastUpdate timestamp of this index is more recent than that of its corresponding
    * {@code ValueTable}
    *

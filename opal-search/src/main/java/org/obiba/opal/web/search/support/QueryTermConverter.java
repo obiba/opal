@@ -99,7 +99,7 @@ public class QueryTermConverter {
 
     String variable = dtoVariable.getVariable();
     JSONObject jsonField = new JSONObject();
-    jsonField.put("field", fullyQualifyVariableName(variable));
+    jsonField.put("field", variableFieldName(variable));
 
     switch(indexManagerHelper.getVariableNature(variable)) {
       case CATEGORICAL:
@@ -156,11 +156,11 @@ public class QueryTermConverter {
       jsonRange.put("include_upper", dtoRange.getIncludeUpper());
     }
 
-    jsonFilter.put("numeric_range", new JSONObject().put(fullyQualifyVariableName(variable), jsonRange));
+    jsonFilter.put("numeric_range", new JSONObject().put(variableFieldName(variable), jsonRange));
   }
 
   private void convertExistFilter(JSONObject jsonFilter, String variable) throws JSONException {
-    jsonFilter.put("exists", new JSONObject().put("field", fullyQualifyVariableName(variable)));
+    jsonFilter.put("exists", new JSONObject().put("field", variableFieldName(variable)));
   }
 
   private void convertTermFilter(Search.InTermDto dtoTerms, JSONObject jsonFilter, String variable)
@@ -170,14 +170,14 @@ public class QueryTermConverter {
     List<String> values = dtoTerms.getValuesList();
 
     if(values.size() == 1) {
-      jsonFilter.put("term", new JSONObject().put(fullyQualifyVariableName(variable), values.get(0).toString()));
+      jsonFilter.put("term", new JSONObject().put(variableFieldName(variable), values.get(0).toString()));
     } else {
-      jsonFilter.put("terms", new JSONObject().put(fullyQualifyVariableName(variable), values));
+      jsonFilter.put("terms", new JSONObject().put(variableFieldName(variable), values));
     }
   }
 
-  private String fullyQualifyVariableName(String variable) {
-    return indexManagerHelper.getIndexName() + ":" + variable;
+  private String variableFieldName(String variable) {
+    return indexManagerHelper.getIndexFieldName(variable);
   }
 
 }

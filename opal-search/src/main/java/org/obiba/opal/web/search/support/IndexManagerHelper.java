@@ -50,6 +50,10 @@ public class IndexManagerHelper {
     return getValueTableIndex().getName();
   }
 
+  public String getIndexFieldName(String variable) {
+    return getValueTableIndex().getFieldName(variable);
+  }
+
   public ValueTableIndex getValueTableIndex() {
     return this.indexManager.getIndex(getValueTable());
   }
