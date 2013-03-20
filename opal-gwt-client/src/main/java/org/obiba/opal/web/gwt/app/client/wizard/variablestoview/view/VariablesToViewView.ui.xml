@@ -78,7 +78,7 @@
               </g:InlineLabel>
               <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
               <o:Table ui:field="table" width="100%" addStyleNames="left-aligned clear-both bottom-margin"/>
-              <g:Label addStyleNames="help-block" addStyleNames="bottom-margin">
+              <g:Label addStyleNames="help-block bottom-margin">
                 <ui:msg description="Derived variable help label">Derived variable name can be different from the
                   original
                   variable. If a variable with same name already exists in the view, it will be overridden.
