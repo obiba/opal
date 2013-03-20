@@ -10,6 +10,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:v="urn:import:org.obiba.opal.web.gwt.app.client.wizard.variablestoview.view"
     xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
     xmlns:c="urn:import:com.google.gwt.user.cellview.client"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
@@ -69,22 +70,28 @@
             </g:FlowPanel>
 
             <!-- Derived variables: Multiple -->
-            <g:FlowPanel styleName="input" ui:field="multipleVariablePanel">
-              <g:Label addStyleNames="key">
-                <ui:msg description="Derived variables label">Derived variables</ui:msg>
-              </g:Label>
-              <g:InlineLabel ui:field="noVariables">
-                <ui:msg description="No Variables label">No Variables</ui:msg>
-              </g:InlineLabel>
-              <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
-              <o:Table ui:field="table" width="100%" addStyleNames="left-aligned clear-both bottom-margin"/>
-              <g:Label addStyleNames="help-block bottom-margin">
-                <ui:msg description="Derived variable help label">Derived variable name can be different from the
-                  original
-                  variable. If a variable with same name already exists in the view, it will be overridden.
-                </ui:msg>
-              </g:Label>
-            </g:FlowPanel>
+            <g:VerticalPanel width="100%" addStyleNames="content">
+              <g:FlowPanel styleName="input" ui:field="multipleVariablePanel">
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Derived variables label">Derived variables</ui:msg>
+                </g:Label>
+                <g:InlineLabel ui:field="noVariables">
+                  <ui:msg description="No Variables label">No Variables</ui:msg>
+                </g:InlineLabel>
+                <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
+                <v:VariableEditableTable ui:field="table" width="100%"
+                    addStyleNames="left-aligned clear-both bottom-margin"/>
+              </g:FlowPanel>
+
+              <g:FlowPanel styleName="clear-both">
+                <g:Label addStyleNames="help-block bottom-margin clear-both">
+                  <ui:msg description="Derived variable help label">Derived variable name can be different from the
+                    original
+                    variable. If a variable with same name already exists in the view, it will be overridden.
+                  </ui:msg>
+                </g:Label>
+              </g:FlowPanel>
+            </g:VerticalPanel>
 
             <!-- Rename -->
             <g:FlowPanel styleName="input">

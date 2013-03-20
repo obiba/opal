@@ -23,7 +23,7 @@ public class Table<T> extends CellTable<T> {
 
   public static final int DEFAULT_PAGESIZE = 15;
 
-  private static final TableResources resources = GWT.create(TableResources.class);
+  protected static final TableResources resources = GWT.create(TableResources.class);
 
   public interface TableResources extends CellTable.Resources {
     @Override
