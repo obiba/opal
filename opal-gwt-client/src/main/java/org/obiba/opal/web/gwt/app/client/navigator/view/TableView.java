@@ -16,6 +16,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
@@ -140,6 +141,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   HorizontalTabLayout tabs;
 
+//  @UiField
+//  FlowPanel addVariablesToView;
+
+  @UiField
+  Anchor copyVariables;
+
   @UiField
   Alert selectAllItemsAlert;
 
@@ -180,6 +187,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private MenuItem createCodingViewItem;
 
   private MenuItemSeparator removeItemSeparator;
+
+  private CheckboxColumn<VariableDto> checkColumn;
 
   public TableView() {
     widget = uiBinder.createAndBindUi(this);
@@ -251,11 +260,16 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @SuppressWarnings({ "unchecked" })
   private void addCheckColumn() {
-    CheckboxColumn<VariableDto> checkColumn = new CheckboxColumn<VariableDto>(new VariableDtoDisplay());
+    checkColumn = new CheckboxColumn<VariableDto>(new VariableDtoDisplay());
+    checkColumn.setActionHandler(new ActionHandler<Integer>() {
+      @Override
+      public void doAction(Integer object, String actionName) {
+        selectAllItemsAlert.setVisible(object > 0);
+      }
+    });
 
     table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Unit.PX);
-
   }
 
   @Override
@@ -618,12 +632,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     }
   }
 
-  private void initializeAnchorTexts() {
-    clearIndexLink.setText(translations.indexActionClear());
-    indexNowLink.setText(translations.indexActionIndexNow());
-    scheduleLink.setText(translations.indexActionScheduleIndexing());
-  }
-
   @Override
   public HasClickHandlers getClear() {
     return clearIndexLink;
@@ -681,11 +689,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     }
 
     @Override
-    public Alert getSelectAllWidget() {
-      return selectAllItemsAlert;
-    }
-
-    @Override
     public Label getSelectAllStatus() {
       return selectAllStatus;
     }
@@ -693,6 +696,11 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     @Override
     public String getItemNamePlural() {
       return translations.variablesLabel().toLowerCase();
+    }
+
+    @Override
+    public String getItemNameSingular() {
+      return translations.variableLabel().toLowerCase();
     }
   }
 }

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +68,13 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   @Override
   public void initializeValueMapEntries() {
+    initializeValueMapEntries(true);
+  }
+
+  public void initializeValueMapEntries(boolean recodeCategoriesName) {
     valueMapEntries = new ArrayList<ValueMapEntry>();
 
-    List<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
+    Collection<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
     int index = 1;
 
     // For each category and value without category, make value map entry and process separately missing and non-missing
@@ -80,13 +85,15 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     }
 
     // recode categories
-    index = initializeNonMissingCategoryValueMapEntries(countByCategoryName, missingValueMapEntries, index);
+    index = initializeNonMissingCategoryValueMapEntries(countByCategoryName, missingValueMapEntries, index,
+        recodeCategoriesName);
 
     // recode values not corresponding to a category
-    index = initializeValueMapEntriesWithoutCategory(countByCategoryName, missingValueMapEntries, index);
+    index = initializeValueMapEntriesWithoutCategory(countByCategoryName, missingValueMapEntries, index,
+        recodeCategoriesName);
 
     // recode missing values
-    initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
+    initializeMissingCategoryValueMapEntries(missingValueMapEntries, index, recodeCategoriesName);
 
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
@@ -103,7 +110,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param index
    */
   private int initializeValueMapEntriesWithoutCategory(Map<String, Double> countByCategoryName,
-      List<ValueMapEntry> missingValueMapEntries, int index) {
+      Collection<ValueMapEntry> missingValueMapEntries, int index, boolean recodeCategoriesName) {
     int newIndex = index;
     for(Map.Entry<String, Double> entry : countByCategoryName.entrySet()) {
       String value = entry.getKey();
@@ -112,7 +119,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
         builder.missing();
         missingValueMapEntries.add(builder.build());
       } else {
-        newIndex = initializeNonMissingCategoryValueMapEntry(newIndex, value, builder);
+        newIndex = initializeNonMissingCategoryValueMapEntry(newIndex, value, builder, recodeCategoriesName);
       }
     }
     return newIndex;
@@ -124,7 +131,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param index
    */
   private int initializeNonMissingCategoryValueMapEntries(Map<String, Double> countByCategoryName,
-      List<ValueMapEntry> missingValueMapEntries, int index) {
+      Collection<ValueMapEntry> missingValueMapEntries, int index, boolean recodeCategoriesName) {
     int newIndex = index;
     for(CategoryDto category : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
       double count = countByCategoryName.containsKey(category.getName())
@@ -135,7 +142,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
         builder.missing();
         missingValueMapEntries.add(builder.build());
       } else {
-        newIndex = initializeNonMissingCategoryValueMapEntry(newIndex, category.getName(), builder);
+        newIndex = initializeNonMissingCategoryValueMapEntry(newIndex, category.getName(), builder,
+            recodeCategoriesName);
       }
       countByCategoryName.remove(category.getName());
     }
@@ -187,32 +195,43 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param builder
    * @return current index value
    */
-  @SuppressWarnings("PMD.NcssMethodCount")
   protected int initializeNonMissingCategoryValueMapEntry(int index, String value, ValueMapEntry.Builder builder) {
+    return initializeNonMissingCategoryValueMapEntry(index, value, builder, false);
+  }
+
+  @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
+  protected int initializeNonMissingCategoryValueMapEntry(int index, String value, ValueMapEntry.Builder builder,
+      boolean recodeCategoriesName) {
     int newIndex = index;
-    if(RegExp.compile("^\\d+$").test(value)) {
-      builder.newValue(value);
-    } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(value)) {
-      builder.newValue("0");
-    } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(value)) {
-      builder.newValue("1");
-      if(index < 2) newIndex = 2;
-    } else if(RegExp.compile(FEMALE_REGEXP, "i").test(value)) {
-      builder.newValue("2");
-      if(index < 3) newIndex = 3;
-    } else {
-      // OPAL-1387 look for a similar entry value and apply same new value
-      boolean found = false;
-      for(ValueMapEntry entry : valueMapEntries) {
-        if(entry.getValue().trim().compareToIgnoreCase(value.trim()) == 0) {
-          builder.newValue(entry.getNewValue());
-          found = true;
-          break;
+
+    if(recodeCategoriesName) {
+      //noinspection IfStatementWithTooManyBranches
+      if(RegExp.compile("^\\d+$").test(value)) {
+        builder.newValue(value);
+      } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(value)) {
+        builder.newValue("0");
+      } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(value)) {
+        builder.newValue("1");
+        if(index < 2) newIndex = 2;
+      } else if(RegExp.compile(FEMALE_REGEXP, "i").test(value)) {
+        builder.newValue("2");
+        if(index < 3) newIndex = 3;
+      } else {
+        // OPAL-1387 look for a similar entry value and apply same new value
+        boolean found = false;
+        for(ValueMapEntry entry : valueMapEntries) {
+          if(entry.getValue().trim().compareToIgnoreCase(value.trim()) == 0) {
+            builder.newValue(entry.getNewValue());
+            found = true;
+            break;
+          }
+        }
+        if(!found) {
+          builder.newValue(Integer.toString(newIndex++));
         }
       }
-      if(found == false) {
-        builder.newValue(Integer.toString(newIndex++));
-      }
+    } else {
+      builder.newValue(value);
     }
 
     valueMapEntries.add(builder.build());
@@ -226,19 +245,30 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * @param missingValueMapEntries
    * @param indexMax
    */
-  protected void initializeMissingCategoryValueMapEntries(List<ValueMapEntry> missingValueMapEntries, int indexMax) {
+  protected void initializeMissingCategoryValueMapEntries(Collection<ValueMapEntry> missingValueMapEntries,
+      int indexMax) {
+    initializeMissingCategoryValueMapEntries(missingValueMapEntries, indexMax, false);
+  }
+
+  protected void initializeMissingCategoryValueMapEntries(Collection<ValueMapEntry> missingValueMapEntries,
+      int indexMax, boolean recodeCategoriesName) {
     if(missingValueMapEntries.isEmpty()) return;
 
-    int missIndex = 10 - missingValueMapEntries.size();
-    int factor = 1;
-    while(missIndex * factor < indexMax + 1) {
-      factor = factor * 10 + 1;
+    if(recodeCategoriesName) {
+      int missIndex = 10 - missingValueMapEntries.size();
+      int factor = 1;
+      while(missIndex * factor < indexMax + 1) {
+        factor = factor * 10 + 1;
+      }
+      for(ValueMapEntry entry : missingValueMapEntries) {
+        entry.setNewValue(Integer.toString(missIndex * factor));
+        missIndex++;
+      }
+    } else {
+      for(ValueMapEntry entry : missingValueMapEntries) {
+        entry.setNewValue(entry.getValue());
+      }
     }
-    for(ValueMapEntry entry : missingValueMapEntries) {
-      entry.setNewValue(Integer.toString(missIndex * factor));
-      missIndex++;
-    }
-
     valueMapEntries.addAll(missingValueMapEntries);
   }
 

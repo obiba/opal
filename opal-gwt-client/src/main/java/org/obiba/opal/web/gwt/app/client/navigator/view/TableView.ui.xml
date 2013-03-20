@@ -88,10 +88,6 @@
         <g:InlineLabel ui:field="noVariables">
           <ui:msg description="No Variables label">No Variables</ui:msg>
         </g:InlineLabel>
-        <g:FlowPanel ui:field="addVariablesToView" addStyleNames="bottom-margin">
-          <b:Button ui:field="copyVariables" enabled="true" icon="COPY" iconSize="LARGE"
-              title="Copy variables"></b:Button>
-        </g:FlowPanel>
         <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
             addStyleNames="block clear select-all-variables">
@@ -107,6 +103,14 @@
                 <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent action">
                   <ui:msg description="Clear selection label">Clear selection</ui:msg>
                 </g:Anchor>
+              </g:customCell>
+              <g:customCell styleName="top-aligned">
+                <g:FlowPanel addStyleNames="indent">
+                  <b:Icon type="PLUS_SIGN"/>
+                  <g:Anchor ui:field="copyVariables" addStyleNames="inline xsmall-indent action">
+                    <ui:msg description="Add to view label">Add to view</ui:msg>
+                  </g:Anchor>
+                </g:FlowPanel>
               </g:customCell>
             </g:row>
           </g:Grid>

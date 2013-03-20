@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.index.view;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
@@ -121,6 +122,12 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
+    checkboxColumn.setActionHandler(new ActionHandler<Integer>() {
+      @Override
+      public void doAction(Integer object, String actionName) {
+        selectAllAlert.setVisible(object > 0);
+      }
+    });
     indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
     indexTable.addColumn(Columns.datasource, translations.datasourceLabel());
     indexTable.addColumn(Columns.table, translations.tableLabel());
@@ -143,6 +150,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTablePager.setVisible(dataProvider.getList().size() > indexTablePager.getPageSize());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void clear() {
     renderRows((JsArray<TableIndexStatusDto>) JavaScriptObject.createArray());
@@ -330,18 +338,13 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     }
 
     @Override
-    public Alert getSelectAllWidget() {
-      return selectAllAlert;
-    }
-
-    @Override
     public String getItemNamePlural() {
       return translations.indicesLabel().toLowerCase();
     }
 
-//    @Override
-//    public ClickHandler getSelectClickHandler(){
-//      return null;
-//    }
+    @Override
+    public String getItemNameSingular() {
+      return translations.indiceLabel().toLowerCase();
+    }
   }
 }
