@@ -11,13 +11,44 @@ package org.obiba.opal.search;
 
 import org.obiba.magma.ValueTable;
 
+/**
+ * Manager of {@code ValueTable} indices.
+ */
 public interface IndexManager {
 
-  public boolean isIndexable(ValueTable valueTable);
+  /**
+   * The name of the index manager that groups some table indices.
+   * @return
+   */
+  String getName();
 
-  public ValueTableIndex getIndex(ValueTable valueTable);
 
-  public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index);
+  /**
+   * Get the table index.
+   * @param valueTable
+   * @return
+   */
+  ValueTableIndex getIndex(ValueTable valueTable);
 
-  public boolean isReadyForIndexing(ValueTable valueTable);
+  /**
+   * Create a index synchronization task.
+   * @param valueTable
+   * @param index
+   * @return
+   */
+  IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index);
+
+  /**
+   * Check if any indexation tasks can be started.
+   *
+   * @return
+   */
+  boolean isReady();
+
+  /**
+   * Check if a value table is to be indexed.
+   * @param valueTable
+   * @return
+   */
+  boolean isIndexable(ValueTable valueTable);
 }

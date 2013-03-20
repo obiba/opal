@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.search.IndexManager;
+import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -41,7 +42,7 @@ public class VariableEntityResource {
   private OpalSearchService opalSearchService;
 
   @Autowired
-  private IndexManager indexManager;
+  private ValuesIndexManager indexManager;
 
   @Autowired
   private ElasticSearchProvider esProvider;

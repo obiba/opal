@@ -15,18 +15,21 @@ import org.obiba.magma.Variable;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.ValueTableIndex;
+import org.obiba.opal.search.ValueTableValuesIndex;
+import org.obiba.opal.search.ValuesIndexManager;
 
 /**
  * Helper class that wraps an IndexManager and provides some utility methods listed below
  */
 public class IndexManagerHelper {
-  private final IndexManager indexManager;
+
+  private final ValuesIndexManager indexManager;
 
   private String datasource;
 
   private String table;
 
-  public IndexManagerHelper(IndexManager indexManager) {
+  public IndexManagerHelper(ValuesIndexManager indexManager) {
     this.indexManager = indexManager;
   }
 
@@ -47,15 +50,15 @@ public class IndexManagerHelper {
   }
 
   public String getIndexName() {
-    return getValueTableIndex().getName();
+    return getValueTableIndex().getIndexName();
   }
 
   public String getIndexFieldName(String variable) {
     return getValueTableIndex().getFieldName(variable);
   }
 
-  public ValueTableIndex getValueTableIndex() {
-    return this.indexManager.getIndex(getValueTable());
+  public ValueTableValuesIndex getValueTableIndex() {
+    return indexManager.getIndex(getValueTable());
   }
 
   private ValueTable getValueTable() {

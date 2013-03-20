@@ -26,18 +26,12 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
   }
 
   /**
-   * Get from the Index manager configuration whether a given value table is indexable or not.
-   */
-  public boolean isIndexable(ValueTable vt) {
-    return getSchedule(vt).getType() != Opal.ScheduleType.NOT_SCHEDULED;
-  }
-
-  /**
    * Get from the Index manager configuration whether a given value table is ready for indexing by comparing
    * the last update of the table with the last update of the index (and a grace period).
    */
   public boolean isReadyForIndexing(ValueTable vt, ValueTableIndex index) {
-    return isIndexable(vt) && !index.isUpToDate() && shouldUpdate(getSchedule(vt), index.now());
+    Schedule schedule = getSchedule(vt);
+    return schedule.getType() != Opal.ScheduleType.NOT_SCHEDULED && !index.isUpToDate() && shouldUpdate(schedule, index.now());
   }
 
   public void updateSchedule(ValueTable vt, Schedule schedule) {

@@ -24,6 +24,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronizationManager;
+import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,8 @@ import com.google.common.collect.Lists;
 public class SearchServiceResource extends IndexResource {
 
   @Autowired
-  public SearchServiceResource(IndexManager indexManager, IndexManagerConfigurationService configService,
+  public SearchServiceResource(ValuesIndexManager indexManager, IndexManagerConfigurationService configService,
       ElasticSearchProvider esProvider, IndexSynchronizationManager synchroManager) {
-
     super(indexManager, configService, esProvider, synchroManager);
   }
 

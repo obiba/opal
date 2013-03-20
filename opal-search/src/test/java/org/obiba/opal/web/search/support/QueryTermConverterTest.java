@@ -28,6 +28,8 @@ import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.ValueTableIndex;
+import org.obiba.opal.search.ValueTableValuesIndex;
+import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
 
 import junit.framework.Assert;
@@ -98,20 +100,20 @@ public class QueryTermConverterTest {
   private IndexManagerHelper createIndexManagerHelper(String datasource, String table, String indexName,
       String variableName, Variable variable) {
 
-    IndexManager indexManager = setupMockObjects(datasource, table, indexName, variableName, variable);
+    ValuesIndexManager indexManager = setupMockObjects(datasource, table, indexName, variableName, variable);
 
     return new IndexManagerHelper(indexManager).setDatasource(datasource).setTable(table);
   }
 
-  private IndexManager setupMockObjects(String dsName, String table, String indexName, String variableName,
+  private ValuesIndexManager setupMockObjects(String dsName, String table, String indexName, String variableName,
       Variable variable) {
-    IndexManager indexManager = createMock(IndexManager.class);
+    ValuesIndexManager indexManager = createMock(ValuesIndexManager.class);
     Datasource datasource = createMockDatasource(dsName, table);
 
     ValueTable mockTable = datasource.getValueTable(table);
     reset(mockTable);
-    ValueTableIndex mockTableIndex = createMock(ValueTableIndex.class);
-    expect(mockTableIndex.getName()).andReturn(indexName).anyTimes();
+    ValueTableValuesIndex mockTableIndex = createMock(ValueTableValuesIndex.class);
+    expect(mockTableIndex.getIndexName()).andReturn(indexName).anyTimes();
     expect(mockTableIndex.getFieldName("LAST_MEAL_WHEN")).andReturn(indexName + "-LAST_MEAL_WHEN").anyTimes();
     expect(mockTableIndex.getFieldName("RES_FIRST_HEIGHT")).andReturn(indexName + "-RES_FIRST_HEIGHT").anyTimes();
     replay(mockTableIndex);
