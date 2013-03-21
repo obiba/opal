@@ -59,6 +59,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 @Component
 public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
@@ -245,9 +246,11 @@ public class EsIndexManager implements IndexManager, ValueTableUpdateListener {
             for(int i = 0; i < variables.length; i++) {
               String fieldName = index.getName() + ":" + variables[i].getName();
               if(values[i].isSequence() && !values[i].isNull()) {
+                List<Object> vals = Lists.newArrayList();
                 for(Value v : values[i].asSequence().getValue()) {
-                  xcb.field(fieldName, esValue(variables[i], v));
+                  vals.add(esValue(variables[i], v));
                 }
+                xcb.field(fieldName, vals);
               } else {
                 xcb.field(fieldName, esValue(variables[i], values[i]));
               }
