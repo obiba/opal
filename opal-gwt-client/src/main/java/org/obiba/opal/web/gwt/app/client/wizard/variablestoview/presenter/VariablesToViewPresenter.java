@@ -169,12 +169,6 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
   }
 
   private VariableDto getDerivedVariable(VariableDto variable, boolean recodeName) {
-
-    GWT.log(variable.getName());
-    GWT.log("   Cat:" + VariableDtos.hasCategories(variable));
-    GWT.log("   Text or int:" + ("text".equals(variable.getValueType()) || "integer".equals(variable.getValueType())));
-    GWT.log("   Not All missing: " + !VariableDtos.allCategoriesMissing(variable));
-
     if(VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
         "integer".equals(variable.getValueType()) && !VariableDtos.allCategoriesMissing(variable))) {
       CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);

@@ -12,14 +12,11 @@ package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 import org.obiba.opal.web.gwt.app.client.ui.HasFieldUpdater;
 
 import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.user.cellview.client.Column;
 
 public abstract class EditableColumn<T> extends Column<T, String> implements HasFieldUpdater<T, String> {
 
-  public EditableColumn() {
+  public EditableColumn(Cell<String> cell) {
     super(cell);
   }
-
-  private static final Cell<String> cell = new EditTextCell();
 }
