@@ -141,7 +141,6 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
         JsArray<VariableDto> variablesDto = JsArrays.create();
         for(VariableDto v : getView().getVariables()) {
           // Push with the right name if it was changed
-          GWT.log("NAME " + v.getName());
           variablesDto.push(v);
         }
         derivedVariables.setVariablesArray(variablesDto);
