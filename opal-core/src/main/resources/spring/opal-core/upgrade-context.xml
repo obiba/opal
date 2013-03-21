@@ -243,13 +243,6 @@
           <property name="appliesTo" value="1.11.2"/>
         </bean>
 
-        <!-- 1.13.0 / Escape backslashes -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.BackslashEscapeUpgradeStep">
-          <property name="description" value="Change binary value table engine to InnoDB."/>
-          <property name="upgradeUtils" ref="upgradeUtils"/>
-          <property name="appliesTo" value="1.13.0"/>
-        </bean>
-
       </list>
     </property>
 
