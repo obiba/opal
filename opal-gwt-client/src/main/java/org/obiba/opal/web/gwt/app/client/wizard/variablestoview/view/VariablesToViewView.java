@@ -152,13 +152,13 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
         return object.getName();
       }
     };
-
     editColumn.setFieldUpdater(new FieldUpdater<VariableDto, String>() {
       @Override
       public void update(int index, VariableDto object, String value) {
         object.setName(value);
       }
     });
+
     table.addColumn(editColumn, translations.nameLabel());
     table.addColumn(new TextColumn<VariableDto>() {
       @Override

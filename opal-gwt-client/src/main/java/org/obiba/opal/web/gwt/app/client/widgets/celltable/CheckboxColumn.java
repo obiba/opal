@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -72,8 +73,8 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       public void update(int index, T object, Boolean value) {
         selectionModel.setSelected(object, value);
 
-//        //hide status message when deselecting an element
-//        // only redraw when the first checkbox is deselected
+        //hide status message when deselecting an element
+        // only redraw when the first checkbox is deselected
         int nbDeselected = 0;
         for(T v : display.getTable().getVisibleItems()) {
           if(!selectionModel.isSelected(v)) {
@@ -124,6 +125,19 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   public MultiSelectionModel<T> getSelectionModel() {
     return selectionModel;
+  }
+
+  /**
+   * @return List of items in the same order as they appear on screen
+   */
+  public List<T> getSelectedItems() {
+    List<T> list = new LinkedList<T>();
+    for(T tc : display.getDataProvider().getList()) {
+      if(selectionModel.isSelected(tc)) {
+        list.add(tc);
+      }
+    }
+    return list;
   }
 
   @Override

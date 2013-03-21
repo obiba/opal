@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -81,7 +80,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   private final Widget widget;
 
-  private List<Anchor> tables = new ArrayList<Anchor>();
+  private final List<Anchor> tables = new ArrayList<Anchor>();
 
   private boolean hasLinkAuthorization = true;
 
@@ -665,7 +664,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public List<VariableDto> getSelectedItems() {
-    return new LinkedList<VariableDto>(checkColumn.getSelectionModel().getSelectedSet());
+    return checkColumn.getSelectedItems();
   }
 
   private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {
