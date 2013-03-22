@@ -54,7 +54,6 @@ public class NavigatorMenuBar extends MenuBar {
   private boolean separated = false;
 
   public NavigatorMenuBar() {
-    super();
     setAutoOpen(true);
 
     previousItem = new MenuItem("", (Command) null);

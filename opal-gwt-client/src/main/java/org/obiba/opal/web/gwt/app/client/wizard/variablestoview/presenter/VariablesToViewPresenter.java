@@ -48,6 +48,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -94,7 +95,43 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
       public void doAction(VariableDto object, String actionName) {
         if(actionName.equals(ActionsVariableCopyColumn.REMOVE_ACTION)) {
           getView().removeVariable(object);
+
+          updateVariableList();
+
+          // Prepare the array of variableDto
+          boolean renameCategory = getView().isRenameSelected();
+          JsArray<VariableDto> derivedVariables = JsArrays.create();
+
+          for(VariableDto variable : variables) {
+            if(renameCategory) {
+              // Keep new name if changed
+              derivedVariables.push(getDerivedVariable(variable, renameCategory));
+            } else {
+              derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
+            }
+          }
+
+          getView().renderRows(variables, derivedVariables, false);
         }
+      }
+
+      private void updateVariableList() {
+        List<VariableDto> viewVariables = getView().getVariables(false);
+        Collection<VariableDto> removeVariables = new LinkedList<VariableDto>();
+        for(VariableDto v : variables) {
+          boolean keep = false;
+          for(VariableDto viewVariable : viewVariables) {
+            if(v.getName().equals(viewVariable.getName())) {
+              keep = true;
+              break;
+            }
+          }
+
+          if(!keep) {
+            removeVariables.add(v);
+          }
+        }
+        variables.removeAll(removeVariables);
       }
     });
 
@@ -104,22 +141,18 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
       public void onClick(ClickEvent event) {
         // Prepare the array of variableDto
         boolean renameCategory = getView().isRenameSelected();
-
         JsArray<VariableDto> derivedVariables = JsArrays.create();
-        if(renameCategory) {
-          for(VariableDto variable : variables) {
+
+        for(VariableDto variable : variables) {
+          if(renameCategory) {
             // Keep new name if changed
             derivedVariables.push(getDerivedVariable(variable, renameCategory));
-          }
-        } else {
-          for(VariableDto variable : variables) {
-            // Keep new name if changed
+          } else {
             derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
           }
         }
-//        getView().clear();
-        getView().renderRows(variables, derivedVariables);
 
+        getView().renderRows(variables, derivedVariables, false);
       }
     }));
     // Save button
@@ -139,7 +172,7 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
             .getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
         JsArray<VariableDto> variablesDto = JsArrays.create();
-        for(VariableDto v : getView().getVariables()) {
+        for(VariableDto v : getView().getVariables(true)) {
           // Push with the right name if it was changed
           variablesDto.push(v);
         }
@@ -209,6 +242,7 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
       // Proceed with view creation
       VariableListViewDto derivedVariables = (VariableListViewDto) viewDto
           .getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      updateFromTables(viewDto);
 
       JsArray<VariableDto> existingVariables = derivedVariables.getVariablesArray();
       for(int i = 0; i < variables.length(); i++) {
@@ -229,6 +263,23 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
           .withCallback(callbackHandler, Response.SC_OK, Response.SC_CREATED, Response.SC_FORBIDDEN,
               Response.SC_BAD_REQUEST)//
           .send();
+    }
+
+    private void updateFromTables(ViewDto viewDto) {
+      // Update from tables
+      JsArrayString fromTables = viewDto.getFromArray();
+      String newFrom = table.getDatasourceName() + "." + table.getName();
+      GWT.log("" + newFrom);
+      boolean addTable = true;
+      for(int i = 0; i < fromTables.length(); i++) {
+        if(fromTables.get(i).equals(newFrom)) {
+          addTable = false;
+          break;
+        }
+      }
+      if(addTable) {
+        fromTables.push(newFrom);
+      }
     }
 
     private int getVariableIndex(JsArray<VariableDto> vars, String name) {
@@ -305,7 +356,7 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
       }
 
 //      getView().clear();
-      getView().renderRows(variables, derivedVariables);
+      getView().renderRows(variables, derivedVariables, true);
       getView().showDialog();
     }
   }
@@ -322,7 +373,7 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
 
     void setDatasources(JsArray<DatasourceDto> datasources, String name);
 
-    void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows);
+    void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames);
 
 //    void clear();
 
@@ -332,13 +383,15 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
 
     HasText getViewName();
 
-    List<VariableDto> getVariables();
+    List<VariableDto> getVariables(boolean withNewNames);
 
     String getDatasourceName();
 
     boolean isRenameSelected();
 
     HasClickHandlers getRenameButton();
+
+    void updateRenameCheckboxVisibility(List<VariableDto> originalVariables);
   }
 
   private class VariableCopyValidationHandler extends AbstractValidationHandler {
@@ -354,8 +407,12 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired"));
+        validators.add(new ConditionValidator(
+            viewNotCurrentCondition(getView().getDatasourceName(), getView().getViewName().getText()),
+            "CopyVariableCurrentView"));
 
-        for(VariableDto v : getView().getVariables()) {
+        List<VariableDto> list = getView().getVariables(true);
+        for(VariableDto v : list) {
           validators.add(new ConditionValidator(variableNameEmptyCondition(v.getName()), "CopyVariableNameRequired"));
 
           @SuppressWarnings("unchecked")
@@ -366,10 +423,19 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
 
         }
 
-        validators.add(new VariableNameUniqueCondition(getView().getVariables()));
+        validators.add(new VariableNameUniqueCondition(list));
 
       }
       return validators;
+    }
+
+    private HasValue<Boolean> viewNotCurrentCondition(final String datasourceName, final String viewName) {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return !(datasourceName + "." + viewName).equals(table.getDatasourceName() + "." + table.getName());
+        }
+      };
     }
 
     private HasValue<Boolean> variableNameEmptyCondition(final String name) {

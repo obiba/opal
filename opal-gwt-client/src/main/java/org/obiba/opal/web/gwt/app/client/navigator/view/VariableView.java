@@ -359,6 +359,11 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     withCategorizeItem(deriveFromMenu = new MenuItem(translations.deriveAnotherVariableToThisLabel(), cmd));
   }
 
+//  @Override
+//  public void setAddVariableToViewCommand(Command cmd) {
+//    toolbar.setAddVariableToViewCommand(cmd);
+//  }
+
   private MenuBar getDeriveBar() {
     if(deriveBar == null) {
       toolbar.getToolsMenu().addItem(translations.deriveLabel(), deriveBar = new MenuBar(true));

@@ -161,7 +161,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     registerHandler(
         getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
-    getView().setCreateCodingViewCommand(new CreateCodingViewCommand());
+    getView().setAddVariablesToViewCommand(new AddVariablesToViewCommand());
     getView().setExcelDownloadCommand(new ExcelDownloadCommand());
     getView().setExportDataCommand(new ExportDataCommand());
     getView().setCopyDataCommand(new CopyDataCommand());
@@ -652,13 +652,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  private final class CreateCodingViewCommand implements Command {
+  private final class AddVariablesToViewCommand implements Command {
 
     @Override
     public void execute() {
-      codingViewDialogPresenter.bind();
-      codingViewDialogPresenter.setTableVariables(table, variables);
-      codingViewDialogPresenter.revealDisplay();
+      if(getView().getSelectedItems().isEmpty()) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
+      } else {
+        getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
+      }
     }
   }
 
@@ -896,7 +898,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setEditCommand(Command cmd);
 
-    void setCreateCodingViewCommand(Command cmd);
+    void setAddVariablesToViewCommand(Command cmd);
 
     void setParentName(String name);
 

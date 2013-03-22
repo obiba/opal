@@ -183,7 +183,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   private MenuItem removeItem;
 
-  private MenuItem createCodingViewItem;
+  private MenuItem addVariablesToViewItem;
 
   private MenuItemSeparator removeItemSeparator;
 
@@ -291,7 +291,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void renderRows(JsArray<VariableDto> rows) {
-    createCodingViewItem.setEnabled(rows.length() > 0);
+    addVariablesToViewItem.setEnabled(rows.length() > 0);
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
@@ -429,15 +429,15 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void setCreateCodingViewCommand(Command cmd) {
+  public void setAddVariablesToViewCommand(Command cmd) {
 
-    if(createCodingViewItem != null) {
+    if(addVariablesToViewItem != null) {
       // toolbar.getToolsMenu().removeSeparator(removeItemSeparator);
-      toolbar.getToolsMenu().removeItem(createCodingViewItem);
+      toolbar.getToolsMenu().removeItem(addVariablesToViewItem);
     }
 
     if(cmd != null) {
-      createCodingViewItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.createCodingView(), cmd));
+      addVariablesToViewItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.addVariablesToView(), cmd));
     }
 
   }

@@ -27,8 +27,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.cell.client.EditTextCell;
-import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -112,7 +111,7 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
-  private final EditTextCell cell = new EditTextCell();
+  private final TextInputCell cell = new TextInputCell();
 
   private ActionsVariableCopyColumn<VariableDto> actionsColumn;
 
@@ -128,7 +127,7 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   }
 
   private void initWidgets() {
-    dialog.setText(translations.addVariablesToView());
+    dialog.setText(translations.addVariablesToViewTitle());
     resizeHandle.makeResizable(contentLayout);
 
     addTableColumns();
@@ -152,12 +151,13 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
         return object.getName();
       }
     };
-    editColumn.setFieldUpdater(new FieldUpdater<VariableDto, String>() {
-      @Override
-      public void update(int index, VariableDto object, String value) {
-        object.setName(value);
-      }
-    });
+//    editColumn.setFieldUpdater(new FieldUpdater<VariableDto, String>() {
+//      @Override
+//      public void update(int index, VariableDto object, String value) {
+//        // Keep the update in memory and apply it when saving the list
+//        originalNamesMap.put(object.getName(), value);
+//      }
+//    });
 
     table.addColumn(editColumn, translations.nameLabel());
     table.addColumn(new TextColumn<VariableDto>() {
@@ -188,10 +188,12 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   }
 
   @Override
-  public void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows) {
+  public void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames) {
     // Set all variable names to their original name
-    for(VariableDto v : originalVariables) {
-      cell.clearViewData(v.getName());
+    if(clearNames) {
+      for(VariableDto v : originalVariables) {
+        cell.clearViewData(v.getName());
+      }
     }
 
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
@@ -201,9 +203,6 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
       singleVariablePanel.setVisible(false);
       multipleVariablePanel.setVisible(true);
 
-      if(dataProvider.getList().isEmpty()) {
-        saveButton.setEnabled(false);
-      }
       dataProvider.refresh();
       table.redraw();
     } else {
@@ -211,19 +210,22 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
       multipleVariablePanel.setVisible(false);
       singleVariable.setText(dataProvider.getList().get(0).getName());
     }
-    setRenameCheckboxVisibility(originalVariables, rows);
+
+    if(dataProvider.getList().isEmpty()) {
+      saveButton.setEnabled(false);
+    }
+    updateRenameCheckboxVisibility(originalVariables);
 
   }
 
-  private void setRenameCheckboxVisibility(List<VariableDto> originalVariables, JsArray<VariableDto> rows) {
+  @Override
+  public void updateRenameCheckboxVisibility(List<VariableDto> originalVariables) {
 
     // Show rename categories to number only if there is at least one variable with categories
     boolean isRenameEnabled = false;
-    for(int i = 0; i < rows.length(); i++) {
-      if(VariableDtos.hasCategories(originalVariables.get(i)) &&
-          ("text".equals(originalVariables.get(i).getValueType()) ||
-              "integer".equals(originalVariables.get(i).getValueType()) &&
-                  !VariableDtos.allCategoriesMissing(originalVariables.get(i)))) {
+    for(VariableDto originalVariable : originalVariables) {
+      if(VariableDtos.hasCategories(originalVariable) && ("text".equals(originalVariable.getValueType()) ||
+          "integer".equals(originalVariable.getValueType()) && !VariableDtos.allCategoriesMissing(originalVariable))) {
         isRenameEnabled = true;
         break;
       }
@@ -332,15 +334,28 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   }
 
   @Override
-  public List<VariableDto> getVariables() {
-    if(dataProvider.getList().size() == 1) {
-      // Update variable name
-      List<VariableDto> list = new LinkedList<VariableDto>(dataProvider.getList());
-      list.get(0).setName(singleVariable.getText());
-      dataProvider.setList(list);
+  public List<VariableDto> getVariables(boolean withNewNames) {
+    List<VariableDto> list = new LinkedList<VariableDto>();
+    if(dataProvider.getList().size() == 1 && !singleVariable.getText().isEmpty()) {
+      VariableDto v = dataProvider.getList().get(0);
+      v.setName(singleVariable.getText());
+      list.add(v);
+    } else {
 
+      // make effective the name changes
+      for(VariableDto v : dataProvider.getList()) {
+        if(withNewNames) {
+          TextInputCell.ViewData vi = cell.getViewData(v.getName());
+
+          if(vi != null) {
+            v.setName(vi.getCurrentValue());
+          }
+        }
+        list.add(v);
+      }
     }
-    return dataProvider.getList();
+
+    return list;
   }
 
   @Override

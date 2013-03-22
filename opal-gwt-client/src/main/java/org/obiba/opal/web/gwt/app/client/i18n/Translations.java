@@ -394,11 +394,11 @@ public interface Translations extends Constants {
       "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
       "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
-//
       "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",//
       "RPackageInstalledButNotFound",
       "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
-//
+      "CopyVariableSelectAtLeastOne", "Select at least one variable to add.",//
+      "CopyVariableCurrentView", "The view can not be the current view. Please select another destination view.",//
       "CopyVariableNameRequired", "Variable name cannot be empty.",//
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
@@ -1628,6 +1628,10 @@ public interface Translations extends Constants {
 
   @Description("Add variables to view label")
   @DefaultStringValue("Add variables to view")
+  String addVariablesToViewTitle();
+
+  @Description("Add variables to view... label")
+  @DefaultStringValue("Add Variables to View...")
   String addVariablesToView();
 
   @Description("Original variable label")

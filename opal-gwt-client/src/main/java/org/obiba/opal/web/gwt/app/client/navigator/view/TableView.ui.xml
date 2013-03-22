@@ -108,7 +108,7 @@
                 <g:FlowPanel addStyleNames="indent">
                   <b:Icon type="PLUS_SIGN"/>
                   <g:Anchor ui:field="copyVariables" addStyleNames="inline xsmall-indent action">
-                    <ui:msg description="Add to view label">Add to view</ui:msg>
+                    <ui:msg description="Add to view... label">Add to view...</ui:msg>
                   </g:Anchor>
                 </g:FlowPanel>
               </g:customCell>
