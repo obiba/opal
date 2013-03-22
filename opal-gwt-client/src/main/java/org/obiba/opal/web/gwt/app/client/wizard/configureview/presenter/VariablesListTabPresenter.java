@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -153,7 +155,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     summaryPresenter.unbind();
   }
 
-  void setCurrentVariable(VariableDto currentVariable) {
+  void setCurrentVariable(@Nullable VariableDto currentVariable) {
     this.currentVariable = currentVariable;
     categoriesPresenter.setCurrentVariable(currentVariable);
     attributesPresenter.setCurrentVariable(currentVariable);
@@ -216,6 +218,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
   }
 
+  @Nullable
   private VariableDto getPreviousVariable() {
     if(getVariableList().isEmpty()) return null;
     if(currentVariable == null) return getVariableList().get(0);
@@ -223,6 +226,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     return index >= 0 ? getVariableList().get(index) : null;
   }
 
+  @Nullable
   private VariableDto getNextVariable() {
     if(getVariableList().isEmpty()) return null;
     if(currentVariable == null) return getVariableList().get(0);
@@ -339,7 +343,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     void addVariableNameSuggestion(String variableName);
 
-    void setSelectedVariableName(VariableDto variable, VariableDto previousVariable, VariableDto nextVariable);
+    void setSelectedVariableName(@Nullable VariableDto variable, @Nullable VariableDto previousVariable,
+        @Nullable VariableDto nextVariable);
 
     HandlerRegistration addPreviousVariableNameClickHandler(ClickHandler handler);
 
@@ -462,6 +467,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       updateSelectedVariableName();
     }
 
+    @Nullable
     private VariableDto findByName(String name) {
       for(VariableDto variable : getVariableList()) {
         if(variable.getName().equals(name)) return variable;
@@ -616,6 +622,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
               setButtonsWhenAddingVariable();
             }
 
+            @Nullable
             private VariableDto getVariableDto() {
               for(VariableDto variableDto : variablesList) {
                 if(newDerivedVariableName.equals(variableDto.getName())) {
@@ -667,8 +674,11 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
           }
           variableListViewDto.setVariablesArray(newVariables); // Updates the viewDto.
           updateAndDisplayVariable(nextVariable);
+
+          getView().saveChangesEnabled(true);
         }
 
+        @Nullable
         private VariableDto variableToDisplayAfterCurrentVariableDeleted() {
           VariableDto nextVariable = getNextVariable();
           if(nextVariable != null) return nextVariable;
@@ -696,7 +706,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     }
   }
 
-  private void updateAndDisplayVariable(VariableDto nextVariable) {
+  private void updateAndDisplayVariable(@Nullable VariableDto nextVariable) {
     setCurrentVariable(nextVariable);
     if(currentVariable == null) {
       getView().setSelectedVariableName(null, null, getNextVariable());

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
@@ -54,7 +56,7 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
     super(eventBus, view);
   }
 
-  public void setCurrentVariable(VariableDto currentVariable) {
+  public void setCurrentVariable(@Nullable VariableDto currentVariable) {
     this.currentVariable = currentVariable;
   }
 
