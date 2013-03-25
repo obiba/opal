@@ -12,6 +12,8 @@ package org.obiba.opal.search.es.mapping;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.type.BinaryType;
@@ -57,13 +59,14 @@ public class ValueTypeMappings {
 
     private final String esType;
 
+    @Nullable
     private final String format;
 
     private SimpleValueTypeMapping(String esType) {
       this(esType, null);
     }
 
-    private SimpleValueTypeMapping(String esType, String format) {
+    private SimpleValueTypeMapping(String esType, @Nullable String format) {
       this.esType = esType;
       this.format = format;
     }

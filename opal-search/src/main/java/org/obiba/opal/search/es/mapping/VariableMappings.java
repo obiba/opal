@@ -22,9 +22,10 @@ import com.google.common.collect.ImmutableList;
 public class VariableMappings {
   private static final Logger log = LoggerFactory.getLogger(VariableMappings.class);
 
-  private ValueTypeMappings valueTypeMappings = new ValueTypeMappings();
+  private final ValueTypeMappings valueTypeMappings = new ValueTypeMappings();
 
-  private Iterable<VariableMapping> mappings = ImmutableList.<VariableMapping>of(new Categorical()/* , new Store() */);
+  private final Iterable<VariableMapping> mappings = ImmutableList
+      .<VariableMapping>of(new Categorical()/* , new Store() */);
 
   public XContentBuilder map(String tableName, Variable variable, XContentBuilder builder) {
     try {

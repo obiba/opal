@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.search;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.ValueTable;
 
 /**
@@ -18,24 +20,29 @@ public interface IndexManager {
 
   /**
    * The name of the index manager that groups some table indices.
+   *
    * @return
    */
+  @Nonnull
   String getName();
-
 
   /**
    * Get the table index.
+   *
    * @param valueTable
    * @return
    */
-  ValueTableIndex getIndex(ValueTable valueTable);
+  @Nonnull
+  ValueTableIndex getIndex(@Nonnull ValueTable valueTable);
 
   /**
    * Create a index synchronization task.
+   *
    * @param valueTable
    * @param index
    * @return
    */
+  @Nonnull
   IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index);
 
   /**
@@ -47,8 +54,9 @@ public interface IndexManager {
 
   /**
    * Check if a value table is to be indexed.
+   *
    * @param valueTable
    * @return
    */
-  boolean isIndexable(ValueTable valueTable);
+  boolean isIndexable(@Nonnull ValueTable valueTable);
 }

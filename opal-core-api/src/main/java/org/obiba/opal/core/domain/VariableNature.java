@@ -13,15 +13,18 @@ public enum VariableNature {
    * A categorical variable: its value can take one of the predefined {@code Category}.
    */
   CATEGORICAL,
+
   /**
    * A continuous variable: its value can take any value of it's {@code ValueType}. Some values may have a particular
    * meaning: they indicate a missing value. These are defined as missing {@code Category} intances.
    */
   CONTINUOUS,
+
   /**
    * A temporal variable: it's value is a date or time.
    */
   TEMPORAL,
+
   /**
    * None of the above. Variables with {@code LocaleType} will be of this nature.
    */
@@ -29,11 +32,7 @@ public enum VariableNature {
 
   public static VariableNature getNature(Variable variable) {
     if(variable.hasCategories()) {
-      if(isAllMissing(variable.getCategories()) == false) {
-        return CATEGORICAL;
-      } else {
-        return CONTINUOUS;
-      }
+      return isAllMissing(variable.getCategories()) ? CONTINUOUS : CATEGORICAL;
     }
     if(variable.getValueType().isNumeric()) {
       return CONTINUOUS;
@@ -49,7 +48,7 @@ public enum VariableNature {
 
   private static boolean isAllMissing(Iterable<Category> categories) {
     for(Category c : categories) {
-      if(c.isMissing() == false) return false;
+      if(!c.isMissing()) return false;
     }
     return true;
   }

@@ -11,8 +11,9 @@ package org.obiba.opal.search;
 
 import java.util.Calendar;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.Timestamped;
-import org.obiba.magma.Variable;
 
 /**
  * An index of a {@code ValueTable}
@@ -20,11 +21,12 @@ import org.obiba.magma.Variable;
 public interface ValueTableIndex extends Timestamped {
 
   /**
-   * The full path of this index to make requests. TODO: this should be hidden in the implementation. Probably we should
-   * expose some sort of Request/Response api?
+   * The full path of this index to make requests.
    *
    * @return
    */
+  // TODO: this should be hidden in the implementation. Probably we should expose some sort of Request/Response api?
+  @Nonnull
   String getRequestPath();
 
   /**
@@ -32,6 +34,7 @@ public interface ValueTableIndex extends Timestamped {
    *
    * @return
    */
+  @Nonnull
   String getIndexName();
 
   /**
@@ -59,5 +62,6 @@ public interface ValueTableIndex extends Timestamped {
    *
    * @return the current date
    */
+  @Nonnull
   Calendar now();
 }

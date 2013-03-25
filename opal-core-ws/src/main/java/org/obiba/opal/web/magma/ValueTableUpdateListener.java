@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.magma;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.ValueTable;
 
 /**
@@ -19,6 +21,6 @@ public interface ValueTableUpdateListener {
   /**
    * Called after a value table was deleted.
    */
-  public void onDelete(ValueTable vt);
+  void onDelete(@Nonnull ValueTable vt);
 
 }

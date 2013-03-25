@@ -39,8 +39,6 @@ import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
 import org.obiba.runtime.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,7 +49,7 @@ import com.google.common.collect.Lists;
 @Component
 public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexManager {
 
-  private static final Logger log = LoggerFactory.getLogger(EsValuesIndexManager.class);
+//  private static final Logger log = LoggerFactory.getLogger(EsValuesIndexManager.class);
 
   @Nonnull
   private final ThreadFactory threadFactory;
@@ -67,8 +65,9 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     this.threadFactory = threadFactory;
   }
 
+  @Nonnull
   @Override
-  public EsValueTableValuesIndex getIndex(ValueTable vt) {
+  public EsValueTableValuesIndex getIndex(@Nonnull ValueTable vt) {
     Preconditions.checkNotNull(vt);
 
     for(EsValueTableValuesIndex i : indices) {
@@ -79,11 +78,13 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     return i;
   }
 
+  @Nonnull
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
     return new Indexer(valueTable, (EsValueTableValuesIndex) index);
   }
 
+  @Nonnull
   @Override
   public String getName() {
     return esIndexName() + "-values";
@@ -98,7 +99,6 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       this.index = index;
     }
 
-    @SuppressWarnings("OverlyComplexAnonymousInnerClass")
     @Override
     protected void index() {
 
@@ -108,89 +108,91 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           .execute().actionGet();
 
       ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).ignoreReadErrors().from(valueTable)
-          .variables(index.getVariables()).to(new ConcurrentReaderCallback() {
+          .variables(index.getVariables()).to(new ValuesReader()).build().read();
 
-        private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+    }
 
-        private final Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
+    private class ValuesReader implements ConcurrentReaderCallback {
 
-        @Override
-        public void onBegin(List<VariableEntity> entitiesToCopy, Variable... variables) {
-          for(Variable variable : variables) {
-            natures.put(variable, VariableNature.getNature(variable));
-          }
+      private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+
+      private final Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
+
+      @Override
+      public void onBegin(List<VariableEntity> entitiesToCopy, Variable... variables) {
+        for(Variable variable : variables) {
+          natures.put(variable, VariableNature.getNature(variable));
+        }
+      }
+
+      @Override
+      public void onValues(VariableEntity entity, Variable[] variables, Value... values) {
+        if(stop) {
+          return;
         }
 
-        @Override
-        public void onValues(VariableEntity entity, Variable[] variables, Value... values) {
-          if(stop) {
-            return;
+        bulkRequest.add(
+            esProvider.getClient().prepareIndex(getName(), valueTable.getEntityType(), entity.getIdentifier())
+                .setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
+        try {
+          XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
+          fillContentBuilder(variables, values, xcb);
+          bulkRequest.add(esProvider.getClient().prepareIndex(getName(), index.getIndexName(), entity.getIdentifier())
+              .setParent(entity.getIdentifier()).setSource(xcb.endObject()));
+          done++;
+          if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
+            bulkRequest = sendAndCheck(bulkRequest);
           }
+        } catch(IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
 
-          bulkRequest.add(
-              esProvider.getClient().prepareIndex(getName(), valueTable.getEntityType(), entity.getIdentifier())
-                  .setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
-          try {
-            XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
-            fillContentBuilder(variables, values, xcb);
-            bulkRequest.add(esProvider.getClient().prepareIndex(getName(), index.getIndexName(), entity.getIdentifier())
-                .setParent(entity.getIdentifier()).setSource(xcb.endObject()));
-            done++;
-            if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
-              bulkRequest = sendAndCheck(bulkRequest);
+      private void fillContentBuilder(Variable[] variables, Value[] values, XContentBuilder xcb) throws IOException {
+        for(int i = 0; i < variables.length; i++) {
+          Variable variable = variables[i];
+          String fieldName = index.getFieldName(variable.getName());
+          Value value = values[i];
+          if(value.isSequence() && !value.isNull()) {
+            List<Object> vals = Lists.newArrayList();
+            //noinspection ConstantConditions
+            for(Value v : value.asSequence().getValue()) {
+              vals.add(esValue(variable, v));
             }
-          } catch(IOException e) {
-            throw new RuntimeException(e);
-          }
-        }
-
-        private void fillContentBuilder(Variable[] variables, Value[] values, XContentBuilder xcb) throws IOException {
-          for(int i = 0; i < variables.length; i++) {
-            Variable variable = variables[i];
-            String fieldName = index.getFieldName(variable.getName());
-            Value value = values[i];
-            if(value.isSequence() && !value.isNull()) {
-              List<Object> vals = Lists.newArrayList();
-              //noinspection ConstantConditions
-              for(Value v : value.asSequence().getValue()) {
-                vals.add(esValue(variable, v));
-              }
-              xcb.field(fieldName, vals);
-            } else {
-              xcb.field(fieldName, esValue(variable, value));
-            }
-          }
-        }
-
-        @Override
-        public void onComplete() {
-          if(stop) {
-            index.delete();
+            xcb.field(fieldName, vals);
           } else {
-            sendAndCheck(bulkRequest);
-            index.updateTimestamps();
+            xcb.field(fieldName, esValue(variable, value));
           }
         }
+      }
 
-        /**
-         * OPAL-1158: missing values are indexed as null for continuous variables
-         * @param variable the variable
-         * @param value the value
-         * @return an object
-         */
-        @Nullable
-        private Object esValue(Variable variable, Value value) {
-          switch(natures.get(variable)) {
-            case CONTINUOUS:
-              if(variable.isMissingValue(value)) {
-                return null;
-              }
-          }
-          return value.getValue();
+      @Override
+      public void onComplete() {
+        if(stop) {
+          index.delete();
+        } else {
+          sendAndCheck(bulkRequest);
+          index.updateTimestamps();
         }
+      }
 
-      }).build().read();
-
+      /**
+       * OPAL-1158: missing values are indexed as null for continuous variables
+       *
+       * @param variable the variable
+       * @param value the value
+       * @return an object
+       */
+      @Nullable
+      private Object esValue(Variable variable, Value value) {
+        switch(natures.get(variable)) {
+          case CONTINUOUS:
+            if(variable.isMissingValue(value)) {
+              return null;
+            }
+        }
+        return value.getValue();
+      }
     }
 
   }

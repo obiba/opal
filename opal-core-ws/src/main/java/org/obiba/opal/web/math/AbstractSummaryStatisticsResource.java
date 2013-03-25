@@ -9,40 +9,59 @@
  ******************************************************************************/
 package org.obiba.opal.web.math;
 
+import java.util.Collections;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 public class AbstractSummaryStatisticsResource {
 
+  @Nonnull
   private final ValueTable valueTable;
 
+  @Nonnull
   private final Variable variable;
 
+  @Nullable
   private final VectorSource vectorSource;
 
-  protected AbstractSummaryStatisticsResource(ValueTable valueTable, Variable variable, VectorSource vectorSource) {
+  protected AbstractSummaryStatisticsResource(@Nonnull ValueTable valueTable, @Nonnull Variable variable,
+      @Nullable VectorSource vectorSource) {
+    Preconditions.checkNotNull(valueTable);
+    Preconditions.checkNotNull(variable);
+
     this.valueTable = valueTable;
     this.variable = variable;
     this.vectorSource = vectorSource;
   }
 
+  @Nonnull
   public ValueTable getValueTable() {
     return valueTable;
   }
 
+  @Nonnull
   public Variable getVariable() {
     return variable;
   }
 
+  @Nullable
   public VectorSource getVectorSource() {
     return vectorSource;
   }
 
+  @Nonnull
   protected Iterable<Value> getValues() {
-    return vectorSource.getValues(Sets.newTreeSet(getValueTable().getVariableEntities()));
+    return vectorSource == null
+        ? Collections.<Value>emptySet()
+        : vectorSource.getValues(Sets.newTreeSet(getValueTable().getVariableEntities()));
   }
 }

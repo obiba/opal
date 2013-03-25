@@ -29,9 +29,9 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
+import org.obiba.opal.search.SummariesIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
-import org.obiba.opal.search.ValueTableVariablesIndex;
-import org.obiba.opal.search.VariablesIndexManager;
+import org.obiba.opal.search.ValueTableSummariesIndex;
 import org.obiba.opal.search.es.mapping.AttributeMapping;
 import org.obiba.opal.search.es.mapping.ValueTableVariablesMapping;
 import org.obiba.runtime.Version;
@@ -42,30 +42,30 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Component
-public class EsVariablesIndexManager extends EsIndexManager implements VariablesIndexManager {
+public class EsSummariesIndexManager extends EsIndexManager implements SummariesIndexManager {
 
-//  private static final Logger log = LoggerFactory.getLogger(EsVariablesIndexManager.class);
+//  private static final Logger log = LoggerFactory.getLogger(EsSummariesIndexManager.class);
 
-  private final Set<EsValueTableVariablesIndex> indices = Sets.newHashSet();
+  private final Set<EsValueTableSummariesIndex> indices = Sets.newHashSet();
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public EsVariablesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
+  public EsSummariesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, Version version) {
     super(esProvider, esConfig, indexConfig, version);
   }
 
   @Nonnull
   @Override
-  public EsValueTableVariablesIndex getIndex(@Nonnull ValueTable vt) {
+  public ValueTableSummariesIndex getIndex(@Nonnull ValueTable vt) {
     Preconditions.checkNotNull(vt);
 
-    for(EsValueTableVariablesIndex i : indices) {
-      if(i.isForTable(vt)) return i;
+    for(EsValueTableSummariesIndex index : indices) {
+      if(index.isForTable(vt)) return index;
     }
-    EsValueTableVariablesIndex i = new EsValueTableVariablesIndex(vt);
-    indices.add(i);
-    return i;
+    EsValueTableSummariesIndex index = new EsValueTableSummariesIndex(vt);
+    indices.add(index);
+    return index;
   }
 
   @Override
@@ -76,20 +76,20 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
   @Nonnull
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
-    return new Indexer(valueTable, (EsValueTableVariablesIndex) index);
+    return new Indexer(valueTable, (EsValueTableSummariesIndex) index);
   }
 
   @Nonnull
   @Override
   public String getName() {
-    return esIndexName() + "-variables";
+    return esIndexName() + "-variable-summaries";
   }
 
   private class Indexer extends EsIndexer {
 
-    private final EsValueTableVariablesIndex index;
+    private final EsValueTableSummariesIndex index;
 
-    private Indexer(ValueTable table, EsValueTableVariablesIndex index) {
+    private Indexer(ValueTable table, EsValueTableSummariesIndex index) {
       super(table, index);
       this.index = index;
     }
@@ -182,23 +182,16 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     }
   }
 
-  private class EsValueTableVariablesIndex extends EsValueTableIndex implements ValueTableVariablesIndex {
+  private class EsValueTableSummariesIndex extends EsValueTableIndex implements ValueTableSummariesIndex {
 
-    private EsValueTableVariablesIndex(ValueTable vt) {
+    private EsValueTableSummariesIndex(@Nonnull ValueTable vt) {
       super(vt);
     }
 
-    @Nonnull
     @Override
-    public String getIndexName() {
-      // type name is unique in ES (even though in different ES indices)
-      return super.getIndexName() + "-variables";
+    public String getFieldName(String variable) {
+      return getIndexName() + "-" + variable;
     }
 
-    @Nonnull
-    @Override
-    public String getFieldName(@Nonnull Attribute attribute) {
-      return AttributeMapping.getFieldName(attribute);
-    }
   }
 }

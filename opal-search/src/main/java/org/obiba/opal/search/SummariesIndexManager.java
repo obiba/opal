@@ -14,18 +14,12 @@ import javax.annotation.Nonnull;
 import org.obiba.magma.ValueTable;
 
 /**
- * Manager of {@code ValueTable} variables indices.
+ *
  */
-public interface VariablesIndexManager extends IndexManager {
+public interface SummariesIndexManager extends IndexManager {
 
-  /**
-   * Get {@code ValueTable} variables index.
-   *
-   * @param valueTable
-   * @return
-   */
   @Nonnull
   @Override
-  ValueTableVariablesIndex getIndex(@Nonnull ValueTable valueTable);
+  ValueTableSummariesIndex getIndex(@Nonnull ValueTable vt);
 
 }

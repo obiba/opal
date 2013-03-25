@@ -9,23 +9,17 @@
  */
 package org.obiba.opal.search;
 
-import javax.annotation.Nonnull;
-
-import org.obiba.magma.ValueTable;
-
 /**
- * Manager of {@code ValueTable} variables indices.
+ * An index of a {@code ValueTable} variables.
  */
-public interface VariablesIndexManager extends IndexManager {
+public interface ValueTableSummariesIndex extends ValueTableIndex {
 
   /**
-   * Get {@code ValueTable} variables index.
+   * Name of the field for the given variable.
    *
-   * @param valueTable
+   * @param variable Variable name
    * @return
    */
-  @Nonnull
-  @Override
-  ValueTableVariablesIndex getIndex(@Nonnull ValueTable valueTable);
+  String getFieldName(String variable);
 
 }
