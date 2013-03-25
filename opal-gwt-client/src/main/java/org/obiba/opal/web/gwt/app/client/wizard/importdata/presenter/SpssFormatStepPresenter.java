@@ -16,6 +16,7 @@ import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.CharacterSetDisplay;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
@@ -77,6 +78,7 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
     importData.setSpssFile(getDisplay().getSelectedFile());
     importData.setCharacterSet(getDisplay().getCharsetText().getText());
     importData.setDestinationEntityType(getDisplay().getEntityType().getText());
+    importData.setLocale(getDisplay().getLocale());
 
     return importData;
   }
@@ -87,6 +89,13 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
       eventBus.fireEvent(NotificationEvent.newBuilder().error("SpssFileRequired").build());
       return false;
     }
+
+    String selectedLocale = getDisplay().getLocale();
+    if (!LanguageLocale.isValid(selectedLocale)) {
+      eventBus.fireEvent(NotificationEvent.newBuilder().error("InvalidLocaleName").args(selectedLocale).build());
+      return false;
+    }
+
     return true;
   }
 
@@ -97,6 +106,8 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
     String getSelectedFile();
 
     HasText getEntityType();
+
+    String getLocale();
   }
 
   private void setDefaultCharset() {

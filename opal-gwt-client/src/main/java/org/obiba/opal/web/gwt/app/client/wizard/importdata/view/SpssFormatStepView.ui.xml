@@ -11,6 +11,7 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
@@ -33,6 +34,12 @@
         </g:Label>
       </g:customHeader>
       <g:FlowPanel>
+        <g:FlowPanel styleName="input">
+          <g:Label addStyleNames="key">
+            <ui:msg description="Spss Entity type">Label Locale</ui:msg>
+          </g:Label>
+          <o:DropdownSuggestBox ui:field="localeNameBox"/>
+        </g:FlowPanel>
         <g:FlowPanel styleName="input">
           <g:Label addStyleNames="key">
             <ui:msg description="Character set label">Character Set</ui:msg>

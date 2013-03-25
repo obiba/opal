@@ -396,7 +396,8 @@ public interface Translations extends Constants {
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
 //
       "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",
-      "RPackageInstalledButNotFound", "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue."//
+      "RPackageInstalledButNotFound", "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",//
+      "InvalidLocaleName", "Invalid locale name '{0}'. Please choose a valid locale name from the list."//
   })
   Map<String, String> userMessageMap();
 

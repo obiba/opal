@@ -70,6 +70,8 @@ public class ImportConfig {
 
   private boolean ignoreUnknownIdentifier;
 
+  private String locale;
+
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   public void clear() {
     importFormat = null;
@@ -89,6 +91,7 @@ public class ImportConfig {
     field = null;
     csvFile = null;
     spssFile = null;
+    locale = null;
 
     transientDatasourceName = null;
     database = null;
@@ -306,4 +309,11 @@ public class ImportConfig {
     this.spssFile = spssFile;
   }
 
+  public String getLocale() {
+    return locale;
+  }
+
+  public void setLocale(String locale) {
+    this.locale = locale;
+  }
 }
