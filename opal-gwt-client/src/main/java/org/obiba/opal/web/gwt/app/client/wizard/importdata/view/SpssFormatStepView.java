@@ -9,9 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
+import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.SpssFormatStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -47,8 +49,22 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
   @UiField
   TextBox entityType;
 
+  @UiField
+  DropdownSuggestBox localeNameBox;
+
   public SpssFormatStepView() {
     widget = uiBinder.createAndBindUi(this);
+    initializeLocales();
+  }
+
+  private void initializeLocales() {
+    localeNameBox.getSuggestOracle().clear();
+
+    for(String locale : LanguageLocale.getAllLocales()) {
+      localeNameBox.getSuggestOracle().add(locale);
+    }
+
+    localeNameBox.setText(LanguageLocale.EN.getName());
   }
 
   @Override
@@ -97,6 +113,9 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
     return entityType;
   }
 
-
+  @Override
+  public String getLocale() {
+    return localeNameBox.getText();
+  }
 }
 

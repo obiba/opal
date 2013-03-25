@@ -135,6 +135,7 @@ public class DatasourceDtos {
     factoryDto.setFile(importConfig.getSpssFile());
     factoryDto.setCharacterSet(importConfig.getCharacterSet());
     factoryDto.setEntityType(importConfig.getEntityType());
+    factoryDto.setLocale(importConfig.getLocale());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     configureIncremental(importConfig, dto);
