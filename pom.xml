@@ -1368,12 +1368,12 @@
 
     <birt.version>2.6.2</birt.version>
     <bouncycastle.version>1.46</bouncycastle.version>
-    <cglib-nodep.version>2.2</cglib-nodep.version>
+    <cglib-nodep.version>2.2.2</cglib-nodep.version>
     <commons-codec.version>1.3</commons-codec.version>
     <commons-collections.version>3.2</commons-collections.version>
     <commons-daemon.version>1.0.3</commons-daemon.version>
     <commons-dbcp.version>1.4</commons-dbcp.version>
-    <commons-fileupload.version>1.2.1</commons-fileupload.version>
+    <commons-fileupload.version>1.2.2</commons-fileupload.version>
     <commons-httpclient.version>3.1</commons-httpclient.version>
     <commons-io.version>1.3.2</commons-io.version>
     <commons-vfs.version>2.0</commons-vfs.version>
@@ -1393,13 +1393,13 @@
     <gwtquery.version>1.3.2</gwtquery.version>
     <hamcrest.version>1.1</hamcrest.version>
     <hibernate.version>3.5.6-Final</hibernate.version>
-    <hsqldb.version>2.2.6</hsqldb.version>
+    <hsqldb.version>2.2.9</hsqldb.version>
     <httpclient.version>4.1.3</httpclient.version>
     <jetty.version>7.6.8.v20121106</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
     <jline.version>0.9.94</jline.version>
-    <jotm.version>2.1.9</jotm.version>
+    <jotm.version>2.2.3</jotm.version>
     <jpa.version>1.0</jpa.version>
     <json.version>20090211</json.version>
     <jsr305.version>2.0.1</jsr305.version>
@@ -1409,7 +1409,7 @@
     <magma.version>1.5-SNAPSHOT</magma.version>
     <mail.version>1.4</mail.version>
     <mockftpserver.version>2.1</mockftpserver.version>
-    <mysql-connector-java.version>5.1.17</mysql-connector-java.version>
+    <mysql-connector-java.version>5.1.24</mysql-connector-java.version>
     <obiba-commons.version>1.3.1</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <ow2-spec.version>1.0.2</ow2-spec.version>
@@ -1420,14 +1420,14 @@
     <REngine.version>0.6-8</REngine.version>
     <resteasy.version>2.1.0.GA</resteasy.version>
     <shiro.version>1.1.0</shiro.version>
-    <slf4j.version>1.7.1</slf4j.version>
-    <spring.version>3.1.2.RELEASE</spring.version>
+    <slf4j.version>1.7.4</slf4j.version>
+    <spring.version>3.1.4.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>
     <velocity.version>1.6.4</velocity.version>
     <xfire.version>1.2.6</xfire.version>
     <xmlunit.version>1.4</xmlunit.version>
-    <xstream.version>1.4.2</xstream.version>
+    <xstream.version>1.4.4</xstream.version>
 
     <!-- maven plugins -->
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
