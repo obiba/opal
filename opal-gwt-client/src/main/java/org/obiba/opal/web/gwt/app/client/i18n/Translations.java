@@ -1658,4 +1658,8 @@ public interface Translations extends Constants {
   @Description("Summary Frequency Plot")
   @Constants.DefaultStringValue("Frequency Plot")
   String summaryFrequencyPlot();
+
+  @Description("Filter Variable label")
+  @Constants.DefaultStringValue("Filter variables...")
+  String filterVariables();
 }

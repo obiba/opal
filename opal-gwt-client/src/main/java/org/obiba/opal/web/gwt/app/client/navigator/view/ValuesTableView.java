@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 import java.util.AbstractList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
@@ -29,6 +30,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -37,11 +39,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -55,14 +57,12 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
@@ -104,16 +104,13 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   NumericTextBox pageSize;
 
   @UiField
-  Button refreshButton;
-
-  @UiField
   Image refreshPending;
 
   @UiField
   FlowPanel searchPanel;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.TextBox searchBox;
+  TextBox searchBox;
 
   @UiField
   NumericTextBox visibleColumns;
@@ -144,6 +141,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private ValueUpdater<String> updater;
 
+  private final Translations translations = GWT.create(Translations.class);
+
   public ValuesTableView() {
     widget = uiBinder.createAndBindUi(this);
     valuesTable.setEmptyTableWidget(noValues);
@@ -153,28 +152,13 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     pageSize.setValue(Integer.toString(DEFAULT_PAGE_SIZE), false);
     pageSize.setMin(1);
+    pageSize.addKeyUpHandler(new OnEnterSubmitKeyUpHandler());
 
     visibleColumns.setValue(Integer.toString(DEFAULT_MAX_VISIBLE_COLUMNS), false);
     visibleColumns.setMin(1);
+    visibleColumns.addKeyUpHandler(new OnEnterSubmitKeyUpHandler());
 
-    refreshButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        if(!lastFilter.equals(filter.getText()) || maxVisibleColumns != visibleColumns.getNumberValue().intValue()) {
-          // variables list has changed so update all
-          lastFilter = filter.getText();
-          maxVisibleColumns = visibleColumns.getNumberValue().intValue();
-          setRefreshing(true);
-          fetcher.updateVariables(filter.getText());
-        } else if(valuesTable.getPageSize() != pageSize.getNumberValue().intValue()) {
-          // page size only has changed
-          setRefreshing(true);
-          valuesTable.setPageSize(pageSize.getNumberValue().intValue());
-        }
-        // else nothing to refresh
-      }
-    });
+    filter.addKeyUpHandler(new FilterOnEnterSubmitKeyUpHandler());
 
     visibleListVariable = new AbstractList<VariableDto>() {
 
@@ -228,6 +212,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     searchBox.setText("");
     filter.setText("");
+    filter.setPlaceholder(translations.filterVariables());
     lastFilter = "";
     filter.setValue(lastFilter, false);
     setRefreshing(false);
@@ -275,7 +260,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private void setRefreshing(boolean refresh) {
     refreshPending.setVisible(refresh);
-    refreshButton.setEnabled(!refresh);
+//    refreshButton.setEnabled(!refresh);
   }
 
   private String getColumnLabel(int i) {
@@ -656,4 +641,67 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
   }
 
+  private class FilterOnEnterSubmitKeyUpHandler implements KeyUpHandler {
+
+    @Override
+    public void onKeyUp(KeyUpEvent event) {
+      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getText().isEmpty()) {
+
+        int page = DEFAULT_PAGE_SIZE;
+        int columns = DEFAULT_MAX_VISIBLE_COLUMNS;
+
+        if(!pageSize.getText().isEmpty()) {
+          page = pageSize.getNumberValue().intValue();
+        }
+        if(!visibleColumns.getText().isEmpty()) {
+          columns = visibleColumns.getNumberValue().intValue();
+        }
+
+        if(!lastFilter.equals(filter.getText()) || maxVisibleColumns != columns) {
+          // variables list has changed so update all
+          lastFilter = filter.getText();
+          maxVisibleColumns = columns;
+          setRefreshing(true);
+          fetcher.updateVariables(filter.getText());
+        } else if(valuesTable.getPageSize() != page) {
+          // page size only has changed
+          setRefreshing(true);
+          valuesTable.setPageSize(page);
+        }
+        // else nothing to refresh
+      }
+    }
+  }
+
+  private class OnEnterSubmitKeyUpHandler implements KeyUpHandler {
+
+    @Override
+    public void onKeyUp(KeyUpEvent event) {
+      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+
+        int page = DEFAULT_PAGE_SIZE;
+        int columns = DEFAULT_MAX_VISIBLE_COLUMNS;
+
+        if(!pageSize.getText().isEmpty()) {
+          page = pageSize.getNumberValue().intValue();
+        }
+        if(!visibleColumns.getText().isEmpty()) {
+          columns = visibleColumns.getNumberValue().intValue();
+        }
+
+        if(!lastFilter.equals(filter.getText()) || maxVisibleColumns != columns) {
+          // variables list has changed so update all
+          lastFilter = filter.getText();
+          maxVisibleColumns = columns;
+          setRefreshing(true);
+          fetcher.updateVariables(filter.getText());
+        } else if(valuesTable.getPageSize() != page) {
+          // page size only has changed
+          setRefreshing(true);
+          valuesTable.setPageSize(page);
+        }
+        // else nothing to refresh
+      }
+    }
+  }
 }

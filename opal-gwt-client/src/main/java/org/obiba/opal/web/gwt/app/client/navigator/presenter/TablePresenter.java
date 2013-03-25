@@ -61,8 +61,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -429,9 +429,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     String sortColumnName = getView().getClickableColumnName(sortColumn);
     String sortColumnArg = sortColumnName == null ? "" : "?sortField=" + sortColumnName;
     String sortDirArg = sortAscending == null ? "" : sortAscending ? "&sortDir=ASC" : "&sortDir=DESC";
+
+    // TODO: Keep filter
+    String filterArg = getView().getFilter().getText().isEmpty()
+        ? ""
+        : "&script=name().matches('" + getView().getFilter().getText() + "')";
+
     // TODO use uriBuilder
     ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
-        .forResource(table.getLink() + "/variables" + sortColumnArg + sortDirArg).get()
+        .forResource(table.getLink() + "/variables" + sortColumnArg + sortDirArg + filterArg).get()
         .withCallback(new VariablesResourceCallback(table)).send();
   }
 
@@ -578,11 +584,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  private final class FilterVariableHandler implements KeyPressHandler {
+  private final class FilterVariableHandler implements KeyUpHandler {
 
     @Override
-    public void onKeyPress(KeyPressEvent event) {
-      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+    public void onKeyUp(KeyUpEvent event) {
+      String filter = getView().getFilter().getText();
+      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.isEmpty()) {
+
+        // TODO: Call WS to execute a full text search through Elastic Search
         UriBuilder ub = UriBuilder.create()
             .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables")
             .query("script", "name().matches('" + getView().getFilter().getText() + "')");
@@ -590,7 +599,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
             .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
               @Override
               public void onResource(Response response, JsArray<VariableDto> resource) {
-                //getEventBus().fireEvent(new DatasourceSelectionChangeEvent(resource));
                 getView().renderRows(resource);
               }
 
@@ -995,7 +1003,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     List<VariableDto> getSelectedItems();
 
-    HandlerRegistration addFilterVariableHandler(KeyPressHandler handler);
+    HandlerRegistration addFilterVariableHandler(KeyUpHandler handler);
 
     HasText getFilter();
   }

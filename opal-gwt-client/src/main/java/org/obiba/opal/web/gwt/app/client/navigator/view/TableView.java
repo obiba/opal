@@ -17,8 +17,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultSuggestBox;
@@ -45,7 +43,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -62,7 +60,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -89,8 +86,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private final List<Anchor> tables = new ArrayList<Anchor>();
 
   private boolean hasLinkAuthorization = true;
-
-  private ActionHandler<Integer> actionHandler;
 
   @UiField
   FlowPanel toolbarPanel;
@@ -174,9 +169,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiField
   TextBox filter;
-
-  @UiField
-  Image refreshPending;
 
   @UiField
   DefaultSuggestBox variableNameSuggestBox;
@@ -270,6 +262,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     dataProvider.addDataDisplay(table);
 
     filter.setText("");
+    filter.setPlaceholder(translations.filterVariables());
   }
 
   @SuppressWarnings({ "unchecked" })
@@ -292,7 +285,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     variableNameSuggestBox.getSuggestOracle().clear();
     variableNameSuggestBox.setText("");
     table.setEmptyTableWidget(table.getLoadingIndicator());
-    refreshPending.setVisible(true);
 
   }
 
@@ -304,7 +296,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     toolbar.setExportDataItemEnabled(enableItem);
     toolbar.setCopyDataItemEnabled(enableItem);
     table.setEmptyTableWidget(noVariables);
-    refreshPending.setVisible(false);
   }
 
   @Override
@@ -329,6 +320,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   public void clear() {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
     checkColumn.getSelectionModel().clear();
+    filter.setText("");
   }
 
   @Override
@@ -732,8 +724,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public HandlerRegistration addFilterVariableHandler(KeyPressHandler handler) {
-    return filter.addKeyPressHandler(handler);
+  public HandlerRegistration addFilterVariableHandler(KeyUpHandler handler) {
+    return filter.addKeyUpHandler(handler);
   }
 
   @Override
