@@ -9,11 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.CopyVariablesToViewEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
@@ -100,6 +104,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setSummaryTabCommand(new SummaryCommand());
     getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    getView().setAddVariableToViewCommand(new AddVariableToViewCommand());
     getView().setDeriveCategorizeCommand(new DeriveCategorizeCommand());
     getView().setDeriveFromCommand(new DeriveFromCommand());
     getView().setDeriveCustomCommand(new DeriveCustomCommand());
@@ -236,6 +241,15 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
           }
         }).send();
       }
+    }
+  }
+
+  final class AddVariableToViewCommand implements Command {
+    @Override
+    public void execute() {
+      List<VariableDto> list = new ArrayList<VariableDto>();
+      list.add(variable);
+      getEventBus().fireEvent(new CopyVariablesToViewEvent(table, list));
     }
   }
 
@@ -443,6 +457,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     HasAuthorization getPermissionsAuthorizer();
 
     void setEditCommand(Command cmd);
+
+    void setAddVariableToViewCommand(Command cmd);
 
     void setDeriveCategorizeCommand(Command cmd);
 

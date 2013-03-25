@@ -2318,7 +2318,8 @@ a.icon:hover {
   margin-bottom: 0px;
 }
 
-.index-status .action {
+.index-status .action,
+.select-all-variables .action {
   text-decoration: underline;
 }
 
@@ -2326,4 +2327,12 @@ a.icon:hover {
 .disabledLink:hover {
   text-decoration: none;
   cursor: default;
+}
+
+/* Select all variable */
+.select-all-variables {
+  padding: 0 1.2em;
+  border-radius: 0px;
+  margin-bottom: 0px;
+  text-align: center;
 }

@@ -15,11 +15,13 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultSuggestBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
@@ -46,7 +48,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
@@ -64,7 +65,6 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class TableView extends ViewImpl implements TablePresenter.Display {
@@ -80,7 +80,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   private final Widget widget;
 
-  private List<Anchor> tables = new ArrayList<Anchor>();
+  private final List<Anchor> tables = new ArrayList<Anchor>();
 
   private boolean hasLinkAuthorization = true;
 
@@ -140,8 +140,26 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   HorizontalTabLayout tabs;
 
+//  @UiField
+//  FlowPanel addVariablesToView;
+
   @UiField
-  CellTable<VariableDto> table;
+  Anchor copyVariables;
+
+  @UiField
+  Alert selectAllItemsAlert;
+
+  @UiField
+  Label selectAllStatus;
+
+  @UiField
+  Anchor selectAllAnchor;
+
+  @UiField
+  Anchor clearSelectionAnchor;
+
+  @UiField
+  Table<VariableDto> table;
 
   @UiField
   Panel values;
@@ -165,9 +183,11 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   private MenuItem removeItem;
 
-  private MenuItem createCodingViewItem;
+  private MenuItem addVariablesToViewItem;
 
   private MenuItemSeparator removeItemSeparator;
+
+  private CheckboxColumn<VariableDto> checkColumn;
 
   public TableView() {
     widget = uiBinder.createAndBindUi(this);
@@ -193,6 +213,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   private void addTableColumns() {
+    addCheckColumn();
+
     variableIndexColumn = new VariableClickableColumn("index") {
       @Override
       public String getValue(VariableDto object) {
@@ -228,12 +250,25 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       }
     }, translations.unitLabel());
 
-    table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(NavigatorView.PAGE_SIZE);
     table.setEmptyTableWidget(noVariables);
     table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
+  }
+
+  @SuppressWarnings({ "unchecked" })
+  private void addCheckColumn() {
+    checkColumn = new CheckboxColumn<VariableDto>(new VariableDtoDisplay());
+    checkColumn.setActionHandler(new ActionHandler<Integer>() {
+      @Override
+      public void doAction(Integer object, String actionName) {
+        selectAllItemsAlert.setVisible(object > 0);
+      }
+    });
+
+    table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
+    table.setColumnWidth(checkColumn, 1, Unit.PX);
   }
 
   @Override
@@ -256,7 +291,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void renderRows(JsArray<VariableDto> rows) {
-    createCodingViewItem.setEnabled(rows.length() > 0);
+    addVariablesToViewItem.setEnabled(rows.length() > 0);
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
@@ -275,6 +310,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @SuppressWarnings("unchecked")
   public void clear() {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
+    checkColumn.getSelectionModel().clear();
   }
 
   @Override
@@ -393,15 +429,15 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void setCreateCodingViewCommand(Command cmd) {
+  public void setAddVariablesToViewCommand(Command cmd) {
 
-    if(createCodingViewItem != null) {
+    if(addVariablesToViewItem != null) {
       // toolbar.getToolsMenu().removeSeparator(removeItemSeparator);
-      toolbar.getToolsMenu().removeItem(createCodingViewItem);
+      toolbar.getToolsMenu().removeItem(addVariablesToViewItem);
     }
 
     if(cmd != null) {
-      createCodingViewItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.createCodingView(), cmd));
+      addVariablesToViewItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.addVariablesToView(), cmd));
     }
 
   }
@@ -486,11 +522,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void setValuesDisplay(Display display) {
-    values.add(display.asWidget());
-  }
-
-  @Override
   public HasAuthorization getValuesAuthorizer() {
     return new TabAuthorizer(tabs, VALUES_TAB_INDEX);
   }
@@ -513,13 +544,13 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       @Override
       public void authorized() {
         super.authorized();
-        TableView.this.hasLinkAuthorization = true;
+        hasLinkAuthorization = true;
       }
 
       @Override
       public void unauthorized() {
         super.unauthorized();    //To change body of overridden methods use File | Settings | File Templates.
-        TableView.this.hasLinkAuthorization = false;
+        hasLinkAuthorization = false;
       }
     };
   }
@@ -624,5 +655,57 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public HasClickHandlers getScheduleIndexing() {
     return scheduleLink;
+  }
+
+  @Override
+  public HasClickHandlers getCopyVariables() {
+    return copyVariables;
+  }
+
+  @Override
+  public List<VariableDto> getSelectedItems() {
+    return checkColumn.getSelectedItems();
+  }
+
+  private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {
+    @Override
+    public Table<VariableDto> getTable() {
+      return table;
+    }
+
+    @Override
+    public Object getItemKey(VariableDto item) {
+      return item.getName();
+    }
+
+    @Override
+    public Anchor getClearSelection() {
+      return clearSelectionAnchor;
+    }
+
+    @Override
+    public Anchor getSelectAll() {
+      return selectAllAnchor;
+    }
+
+    @Override
+    public ListDataProvider<VariableDto> getDataProvider() {
+      return dataProvider;
+    }
+
+    @Override
+    public Label getSelectAllStatus() {
+      return selectAllStatus;
+    }
+
+    @Override
+    public String getItemNamePlural() {
+      return translations.variablesLabel().toLowerCase();
+    }
+
+    @Override
+    public String getItemNameSingular() {
+      return translations.variableLabel().toLowerCase();
+    }
   }
 }

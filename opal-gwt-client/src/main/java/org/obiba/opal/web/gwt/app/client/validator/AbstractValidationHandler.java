@@ -24,23 +24,28 @@ public abstract class AbstractValidationHandler implements ValidationHandler {
   private final EventBus eventBus;
 
   public AbstractValidationHandler(EventBus eventBus) {
-    super();
     this.eventBus = eventBus;
   }
 
   @Override
   public boolean validate() {
     List<String> messages = new ArrayList<String>();
+    List<String> args = new ArrayList<String>();
+
     String message;
     for(FieldValidator validator : getValidators()) {
       message = validator.validate();
       if(message != null) {
         messages.add(message);
+
+        if(validator instanceof AbstractFieldValidator && !((AbstractFieldValidator) validator).getArgs().isEmpty()) {
+          args.addAll(((AbstractFieldValidator) validator).getArgs());
+        }
       }
     }
 
     if(messages.size() > 0) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).build());
+      eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).args(args).build());
       return false;
     } else {
       return true;

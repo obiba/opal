@@ -394,9 +394,15 @@ public interface Translations extends Constants {
       "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
       "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
-//
-      "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",
-      "RPackageInstalledButNotFound", "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue."//
+      "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",//
+      "RPackageInstalledButNotFound",
+      "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
+      "CopyVariableSelectAtLeastOne", "Select at least one variable to add.",//
+      "CopyVariableCurrentView", "The view can not be the current view. Please select another destination view.",//
+      "CopyVariableNameRequired", "Variable name cannot be empty.",//
+      "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
+      "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
+      "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}"//
   })
   Map<String, String> userMessageMap();
 
@@ -773,12 +779,19 @@ public interface Translations extends Constants {
       "CsvCannotObtainWriter", "Can not get csv writer", //
       "CsvCannotObtainReader", "Can not get csv reader", //
       "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
-      "InvalidCharsetCharacter", "File contains invalid characters at row '{0}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.", //
-      "InvalidCategoryCharsetCharacter", "File contains invalid characters at row '{0}' for variable category {1}. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.", //
-      "SpssFailedToLoadMetadata", "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
-      "SpssFailedToLoadData", "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
-      "SpssDuplicateEntity", "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",//
-      "SpssEmptyIdentifier", "Invalid empty entity identifier. Please make sure that the variable '{0}' at row '{1}' has a valid value in the SPSS file. In addition, be advised that numerical variables having a value greater than their width are subject to value elimination.",//
+      "InvalidCharsetCharacter",
+      "File contains invalid characters at row '{0}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
+//
+      "InvalidCategoryCharsetCharacter",
+      "File contains invalid characters at row '{0}' for variable category {1}. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
+//
+      "SpssFailedToLoadMetadata",
+      "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
+      "SpssFailedToLoadData",
+      "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
+      "SpssDuplicateEntity",
+      "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
+//
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set." })
   Map<String, String> datasourceParsingErrorMap();
 
@@ -1050,6 +1063,10 @@ public interface Translations extends Constants {
   @Description("Add View Success")
   @DefaultStringValue("View successfully created.")
   String addViewSuccess();
+
+  @Description("Update View Success")
+  @DefaultStringValue("View successfully updated.")
+  String updateViewSuccess();
 
   @Description("Add View Failed")
   @DefaultStringValue("View creation failed.")
@@ -1532,6 +1549,14 @@ public interface Translations extends Constants {
   String indexStatusNotIndexed();
 
   @Description("Table index is up-to-date")
+  @DefaultStringValue("Indices")
+  String indicesLabel();
+
+  @Description("Indice label")
+  @DefaultStringValue("Indice")
+  String indiceLabel();
+
+  @Description("Indices label")
   @DefaultStringValue("Table index is up-to-date")
   String indexAlertUpToDate();
 
@@ -1576,6 +1601,46 @@ public interface Translations extends Constants {
   @Description("Version label")
   @DefaultStringValue("Version")
   String versionLabel();
+
+  @Description("All N items on this page are selected label")
+  @DefaultStringValue("All {0} {1} on this page are selected.")
+  String allNItemsSelected();
+
+  @Description("N item this page is selected label")
+  @DefaultStringValue("{0} {1} on this page is selected.")
+  String NItemSelected();
+
+  @Description("N items on this page are selected label")
+  @DefaultStringValue("{0} {1} on this page are selected.")
+  String NItemsSelected();
+
+  @Description("Select all N items label")
+  @DefaultStringValue("Select all {0} {1}")
+  String selectAllNItems();
+
+  @Description("Clear selection label")
+  @DefaultStringValue("Clear selection")
+  String clearSelection();
+
+  @Description("All N items are selected label")
+  @DefaultStringValue("All {0} {1} are selected.")
+  String allItemsSelected();
+
+  @Description("Add variables to view label")
+  @DefaultStringValue("Add variables to view")
+  String addVariablesToViewTitle();
+
+  @Description("Add variables to view... label")
+  @DefaultStringValue("Add Variables to View...")
+  String addVariablesToView();
+
+  @Description("Add variable to view... label")
+  @DefaultStringValue("Add Variable to View...")
+  String addVariableToView();
+
+  @Description("Original variable label")
+  @DefaultStringValue("Original variable")
+  String originalVariable();
 
   @Description("Index Action Index Now")
   @Constants.DefaultStringValue("Index now")

@@ -101,7 +101,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     displayMock.setExcelDownloadCommand((Command) EasyMock.anyObject());
     displayMock.setExportDataCommand((Command) EasyMock.anyObject());
     displayMock.setCopyDataCommand((Command) EasyMock.anyObject());
-    displayMock.setCreateCodingViewCommand((Command) EasyMock.anyObject());
+    displayMock.setAddVariablesToViewCommand((Command) EasyMock.anyObject());
     displayMock.setVariableNameFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
     displayMock.setVariableIndexFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
 
