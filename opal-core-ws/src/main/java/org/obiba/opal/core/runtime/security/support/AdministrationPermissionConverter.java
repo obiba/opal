@@ -60,7 +60,8 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
     DATASHIELD_SESSION_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(magmaConvert("/datashield/session", "*:GET/*"));
+        return Lists.newArrayList(magmaConvert("/datashield/session", "*:GET/*"), //
+            magmaConvert("/datashield/env", "GET:GET/GET"));
       }
 
     };
