@@ -1,0 +1,127 @@
+<!--
+  ~ Copyright (c) 2013 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:v="urn:import:org.obiba.opal.web.gwt.app.client.wizard.variablestoview.view"
+    xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.widgets.view"
+    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+  <ui:style>
+    .optionsPanelMsg td {
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    }
+  </ui:style>
+
+  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
+    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="55em" width="60em">
+      <g:center>
+        <g:ScrollPanel>
+          <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Add or update derived variables to a view description label">Add or update a
+                  derived
+                  variable in a view for each selected variable.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
+            <g:FlowPanel styleName="input">
+              <!-- Datasource -->
+              <g:Label addStyleNames="key">
+                <ui:msg description="Datasource label">Datasource</ui:msg>
+              </g:Label>
+              <o:Chooser ui:field="datasourceListBox" visibleItemCount="1"/>
+              <g:Label addStyleNames="help-block">
+                <ui:msg description="Datasource help label">The view will be attached to the selected datasource.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
+            <!-- View-->
+            <g:FlowPanel styleName="input">
+              <g:Label addStyleNames="key">
+                <ui:msg description="View label">View</ui:msg>
+              </g:Label>
+              <w:EditableListBox ui:field="viewListBox"/>
+              <g:Label addStyleNames="help-block">
+                <ui:msg description="Add variable to view, view help label">Name of the view that will be created or
+                  updated with the derived variable.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
+            <!-- Derived variable: Single -->
+            <g:FlowPanel styleName="input" ui:field="singleVariablePanel">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Derived variable label">Derived variable</ui:msg>
+              </g:Label>
+              <b:TextBox ui:field="singleVariable"/>
+            </g:FlowPanel>
+
+            <!-- Derived variables: Multiple -->
+            <g:VerticalPanel width="100%" addStyleNames="content">
+              <g:FlowPanel styleName="input" ui:field="multipleVariablePanel">
+                <g:Label addStyleNames="key">
+                  <ui:msg description="Derived variables label">Derived variables</ui:msg>
+                </g:Label>
+                <g:InlineLabel ui:field="noVariables">
+                  <ui:msg description="No Variables label">No Variables</ui:msg>
+                </g:InlineLabel>
+                <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
+                <v:VariableEditableTable ui:field="table" width="100%"
+                    addStyleNames="left-aligned clear-both bottom-margin"/>
+              </g:FlowPanel>
+
+              <g:FlowPanel styleName="clear-both">
+                <g:Label addStyleNames="help-block bottom-margin clear-both">
+                  <ui:msg description="Derived variable help label">Derived variable name can be different from the
+                    original
+                    variable. If a variable with same name already exists in the view, it will be overridden.
+                  </ui:msg>
+                </g:Label>
+              </g:FlowPanel>
+            </g:VerticalPanel>
+
+            <!-- Rename -->
+            <g:FlowPanel styleName="input">
+              <g:CheckBox ui:field="renameWithNumber">
+                <ui:msg description="Rename categories with number label">Rename categories with number</ui:msg>
+              </g:CheckBox>
+              <g:Label addStyleNames="help-block">
+                <ui:msg description="Rename categories with number help label">Modify variables script to rename
+                  original categories names with number.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
+          </g:FlowPanel>
+        </g:ScrollPanel>
+      </g:center>
+
+      <g:south size="4">
+        <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
+          <g:Button ui:field="cancelButton" styleName="btn right-aligned top-margin">
+            <ui:msg description="Cancel button label">Cancel</ui:msg>
+          </g:Button>
+          <g:Button ui:field="saveButton" styleName="btn btn-primary right-aligned top-margin">
+            <ui:msg description="Save button label">Save</ui:msg>
+          </g:Button>
+        </g:FlowPanel>
+      </g:south>
+
+    </g:DockLayoutPanel>
+  </g:DialogBox>
+
+</ui:UiBinder>

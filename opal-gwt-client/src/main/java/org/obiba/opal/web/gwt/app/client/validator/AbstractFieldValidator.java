@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.validator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  */
@@ -18,6 +21,8 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   //
 
   private String errorMessageKey;
+
+  private List<String> args = new ArrayList<String>();
 
   //
   // Constructors
@@ -33,6 +38,14 @@ public abstract class AbstractFieldValidator implements FieldValidator {
 
   public final String validate() {
     return hasError() ? errorMessageKey : null;
+  }
+
+  public void setArgs(List<String> args) {
+    this.args = args;
+  }
+
+  public List<String> getArgs() {
+    return args;
   }
 
   //

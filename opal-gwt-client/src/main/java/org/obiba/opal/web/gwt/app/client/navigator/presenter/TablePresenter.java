@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.CopyVariablesToViewEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
@@ -86,6 +87,7 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
   private static final int DELAY_MILLIS = 1000;
@@ -153,13 +155,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     addEventHandlers();
   }
 
-  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+  @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
     registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
     registerHandler(
         getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
-    getView().setCreateCodingViewCommand(new CreateCodingViewCommand());
+    getView().setAddVariablesToViewCommand(new AddVariablesToViewCommand());
     getView().setExcelDownloadCommand(new ExcelDownloadCommand());
     getView().setExportDataCommand(new ExportDataCommand());
     getView().setCopyDataCommand(new CopyDataCommand());
@@ -167,6 +169,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().setPreviousCommand(new PreviousCommand());
     getView().setNextCommand(new NextCommand());
     getView().setValuesTabCommand(new ValuesCommand());
+
+    // Copy variables handler
+    getView().getCopyVariables().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
+      }
+
+    });
 
     FieldUpdater<VariableDto, String> updater = new VariableNameFieldUpdater();
     getView().setVariableNameFieldUpdater(updater);
@@ -285,6 +296,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
       }
     });
+
   }
 
   private void showWaitCursor() {RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.WAIT);}
@@ -341,7 +353,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateDisplay(TableDto tableDto, String previous, String next) {
     table = tableDto;
     this.previous = previous;
@@ -641,13 +652,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  private final class CreateCodingViewCommand implements Command {
+  private final class AddVariablesToViewCommand implements Command {
 
     @Override
     public void execute() {
-      codingViewDialogPresenter.bind();
-      codingViewDialogPresenter.setTableVariables(table, variables);
-      codingViewDialogPresenter.revealDisplay();
+      if(getView().getSelectedItems().isEmpty()) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
+      } else {
+        getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
+      }
     }
   }
 
@@ -688,7 +701,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
+  private class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
 
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
@@ -859,8 +872,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setVariableSelection(VariableDto variable, int index);
 
-    void setValuesDisplay(ValuesTablePresenter.Display display);
-
     void beforeRenderRows();
 
     void renderRows(JsArray<VariableDto> rows);
@@ -887,7 +898,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setEditCommand(Command cmd);
 
-    void setCreateCodingViewCommand(Command cmd);
+    void setAddVariablesToViewCommand(Command cmd);
 
     void setParentName(String name);
 
@@ -950,6 +961,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     void setFromTables(JsArrayString tables);
 
     List<Anchor> getFromTablesAnchor();
+
+    HasClickHandlers getCopyVariables();
+
+    List<VariableDto> getSelectedItems();
   }
 
 }

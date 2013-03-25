@@ -11,18 +11,24 @@ package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IndexStatusImageCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -30,12 +36,13 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
-import com.google.gwt.view.client.ProvidesKey;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 import static org.obiba.opal.web.model.client.opal.ScheduleType.DAILY;
@@ -76,15 +83,23 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   SimplePager indexTablePager;
 
   @UiField
+  Alert selectAllAlert;
+
+  @UiField
+  Label selectAllStatus;
+
+  @UiField
+  Anchor selectAllAnchor;
+
+  @UiField
+  Anchor clearSelectionAnchor;
+
+  @UiField
   Table<TableIndexStatusDto> indexTable;
 
-  final static MultiSelectionModel<TableIndexStatusDto> selectedIndices = new MultiSelectionModel<TableIndexStatusDto>(
-      new ProvidesKey<TableIndexStatusDto>() {
-        @Override
-        public Object getKey(TableIndexStatusDto item) {
-          return item == null ? null : item.getDatasource() + "." + item.getTable();
-        }
-      });
+  private final ListDataProvider<TableIndexStatusDto> dataProvider = new ListDataProvider<TableIndexStatusDto>();
+
+  private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
 
   ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
       new ActionsProvider<TableIndexStatusDto>() {
@@ -106,10 +121,14 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     uiWidget = uiBinder.createAndBindUi(this);
     indexTablePager.setDisplay(indexTable);
 
-    indexTable
-        .setSelectionModel(selectedIndices, DefaultSelectionEventManager.<TableIndexStatusDto>createCheckboxManager());
-
-    indexTable.addColumn(Columns.select, "");
+    checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
+    checkboxColumn.setActionHandler(new ActionHandler<Integer>() {
+      @Override
+      public void doAction(Integer object, String actionName) {
+        selectAllAlert.setVisible(object > 0);
+      }
+    });
+    indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
     indexTable.addColumn(Columns.datasource, translations.datasourceLabel());
     indexTable.addColumn(Columns.table, translations.tableLabel());
     indexTable.addColumn(Columns.tableLastUpdate, translations.tableLastUpdateLabel());
@@ -118,6 +137,25 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTable.addColumn(Columns.status, translations.statusLabel());
     indexTable.addColumn(actionsColumn, translations.actionsLabel());
     indexTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
+    indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
+
+    dataProvider.addDataDisplay(indexTable);
+  }
+
+  @Override
+  public void renderRows(JsArray<TableIndexStatusDto> rows) {
+    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
+    indexTablePager.firstPage();
+    dataProvider.refresh();
+    indexTablePager.setVisible(dataProvider.getList().size() > indexTablePager.getPageSize());
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void clear() {
+    renderRows((JsArray<TableIndexStatusDto>) JavaScriptObject.createArray());
+    checkboxColumn.getSelectionModel().clear();
+    selectAllAlert.setVisible(false);
   }
 
   @Override
@@ -174,7 +212,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
 
   @Override
   public MultiSelectionModel<TableIndexStatusDto> getSelectedIndices() {
-    return selectedIndices;
+    return checkboxColumn.getSelectionModel();
   }
 
   @Override
@@ -188,14 +226,6 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   private static final class Columns {
-
-    static final Column<TableIndexStatusDto, Boolean> select = new Column<TableIndexStatusDto, Boolean>(
-        new CheckboxCell(true, false)) {
-      @Override
-      public Boolean getValue(TableIndexStatusDto object) {
-        return selectedIndices.isSelected(object);
-      }
-    };
 
     static final Column<TableIndexStatusDto, String> datasource = new TextColumn<TableIndexStatusDto>() {
 
@@ -273,5 +303,48 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
         return IndexStatusImageCell.getSrc(tableIndexStatusDto);
       }
     };
+  }
+
+  private class TableIndexStatusDtoDisplay implements CheckboxColumn.Display<TableIndexStatusDto> {
+
+    @Override
+    public Table<TableIndexStatusDto> getTable() {
+      return indexTable;
+    }
+
+    @Override
+    public Object getItemKey(TableIndexStatusDto item) {
+      return item == null ? null : item.getDatasource() + "." + item.getTable();
+    }
+
+    @Override
+    public Anchor getClearSelection() {
+      return clearSelectionAnchor;
+    }
+
+    @Override
+    public Anchor getSelectAll() {
+      return selectAllAnchor;
+    }
+
+    @Override
+    public HasText getSelectAllStatus() {
+      return selectAllStatus;
+    }
+
+    @Override
+    public ListDataProvider<TableIndexStatusDto> getDataProvider() {
+      return dataProvider;
+    }
+
+    @Override
+    public String getItemNamePlural() {
+      return translations.indicesLabel().toLowerCase();
+    }
+
+    @Override
+    public String getItemNameSingular() {
+      return translations.indiceLabel().toLowerCase();
+    }
   }
 }

@@ -75,6 +75,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.SpssFormatS
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.UnitSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
@@ -201,6 +202,8 @@ public interface OpalGinjector extends Ginjector {
 
   ConfigureViewStepPresenter getConfigureViewStepPresenter();
 
+  VariablesToViewPresenter getVariablesToViewPresenter();
+
   CreateDatasourcePresenter getCreateDatasourcePresenter();
 
   DataExportPresenter getDataExportPresenter();
@@ -232,4 +235,5 @@ public interface OpalGinjector extends Ginjector {
   Provider<IndexAdministrationPresenter> getIndexAdministrationPresenter();
 
   Provider<IndexPresenter> getIndexPresenter();
+
 }
