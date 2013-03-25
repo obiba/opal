@@ -59,14 +59,10 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
     long max = 0;
     // Mode is the most frequent value
     String mode = NULL_NAME;
-    Iterator<String> concat;
-    if(distinct) {
-      // category names, null values and distinct values
-      concat = freqNames(freq);
-    } else {
-      // category names and null values
-      concat = Iterators.concat(categoryNames(), ImmutableList.of(NULL_NAME).iterator());
-    }
+    Iterator<String> concat = distinct //
+        ? freqNames(freq)  // category names, null values and distinct values
+        : Iterators.concat(categoryNames(), ImmutableList.of(NULL_NAME).iterator()); // category names and null values
+
     // Iterate over all category names including or not distinct values. The loop will also determine the mode
     // of the distribution (most frequent value)
     while(concat.hasNext()) {
@@ -98,16 +94,13 @@ public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatist
       if(value.isNull()) {
         freq.addValue(NULL_NAME);
       } else {
+        //noinspection ConstantConditions
         for(Value v : value.asSequence().getValue()) {
           addValue(freq, v);
         }
       }
     } else {
-      if(value.isNull() == false) {
-        freq.addValue(value.toString());
-      } else {
-        freq.addValue(NULL_NAME);
-      }
+      freq.addValue(value.isNull() ? NULL_NAME : value.toString());
     }
   }
 

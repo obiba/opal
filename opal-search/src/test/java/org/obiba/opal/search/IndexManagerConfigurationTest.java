@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Opal;
 
@@ -29,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
+@SuppressWarnings({ "OverlyLongMethod", "ReuseOfLocalVariable" })
 public class IndexManagerConfigurationTest {
 
   @Before
@@ -46,7 +46,6 @@ public class IndexManagerConfigurationTest {
     ValueTable vt = createMock(ValueTable.class);
     Datasource datasource = createMock(Datasource.class);
     ValueTableIndex index = createMock(ValueTableIndex.class);
-    Timestamps timestamps = createMock(Timestamps.class);
 
     IndexManagerConfiguration config = new IndexManagerConfiguration();
 
@@ -256,7 +255,6 @@ public class IndexManagerConfigurationTest {
     ValueTable vt = createMock(ValueTable.class);
     Datasource datasource = createMock(Datasource.class);
     ValueTableIndex index = createMock(ValueTableIndex.class);
-    Timestamps timestamps = createMock(Timestamps.class);
 
     IndexManagerConfiguration config = new IndexManagerConfiguration();
 
@@ -329,7 +327,6 @@ public class IndexManagerConfigurationTest {
     ValueTable vt = createMock(ValueTable.class);
     Datasource datasource = createMock(Datasource.class);
     ValueTableIndex index = createMock(ValueTableIndex.class);
-    Timestamps timestamps = createMock(Timestamps.class);
 
     IndexManagerConfiguration config = new IndexManagerConfiguration();
 
@@ -425,7 +422,6 @@ public class IndexManagerConfigurationTest {
     ValueTable vt = createMock(ValueTable.class);
     Datasource datasource = createMock(Datasource.class);
     ValueTableIndex index = createMock(ValueTableIndex.class);
-    Timestamps timestamps = createMock(Timestamps.class);
 
     IndexManagerConfiguration config = new IndexManagerConfiguration();
 

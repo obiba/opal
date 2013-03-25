@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -51,16 +52,20 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   protected static final int ES_BATCH_SIZE = 100;
 
+  @Nonnull
   protected final ElasticSearchProvider esProvider;
 
+  @Nonnull
   private final ElasticSearchConfigurationService esConfig;
 
+  @Nonnull
   private final IndexManagerConfigurationService indexConfig;
 
   protected final Version runtimeVersion;
 
-  protected EsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
-      IndexManagerConfigurationService indexConfig, Version version) {
+  protected EsIndexManager(@Nonnull ElasticSearchProvider esProvider,
+      @Nonnull ElasticSearchConfigurationService esConfig, @Nonnull IndexManagerConfigurationService indexConfig,
+      Version version) {
 
     Preconditions.checkNotNull(esProvider);
     Preconditions.checkNotNull(esConfig);
@@ -224,6 +229,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     protected void updateTimestamps() {
       try {
         EsMapping mapping = readMapping();
+        //noinspection ConstantConditions
         mapping.meta().setString("_updated", DateTimeType.get().valueOf(new Date()).toString());
         esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(getIndexName())
             .setSource(mapping.toXContent()).execute().actionGet();
@@ -310,11 +316,12 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       return MagmaEngineTableResolver.valueOf(valueTableReference).resolveTable();
     }
 
+    @Nullable
     private IndexMetaData getIndexMetaData() {
       if(esProvider.getClient() == null) return null;
 
-      IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(getName())
-          .execute().actionGet().getState().getMetaData().index(getName());
+      IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(getName()).execute()
+          .actionGet().getState().getMetaData().index(getName());
       return imd != null ? imd : createIndex();
     }
 
@@ -332,8 +339,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
     @Override
     public boolean equals(Object obj) {
-      return obj != null &&
-          (obj == this || obj instanceof EsValueTableIndex && ((ValueTableIndex) obj).getIndexName().equals(getIndexName()));
+      return obj != null && (obj == this ||
+          obj instanceof EsValueTableIndex && ((ValueTableIndex) obj).getIndexName().equals(getIndexName()));
     }
   }
 

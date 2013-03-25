@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.common.base.Preconditions;
@@ -50,6 +53,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
   private static final Logger log = LoggerFactory.getLogger(EsValuesIndexManager.class);
 
+  @Nonnull
   private final ThreadFactory threadFactory;
 
   private final Set<EsValueTableValuesIndex> indices = Sets.newHashSet();
@@ -57,7 +61,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public EsValuesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
-      IndexManagerConfigurationService indexConfig, ThreadFactory threadFactory, Version version) {
+      IndexManagerConfigurationService indexConfig, @Nonnull ThreadFactory threadFactory, Version version) {
     super(esProvider, esConfig, indexConfig, version);
     Preconditions.checkNotNull(threadFactory);
     this.threadFactory = threadFactory;
@@ -128,18 +132,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
                   .setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
           try {
             XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
-            for(int i = 0; i < variables.length; i++) {
-              String fieldName = index.getFieldName(variables[i].getName());
-              if(values[i].isSequence() && !values[i].isNull()) {
-                List<Object> vals = Lists.newArrayList();
-                for(Value v : values[i].asSequence().getValue()) {
-                  vals.add(esValue(variables[i], v));
-                }
-                xcb.field(fieldName, vals);
-              } else {
-                xcb.field(fieldName, esValue(variables[i], values[i]));
-              }
-            }
+            fillContentBuilder(variables, values, xcb);
             bulkRequest.add(esProvider.getClient().prepareIndex(getName(), index.getIndexName(), entity.getIdentifier())
                 .setParent(entity.getIdentifier()).setSource(xcb.endObject()));
             done++;
@@ -148,6 +141,24 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
             }
           } catch(IOException e) {
             throw new RuntimeException(e);
+          }
+        }
+
+        private void fillContentBuilder(Variable[] variables, Value[] values, XContentBuilder xcb) throws IOException {
+          for(int i = 0; i < variables.length; i++) {
+            Variable variable = variables[i];
+            String fieldName = index.getFieldName(variable.getName());
+            Value value = values[i];
+            if(value.isSequence() && !value.isNull()) {
+              List<Object> vals = Lists.newArrayList();
+              //noinspection ConstantConditions
+              for(Value v : value.asSequence().getValue()) {
+                vals.add(esValue(variable, v));
+              }
+              xcb.field(fieldName, vals);
+            } else {
+              xcb.field(fieldName, esValue(variable, value));
+            }
           }
         }
 
@@ -167,6 +178,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
          * @param value the value
          * @return an object
          */
+        @Nullable
         private Object esValue(Variable variable, Value value) {
           switch(natures.get(variable)) {
             case CONTINUOUS:

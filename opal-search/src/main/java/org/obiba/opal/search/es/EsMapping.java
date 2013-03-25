@@ -23,7 +23,7 @@ class EsMapping {
 
   private final Map<String, Object> mapping;
 
-  EsMapping(String name, byte[] mappingSource) throws IOException {
+  EsMapping(String name, byte... mappingSource) throws IOException {
     this.name = name;
     mapping = XContentFactory.xContent(mappingSource).createParser(mappingSource).map();
   }
@@ -45,6 +45,7 @@ class EsMapping {
     return newIfAbsent(mapping, name);
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   class Meta {
 
     public String getString(String name) {

@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.math;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 
@@ -27,7 +28,8 @@ public class DefaultSummaryStatisticsResource extends AbstractSummaryStatisticsR
    * @param variable
    * @param vectorSource
    */
-  public DefaultSummaryStatisticsResource(ValueTable valueTable, Variable variable, VectorSource vectorSource) {
+  public DefaultSummaryStatisticsResource(ValueTable valueTable, Variable variable,
+      @Nullable VectorSource vectorSource) {
     super(valueTable, variable, vectorSource);
   }
 
