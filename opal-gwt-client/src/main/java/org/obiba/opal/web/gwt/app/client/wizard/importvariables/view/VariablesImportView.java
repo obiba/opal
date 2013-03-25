@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
@@ -22,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.Compar
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -101,6 +103,9 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   @UiField
   TextBox spssEntityType;
 
+  @UiField
+  DropdownSuggestBox localeNameBox;
+
   private FileSelectionPresenter.Display fileSelection;
 
   private WizardStepChain stepChain;
@@ -113,11 +118,14 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
 
   private ValidationHandler importableValidator;
 
+  private ValidationHandler localeValidator;
+
   @Inject
   public VariablesImportView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
+    initializeLocales();
   }
 
   private void initWizardDialog() {
@@ -159,6 +167,16 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
       datasourceParsingErrors.setErrors(errorDto);
       datasourceParsingErrors.setVisible(true);
     }
+  }
+
+  private void initializeLocales() {
+    localeNameBox.getSuggestOracle().clear();
+
+    for(String locale : LanguageLocale.getAllLocales()) {
+      localeNameBox.getSuggestOracle().add(locale);
+    }
+
+    localeNameBox.setText(LanguageLocale.EN.getName());
   }
 
   @Override
@@ -214,6 +232,8 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
 
       @Override
       public void onClick(ClickEvent evt) {
+        if (!localeValidator.validate()) return;
+
         if(fileSelectionStep.isVisible()) {
           if(fileSelectionValidator.validate()) {
             handler.onClick(evt);
@@ -254,6 +274,11 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   @Override
   public void setFileSelectionValidator(ValidationHandler handler) {
     this.fileSelectionValidator = handler;
+  }
+
+  @Override
+  public void setLocaleValidator(ValidationHandler handler) {
+    this.localeValidator = handler;
   }
 
   @Override
@@ -323,6 +348,11 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   @Override
   public HasText getSpssEntityType() {
     return spssEntityType;
+  }
+
+  @Override
+  public String getLocale() {
+    return localeNameBox.getText();
   }
 
   @Override

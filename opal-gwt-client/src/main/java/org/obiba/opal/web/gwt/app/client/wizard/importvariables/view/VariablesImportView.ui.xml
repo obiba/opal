@@ -48,6 +48,12 @@
               <g:FlowPanel>
                 <g:FlowPanel styleName="input">
                   <g:Label addStyleNames="key">
+                    <ui:msg description="Spss Entity type">Label Locale</ui:msg>
+                  </g:Label>
+                  <o:DropdownSuggestBox ui:field="localeNameBox"/>
+                </g:FlowPanel>
+                <g:FlowPanel styleName="input">
+                  <g:Label addStyleNames="key">
                     <ui:msg description="Character set label">Character Set</ui:msg>
                   </g:Label>
                   <w:CharacterSetView ui:field='charsetView'></w:CharacterSetView>
