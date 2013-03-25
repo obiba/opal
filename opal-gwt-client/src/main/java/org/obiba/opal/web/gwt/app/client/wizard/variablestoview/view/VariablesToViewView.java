@@ -151,18 +151,15 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
         return object.getName();
       }
     };
-//    editColumn.setFieldUpdater(new FieldUpdater<VariableDto, String>() {
-//      @Override
-//      public void update(int index, VariableDto object, String value) {
-//        // Keep the update in memory and apply it when saving the list
-//        originalNamesMap.put(object.getName(), value);
-//      }
-//    });
 
     table.addColumn(editColumn, translations.nameLabel());
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
       public String getValue(VariableDto object) {
+        return getTruncatedScript(object);
+      }
+
+      private String getTruncatedScript(VariableDto object) {
         String script = "";
         for(int i = 0; i < JsArrays.toSafeArray(object.getAttributesArray()).length(); i++) {
           if("script".equals(object.getAttributesArray().get(i).getName())) {
