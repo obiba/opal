@@ -60,6 +60,9 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -71,6 +74,7 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
@@ -185,11 +189,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     registerHandler(getView().addVariableSuggestionHandler(new VariableSuggestionHandler()));
     registerHandler(getView().addVariableSortHandler(new VariableSortHandler()));
 
+    // Filter variable event
+    registerHandler(getView().addFilterVariableHandler(new FilterVariableHandler()));
     // OPAL-975
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
 
     registerHandler(
         getEventBus().addHandler(TableIndexStatusRefreshEvent.getType(), new TableIndexStatusRefreshHandler()));
+
     //Link actions: CLEAR
     final UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}", "index");
     getView().getClear().addClickHandler(new ClickHandler() {
@@ -569,6 +576,28 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       sortColumn = event.getColumn();
       updateDisplay(table, previous, next);
     }
+  }
+
+  private final class FilterVariableHandler implements KeyPressHandler {
+
+    @Override
+    public void onKeyPress(KeyPressEvent event) {
+      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+        UriBuilder ub = UriBuilder.create()
+            .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables")
+            .query("script", "name().matches('" + getView().getFilter().getText() + "')");
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build()).get()
+            .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+              @Override
+              public void onResource(Response response, JsArray<VariableDto> resource) {
+                //getEventBus().fireEvent(new DatasourceSelectionChangeEvent(resource));
+                getView().renderRows(resource);
+              }
+
+            }).send();
+      }
+    }
+
   }
 
   private final class NextCommand implements Command {
@@ -965,6 +994,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasClickHandlers getCopyVariables();
 
     List<VariableDto> getSelectedItems();
+
+    HandlerRegistration addFilterVariableHandler(KeyPressHandler handler);
+
+    HasText getFilter();
   }
 
 }

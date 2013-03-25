@@ -17,6 +17,8 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultSuggestBox;
@@ -34,6 +36,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -42,6 +45,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -56,7 +60,9 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -83,6 +89,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private final List<Anchor> tables = new ArrayList<Anchor>();
 
   private boolean hasLinkAuthorization = true;
+
+  private ActionHandler<Integer> actionHandler;
 
   @UiField
   FlowPanel toolbarPanel;
@@ -140,9 +148,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   HorizontalTabLayout tabs;
 
-//  @UiField
-//  FlowPanel addVariablesToView;
-
   @UiField
   Anchor copyVariables;
 
@@ -166,6 +171,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @UiField
   SimplePager pager;
+
+  @UiField
+  TextBox filter;
+
+  @UiField
+  Image refreshPending;
 
   @UiField
   DefaultSuggestBox variableNameSuggestBox;
@@ -194,6 +205,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
     initializeAnchorTexts();
+    addHandlers();
+
   }
 
   @Override
@@ -255,6 +268,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
+
+    filter.setText("");
   }
 
   @SuppressWarnings({ "unchecked" })
@@ -277,6 +292,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     variableNameSuggestBox.getSuggestOracle().clear();
     variableNameSuggestBox.setText("");
     table.setEmptyTableWidget(table.getLoadingIndicator());
+    refreshPending.setVisible(true);
+
   }
 
   @Override
@@ -287,6 +304,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     toolbar.setExportDataItemEnabled(enableItem);
     toolbar.setCopyDataItemEnabled(enableItem);
     table.setEmptyTableWidget(noVariables);
+    refreshPending.setVisible(false);
   }
 
   @Override
@@ -708,4 +726,33 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       return translations.variableLabel().toLowerCase();
     }
   }
+
+  private void addHandlers() {
+//    filter.addKeyPressHandler(new EnterKeyPressHandler());
+  }
+
+  @Override
+  public HandlerRegistration addFilterVariableHandler(KeyPressHandler handler) {
+    return filter.addKeyPressHandler(handler);
+  }
+
+  @Override
+  public HasText getFilter() {
+    return filter;
+  }
+//  private final class EnterKeyPressHandler implements KeyPressHandler {
+//    @Override
+//    public void onKeyPress(KeyPressEvent event) {
+//      if(event.getNativeEvent().getCtrlKey() || event.getNativeEvent().getAltKey()) {
+//        return;
+//      }
+//
+//      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+//        GWT.log("SUBMIT FILTER");
+//        if(actionHandler != null) {
+//          actionHandler.doAction(1, "");
+//        }
+//      }
+//    }
+//  }
 }

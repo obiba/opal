@@ -79,7 +79,6 @@
       </g:FlowPanel>
     </o:PropertiesTable>
 
-
     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">
       <g:Anchor>
         <ui:msg description="Variables label">Variables</ui:msg>
@@ -88,6 +87,44 @@
         <g:InlineLabel ui:field="noVariables">
           <ui:msg description="No Variables label">No Variables</ui:msg>
         </g:InlineLabel>
+
+        <g:DisclosurePanel addStyleNames="left-aligned">
+          <g:customHeader>
+            <g:FlowPanel>
+              <g:InlineLabel>
+                <ui:msg description="Display Options label">Display options</ui:msg>
+              </g:InlineLabel>
+              <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
+              <!--<g:Image url="image/loading.gif" addStyleNames="small-indent"/>-->
+            </g:FlowPanel>
+          </g:customHeader>
+
+          <g:Grid>
+            <g:row>
+              <g:customCell styleName="top-aligned">
+                <g:FlowPanel styleName="input block">
+                  <g:Label addStyleNames="key">
+                    <ui:msg description="Filter Variables label">Variables filter</ui:msg>
+                  </g:Label>
+                  <b:Controls>
+                    <b:InputAddOn appendIcon="FILTER">
+                      <b:TextBox ui:field="filter"></b:TextBox>
+                    </b:InputAddOn>
+                  </b:Controls>
+                  <g:HorizontalPanel>
+                    <g:Label styleName="help-block">
+                      <ui:msg description="Variable name filter label">Display the variables which name matches the
+                        provided
+                        regular expression.
+                      </ui:msg>
+                    </g:Label>
+                  </g:HorizontalPanel>
+                </g:FlowPanel>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+        </g:DisclosurePanel>
+
         <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
             addStyleNames="block clear select-all-variables">
