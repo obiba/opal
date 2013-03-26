@@ -28,10 +28,6 @@
         <ui:msg description="Refresh label">Refresh</ui:msg>
       </g:Button>
       <g:FlowPanel addStyleNames="right-aligned small-search-box">
-        <!--<b:Controls>-->
-        <!--<b:InputAddOn prependIcon="SEARCH">-->
-        <!--<b:Controls >-->
-        <!--<b:InputAddOn prependIcon="FILTER">-->
         <g:Grid>
           <g:row>
             <g:customCell styleName="top-aligned">
@@ -42,17 +38,6 @@
             </g:customCell>
           </g:row>
         </g:Grid>
-
-        <!--</b:InputAddOn>-->
-
-        <!--</b:Controls>-->
-
-        <!--<b:TextBox ui:field="search"></b:TextBox>-->
-        <!--<o:HelpImage page="Working+with+Datasources" addStyleNames="small-indent"></o:HelpImage>-->
-        <!--</b:InputAddOn>-->
-        <!--</b:Controls>-->
-
-
       </g:FlowPanel>
 
     </g:FlowPanel>
