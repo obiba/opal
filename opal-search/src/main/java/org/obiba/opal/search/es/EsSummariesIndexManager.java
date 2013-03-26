@@ -9,14 +9,20 @@
  */
 package org.obiba.opal.search.es;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.SummariesIndexManager;
@@ -26,6 +32,8 @@ import org.obiba.opal.search.es.mapping.VariableSummariesMapping;
 import org.obiba.runtime.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Maps;
 
 @Component
 public class EsSummariesIndexManager extends EsIndexManager implements SummariesIndexManager {
@@ -75,6 +83,8 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
 
     private final EsValueTableSummariesIndex index;
 
+    private final Map<String, CategoricalVariableSummary.Builder> categoricalSummaryBuilders = Maps.newHashMap();
+
     private Indexer(ValueTable table, EsValueTableSummariesIndex index) {
       super(table, index);
       this.index = index;
@@ -86,6 +96,19 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
       XContentBuilder builder = new VariableSummariesMapping()
           .createMapping(runtimeVersion, index.getIndexName(), valueTable);
 
+    }
+
+    // TODO skip binary variable
+    private void indexVariable(@Nonnull Variable variable, @Nonnull Value value,
+        @Nonnull BulkRequestBuilder bulkRequest) {
+
+      CategoricalVariableSummary.Builder builder = categoricalSummaryBuilders.get(variable.getName());
+      if(builder == null) {
+        // TODO distinct ?
+        boolean distinct = TextType.get().equals(variable.getValueType()) && variable.areAllCategoriesMissing();
+        builder = new CategoricalVariableSummary.Builder(variable).distinct(distinct);
+      }
+      builder.addValue(value);
     }
 
   }

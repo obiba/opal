@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -135,10 +136,16 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
             esProvider.getClient().prepareIndex(getName(), valueTable.getEntityType(), entity.getIdentifier())
                 .setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
         try {
-          XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
-          fillContentBuilder(variables, values, xcb);
-          bulkRequest.add(esProvider.getClient().prepareIndex(getName(), index.getIndexName(), entity.getIdentifier())
-              .setParent(entity.getIdentifier()).setSource(xcb.endObject()));
+          XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
+          for(int i = 0; i < variables.length; i++) {
+            indexValue(builder, variables[i], values[i]);
+          }
+          builder.endObject();
+
+          IndexRequestBuilder requestBuilder = esProvider.getClient()
+              .prepareIndex(getName(), index.getIndexName(), entity.getIdentifier()).setParent(entity.getIdentifier())
+              .setSource(builder);
+          bulkRequest.add(requestBuilder);
           done++;
           if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
             bulkRequest = sendAndCheck(bulkRequest);
@@ -148,21 +155,17 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         }
       }
 
-      private void fillContentBuilder(Variable[] variables, Value[] values, XContentBuilder xcb) throws IOException {
-        for(int i = 0; i < variables.length; i++) {
-          Variable variable = variables[i];
-          String fieldName = index.getFieldName(variable.getName());
-          Value value = values[i];
-          if(value.isSequence() && !value.isNull()) {
-            List<Object> vals = Lists.newArrayList();
-            //noinspection ConstantConditions
-            for(Value v : value.asSequence().getValue()) {
-              vals.add(esValue(variable, v));
-            }
-            xcb.field(fieldName, vals);
-          } else {
-            xcb.field(fieldName, esValue(variable, value));
+      private void indexValue(XContentBuilder xcb, Variable variable, Value value) throws IOException {
+        String fieldName = index.getFieldName(variable.getName());
+        if(value.isSequence() && !value.isNull()) {
+          List<Object> vals = Lists.newArrayList();
+          //noinspection ConstantConditions
+          for(Value v : value.asSequence().getValue()) {
+            vals.add(esValue(variable, v));
           }
+          xcb.field(fieldName, vals);
+        } else {
+          xcb.field(fieldName, esValue(variable, value));
         }
       }
 

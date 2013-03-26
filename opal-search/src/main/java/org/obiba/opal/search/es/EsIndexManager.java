@@ -120,6 +120,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     @Nonnull
     protected final ValueTable valueTable;
 
+    @Nonnull
     private final EsValueTableIndex index;
 
     private final int total;
@@ -128,7 +129,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
     protected boolean stop = false;
 
-    protected EsIndexer(@Nonnull ValueTable table, EsValueTableIndex index) {
+    protected EsIndexer(@Nonnull ValueTable table, @Nonnull EsValueTableIndex index) {
       valueTable = table;
       this.index = index;
       total = valueTable.getVariableEntities().size();
