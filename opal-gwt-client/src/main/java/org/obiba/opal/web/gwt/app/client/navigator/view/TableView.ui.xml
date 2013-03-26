@@ -121,7 +121,7 @@
             </g:row>
           </g:Grid>
         </b:Alert>
-        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned"/>
+        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned first-column-checkbox"/>
       </g:FlowPanel>
 
       <g:Anchor>

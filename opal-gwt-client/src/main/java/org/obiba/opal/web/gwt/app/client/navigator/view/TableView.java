@@ -271,6 +271,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
         selectAllItemsAlert.setVisible(object > 0);
       }
     });
+//    checkColumn.setCellStyleNames("checkbox-column");
 
     table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Unit.PX);
