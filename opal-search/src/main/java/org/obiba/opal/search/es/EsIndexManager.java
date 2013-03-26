@@ -61,15 +61,17 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   @Nonnull
   private final IndexManagerConfigurationService indexConfig;
 
+  @Nonnull
   protected final Version runtimeVersion;
 
   protected EsIndexManager(@Nonnull ElasticSearchProvider esProvider,
       @Nonnull ElasticSearchConfigurationService esConfig, @Nonnull IndexManagerConfigurationService indexConfig,
-      Version version) {
+      @Nonnull Version version) {
 
     Preconditions.checkNotNull(esProvider);
     Preconditions.checkNotNull(esConfig);
-    Preconditions.checkNotNull(indexConfig);
+    Preconditions.checkNotNull(esConfig);
+    Preconditions.checkNotNull(version);
 
     this.esProvider = esProvider;
     this.esConfig = esConfig;

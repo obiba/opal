@@ -9,37 +9,23 @@
  */
 package org.obiba.opal.search.es;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.obiba.magma.Attribute;
-import org.obiba.magma.AttributeAware;
-import org.obiba.magma.Category;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.SummariesIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableSummariesIndex;
-import org.obiba.opal.search.es.mapping.AttributeMapping;
-import org.obiba.opal.search.es.mapping.ValueTableVariablesMapping;
+import org.obiba.opal.search.es.mapping.VariableSummariesMapping;
 import org.obiba.runtime.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 @Component
 public class EsSummariesIndexManager extends EsIndexManager implements SummariesIndexManager {
@@ -97,89 +83,11 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
     @Override
     protected void index() {
 
-      XContentBuilder b = new ValueTableVariablesMapping()
+      XContentBuilder builder = new VariableSummariesMapping()
           .createMapping(runtimeVersion, index.getIndexName(), valueTable);
-      esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName()).setSource(b)
-          .execute().actionGet();
 
-      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
-
-      String fullNamePrefix = valueTable.getDatasource().getName() + "." + valueTable.getName();
-      for(Variable variable : valueTable.getVariables()) {
-        bulkRequest = indexVariable(bulkRequest, fullNamePrefix, variable);
-      }
-
-      sendAndCheck(bulkRequest);
-      index.updateTimestamps();
     }
 
-    private BulkRequestBuilder indexVariable(BulkRequestBuilder bulkRequest, String fullNamePrefix, Variable variable) {
-      String fullName = fullNamePrefix + ":" + variable.getName();
-      try {
-        XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
-        xcb.field("datasource", valueTable.getDatasource().getName());
-        xcb.field("table", valueTable.getName());
-        xcb.field("fullName", fullName);
-        indexVariableParameters(variable, xcb);
-
-        if(variable.hasAttributes()) {
-          indexVariableAttributes(variable, xcb);
-        }
-
-        if(variable.hasCategories()) {
-          indexVariableCategories(variable, xcb);
-        }
-
-        bulkRequest.add(
-            esProvider.getClient().prepareIndex(getName(), index.getIndexName(), fullName).setSource(xcb.endObject()));
-        if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
-          return sendAndCheck(bulkRequest);
-        }
-      } catch(IOException e) {
-        throw new RuntimeException(e);
-      }
-      return bulkRequest;
-    }
-
-    private void indexVariableParameters(Variable variable, XContentBuilder xcb) throws IOException {
-      xcb.field("name", variable.getName());
-      xcb.field("entityType", variable.getEntityType());
-      xcb.field("valueType", variable.getValueType().getName());
-      xcb.field("occurrenceGroup", variable.getOccurrenceGroup());
-      xcb.field("repeatable", variable.isRepeatable());
-      xcb.field("mimeType", variable.getMimeType());
-      xcb.field("unit", variable.getUnit());
-      xcb.field("referencedEntityType", variable.getReferencedEntityType());
-    }
-
-    private void indexVariableAttributes(AttributeAware variable, XContentBuilder xcb) throws IOException {
-      for(Attribute attribute : variable.getAttributes()) {
-        if(!attribute.getValue().isNull()) {
-          xcb.field(AttributeMapping.getFieldName(attribute), attribute.getValue());
-        }
-      }
-    }
-
-    private void indexVariableCategories(Variable variable, XContentBuilder xcb) throws IOException {
-      List<String> names = Lists.newArrayList();
-      Map<String, List<Object>> attributeFields = Maps.newHashMap();
-      for(Category category : variable.getCategories()) {
-        names.add(category.getName());
-        if(category.hasAttributes()) {
-          for(Attribute attribute : category.getAttributes()) {
-            String field = "category-" + AttributeMapping.getFieldName(attribute);
-            if(!attributeFields.containsKey(field)) {
-              attributeFields.put(field, new ArrayList<Object>());
-            }
-            attributeFields.get(field).add(attribute.getValue().getValue());
-          }
-        }
-      }
-      xcb.field("category", names);
-      for(String field : attributeFields.keySet()) {
-        xcb.field(field, attributeFields.get(field));
-      }
-    }
   }
 
   private class EsValueTableSummariesIndex extends EsValueTableIndex implements ValueTableSummariesIndex {

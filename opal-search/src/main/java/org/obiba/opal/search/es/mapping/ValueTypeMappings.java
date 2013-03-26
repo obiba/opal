@@ -12,6 +12,7 @@ package org.obiba.opal.search.es.mapping;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -32,47 +33,51 @@ public class ValueTypeMappings {
   private final Map<? extends ValueType, ValueTypeMapping> mapping;
 
   public ValueTypeMappings() {
-    mapping = ImmutableMap.<ValueType, ValueTypeMapping>builder()//
-        .put(TextType.get(), forType("string"))//
-        .put(IntegerType.get(), forType("long"))//
-        .put(DecimalType.get(), forType("double"))//
-        .put(BooleanType.get(), forType("boolean"))//
-        .put(DateType.get(), forTypeWithFormat("date", "date"))//
-        .put(DateTimeType.get(), forTypeWithFormat("date", "date_time"))//
-        .put(LocaleType.get(), forType("string"))//
+    mapping = ImmutableMap.<ValueType, ValueTypeMapping>builder() //
+        .put(TextType.get(), forType("string")) //
+        .put(IntegerType.get(), forType("long")) //
+        .put(DecimalType.get(), forType("double")) //
+        .put(BooleanType.get(), forType("boolean")) //
+        .put(DateType.get(), forTypeWithFormat("date", "date")) //
+        .put(DateTimeType.get(), forTypeWithFormat("date", "date_time")) //
+        .put(LocaleType.get(), forType("string")) //
         .put(BinaryType.get(), forType("binary")).build();
   }
 
+  @Nonnull
   public ValueTypeMapping forType(ValueType type) {
     return mapping.get(type);
   }
 
+  @Nonnull
   private static ValueTypeMapping forType(String esType) {
     return new SimpleValueTypeMapping(esType);
   }
 
+  @Nonnull
   private static ValueTypeMapping forTypeWithFormat(String esType, String format) {
     return new SimpleValueTypeMapping(esType, format);
   }
 
   private static class SimpleValueTypeMapping implements ValueTypeMapping {
 
+    @Nonnull
     private final String esType;
 
     @Nullable
     private final String format;
 
-    private SimpleValueTypeMapping(String esType) {
+    private SimpleValueTypeMapping(@Nonnull String esType) {
       this(esType, null);
     }
 
-    private SimpleValueTypeMapping(String esType, @Nullable String format) {
+    private SimpleValueTypeMapping(@Nonnull String esType, @Nullable String format) {
       this.esType = esType;
       this.format = format;
     }
 
     @Override
-    public XContentBuilder map(XContentBuilder builder) {
+    public XContentBuilder map(@Nonnull XContentBuilder builder) {
       try {
         builder.field("type", esType);
         if(format != null) {

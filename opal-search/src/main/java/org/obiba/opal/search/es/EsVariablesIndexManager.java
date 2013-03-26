@@ -104,17 +104,16 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
-      String fullNamePrefix = valueTable.getDatasource().getName() + "." + valueTable.getName();
       for(Variable variable : valueTable.getVariables()) {
-        bulkRequest = indexVariable(bulkRequest, fullNamePrefix, variable);
+        bulkRequest = indexVariable(variable, bulkRequest);
       }
 
       sendAndCheck(bulkRequest);
       index.updateTimestamps();
     }
 
-    private BulkRequestBuilder indexVariable(BulkRequestBuilder bulkRequest, String fullNamePrefix, Variable variable) {
-      String fullName = fullNamePrefix + ":" + variable.getName();
+    private BulkRequestBuilder indexVariable(Variable variable, BulkRequestBuilder bulkRequest) {
+      String fullName = valueTable.getDatasource().getName() + "." + valueTable.getName() + ":" + variable.getName();
       try {
         XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
         xcb.field("datasource", valueTable.getDatasource().getName());

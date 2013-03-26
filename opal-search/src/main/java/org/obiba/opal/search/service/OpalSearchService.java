@@ -61,7 +61,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
               .put("discovery.zen.ping.multicast.enabled", false) //
               .loadFromSource(esConfig.getEsSettings())) //
           .clusterName(esConfig.getClusterName()) //
-          .client(esConfig.isDataNode() == false).node();
+          .client(!esConfig.isDataNode()).node();
       client = esNode.client();
     }
   }

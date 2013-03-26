@@ -108,11 +108,11 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           .execute().actionGet();
 
       ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).ignoreReadErrors().from(valueTable)
-          .variables(index.getVariables()).to(new ValuesReader()).build().read();
+          .variables(index.getVariables()).to(new ValuesReaderCallback()).build().read();
 
     }
 
-    private class ValuesReader implements ConcurrentReaderCallback {
+    private class ValuesReaderCallback implements ConcurrentReaderCallback {
 
       private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 

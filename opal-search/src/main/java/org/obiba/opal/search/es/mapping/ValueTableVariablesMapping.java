@@ -21,8 +21,6 @@ import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.TextType;
 import org.obiba.runtime.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ValueTableVariablesMapping {
 
@@ -30,6 +28,7 @@ public class ValueTableVariablesMapping {
 
   private final AttributeMapping attributeMapping = new AttributeMapping();
 
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   public XContentBuilder createMapping(Version opalVersion, String name, ValueTable valueTable) {
     try {
       XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(name);
@@ -59,12 +58,13 @@ public class ValueTableVariablesMapping {
           }
         }
       }
-      mapping.endObject();// properties
+      mapping.endObject(); // properties
 
-      mapping.startObject("_meta")//
-          .field("_created", DateTimeType.get().valueOf(new Date()).toString())//
-          .field("_opalversion", opalVersion.toString())//
-          .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()).endObject();
+      mapping.startObject("_meta") //
+          .field("_created", DateTimeType.get().valueOf(new Date()).toString()) //
+          .field("_opalversion", opalVersion.toString()) //
+          .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()) //
+          .endObject();
 
       mapping.endObject() // type
           .endObject(); // mapping
