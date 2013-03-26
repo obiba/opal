@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -26,7 +27,18 @@
       <g:Button ui:field="refreshButton" styleName="btn iconb i-sync">
         <ui:msg description="Refresh label">Refresh</ui:msg>
       </g:Button>
-      <o:HelpImage page="Working+with+Datasources"></o:HelpImage>
+      <g:FlowPanel addStyleNames="right-aligned small-search-box one-third-width">
+        <!--<b:Controls>-->
+        <!--<b:InputAddOn prependIcon="SEARCH">-->
+        <b:TextBox ui:field="search"></b:TextBox>
+        <!--</b:InputAddOn>-->
+        <!--</b:Controls>-->
+
+        <o:HelpImage page="Working+with+Datasources" addStyleNames="small-indent"></o:HelpImage>
+
+
+      </g:FlowPanel>
+
     </g:FlowPanel>
     <g:SplitLayoutPanel>
       <g:center>

@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultSuggestBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -170,8 +169,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   TextBox filter;
 
-  @UiField
-  DefaultSuggestBox variableNameSuggestBox;
+//  @UiField
+//  DefaultSuggestBox variableNameSuggestBox;
 
   @UiField
   Panel permissions;
@@ -282,8 +281,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
-    variableNameSuggestBox.getSuggestOracle().clear();
-    variableNameSuggestBox.setText("");
+//    variableNameSuggestBox.getSuggestOracle().clear();
+//    variableNameSuggestBox.setText("");
     table.setEmptyTableWidget(table.getLoadingIndicator());
 
   }
@@ -483,12 +482,13 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void addVariableSuggestion(String suggestion) {
-    variableNameSuggestBox.getSuggestOracle().add(suggestion);
+//    variableNameSuggestBox.getSuggestOracle().add(suggestion);
   }
 
   @Override
   public HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler) {
-    return variableNameSuggestBox.addSelectionHandler(handler);
+//    return variableNameSuggestBox.addSelectionHandler(handler);
+    return null;
   }
 
   @Override
@@ -498,7 +498,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void clearVariableSuggestion() {
-    variableNameSuggestBox.setText("");
+//    variableNameSuggestBox.setText("");
   }
 
   @Override

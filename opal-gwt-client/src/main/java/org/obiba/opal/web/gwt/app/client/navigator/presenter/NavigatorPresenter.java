@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
+import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
@@ -25,6 +28,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.Presenter;
@@ -53,6 +57,8 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
     HasAuthorization getExportDataAuthorizer();
 
     HandlerRegistration refreshClickHandler(ClickHandler handler);
+
+    HasText getSearch();
   }
 
   @ContentSlot
@@ -78,7 +84,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
   protected void onBind() {
     super.onBind();
 
-    super.registerHandler(getView().addCreateDatasourceClickHandler(new ClickHandler() {
+    registerHandler(getView().addCreateDatasourceClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -87,7 +93,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
     }));
 
-    super.registerHandler(getView().addImportDataClickHandler(new ClickHandler() {
+    registerHandler(getView().addImportDataClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -95,7 +101,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
       }
     }));
 
-    super.registerHandler(getView().addExportDataClickHandler(new ClickHandler() {
+    registerHandler(getView().addExportDataClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -103,7 +109,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
       }
     }));
 
-    super.registerHandler(getView().refreshClickHandler(new ClickHandler() {
+    registerHandler(getView().refreshClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
@@ -111,6 +117,36 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
       }
     }));
+
+    // Update search box on event
+    registerHandler(getEventBus()
+        .addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+          @Override
+          public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+            getView().getSearch().setText("datasource:" + event.getSelection().getName());
+          }
+        }));
+
+    registerHandler(
+        getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
+          @Override
+          public void onTableSelectionChanged(TableSelectionChangeEvent event) {
+            getView().getSearch().setText( //
+                "datasource:" + event.getSelection().getDatasourceName() +//
+                    " table:" + event.getSelection().getName());
+          }
+        }));
+
+    registerHandler(
+        getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+          @Override
+          public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+            getView().getSearch().setText(//
+                "datasource:" + event.getTable().getDatasourceName() +//
+                    " table:" + event.getTable().getName() +
+                    " variable:" + event.getSelection().getName());
+          }
+        }));
   }
 
   @Override

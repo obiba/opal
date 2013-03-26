@@ -14,8 +14,8 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left">
-      <o:DefaultSuggestBox ui:field="variableNameSuggestBox" defaultSuggestionsEnabled="false"
-          addStyleNames="right-aligned ui-corner-all"/>
+      <!--<o:DefaultSuggestBox ui:field="variableNameSuggestBox" defaultSuggestionsEnabled="false"-->
+      <!--addStyleNames="right-aligned ui-corner-all"/>-->
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="indexStatus" addStyleNames="index-status" visible="false">
