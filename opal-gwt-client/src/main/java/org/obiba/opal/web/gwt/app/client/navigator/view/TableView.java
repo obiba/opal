@@ -196,8 +196,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
     addTableColumns();
     initializeAnchorTexts();
-    addHandlers();
-
   }
 
   @Override
@@ -719,10 +717,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     }
   }
 
-  private void addHandlers() {
-//    filter.addKeyPressHandler(new EnterKeyPressHandler());
-  }
-
   @Override
   public HandlerRegistration addFilterVariableHandler(KeyUpHandler handler) {
     return filter.addKeyUpHandler(handler);
@@ -732,19 +726,5 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   public HasText getFilter() {
     return filter;
   }
-//  private final class EnterKeyPressHandler implements KeyPressHandler {
-//    @Override
-//    public void onKeyPress(KeyPressEvent event) {
-//      if(event.getNativeEvent().getCtrlKey() || event.getNativeEvent().getAltKey()) {
-//        return;
-//      }
-//
-//      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-//        GWT.log("SUBMIT FILTER");
-//        if(actionHandler != null) {
-//          actionHandler.doAction(1, "");
-//        }
-//      }
-//    }
-//  }
+
 }

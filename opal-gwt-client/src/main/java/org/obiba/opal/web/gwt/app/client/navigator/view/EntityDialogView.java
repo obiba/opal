@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -26,10 +27,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -46,11 +48,9 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
@@ -93,12 +93,6 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   TextBox filter;
 
   @UiField
-  Image refreshPending;
-
-  @UiField
-  Button refreshButton;
-
-  @UiField
   Button closeButton;
 
   @UiField
@@ -117,8 +111,6 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   private EntityDialogPresenter.ValueViewHandler valueViewHandler;
 
-  private String lastFilter = "";
-
   @Inject
   public EntityDialogView(EventBus eventBus) {
     super(eventBus);
@@ -132,19 +124,16 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   }
 
   private void initializeDisplayOptions() {
-    refreshButton.addClickHandler(new ClickHandler() {
-
+    filter.setPlaceholder(translations.filterVariables());
+    filter.addKeyUpHandler(new KeyUpHandler() {
       @Override
-      public void onClick(ClickEvent event) {
-        if(!lastFilter.equals(filter.getText())) {
+      public void onKeyUp(KeyUpEvent event) {
+        if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getText().isEmpty()) {
           // variables list has changed so update all
-          lastFilter = filter.getText();
-          setRefreshing(true);
           variablesFilterHandler.filterVariables(filter.getText());
         }
       }
     });
-
   }
 
   @Override
@@ -212,13 +201,11 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
-    setRefreshing(false);
   }
 
   @Override
   public void clearFilter() {
     filter.setText("");
-    lastFilter = "";
   }
 
   private void clear() {
@@ -262,11 +249,6 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
     table.setPageSize(PAGE_SIZE);
     table.setEmptyTableWidget(noTables);
     pager.setDisplay(table);
-  }
-
-  private void setRefreshing(boolean refresh) {
-    refreshPending.setVisible(refresh);
-    refreshButton.setEnabled(!refresh);
   }
 
   /**
