@@ -37,7 +37,11 @@
               <g:Label addStyleNames="key">
                 <ui:msg description="Filter Variables label">Variables filter</ui:msg>
               </g:Label>
-              <g:TextBox ui:field="filter"></g:TextBox>
+              <b:Controls>
+                <b:InputAddOn prependIcon="FILTER">
+                  <b:TextBox ui:field="filter"></b:TextBox>
+                </b:InputAddOn>
+              </b:Controls>
               <g:HorizontalPanel>
                 <g:Label styleName="help-block">
                   <ui:msg description="Variable name filter label">Display the variables which name matches the provided
@@ -595,13 +599,13 @@
             </g:FlowPanel>
           </g:customCell>
         </g:row>
-        <g:row>
-          <g:customCell>
-            <g:Button styleName="btn small-bottom-margin btn-info iconb i-sync" ui:field="refreshButton">
-              <ui:msg description="Refresh label">Refresh</ui:msg>
-            </g:Button>
-          </g:customCell>
-        </g:row>
+        <!--<g:row>-->
+        <!--<g:customCell>-->
+        <!--<g:Button styleName="btn small-bottom-margin btn-info iconb i-sync" ui:field="refreshButton">-->
+        <!--<ui:msg description="Refresh label">Refresh</ui:msg>-->
+        <!--</g:Button>-->
+        <!--</g:customCell>-->
+        <!--</g:row>-->
       </g:Grid>
 
     </g:DisclosurePanel>

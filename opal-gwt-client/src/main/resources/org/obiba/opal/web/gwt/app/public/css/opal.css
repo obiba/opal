@@ -270,6 +270,10 @@ td.link {
   width: 50%;
 }
 
+.one-third-width {
+  width: 33%;
+}
+
 .block {
   display: block;
 }
@@ -2335,4 +2339,23 @@ a.icon:hover {
   border-radius: 0px;
   margin-bottom: 0px;
   text-align: center;
+}
+
+/*.small-search-box {*/
+/*margin-right: 3em;*/
+/*}*/
+
+.small-search-box  input,
+.small-search-box .controls,
+.small-search-box .add-on,
+.small-search-box .input-prepend {
+  height: 1.3em;
+  font-size: 0.9em;
+  /*line-height: 0.8em;*/
+  width: 90%;
+}
+
+.first-column-checkbox tr td:first-child, .first-column-checkbox tr th:first-child {
+  padding-left: 3px;
+  padding-right: 3px;
 }

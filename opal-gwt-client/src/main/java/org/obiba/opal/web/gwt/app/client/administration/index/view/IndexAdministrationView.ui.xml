@@ -81,8 +81,12 @@
           </b:Button>
         </g:FlowPanel>
         <b:DropdownButton ui:field="actionsDropdown" text="Actions" size="MINI" addStyleNames="small-indent">
-          <b:NavLink><ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg></b:NavLink>
-          <b:NavLink><ui:msg description="Index Action Clear">Clear</ui:msg></b:NavLink>
+          <b:NavLink>
+            <ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg>
+          </b:NavLink>
+          <b:NavLink>
+            <ui:msg description="Index Action Clear">Clear</ui:msg>
+          </b:NavLink>
         </b:DropdownButton>
       </g:HorizontalPanel>
       <g:VerticalPanel width="100%" addStyleNames="content">
@@ -105,7 +109,7 @@
             </g:row>
           </g:Grid>
         </b:Alert>
-        <o:Table width="100%" ui:field="indexTable" addStyleNames="gwt-CellTable"/>
+        <o:Table width="100%" ui:field="indexTable" addStyleNames="gwt-CellTable first-column-checkbox"/>
       </g:VerticalPanel>
     </g:FlowPanel>
 
