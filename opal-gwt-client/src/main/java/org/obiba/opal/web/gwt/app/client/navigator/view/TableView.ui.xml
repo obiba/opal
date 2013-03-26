@@ -14,8 +14,8 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left">
-      <o:DefaultSuggestBox ui:field="variableNameSuggestBox" defaultSuggestionsEnabled="false"
-          addStyleNames="right-aligned ui-corner-all"/>
+      <!--<o:DefaultSuggestBox ui:field="variableNameSuggestBox" defaultSuggestionsEnabled="false"-->
+      <!--addStyleNames="right-aligned ui-corner-all"/>-->
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="indexStatus" addStyleNames="index-status" visible="false">
@@ -79,7 +79,6 @@
       </g:FlowPanel>
     </o:PropertiesTable>
 
-
     <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-dual-indent top-margin">
       <g:Anchor>
         <ui:msg description="Variables label">Variables</ui:msg>
@@ -88,6 +87,13 @@
         <g:InlineLabel ui:field="noVariables">
           <ui:msg description="No Variables label">No Variables</ui:msg>
         </g:InlineLabel>
+
+        <b:Controls addStyleNames="left-aligned">
+          <b:InputAddOn prependIcon="FILTER">
+            <b:TextBox ui:field="filter"></b:TextBox>
+          </b:InputAddOn>
+        </b:Controls>
+
         <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
             addStyleNames="block clear select-all-variables">
@@ -115,7 +121,7 @@
             </g:row>
           </g:Grid>
         </b:Alert>
-        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned"/>
+        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned first-column-checkbox"/>
       </g:FlowPanel>
 
       <g:Anchor>

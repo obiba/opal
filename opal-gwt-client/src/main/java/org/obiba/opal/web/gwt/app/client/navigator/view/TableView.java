@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultSuggestBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -34,6 +33,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -42,6 +42,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -56,6 +57,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -140,9 +142,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   HorizontalTabLayout tabs;
 
-//  @UiField
-//  FlowPanel addVariablesToView;
-
   @UiField
   Anchor copyVariables;
 
@@ -168,7 +167,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   SimplePager pager;
 
   @UiField
-  DefaultSuggestBox variableNameSuggestBox;
+  TextBox filter;
+
+//  @UiField
+//  DefaultSuggestBox variableNameSuggestBox;
 
   @UiField
   Panel permissions;
@@ -255,6 +257,9 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
+
+    filter.setText("");
+    filter.setPlaceholder(translations.filterVariables());
   }
 
   @SuppressWarnings({ "unchecked" })
@@ -266,6 +271,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
         selectAllItemsAlert.setVisible(object > 0);
       }
     });
+//    checkColumn.setCellStyleNames("checkbox-column");
 
     table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Unit.PX);
@@ -274,9 +280,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
-    variableNameSuggestBox.getSuggestOracle().clear();
-    variableNameSuggestBox.setText("");
+//    variableNameSuggestBox.getSuggestOracle().clear();
+//    variableNameSuggestBox.setText("");
     table.setEmptyTableWidget(table.getLoadingIndicator());
+
   }
 
   @Override
@@ -311,6 +318,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   public void clear() {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
     checkColumn.getSelectionModel().clear();
+    filter.setText("");
   }
 
   @Override
@@ -473,12 +481,13 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void addVariableSuggestion(String suggestion) {
-    variableNameSuggestBox.getSuggestOracle().add(suggestion);
+//    variableNameSuggestBox.getSuggestOracle().add(suggestion);
   }
 
   @Override
   public HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler) {
-    return variableNameSuggestBox.addSelectionHandler(handler);
+//    return variableNameSuggestBox.addSelectionHandler(handler);
+    return null;
   }
 
   @Override
@@ -488,7 +497,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void clearVariableSuggestion() {
-    variableNameSuggestBox.setText("");
+//    variableNameSuggestBox.setText("");
   }
 
   @Override
@@ -708,4 +717,15 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       return translations.variableLabel().toLowerCase();
     }
   }
+
+  @Override
+  public HandlerRegistration addFilterVariableHandler(KeyUpHandler handler) {
+    return filter.addKeyUpHandler(handler);
+  }
+
+  @Override
+  public HasText getFilter() {
+    return filter;
+  }
+
 }
