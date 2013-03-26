@@ -100,12 +100,12 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   private final Widget widget;
 
-  private Translations translations = GWT.create(Translations.class);
+  private final Translations translations = GWT.create(Translations.class);
 
-  private ListDataProvider<EntityDialogPresenter.VariableValueRow> dataProvider
+  private final ListDataProvider<EntityDialogPresenter.VariableValueRow> dataProvider
       = new ListDataProvider<EntityDialogPresenter.VariableValueRow>();
 
-  private ValueSelectionHandlerImpl valueSelectionHandler;
+  private final ValueSelectionHandlerImpl valueSelectionHandler;
 
   private EntityDialogPresenter.VariablesFilterHandler variablesFilterHandler;
 
@@ -274,7 +274,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   /**
    * Specialized column class using ClickableValueCell
    */
-  private class VariableValueRowClickableColumn
+  private static class VariableValueRowClickableColumn
       extends Column<EntityDialogPresenter.VariableValueRow, EntityDialogPresenter.VariableValueRow> {
 
     private VariableValueRowClickableColumn() {
@@ -291,7 +291,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   /**
    * Specialized class to render each cell depending on the variable type (text, repeatable, binary)
    */
-  public class ClickableValueCell extends AbstractSafeHtmlCell<EntityDialogPresenter.VariableValueRow> {
+  public static class ClickableValueCell extends AbstractSafeHtmlCell<EntityDialogPresenter.VariableValueRow> {
 
     public ClickableValueCell() {
       this(new AbstractSafeHtmlRenderer<EntityDialogPresenter.VariableValueRow>() {
