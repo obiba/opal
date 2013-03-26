@@ -39,8 +39,6 @@ public class VariableSummariesMapping {
           .startObject("frequency-value").field("type", "string").endObject() //
           .startObject("frequency-freq").field("type", "long").endObject() //
           .startObject("frequency-pct").field("type", "double").endObject() //
-          .startObject("frequency-cummFreq").field("type", "long").endObject() //
-          .startObject("frequency-cummPct").field("type", "double").endObject() //
           .endObject();
 
       return builder;

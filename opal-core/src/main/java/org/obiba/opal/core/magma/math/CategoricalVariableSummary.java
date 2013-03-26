@@ -86,6 +86,7 @@ public class CategoricalVariableSummary {
     }
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void compute() {
     long max = 0;
     Iterator<String> concat = distinct //

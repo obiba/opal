@@ -96,12 +96,6 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
     @Override
     protected void index() {
-
-      XContentBuilder b = new ValueTableVariablesMapping()
-          .createMapping(runtimeVersion, index.getIndexName(), valueTable);
-      esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName()).setSource(b)
-          .execute().actionGet();
-
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
       for(Variable variable : valueTable.getVariables()) {
@@ -110,6 +104,11 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
       sendAndCheck(bulkRequest);
       index.updateTimestamps();
+    }
+
+    @Override
+    protected XContentBuilder getMapping() {
+      return new ValueTableVariablesMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
     }
 
     private BulkRequestBuilder indexVariable(Variable variable, BulkRequestBuilder bulkRequest) {

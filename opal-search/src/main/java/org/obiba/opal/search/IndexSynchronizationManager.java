@@ -53,7 +53,7 @@ public class IndexSynchronizationManager {
 
   private IndexSynchronization currentTask;
 
-  private final BlockingQueue<IndexSynchronization> indexSyncQueue =  new LinkedBlockingQueue<IndexSynchronization>();
+  private final BlockingQueue<IndexSynchronization> indexSyncQueue = new LinkedBlockingQueue<IndexSynchronization>();
 
   public IndexSynchronizationManager() {
   }
@@ -163,7 +163,8 @@ public class IndexSynchronizationManager {
 
       boolean alreadyQueued = false;
       for(IndexSynchronization s : indexSyncQueue) {
-        if(s.getValueTableIndex().getIndexName().equals(index.getIndexName()) && s.getIndexManager().getName().equals(indexManager.getName())) {
+        if(s.getValueTableIndex().getIndexName().equals(index.getIndexName()) &&
+            s.getIndexManager().getName().equals(indexManager.getName())) {
           alreadyQueued = true;
           break;
         }
@@ -192,7 +193,8 @@ public class IndexSynchronizationManager {
     private void consume(IndexSynchronization sync) {
       currentTask = sync;
       try {
-        log.trace("Prepare indexing {} in {}", sync.getValueTableIndex().getIndexName(), sync.getIndexManager().getName());
+        log.trace("Prepare indexing {} in {}", sync.getValueTableIndex().getIndexName(),
+            sync.getIndexManager().getName());
         // check if still indexable: indexation config could have changed
         if(sync.getIndexManager().isReady()) {
           getSubject().execute(sync);

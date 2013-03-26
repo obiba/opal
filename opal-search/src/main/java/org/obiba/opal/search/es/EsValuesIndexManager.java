@@ -55,15 +55,21 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   @Nonnull
   private final ThreadFactory threadFactory;
 
+  @Nonnull
+  private final EsSummariesIndexManager esSummariesIndexManager;
+
   private final Set<EsValueTableValuesIndex> indices = Sets.newHashSet();
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public EsValuesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
-      IndexManagerConfigurationService indexConfig, @Nonnull ThreadFactory threadFactory, Version version) {
+      IndexManagerConfigurationService indexConfig, @Nonnull ThreadFactory threadFactory, Version version,
+      @Nonnull EsSummariesIndexManager esSummariesIndexManager) {
     super(esProvider, esConfig, indexConfig, version);
     Preconditions.checkNotNull(threadFactory);
+    Preconditions.checkNotNull(esSummariesIndexManager);
     this.threadFactory = threadFactory;
+    this.esSummariesIndexManager = esSummariesIndexManager;
   }
 
   @Nonnull
@@ -102,15 +108,13 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     @Override
     protected void index() {
-
-      XContentBuilder b = new ValueTableMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
-
-      esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName()).setSource(b)
-          .execute().actionGet();
-
       ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).ignoreReadErrors().from(valueTable)
           .variables(index.getVariables()).to(new ValuesReaderCallback()).build().read();
+    }
 
+    @Override
+    protected XContentBuilder getMapping() {
+      return new ValueTableMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
     }
 
     private class ValuesReaderCallback implements ConcurrentReaderCallback {
@@ -167,6 +171,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
+        esSummariesIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
       }
 
       @Override

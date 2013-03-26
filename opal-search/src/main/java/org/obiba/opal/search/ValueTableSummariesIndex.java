@@ -9,6 +9,11 @@
  */
 package org.obiba.opal.search;
 
+import javax.annotation.Nonnull;
+
+import org.obiba.magma.Value;
+import org.obiba.magma.Variable;
+
 /**
  * An index of a {@code ValueTable} variables.
  */
@@ -22,4 +27,5 @@ public interface ValueTableSummariesIndex extends ValueTableIndex {
    */
   String getFieldName(String variable);
 
+  void indexVariable(@Nonnull Variable variable, @Nonnull Value value);
 }

@@ -25,6 +25,7 @@ import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.indices.TypeMissingException;
 import org.obiba.magma.Timestamps;
@@ -145,7 +146,13 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       log.debug("Updating ValueTable index {}", index.getValueTableReference());
       index.delete();
       createIndex();
+      createMapping();
       index();
+    }
+
+    private void createMapping() {
+      esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName())
+          .setSource(getMapping()).execute().actionGet();
     }
 
     protected BulkRequestBuilder sendAndCheck(BulkRequestBuilder bulkRequest) {
@@ -161,6 +168,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     }
 
     protected abstract void index();
+
+    protected abstract XContentBuilder getMapping();
 
     @Override
     public ValueTableIndex getValueTableIndex() {
