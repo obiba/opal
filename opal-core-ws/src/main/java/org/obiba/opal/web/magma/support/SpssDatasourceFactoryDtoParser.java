@@ -39,6 +39,10 @@ public class SpssDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
       factory.setEntityType(spssDto.getEntityType());
     }
 
+    if (spssDto.hasLocale()) {
+      factory.setLocale(spssDto.getLocale());
+    }
+
     return factory;
   }
 

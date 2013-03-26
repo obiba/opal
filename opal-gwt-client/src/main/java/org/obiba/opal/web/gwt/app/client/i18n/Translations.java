@@ -397,6 +397,7 @@ public interface Translations extends Constants {
       "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",//
       "RPackageInstalledButNotFound",
       "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
+      "InvalidLocaleName", "Invalid locale name '{0}'. Please choose a valid locale name from the list.",//
       "CopyVariableSelectAtLeastOne", "Select at least one variable to add.",//
       "CopyVariableCurrentView", "The view can not be the current view. Please select another destination view.",//
       "CopyVariableNameRequired", "Variable name cannot be empty.",//
