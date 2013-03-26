@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionUpdateEvent;
@@ -140,7 +141,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
     getView().setFileSelectionValidator(new FileSelectionValidator());
     getView().setImportableValidator(new ImportableValidator());
-
+    getView().setLocaleValidator(new LocaleValidator());
   }
 
   @Override
@@ -209,6 +210,19 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     }
   }
 
+  private final class LocaleValidator implements ValidationHandler {
+    @Override
+    public boolean validate() {
+      String selectedLocale = getView().getLocale();
+      if (!LanguageLocale.isValid(selectedLocale)) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error("InvalidLocaleName").args(selectedLocale).build());
+        return false;
+      }
+
+      return true;
+    }
+  }
+
   public interface Display extends WizardView, CharacterSetDisplay {
 
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
@@ -216,6 +230,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     void setFileSelectionValidator(ValidationHandler handler);
 
     void setImportableValidator(ValidationHandler handler);
+
+    void setLocaleValidator(ValidationHandler handler);
 
     void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
 
@@ -234,6 +250,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     String getSelectedDatasource();
 
     HasText getSpssEntityType();
+
+    String getLocale();
 
     void setSelectedDatasource(String dsName);
 
@@ -323,6 +341,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       spssDto.setFile(tmpFilePath);
       spssDto.setCharacterSet(getView().getCharsetText().getText());
       spssDto.setEntityType(getView().getSpssEntityType().getText());
+      spssDto.setLocale(getView().getLocale());
 
       DatasourceFactoryDto dto = DatasourceFactoryDto.create();
       dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, spssDto);
