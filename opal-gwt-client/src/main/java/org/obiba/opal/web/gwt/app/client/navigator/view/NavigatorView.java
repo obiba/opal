@@ -34,7 +34,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @UiTemplate("NavigatorView.ui.xml")
   interface NavigatorViewUiBinder extends UiBinder<Widget, NavigatorView> {}
 
-  private static NavigatorViewUiBinder uiBinder = GWT.create(NavigatorViewUiBinder.class);
+  private static final NavigatorViewUiBinder uiBinder = GWT.create(NavigatorViewUiBinder.class);
 
   @UiField
   ScrollPanel navigatorDisplayPanel;
@@ -84,8 +84,6 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
       navigatorDisplayPanel.remove(content);
     }
   }
-
-  ;
 
   @Override
   public void setInSlot(Object slot, Widget content) {
