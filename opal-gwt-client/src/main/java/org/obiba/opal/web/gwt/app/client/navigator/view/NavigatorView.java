@@ -59,6 +59,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
 
   public NavigatorView() {
     initWidget(uiBinder.createAndBindUi(this));
+    search.setWidth("250px");
   }
 
   @Override

@@ -2341,9 +2341,9 @@ a.icon:hover {
   text-align: center;
 }
 
-.small-search-box {
-  margin-right: 3em;
-}
+/*.small-search-box {*/
+/*margin-right: 3em;*/
+/*}*/
 
 .small-search-box  input,
 .small-search-box .controls,
