@@ -198,17 +198,32 @@ public class CategoricalVariableSummary {
 
     private final CategoricalVariableSummary summary;
 
+    private boolean addedTable;
+
+    private boolean addedValue;
+
     public Builder(@Nonnull Variable variable) {
       summary = new CategoricalVariableSummary(variable);
     }
 
     public Builder addValue(@Nonnull Value value) {
+      if(addedTable) {
+        throw new RuntimeException("Cannot add value for variable " + summary.getVariable().getName() +
+            " because values where previously added from the whole table with addTable().");
+      }
       summary.add(value);
+      addedValue = true;
       return this;
     }
 
     public Builder addTable(@Nonnull ValueTable table) {
+      if(addedValue) {
+        throw new RuntimeException("Cannot add table for variable " + summary.getVariable().getName() +
+            " because values where previously added with addValue().");
+      }
       summary.add(table);
+      addedTable = true;
+
       return this;
     }
 

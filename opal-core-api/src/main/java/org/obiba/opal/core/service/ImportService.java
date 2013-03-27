@@ -42,7 +42,7 @@ public interface ImportService {
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  void importData(String unitName, @Nonnull FileObject sourceFile, @Nonnull String destinationDatasourceName,
+  void importData(@Nullable String unitName, @Nonnull FileObject sourceFile, @Nonnull String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException,
       InterruptedException;

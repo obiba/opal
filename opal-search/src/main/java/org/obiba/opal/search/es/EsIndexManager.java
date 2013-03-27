@@ -12,11 +12,12 @@ package org.obiba.opal.search.es;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.IndicesAdminClient;
@@ -43,6 +44,8 @@ import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Maps;
+
 abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   private static final Logger log = LoggerFactory.getLogger(EsIndexManager.class);
@@ -65,6 +68,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   @Nonnull
   protected final Version runtimeVersion;
 
+  private final Map<String, ValueTableIndex> indices = Maps.newHashMap();
+
   protected EsIndexManager(@Nonnull ElasticSearchProvider esProvider,
       @Nonnull ElasticSearchConfigurationService esConfig, @Nonnull IndexManagerConfigurationService indexConfig,
       @Nonnull Version version) {
@@ -79,6 +84,22 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     this.indexConfig = indexConfig;
     runtimeVersion = version;
   }
+
+  @Nonnull
+  @Override
+  public ValueTableIndex getIndex(@Nonnull ValueTable vt) {
+    Preconditions.checkNotNull(vt);
+
+    String tableFullName = tableReference(vt);
+    ValueTableIndex index = indices.get(tableFullName);
+    if(index == null) {
+      index = createIndex(vt);
+      indices.put(tableFullName, index);
+    }
+    return index;
+  }
+
+  protected abstract ValueTableIndex createIndex(@Nonnull ValueTable vt);
 
   @Override
   public boolean isReady() {
@@ -114,6 +135,11 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   public void onDelete(@Nonnull ValueTable vt) {
     // Delete index
     getIndex(vt).delete();
+  }
+
+  @Nonnull
+  protected static String tableReference(@Nonnull ValueTable vt) {
+    return vt.getDatasource().getName() + "." + vt.getName();
   }
 
   protected abstract class EsIndexer implements IndexSynchronization {
@@ -211,8 +237,12 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     @Nonnull
     private final String valueTableReference;
 
-    EsValueTableIndex(@Nonnull ValueTable vt) {
-      name = indexName(vt);
+    /**
+     * @param vt
+     * @param prefixName used to avoid same type name. (Must be unique in ES (even though in different ES indices))
+     */
+    EsValueTableIndex(@Nonnull ValueTable vt, @Nonnull String prefixName) {
+      name = prefixName + "-" + indexName(vt);
       valueTableReference = tableReference(vt);
     }
 
@@ -258,6 +288,18 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       }
     }
 
+    protected BulkRequestBuilder sendAndCheck(BulkRequestBuilder bulkRequest) {
+      if(bulkRequest.numberOfActions() > 0) {
+        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+        if(bulkResponse.hasFailures()) {
+          // process failures by iterating through each bulk response item
+          throw new RuntimeException(bulkResponse.buildFailureMessage());
+        }
+        return esProvider.getClient().prepareBulk();
+      }
+      return bulkRequest;
+    }
+
     @Override
     public void delete() {
       if(esProvider.isEnabled()) {
@@ -298,11 +340,6 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
         }
 
       };
-    }
-
-    @Nonnull
-    protected String tableReference(@Nonnull ValueTable vt) {
-      return vt.getDatasource().getName() + "." + vt.getName();
     }
 
     boolean isForTable(@Nonnull ValueTable valueTable) {

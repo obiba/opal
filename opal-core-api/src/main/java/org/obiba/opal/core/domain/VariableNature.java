@@ -1,6 +1,5 @@
 package org.obiba.opal.core.domain;
 
-import org.obiba.magma.Category;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.BooleanType;
 
@@ -32,7 +31,7 @@ public enum VariableNature {
 
   public static VariableNature getNature(Variable variable) {
     if(variable.hasCategories()) {
-      return isAllMissing(variable.getCategories()) ? CONTINUOUS : CATEGORICAL;
+      return variable.areAllCategoriesMissing() ? CONTINUOUS : CATEGORICAL;
     }
     if(variable.getValueType().isNumeric()) {
       return CONTINUOUS;
@@ -44,13 +43,6 @@ public enum VariableNature {
       return CATEGORICAL;
     }
     return UNDETERMINED;
-  }
-
-  private static boolean isAllMissing(Iterable<Category> categories) {
-    for(Category c : categories) {
-      if(!c.isMissing()) return false;
-    }
-    return true;
   }
 
 }

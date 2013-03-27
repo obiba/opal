@@ -29,8 +29,6 @@ import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
  */
 public class CategoricalSummaryStatisticsResource extends AbstractSummaryStatisticsResource {
 
-  final static String NULL_NAME = "N/A";
-
   /**
    * @param valueTable
    * @param variable

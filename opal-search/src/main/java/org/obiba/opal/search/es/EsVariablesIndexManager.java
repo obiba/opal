@@ -13,13 +13,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.common.base.Preconditions;
-import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.Attribute;
@@ -46,8 +43,6 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
 //  private static final Logger log = LoggerFactory.getLogger(EsVariablesIndexManager.class);
 
-  private final Set<EsValueTableVariablesIndex> indices = Sets.newHashSet();
-
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public EsVariablesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
@@ -58,14 +53,12 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
   @Nonnull
   @Override
   public EsValueTableVariablesIndex getIndex(@Nonnull ValueTable vt) {
-    Preconditions.checkNotNull(vt);
+    return (EsValueTableVariablesIndex) super.getIndex(vt);
+  }
 
-    for(EsValueTableVariablesIndex i : indices) {
-      if(i.isForTable(vt)) return i;
-    }
-    EsValueTableVariablesIndex i = new EsValueTableVariablesIndex(vt);
-    indices.add(i);
-    return i;
+  @Override
+  protected ValueTableIndex createIndex(@Nonnull ValueTable vt) {
+    return new EsValueTableVariablesIndex(vt);
   }
 
   @Override
@@ -183,14 +176,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
   private class EsValueTableVariablesIndex extends EsValueTableIndex implements ValueTableVariablesIndex {
 
     private EsValueTableVariablesIndex(ValueTable vt) {
-      super(vt);
-    }
-
-    @Nonnull
-    @Override
-    public String getIndexName() {
-      // type name is unique in ES (even though in different ES indices)
-      return super.getIndexName() + "-variables";
+      super(vt, "variables");
     }
 
     @Nonnull

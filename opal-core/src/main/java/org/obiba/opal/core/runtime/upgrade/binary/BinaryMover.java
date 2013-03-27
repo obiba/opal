@@ -11,6 +11,7 @@ package org.obiba.opal.core.runtime.upgrade.binary;
 
 import java.io.IOException;
 
+import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Value;
@@ -20,7 +21,6 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.opal.core.support.TimedExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

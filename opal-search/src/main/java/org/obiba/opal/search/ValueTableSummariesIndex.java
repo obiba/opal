@@ -28,4 +28,6 @@ public interface ValueTableSummariesIndex extends ValueTableIndex {
   String getFieldName(String variable);
 
   void indexVariable(@Nonnull Variable variable, @Nonnull Value value);
+
+  void computeAndIndexSummaries();
 }

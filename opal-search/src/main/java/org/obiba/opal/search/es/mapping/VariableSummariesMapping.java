@@ -33,12 +33,12 @@ public class VariableSummariesMapping {
           .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()) //
           .endObject();
 
-      builder.startObject("categorical-summary") //
-          .startObject("mode").field("type", "string").endObject() //
-          .startObject("n").field("type", "long").endObject() //
-          .startObject("frequency-value").field("type", "string").endObject() //
-          .startObject("frequency-freq").field("type", "long").endObject() //
-          .startObject("frequency-pct").field("type", "double").endObject() //
+      builder.startObject("properties") //
+          .startObject("cat-summary-mode").field("type", "string").endObject() //
+          .startObject("cat-summary-n").field("type", "long").endObject() //
+          .startObject("cat-summary-freq-value").field("type", "string").endObject() //
+          .startObject("cat-summary-freq-freq").field("type", "long").endObject() //
+          .startObject("cat-summary-freq-pct").field("type", "double").endObject() //
           .endObject();
 
       return builder;

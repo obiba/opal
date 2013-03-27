@@ -12,15 +12,13 @@ package org.obiba.opal.search.es;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.common.base.Preconditions;
-import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -34,6 +32,8 @@ import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableSummariesIndex;
 import org.obiba.opal.search.es.mapping.VariableSummariesMapping;
 import org.obiba.runtime.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,9 +43,7 @@ import com.google.common.collect.Maps;
 @Component
 public class EsSummariesIndexManager extends EsIndexManager implements SummariesIndexManager {
 
-//  private static final Logger log = LoggerFactory.getLogger(EsSummariesIndexManager.class);
-
-  private final Set<EsValueTableSummariesIndex> indices = Sets.newHashSet();
+  private static final Logger log = LoggerFactory.getLogger(EsSummariesIndexManager.class);
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
@@ -57,14 +55,12 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
   @Nonnull
   @Override
   public ValueTableSummariesIndex getIndex(@Nonnull ValueTable vt) {
-    Preconditions.checkNotNull(vt);
+    return (ValueTableSummariesIndex) super.getIndex(vt);
+  }
 
-    for(EsValueTableSummariesIndex index : indices) {
-      if(index.isForTable(vt)) return index;
-    }
-    EsValueTableSummariesIndex index = new EsValueTableSummariesIndex(vt);
-    indices.add(index);
-    return index;
+  @Override
+  protected ValueTableIndex createIndex(@Nonnull ValueTable vt) {
+    return new EsValueTableSummariesIndex(vt);
   }
 
   @Override
@@ -95,24 +91,12 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
 
     @Override
     protected void index() {
-      // do nothing as we calculate summaries on values indexation (EsValuesIndexManager)
+      // do nothing as we calculate summaries on values indexation (from EsValuesIndexManager)
     }
 
     @Override
     protected XContentBuilder getMapping() {
       return new VariableSummariesMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
-    }
-
-    @Override
-    protected BulkRequestBuilder sendAndCheck(BulkRequestBuilder bulkRequest) {
-      compute(bulkRequest);
-      return super.sendAndCheck(bulkRequest);
-    }
-
-    // TODO do we need to do this async? Will it be long?
-    private void compute(BulkRequestBuilder bulkRequest) {
-      String variablePath = valueTable.getDatasource().getName() + "." + valueTable.getName();
-      index.compute(variablePath, bulkRequest);
     }
 
   }
@@ -122,7 +106,7 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
     private final Map<String, CategoricalVariableSummary.Builder> categoricalSummaryBuilders = Maps.newHashMap();
 
     private EsValueTableSummariesIndex(@Nonnull ValueTable vt) {
-      super(vt);
+      super(vt, "stats");
     }
 
     @Override
@@ -133,6 +117,8 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
     @Override
     public void indexVariable(@Nonnull Variable variable, @Nonnull Value value) {
 
+      log.debug("Add {} to summary", variable.getName());
+
       // skip binary variable
       if(variable.getValueType().equals(BinaryType.get())) {
         throw new RuntimeException("Cannot compute summary for binary variable " + variable.getName());
@@ -140,46 +126,64 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
 
       CategoricalVariableSummary.Builder builder = categoricalSummaryBuilders.get(variable.getName());
       if(builder == null) {
-        // TODO distinct ?
         boolean distinct = TextType.get().equals(variable.getValueType()) && variable.areAllCategoriesMissing();
         builder = new CategoricalVariableSummary.Builder(variable).distinct(distinct);
+        categoricalSummaryBuilders.put(variable.getName(), builder);
       }
       builder.addValue(value);
     }
 
-    private void compute(String variablePath, BulkRequestBuilder bulkRequest) {
+    @Override
+    public void computeAndIndexSummaries() {
       try {
-        CategoricalVariableSummary summary = null;
-        List<String> values = Lists.newArrayList();
-        List<Long> freqs = Lists.newArrayList();
-        List<Double> pcts = Lists.newArrayList();
+        BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
-        for(CategoricalVariableSummary.Builder builder : categoricalSummaryBuilders.values()) {
-          summary = builder.build();
-          values.clear();
-          freqs.clear();
-          pcts.clear();
-          for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
-            values.add(frequency.getValue());
-            freqs.add(frequency.getFreq());
-            pcts.add(frequency.getPct());
-          }
+        TimedExecution timedExecution = new TimedExecution().start();
 
-          XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject() //
-              .field("mode", summary.getMode()) //
-              .field("n", summary.getN()) //
-              .field("frequency-value", values) //
-              .field("frequency-freq", freqs) //
-              .field("frequency-pct", pcts) //
-              .endObject();
-
-          String variableFullName = variablePath + ":" + summary.getVariable().getName();
-          bulkRequest.add(esProvider.getClient().prepareIndex(getName(), getIndexName(), variableFullName)
-              .setSource(contentBuilder));
+        for(CategoricalVariableSummary.Builder summaryBuilder : categoricalSummaryBuilders.values()) {
+          indexSummary(bulkRequest, summaryBuilder.build());
         }
+
+        sendAndCheck(bulkRequest);
+        updateTimestamps();
+
+        log.info("Variable summaries of table {} computed in {}", getValueTableReference(),
+            timedExecution.end().formatExecutionTime());
+
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
+    }
+
+    @Override
+    public void delete() {
+      super.delete();
+      categoricalSummaryBuilders.clear();
+    }
+
+    private void indexSummary(BulkRequestBuilder bulkRequest, CategoricalVariableSummary summary) throws IOException {
+      List<String> values = Lists.newArrayList();
+      List<Long> freqs = Lists.newArrayList();
+      List<Double> pcts = Lists.newArrayList();
+
+      for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
+        values.add(frequency.getValue());
+        freqs.add(frequency.getFreq());
+        pcts.add(frequency.getPct());
+      }
+
+      XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject() //
+          .field("cat-summary-mode", summary.getMode()) //
+          .field("cat-summary-n", summary.getN()) //
+          .field("cat-summary-freq-value", values) //
+          .field("cat-summary-freq-freq", freqs) //
+          .field("cat-summary-freq-pct", pcts) //
+          .endObject();
+
+      String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
+      bulkRequest.add(
+          esProvider.getClient().prepareIndex(getName(), getIndexName(), variableReference).setSource(contentBuilder));
+
     }
 
   }

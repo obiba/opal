@@ -99,8 +99,8 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(String unitName, @Nonnull FileObject sourceFile, @Nonnull String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
+  public void importData(@Nullable String unitName, @Nonnull FileObject sourceFile,
+      @Nonnull String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException,
       InterruptedException {
     // If unitName is the empty string, coerce it to null

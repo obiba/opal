@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nonnull;
@@ -22,7 +21,6 @@ import javax.annotation.Nullable;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.base.Preconditions;
-import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.Value;
@@ -35,6 +33,7 @@ import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
+import org.obiba.opal.search.SummariesIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
@@ -56,33 +55,29 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   private final ThreadFactory threadFactory;
 
   @Nonnull
-  private final EsSummariesIndexManager esSummariesIndexManager;
-
-  private final Set<EsValueTableValuesIndex> indices = Sets.newHashSet();
+  private final SummariesIndexManager summariesIndexManager;
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public EsValuesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, @Nonnull ThreadFactory threadFactory, Version version,
-      @Nonnull EsSummariesIndexManager esSummariesIndexManager) {
+      @Nonnull SummariesIndexManager summariesIndexManager) {
     super(esProvider, esConfig, indexConfig, version);
     Preconditions.checkNotNull(threadFactory);
-    Preconditions.checkNotNull(esSummariesIndexManager);
+    Preconditions.checkNotNull(summariesIndexManager);
     this.threadFactory = threadFactory;
-    this.esSummariesIndexManager = esSummariesIndexManager;
+    this.summariesIndexManager = summariesIndexManager;
   }
 
   @Nonnull
   @Override
   public EsValueTableValuesIndex getIndex(@Nonnull ValueTable vt) {
-    Preconditions.checkNotNull(vt);
+    return (EsValueTableValuesIndex) super.getIndex(vt);
+  }
 
-    for(EsValueTableValuesIndex i : indices) {
-      if(i.isForTable(vt)) return i;
-    }
-    EsValueTableValuesIndex i = new EsValueTableValuesIndex(vt);
-    indices.add(i);
-    return i;
+  @Override
+  protected ValueTableIndex createIndex(@Nonnull ValueTable vt) {
+    return new EsValueTableValuesIndex(vt);
   }
 
   @Nonnull
@@ -136,9 +131,9 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           return;
         }
 
-        bulkRequest.add(
-            esProvider.getClient().prepareIndex(getName(), valueTable.getEntityType(), entity.getIdentifier())
-                .setSource("{\"identifier\":\"" + entity.getIdentifier() + "\"}"));
+        String identifier = entity.getIdentifier();
+        bulkRequest.add(esProvider.getClient().prepareIndex(getName(), valueTable.getEntityType(), identifier)
+            .setSource("{\"identifier\":\"" + identifier + "\"}"));
         try {
           XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
           for(int i = 0; i < variables.length; i++) {
@@ -147,8 +142,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           builder.endObject();
 
           IndexRequestBuilder requestBuilder = esProvider.getClient()
-              .prepareIndex(getName(), index.getIndexName(), entity.getIdentifier()).setParent(entity.getIdentifier())
-              .setSource(builder);
+              .prepareIndex(getName(), index.getIndexName(), identifier).setParent(identifier).setSource(builder);
           bulkRequest.add(requestBuilder);
           done++;
           if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
@@ -171,15 +165,17 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
-        esSummariesIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
+        summariesIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
       }
 
       @Override
       public void onComplete() {
         if(stop) {
           index.delete();
+          summariesIndexManager.getIndex(getValueTable()).delete();
         } else {
           sendAndCheck(bulkRequest);
+          summariesIndexManager.getIndex(getValueTable()).computeAndIndexSummaries();
           index.updateTimestamps();
         }
       }
@@ -208,7 +204,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   private class EsValueTableValuesIndex extends EsValueTableIndex implements ValueTableValuesIndex {
 
     private EsValueTableValuesIndex(ValueTable vt) {
-      super(vt);
+      super(vt, "values");
     }
 
     @Override

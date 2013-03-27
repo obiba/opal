@@ -14,8 +14,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.obiba.core.util.TimedExecution;
 import org.obiba.opal.core.runtime.upgrade.support.UpgradeUtils;
-import org.obiba.opal.core.support.TimedExecution;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep;

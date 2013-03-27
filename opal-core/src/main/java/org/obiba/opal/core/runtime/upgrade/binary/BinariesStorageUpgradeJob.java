@@ -17,10 +17,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.runtime.BackgroundJob;
 import org.obiba.opal.core.runtime.upgrade.support.UpgradeUtils;
-import org.obiba.opal.core.support.TimedExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
