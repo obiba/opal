@@ -1,3 +1,6 @@
+import "Opal.proto";
+import "Magma.proto";
+
 package Search;
 
 option java_package = "org.obiba.opal.web.model";
@@ -72,6 +75,7 @@ message RangeTermDto {
 message QueryResultDto {
   repeated FacetResultDto facets = 1;
   required int32 total_hits = 2;
+  repeated ItemResultDto hits = 3;
 }
 
 message FacetResultDto {
@@ -100,4 +104,23 @@ message FacetResultDto {
   repeated TermFrequencyResultDto frequencies = 2;
   optional StatisticalResultDto statistics = 3;
   repeated FilterResultDto filters = 4;
+}
+
+message ItemResultDto {
+  required string identifier = 1;
+  extensions 1000 to max;
+}
+
+message ItemFieldsDto {
+  repeated Opal.EntryDto fields = 1; // key is the field name, value is the field value for the item
+  extend ItemResultDto {
+    optional ItemFieldsDto item = 1000;
+  }
+}
+
+message VariableItemDto {
+  required Magma.VariableDto variable = 1;
+  extend ItemResultDto {
+    optional VariableItemDto item = 1001;
+  }
 }
