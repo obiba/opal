@@ -21,8 +21,10 @@ import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.rest.RestChannel;
+import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.support.AbstractRestRequest;
+import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.util.Assert;
 
@@ -34,7 +36,19 @@ public class EsQueryExecutor {
     this.elasticSearchProvider = elasticSearchProvider;
   }
 
+  public JSONObject execute(ValueTableIndex valueTableIndex, JSONObject jsonBody, RestRequest.Method httpMethod) throws JSONException {
+    return executeQuery(jsonBody, new EsRestRequest(valueTableIndex, jsonBody.toString(), "_search").setHttpMethod(httpMethod));
+  }
+
   public JSONObject execute(JSONObject jsonBody) throws JSONException {
+    return executeQuery(jsonBody, new EsRestRequest(jsonBody.toString(), "_search"));
+  }
+
+  //
+  // Private members
+  //
+
+  private JSONObject executeQuery(JSONObject jsonBody, RestRequest esRestRequest) throws JSONException {
 
     Assert.notNull(jsonBody, "Query json body is null!");
 
@@ -42,7 +56,7 @@ public class EsQueryExecutor {
     final AtomicReference<byte[]> ref = new AtomicReference<byte[]>();
 
     elasticSearchProvider.getRest()
-        .dispatchRequest(new EsRestRequest(jsonBody.toString(), "_search"), new RestChannel() {
+        .dispatchRequest(esRestRequest, new RestChannel() {
 
           @Override
           public void sendResponse(RestResponse response) {
@@ -90,6 +104,8 @@ public class EsQueryExecutor {
 
     private final String esUri;
 
+    private Method httpMethod = Method.GET;
+
     private final Map<String, String> headers = ImmutableMap.of("Content-Type", "application/json");
 
     EsRestRequest(String body, String path) {
@@ -99,12 +115,27 @@ public class EsQueryExecutor {
     EsRestRequest(String body, String path, Map<String, String> params) {
       this.body = body;
       this.params = params;
-      this.esUri = "/" + path;
+      esUri = "/" + path;
+    }
+
+    EsRestRequest(ValueTableIndex tableIndex, String body, String path) {
+      this(tableIndex, body, path, new HashMap<String, String>());
+    }
+
+    EsRestRequest(ValueTableIndex tableIndex, String body, String path, Map<String, String> params) {
+      this.body = body;
+      this.params = params;
+      esUri = tableIndex.getRequestPath() + "/" + path;
+    }
+
+    public EsRestRequest setHttpMethod(Method method) {
+      httpMethod = method;
+      return this;
     }
 
     @Override
     public Method method() {
-      return Method.GET;
+      return httpMethod;
     }
 
     @Override
@@ -115,11 +146,7 @@ public class EsQueryExecutor {
     @Override
     public String rawPath() {
       int pathEndPos = esUri.indexOf('?');
-      if(pathEndPos < 0) {
-        return esUri;
-      } else {
-        return esUri.substring(0, pathEndPos);
-      }
+      return pathEndPos < 0 ? esUri : esUri.substring(0, pathEndPos);
     }
 
     @Override
