@@ -12,12 +12,12 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.SearchVariablesSuggestBox;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
@@ -28,7 +28,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.Presenter;
@@ -58,7 +57,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
     HandlerRegistration refreshClickHandler(ClickHandler handler);
 
-    HasText getSearch();
+    SearchVariablesSuggestBox getSearch();
   }
 
   @ContentSlot
@@ -137,16 +136,20 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           }
         }));
 
-    registerHandler(
-        getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
-          @Override
-          public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-            getView().getSearch().setText(//
-                "datasource:" + event.getTable().getDatasourceName() +//
-                    " table:" + event.getTable().getName() +
-                    " variable:" + event.getSelection().getName());
-          }
-        }));
+    getView().getSearch().getSuggestOracle().add("Var1");
+    getView().getSearch().getSuggestOracle().add("Var2");
+    getView().getSearch().getSuggestOracle().add("Var3");
+    getView().getSearch().getSuggestOracle().add("Var4");
+    getView().getSearch().getSuggestOracle().add("Var5");
+    getView().getSearch().getSuggestOracle().add("Var6");
+//    getView().getSearch().adgetTextBox().addFocusHandler(new FocusHandler() {
+//      @Override
+//      public void onFocus(FocusEvent event) {
+//        getView().getSearch().getSuggestOracle().requestDefaultSuggestions(new SuggestOracle.Request(
+//
+//        ));
+//      }
+//    });
   }
 
   @Override
