@@ -33,7 +33,7 @@ import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.SummariesIndexManager;
+import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
@@ -55,18 +55,18 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   private final ThreadFactory threadFactory;
 
   @Nonnull
-  private final SummariesIndexManager summariesIndexManager;
+  private final StatsIndexManager statsIndexManager;
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public EsValuesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, @Nonnull ThreadFactory threadFactory, Version version,
-      @Nonnull SummariesIndexManager summariesIndexManager) {
+      @Nonnull StatsIndexManager statsIndexManager) {
     super(esProvider, esConfig, indexConfig, version);
     Preconditions.checkNotNull(threadFactory);
-    Preconditions.checkNotNull(summariesIndexManager);
+    Preconditions.checkNotNull(statsIndexManager);
     this.threadFactory = threadFactory;
-    this.summariesIndexManager = summariesIndexManager;
+    this.statsIndexManager = statsIndexManager;
   }
 
   @Nonnull
@@ -165,17 +165,17 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
-        summariesIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
+        statsIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
       }
 
       @Override
       public void onComplete() {
         if(stop) {
           index.delete();
-          summariesIndexManager.getIndex(getValueTable()).delete();
+          statsIndexManager.getIndex(getValueTable()).delete();
         } else {
           sendAndCheck(bulkRequest);
-          summariesIndexManager.getIndex(getValueTable()).computeAndIndexSummaries();
+          statsIndexManager.getIndex(getValueTable()).computeAndIndexSummaries();
           index.updateTimestamps();
         }
       }

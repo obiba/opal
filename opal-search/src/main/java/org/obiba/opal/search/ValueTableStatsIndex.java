@@ -17,7 +17,7 @@ import org.obiba.magma.Variable;
 /**
  * An index of a {@code ValueTable} variables.
  */
-public interface ValueTableSummariesIndex extends ValueTableIndex {
+public interface ValueTableStatsIndex extends ValueTableIndex {
 
   /**
    * Name of the field for the given variable.

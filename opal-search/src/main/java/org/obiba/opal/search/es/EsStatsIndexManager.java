@@ -27,10 +27,10 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.SummariesIndexManager;
+import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
-import org.obiba.opal.search.ValueTableSummariesIndex;
-import org.obiba.opal.search.es.mapping.VariableSummariesMapping;
+import org.obiba.opal.search.ValueTableStatsIndex;
+import org.obiba.opal.search.es.mapping.StatsMapping;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,26 +41,26 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Component
-public class EsSummariesIndexManager extends EsIndexManager implements SummariesIndexManager {
+public class EsStatsIndexManager extends EsIndexManager implements StatsIndexManager {
 
-  private static final Logger log = LoggerFactory.getLogger(EsSummariesIndexManager.class);
+  private static final Logger log = LoggerFactory.getLogger(EsStatsIndexManager.class);
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public EsSummariesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
+  public EsStatsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, Version version) {
     super(esProvider, esConfig, indexConfig, version);
   }
 
   @Nonnull
   @Override
-  public ValueTableSummariesIndex getIndex(@Nonnull ValueTable vt) {
-    return (ValueTableSummariesIndex) super.getIndex(vt);
+  public ValueTableStatsIndex getIndex(@Nonnull ValueTable vt) {
+    return (ValueTableStatsIndex) super.getIndex(vt);
   }
 
   @Override
   protected ValueTableIndex createIndex(@Nonnull ValueTable vt) {
-    return new EsValueTableSummariesIndex(vt);
+    return new EsValueTableStatsIndex(vt);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
   @Nonnull
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
-    return new Indexer(valueTable, (EsValueTableSummariesIndex) index);
+    return new Indexer(valueTable, (EsValueTableStatsIndex) index);
   }
 
   @Nonnull
@@ -82,9 +82,9 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
 
   private class Indexer extends EsIndexer {
 
-    private final EsValueTableSummariesIndex index;
+    private final EsValueTableStatsIndex index;
 
-    private Indexer(ValueTable table, EsValueTableSummariesIndex index) {
+    private Indexer(ValueTable table, EsValueTableStatsIndex index) {
       super(table, index);
       this.index = index;
     }
@@ -96,16 +96,16 @@ public class EsSummariesIndexManager extends EsIndexManager implements Summaries
 
     @Override
     protected XContentBuilder getMapping() {
-      return new VariableSummariesMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
+      return new StatsMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
     }
 
   }
 
-  private class EsValueTableSummariesIndex extends EsValueTableIndex implements ValueTableSummariesIndex {
+  private class EsValueTableStatsIndex extends EsValueTableIndex implements ValueTableStatsIndex {
 
     private final Map<String, CategoricalVariableSummary.Builder> categoricalSummaryBuilders = Maps.newHashMap();
 
-    private EsValueTableSummariesIndex(@Nonnull ValueTable vt) {
+    private EsValueTableStatsIndex(@Nonnull ValueTable vt) {
       super(vt, "stats");
     }
 

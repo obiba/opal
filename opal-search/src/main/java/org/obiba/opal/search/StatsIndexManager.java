@@ -16,10 +16,10 @@ import org.obiba.magma.ValueTable;
 /**
  *
  */
-public interface SummariesIndexManager extends IndexManager {
+public interface StatsIndexManager extends IndexManager {
 
   @Nonnull
   @Override
-  ValueTableSummariesIndex getIndex(@Nonnull ValueTable vt);
+  ValueTableStatsIndex getIndex(@Nonnull ValueTable vt);
 
 }

@@ -21,7 +21,7 @@ import org.obiba.runtime.Version;
 /**
  *
  */
-public class VariableSummariesMapping {
+public class StatsMapping {
 
   public XContentBuilder createMapping(Version opalVersion, String indexName, ValueTable valueTable) {
     try {
