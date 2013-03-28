@@ -12,6 +12,7 @@ package org.obiba.opal.web.search;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.IndexManagerConfigurationService;
+import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.Schedule;
 import org.obiba.opal.search.ValueTableValuesIndex;
@@ -70,7 +71,8 @@ public abstract class IndexResource {
 
   protected float getValueTableIndexationProgress(String table) {
     float progress = 0f;
-    if(synchroManager.hasTask() && synchroManager.getCurrentTask().getValueTable().getName().equals(table)) {
+    IndexSynchronization currentTask = synchroManager.getCurrentTask();
+    if(currentTask != null && currentTask.getValueTable().getName().equals(table)) {
 
       progress = synchroManager.getCurrentTask().getProgress();
     }
@@ -87,7 +89,6 @@ public abstract class IndexResource {
 
   protected Opal.TableIndexationStatus getTableIndexationStatus(String datasource, String table) {
     boolean inProgress = isInProgress(table);
-    ValueTable valueTable = getValueTable(datasource, table);
 
     // Set Indexation status
     boolean upToDate = getValueTableIndex(datasource, table).isUpToDate();
