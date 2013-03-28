@@ -50,6 +50,8 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
+import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
@@ -100,6 +102,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private TableDto table;
 
+  private TableDto originalTable;
+
   private TableIndexStatusDto statusDto;
 
   private String previous;
@@ -148,6 +152,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     if(!isVisible()) {
       forceReveal();
       updateDisplay(e.getSelection(), e.getPrevious(), e.getNext());
+
+      if(originalTable == null) originalTable = e.getSelection();
     }
   }
 
@@ -191,6 +197,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     // Filter variable event
     registerHandler(getView().addFilterVariableHandler(new FilterVariableHandler()));
+
     // OPAL-975
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
 
@@ -591,17 +598,30 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       String filter = getView().getFilter().getText();
       if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.isEmpty()) {
 
-        // TODO: Call WS to execute a full text search through Elastic Search
-        UriBuilder ub = UriBuilder.create()
-            .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables")
-            .query("script", "name().matches('" + getView().getFilter().getText() + "')");
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build()).get()
-            .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-              @Override
-              public void onResource(Response response, JsArray<VariableDto> resource) {
-                getView().renderRows(resource);
-              }
+        String query = getView().getFilter().getText().isEmpty() ? "*" : getView().getFilter().getText();
 
+        UriBuilder ub = UriBuilder.create()
+            .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
+            .query("query", query)//
+            .query("limit", String.valueOf(table.getVariableCount()))//
+            .query("variable", "true");
+        ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
+            .withCallback(new ResourceCallback<QueryResultDto>() {
+              @Override
+              public void onResource(Response response, QueryResultDto resource) {
+                if(response.getStatusCode() == Response.SC_OK) {
+                  QueryResultDto resultDto = (QueryResultDto) JsonUtils.unsafeEval(response.getText());
+
+                  JsArray<VariableDto> variables = JsArrays.create();
+                  for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+                    VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
+                        .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
+
+                    variables.push(varDto.getVariable());
+                  }
+                  getView().renderRows(variables);
+                }
+              }
             }).send();
       }
     }
