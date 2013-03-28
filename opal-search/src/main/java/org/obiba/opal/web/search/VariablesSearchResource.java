@@ -18,8 +18,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
@@ -49,10 +47,6 @@ public class VariablesSearchResource extends AbstractVariablesSearchResource {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       Search.QueryResultDto dtoResponse = convertResonse(executeQuery(query, offset, limit, fields));
       return Response.ok().entity(dtoResponse).build();
-    } catch(NoSuchValueSetException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    } catch(NoSuchDatasourceException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
     } catch(Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }

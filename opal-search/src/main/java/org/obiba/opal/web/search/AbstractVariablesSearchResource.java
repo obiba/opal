@@ -57,10 +57,5 @@ public abstract class AbstractVariablesSearchResource {
   protected boolean searchServiceAvailable() {
     return opalSearchService.isRunning() && opalSearchService.isEnabled();
   }
-
-  //
-  // Private members
-  //
-
 }
 
