@@ -102,7 +102,7 @@ public class DeriveOpenTextualVariableStepPresenter
   }
 
   public boolean addEntry(String value, String newValue, String label) {
-    if(value != null && !value.trim().equals("") && newValue != null && !newValue.trim().equals("")) {
+    if(value != null && !"".equals(value.trim()) && newValue != null && !"".equals(newValue.trim())) {
       Double count = getFreqFromValue(value);
       Builder builder = ValueMapEntry.fromDistinct(value).newValue(newValue).label(label);
       if(count != null) {
@@ -137,7 +137,7 @@ public class DeriveOpenTextualVariableStepPresenter
     public void onStepIn() {
       if(derivationHelper == null || derivationHelper.getMethod() != getView().getMethod()) {
         String link = getOriginalVariable().getLink() //
-            + "/summary" //
+            + "/stats/summary" //
             + "?nature=categorical" //
             + "&distinct=true";
 

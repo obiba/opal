@@ -23,19 +23,18 @@ public abstract class AbstractElasticSearchFinder<TQuery extends AbstractFinderQ
     this.opalSearchService = opalSearchService;
   }
 
-  public abstract void executeQuery(TQuery query, TResult result, String... indexes);
+  public abstract void executeQuery(TQuery query, TResult result);
 
   @Override
   public void find(TQuery query, TResult result) {
-
     if(isSearchEnabled()) {
-      executeQuery(query, result, "indexed_table_1", "indexed_table_2");
+      executeQuery(query, result);
     }
-
     next(query, result);
   }
 
   public boolean isSearchEnabled() {
     return opalSearchService.isRunning() && opalSearchService.isEnabled();
   }
+
 }

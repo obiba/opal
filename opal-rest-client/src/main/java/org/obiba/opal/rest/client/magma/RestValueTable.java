@@ -61,6 +61,7 @@ class RestValueTable extends AbstractValueTable {
     tableReference = getDatasource().newReference("table", dto.getName());
   }
 
+  @Nonnull
   @Override
   public RestDatasource getDatasource() {
     return (RestDatasource) super.getDatasource();

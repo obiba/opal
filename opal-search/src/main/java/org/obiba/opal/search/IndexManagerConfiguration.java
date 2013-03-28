@@ -31,7 +31,8 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
    */
   public boolean isReadyForIndexing(ValueTable vt, ValueTableIndex index) {
     Schedule schedule = getSchedule(vt);
-    return schedule.getType() != Opal.ScheduleType.NOT_SCHEDULED && !index.isUpToDate() && shouldUpdate(schedule, index.now());
+    return schedule.getType() != Opal.ScheduleType.NOT_SCHEDULED && !index.isUpToDate() &&
+        shouldUpdate(schedule, index.now());
   }
 
   public void updateSchedule(ValueTable vt, Schedule schedule) {
@@ -48,6 +49,7 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
     return schedule == null ? new Schedule() : schedule;
   }
 
+  @SuppressWarnings("MagicNumber")
   private boolean shouldUpdate(Schedule schedule, Calendar now) {
     switch(schedule.getType()) {
       case MINUTES_5:

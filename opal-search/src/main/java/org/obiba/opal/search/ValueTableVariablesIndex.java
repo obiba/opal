@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -9,11 +9,9 @@
  */
 package org.obiba.opal.search;
 
-import java.util.Calendar;
+import javax.annotation.Nonnull;
 
 import org.obiba.magma.Attribute;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Variable;
 
 /**
  * An index of a {@code ValueTable} variables.
@@ -26,6 +24,7 @@ public interface ValueTableVariablesIndex extends ValueTableIndex {
    * @param attribute Attribute
    * @return
    */
-  String getFieldName(Attribute attribute);
+  @Nonnull
+  String getFieldName(@Nonnull Attribute attribute);
 
 }

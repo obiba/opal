@@ -28,31 +28,31 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
   private String esSettings;
 
   public boolean isEnabled() {
-    return enabled != null ? enabled : true;
+    return enabled == null ? true : enabled;
   }
 
   public String getClusterName() {
-    return clusterName != null ? clusterName : EsIndexManager.DEFAULT_CLUSTER_NAME;
+    return clusterName == null ? EsIndexManager.DEFAULT_CLUSTER_NAME : clusterName;
   }
 
   public String getIndexName() {
-    return indexName != null ? indexName : EsIndexManager.DEFAULT_OPAL_INDEX_NAME;
+    return indexName == null ? EsIndexManager.DEFAULT_OPAL_INDEX_NAME : indexName;
   }
 
   public boolean isDataNode() {
-    return dataNode != null ? dataNode : Boolean.TRUE;
+    return dataNode == null ? true : dataNode;
   }
 
   public String getEsSettings() {
-    return esSettings != null ? esSettings : "";
+    return esSettings == null ? "" : esSettings;
   }
 
   public Integer getShards() {
-    return shards != null ? shards : 5;
+    return shards == null ? 5 : shards;
   }
 
   public Integer getReplicas() {
-    return replicas != null ? replicas : 1;
+    return replicas == null ? 1 : replicas;
   }
 
   public void setEnabled(Boolean enabled) {

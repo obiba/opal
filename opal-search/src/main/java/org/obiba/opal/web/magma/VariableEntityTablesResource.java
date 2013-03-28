@@ -21,8 +21,6 @@ import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
@@ -33,6 +31,7 @@ import org.obiba.opal.web.finder.AbstractElasticSearchFinder;
 import org.obiba.opal.web.finder.AbstractFinder;
 import org.obiba.opal.web.finder.AbstractFinderQuery;
 import org.obiba.opal.web.finder.AbstractMagmaFinder;
+import org.obiba.opal.web.finder.AccessFilterTablesFinder;
 import org.obiba.opal.web.finder.FinderResult;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
@@ -42,7 +41,7 @@ import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VariableEntityTablesResource extends AbstractTablesResource {
+public class VariableEntityTablesResource implements AbstractTablesResource {
 
   private static final Logger log = LoggerFactory.getLogger(VariableEntityTablesResource.class);
 
@@ -73,8 +72,10 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
 
     FinderResult<List<Magma.TableDto>> results = new FinderResult<List<Magma.TableDto>>(
         new ArrayList<Magma.TableDto>());
-    VariableEntityTablesFinder finder = new VariableEntityTablesFinder().withLimit(limit);
-    finder.find(new VariableEntityTablesQuery(variableEntity), results);
+
+    new VariableEntityTablesFinder() //
+        .withLimit(limit) //
+        .find(new VariableEntityTablesQuery(variableEntity), results);
 
     return results.getValue();
   }
@@ -93,28 +94,17 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   }
 
   public static class EntityTablesFinder
-      extends AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
+      extends AccessFilterTablesFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
     @Override
-    public void find(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
-
-      for(Datasource datasource : MagmaEngine.get().getDatasources()) {
-        for(ValueTable valueTable : datasource.getValueTables()) {
-
-          if(valueTable.getEntityType().equals(query.getEntity().getType()) && areEntitiesReadable(valueTable)) {
-            query.getTableFilter().add(valueTable);
-          }
-        }
-      }
-
-      next(query, result);
+    protected boolean isTableSearchable(ValueTable valueTable, VariableEntityTablesQuery query) {
+      return valueTable.getEntityType().equals(query.getEntity().getType()) && areEntitiesReadable(valueTable);
     }
 
     private boolean areEntitiesReadable(ValueTable valueTable) {
       return SecurityUtils.getSubject().isPermitted("magma:/datasource/" + valueTable.getDatasource().getName() +
           "/table/" + valueTable.getName() + "/entities:GET");
     }
-
   }
 
   @SuppressWarnings("ClassTooDeepInInheritanceTree")
@@ -125,11 +115,6 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
 
     private final ElasticSearchProvider esProvider;
 
-    /**
-     * Size of the resultset to return, 0 to return all
-     */
-    private int limit = 0;
-
     public EntityTablesElasticSearchFinder(OpalSearchService opalSearchService, ValuesIndexManager indexManager,
         ElasticSearchProvider esProvider) {
       super(opalSearchService);
@@ -138,8 +123,7 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
     }
 
     @Override
-    public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result,
-        String... indexes) {
+    public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
 
       Map<String, ValueTable> map = buildIndexValueTableMap(query, new IndexManagerHelper(indexManager));
 
@@ -148,8 +132,8 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
       }
 
       try {
-        JSONObject jsonResponse = executeEsQuery(query.getEntity().getIdentifier(), new ArrayList<String>(map.keySet()),
-            limit);
+        JSONObject jsonResponse = executeEsQuery(query.getEntity().getIdentifier(),
+            new ArrayList<String>(map.keySet()));
         // parse the jsonResponse and by using the map, create the required TableDtos
         log.debug("JSON ES Response {}", jsonResponse);
         JSONObject jsonHitsInfo = jsonResponse.getJSONObject("hits");
@@ -170,20 +154,20 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
         }
 
       } catch(JSONException e) {
-        // ??? log error or throw RuntimeException
+        throw new RuntimeException(e);
       }
 
     }
 
-    private JSONObject executeEsQuery(String identifier, List<String> tableIndexNames, int limit) throws JSONException {
+    private JSONObject executeEsQuery(String identifier, List<String> tableIndexNames) throws JSONException {
       QueryTermJsonBuilder.QueryTermsFiltersBuilder filtersBuilder = new QueryTermJsonBuilder.QueryTermsFiltersBuilder()
           .setFieldName("_type").addFilterValues(tableIndexNames);
 
       QueryTermJsonBuilder queryBuilder = new QueryTermJsonBuilder().setTermFieldName("_id")
           .setTermFieldValue(identifier).setTermFilters(filtersBuilder.build());
 
-      if(limit > 0) {
-        queryBuilder.setSize(limit).build();
+      if(getLimit() > 0) {
+        queryBuilder.setSize(getLimit()).build();
       }
 
       EsQueryExecutor queryExecutor = new EsQueryExecutor(esProvider);
@@ -213,18 +197,11 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
       return map;
     }
 
-    private EntityTablesElasticSearchFinder withLimit(int limit) {
-      this.limit = limit;
-      return this;
-    }
-
   }
 
   @SuppressWarnings("ClassTooDeepInInheritanceTree")
   public static class EntityTablesMagmaFinder
       extends AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
-
-    private int limit = 0;
 
     @Override
     public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
@@ -235,16 +212,11 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
           Magma.TableDto tableDto = Dtos.asDto(valueTable, false).build();
           result.getValue().add(tableDto);
 
-          if(limit > 0 && result.getValue().size() == limit) {
+          if(getLimit() > 0 && result.getValue().size() == getLimit()) {
             break;
           }
         }
       }
-    }
-
-    public EntityTablesMagmaFinder withLimit(int limit) {
-      this.limit = limit;
-      return this;
     }
 
   }
@@ -252,21 +224,15 @@ public class VariableEntityTablesResource extends AbstractTablesResource {
   public class VariableEntityTablesFinder
       extends AbstractFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
-    private int limit = 0;
-
     @Override
     public void find(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
       nextFinder(new EntityTablesFinder()) //
           .nextFinder(
-              new EntityTablesElasticSearchFinder(opalSearchService, indexManager, esProvider).withLimit(limit)) //
-          .nextFinder(new EntityTablesMagmaFinder().withLimit(limit));
+              new EntityTablesElasticSearchFinder(opalSearchService, indexManager, esProvider).withLimit(getLimit())) //
+          .nextFinder(new EntityTablesMagmaFinder().withLimit(getLimit()));
       next(query, result);
     }
 
-    public VariableEntityTablesFinder withLimit(int limit) {
-      this.limit = limit;
-      return this;
-    }
   }
 
 }

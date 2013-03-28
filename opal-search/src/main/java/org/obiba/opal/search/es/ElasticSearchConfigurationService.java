@@ -25,12 +25,12 @@ public class ElasticSearchConfigurationService {
   @Autowired
   public ElasticSearchConfigurationService(OpalConfigurationService configService) {
     this.configService = configService;
-    this.configSupplier = new ExtensionConfigurationSupplier<ElasticSearchConfiguration>(configService,
+    configSupplier = new ExtensionConfigurationSupplier<ElasticSearchConfiguration>(configService,
         ElasticSearchConfiguration.class);
   }
 
   public ElasticSearchConfiguration getConfig() {
-    if(configSupplier.hasExtension() == false) {
+    if(!configSupplier.hasExtension()) {
       configSupplier.addExtension(new ElasticSearchConfiguration());
     }
     return configSupplier.get();

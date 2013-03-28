@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
+import javax.annotation.Nullable;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -56,6 +58,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     super(display, eventBus);
   }
 
+  @Nullable
   @Override
   public Place getPlace() {
     return null;
@@ -77,7 +80,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
   @Override
   public void refreshDisplay() {
     if(!hasSummaryOrPendingRequest()) {
-      requestSummary(resourceRequestBuilder);
+      requestSummary();
     }
   }
 
@@ -100,35 +103,32 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     this.resourceRequestBuilder = resourceRequestBuilder;
   }
 
-  private void requestSummary(final ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
+  private void requestSummary() {
     getDisplay().requestingSummary();
-    summaryRequest = resourceRequestBuilder.withCallback(new ResourceCallback<SummaryStatisticsDto>() {
-      @Override
-      public void onResource(Response response, SummaryStatisticsDto resource) {
-        if(SummaryTabPresenter.this.resourceRequestBuilder == resourceRequestBuilder) {
-          summary = resource;
-          getDisplay().renderSummary(resource);
-          eventBus.fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
-        }
-      }
-    }).withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        getDisplay().renderNoSummary();
-      }
-    }).withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
-            .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
-
-        eventBus.fireEvent(notificationEvent);
-      }
-    }
-
-    ).
-
-        send();
+    summaryRequest = resourceRequestBuilder //
+        .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+          @Override
+          public void onResource(Response response, SummaryStatisticsDto resource) {
+            summary = resource;
+            getDisplay().renderSummary(resource);
+            eventBus.fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
+          }
+        }) //
+        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getDisplay().renderNoSummary();
+          }
+        }) //
+        .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
+                .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
+            eventBus.fireEvent(notificationEvent);
+          }
+        }) //
+        .send();
   }
 
   private void cancelPendingSummaryRequest() {

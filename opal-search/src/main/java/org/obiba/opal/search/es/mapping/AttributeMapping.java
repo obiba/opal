@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -11,10 +11,10 @@ package org.obiba.opal.search.es.mapping;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.obiba.magma.Attribute;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AttributeMapping {
 
@@ -30,12 +30,13 @@ public class AttributeMapping {
     }
   }
 
-  public static String getFieldName(Attribute attribute) {
+  public static String getFieldName(@Nonnull Attribute attribute) {
     String field = attribute.getName();
-    if (attribute.hasNamespace()) {
+    if(attribute.hasNamespace()) {
       field = attribute.getNamespace() + "-" + field;
     }
-    if (attribute.isLocalised()) {
+    if(attribute.isLocalised()) {
+      //noinspection ConstantConditions
       field += "-" + attribute.getLocale().toString();
     }
     return field;

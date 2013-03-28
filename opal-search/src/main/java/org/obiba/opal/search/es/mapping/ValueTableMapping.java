@@ -18,28 +18,28 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.runtime.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ValueTableMapping {
 
   private final VariableMappings variableMappings = new VariableMappings();
 
-  public XContentBuilder createMapping(Version opalVersion, String name, ValueTable valueTable) {
+  public XContentBuilder createMapping(Version opalVersion, String indexName, ValueTable valueTable) {
     try {
-      XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(name);
-      mapping.startObject("_all").field("enabled", false).endObject().startObject("_parent")
-          .field("type", valueTable.getEntityType()).endObject();
+      XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(indexName);
+      mapping.startObject("_all").field("enabled", false).endObject();
+      mapping.startObject("_parent").field("type", valueTable.getEntityType()).endObject();
+
       mapping.startObject("properties");
       for(Variable variable : valueTable.getVariables()) {
-        variableMappings.map(name, variable, mapping);
+        variableMappings.map(indexName, variable, mapping);
       }
       mapping.endObject();// properties
 
-      mapping.startObject("_meta")//
-          .field("_created", DateTimeType.get().valueOf(new Date()).toString())//
-          .field("_opalversion", opalVersion.toString())//
-          .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()).endObject();
+      mapping.startObject("_meta") //
+          .field("_created", DateTimeType.get().valueOf(new Date()).toString()) //
+          .field("_opalversion", opalVersion.toString()) //
+          .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()) //
+          .endObject();
 
       mapping.endObject() // type
           .endObject(); // mapping

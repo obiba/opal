@@ -9,17 +9,28 @@
  ******************************************************************************/
 package org.obiba.opal.web.finder;
 
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+
 /**
  *
  */
-public class AccessFilterTablesFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>>
+public abstract class AccessFilterTablesFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>>
     extends AbstractFinder<TQuery, TResult> {
 
   @Override
   public void find(TQuery query, TResult result) {
-    // TODO iterate on all tables for which user has at least TABLE_READ
-//    query.getTableFilter().addAll(readableTables);
+    for(Datasource datasource : MagmaEngine.get().getDatasources()) {
+      for(ValueTable valueTable : datasource.getValueTables()) {
+        if(isTableSearchable(valueTable, query)) {
+          query.getTableFilter().add(valueTable);
+        }
+      }
+    }
     next(query, result);
   }
+
+  protected abstract boolean isTableSearchable(ValueTable valueTable, TQuery query);
 
 }

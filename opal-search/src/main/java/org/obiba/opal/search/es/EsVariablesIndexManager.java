@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -11,20 +11,17 @@ package org.obiba.opal.search.es;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.common.base.Preconditions;
-import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.obiba.core.util.StringUtil;
 import org.obiba.magma.Attribute;
+import org.obiba.magma.AttributeAware;
 import org.obiba.magma.Category;
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.search.IndexManagerConfigurationService;
@@ -35,22 +32,16 @@ import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.mapping.AttributeMapping;
 import org.obiba.opal.search.es.mapping.ValueTableVariablesMapping;
 import org.obiba.runtime.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Component
 public class EsVariablesIndexManager extends EsIndexManager implements VariablesIndexManager {
 
-  private static final Logger log = LoggerFactory.getLogger(EsVariablesIndexManager.class);
-
-  private final Set<EsValueTableVariablesIndex> indices = Sets.newHashSet();
+//  private static final Logger log = LoggerFactory.getLogger(EsVariablesIndexManager.class);
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
@@ -59,28 +50,29 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     super(esProvider, esConfig, indexConfig, version);
   }
 
+  @Nonnull
   @Override
-  public EsValueTableVariablesIndex getIndex(ValueTable vt) {
-    Preconditions.checkNotNull(vt);
-
-    for(EsValueTableVariablesIndex i : indices) {
-      if(i.isForTable(vt)) return i;
-    }
-    EsValueTableVariablesIndex i = new EsValueTableVariablesIndex(vt);
-    indices.add(i);
-    return i;
+  public EsValueTableVariablesIndex getIndex(@Nonnull ValueTable vt) {
+    return (EsValueTableVariablesIndex) super.getIndex(vt);
   }
 
   @Override
-  public boolean isIndexable(ValueTable valueTable) {
+  protected ValueTableIndex createIndex(@Nonnull ValueTable vt) {
+    return new EsValueTableVariablesIndex(vt);
+  }
+
+  @Override
+  public boolean isIndexable(@Nonnull ValueTable valueTable) {
     return !getIndex(valueTable).isUpToDate();
   }
 
+  @Nonnull
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
     return new Indexer(valueTable, (EsValueTableVariablesIndex) index);
   }
 
+  @Nonnull
   @Override
   public String getName() {
     return esIndexName() + "-variables";
@@ -97,44 +89,47 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
     @Override
     protected void index() {
-
-      XContentBuilder b = new ValueTableVariablesMapping()
-          .createMapping(runtimeVersion, index.getIndexName(), valueTable);
-      esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName()).setSource(b)
-          .execute().actionGet();
-
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
-      String fullNamePrefix = valueTable.getDatasource().getName() + "." + valueTable.getName();
       for(Variable variable : valueTable.getVariables()) {
-        String fullName = fullNamePrefix + ":" + variable.getName();
-        try {
-          XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
-          xcb.field("datasource", valueTable.getDatasource().getName());
-          xcb.field("table", valueTable.getName());
-          xcb.field("fullName", fullName);
-          indexVariableParameters(variable, xcb);
-
-          if(variable.hasAttributes()) {
-            indexVariableAttributes(variable, xcb);
-          }
-
-          if(variable.hasCategories()) {
-            indexVariableCategories(variable, xcb);
-          }
-
-          bulkRequest.add(esProvider.getClient().prepareIndex(getName(), index.getIndexName(), fullName)
-              .setSource(xcb.endObject()));
-          if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
-            bulkRequest = sendAndCheck(bulkRequest);
-          }
-        } catch(IOException e) {
-          throw new RuntimeException(e);
-        }
+        bulkRequest = indexVariable(variable, bulkRequest);
       }
 
       sendAndCheck(bulkRequest);
       index.updateTimestamps();
+    }
+
+    @Override
+    protected XContentBuilder getMapping() {
+      return new ValueTableVariablesMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
+    }
+
+    private BulkRequestBuilder indexVariable(Variable variable, BulkRequestBuilder bulkRequest) {
+      String fullName = valueTable.getDatasource().getName() + "." + valueTable.getName() + ":" + variable.getName();
+      try {
+        XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
+        xcb.field("datasource", valueTable.getDatasource().getName());
+        xcb.field("table", valueTable.getName());
+        xcb.field("fullName", fullName);
+        indexVariableParameters(variable, xcb);
+
+        if(variable.hasAttributes()) {
+          indexVariableAttributes(variable, xcb);
+        }
+
+        if(variable.hasCategories()) {
+          indexVariableCategories(variable, xcb);
+        }
+
+        bulkRequest.add(
+            esProvider.getClient().prepareIndex(getName(), index.getIndexName(), fullName).setSource(xcb.endObject()));
+        if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
+          return sendAndCheck(bulkRequest);
+        }
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      }
+      return bulkRequest;
     }
 
     private void indexVariableParameters(Variable variable, XContentBuilder xcb) throws IOException {
@@ -148,7 +143,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       xcb.field("referencedEntityType", variable.getReferencedEntityType());
     }
 
-    private void indexVariableAttributes(Variable variable, XContentBuilder xcb) throws IOException {
+    private void indexVariableAttributes(AttributeAware variable, XContentBuilder xcb) throws IOException {
       for(Attribute attribute : variable.getAttributes()) {
         if(!attribute.getValue().isNull()) {
           xcb.field(AttributeMapping.getFieldName(attribute), attribute.getValue());
@@ -161,18 +156,18 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       Map<String, List<Object>> attributeFields = Maps.newHashMap();
       for(Category category : variable.getCategories()) {
         names.add(category.getName());
-        if (category.hasAttributes()) {
-          for (Attribute attribute : category.getAttributes()) {
+        if(category.hasAttributes()) {
+          for(Attribute attribute : category.getAttributes()) {
             String field = "category-" + AttributeMapping.getFieldName(attribute);
-            if (!attributeFields.containsKey(field)) {
-              attributeFields.put(field,new ArrayList<Object>());
+            if(!attributeFields.containsKey(field)) {
+              attributeFields.put(field, new ArrayList<Object>());
             }
             attributeFields.get(field).add(attribute.getValue().getValue());
           }
         }
       }
       xcb.field("category", names);
-      for (String field : attributeFields.keySet()) {
+      for(String field : attributeFields.keySet()) {
         xcb.field(field, attributeFields.get(field));
       }
     }
@@ -181,17 +176,12 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
   private class EsValueTableVariablesIndex extends EsValueTableIndex implements ValueTableVariablesIndex {
 
     private EsValueTableVariablesIndex(ValueTable vt) {
-      super(vt);
+      super(vt, "variables");
     }
 
+    @Nonnull
     @Override
-    public String getIndexName() {
-      // type name is unique in ES (even though in different ES indices)
-      return super.getIndexName() + "-variables";
-    }
-
-    @Override
-    public String getFieldName(Attribute attribute) {
+    public String getFieldName(@Nonnull Attribute attribute) {
       return AttributeMapping.getFieldName(attribute);
     }
   }

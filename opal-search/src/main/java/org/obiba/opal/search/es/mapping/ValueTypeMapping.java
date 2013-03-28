@@ -13,6 +13,6 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 
 public interface ValueTypeMapping {
 
-  public XContentBuilder map(XContentBuilder builder);
+  XContentBuilder map(XContentBuilder builder);
 
 }

@@ -12,8 +12,6 @@ package org.obiba.opal.web.magma;
 import java.util.List;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
@@ -21,8 +19,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.opal.web.math.AbstractSummaryStatisticsResource;
-import org.obiba.opal.web.math.SummaryStatisticsResourceFactory;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
@@ -31,8 +27,6 @@ public class VariableResource {
   private final ValueTable valueTable;
 
   private final VariableValueSource vvs;
-
-//  private PagingVectorSource pagingVectorSource;
 
   public VariableResource(ValueTable valueTable, VariableValueSource vvs) {
     this.valueTable = valueTable;
@@ -51,20 +45,12 @@ public class VariableResource {
     return Dtos.asDto(linkDto, vvs.getVariable()).build();
   }
 
-  VariableValueSource getVariableValueSource() {
+  protected VariableValueSource getVariableValueSource() {
     return vvs;
   }
 
-  @Path("/summary")
-  public AbstractSummaryStatisticsResource getSummary(@QueryParam("nature") String nature) {
-    return new SummaryStatisticsResourceFactory().getResource(valueTable, vvs, nature);
+  protected ValueTable getValueTable() {
+    return valueTable;
   }
-
-//  PagingVectorSource getPagingVectorSource() {
-//    if(pagingVectorSource == null) {
-//      pagingVectorSource = new DefaultPagingVectorSourceImpl(valueTable, vvs);
-//    }
-//    return pagingVectorSource;
-//  }
 
 }

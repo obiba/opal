@@ -121,7 +121,7 @@ public class VariableDtos {
   }
 
   @Nullable
-  public static String getAttributeValue(VariableDto variable, String namespace, String name) {
+  public static String getAttributeValue(VariableDto variable, @Nullable String namespace, String name) {
     AttributeDto attribute = getAttribute(variable, namespace, name);
     return attribute == null ? null : attribute.getValue();
   }
@@ -145,7 +145,7 @@ public class VariableDtos {
    * @param name
    * @param value
    */
-  public static void setAttributeValue(VariableDto variable, String namespace, String name, String value) {
+  public static void setAttributeValue(VariableDto variable, @Nullable String namespace, String name, String value) {
     AttributeDto attribute = getAttribute(variable, namespace, name);
     if(attribute == null) {
       createAttribute(variable, namespace, name, value);
