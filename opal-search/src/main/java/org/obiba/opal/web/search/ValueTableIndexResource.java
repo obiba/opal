@@ -37,6 +37,7 @@ import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.search.IndexManagerConfigurationService;
+import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.Schedule;
 import org.obiba.opal.search.SearchServiceException;
@@ -118,9 +119,10 @@ public class ValueTableIndexResource extends IndexResource {
     if(esProvider.isEnabled()) {
 
       // cancel indexation if in progress
-      if(synchroManager.hasTask() &&
-          synchroManager.getCurrentTask().getValueTable().getName().equals(table) &&
-          synchroManager.getCurrentTask().getValueTable().getDatasource().getName().equals(datasource)) {
+      IndexSynchronization currentTask = synchroManager.getCurrentTask();
+      if(currentTask != null &&
+          currentTask.getValueTable().getName().equals(table) &&
+          currentTask.getValueTable().getDatasource().getName().equals(datasource)) {
         // Stop task
         synchroManager.stopTask();
       }
@@ -172,7 +174,7 @@ public class ValueTableIndexResource extends IndexResource {
 
   @GET
   @Path("_schema")
-  public Response search(@Context HttpServletRequest servletRequest) {
+  public Response search() {
     ValueTableValuesIndex index = getValueTableIndex(datasource, table);
     OpalMap.Builder map = OpalMap.newBuilder();
 
@@ -210,7 +212,7 @@ public class ValueTableIndexResource extends IndexResource {
     try {
       latch.await();
       Response r = ref.get();
-      return (r != null) ? r : Response.serverError().build();
+      return r != null ? r : Response.serverError().build();
     } catch(InterruptedException e) {
       throw new RuntimeException(e);
     }
@@ -242,12 +244,12 @@ public class ValueTableIndexResource extends IndexResource {
     JaxRsRestRequest(ValueTableIndex tableIndex, HttpServletRequest servletRequest, String body, String path) {
       this.body = body;
       this.servletRequest = servletRequest;
-      this.params = Maps.newHashMap();
-      this.rawPath = tableIndex.getRequestPath() + "/" + path;
+      params = Maps.newHashMap();
+      rawPath = tableIndex.getRequestPath() + "/" + path;
 
       // Reconstruct the uri
       String queryString = servletRequest.getQueryString();
-      esUri = rawPath + (queryString != null ? ('?' + queryString) : "");
+      esUri = rawPath + (queryString != null ? '?' + queryString : "");
 
       RestUtils.decodeQueryString(queryString != null ? queryString : "", 0, params);
     }
@@ -265,11 +267,7 @@ public class ValueTableIndexResource extends IndexResource {
     @Override
     public String rawPath() {
       int pathEndPos = esUri.indexOf('?');
-      if(pathEndPos < 0) {
-        return esUri;
-      } else {
-        return esUri.substring(0, pathEndPos);
-      }
+      return pathEndPos < 0 ? esUri : esUri.substring(0, pathEndPos);
     }
 
     @Override
