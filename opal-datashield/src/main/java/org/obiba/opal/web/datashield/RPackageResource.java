@@ -21,6 +21,7 @@ import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.RStringMatrix;
 import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.web.datashield.support.NoSuchRPackageException;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
@@ -153,7 +154,7 @@ public abstract class RPackageResource {
       OpalR.RPackageDto.Builder builder = OpalR.RPackageDto.newBuilder();
       for(int i = 0; i < input.length; i++) {
         if(!Strings.isNullOrEmpty(input[i])) {
-          OpalR.EntryDto.Builder entry = OpalR.EntryDto.newBuilder();
+          Opal.EntryDto.Builder entry = Opal.EntryDto.newBuilder();
           entry.setKey(matrix.getColumnName(i));
           entry.setValue(input[i]);
           builder.addDescription(entry);
@@ -167,7 +168,7 @@ public abstract class RPackageResource {
   protected static class DataShieldPackagePredicate implements Predicate<OpalR.RPackageDto> {
     @Override
     public boolean apply(@Nullable OpalR.RPackageDto input) {
-      for(OpalR.EntryDto entry : input.getDescriptionList()) {
+      for(Opal.EntryDto entry : input.getDescriptionList()) {
         if(entry.getKey().equals("AggregationMethods") || entry.getKey().equals("AssignMethods")) {
           return true;
         }

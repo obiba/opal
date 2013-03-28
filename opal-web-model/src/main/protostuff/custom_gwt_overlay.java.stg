@@ -14,8 +14,19 @@
 
 group custom_gwt_overlay : gwt_overlay;
 
+message_header(message, module, options) ::= <<
+<header_text(prefix="// ", module=module)>
+
+package <message.proto.javaPackageName>;
+
+import com.google.gwt.core.client.*;
+import org.obiba.opal.web.model.client.magma.*;
+import org.obiba.opal.web.model.client.opal.*;
+
+>>
+
 message_getters_and_setters(message, options) ::= <<
-<message.nestedExtensions:extensions_static_definintion(extension=it, options=options)>
+<message.nestedExtensions:extensions_static_definition(extension=it, options=options)>
 <if(message.extensible)>
 <message:extension_getters_and_setters(message=message, options=options)>
 
@@ -24,7 +35,7 @@ message_getters_and_setters(message, options) ::= <<
 <message.fields:field_getters_and_setters(field=it, options=options)>
 >>
 
-extensions_static_definintion(extension, options) ::= <<
+extensions_static_definition(extension, options) ::= <<
 
 public static final class <extension.extendedMessage.name>Extensions {
   <extension.fields:extension_field_static_definition(extension=extension, field=it, options=options)>

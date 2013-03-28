@@ -24,6 +24,7 @@ import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.web.model.DataShield;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class DataShieldPackageResource extends RPackageResource {
     OpalR.RPackageDto packageDto = getPackage();
     List<DataShield.DataShieldMethodDto> aggregateMethodDtos = Lists.newArrayList();
     List<DataShield.DataShieldMethodDto> assignMethodDtos = Lists.newArrayList();
-    for(OpalR.EntryDto entry : packageDto.getDescriptionList()) {
+    for(Opal.EntryDto entry : packageDto.getDescriptionList()) {
       if(entry.getKey().equals(AGGREGATE_METHODS)) {
         aggregateMethodDtos.addAll(parsePackageMethods(entry.getValue()));
       } else if(entry.getKey().equals(ASSIGN_METHODS)) {

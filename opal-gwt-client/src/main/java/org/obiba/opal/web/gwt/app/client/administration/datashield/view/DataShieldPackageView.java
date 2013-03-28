@@ -13,7 +13,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.Dat
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
-import org.obiba.opal.web.model.client.opal.r.EntryDto;
+import org.obiba.opal.web.model.client.opal.EntryDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;

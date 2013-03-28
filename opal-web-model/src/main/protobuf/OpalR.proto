@@ -1,4 +1,5 @@
 import "Ws.proto";
+import "Opal.proto";
 
 package OpalR;
 
@@ -11,10 +12,5 @@ message RSessionDto {
 
 message RPackageDto {
   required string name = 1;
-  repeated EntryDto description = 2;
-}
-
-message EntryDto {
-  required string key = 1;
-  required string value = 2;
+  repeated Opal.EntryDto description = 2;
 }
