@@ -625,7 +625,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
             }).send();
       }
     }
-
   }
 
   private final class NextCommand implements Command {
