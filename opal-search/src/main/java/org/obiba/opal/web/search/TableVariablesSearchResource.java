@@ -21,20 +21,16 @@ import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.elasticsearch.rest.RestRequest;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.ItemResultDtoVisitor;
-import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +40,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/variables")
-public class VariablesTableIndexResource {
+public class TableVariablesSearchResource extends AbstractVariablesSearchResource {
 
-  private static final Logger log = LoggerFactory.getLogger(VariablesTableIndexResource.class);
+  private static final Logger log = LoggerFactory.getLogger(TableVariablesSearchResource.class);
 
   @PathParam("ds")
   private String datasource;
@@ -54,18 +50,10 @@ public class VariablesTableIndexResource {
   @PathParam("table")
   private String table;
 
-  private final OpalSearchService opalSearchService;
-
-  private final VariablesIndexManager indexManager;
-
-  private final ElasticSearchProvider esProvider;
-
   @Autowired
-  public VariablesTableIndexResource(VariablesIndexManager indexManager, OpalSearchService opalSearchService,
+  public TableVariablesSearchResource(VariablesIndexManager manager, OpalSearchService opalSearchService,
       ElasticSearchProvider esProvider) {
-    this.indexManager = indexManager;
-    this.opalSearchService = opalSearchService;
-    this.esProvider = esProvider;
+    super(opalSearchService, esProvider, manager);
   }
 
   @GET
@@ -73,14 +61,11 @@ public class VariablesTableIndexResource {
   @Path("_search")
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("variable") @DefaultValue("false") boolean includeVariableDto,
-      @QueryParam("field") List<String> fields) {
+      @QueryParam("variable") @DefaultValue("false") boolean addVariableDto, @QueryParam("field") List<String> fields) {
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
-      JSONObject jsonQuery = jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit).build();
-      Search.QueryResultDto dtoResponse = executeQuery(includeVariableDto, jsonQuery);
+      Search.QueryResultDto dtoResponse = convertResonse(executeQuery(query, offset, limit, fields), addVariableDto);
       return Response.ok().entity(dtoResponse).build();
     } catch(NoSuchValueSetException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
@@ -91,24 +76,22 @@ public class VariablesTableIndexResource {
     }
   }
 
-  private boolean searchServiceAvailable() {
-    return opalSearchService.isRunning() && opalSearchService.isEnabled();
+  //
+  // Protected methods
+  //
+
+  @Override
+  protected String getSearchPath() {
+    return indexManager.getIndex(getValueTable()).getRequestPath();
   }
 
-  private Search.QueryResultDto executeQuery(boolean includeVariableDto, JSONObject jsonQuery) throws JSONException {
-    EsQueryExecutor queryExecutor = new EsQueryExecutor(esProvider);
-    JSONObject jsonResponse = queryExecutor.execute(getValueTableIndex(), jsonQuery, RestRequest.Method.POST);
+  protected Search.QueryResultDto convertResonse(JSONObject jsonResponse, boolean addVariableDto) throws JSONException {
     EsResultConverter converter = new EsResultConverter();
-    if(includeVariableDto) converter.accept(new ItemResultDtoVisitor(getValueTable()));
+    if(addVariableDto) converter.accept(new ItemResultDtoVisitor(getValueTable()));
     return converter.convert(jsonResponse);
-  }
-
-  private ValueTableIndex getValueTableIndex() {
-    return indexManager.getIndex(getValueTable());
   }
 
   private ValueTable getValueTable() {
     return MagmaEngine.get().getDatasource(datasource).getValueTable(table);
   }
-
 }
