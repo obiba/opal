@@ -135,21 +135,6 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
                     " table:" + event.getSelection().getName());
           }
         }));
-
-    getView().getSearch().getSuggestOracle().add("Var1");
-    getView().getSearch().getSuggestOracle().add("Var2");
-    getView().getSearch().getSuggestOracle().add("Var3");
-    getView().getSearch().getSuggestOracle().add("Var4");
-    getView().getSearch().getSuggestOracle().add("Var5");
-    getView().getSearch().getSuggestOracle().add("Var6");
-//    getView().getSearch().adgetTextBox().addFocusHandler(new FocusHandler() {
-//      @Override
-//      public void onFocus(FocusEvent event) {
-//        getView().getSearch().getSuggestOracle().requestDefaultSuggestions(new SuggestOracle.Request(
-//
-//        ));
-//      }
-//    });
   }
 
   @Override
