@@ -51,7 +51,7 @@ public class DeriveCategoricalVariableStepPresenter
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     // TODO use uribuilder
     ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-        .forResource(getOriginalVariable().getLink() + "/summary?nature=categorical&distinct=true").get()
+        .forResource(getOriginalVariable().getLink() + "/stats/summary?nature=categorical&distinct=true").get()
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
           public void onResource(Response response, SummaryStatisticsDto statisticsDto) {

@@ -65,7 +65,7 @@ public class DeriveNumericalVariableStepPresenter
       VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     getView().setNumberType(originalVariable.getValueType());
-    summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/summary");
+    summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/stats/summary");
     summaryTabPresenter.forgetSummary();
     summaryTabPresenter.refreshDisplay();
   }
@@ -239,7 +239,7 @@ public class DeriveNumericalVariableStepPresenter
 
     private void addDistinctValuesMapping() {
       String link = getOriginalVariable().getLink() //
-          + "/summary" //
+          + "/stats/summary" //
           + "?nature=categorical" //
           + "&distinct=true";
 
@@ -417,7 +417,8 @@ public class DeriveNumericalVariableStepPresenter
   private final class OriginalVariableSummaryReceivedHandler implements SummaryReceivedEvent.Handler {
     @Override
     public void onSummaryReceived(SummaryReceivedEvent event) {
-      if(getOriginalVariable() != null && event.getResourceUri().equals(getOriginalVariable().getLink() + "/summary")) {
+      if(getOriginalVariable() != null &&
+          event.getResourceUri().equals(getOriginalVariable().getLink() + "/stats/summary")) {
         SummaryStatisticsDto dto = event.getSummary();
         if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
           ContinuousSummaryDto continuous = dto
@@ -437,12 +438,9 @@ public class DeriveNumericalVariableStepPresenter
   private final class AddValueMapEntryHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent event) {
-      boolean added = false;
-      if(getView().addRangeSelected()) {
-        added = addValueMapEntry(getView().getLowerValue(), getView().getUpperValue(), getView().getNewValue());
-      } else {
-        added = addValueMapEntry(numberType.formatNumber(getView().getDiscreteValue()), getView().getNewValue());
-      }
+      boolean added = getView().addRangeSelected()
+          ? addValueMapEntry(getView().getLowerValue(), getView().getUpperValue(), getView().getNewValue())
+          : addValueMapEntry(numberType.formatNumber(getView().getDiscreteValue()), getView().getNewValue());
       if(added) {
         getView().refreshValuesMapDisplay();
       }

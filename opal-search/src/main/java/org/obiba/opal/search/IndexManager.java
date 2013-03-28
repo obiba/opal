@@ -59,4 +59,12 @@ public interface IndexManager {
    * @return
    */
   boolean isIndexable(@Nonnull ValueTable valueTable);
+
+  /**
+   * Returns true of value table is indexed and index is up to date, ie ready to be queried.
+   *
+   * @param valueTable
+   * @return
+   */
+  boolean isIndexUpToDate(@Nonnull ValueTable valueTable);
 }

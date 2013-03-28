@@ -44,6 +44,7 @@ public class IndexSynchronizationManager {
   // Grace period before reindexing (in seconds)
   private static final int GRACE_PERIOD = 300;
 
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   @Autowired
   private Set<IndexManager> indexManagers;
 
@@ -110,8 +111,8 @@ public class IndexSynchronizationManager {
             for(IndexManager indexManager : indexManagers) {
               checkIndexable(indexManager, vt);
             }
-          } catch(Exception e) {
-            // ignore
+          } catch(Exception ignored) {
+            log.debug("Error while checking indexable", ignored);
           }
         }
       }

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.search.support;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -18,11 +19,12 @@ import org.codehaus.jettison.json.JSONObject;
 
 import com.google.common.base.Joiner;
 
+@SuppressWarnings("ParameterHidesMemberVariable")
 public class QueryTermJsonBuilder {
 
   private static final int DEFAULT_MAX_FIELDS = 9999;
 
-  private List<String> fieldNames = new ArrayList<String>();
+  private final Collection<String> fieldNames = new ArrayList<String>();
 
   private String termFieldName;
 
@@ -62,8 +64,11 @@ public class QueryTermJsonBuilder {
     JSONObject jsonQuery = new JSONObject().put("query", jsonTerm);
 
     jsonQuery.put("size", Integer.toString(size));
-    jsonQuery.put("fields", fieldNames.isEmpty() ? new JSONArray() : Joiner.on(",").join(fieldNames));
     jsonQuery.put("filter", termFilters);
+
+    if(!fieldNames.isEmpty()) {
+      jsonQuery.put("fields", Joiner.on(",").join(fieldNames));
+    }
 
     return jsonQuery;
   }
@@ -92,7 +97,7 @@ public class QueryTermJsonBuilder {
       JSONObject jsonTerms = new JSONObject();
       jsonTerms.put(fieldName, new JSONArray(filterValues));
 
-      List<JSONObject> filtersTerms = new ArrayList<JSONObject>();
+      Collection<JSONObject> filtersTerms = new ArrayList<JSONObject>();
       filtersTerms.add(new JSONObject().put("terms", jsonTerms));
 
       JSONObject jsonFiltersTerms = new JSONObject().put("filters", filtersTerms);

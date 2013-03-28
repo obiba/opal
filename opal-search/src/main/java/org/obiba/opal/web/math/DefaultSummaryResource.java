@@ -16,21 +16,19 @@ import javax.ws.rs.POST;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 
 /**
  *
  */
-public class DefaultSummaryStatisticsResource extends AbstractSummaryStatisticsResource {
+public class DefaultSummaryResource extends AbstractSummaryResource {
 
-  /**
-   * @param valueTable
-   * @param variable
-   * @param vectorSource
-   */
-  public DefaultSummaryStatisticsResource(ValueTable valueTable, Variable variable,
-      @Nullable VectorSource vectorSource) {
-    super(valueTable, variable, vectorSource);
+  public DefaultSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
+      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable, @Nullable VectorSource vectorSource) {
+    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable, vectorSource);
   }
 
   @GET

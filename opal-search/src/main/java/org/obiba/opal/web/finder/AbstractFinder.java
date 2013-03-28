@@ -16,6 +16,8 @@ public abstract class AbstractFinder<TQuery extends AbstractFinderQuery, TResult
 
   private AbstractFinder<TQuery, TResult> nextFinder;
 
+  private int limit;
+
   public abstract void find(TQuery query, TResult result);
 
   public void next(TQuery query, TResult result) {
@@ -29,5 +31,14 @@ public abstract class AbstractFinder<TQuery extends AbstractFinderQuery, TResult
   public AbstractFinder<TQuery, TResult> nextFinder(AbstractFinder<TQuery, TResult> next) {
     setNextFinder(next);
     return next;
+  }
+
+  public AbstractFinder<TQuery, TResult> withLimit(@SuppressWarnings("ParameterHidesMemberVariable") int limit) {
+    this.limit = limit;
+    return this;
+  }
+
+  public int getLimit() {
+    return limit;
   }
 }

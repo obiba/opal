@@ -18,11 +18,20 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-public class AbstractSummaryStatisticsResource {
+public class AbstractSummaryResource {
+
+  protected final OpalSearchService opalSearchService;
+
+  protected final StatsIndexManager statsIndexManager;
+
+  protected final ElasticSearchProvider esProvider;
 
   @Nonnull
   private final ValueTable valueTable;
@@ -33,11 +42,15 @@ public class AbstractSummaryStatisticsResource {
   @Nullable
   private final VectorSource vectorSource;
 
-  protected AbstractSummaryStatisticsResource(@Nonnull ValueTable valueTable, @Nonnull Variable variable,
+  protected AbstractSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
+      ElasticSearchProvider esProvider, @Nonnull ValueTable valueTable, @Nonnull Variable variable,
       @Nullable VectorSource vectorSource) {
     Preconditions.checkNotNull(valueTable);
     Preconditions.checkNotNull(variable);
 
+    this.opalSearchService = opalSearchService;
+    this.statsIndexManager = statsIndexManager;
+    this.esProvider = esProvider;
     this.valueTable = valueTable;
     this.variable = variable;
     this.vectorSource = vectorSource;
@@ -63,5 +76,10 @@ public class AbstractSummaryStatisticsResource {
     return vectorSource == null
         ? Collections.<Value>emptySet()
         : vectorSource.getValues(Sets.newTreeSet(getValueTable().getVariableEntities()));
+  }
+
+  protected boolean canQueryEsIndex() {
+    return opalSearchService.isEnabled() && opalSearchService.isRunning() && statsIndexManager.isReady() &&
+        statsIndexManager.isIndexUpToDate(valueTable);
   }
 }

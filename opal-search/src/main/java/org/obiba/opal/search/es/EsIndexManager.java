@@ -90,7 +90,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   public ValueTableIndex getIndex(@Nonnull ValueTable vt) {
     Preconditions.checkNotNull(vt);
 
-    String tableFullName = tableReference(vt);
+    String tableFullName = vt.getTableReference();
     ValueTableIndex index = indices.get(tableFullName);
     if(index == null) {
       index = createIndex(vt);
@@ -109,6 +109,11 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   @Override
   public boolean isIndexable(@Nonnull ValueTable valueTable) {
     return indexConfig.getConfig().isReadyForIndexing(valueTable, getIndex(valueTable));
+  }
+
+  @Override
+  public boolean isIndexUpToDate(@Nonnull ValueTable valueTable) {
+    return getIndex(valueTable).isUpToDate();
   }
 
   protected String esIndexName() {
@@ -135,11 +140,6 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   public void onDelete(@Nonnull ValueTable vt) {
     // Delete index
     getIndex(vt).delete();
-  }
-
-  @Nonnull
-  protected static String tableReference(@Nonnull ValueTable vt) {
-    return vt.getDatasource().getName() + "." + vt.getName();
   }
 
   protected abstract class EsIndexer implements IndexSynchronization {
@@ -243,7 +243,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
      */
     EsValueTableIndex(@Nonnull ValueTable vt, @Nonnull String prefixName) {
       name = prefixName + "-" + indexName(vt);
-      valueTableReference = tableReference(vt);
+      valueTableReference = vt.getTableReference();
     }
 
     @Nonnull
@@ -343,12 +343,12 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     }
 
     boolean isForTable(@Nonnull ValueTable valueTable) {
-      return valueTableReference.equals(tableReference(valueTable));
+      return valueTableReference.equals(valueTable.getTableReference());
     }
 
     @Nonnull
-    private String indexName(@Nonnull ValueTable vt) {
-      return tableReference(vt).replace(' ', '_').replace('.', '-');
+    private String indexName(@Nonnull ValueTable table) {
+      return table.getTableReference().replace(' ', '_').replace('.', '-');
     }
 
     @Nonnull

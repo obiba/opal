@@ -34,6 +34,9 @@ import org.obiba.magma.VectorSource;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.math.stat.IntervalFrequency.Interval;
 import org.obiba.magma.type.IntegerType;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.Math.DescriptiveStatsDto;
@@ -44,14 +47,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 @SuppressWarnings("MagicNumber")
-public class ContinuousSummaryStatisticsResource extends AbstractSummaryStatisticsResource {
+public class ContinuousSummaryResource extends AbstractSummaryResource {
 
   // Holds missing categories (the case of continuous variables that have "special" values such as 8888 or 9999 that
   // indicate a missing value)
   private final Set<Value> missing = Sets.newHashSet();
 
-  public ContinuousSummaryStatisticsResource(ValueTable valueTable, Variable variable, VectorSource vectorSource) {
-    super(valueTable, variable, vectorSource);
+  public ContinuousSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
+      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable, VectorSource vectorSource) {
+    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable, vectorSource);
     if(!variable.getValueType().isNumeric()) {
       throw new IllegalArgumentException("continuous variables must be numeric");
     }

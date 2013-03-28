@@ -125,7 +125,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   private void requestSummary() {
     StringBuilder link = new StringBuilder();
     appendTable(link);
-    link.append("/variable/_transient/summary?");
+    link.append("/variable/_transient/stats/summary?");
     appendVariableSummaryArguments(link);
 
     ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = requestSummaryBuilder(link.toString());

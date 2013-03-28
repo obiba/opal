@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -22,17 +24,22 @@ import org.obiba.magma.Value;
  */
 public final class TimestampedResponses {
 
+  private TimestampedResponses() {}
+
   /**
    * Evaluates a request against a {@code Timestamped}. This method will compare a client's timestamp against the
    * {@code lastUpdate} timestamp and respond with a 304 (Not Modified) accordingly.
    */
-  public static final void evaluate(Request request, Timestamped stamped) {
+  public static void evaluate(Request request, Timestamped stamped) {
     Value lastModified = stamped.getTimestamps().getLastUpdate();
-    if(lastModified.isNull() == false) {
-      Date d = (Date) lastModified.getValue();
+    if(!lastModified.isNull()) {
+
       // Don't compare milliseconds because HTTP headers don't have that precision
-      Response.ResponseBuilder builder = request.evaluatePreconditions(
-          new Date(d.getYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
+      Calendar calendar = GregorianCalendar.getInstance();
+      calendar.setTime((Date) lastModified.getValue());
+      calendar.clear(Calendar.MILLISECOND);
+
+      Response.ResponseBuilder builder = request.evaluatePreconditions(calendar.getTime());
       if(builder != null) {
         // Hijack the normal flow.
         throw new UnsatisfiedPreconditionException(builder);
@@ -41,7 +48,7 @@ public final class TimestampedResponses {
   }
 
   /**
-   * Produces a {@code ReponseBuilder} with {@code lastModified} timestamp set.
+   * Produces a {@code ResponseBuilder} with {@code lastModified} timestamp set.
    */
   public static Response.ResponseBuilder ok(Timestamped stamped, Object entity) {
     return ok(stamped).entity(entity);
@@ -54,7 +61,7 @@ public final class TimestampedResponses {
   public static Response.ResponseBuilder with(Response.ResponseBuilder builder, Timestamped stamped) {
     Value lastModified = stamped.getTimestamps().getLastUpdate();
     // This null-check shouldn't be necessary: https://issues.jboss.org/browse/RESTEASY-630
-    if(lastModified.isNull() == false) {
+    if(!lastModified.isNull()) {
       return builder.lastModified((Date) stamped.getTimestamps().getLastUpdate().getValue());
     }
     return builder;

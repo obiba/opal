@@ -77,7 +77,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
   @Nonnull
   @Override
   public String getName() {
-    return esIndexName() + "-variable-summaries";
+    return esIndexName() + "-stats";
   }
 
   private class Indexer extends EsIndexer {

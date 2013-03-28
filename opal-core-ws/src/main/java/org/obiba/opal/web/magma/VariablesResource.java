@@ -11,7 +11,6 @@ package org.obiba.opal.web.magma;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -70,7 +69,7 @@ public class VariablesResource extends AbstractValueTableResource {
    */
   @GET
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public Response getVariables(@Context final UriInfo uriInfo, @QueryParam("script") String script,
+  public Response getVariables(@Context UriInfo uriInfo, @QueryParam("script") String script,
       @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
 
     if(offset < 0) {
@@ -133,12 +132,11 @@ public class VariablesResource extends AbstractValueTableResource {
       // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
       // done with the current Magma implementation).
 
-      if(getValueTable().isView() == false) {
-        vw = addOrUpdateTableVariables(variables);
-      } else {
+      if(getValueTable().isView()) {
         return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView"))
             .build();
       }
+      vw = addOrUpdateTableVariables(variables);
 
       return Response.ok().build();
     } catch(Exception e) {
@@ -158,6 +156,7 @@ public class VariablesResource extends AbstractValueTableResource {
     return vw;
   }
 
+  @Override
   @Path("/locales")
   public LocalesResource getLocalesResource() {
     return super.getLocalesResource();
@@ -172,7 +171,7 @@ public class VariablesResource extends AbstractValueTableResource {
   }
 
   private static UriBuilder tableUriBuilder(UriInfo uriInfo) {
-    ArrayList<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
+    List<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
     UriBuilder ub = UriBuilder.fromPath("/");
     for(PathSegment segment : segments) {
