@@ -28,20 +28,29 @@ import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.util.Assert;
 
+import com.google.common.base.Strings;
+
 public class EsQueryExecutor {
 
   private final ElasticSearchProvider elasticSearchProvider;
+
+  private String searchPath;
 
   public EsQueryExecutor(ElasticSearchProvider elasticSearchProvider) {
     this.elasticSearchProvider = elasticSearchProvider;
   }
 
-  public JSONObject execute(ValueTableIndex valueTableIndex, JSONObject jsonBody, RestRequest.Method httpMethod) throws JSONException {
-    return executeQuery(jsonBody, new EsRestRequest(valueTableIndex, jsonBody.toString(), "_search").setHttpMethod(httpMethod));
+  public EsQueryExecutor setSearchPath(String path) {
+    searchPath = path;
+    return this;
   }
 
   public JSONObject execute(JSONObject jsonBody) throws JSONException {
-    return executeQuery(jsonBody, new EsRestRequest(jsonBody.toString(), "_search"));
+    return execute(jsonBody, RestRequest.Method.GET);
+  }
+
+  public JSONObject execute(JSONObject jsonBody, RestRequest.Method httpMethod) throws JSONException {
+    return executeQuery(jsonBody, new EsRestRequest(jsonBody.toString(), searchPath).setHttpMethod(httpMethod));
   }
 
   //
@@ -115,17 +124,14 @@ public class EsQueryExecutor {
     EsRestRequest(String body, String path, Map<String, String> params) {
       this.body = body;
       this.params = params;
-      esUri = "/" + path;
-    }
 
-    EsRestRequest(ValueTableIndex tableIndex, String body, String path) {
-      this(tableIndex, body, path, new HashMap<String, String>());
-    }
+      StringBuilder pathBuilder = new StringBuilder("/");
 
-    EsRestRequest(ValueTableIndex tableIndex, String body, String path, Map<String, String> params) {
-      this.body = body;
-      this.params = params;
-      esUri = tableIndex.getRequestPath() + "/" + path;
+      if (!Strings.isNullOrEmpty(path)) {
+        pathBuilder.append(path).append("/");
+      }
+
+      esUri = pathBuilder.append("_search").toString();
     }
 
     public EsRestRequest setHttpMethod(Method method) {
