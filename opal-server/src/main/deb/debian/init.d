@@ -137,7 +137,7 @@ do_reload() {
 #
 if [ ! -d $TMPDIR ]; then 
   mkdir $TMPDIR
-  chown -R opal:adm $TMPDIR
+  chown -R $OPAL_USER:adm $TMPDIR
   chmod -R 750 $TMPDIR
 fi
 
