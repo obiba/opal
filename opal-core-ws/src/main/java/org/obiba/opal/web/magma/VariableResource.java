@@ -29,10 +29,10 @@ import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.TimestampedResponses;
-import org.obiba.opal.web.math.AbstractSummaryResource;
-import org.obiba.opal.web.math.CategoricalSummaryResource;
-import org.obiba.opal.web.math.ContinuousSummaryResource;
-import org.obiba.opal.web.math.DefaultSummaryResource;
+import org.obiba.opal.web.magma.math.AbstractSummaryResource;
+import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
+import org.obiba.opal.web.magma.math.ContinuousSummaryResource;
+import org.obiba.opal.web.magma.math.DefaultSummaryResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 

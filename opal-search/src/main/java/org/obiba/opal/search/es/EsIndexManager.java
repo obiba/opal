@@ -401,6 +401,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       return obj != null && (obj == this ||
           obj instanceof EsValueTableIndex && ((ValueTableIndex) obj).getIndexName().equals(getIndexName()));
     }
+
   }
 
 }
