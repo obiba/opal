@@ -131,24 +131,21 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
     @Override
     public void computeAndIndexSummaries() {
-      try {
-        BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
-        TimedExecution timedExecution = new TimedExecution().start();
+      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
-        for(CategoricalVariableSummary.Builder summaryBuilder : categoricalSummaryBuilders.values()) {
-          indexSummary(bulkRequest, summaryBuilder.build());
-        }
+      TimedExecution timedExecution = new TimedExecution().start();
 
-        sendAndCheck(bulkRequest);
-        updateTimestamps();
-
-        log.info("Variable summaries of table {} computed in {}", getValueTableReference(),
-            timedExecution.end().formatExecutionTime());
-
-      } catch(IOException e) {
-        throw new RuntimeException(e);
+      for(CategoricalVariableSummary.Builder summaryBuilder : categoricalSummaryBuilders.values()) {
+        indexSummary(summaryBuilder.build(), bulkRequest);
       }
+
+      sendAndCheck(bulkRequest);
+      updateTimestamps();
+
+      log.info("Variable summaries of table {} computed in {}", getValueTableReference(),
+          timedExecution.end().formatExecutionTime());
+
     }
 
     @Override
@@ -157,27 +154,37 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
       categoricalSummaryBuilders.clear();
     }
 
-    private void indexSummary(BulkRequestBuilder bulkRequest, CategoricalVariableSummary summary) throws IOException {
+    @Override
+    public void indexSummary(CategoricalVariableSummary summary) {
+      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+      indexSummary(summary, bulkRequest);
+      sendAndCheck(bulkRequest);
+      updateTimestamps();
+    }
 
-      XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
-      builder.field("categorical-summary").startObject();
-      builder.field("mode", summary.getMode()).field("n", summary.getN());
-      builder.startArray("frequencies");
-      for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
-        builder.startObject() //
-            .field("value", frequency.getValue()) //
-            .field("freq", frequency.getFreq()) //
-            .field("pct", frequency.getPct()) //
-            .endObject();
+    private void indexSummary(CategoricalVariableSummary summary, BulkRequestBuilder bulkRequest) {
+      try {
+        XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
+        builder.field("categorical-summary").startObject();
+        builder.field("mode", summary.getMode()).field("n", summary.getN());
+        builder.startArray("frequencies");
+        for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
+          builder.startObject() //
+              .field("value", frequency.getValue()) //
+              .field("freq", frequency.getFreq()) //
+              .field("pct", frequency.getPct()) //
+              .endObject();
+        }
+        builder.endArray(); // frequencies
+        builder.endObject(); // categorical-summary
+        builder.endObject();
+
+        String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
+        bulkRequest
+            .add(esProvider.getClient().prepareIndex(getName(), getIndexName(), variableReference).setSource(builder));
+      } catch(IOException e) {
+        throw new RuntimeException(e);
       }
-      builder.endArray(); // frequencies
-      builder.endObject(); // categorical-summary
-      builder.endObject();
-
-      String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
-      bulkRequest
-          .add(esProvider.getClient().prepareIndex(getName(), getIndexName(), variableReference).setSource(builder));
-
     }
 
   }

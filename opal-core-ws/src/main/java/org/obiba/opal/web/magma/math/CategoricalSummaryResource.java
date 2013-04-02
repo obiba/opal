@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.math;
+package org.obiba.opal.web.magma.math;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -105,16 +105,20 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
   private CategoricalSummaryDto queryMagma(boolean distinct) {
     // TODO remove distinct param
-    // TODO store this new summary to ES
     CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(getVariable()) //
         .distinct(distinct) //
         .addTable(getValueTable()) //
         .build();
 
+    // TODO should we store this summary to ES in a new thread?
+    statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
+
     CategoricalSummaryDto.Builder dtoBuilder = CategoricalSummaryDto.newBuilder();
     dtoBuilder.setMode(summary.getMode()).setN(summary.getN());
     for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
-      dtoBuilder.addFrequencies(FrequencyDto.newBuilder().setValue(frequency.getValue()).setFreq(frequency.getFreq())
+      dtoBuilder.addFrequencies(FrequencyDto.newBuilder() //
+          .setValue(frequency.getValue()) //
+          .setFreq(frequency.getFreq()) //
           .setPct(frequency.getPct()));
     }
 
