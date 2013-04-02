@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
+import java.io.IOException;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
@@ -17,6 +19,8 @@ import javax.ws.rs.core.Response;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
@@ -28,7 +32,6 @@ import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.Math.FrequencyDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
-import org.obiba.opal.web.search.support.QueryTermJsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,44 +50,66 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
   @GET
   @POST
   public Response get(@QueryParam("distinct") boolean distinct) {
-    CategoricalSummaryDto summary = canQueryEsIndex() ? queryEs() : queryMagma(distinct);
+    CategoricalSummaryDto summary = canQueryEsIndex() ? queryEs(distinct) : queryMagma(distinct);
 
     SummaryStatisticsDto statisticsDto = SummaryStatisticsDto.newBuilder().setResource(getVariable().getName())
         .setExtension(CategoricalSummaryDto.categorical, summary).build();
     return TimestampedResponses.ok(getValueTable(), statisticsDto).build();
   }
 
-  private CategoricalSummaryDto queryEs() {
+  private CategoricalSummaryDto queryEs(boolean distinct) {
+
+    log.info("Query ES for {} summary", getVariable().getName());
 
     try {
 
-      String indexName = statsIndexManager.getIndex(getValueTable()).getIndexName();
-      QueryTermJsonBuilder.QueryTermsFiltersBuilder filtersBuilder = new QueryTermJsonBuilder.QueryTermsFiltersBuilder()
-          .setFieldName("_type").addFilterValue(indexName);
+      JSONObject esQuery = createEsQuery(distinct);
+      log.debug("ES query: {}", esQuery.toString(2));
 
-      QueryTermJsonBuilder queryBuilder = new QueryTermJsonBuilder() //
-          .setTermFieldName("_id") //
-          .setTermFieldValue(getVariable().getVariableReference(getValueTable())) //
-          .setTermFilters(filtersBuilder.build());
-      JSONObject query = queryBuilder.build();
-      log.debug("ES query: {}", query.toString(2));
-
-      JSONObject response = new EsQueryExecutor(esProvider).execute(query);
+      JSONObject response = new EsQueryExecutor(esProvider).execute(esQuery);
       log.debug("ES Response: {}", response.toString(2));
 
       JSONObject jsonHitsInfo = response.getJSONObject("hits");
       if(jsonHitsInfo.getInt("total") != 1) {
-        throw new RuntimeException("Cannot find indexed summary for variable " + getVariable().getName());
+        return queryMagma(distinct); // fallback
       }
       JSONObject source = jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source");
       if(!source.has("categorical-summary")) {
-        throw new RuntimeException("Cannot find indexed summary for variable " + getVariable().getName());
+        return queryMagma(distinct); // fallback
       }
       return parseJsonSummary(source.getJSONObject("categorical-summary"));
 
     } catch(JSONException e) {
       throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
     }
+  }
+
+  private JSONObject createEsQuery(boolean distinct) throws IOException, JSONException {
+    String indexName = statsIndexManager.getIndex(getValueTable()).getIndexName();
+    String variableReference = getVariable().getVariableReference(getValueTable());
+    XContentBuilder builder = XContentFactory.jsonBuilder().startObject() //
+        .startObject("query") //
+        .startObject("bool") //
+        .startArray("must") //
+
+        .startObject() //
+        .startObject("term").field("_id", variableReference).endObject() //
+        .endObject() //
+
+        .startObject() //
+        .startObject("term").field("_type", indexName).endObject() //
+        .endObject() //
+
+        .startObject() //
+        .startObject("term").field("distinct", distinct).endObject() //
+        .endObject() //
+
+        .endArray() // must
+        .endObject() // bool
+        .endObject(); //query
+    return new JSONObject(builder.string());
   }
 
   private CategoricalSummaryDto parseJsonSummary(JSONObject jsonSummary) throws JSONException {
@@ -104,13 +129,15 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
   }
 
   private CategoricalSummaryDto queryMagma(boolean distinct) {
-    // TODO remove distinct param
+
+    log.info("Query Magma for {} summary", getVariable().getName());
+
     CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(getVariable()) //
         .distinct(distinct) //
         .addTable(getValueTable()) //
         .build();
 
-    // TODO should we store this summary to ES in a new thread?
+    // TODO should we store this summary to ES with a new thread?
     statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
 
     CategoricalSummaryDto.Builder dtoBuilder = CategoricalSummaryDto.newBuilder();

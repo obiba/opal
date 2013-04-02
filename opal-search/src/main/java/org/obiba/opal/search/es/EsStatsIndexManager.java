@@ -166,7 +166,9 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
       try {
         XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
         builder.field("categorical-summary").startObject();
-        builder.field("mode", summary.getMode()).field("n", summary.getN());
+        builder.field("distinct", summary.isDistinct());
+        builder.field("mode", summary.getMode());
+        builder.field("n", summary.getN());
         builder.startArray("frequencies");
         for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
           builder.startObject() //
