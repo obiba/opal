@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvid
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.opal.EntryDto;
+import org.obiba.opal.web.model.client.opal.r.EntryDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 import com.google.gwt.cell.client.FieldUpdater;

@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import org.obiba.opal.web.model.client.opal.EntryDto;
+import org.obiba.opal.web.model.client.opal.r.EntryDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 import com.google.gwt.core.client.JsArray;

@@ -13,7 +13,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.Dat
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
-import org.obiba.opal.web.model.client.opal.EntryDto;
+import org.obiba.opal.web.model.client.opal.r.EntryDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -39,9 +39,9 @@ public class DataShieldPackageView extends PopupViewImpl implements DataShieldPa
   @UiTemplate("DataShieldPackageView.ui.xml")
   interface DataShieldPackageViewUiBinder extends UiBinder<DialogBox, DataShieldPackageView> {}
 
-  private static DataShieldPackageViewUiBinder uiBinder = GWT.create(DataShieldPackageViewUiBinder.class);
+  private static final DataShieldPackageViewUiBinder uiBinder = GWT.create(DataShieldPackageViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
