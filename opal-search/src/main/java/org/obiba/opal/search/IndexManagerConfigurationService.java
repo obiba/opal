@@ -12,9 +12,9 @@ package org.obiba.opal.search;
 import javax.annotation.Nonnull;
 
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.web.magma.ValueTableUpdateListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,7 @@ public class IndexManagerConfigurationService implements ValueTableUpdateListene
   }
 
   public IndexManagerConfiguration getConfig() {
-    if(configSupplier.hasExtension() == false) {
+    if(!configSupplier.hasExtension()) {
       configSupplier.addExtension(new IndexManagerConfiguration());
     }
     return configSupplier.get();

@@ -10,7 +10,6 @@
 package org.obiba.opal.search.es;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -37,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Component
@@ -117,8 +115,6 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     @Override
     public void indexVariable(@Nonnull Variable variable, @Nonnull Value value) {
 
-      log.debug("Add {} to summary", variable.getName());
-
       // skip binary variable
       if(variable.getValueType().equals(BinaryType.get())) {
         throw new RuntimeException("Cannot compute summary for binary variable " + variable.getName());
@@ -162,27 +158,25 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     }
 
     private void indexSummary(BulkRequestBuilder bulkRequest, CategoricalVariableSummary summary) throws IOException {
-      List<String> values = Lists.newArrayList();
-      List<Long> freqs = Lists.newArrayList();
-      List<Double> pcts = Lists.newArrayList();
 
+      XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
+      builder.field("categorical-summary").startObject();
+      builder.field("mode", summary.getMode()).field("n", summary.getN());
+      builder.startArray("frequencies");
       for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
-        values.add(frequency.getValue());
-        freqs.add(frequency.getFreq());
-        pcts.add(frequency.getPct());
+        builder.startObject() //
+            .field("value", frequency.getValue()) //
+            .field("freq", frequency.getFreq()) //
+            .field("pct", frequency.getPct()) //
+            .endObject();
       }
-
-      XContentBuilder contentBuilder = XContentFactory.jsonBuilder().startObject() //
-          .field("cat-summary-mode", summary.getMode()) //
-          .field("cat-summary-n", summary.getN()) //
-          .field("cat-summary-freq-value", values) //
-          .field("cat-summary-freq-freq", freqs) //
-          .field("cat-summary-freq-pct", pcts) //
-          .endObject();
+      builder.endArray(); // frequencies
+      builder.endObject(); // categorical-summary
+      builder.endObject();
 
       String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
-      bulkRequest.add(
-          esProvider.getClient().prepareIndex(getName(), getIndexName(), variableReference).setSource(contentBuilder));
+      bulkRequest
+          .add(esProvider.getClient().prepareIndex(getName(), getIndexName(), variableReference).setSource(builder));
 
     }
 

@@ -16,7 +16,11 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 
 /**
  * A table resource that supports DELETE (drop)
@@ -26,9 +30,9 @@ public class DroppableTableResource extends TableResource {
   private final Set<ValueTableUpdateListener> tableListeners;
 
   public DroppableTableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService,
+      OpalSearchService opalSearchService, StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider,
       Set<ValueTableUpdateListener> tableListeners) {
-    super(valueTable, locales, importService);
-
+    super(valueTable, locales, importService, opalSearchService, statsIndexManager, esProvider);
     this.tableListeners = tableListeners;
   }
 

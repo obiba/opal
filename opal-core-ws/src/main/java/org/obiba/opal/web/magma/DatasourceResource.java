@@ -12,12 +12,10 @@ package org.obiba.opal.web.magma;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -35,6 +33,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
@@ -43,6 +42,9 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -55,6 +57,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @SuppressWarnings("OverlyCoupledClass")
@@ -66,15 +70,18 @@ public class DatasourceResource {
   @PathParam("name")
   private String name;
 
-  @Nonnull
   private final OpalConfigurationService configService;
+
+  private final ViewManager viewManager;
 
   private final ImportService importService;
 
-  @Nonnull
-  private final ViewManager viewManager;
+  private final OpalSearchService opalSearchService;
 
-  @Nonnull
+  private final StatsIndexManager statsIndexManager;
+
+  private final ElasticSearchProvider esProvider;
+
   private final ViewDtos viewDtos;
 
   private final Set<ValueTableUpdateListener> tableListeners;
@@ -87,34 +94,30 @@ public class DatasourceResource {
   @SuppressWarnings("NullableProblems")
   @Autowired
   public DatasourceResource(OpalConfigurationService configService, ImportService importService,
-      ViewManager viewManager, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
+      ViewManager viewManager, OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
+      ElasticSearchProvider esProvider, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
 
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
+    if(importService == null) throw new IllegalArgumentException("importService cannot be null");
+    if(opalSearchService == null) throw new IllegalArgumentException("opalSearchService cannot be null");
+    if(statsIndexManager == null) throw new IllegalArgumentException("statsIndexManager cannot be null");
+    if(esProvider == null) throw new IllegalArgumentException("esProvider cannot be null");
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
 
     this.configService = configService;
     this.importService = importService;
     this.viewManager = viewManager;
+    this.opalSearchService = opalSearchService;
+    this.statsIndexManager = statsIndexManager;
+    this.esProvider = esProvider;
     this.viewDtos = viewDtos;
     this.tableListeners = tableListeners;
   }
 
-  // Used for testing
-  @SuppressWarnings("ConstantConditions")
-  DatasourceResource(String name) {
-    this(null, null, null, name);
-  }
-
-  // Used for testing
-  DatasourceResource(@Nonnull OpalConfigurationService configService, @Nonnull ViewManager viewManager,
-      @Nonnull ViewDtos viewDtos, String name) {
-    this.configService = configService;
-    this.viewManager = viewManager;
-    this.viewDtos = viewDtos;
+  @VisibleForTesting
+  void setName(String name) {
     this.name = name;
-    tableListeners = new HashSet<ValueTableUpdateListener>();
-    importService = null;
   }
 
   public void setLocalesProperty(String localesProperty) {
@@ -167,12 +170,14 @@ public class DatasourceResource {
 
   public TableResource getTableResource(ValueTable table) {
     return getDatasource().canDropTable(table.getName()) //
-        ? new DroppableTableResource(table, getLocales(), importService, tableListeners) //
-        : new TableResource(table, getLocales(), importService);
+        ? new DroppableTableResource(table, getLocales(), importService, opalSearchService, statsIndexManager,
+        esProvider, tableListeners) //
+        : new TableResource(table, getLocales(), importService, opalSearchService, statsIndexManager, esProvider);
   }
 
   public ViewResource getViewResource(View view) {
-    return new ViewResource(viewManager, view, viewDtos, getLocales());
+    return new ViewResource(viewManager, view, viewDtos, getLocales(), importService, opalSearchService,
+        statsIndexManager, esProvider);
   }
 
   @Path("/compare")

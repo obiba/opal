@@ -18,6 +18,12 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchConfigurationService;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtoExtension;
@@ -50,9 +56,15 @@ public class ViewResourceTest {
     // Setup
     View view = new View();
     ViewManager mockViewManager = createMock(ViewManager.class);
+    ImportService importService = createMock(ImportService.class);
+    OpalSearchService opalSearchService = new OpalSearchService(
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
+    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 
     // Exercise
-    ViewResource sut = new ViewResource(mockViewManager, view, newViewDtos());
+    ViewResource sut = new ViewResource(mockViewManager, view, newViewDtos(), opalSearchService, statsIndexManager,
+        esProvider, importService);
 
     // Verify
     assertEquals(view, sut.getValueTable());
@@ -62,11 +74,18 @@ public class ViewResourceTest {
   public void testGetFrom_ReturnsTableResourceForWrappedTable() {
     // Setup
     ViewManager mockViewManager = createMock(ViewManager.class);
+    ImportService importService = createMock(ImportService.class);
+    OpalSearchService opalSearchService = new OpalSearchService(
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
+    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+
     ValueTable fromTableMock = createMock(ValueTable.class);
     expect(fromTableMock.getName()).andReturn("fromTable").atLeastOnce();
 
     View view = new View("testView", fromTableMock);
-    ViewResource sut = new ViewResource(mockViewManager, view, newViewDtos(), ImmutableSet.of(new Locale("en")));
+    ViewResource sut = new ViewResource(mockViewManager, view, newViewDtos(), ImmutableSet.of(new Locale("en")),
+        importService, opalSearchService, statsIndexManager, esProvider);
 
     replay(fromTableMock);
 

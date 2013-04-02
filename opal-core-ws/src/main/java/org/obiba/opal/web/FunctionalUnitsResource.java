@@ -58,6 +58,9 @@ import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.obiba.opal.core.unit.FunctionalUnitService;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
@@ -66,8 +69,6 @@ import org.obiba.opal.web.model.Magma.TableIdentifiersSync;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -84,7 +85,7 @@ import au.com.bytecode.opencsv.CSVReader;
 @Path("/functional-units")
 public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
-  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitsResource.class);
+//  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitsResource.class);
 
   private final FunctionalUnitService functionalUnitService;
 
@@ -98,17 +99,26 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private final IdentifiersTableService identifiersTableService;
 
+  private final OpalSearchService opalSearchService;
+
+  private final StatsIndexManager statsIndexManager;
+
+  private final ElasticSearchProvider esProvider;
+
   @Autowired
   public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime,
       UnitKeyStoreService unitKeyStoreService, ImportService importService,
-      DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableResolver) {
-    super();
+      DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableResolver,
+      OpalSearchService opalSearchService, StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
     this.functionalUnitService = functionalUnitService;
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
     this.importService = importService;
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     this.identifiersTableService = identifiersTableResolver;
+    this.opalSearchService = opalSearchService;
+    this.statsIndexManager = statsIndexManager;
+    this.esProvider = esProvider;
   }
 
   //
@@ -117,7 +127,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @GET
   public List<Opal.FunctionalUnitDto> getFunctionalUnits() {
-    final List<Opal.FunctionalUnitDto> functionalUnits = Lists.newArrayList();
+    List<Opal.FunctionalUnitDto> functionalUnits = Lists.newArrayList();
     for(FunctionalUnit functionalUnit : getFunctionalUnitService().getFunctionalUnits()) {
       Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().setName(functionalUnit.getName())
           .setDescription(functionalUnit.hasDescription() ? functionalUnit.getDescription() : "")
@@ -209,7 +219,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @Path("/entities/table")
   public TableResource getEntitiesTable() {
-    return new TableResource(identifiersTableService.getValueTable());
+    return new TableResource(identifiersTableService.getValueTable(), importService, opalSearchService,
+        statsIndexManager, esProvider);
   }
 
   @GET

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -44,6 +43,9 @@ import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -62,20 +64,26 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @SuppressWarnings("OverlyCoupledClass")
 public class TableResource extends AbstractValueTableResource {
 
-  @Nullable
   private final ImportService importService;
 
-  public TableResource(ValueTable valueTable) {
-    this(valueTable, Collections.<Locale>emptySet(), null);
+  private final OpalSearchService opalSearchService;
+
+  private final StatsIndexManager statsIndexManager;
+
+  private final ElasticSearchProvider esProvider;
+
+  public TableResource(ValueTable valueTable, ImportService importService, OpalSearchService opalSearchService,
+      StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
+    this(valueTable, Collections.<Locale>emptySet(), importService, opalSearchService, statsIndexManager, esProvider);
   }
 
-  public TableResource(ValueTable valueTable, Set<Locale> locales) {
-    this(valueTable, locales, null);
-  }
-
-  public TableResource(ValueTable valueTable, Set<Locale> locales, @Nullable ImportService importService) {
+  public TableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService,
+      OpalSearchService opalSearchService, StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
     super(valueTable, locales);
     this.importService = importService;
+    this.opalSearchService = opalSearchService;
+    this.statsIndexManager = statsIndexManager;
+    this.esProvider = esProvider;
   }
 
   @GET
@@ -386,7 +394,7 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   private VariableResource getVariableResource(VariableValueSource source) {
-    return new VariableResource(getValueTable(), source);
+    return new VariableResource(getValueTable(), source, opalSearchService, statsIndexManager, esProvider);
   }
 
   private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,

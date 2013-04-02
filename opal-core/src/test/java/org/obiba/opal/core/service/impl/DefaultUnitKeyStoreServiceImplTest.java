@@ -24,6 +24,7 @@ import org.easymock.IArgumentMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.service.PersistenceManager;
+import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.unit.UnitKeyStore;
 
@@ -140,7 +141,8 @@ public class DefaultUnitKeyStoreServiceImplTest {
     try {
       baos = new ByteArrayOutputStream();
 
-      testKeyStoreStream = new FileInputStream("src/test/resources/DefaultUnitKeyStoreServiceImplTest/opal.jks");
+      testKeyStoreStream = new FileInputStream(
+          FileUtil.getFileFromResource("DefaultUnitKeyStoreServiceImplTest/opal.jks"));
       while(testKeyStoreStream.available() != 0) {
         byte[] buf = new byte[1024];
         int bytesRead = testKeyStoreStream.read(buf);

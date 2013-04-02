@@ -171,7 +171,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
   private void authorize() {
     // summary
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/stats/summary").get()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(variable.getLink() + "/summary").get()
         .authorize(new CompositeAuthorizer(getView().getSummaryAuthorizer(), new SummaryUpdate())).send();
 
     // values
@@ -207,7 +207,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
    */
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void requestSummary(VariableDto selection) {
-    getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/stats/summary"));
+    getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
   }
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")

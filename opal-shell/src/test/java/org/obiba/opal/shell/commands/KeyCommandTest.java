@@ -21,6 +21,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.UnitKeyStoreService;
@@ -372,7 +373,7 @@ public class KeyCommandTest {
 
     FileInputStream fis = null;
     try {
-      fis = new FileInputStream("src/test/resources/KeyCommandTest/opal.jks");
+      fis = new FileInputStream(FileUtil.getFileFromResource("KeyCommandTest/opal.jks"));
       keyStore.load(fis, "password".toCharArray());
     } finally {
       if(fis != null) {
