@@ -76,7 +76,11 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
       if(jsonHitsInfo.getInt("total") != 1) {
         throw new RuntimeException("Cannot find indexed summary for variable " + getVariable().getName());
       }
-      return parseJsonSummary(jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source"));
+      JSONObject source = jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source");
+      if(!source.has("categorical-summary")) {
+        throw new RuntimeException("Cannot find indexed summary for variable " + getVariable().getName());
+      }
+      return parseJsonSummary(source.getJSONObject("categorical-summary"));
 
     } catch(JSONException e) {
       throw new RuntimeException(e);
@@ -85,16 +89,15 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
   private CategoricalSummaryDto parseJsonSummary(JSONObject jsonSummary) throws JSONException {
     CategoricalSummaryDto.Builder dtoBuilder = CategoricalSummaryDto.newBuilder();
-    dtoBuilder.setMode(jsonSummary.getString("cat-summary-mode")).setN(jsonSummary.getLong("cat-summary-n"));
-
-    JSONArray jsonValues = jsonSummary.getJSONArray("cat-summary-freq-value");
-    JSONArray jsonFreq = jsonSummary.getJSONArray("cat-summary-freq-freq");
-    JSONArray jsonPct = jsonSummary.getJSONArray("cat-summary-freq-pct");
-
-    int nbValues = jsonValues.length();
-    for(int i = 0; i < nbValues; i++) {
-      dtoBuilder.addFrequencies(FrequencyDto.newBuilder().setValue(jsonValues.getString(i)).setFreq(jsonFreq.getLong(i))
-          .setPct(jsonPct.getDouble(i)));
+    dtoBuilder.setMode(jsonSummary.getString("mode")).setN(jsonSummary.getLong("n"));
+    JSONArray frequencies = jsonSummary.getJSONArray("frequencies");
+    int nbFreq = frequencies.length();
+    for(int i = 0; i < nbFreq; i++) {
+      JSONObject jsonFreq = frequencies.getJSONObject(i);
+      dtoBuilder.addFrequencies(FrequencyDto.newBuilder() //
+          .setValue(jsonFreq.getString("value")) //
+          .setFreq(jsonFreq.getLong("freq")) //
+          .setPct(jsonFreq.getDouble("pct")));
     }
 
     return dtoBuilder.build();

@@ -27,24 +27,20 @@ public class StatsMapping {
     try {
       XContentBuilder builder = XContentFactory.jsonBuilder().startObject().startObject(indexName);
 
-      builder.startObject("_meta") //
-          .field("_created", DateTimeType.get().valueOf(new Date()).toString()) //
-          .field("_opalversion", opalVersion.toString()) //
-          .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()) //
-          .endObject();
-
-      builder.startObject("properties") //
-          .startObject("cat-summary-mode").field("type", "string").endObject() //
-          .startObject("cat-summary-n").field("type", "long").endObject() //
-          .startObject("cat-summary-freq-value").field("type", "string").endObject() //
-          .startObject("cat-summary-freq-freq").field("type", "long").endObject() //
-          .startObject("cat-summary-freq-pct").field("type", "double").endObject() //
-          .endObject();
+      mapMetadata(opalVersion, valueTable, builder);
 
       return builder;
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void mapMetadata(Version opalVersion, ValueTable valueTable, XContentBuilder builder) throws IOException {
+    builder.startObject("_meta") //
+        .field("_created", DateTimeType.get().valueOf(new Date()).toString()) //
+        .field("_opalversion", opalVersion.toString()) //
+        .field("_reference", valueTable.getDatasource().getName() + "." + valueTable.getName()) //
+        .endObject();
   }
 
 }
