@@ -15,6 +15,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -99,6 +101,7 @@ public class RestDatasource extends AbstractDatasource {
     return ImmutableSet.copyOf(d.getTableList());
   }
 
+  @Nonnull
   @Override
   public ValueTableWriter createWriter(String tableName, String entityType) {
     if(!hasValueTable(tableName)) {

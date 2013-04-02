@@ -27,6 +27,10 @@ import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -40,14 +44,30 @@ public class ViewResource extends AbstractValueTableResource {
 
   private final ViewDtos viewDtos;
 
-  public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos, Set<Locale> locales) {
+  private final ImportService importService;
+
+  private final OpalSearchService opalSearchService;
+
+  private final StatsIndexManager statsIndexManager;
+
+  private final ElasticSearchProvider esProvider;
+
+  public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos, Set<Locale> locales,
+      ImportService importService, OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
+      ElasticSearchProvider esProvider) {
     super(view, locales);
     this.viewDtos = viewDtos;
     this.viewManager = viewManager;
+    this.importService = importService;
+    this.opalSearchService = opalSearchService;
+    this.statsIndexManager = statsIndexManager;
+    this.esProvider = esProvider;
   }
 
-  public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos) {
-    this(viewManager, view, viewDtos, Collections.<Locale>emptySet());
+  public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos, OpalSearchService opalSearchService,
+      StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider, ImportService importService) {
+    this(viewManager, view, viewDtos, Collections.<Locale>emptySet(), importService, opalSearchService,
+        statsIndexManager, esProvider);
   }
 
   @GET
@@ -104,7 +124,8 @@ public class ViewResource extends AbstractValueTableResource {
   @Bean
   @Scope("request")
   public TableResource getFrom() {
-    return new TableResource(asView().getWrappedValueTable(), getLocales());
+    return new TableResource(asView().getWrappedValueTable(), getLocales(), importService, opalSearchService,
+        statsIndexManager, esProvider);
   }
 
   @Override

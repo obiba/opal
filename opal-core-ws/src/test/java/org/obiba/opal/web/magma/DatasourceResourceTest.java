@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,10 +26,13 @@ import org.easymock.IArgumentMatcher;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.obiba.core.util.FileUtil;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
@@ -39,6 +43,11 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
+import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchConfigurationService;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
@@ -71,6 +80,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.obiba.core.util.FileUtil.getFileFromResource;
 
 /**
  *
@@ -144,9 +154,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     DatasourcesResource resource = new DatasourcesResource(newSpssDatasourceFactoryRegistry(), opalruntimeMock);
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName(name)
-        .setExtension(Magma.SpssDatasourceFactoryDto.params,
-            Magma.SpssDatasourceFactoryDto.newBuilder().setFile("src/test/resources/spss/DatabaseTest.sav").build())
-        .build();
+        .setExtension(Magma.SpssDatasourceFactoryDto.params, Magma.SpssDatasourceFactoryDto.newBuilder()
+            .setFile(FileUtil.getFileFromResource("spss/DatabaseTest.sav").getAbsolutePath()).build()).build();
 
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
 
@@ -183,7 +192,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     OpalConfiguration opalConfig = new OpalConfiguration();
 
     MagmaEngineFactory factory = new MagmaEngineFactory();
-    ExcelDatasourceFactory excelFactory = new ExcelDatasourceFactory();
+    DatasourceFactory excelFactory = new ExcelDatasourceFactory();
     excelFactory.setName("datasourceToRemove");
     factory.withFactory(excelFactory);
     opalConfig.setMagmaEngineFactory(factory);
@@ -191,24 +200,68 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     expect(opalruntimeMock.getOpalConfiguration()).andReturn(opalConfig);
     opalruntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
 
-    ViewManager viewManagerMock = createMock(ViewManager.class);
-
     replay(opalruntimeMock);
 
-    DatasourceResource resource = new DatasourceResource(opalruntimeMock, viewManagerMock, newViewDtos(),
-        "datasourceToRemove");
+    DatasourceResource resource = createDatasource("datasourceToRemove", opalruntimeMock);
     Response response = resource.removeDatasource();
 
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  private DatasourceResource createDatasource(String name) {
+    return createDatasource(name, createMock(OpalConfigurationService.class));
+  }
+
+  private DatasourceResource createDatasource(String name, OpalConfigurationService opalConfigurationService) {
+    ViewManager viewManagerMock = createMock(ViewManager.class);
+    ImportService importService = createMock(ImportService.class);
+    OpalSearchService opalSearchService = new OpalSearchService(
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
+    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+
+    DatasourceResource resource = new DatasourceResource(opalConfigurationService, importService, viewManagerMock,
+        opalSearchService, statsIndexManager, esProvider, newViewDtos(),
+        Collections.<ValueTableUpdateListener>emptySet());
+    resource.setName(name);
+    return resource;
+  }
+
+  private DatasourceResource createDatasource(String mockDatasourceName, final Datasource mockDatasource,
+      OpalConfigurationService mockOpalRuntime, ViewManager mockViewManager) {
+    ImportService importService = createMock(ImportService.class);
+    OpalSearchService opalSearchService = new OpalSearchService(
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
+    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+
+    DatasourceResource sut = new DatasourceResource(mockOpalRuntime, importService, mockViewManager, opalSearchService,
+        statsIndexManager, esProvider, newViewDtos(), Collections.<ValueTableUpdateListener>emptySet()) {
+
+      @Override
+      Datasource getDatasource() {
+        return mockDatasource;
+      }
+    };
+    sut.setName(mockDatasourceName);
+
+    return sut;
   }
 
   @Test
   public void testRemoveDatasource_DatasourceNotFound() {
     OpalConfigurationService opalruntimeMock = createMock(OpalConfigurationService.class);
     ViewManager viewManagerMock = createMock(ViewManager.class);
+    ImportService importService = createMock(ImportService.class);
+    OpalSearchService opalSearchService = new OpalSearchService(
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
+    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 
-    DatasourceResource resource = new DatasourceResource(opalruntimeMock, viewManagerMock, newViewDtos(),
-        "datasourceNotExist");
+    DatasourceResource resource = new DatasourceResource(opalruntimeMock, importService, viewManagerMock,
+        opalSearchService, statsIndexManager, esProvider, newViewDtos(),
+        Collections.<ValueTableUpdateListener>emptySet());
+    resource.setName("datasourceNotExist");
     Response response = resource.removeDatasource();
 
     Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -288,7 +341,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
 
-    File file = new File(DATASOURCES_FOLDER, "user-defined-bogus.xls");
+    File file = new File(getFileFromResource(DATASOURCES_FOLDER), "user-defined-bogus.xls");
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder()
         .setExtension(ExcelDatasourceFactoryDto.params,
             Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(file.getAbsolutePath()).setReadOnly(true).build())
@@ -315,7 +368,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     String uid = MagmaEngine.get().addTransientDatasource(factory);
 
-    DatasourceResource resource = new DatasourceResource(uid);
+    DatasourceResource resource = createDatasource(uid);
 
     Magma.DatasourceDto dto = resource.get();
 
@@ -331,7 +384,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     String uid = MagmaEngine.get().addTransientDatasource(factory);
 
-    DatasourceResource resource = new DatasourceResource(uid);
+    DatasourceResource resource = createDatasource(uid);
 
     Response response = resource.removeDatasource();
 
@@ -344,7 +397,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testDatasourceGET() {
-    DatasourceResource resource = new DatasourceResource(DATASOURCE1);
+    DatasourceResource resource = createDatasource(DATASOURCE1);
 
     Magma.DatasourceDto dto = resource.get();
 
@@ -376,7 +429,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     MagmaEngine.get().addDatasource(datasourceMock);
 
-    DatasourceResource datasourceResource = new DatasourceResource(datasourceMock.getName());
+    DatasourceResource datasourceResource = createDatasource(datasourceMock.getName());
     Response response = datasourceResource.getTables().createTable(createTableDto());
 
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
@@ -403,7 +456,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     MagmaEngine.get().addDatasource(datasourceMock);
 
-    DatasourceResource datasourceResource = new DatasourceResource(datasourceMock.getName());
+    DatasourceResource datasourceResource = createDatasource(datasourceMock.getName());
     Response response = datasourceResource.getTables().createTable(createTableDto());
 
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -423,7 +476,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     ValueTable mockFromTable = createMock(ValueTable.class);
 
-    final Datasource mockDatasource = createMock(Datasource.class);
+    Datasource mockDatasource = createMock(Datasource.class);
     mockDatasource.initialise();
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
     expect(mockDatasource.hasValueTable(viewName)).andReturn(false).atLeastOnce();
@@ -442,8 +495,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     expect(uriInfoMock.getBaseUri()).andReturn(new URI("http://localhost:8080/ws")).atLeastOnce();
 
     OpalConfigurationService mockOpalRuntime = createMock(OpalConfigurationService.class);
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, mockOpalRuntime,
-        mockViewManager);
+    DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource, mockOpalRuntime, mockViewManager);
 
     replay(mockDatasource, mockFromTable, mockViewManager, uriInfoMock);
 
@@ -469,7 +521,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     ValueTable mockFromTable = createMock(ValueTable.class);
 
-    final Datasource mockDatasource = createMock(Datasource.class);
+    Datasource mockDatasource = createMock(Datasource.class);
     mockDatasource.initialise();
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
     expect(mockDatasource.hasValueTable(viewName)).andReturn(true).atLeastOnce();
@@ -488,7 +540,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(view));
     expectLastCall().once();
 
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, null, mockViewManager);
+    OpalConfigurationService mockOpalRuntime = createMock(OpalConfigurationService.class);
+    DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource, mockOpalRuntime, mockViewManager);
     sut.setLocalesProperty("en, fr");
 
     replay(mockDatasource, mockFromTable, mockViewManager);
@@ -513,7 +566,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     ValueTable mockFromTable = createMock(ValueTable.class);
 
-    final Datasource mockDatasource = createMock(Datasource.class);
+    Datasource mockDatasource = createMock(Datasource.class);
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
 
     expect(mockFromTable.getDatasource()).andReturn(mockDatasource).atLeastOnce();
@@ -524,7 +577,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     mockViewManager.removeView(mockDatasourceName, viewName);
     expectLastCall().once();
 
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, null, mockViewManager);
+    DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource,
+        createMock(OpalConfigurationService.class), mockViewManager);
     sut.setLocalesProperty("en, fr");
 
     replay(mockDatasource, mockFromTable, mockViewManager);
@@ -545,14 +599,15 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     String mockDatasourceName = "mockDatasource";
     String viewName = "viewToGet";
 
-    final Datasource mockDatasource = createMock(Datasource.class);
+    Datasource mockDatasource = createMock(Datasource.class);
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
 
     View view = new View(viewName, createMock(ValueTable.class));
     ViewManager mockViewManager = createMock(ViewManager.class);
     expect(mockViewManager.getView(mockDatasourceName, viewName)).andReturn(view).atLeastOnce();
 
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, null, mockViewManager);
+    DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource,
+        createMock(OpalConfigurationService.class), mockViewManager);
     sut.setLocalesProperty("en");
 
     replay(mockDatasource, mockViewManager);
@@ -573,13 +628,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     String mockDatasourceName = "mockDatasource";
     String viewName = "viewToGet";
 
-    final Datasource mockDatasource = createMock(Datasource.class);
+    Datasource mockDatasource = createMock(Datasource.class);
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
 
     ViewManager mockViewManager = createMock(ViewManager.class);
     expect(mockViewManager.getView(mockDatasourceName, viewName)).andThrow(new NoSuchValueTableException(viewName));
 
-    DatasourceResource sut = createDatasourceResource(mockDatasourceName, mockDatasource, null, mockViewManager);
+    DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource,
+        createMock(OpalConfigurationService.class), mockViewManager);
     sut.setLocalesProperty("en");
 
     replay(mockDatasource, mockViewManager);
@@ -591,7 +647,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenDisplayLocaleSpecifiedReturnsLocaleDtosWithDisplayFieldSet() {
     // Setup
-    DatasourceResource sut = new DatasourceResource("theDatasource");
+    DatasourceResource sut = createDatasource("theDatasource");
     sut.setLocalesProperty("en, fr");
 
     // Exercise
@@ -609,7 +665,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenDisplayLocaleNotSpecifiedReturnsLocaleDtosWithDisplayFieldNotSet() {
     // Setup
-    DatasourceResource sut = new DatasourceResource("theDatasource");
+    DatasourceResource sut = createDatasource("theDatasource");
     sut.setLocalesProperty("en, fr");
 
     // Exercise
@@ -621,19 +677,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     assertEquals(2, localeDtoList.size());
     assertEqualsLocaleDto(localeDtoList.get(0), "en", null);
     assertEqualsLocaleDto(localeDtoList.get(1), "fr", null);
-  }
-
-  private DatasourceResource createDatasourceResource(String mockDatasourceName, final Datasource mockDatasource,
-      OpalConfigurationService mockOpalRuntime, ViewManager mockViewManager) {
-    DatasourceResource sut = new DatasourceResource(mockOpalRuntime, mockViewManager, newViewDtos(),
-        mockDatasourceName) {
-
-      @Override
-      Datasource getDatasource() {
-        return mockDatasource;
-      }
-    };
-    return sut;
   }
 
   private DatasourceFactoryRegistry newDatasourceFactoryRegistry() {

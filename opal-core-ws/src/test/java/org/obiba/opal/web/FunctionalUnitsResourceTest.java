@@ -15,11 +15,17 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchConfigurationService;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 
@@ -63,8 +69,15 @@ public class FunctionalUnitsResourceTest {
 
     replay(opalRuntimeMock, functionalUnitServiceMock);
 
+    ImportService importService = createMock(ImportService.class);
+    OpalSearchService opalSearchService = new OpalSearchService(
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
+    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+
     FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(functionalUnitServiceMock,
-        opalRuntimeMock, unitKeyStoreServiceMock, null, null, identifiersTableResolverMock);
+        opalRuntimeMock, unitKeyStoreServiceMock, importService, null, identifiersTableResolverMock, opalSearchService,
+        statsIndexManager, esProvider);
     List<Opal.FunctionalUnitDto> functionalUnitDtoList = functionalUnitsResource.getFunctionalUnits();
     Assert.assertTrue(functionalUnitDtoList.size() == 3);
 

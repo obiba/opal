@@ -17,14 +17,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ElasticSearchConfigurationService {
 
-  private final OpalConfigurationService configService;
-
   private final ExtensionConfigurationSupplier<ElasticSearchConfiguration> configSupplier;
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public ElasticSearchConfigurationService(OpalConfigurationService configService) {
-    this.configService = configService;
     configSupplier = new ExtensionConfigurationSupplier<ElasticSearchConfiguration>(configService,
         ElasticSearchConfiguration.class);
   }

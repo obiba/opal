@@ -11,14 +11,14 @@ package org.obiba.opal.core.cfg;
 
 public interface OpalConfigurationService {
 
-  public void readOpalConfiguration();
+  void readOpalConfiguration();
 
-  public OpalConfiguration getOpalConfiguration();
+  OpalConfiguration getOpalConfiguration();
 
-  public void modifyConfiguration(ConfigModificationTask task);
+  void modifyConfiguration(ConfigModificationTask task);
 
-  public interface ConfigModificationTask {
-    public void doWithConfig(OpalConfiguration config);
+  interface ConfigModificationTask {
+    void doWithConfig(OpalConfiguration config);
   }
 
 }

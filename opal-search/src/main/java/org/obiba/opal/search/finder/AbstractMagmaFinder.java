@@ -7,27 +7,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.finder;
+package org.obiba.opal.search.finder;
 
 /**
  *
  */
-public class FinderResult<T> {
+public abstract class AbstractMagmaFinder<TQuery extends AbstractFinderQuery, TResult extends FinderResult<?>>
+    extends AbstractFinder<TQuery, TResult> {
 
-  private T value;
+  public abstract void executeQuery(TQuery query, TResult result);
 
-  public FinderResult() {
+  @Override
+  public void find(TQuery query, TResult result) {
+    executeQuery(query, result);
+    next(query, result);
   }
 
-  public FinderResult(T value) {
-    this.value = value;
-  }
-
-  public T getValue() {
-    return value;
-  }
-
-  public void setValue(T value) {
-    this.value = value;
-  }
 }

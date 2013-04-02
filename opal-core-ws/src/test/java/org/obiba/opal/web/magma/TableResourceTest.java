@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.PathSegment;
@@ -32,6 +33,12 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.search.StatsIndexManager;
+import org.obiba.opal.search.es.ElasticSearchConfigurationService;
+import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
@@ -79,10 +86,23 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     checkWeightTableDto(dtos.get(1));
   }
 
+  private TableResource createResource(ValueTable table) {
+    return createResource(table, Collections.<Locale>emptySet());
+  }
+
+  private TableResource createResource(ValueTable table, Set<Locale> locales) {
+    ImportService importService = createMock(ImportService.class);
+    OpalSearchService opalSearchService = new OpalSearchService(
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
+    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+    return new TableResource(table, locales, importService, opalSearchService, statsIndexManager, esProvider);
+  }
+
   @Test
   public void testTableGET() {
     Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
-    TableResource resource = new TableResource(datasource.getValueTable("Weight"));
+    TableResource resource = createResource(datasource.getValueTable("Weight"));
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getPath(false)).andReturn("/datasource/" + DATASOURCE2 + "/table/Weight");
@@ -95,7 +115,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testTableGETVariables() {
     Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
-    TableResource resource = new TableResource(datasource.getValueTable("Weight"));
+    TableResource resource = createResource(datasource.getValueTable("Weight"));
 
     List<PathSegment> segments = new ArrayList<PathSegment>();
     segments.add(createMock(PathSegment.class));
@@ -201,7 +221,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenNoDisplayLocaleSpecifiedReturnsLocaleDtosWithDisplayFieldUnset() {
     // Setup
-    TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")), null);
+    TableResource sut = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
     Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales(null);
@@ -217,7 +237,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenDisplayLocaleIsEnglishReturnsLocaleDtosWithDisplayFieldInEnglish() {
     // Setup
-    TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")), null);
+    TableResource sut = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
     Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales("en");
@@ -238,7 +258,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenDisplayLocaleIsFrenchReturnsLocaleDtosWithDisplayFieldInFrench() {
     // Setup
-    TableResource sut = new TableResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")), null);
+    TableResource sut = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
 
     // Exercise
     Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales("fr");
@@ -261,7 +281,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     // Setup
     ValueTable mockTable = createMock(ValueTable.class);
     expect(mockTable.getEntityType()).andReturn("Participant").atLeastOnce();
-    TableResource sut = new TableResource(mockTable);
+    TableResource sut = createResource(mockTable);
     String script = "$('someVar')";
 
     replay(mockTable);

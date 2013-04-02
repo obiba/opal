@@ -17,12 +17,14 @@ import org.junit.BeforeClass;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 
+import static org.obiba.core.util.FileUtil.getFileFromResource;
+
 /**
  *
  */
 public abstract class AbstractMagmaResourceTest {
 
-  protected static final String DATASOURCES_FOLDER = "src/test/resources/datasources-novalues";
+  protected static final String DATASOURCES_FOLDER = "datasources-novalues";
 
   public static final String DATASOURCE1 = "datasource1-novalues.xlsx";
 
@@ -39,7 +41,7 @@ public abstract class AbstractMagmaResourceTest {
   }
 
   protected static void addAllDatasources() {
-    File folder = new File(DATASOURCES_FOLDER);
+    File folder = getFileFromResource(DATASOURCES_FOLDER);
     for(File file : folder.listFiles(new FileFilter() {
 
       @Override
@@ -52,7 +54,8 @@ public abstract class AbstractMagmaResourceTest {
   }
 
   protected static void addDatasource(String name) {
-    MagmaEngine.get().addDatasource(new TestExcelDatasource(name, new File(DATASOURCES_FOLDER, name)));
+    MagmaEngine.get()
+        .addDatasource(new TestExcelDatasource(name, new File(getFileFromResource(DATASOURCES_FOLDER), name)));
   }
 
   protected static void removeDatasource(String name) {
@@ -73,7 +76,7 @@ public abstract class AbstractMagmaResourceTest {
   }
 
   protected String getDatasourcePath(String name) {
-    return new File(DATASOURCES_FOLDER, name).getAbsolutePath();
+    return new File(getFileFromResource(DATASOURCES_FOLDER), name).getAbsolutePath();
   }
 
 }
