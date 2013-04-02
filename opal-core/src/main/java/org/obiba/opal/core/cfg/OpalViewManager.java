@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
-import org.obiba.magma.views.impl.DefaultViewManagerImpl;
+import org.obiba.magma.views.DefaultViewManagerImpl;
 import org.springframework.stereotype.Component;
 
 @Component
