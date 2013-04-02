@@ -137,7 +137,7 @@ public class DeriveOpenTextualVariableStepPresenter
     public void onStepIn() {
       if(derivationHelper == null || derivationHelper.getMethod() != getView().getMethod()) {
         String link = getOriginalVariable().getLink() //
-            + "/stats/summary" //
+            + "/summary" //
             + "?nature=categorical" //
             + "&distinct=true";
 

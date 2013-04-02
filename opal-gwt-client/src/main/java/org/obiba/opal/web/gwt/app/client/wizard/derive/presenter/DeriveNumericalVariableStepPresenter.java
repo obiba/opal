@@ -65,7 +65,7 @@ public class DeriveNumericalVariableStepPresenter
       VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     getView().setNumberType(originalVariable.getValueType());
-    summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/stats/summary");
+    summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/summary");
     summaryTabPresenter.forgetSummary();
     summaryTabPresenter.refreshDisplay();
   }
@@ -239,7 +239,7 @@ public class DeriveNumericalVariableStepPresenter
 
     private void addDistinctValuesMapping() {
       String link = getOriginalVariable().getLink() //
-          + "/stats/summary" //
+          + "/summary" //
           + "?nature=categorical" //
           + "&distinct=true";
 
@@ -417,8 +417,7 @@ public class DeriveNumericalVariableStepPresenter
   private final class OriginalVariableSummaryReceivedHandler implements SummaryReceivedEvent.Handler {
     @Override
     public void onSummaryReceived(SummaryReceivedEvent event) {
-      if(getOriginalVariable() != null &&
-          event.getResourceUri().equals(getOriginalVariable().getLink() + "/stats/summary")) {
+      if(getOriginalVariable() != null && event.getResourceUri().equals(getOriginalVariable().getLink() + "/summary")) {
         SummaryStatisticsDto dto = event.getSummary();
         if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
           ContinuousSummaryDto continuous = dto

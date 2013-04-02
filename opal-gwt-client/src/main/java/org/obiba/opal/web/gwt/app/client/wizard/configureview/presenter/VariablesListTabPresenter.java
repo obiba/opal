@@ -732,7 +732,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     if(hasChanges) {
       // TODO: it would probably be simpler to add a VariableDto to the body instead of putting everything on the URL
       StringBuilder summaryLink = new StringBuilder("/datasource/" + datasourceName + "/view/" + viewName +
-          "/from/variable/_transient/stats/summary?valueType=" + getCurrentVariableDto().getValueType() +
+          "/from/variable/_transient/summary?valueType=" + getCurrentVariableDto().getValueType() +
           "&script=" + URL.encodeQueryString(scriptEditorPresenter.getScript()));
 
       if(currentVariable.getCategoriesArray() != null) {
@@ -745,7 +745,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     } else {
       // TODO: this link should be built from VariableDto.getLink() but it's not initialised in ViewResource
       uri = "/datasource/" + datasourceName + "/table/" + viewName + "/variable/" + currentVariable.getName() +
-          "/stats/summary";
+          "/summary";
     }
 
     getEventBus().fireEvent(new SummaryRequiredEvent(uri));
