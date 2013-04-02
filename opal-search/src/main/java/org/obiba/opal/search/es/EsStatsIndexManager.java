@@ -156,10 +156,15 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
     @Override
     public void indexSummary(CategoricalVariableSummary summary) {
+      TimedExecution timedExecution = new TimedExecution().start();
+
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
       indexSummary(summary, bulkRequest);
       sendAndCheck(bulkRequest);
       updateTimestamps();
+
+      log.debug("Indexed variable {} summary in {}", summary.getVariable().getName(),
+          timedExecution.end().formatExecutionTime());
     }
 
     private void indexSummary(CategoricalVariableSummary summary, BulkRequestBuilder bulkRequest) {
