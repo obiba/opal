@@ -1,0 +1,16 @@
+index:
+    analysis:
+          analyzer:
+              opal_index_analyzer:
+                 type: custom
+                 tokenizer: standard
+                 filter: [standard,lowercase,opal_filter]
+              opal_search_analyzer:
+                 type: custom
+                 tokenizer: standard
+                 filter: [standard,lowercase]
+          filter:
+              opal_filter:
+                  type: nGram
+                  min_gram: 3
+                  max_gram: 10

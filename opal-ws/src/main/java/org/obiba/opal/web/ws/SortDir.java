@@ -11,6 +11,19 @@ package org.obiba.opal.web.ws;
 
 public enum SortDir {
 
-  ASC, DESC;
+  ASC("asc"), DESC("desc");
 
+  public String toString() {
+    return value;
+  }
+
+  //
+  // Private members
+  //
+
+  private final String value;
+
+  SortDir(String value) {
+    this.value = value;
+  }
 }

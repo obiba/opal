@@ -91,8 +91,9 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     protected void index() {
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
+      int tableIndex = 1;
       for(Variable variable : valueTable.getVariables()) {
-        bulkRequest = indexVariable(variable, bulkRequest);
+        bulkRequest = indexVariable(variable, bulkRequest, tableIndex++);
       }
 
       sendAndCheck(bulkRequest);
@@ -104,13 +105,14 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       return new ValueTableVariablesMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
     }
 
-    private BulkRequestBuilder indexVariable(Variable variable, BulkRequestBuilder bulkRequest) {
+    private BulkRequestBuilder indexVariable(Variable variable, BulkRequestBuilder bulkRequest, int tableIndex) {
       String fullName = valueTable.getDatasource().getName() + "." + valueTable.getName() + ":" + variable.getName();
       try {
         XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
         xcb.field("datasource", valueTable.getDatasource().getName());
         xcb.field("table", valueTable.getName());
         xcb.field("fullName", fullName);
+        xcb.field("index", tableIndex);
         indexVariableParameters(variable, xcb);
 
         if(variable.hasAttributes()) {
@@ -184,5 +186,28 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     public String getFieldName(@Nonnull Attribute attribute) {
       return AttributeMapping.getFieldName(attribute);
     }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getFieldSortName(@Nonnull String field) {
+      EsMapping.Properties properties = readMapping().properties();
+      Map<String, Object> result = properties.getProperty(field);
+
+      if(result == null || !"multi_field".equals(result.get("type")) || !result.containsKey("fields")) {
+        return field;
+      }
+
+      Map<String, Object> fields = (Map<String, Object>) result.get("fields");
+      for(String fieldKey : fields.keySet()) {
+        if(!field.equals(fieldKey)) {
+          // the field name get post-fixed by the un-analyzed mapping name (usually 'untouched')
+          return field + "." + fieldKey;
+        }
+      }
+
+      return field;
+    }
+
   }
 }

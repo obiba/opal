@@ -41,6 +41,10 @@ class EsMapping {
     return new Meta();
   }
 
+  Properties properties() {
+    return new Properties();
+  }
+
   private Map<String, Object> type() {
     return newIfAbsent(mapping, name);
   }
@@ -59,6 +63,18 @@ class EsMapping {
 
     private Map<String, Object> meta() {
       return newIfAbsent(type(), "_meta");
+    }
+  }
+
+  @SuppressWarnings("ParameterHidesMemberVariable, unchecked")
+  class Properties {
+
+    public Map<String, Object> getProperty(String name) {
+      return (Map<String, Object>)properties().get(name);
+    }
+
+    private Map<String, Object> properties() {
+      return newIfAbsent(type(), "properties");
     }
   }
 

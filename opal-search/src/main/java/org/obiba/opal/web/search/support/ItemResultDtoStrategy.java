@@ -14,18 +14,18 @@ import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Search;
 
-public class ItemResultDtoVisitor {
+public class ItemResultDtoStrategy {
 
   private final ValueTable valueTable;
 
-  public ItemResultDtoVisitor(ValueTable valueTable) {
+  public ItemResultDtoStrategy(ValueTable valueTable) {
     this.valueTable = valueTable;
   }
 
-  public void visit(Search.ItemResultDto.Builder dtoItemResultBuilder) {
+  public void process(Search.ItemResultDto.Builder dtoItemResultBuilder, int tableIndex) {
     String variableName = MagmaEngineVariableResolver.valueOf(dtoItemResultBuilder.getIdentifier()).getVariableName();
     Search.VariableItemDto.Builder dtoVariableItemBuilder = Search.VariableItemDto.newBuilder();
-    dtoVariableItemBuilder.setVariable(Dtos.asDto(valueTable.getVariable(variableName)));
+    dtoVariableItemBuilder.setVariable(Dtos.asDto(null, valueTable.getVariable(variableName), tableIndex));
     dtoItemResultBuilder.setExtension(Search.VariableItemDto.item, dtoVariableItemBuilder.build());
   }
 
