@@ -156,17 +156,25 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
     @Override
     public void indexSummary(CategoricalVariableSummary summary) {
+      TimedExecution timedExecution = new TimedExecution().start();
+
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
       indexSummary(summary, bulkRequest);
       sendAndCheck(bulkRequest);
       updateTimestamps();
+
+      log.debug("Indexed variable {} summary in {}", summary.getVariable().getName(),
+          timedExecution.end().formatExecutionTime());
     }
 
     private void indexSummary(CategoricalVariableSummary summary, BulkRequestBuilder bulkRequest) {
       try {
         XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
-        builder.field("categorical-summary").startObject();
-        builder.field("mode", summary.getMode()).field("n", summary.getN());
+        builder.startObject("summary");
+        builder.field("nature", "categorical");
+        builder.field("distinct", summary.isDistinct());
+        builder.field("mode", summary.getMode());
+        builder.field("n", summary.getN());
         builder.startArray("frequencies");
         for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
           builder.startObject() //
@@ -176,7 +184,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
               .endObject();
         }
         builder.endArray(); // frequencies
-        builder.endObject(); // categorical-summary
+        builder.endObject(); // summary
         builder.endObject();
 
         String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
