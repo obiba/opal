@@ -17,12 +17,13 @@ import javax.annotation.Nonnull;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.obiba.opal.web.ws.SortDir;
 
 import com.google.common.base.Strings;
 
 public class QuerySearchJsonBuilder {
 
-  private static Collection<String> defaultQueryFields = new ArrayList<String>();
+  private static final Collection<String> defaultQueryFields = new ArrayList<String>();
 
   private final static int DEFAULT_FROM = 0;
 
@@ -47,6 +48,10 @@ public class QuerySearchJsonBuilder {
 
   private String query;
 
+  private String sortField;
+
+  private String sortDir;
+
   //
   // Public methods
   //
@@ -54,33 +59,44 @@ public class QuerySearchJsonBuilder {
   public QuerySearchJsonBuilder() {
   }
 
-  public QuerySearchJsonBuilder setFrom(int from) {
-    this.from = from;
+  public QuerySearchJsonBuilder setFrom(int value) {
+    from = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setSize(int size) {
-    this.size = size;
+  public QuerySearchJsonBuilder setSize(int value) {
+    size = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setFields(Collection<String> fields) {
-    this.fields = fields;
+  public QuerySearchJsonBuilder setFields(@Nonnull Collection<String> value) {
+    fields = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setQuery(String query) {
-    if(Strings.isNullOrEmpty(query)) {
+  public QuerySearchJsonBuilder setSortField(@Nonnull String value) {
+    sortField = value;
+    return this;
+  }
+
+  public QuerySearchJsonBuilder setSortDir(String value) {
+    sortDir = Strings.isNullOrEmpty(value) ? SortDir.ASC.toString() : value.toLowerCase();
+    return this;
+  }
+
+  public QuerySearchJsonBuilder setQuery(@Nonnull String value) {
+    if(Strings.isNullOrEmpty(value)) {
       throw new IllegalArgumentException();
     }
 
-    this.query = query;
+    query = value;
     return this;
   }
 
   public JSONObject build() throws JSONException {
     JSONObject jsonQuery = new JSONObject();
     jsonQuery.accumulate("query", new JSONObject().put("query_string", buildQueryStringJson()));
+    jsonQuery.put("sort", buildSortJson());
     jsonQuery.put("fields", new JSONArray(fields));
     jsonQuery.put("from", from);
     jsonQuery.put("size", size);
@@ -98,6 +114,14 @@ public class QuerySearchJsonBuilder {
     json.put("query", query);
 
     return json;
+  }
+
+  private JSONObject buildSortJson() throws JSONException {
+    if (Strings.isNullOrEmpty(sortField)) {
+      return new JSONObject();
+    }
+
+    return new JSONObject().put(sortField, new JSONObject().put("order", sortDir));
   }
 
 }

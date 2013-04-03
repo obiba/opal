@@ -29,6 +29,8 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   public static final String SERVICE_NAME = "search";
 
+  private static final String DEFAULT_SETTINGS_RESOURCE = "org/obiba/opal/search/service/default-settings.yml";
+
   private final ElasticSearchConfigurationService configService;
 
   private Node esNode;
@@ -59,6 +61,8 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
           .settings(ImmutableSettings.settingsBuilder() //
               .put("http.enabled", false) //
               .put("discovery.zen.ping.multicast.enabled", false) //
+              .classLoader(OpalSearchService.class.getClassLoader())
+              .loadFromClasspath(DEFAULT_SETTINGS_RESOURCE) //
               .loadFromSource(esConfig.getEsSettings())) //
           .clusterName(esConfig.getClusterName()) //
           .client(!esConfig.isDataNode()).node();
