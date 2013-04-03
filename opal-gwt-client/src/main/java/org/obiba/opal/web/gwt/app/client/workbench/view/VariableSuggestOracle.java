@@ -242,8 +242,8 @@ public class VariableSuggestOracle extends SuggestOracle {
 
               if(attributes.containsKey("label")) {
                 accum.appendHtmlConstant("<br>");
-                String label = attributes.get("label") + attributes.get("label") + attributes.get("label") +
-                    attributes.get("label");
+
+                String label = attributes.get("label");
                 if(label.length() > LABEL_MAX_SIZE) {
                   label = label.substring(0, LABEL_MAX_SIZE) + " ...";
                 }
