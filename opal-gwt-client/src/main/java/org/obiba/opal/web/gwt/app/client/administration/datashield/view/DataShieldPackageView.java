@@ -39,9 +39,9 @@ public class DataShieldPackageView extends PopupViewImpl implements DataShieldPa
   @UiTemplate("DataShieldPackageView.ui.xml")
   interface DataShieldPackageViewUiBinder extends UiBinder<DialogBox, DataShieldPackageView> {}
 
-  private static final DataShieldPackageViewUiBinder uiBinder = GWT.create(DataShieldPackageViewUiBinder.class);
+  private static DataShieldPackageViewUiBinder uiBinder = GWT.create(DataShieldPackageViewUiBinder.class);
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private static Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
