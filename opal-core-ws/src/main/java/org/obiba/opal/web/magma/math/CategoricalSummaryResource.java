@@ -73,11 +73,8 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
       if(jsonHitsInfo.getInt("total") != 1) {
         return queryMagma(distinct); // fallback
       }
-      JSONObject source = jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source");
-      if(!source.has("categorical-summary")) {
-        return queryMagma(distinct); // fallback
-      }
-      return parseJsonSummary(source.getJSONObject("categorical-summary"));
+      return parseJsonSummary(
+          jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source").getJSONObject("summary"));
 
     } catch(JSONException e) {
       throw new RuntimeException(e);
@@ -103,6 +100,10 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
         .endObject() //
 
         .startObject() //
+        .startObject("term").field("nature", "categorical").endObject() //
+        .endObject() //
+
+        .startObject() //
         .startObject("term").field("distinct", distinct).endObject() //
         .endObject() //
 
@@ -124,7 +125,6 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
           .setFreq(jsonFreq.getLong("freq")) //
           .setPct(jsonFreq.getDouble("pct")));
     }
-
     return dtoBuilder.build();
   }
 

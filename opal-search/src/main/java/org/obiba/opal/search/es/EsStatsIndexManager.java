@@ -170,7 +170,8 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     private void indexSummary(CategoricalVariableSummary summary, BulkRequestBuilder bulkRequest) {
       try {
         XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
-        builder.field("categorical-summary").startObject();
+        builder.startObject("summary");
+        builder.field("nature", "categorical");
         builder.field("distinct", summary.isDistinct());
         builder.field("mode", summary.getMode());
         builder.field("n", summary.getN());
@@ -183,7 +184,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
               .endObject();
         }
         builder.endArray(); // frequencies
-        builder.endObject(); // categorical-summary
+        builder.endObject(); // summary
         builder.endObject();
 
         String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
