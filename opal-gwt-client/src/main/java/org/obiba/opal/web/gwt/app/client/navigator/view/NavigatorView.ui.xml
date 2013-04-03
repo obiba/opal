@@ -1,7 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -30,8 +29,13 @@
       <g:FlowPanel addStyleNames="right-aligned small-search-box">
         <g:Grid>
           <g:row>
+            <!--<g:customCell styleName="top-aligned">-->
+            <!--<g:Label>-->
+            <!--<ui:msg description="Variable label">Variables </ui:msg>-->
+            <!--</g:Label>-->
+            <!--</g:customCell>-->
             <g:customCell styleName="top-aligned">
-              <b:TextBox ui:field="search"></b:TextBox>
+              <g:SuggestBox ui:field="search" styleName="variable-search-box"></g:SuggestBox>
             </g:customCell>
             <g:customCell styleName="top-aligned">
               <o:HelpImage page="Working+with+Datasources" imageSize="16" addStyleNames="xsmall-indent"></o:HelpImage>

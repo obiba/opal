@@ -37,17 +37,12 @@
               <g:Label addStyleNames="key">
                 <ui:msg description="Filter Variables label">Variables filter</ui:msg>
               </g:Label>
-              <b:Controls>
-                <b:InputAddOn prependIcon="FILTER">
-                  <b:TextBox ui:field="filter"></b:TextBox>
-                </b:InputAddOn>
-              </b:Controls>
               <g:HorizontalPanel>
-                <g:Label styleName="help-block">
-                  <ui:msg description="Variable name filter label">Display the variables which name matches the provided
-                    regular expression.
-                  </ui:msg>
-                </g:Label>
+                <b:Controls>
+                  <b:InputAddOn prependIcon="FILTER">
+                    <b:TextBox ui:field="filter"></b:TextBox>
+                  </b:InputAddOn>
+                </b:Controls>
                 <o:HelpImage imageSize="16" tooltipWidth="400px" addStyleNames="xsmall-indent">
                   <g:HTMLPanel>
                     <h4>Writing a Regular Expression Pattern</h4>
