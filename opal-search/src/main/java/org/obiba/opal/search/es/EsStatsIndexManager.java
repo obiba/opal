@@ -14,6 +14,8 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math.stat.descriptive.rank.Median;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -21,9 +23,12 @@ import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummary.Distribution;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.StatsIndexManager;
@@ -103,6 +108,8 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
     private final Map<String, CategoricalVariableSummary.Builder> categoricalSummaryBuilders = Maps.newHashMap();
 
+    private final Map<String, ContinuousVariableSummary.Builder> continuousSummaryBuilders = Maps.newHashMap();
+
     private EsValueTableStatsIndex(@Nonnull ValueTable vt) {
       super(vt, "stats");
     }
@@ -120,11 +127,26 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
         throw new RuntimeException("Cannot compute summary for binary variable " + variable.getName());
       }
 
+      addValueToCategoricalSummaryBuilder(variable, value);
+      addValueToContinuousSummaryBuilder(variable, value);
+    }
+
+    private void addValueToCategoricalSummaryBuilder(Variable variable, Value value) {
       CategoricalVariableSummary.Builder builder = categoricalSummaryBuilders.get(variable.getName());
       if(builder == null) {
         boolean distinct = TextType.get().equals(variable.getValueType()) && variable.areAllCategoriesMissing();
         builder = new CategoricalVariableSummary.Builder(variable).distinct(distinct);
         categoricalSummaryBuilders.put(variable.getName(), builder);
+      }
+      builder.addValue(value);
+    }
+
+    private void addValueToContinuousSummaryBuilder(Variable variable, Value value) {
+      if(!variable.getValueType().isNumeric()) return;
+      ContinuousVariableSummary.Builder builder = continuousSummaryBuilders.get(variable.getName());
+      if(builder == null) {
+        builder = new ContinuousVariableSummary.Builder(variable, Distribution.normal);
+        continuousSummaryBuilders.put(variable.getName(), builder);
       }
       builder.addValue(value);
     }
@@ -136,7 +158,13 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
       TimedExecution timedExecution = new TimedExecution().start();
 
+      // categorical summaries
       for(CategoricalVariableSummary.Builder summaryBuilder : categoricalSummaryBuilders.values()) {
+        indexSummary(summaryBuilder.build(), bulkRequest);
+      }
+
+      // continuous summaries
+      for(ContinuousVariableSummary.Builder summaryBuilder : continuousSummaryBuilders.values()) {
         indexSummary(summaryBuilder.build(), bulkRequest);
       }
 
@@ -145,7 +173,6 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
       log.info("Variable summaries of table {} computed in {}", getValueTableReference(),
           timedExecution.end().formatExecutionTime());
-
     }
 
     @Override
@@ -163,7 +190,20 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
       sendAndCheck(bulkRequest);
       updateTimestamps();
 
-      log.debug("Indexed variable {} summary in {}", summary.getVariable().getName(),
+      log.debug("Indexed variable {} categorical summary in {}", summary.getVariable().getName(),
+          timedExecution.end().formatExecutionTime());
+    }
+
+    @Override
+    public void indexSummary(ContinuousVariableSummary summary) {
+      TimedExecution timedExecution = new TimedExecution().start();
+
+      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+      indexSummary(summary, bulkRequest);
+      sendAndCheck(bulkRequest);
+      updateTimestamps();
+
+      log.debug("Indexed variable {} continuous summary in {}", summary.getVariable().getName(),
           timedExecution.end().formatExecutionTime());
     }
 
@@ -195,5 +235,57 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
       }
     }
 
+    @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+    private void indexSummary(ContinuousVariableSummary summary, BulkRequestBuilder bulkRequest) {
+      try {
+
+        DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();
+
+        XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
+
+        builder.startObject("summary");
+        builder.field("nature", "continuous");
+        builder.field("distribution", summary.getDistribution().name());
+        builder.field("intervals", summary.getIntervals());
+        builder.field("n", descriptiveStats.getN());
+        builder.field("min", descriptiveStats.getMin());
+        builder.field("max", descriptiveStats.getMax());
+        builder.field("mean", descriptiveStats.getMean());
+        builder.field("geometricMean", descriptiveStats.getGeometricMean());
+        builder.field("sum", descriptiveStats.getSum());
+        builder.field("sumsq", descriptiveStats.getSumsq());
+        builder.field("stdDev", descriptiveStats.getStandardDeviation());
+        builder.field("variance", descriptiveStats.getVariance());
+        builder.field("skewness", descriptiveStats.getSkewness());
+        builder.field("kurtosis", descriptiveStats.getKurtosis());
+        builder.field("median", descriptiveStats.apply(new Median()));
+        builder.field("values", descriptiveStats.getValues());
+        builder.field("percentiles", summary.getPercentiles());
+        builder.field("distributionPercentiles", summary.getDistributionPercentiles());
+
+        builder.startArray("intervalFrequencies");
+        for(IntervalFrequency.Interval frequency : summary.getIntervalFrequencies()) {
+          builder.startObject() //
+              .field("lower", frequency.getLower()) //
+              .field("upper", frequency.getUpper()) //
+              .field("freq", frequency.getFreq()) //
+              .field("density", frequency.getDensity()) //
+              .field("densityPct", frequency.getDensityPct()) //
+              .endObject();
+        }
+        builder.endArray(); // intervalFrequencies
+
+        builder.endObject(); // summary
+        builder.endObject();
+
+        String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
+        bulkRequest
+            .add(esProvider.getClient().prepareIndex(getName(), getIndexName(), variableReference).setSource(builder));
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
+
 }
+

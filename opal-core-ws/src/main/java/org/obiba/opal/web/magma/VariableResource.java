@@ -86,12 +86,11 @@ public class VariableResource {
             variable);
       case CONTINUOUS:
         return new ContinuousSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(),
-            variable, null);
+            variable);
       case TEMPORAL:
       case UNDETERMINED:
       default:
-        return new DefaultSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(), variable,
-            null);
+        return new DefaultSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(), variable);
     }
   }
 

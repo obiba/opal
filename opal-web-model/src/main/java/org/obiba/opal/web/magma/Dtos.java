@@ -224,13 +224,11 @@ public final class Dtos {
       builder.setTimestamps(tsBuilder);
     }
 
-    if(valueTable.getDatasource() != null) {
-      builder.setDatasourceName(valueTable.getDatasource().getName());
-      String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
-      builder.setLink(link);
-      if(valueTable.isView()) {
-        builder.setViewLink(link.replaceFirst("/table/", "/view/"));
-      }
+    builder.setDatasourceName(valueTable.getDatasource().getName());
+    String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
+    builder.setLink(link);
+    if(valueTable.isView()) {
+      builder.setViewLink(link.replaceFirst("/table/", "/view/"));
     }
 
     return builder;

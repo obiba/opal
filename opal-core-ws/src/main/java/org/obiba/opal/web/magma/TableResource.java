@@ -189,11 +189,11 @@ public class TableResource extends AbstractValueTableResource {
       @QueryParam("ignoreUnknownIds") @DefaultValue("false") boolean ignoreUnknownIds)
       throws IOException, InterruptedException {
     ValueTable vt = getValueTable();
-    if(vt.getDatasource() == null) {
-      return Response.status(BAD_REQUEST).entity(ClientErrorDtos
-          .getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", "Cannot write to a table without datasource")
-          .build()).build();
-    }
+//    if(vt.getDatasource() == null) {
+//      return Response.status(BAD_REQUEST).entity(ClientErrorDtos
+//          .getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", "Cannot write to a table without datasource")
+//          .build()).build();
+//    }
     try {
       if(importService == null) {
         writeValueSets(vt.getDatasource().createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);

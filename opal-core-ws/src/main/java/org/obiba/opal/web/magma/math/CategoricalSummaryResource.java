@@ -19,8 +19,6 @@ import javax.ws.rs.core.Response;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
@@ -31,6 +29,7 @@ import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.Math.FrequencyDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
+import org.obiba.opal.web.search.support.EsQueryBuilders;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,7 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
   public CategoricalSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
       ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable) {
-    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable, null);
+    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable);
   }
 
   @GET
@@ -84,33 +83,11 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
   }
 
   private JSONObject createEsQuery(boolean distinct) throws IOException, JSONException {
-    String indexName = statsIndexManager.getIndex(getValueTable()).getIndexName();
-    String variableReference = getVariable().getVariableReference(getValueTable());
-    XContentBuilder builder = XContentFactory.jsonBuilder().startObject() //
-        .startObject("query") //
-        .startObject("bool") //
-        .startArray("must") //
-
-        .startObject() //
-        .startObject("term").field("_id", variableReference).endObject() //
-        .endObject() //
-
-        .startObject() //
-        .startObject("term").field("_type", indexName).endObject() //
-        .endObject() //
-
-        .startObject() //
-        .startObject("term").field("nature", "categorical").endObject() //
-        .endObject() //
-
-        .startObject() //
-        .startObject("term").field("distinct", distinct).endObject() //
-        .endObject() //
-
-        .endArray() // must
-        .endObject() // bool
-        .endObject(); //query
-    return new JSONObject(builder.string());
+    return new EsQueryBuilders.EsBoolTermsQueryBuilder() //
+        .addTerm("_id", getVariable().getVariableReference(getValueTable())) //
+        .addTerm("_type", statsIndexManager.getIndex(getValueTable()).getIndexName()) //
+        .addTerm("nature", "categorical") //
+        .addTerm("distinct", String.valueOf(distinct)).build();
   }
 
   private CategoricalSummaryDto parseJsonSummary(JSONObject jsonSummary) throws JSONException {

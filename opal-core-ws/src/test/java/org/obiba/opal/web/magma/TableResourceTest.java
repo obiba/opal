@@ -42,8 +42,6 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -63,9 +61,10 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
+@SuppressWarnings({ "OverlyLongMethod", "OverlyCoupledClass" })
 public class TableResourceTest extends AbstractMagmaResourceTest {
 
-  private static final Logger log = LoggerFactory.getLogger(TableResourceTest.class);
+//  private static final Logger log = LoggerFactory.getLogger(TableResourceTest.class);
 
   @BeforeClass
   public static void before() {
@@ -115,7 +114,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testTableGETVariables() {
     Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
-    TableResource resource = createResource(datasource.getValueTable("Weight"));
+    createResource(datasource.getValueTable("Weight"));
 
     List<PathSegment> segments = new ArrayList<PathSegment>();
     segments.add(createMock(PathSegment.class));
@@ -182,10 +181,10 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testAddOrUpdateVariables_UpdatingVariables() throws IOException {
 
-    ValueTable valueTableMock = EasyMock.createMock(ValueTable.class);
-    Datasource datasourceMock = EasyMock.createMock(Datasource.class);
-    ValueTableWriter valueTableWriterMock = EasyMock.createMock(ValueTableWriter.class);
-    VariableWriter variableWriterMock = EasyMock.createMock(VariableWriter.class);
+    ValueTable valueTableMock = createMock(ValueTable.class);
+    Datasource datasourceMock = createMock(Datasource.class);
+    ValueTableWriter valueTableWriterMock = createMock(ValueTableWriter.class);
+    VariableWriter variableWriterMock = createMock(VariableWriter.class);
 
     expect(valueTableMock.getDatasource()).andReturn(datasourceMock);
     expect(valueTableMock.getName()).andReturn("name");
@@ -247,9 +246,9 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     assertEquals(sut.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
     for(LocaleDto localeDto : localeDtos) {
       assertTrue(localeDto.hasDisplay());
-      if(localeDto.getName().equals("en")) {
+      if("en".equals(localeDto.getName())) {
         assertEquals("English", localeDto.getDisplay());
-      } else if(localeDto.getName().equals("fr")) {
+      } else if("fr".equals(localeDto.getName())) {
         assertEquals("French", localeDto.getDisplay());
       }
     }
@@ -268,9 +267,9 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     assertEquals(sut.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
     for(LocaleDto localeDto : localeDtos) {
       assertTrue(localeDto.hasDisplay());
-      if(localeDto.getName().equals("en")) {
+      if("en".equals(localeDto.getName())) {
         assertEquals("anglais", localeDto.getDisplay());
-      } else if(localeDto.getName().equals("fr")) {
+      } else if("fr".equals(localeDto.getName())) {
         assertEquals("fran\u00e7ais", localeDto.getDisplay());
       }
     }

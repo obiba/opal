@@ -64,7 +64,7 @@ public abstract class AbstractMagmaResourceTest {
 
   private static class TestExcelDatasource extends ExcelDatasource {
 
-    public TestExcelDatasource(String name, File excelFile) {
+    private TestExcelDatasource(String name, File excelFile) {
       super(name, excelFile);
     }
 
