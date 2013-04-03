@@ -10,20 +10,22 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.SearchVariablesSuggestBox;
+import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class NavigatorView extends Composite implements NavigatorPresenter.Display {
@@ -53,12 +55,21 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @UiField
   Button refreshButton;
 
-  @UiField
-  SearchVariablesSuggestBox search;
+  @UiField(provided = true)
+  SuggestBox search;
 
   public NavigatorView() {
+    VariableSuggestOracle oracle = new VariableSuggestOracle();
+    search = new SuggestBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
-    search.setWidth("250px");
+
+    search.setWidth("350px"); // for 1024x768 screens
+    search.getValueBox().addFocusHandler(new FocusHandler() {
+      @Override
+      public void onFocus(FocusEvent event) {
+        search.showSuggestionList();
+      }
+    });
   }
 
   @Override
@@ -93,11 +104,6 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
       navigatorDisplayPanel.clear();
       navigatorDisplayPanel.add(content);
     }
-  }
-
-  @Override
-  public HasWidgets getDetailsPanel() {
-    return navigatorDisplayPanel;
   }
 
   @Override
@@ -136,7 +142,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public SearchVariablesSuggestBox getSearch() {
+  public SuggestBox getSearch() {
     return search;
   }
 }
