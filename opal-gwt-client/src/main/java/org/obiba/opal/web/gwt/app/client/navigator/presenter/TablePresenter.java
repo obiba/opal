@@ -98,6 +98,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private static final int DELAY_MILLIS = 1000;
 
+  private static final String SORT_DESCENDING = "DESC";
+
+  private static final String SORT_ASCENDING = "ASC";
+
   private JsArray<VariableDto> variables;
 
   private TableDto table;
@@ -434,17 +438,16 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private void updateVariables() {
     String sortColumnName = getView().getClickableColumnName(sortColumn);
-    String sortColumnArg = sortColumnName == null ? "" : "?sortField=" + sortColumnName;
-    String sortDirArg = sortAscending == null ? "" : sortAscending ? "&sortDir=ASC" : "&sortDir=DESC";
 
-    // TODO: Keep filter
-    String filterArg = getView().getFilter().getText().isEmpty()
-        ? ""
-        : "&script=name().matches('" + getView().getFilter().getText() + "')";
+    UriBuilder ub = UriBuilder.create()//
+        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables");
 
-    // TODO use uriBuilder
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
-        .forResource(table.getLink() + "/variables" + sortColumnArg + sortDirArg + filterArg).get()
+    if(sortColumnName != null) {
+      ub.query("sortField", sortColumnName);
+    }
+    ub.query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
+
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build()).get()
         .withCallback(new VariablesResourceCallback(table)).send();
   }
 
@@ -595,16 +598,27 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void onKeyUp(KeyUpEvent event) {
+      String sortColumnName = getView().getClickableColumnName(sortColumn);
       String filter = getView().getFilter().getText();
-      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.isEmpty()) {
 
-        String query = getView().getFilter().getText().isEmpty() ? "*" : getView().getFilter().getText();
+      if(filter.isEmpty()) {
+        updateVariables();
+      } else if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+
+        String query = getView().getFilter().getText();
 
         UriBuilder ub = UriBuilder.create()
             .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
             .query("query", query)//
             .query("limit", String.valueOf(table.getVariableCount()))//
             .query("variable", "true");
+
+        // Keep sort info
+        if(sortColumnName != null) {
+          ub.query("sortField", sortColumnName);
+        }
+        ub.query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
+
         ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
             .withCallback(new ResourceCallback<QueryResultDto>() {
               @Override

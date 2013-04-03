@@ -148,13 +148,17 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
     UriBuilder uriBuilder = UriBuilder.create()
         .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables");
 
-    StringBuilder link = new StringBuilder(uriBuilder.build());
+//    StringBuilder link = new StringBuilder(uriBuilder.build());
+//    UriBuilder ub = UriBuilder.create()
+//        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
+    uriBuilder.query("query", select.isEmpty() ? "*" : select)//
+        .query("limit", String.valueOf(table.getVariableCount()))//
+        .query("variable", "true");
+//    if(!select.isEmpty()) {
+//      link.append("?script=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(select) + "/)"));
+//    }
 
-    if(!select.isEmpty()) {
-      link.append("?script=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(select) + "/)"));
-    }
-
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link.toString()).get()
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseErrorCallback(getEventBus(), "InternalError"))
         .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariablesFound"))
         .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
