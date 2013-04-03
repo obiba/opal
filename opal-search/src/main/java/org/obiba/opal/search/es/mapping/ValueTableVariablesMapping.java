@@ -11,6 +11,8 @@ package org.obiba.opal.search.es.mapping;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -37,7 +39,7 @@ public class ValueTableVariablesMapping {
 
       mapString("datasource", mapping);
       mapString("table", mapping);
-      mapString("name", mapping);
+      mapAnalyzedString("name", mapping);
       mapString("fullName", mapping);
       mapString("entityType", mapping);
       mapString("valueType", mapping);
@@ -74,12 +76,6 @@ public class ValueTableVariablesMapping {
     }
   }
 
-  private void mapString(String field, XContentBuilder mapping) throws IOException {
-    mapping.startObject(field);
-    valueTypeMappings.forType(TextType.get()).map(mapping);
-    mapping.endObject();
-  }
-
   public XContentBuilder updateTimestamps(String name) {
     try {
       XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(name);
@@ -92,5 +88,40 @@ public class ValueTableVariablesMapping {
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  //
+  // Private Methods
+  //
+
+  private void mapString(String field, XContentBuilder mapping) throws IOException {
+    mapping.startObject(field);
+    valueTypeMappings.forType(TextType.get()).map(mapping);
+    mapping.endObject();
+  }
+
+  private void mapAnalyzedString(String field, XContentBuilder mapping) throws IOException {
+    mapping.startObject(field);
+    mapping.field("fields", mapFields(field));
+    mapping.field("type", "multi_field");
+    mapping.endObject();
+  }
+
+  private Map<String, Map<String, String>> mapFields(String field) {
+    Map<String, String> analyzed = new HashMap<String, String>();
+    analyzed.put("type", "string");
+    analyzed.put("index", "analyzed");
+    analyzed.put("index_analyzer", "opal_index_analyzer");
+    analyzed.put("search_analyzer", "opal_search_analyzer");
+
+    Map<String, String> notAnalyzed = new HashMap<String, String>();
+    notAnalyzed.put("type", "string");
+    notAnalyzed.put("index", "not_analyzed");
+
+    Map<String, Map<String, String>> fields = new HashMap<String, Map<String, String>>();
+    fields.put(field, analyzed);
+    fields.put("untouched", notAnalyzed);
+
+    return fields;
   }
 }

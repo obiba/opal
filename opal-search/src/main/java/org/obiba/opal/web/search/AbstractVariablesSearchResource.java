@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.web.search;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -22,7 +22,11 @@ import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 
+import com.google.common.base.Strings;
+
 public abstract class AbstractVariablesSearchResource {
+
+  protected static final String INDEX_FIELD = "index";
 
   protected final OpalSearchService opalSearchService;
 
@@ -47,15 +51,30 @@ public abstract class AbstractVariablesSearchResource {
     return new EsResultConverter().convert(jsonResponse);
   }
 
-  protected JSONObject executeQuery(String query, int offset, int limit, List<String> fields) throws JSONException {
+  protected JSONObject executeQuery(String query, int offset, int limit, Collection<String> fields) throws JSONException {
+    return executeQuery(query, offset, limit, fields, INDEX_FIELD, "ASC");
+  }
+
+  protected JSONObject executeQuery(String query, int offset, int limit, Collection<String> fields, String sortField,
+      String sortDir) throws JSONException {
+
+    addDefaultFields(fields);
+
+    if(Strings.isNullOrEmpty(sortField)) sortField = INDEX_FIELD;
+
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
-    JSONObject jsonQuery = jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit).build();
+    JSONObject jsonQuery = jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit)
+        .setSortField(sortField).setSortDir(sortDir).build();
     EsQueryExecutor queryExecutor = new EsQueryExecutor(esProvider).setSearchPath(getSearchPath());
     return queryExecutor.execute(jsonQuery, RestRequest.Method.POST);
   }
 
   protected boolean searchServiceAvailable() {
     return opalSearchService.isRunning() && opalSearchService.isEnabled();
+  }
+
+  protected void addDefaultFields(Collection<String> fields) {
+    if(!fields.contains(INDEX_FIELD)) fields.add(INDEX_FIELD);
   }
 }
 

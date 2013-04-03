@@ -27,13 +27,13 @@ public class EsResultConverter {
 
   private static final int MINIMUM_RESULT_COUNT = 0;
 
-  private ItemResultDtoVisitor itemResultVisitor;
+  private ItemResultDtoStrategy itemResultStrategy;
 
   public EsResultConverter() {
   }
 
-  public void accept(ItemResultDtoVisitor visitor) {
-    itemResultVisitor = visitor;
+  public void setStrategy(ItemResultDtoStrategy strategy) {
+    itemResultStrategy = strategy;
   }
 
   /**
@@ -56,7 +56,7 @@ public class EsResultConverter {
     }
     else if (jsonHits.has("hits")) {
       HitsConverter hitsConverter = new HitsConverter();
-      hitsConverter.accept(itemResultVisitor);
+      hitsConverter.setStrategy(itemResultStrategy);
       dtoResultsBuilder.addAllHits(hitsConverter.convert(jsonHits.getJSONArray("hits")));
     }
 
@@ -72,6 +72,7 @@ public class EsResultConverter {
    */
   private static class FacetsConverter {
 
+    @SuppressWarnings("unchecked")
     public Collection<Search.FacetResultDto> convert(JSONObject jsonFacets) throws JSONException {
       Collection<Search.FacetResultDto> facetsDtoList = new ArrayList<Search.FacetResultDto>();
 
@@ -147,10 +148,10 @@ public class EsResultConverter {
    */
   private static class HitsConverter {
 
-    private ItemResultDtoVisitor itemResultVisitor;
+    private ItemResultDtoStrategy itemResultStrategy;
 
-    public void accept(ItemResultDtoVisitor visitor) {
-      itemResultVisitor = visitor;
+    public void setStrategy(ItemResultDtoStrategy strategy) {
+      itemResultStrategy = strategy;
     }
 
     public Collection<Search.ItemResultDto> convert(JSONArray jsonHits) throws JSONException {
@@ -160,18 +161,20 @@ public class EsResultConverter {
         Search.ItemResultDto.Builder dtoItemResultBuilder = Search.ItemResultDto.newBuilder();
         JSONObject jsonHit = jsonHits.getJSONObject(i);
         dtoItemResultBuilder.setIdentifier(jsonHit.getString("_id"));
+        JSONObject fields = jsonHit.getJSONObject("fields");
 
-        if (jsonHit.has("fields")) {
-          convertFields(dtoItemResultBuilder, jsonHit.getJSONObject("fields"));
-        }
+        int tableIndex = fields.getInt("index");
+        fields.remove("index"); // no longer needed
+        if (fields.length() > 0) convertFields(dtoItemResultBuilder, fields);
 
-        if (itemResultVisitor != null) itemResultVisitor.visit(dtoItemResultBuilder);
+        if (itemResultStrategy != null) itemResultStrategy.process(dtoItemResultBuilder, tableIndex);
         itemsDtoList.add(dtoItemResultBuilder.build());
       }
 
       return itemsDtoList;
     }
 
+    @SuppressWarnings("unchecked")
     private void convertFields(Search.ItemResultDto.Builder dtoItemResultBuilder, JSONObject jsonFields)
         throws JSONException {
 
