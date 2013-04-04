@@ -14,5 +14,5 @@ index:
           filter:
               opal_filter:
                   type: nGram
-                  min_gram: 3
-                  max_gram: 10
+                  min_gram: 1
+                  max_gram: 20

@@ -1849,7 +1849,7 @@ textarea.error:focus {
   background-image: -webkit-linear-gradient(top, #FCEEC1, #EEDC94);
   background-image: -o-linear-gradient(top, #FCEEC1, #EEDC94);
   background-image: linear-gradient(top, #FCEEC1, #EEDC94);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#FCEEC1', endColorstr = '#EEDC94', GradientType = 0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FCEEC1', endColorstr='#EEDC94', GradientType=0);
   -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
   -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
@@ -2140,7 +2140,7 @@ a.icon:hover {
   -moz-transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation = 0.5);
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0.5);
 }
 
 /* Social networks icons */
@@ -2345,14 +2345,10 @@ a.icon:hover {
 /*margin-right: 3em;*/
 /*}*/
 
-.small-search-box  input,
-.small-search-box .controls,
-.small-search-box .add-on,
-.small-search-box .input-prepend {
-  height: 1.3em;
-  font-size: 0.9em;
-  /*line-height: 0.8em;*/
-  width: 90%;
+.small-search-box input {
+  font-size: 1em;
+  padding: 1px;
+  width: 350px;
 }
 
 .first-column-checkbox tr td:first-child, .first-column-checkbox tr th:first-child {
@@ -2362,7 +2358,7 @@ a.icon:hover {
 
 /* SuggestBox */
 .variable-search-box {
-  background: url(../image/search.png) no-repeat 2px 2px;
+  background: url(../image/16/search.png) no-repeat 2px 2px;
   padding-left: 20px !important;
 }
 
@@ -2377,4 +2373,8 @@ a.icon:hover {
 
 .gwt-SuggestBoxPopup .suggestPopupContent table tbody tr:nth-child(odd) {
   background-color: #f5f5f5;
+}
+
+.variables-filter-box {
+  width: 350px;
 }
