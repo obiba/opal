@@ -91,7 +91,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     protected void index() {
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
 
-      int tableIndex = 1;
+      int tableIndex = 0;
       for(Variable variable : valueTable.getVariables()) {
         bulkRequest = indexVariable(variable, bulkRequest, tableIndex++);
       }

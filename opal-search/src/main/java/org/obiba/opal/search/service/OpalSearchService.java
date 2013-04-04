@@ -59,8 +59,6 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
     if(!isRunning() && esConfig.isEnabled()) {
       esNode = NodeBuilder.nodeBuilder().client(true) //
           .settings(ImmutableSettings.settingsBuilder() //
-              .put("http.enabled", false) //
-              .put("discovery.zen.ping.multicast.enabled", false) //
               .classLoader(OpalSearchService.class.getClassLoader())
               .loadFromClasspath(DEFAULT_SETTINGS_RESOURCE) //
               .loadFromSource(esConfig.getEsSettings())) //
