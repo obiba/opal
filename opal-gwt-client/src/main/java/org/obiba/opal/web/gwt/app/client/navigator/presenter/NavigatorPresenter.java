@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
@@ -24,21 +25,24 @@ import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -149,6 +153,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         }));
 
     getView().getSearch().addSelectionHandler(new VariableSuggestionSelectionHandler());
+    getView().getSearch().getValueBox().addFocusHandler(new VariableSuggestionFocusHandler());
   }
 
   @Override
@@ -207,7 +212,6 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
                       VariableDto selection = null;
                       VariableDto next = null;
                       for(int i = 0; i < variables.length(); i++) {
-                        GWT.log("Equals: " + variables.get(i).getName() + " = " + variableName);
                         if(variables.get(i).getName().equals(variableName)) {
                           selection = variables.get(i);
 
@@ -222,10 +226,24 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
                       }
                       getEventBus().fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
                     }
+                  })//
+                  .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+                    @Override
+                    public void onResponseCode(Request request, Response response) {
+                      getEventBus().fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
+                    }
                   }).send();
             }
           }).send();
 
+    }
+  }
+
+  private class VariableSuggestionFocusHandler implements FocusHandler {
+
+    @Override
+    public void onFocus(FocusEvent event) {
+      getView().getSearch().showSuggestionList();
     }
   }
 }

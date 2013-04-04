@@ -16,8 +16,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -27,6 +26,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class NavigatorView extends Composite implements NavigatorPresenter.Display {
 
@@ -58,18 +58,13 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @UiField(provided = true)
   SuggestBox search;
 
-  public NavigatorView() {
-    VariableSuggestOracle oracle = new VariableSuggestOracle();
+  @Inject
+  public NavigatorView(EventBus eventBus) {
+    VariableSuggestOracle oracle = new VariableSuggestOracle(eventBus);
     search = new SuggestBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
 
     search.setWidth("350px"); // for 1024x768 screens
-    search.getValueBox().addFocusHandler(new FocusHandler() {
-      @Override
-      public void onFocus(FocusEvent event) {
-        search.showSuggestionList();
-      }
-    });
   }
 
   @Override

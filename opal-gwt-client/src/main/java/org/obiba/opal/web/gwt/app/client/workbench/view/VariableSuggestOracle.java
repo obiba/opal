@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -24,6 +25,7 @@ import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -93,12 +95,6 @@ public class VariableSuggestOracle extends SuggestOracle {
     }
   }
 
-//  /**
-//   * Associates individual words with candidates.
-//   */
-//  private HashMap<String, Set<String>> toCandidates = new HashMap<String, Set<String>>();
-//
-
   /**
    * Associates candidates with their formatted suggestions.
    */
@@ -112,20 +108,7 @@ public class VariableSuggestOracle extends SuggestOracle {
 
   private Response defaultResponse;
 
-//  /*
-//   * Comparator used for sorting candidates from search.
-//   */
-//  private Comparator<String> comparator = null;
-
-  /**
-   * Constructor for <code>MultiWordSuggestOracle</code>. This uses a space as
-   * the whitespace character.
-   *
-   * @see #MultiWordSuggestOracle(String)
-   */
-  public VariableSuggestOracle() {
-    this(" ");
-  }
+  private EventBus eventBus;
 
   /**
    * Constructor for <code>MultiWordSuggestOracle</code> which takes in a set of
@@ -140,11 +123,12 @@ public class VariableSuggestOracle extends SuggestOracle {
    *
    * @param whitespaceChars the characters to treat as word separators
    */
-  public VariableSuggestOracle(String whitespaceChars) {
-    this.whitespaceChars = new char[whitespaceChars.length()];
-    for(int i = 0; i < whitespaceChars.length(); i++) {
-      this.whitespaceChars[i] = whitespaceChars.charAt(i);
-    }
+  public VariableSuggestOracle(EventBus eventBus) {
+    this.eventBus = eventBus;
+//    this.whitespaceChars = new char[whitespaceChars.length()];
+//    for(int i = 0; i < whitespaceChars.length(); i++) {
+//      this.whitespaceChars[i] = whitespaceChars.charAt(i);
+//    }
   }
 
   /**
@@ -153,7 +137,6 @@ public class VariableSuggestOracle extends SuggestOracle {
    * @param suggestion the suggestion
    */
   public void add(String suggestion) {
-    // candidates --> real suggestions.
     toRealSuggestions.put(suggestion, suggestion);
 
   }
@@ -162,8 +145,6 @@ public class VariableSuggestOracle extends SuggestOracle {
    * Removes all of the suggestions from the oracle.
    */
   public void clear() {
-//    tree.clear();
-//    toCandidates.clear();
     toRealSuggestions.clear();
   }
 
@@ -253,6 +234,13 @@ public class VariableSuggestOracle extends SuggestOracle {
 
               return createSuggestion(query, accum.toSafeHtml().asString(), attributes.get("datasource"),
                   attributes.get("table"), attributes.get("name"));
+            }
+          })//
+          .withCallback(com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(com.google.gwt.http.client.Request request,
+                com.google.gwt.http.client.Response response) {
+              eventBus.fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
             }
           }).send();
     }

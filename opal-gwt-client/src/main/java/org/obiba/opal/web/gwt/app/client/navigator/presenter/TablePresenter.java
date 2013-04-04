@@ -640,7 +640,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
             .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
-                getEventBus().fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
+                getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
               }
             }).send();
       }

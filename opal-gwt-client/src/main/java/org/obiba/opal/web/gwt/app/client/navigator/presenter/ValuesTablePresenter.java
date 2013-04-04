@@ -24,8 +24,6 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
-import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.ValueUpdater;
@@ -124,7 +122,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setViewMode(mode);
   }
 
-  private class VariablesResourceCallback implements ResourceCallback<QueryResultDto> {
+  //  private class VariablesResourceCallback implements ResourceCallback<QueryResultDto> {
+  private class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
     private final TableDto table;
 
@@ -133,18 +132,25 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
-    public void onResource(Response response, QueryResultDto resource) {
+    public void onResource(Response response, JsArray<VariableDto> resource) {
+//      if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
+//
+//        QueryResultDto resultDto = (QueryResultDto) JsonUtils.unsafeEval(response.getText());
+//        JsArray<VariableDto> variables = JsArrays.create();
+//        for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+//          VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
+//              .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
+//
+//          variables.push(varDto.getVariable());
+//        }
+//
+//        getView().setVariables(variables);
+//      }
+//    }
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-
-        QueryResultDto resultDto = (QueryResultDto) JsonUtils.unsafeEval(response.getText());
-        JsArray<VariableDto> variables = JsArrays.create();
-        for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-          VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
-              .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
-
-          variables.push(varDto.getVariable());
-        }
-
+        JsArray<VariableDto> variables = resource == null
+            ? JsArray.createArray().<JsArray<VariableDto>>cast()
+            : resource;
         getView().setVariables(variables);
       }
     }
@@ -287,19 +293,37 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void updateVariables(String select) {
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
-          .query("query", select.isEmpty() ? "*" : select)//
-          .query("limit", String.valueOf(table.getVariableCount()))//
-          .query("variable", "true");
-
+//      UriBuilder ub = UriBuilder.create()
+//          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
+//          .query("query", select.isEmpty() ? "*" : select)//
+//          .query("limit", String.valueOf(table.getVariableCount()))//
+//          .query("variable", "true");
+//
+//      if(variablesRequest != null) {
+//        variablesRequest.cancel();
+//        variablesRequest = null;
+//      }
+//      getView().clearTable();
+//
+//      variablesRequest = ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()//
+//          .withCallback(new VariablesResourceCallback(table))
+//          .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
+//            @Override
+//            public void onResponseCode(Request request, Response response) {
+//              notifyError(response);
+//              setTable(table);
+//            }
+//          }).send();
+      String link = table.getLink() + "/variables";
+      if(select != null && !select.isEmpty()) {
+        link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(select) + "/)");
+      }
       if(variablesRequest != null) {
         variablesRequest.cancel();
         variablesRequest = null;
       }
       getView().clearTable();
-
-      variablesRequest = ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()//
+      variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link).get()//
           .withCallback(new VariablesResourceCallback(table))
           .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
             @Override
