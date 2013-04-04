@@ -64,7 +64,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -169,9 +168,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @UiField
   TextBox filter;
 
-//  @UiField
-//  DefaultSuggestBox variableNameSuggestBox;
-
   @UiField
   Panel permissions;
 
@@ -194,6 +190,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   public TableView() {
     widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
+    filter.addStyleName("variables-filter-box");
     addTableColumns();
     initializeAnchorTexts();
   }
@@ -480,24 +477,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void addVariableSuggestion(String suggestion) {
-//    variableNameSuggestBox.getSuggestOracle().add(suggestion);
-  }
-
-  @Override
-  public HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler) {
-//    return variableNameSuggestBox.addSelectionHandler(handler);
-    return null;
-  }
-
-  @Override
   public HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler) {
     return table.addColumnSortHandler(handler);
-  }
-
-  @Override
-  public void clearVariableSuggestion() {
-//    variableNameSuggestBox.setText("");
   }
 
   @Override
