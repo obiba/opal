@@ -403,7 +403,8 @@ public interface Translations extends Constants {
       "CopyVariableNameRequired", "Variable name cannot be empty.",//
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
-      "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}"//
+      "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}",//
+      "SearchServiceUnavailable", "Can not search variables because the search service is not running."//
   })
   Map<String, String> userMessageMap();
 
