@@ -287,7 +287,7 @@ public class DefaultImportService implements ImportService {
   @Override
   public void importIdentifiers(ValueTable sourceKeysTable) throws IOException {
 
-    Assert.isTrue(!sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType()),
+    Assert.isTrue(sourceKeysTable.getEntityType().equals(identifiersTableService.getEntityType()),
         "source identifiers table has unexpected entity type '" + sourceKeysTable.getEntityType() + "' (expected '" +
             identifiersTableService.getEntityType() + "')");
 
