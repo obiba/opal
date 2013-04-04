@@ -9,7 +9,6 @@
     <version>1.14-SNAPSHOT</version>
   </parent>
   <artifactId>opal-web-model</artifactId>
-  <packaging>jar</packaging>
   <name>opal-web-model</name>
 
   <dependencies>

@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -489,6 +490,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     }
   }
 
+  @Nullable
   private ResponseBuilder doImportCertificate(Opal.KeyForm kpForm) {
     try {
       unitKeyStoreService
@@ -500,6 +502,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     return null;
   }
 
+  @Nullable
   private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;
     if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
@@ -514,6 +517,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     return response;
   }
 
+  @Nullable
   private ResponseBuilder doImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;
     if(kpForm.hasPublicForm()) {

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
+import javax.annotation.Nullable;
+
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
@@ -25,11 +27,11 @@ public class HttpAuthorizationToken extends UsernamePasswordToken implements Aut
     this(scheme, authorization, null);
   }
 
-  public HttpAuthorizationToken(String scheme, String authorization, String host) {
+  public HttpAuthorizationToken(String scheme, String authorization, @Nullable String host) {
     this(new DecodedCredentials(scheme, authorization), host);
   }
 
-  private HttpAuthorizationToken(DecodedCredentials decoded, String host) {
+  private HttpAuthorizationToken(DecodedCredentials decoded, @Nullable String host) {
     super(decoded.getUsername(), decoded.getPassword(), host);
   }
 
@@ -43,7 +45,7 @@ public class HttpAuthorizationToken extends UsernamePasswordToken implements Aut
       // Scheme <token>
       String schemeAndToken[] = authorization.split(" ", 2);
 
-      if(scheme.equals(schemeAndToken[0]) == false) {
+      if(!scheme.equals(schemeAndToken[0])) {
         throw new UnsupportedTokenException();
       }
 

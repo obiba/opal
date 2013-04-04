@@ -11,6 +11,7 @@ package org.obiba.opal.web.security;
 
 import java.lang.annotation.Annotation;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -53,6 +54,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
     super(securityManager);
   }
 
+  @Nullable
   @Override
   public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
     // Check authentication before processing. If resource requires authentication and user is not authenticated, return
@@ -100,10 +102,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
 
   private boolean isOpalCookieValid(HttpRequest request) {
     Cookie cookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
-    if(cookie != null) {
-      return isValidSessionId(cookie.getValue());
-    }
-    return false;
+    return cookie != null && isValidSessionId(cookie.getValue());
   }
 
   private boolean isWebServiceAuthenticated(Annotation... annotations) {

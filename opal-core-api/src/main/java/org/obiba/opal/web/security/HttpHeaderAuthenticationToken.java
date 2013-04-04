@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
+import javax.annotation.Nullable;
+
 import org.apache.shiro.authc.AuthenticationToken;
 
 public class HttpHeaderAuthenticationToken implements AuthenticationToken {
@@ -26,6 +28,7 @@ public class HttpHeaderAuthenticationToken implements AuthenticationToken {
     return getSessionId();
   }
 
+  @Nullable
   @Override
   public Object getCredentials() {
     return null;

@@ -133,7 +133,7 @@ public interface ImportService {
    * is used if this one is defined.
    * @throws IOException
    */
-  void importIdentifiers(FunctionalUnit unit, Datasource sourceDatasource, String select) throws IOException;
+  void importIdentifiers(FunctionalUnit unit, Datasource sourceDatasource, @Nullable String select) throws IOException;
 
   /**
    * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
