@@ -15,6 +15,8 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math.stat.descriptive.rank.Median;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
@@ -25,7 +27,10 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
+import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
@@ -35,6 +40,7 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
+import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 
 import com.google.common.base.Function;
@@ -343,6 +349,53 @@ public final class Dtos {
     }
 
     return builder.build();
+  }
+
+  public static Math.CategoricalSummaryDto.Builder asDto(CategoricalVariableSummary summary) {
+    Math.CategoricalSummaryDto.Builder dtoBuilder = Math.CategoricalSummaryDto.newBuilder() //
+        .setMode(summary.getMode()) //
+        .setN(summary.getN());
+    for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
+      dtoBuilder.addFrequencies(Math.FrequencyDto.newBuilder() //
+          .setValue(frequency.getValue()) //
+          .setFreq(frequency.getFreq()) //
+          .setPct(frequency.getPct()));
+    }
+    return dtoBuilder;
+  }
+
+  public static Math.ContinuousSummaryDto.Builder asDto(ContinuousVariableSummary summary) {
+    DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();
+
+    Math.DescriptiveStatsDto.Builder descriptiveBuilder = Math.DescriptiveStatsDto.newBuilder() //
+        .setMin(descriptiveStats.getMin()) //
+        .setMax(descriptiveStats.getMax()) //
+        .setN(descriptiveStats.getN()) //
+        .setMean(descriptiveStats.getMean()) //
+        .setSum(descriptiveStats.getSum()) //
+        .setSumsq(descriptiveStats.getSumsq()) //
+        .setStdDev(descriptiveStats.getStandardDeviation()) //
+        .setVariance(descriptiveStats.getVariance()) //
+        .setSkewness(descriptiveStats.getSkewness()) //
+        .setGeometricMean(descriptiveStats.getGeometricMean()) //
+        .setKurtosis(descriptiveStats.getKurtosis()) //
+        .setMedian(descriptiveStats.apply(new Median()));
+
+    Math.ContinuousSummaryDto.Builder continuousBuilder = Math.ContinuousSummaryDto.newBuilder();
+    continuousBuilder.setSummary(descriptiveBuilder);
+
+    for(IntervalFrequency.Interval interval : summary.getIntervalFrequencies()) {
+      continuousBuilder.addIntervalFrequency(Math.IntervalFrequencyDto.newBuilder() //
+          .setLower(interval.getLower()) //
+          .setUpper(interval.getUpper()) //
+          .setFreq(interval.getFreq()) //
+          .setDensity(interval.getDensity()) //
+          .setDensityPct(interval.getDensityPct()));
+    }
+
+    descriptiveBuilder.addAllPercentiles(summary.getPercentiles());
+    continuousBuilder.addAllDistributionPercentiles(summary.getDistributionPercentiles());
+    return continuousBuilder;
   }
 
   private static final class FilteredToStringFunction implements Function<Object, String> {

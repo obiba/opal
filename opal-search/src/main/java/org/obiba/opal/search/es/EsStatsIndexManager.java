@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.descriptive.rank.Median;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.core.util.TimedExecution;
@@ -35,6 +36,8 @@ import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableStatsIndex;
 import org.obiba.opal.search.es.mapping.StatsMapping;
+import org.obiba.opal.web.magma.Dtos;
+import org.obiba.opal.web.model.Search.EsCategoricalSummaryDto;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
+import com.googlecode.protobuf.format.JsonFormat;
 
 @Component
 public class EsStatsIndexManager extends EsIndexManager implements StatsIndexManager {
@@ -182,7 +186,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     }
 
     @Override
-    public void indexSummary(CategoricalVariableSummary summary) {
+    public void indexSummary(@Nonnull ContinuousVariableSummary summary) {
       TimedExecution timedExecution = new TimedExecution().start();
 
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
@@ -195,7 +199,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     }
 
     @Override
-    public void indexSummary(ContinuousVariableSummary summary) {
+    public void indexSummary(@Nonnull CategoricalVariableSummary summary) {
       TimedExecution timedExecution = new TimedExecution().start();
 
       BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
@@ -207,36 +211,21 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
           timedExecution.end().formatExecutionTime());
     }
 
-    private void indexSummary(CategoricalVariableSummary summary, BulkRequestBuilder bulkRequest) {
-      try {
-        XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
-        builder.startObject("summary");
-        builder.field("nature", "categorical");
-        builder.field("distinct", summary.isDistinct());
-        builder.field("mode", summary.getMode());
-        builder.field("n", summary.getN());
-        builder.startArray("frequencies");
-        for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
-          builder.startObject() //
-              .field("value", frequency.getValue()) //
-              .field("freq", frequency.getFreq()) //
-              .field("pct", frequency.getPct()) //
-              .endObject();
-        }
-        builder.endArray(); // frequencies
-        builder.endObject(); // summary
-        builder.endObject();
+    private void indexSummary(@Nonnull CategoricalVariableSummary summary, @Nonnull BulkRequestBuilder bulkRequest) {
 
-        String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
-        bulkRequest
-            .add(esProvider.getClient().prepareIndex(getName(), getIndexName(), variableReference).setSource(builder));
-      } catch(IOException e) {
-        throw new RuntimeException(e);
-      }
+      EsCategoricalSummaryDto summaryDto = EsCategoricalSummaryDto.newBuilder() //
+          .setNature("categorical") //
+          .setDistinct(summary.isDistinct()) //
+          .setSummary(Dtos.asDto(summary)).build();
+
+      IndexRequestBuilder request = esProvider.getClient() //
+          .prepareIndex(getName(), getIndexName(), getValueTableReference() + ":" + summary.getVariable().getName()) //
+          .setSource(JsonFormat.printToString(summaryDto));
+      bulkRequest.add(request);
     }
 
     @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
-    private void indexSummary(ContinuousVariableSummary summary, BulkRequestBuilder bulkRequest) {
+    private void indexSummary(@Nonnull ContinuousVariableSummary summary, @Nonnull BulkRequestBuilder bulkRequest) {
       try {
 
         DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();

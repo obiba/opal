@@ -18,6 +18,10 @@
       <artifactId>magma-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-core-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
       <scope>provided</scope>

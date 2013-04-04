@@ -33,7 +33,7 @@ public interface ValueTableStatsIndex extends ValueTableIndex {
 
   void computeAndIndexSummaries();
 
-  void indexSummary(CategoricalVariableSummary summary);
+  void indexSummary(@Nonnull CategoricalVariableSummary summary);
 
-  void indexSummary(ContinuousVariableSummary summary);
+  void indexSummary(@Nonnull ContinuousVariableSummary summary);
 }
