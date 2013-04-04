@@ -30,6 +30,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
 import org.obiba.magma.type.BinaryType;
+import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
@@ -195,7 +196,11 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
               return null;
             }
         }
-        return value.getValue();
+        Object obj = value.getValue();
+        if(obj != null && value.getValueType() == DateType.get()) {
+          return obj.toString(); // ie MagmaDate.toString()
+        }
+        return obj;
       }
     }
 

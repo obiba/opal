@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.search;
 
-import java.util.Calendar;
-
-import org.obiba.magma.Timestamped;
 import org.obiba.magma.Variable;
 
 /**
