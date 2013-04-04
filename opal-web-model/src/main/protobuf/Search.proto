@@ -139,5 +139,5 @@ message EsContinuousSummaryDto {
   required string nature = 2;
   required string distribution = 3;
   required int32 intervals = 4;
-  repeated int32 defaultPercentiles = 5;
+  repeated double defaultPercentiles = 5;
 }

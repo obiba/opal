@@ -18,7 +18,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.ValueTable;
@@ -31,8 +30,6 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
-import org.obiba.opal.web.model.Math.DescriptiveStatsDto;
-import org.obiba.opal.web.model.Math.IntervalFrequencyDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 import org.obiba.opal.web.search.support.EsQueryBuilders;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
@@ -70,7 +67,13 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
 
     try {
 
-      JSONObject esQuery = createEsQuery(distribution, percentiles, intervals);
+      // TODO query on defaultPercentiles
+      JSONObject esQuery = new EsQueryBuilders.EsBoolTermsQueryBuilder() //
+          .addTerm("_id", getVariable().getVariableReference(getValueTable())) //
+          .addTerm("_type", statsIndexManager.getIndex(getValueTable()).getIndexName()) //
+          .addTerm("nature", "continuous") //
+          .addTerm("distribution", distribution.name()) //
+          .addTerm("intervals", String.valueOf(intervals)).build();
       log.debug("ES query: {}", esQuery.toString(2));
 
       JSONObject response = new EsQueryExecutor(esProvider).execute(esQuery);
@@ -80,106 +83,19 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
       if(jsonHitsInfo.getInt("total") != 1) {
         return queryMagma(distribution, percentiles, intervals); // fallback
       }
-      return asDto(
-          jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source").getJSONObject("summary"));
+
+      JSONObject jsonObject = jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source");
+
+      log.debug("jsonObject: {}", jsonObject.toString(2));
+
+      ContinuousSummaryDto.Builder builder = ContinuousSummaryDto.newBuilder();
+      JsonFormat.merge(jsonObject.toString(), builder);
+      return builder.build();
 
     } catch(JSONException e) {
       throw new RuntimeException(e);
     } catch(IOException e) {
       throw new RuntimeException(e);
-    }
-  }
-
-  private JSONObject createEsQuery(Distribution distribution, List<Double> percentiles, int intervals)
-      throws IOException, JSONException {
-    // TODO query on percentiles
-    return new EsQueryBuilders.EsBoolTermsQueryBuilder() //
-        .addTerm("_id", getVariable().getVariableReference(getValueTable())) //
-        .addTerm("_type", statsIndexManager.getIndex(getValueTable()).getIndexName()) //
-        .addTerm("nature", "continuous") //
-        .addTerm("distribution", distribution.name()) //
-        .addTerm("intervals", String.valueOf(intervals)).build();
-  }
-
-  private ContinuousSummaryDto asDto(JSONObject jsonSummary) throws JSONException {
-
-    DescriptiveStatsDto.Builder descriptiveBuilder = DescriptiveStatsDto.newBuilder() //
-        .setN(jsonSummary.getLong("n")) //
-        .setMin(jsonSummary.getDouble("min")) //
-        .setMax(jsonSummary.getDouble("max")) //
-        .setMean(jsonSummary.getDouble("mean")) //
-        .setSum(jsonSummary.getDouble("sum")) //
-        .setSumsq(jsonSummary.getDouble("sumsq")) //
-        .setStdDev(jsonSummary.getDouble("stdDev")) //
-        .setVariance(jsonSummary.getDouble("variance")) //
-        .setSkewness(jsonSummary.getDouble("skewness")) //
-        .setGeometricMean(jsonSummary.getDouble("geometricMean")) //
-        .setKurtosis(jsonSummary.getDouble("kurtosis")) //
-        .setMedian(jsonSummary.getDouble("median"));
-
-    ContinuousSummaryDto.Builder continuousBuilder = ContinuousSummaryDto.newBuilder();
-
-    parseJsonValues(jsonSummary, descriptiveBuilder);
-    parseJsonPercentiles(jsonSummary, descriptiveBuilder);
-    parseJsonFrequencies(jsonSummary, continuousBuilder);
-    parseJsonDistPercentiles(jsonSummary, continuousBuilder);
-
-    ContinuousSummaryDto summaryDto = continuousBuilder.setSummary(descriptiveBuilder).build();
-    try {
-      JsonFormat.print(summaryDto, System.out);
-    } catch(IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }
-    return summaryDto;
-  }
-
-  private void parseJsonDistPercentiles(JSONObject jsonSummary, ContinuousSummaryDto.Builder continuousBuilder)
-      throws JSONException {
-    JSONArray jsonDistPercentiles = jsonSummary.getJSONArray("distributionPercentiles");
-    if(jsonDistPercentiles != null) {
-      int nbDistPercentiles = jsonDistPercentiles.length();
-      for(int i = 0; i < nbDistPercentiles; i++) {
-        continuousBuilder.addDistributionPercentiles(jsonDistPercentiles.getDouble(i));
-      }
-    }
-  }
-
-  private void parseJsonFrequencies(JSONObject jsonSummary, ContinuousSummaryDto.Builder continuousBuilder)
-      throws JSONException {
-    JSONArray jsonFrequencies = jsonSummary.getJSONArray("intervalFrequencies");
-    if(jsonFrequencies != null) {
-      int nbFreq = jsonFrequencies.length();
-      for(int i = 0; i < nbFreq; i++) {
-        JSONObject jsonFreq = jsonFrequencies.getJSONObject(i);
-        continuousBuilder.addIntervalFrequency(IntervalFrequencyDto.newBuilder() //
-            .setLower(jsonFreq.getDouble("lower")) //
-            .setUpper(jsonFreq.getDouble("upper")) //
-            .setFreq(jsonFreq.getLong("freq")) //
-            .setDensity(jsonFreq.getDouble("density")) //
-            .setDensityPct(jsonFreq.getDouble("densityPct")));
-      }
-    }
-  }
-
-  private void parseJsonPercentiles(JSONObject jsonSummary, DescriptiveStatsDto.Builder descriptiveBuilder)
-      throws JSONException {
-    JSONArray jsonPercentiles = jsonSummary.getJSONArray("percentiles");
-    if(jsonPercentiles != null) {
-      int nbPercentiles = jsonPercentiles.length();
-      for(int i = 0; i < nbPercentiles; i++) {
-        descriptiveBuilder.addPercentiles(jsonPercentiles.getDouble(i));
-      }
-    }
-  }
-
-  private void parseJsonValues(JSONObject jsonSummary, DescriptiveStatsDto.Builder descriptiveBuilder)
-      throws JSONException {
-    JSONArray jsonValues = jsonSummary.getJSONArray("values");
-    if(jsonValues != null) {
-      int nbValues = jsonValues.length();
-      for(int i = 0; i < nbValues; i++) {
-        descriptiveBuilder.addValues(jsonValues.getDouble(i));
-      }
     }
   }
 

@@ -9,22 +9,17 @@
  */
 package org.obiba.opal.search.es;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.descriptive.rank.Median;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
@@ -38,6 +33,7 @@ import org.obiba.opal.search.ValueTableStatsIndex;
 import org.obiba.opal.search.es.mapping.StatsMapping;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Search.EsCategoricalSummaryDto;
+import org.obiba.opal.web.model.Search.EsContinuousSummaryDto;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
+import com.google.protobuf.Message;
 import com.googlecode.protobuf.format.JsonFormat;
 
 @Component
@@ -218,61 +215,27 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
           .setDistinct(summary.isDistinct()) //
           .setSummary(Dtos.asDto(summary)).build();
 
-      IndexRequestBuilder request = esProvider.getClient() //
-          .prepareIndex(getName(), getIndexName(), getValueTableReference() + ":" + summary.getVariable().getName()) //
-          .setSource(JsonFormat.printToString(summaryDto));
-      bulkRequest.add(request);
+      indexMessage(summary.getVariable().getName(), summaryDto, bulkRequest);
     }
 
-    @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
     private void indexSummary(@Nonnull ContinuousVariableSummary summary, @Nonnull BulkRequestBuilder bulkRequest) {
-      try {
 
-        DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();
+      EsContinuousSummaryDto summaryDto = EsContinuousSummaryDto.newBuilder() //
+          .setNature("continuous") //
+          .setDistribution(summary.getDistribution().name()) //
+          .addAllDefaultPercentiles(summary.getDefaultPercentiles()) //
+          .setIntervals(summary.getIntervals()) //
+          .setSummary(Dtos.asDto(summary)).build();
 
-        XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
+      indexMessage(summary.getVariable().getName(), summaryDto, bulkRequest);
+    }
 
-        builder.startObject("summary");
-        builder.field("nature", "continuous");
-        builder.field("distribution", summary.getDistribution().name());
-        builder.field("intervals", summary.getIntervals());
-        builder.field("n", descriptiveStats.getN());
-        builder.field("min", descriptiveStats.getMin());
-        builder.field("max", descriptiveStats.getMax());
-        builder.field("mean", descriptiveStats.getMean());
-        builder.field("geometricMean", descriptiveStats.getGeometricMean());
-        builder.field("sum", descriptiveStats.getSum());
-        builder.field("sumsq", descriptiveStats.getSumsq());
-        builder.field("stdDev", descriptiveStats.getStandardDeviation());
-        builder.field("variance", descriptiveStats.getVariance());
-        builder.field("skewness", descriptiveStats.getSkewness());
-        builder.field("kurtosis", descriptiveStats.getKurtosis());
-        builder.field("median", descriptiveStats.apply(new Median()));
-        builder.field("values", descriptiveStats.getValues());
-        builder.field("percentiles", summary.getPercentiles());
-        builder.field("distributionPercentiles", summary.getDistributionPercentiles());
-
-        builder.startArray("intervalFrequencies");
-        for(IntervalFrequency.Interval frequency : summary.getIntervalFrequencies()) {
-          builder.startObject() //
-              .field("lower", frequency.getLower()) //
-              .field("upper", frequency.getUpper()) //
-              .field("freq", frequency.getFreq()) //
-              .field("density", frequency.getDensity()) //
-              .field("densityPct", frequency.getDensityPct()) //
-              .endObject();
-        }
-        builder.endArray(); // intervalFrequencies
-
-        builder.endObject(); // summary
-        builder.endObject();
-
-        String variableReference = getValueTableReference() + ":" + summary.getVariable().getName();
-        bulkRequest
-            .add(esProvider.getClient().prepareIndex(getName(), getIndexName(), variableReference).setSource(builder));
-      } catch(IOException e) {
-        throw new RuntimeException(e);
-      }
+    private void indexMessage(@Nonnull String variableName, @Nonnull Message message,
+        @Nonnull BulkRequestBuilder bulkRequest) {
+      IndexRequestBuilder request = esProvider.getClient() //
+          .prepareIndex(getName(), getIndexName(), getValueTableReference() + ":" + variableName) //
+          .setSource(JsonFormat.printToString(message));
+      bulkRequest.add(request);
     }
   }
 

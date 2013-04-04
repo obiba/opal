@@ -175,6 +175,11 @@ public class ContinuousVariableSummary {
     return intervalFrequencies;
   }
 
+  @Nonnull
+  public List<Double> getDefaultPercentiles() {
+    return defaultPercentiles;
+  }
+
   public enum Distribution {
     normal {
       @Nullable
