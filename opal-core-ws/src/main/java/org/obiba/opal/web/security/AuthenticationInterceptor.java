@@ -45,8 +45,6 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(AuthenticationInterceptor.class);
 
-  private static final String X_OPAL_AUTH = "X-Opal-Auth";
-
   private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
 
   @Autowired
@@ -78,7 +76,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
 
     // Not authorized: method requires proper authentication, and no user is authenticated
     return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED)
-        .header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
+        .header(HttpHeaders.WWW_AUTHENTICATE, OpalAuth.CREDENTIALS_HEADER + " realm=\"Opal\"").build();
   }
 
   @Override

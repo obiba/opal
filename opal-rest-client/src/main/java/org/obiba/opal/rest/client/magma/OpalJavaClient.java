@@ -62,6 +62,7 @@ import org.apache.http.impl.client.cache.ManagedHttpCacheStorage;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
+import org.obiba.opal.web.security.OpalAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,12 +127,13 @@ public class OpalJavaClient {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
     httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
-    httpClient.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuthScheme.NAME));
+    httpClient.getParams()
+        .setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuth.CREDENTIALS_HEADER));
     httpClient.getParams().setParameter(ClientPNames.CONNECTION_MANAGER_FACTORY_CLASS_NAME,
         OpalClientConnectionManagerFactory.class.getName());
     httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, soTimeout);
     httpClient.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(DEFAULT_MAX_ATTEMPT, false));
-    httpClient.getAuthSchemes().register(OpalAuthScheme.NAME, new OpalAuthScheme.Factory());
+    httpClient.getAuthSchemes().register(OpalAuth.CREDENTIALS_HEADER, new OpalAuthScheme.Factory());
 
     try {
       httpClient.getConnectionManager().getSchemeRegistry()
