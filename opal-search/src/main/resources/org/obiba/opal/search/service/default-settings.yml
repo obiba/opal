@@ -1,3 +1,5 @@
+http.enabled: true
+discovery.zen.ping.multicast.enabled: false
 index:
     analysis:
           analyzer:
