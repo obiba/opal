@@ -382,8 +382,6 @@ public final class Dtos {
         .setMedian(descriptiveStats.apply(new Median()));
 
     Math.ContinuousSummaryDto.Builder continuousBuilder = Math.ContinuousSummaryDto.newBuilder();
-    continuousBuilder.setSummary(descriptiveBuilder);
-
     for(IntervalFrequency.Interval interval : summary.getIntervalFrequencies()) {
       continuousBuilder.addIntervalFrequency(Math.IntervalFrequencyDto.newBuilder() //
           .setLower(interval.getLower()) //
@@ -395,7 +393,7 @@ public final class Dtos {
 
     descriptiveBuilder.addAllPercentiles(summary.getPercentiles());
     continuousBuilder.addAllDistributionPercentiles(summary.getDistributionPercentiles());
-    return continuousBuilder;
+    return continuousBuilder.setSummary(descriptiveBuilder);
   }
 
   private static final class FilteredToStringFunction implements Function<Object, String> {
