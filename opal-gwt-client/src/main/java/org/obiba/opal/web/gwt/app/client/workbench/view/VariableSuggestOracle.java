@@ -162,7 +162,7 @@ public class VariableSuggestOracle extends SuggestOracle {
   public void requestSuggestions(final Request request, final Callback callback) {
     final String query = request.getQuery();
 
-    if(query.length() > 2) {
+    if(query.length() > 1) {
       UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
           .query("query", query)//
           .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
