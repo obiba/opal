@@ -66,6 +66,7 @@ import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class TableView extends ViewImpl implements TablePresenter.Display {
@@ -249,6 +250,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       }
     }, translations.unitLabel());
 
+    table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(NavigatorView.PAGE_SIZE);
     table.setEmptyTableWidget(noVariables);
     table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
@@ -268,7 +270,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
         selectAllItemsAlert.setVisible(object > 0);
       }
     });
-//    checkColumn.setCellStyleNames("checkbox-column");
 
     table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Unit.PX);
@@ -277,8 +278,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
-//    variableNameSuggestBox.getSuggestOracle().clear();
-//    variableNameSuggestBox.setText("");
     table.setEmptyTableWidget(table.getLoadingIndicator());
 
   }
