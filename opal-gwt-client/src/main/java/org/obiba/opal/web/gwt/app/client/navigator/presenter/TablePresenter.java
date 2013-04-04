@@ -65,8 +65,6 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
@@ -78,7 +76,6 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.Presenter;
@@ -196,7 +193,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     FieldUpdater<VariableDto, String> updater = new VariableNameFieldUpdater();
     getView().setVariableNameFieldUpdater(updater);
     getView().setVariableIndexFieldUpdater(updater);
-    registerHandler(getView().addVariableSuggestionHandler(new VariableSuggestionHandler()));
     registerHandler(getView().addVariableSortHandler(new VariableSortHandler()));
 
     // Filter variable event
@@ -565,25 +561,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  private final class VariableSuggestionHandler implements SelectionHandler<Suggestion> {
-
-    @Override
-    public void onSelection(SelectionEvent<Suggestion> evt) {
-      String value = evt.getSelectedItem().getReplacementString();
-      // look for the variable and fire selection
-      for(int i = 0; i < variables.length(); i++) {
-        if(variables.get(i).getName().equals(value)) {
-          VariableDto selection = variables.get(i);
-          getEventBus().fireEvent(
-              new VariableSelectionChangeEvent(table, selection, getPreviousVariable(i), getNextVariable(i)));
-          getView().setVariableSelection(selection, i);
-          getView().clearVariableSuggestion();
-          break;
-        }
-      }
-    }
-  }
-
   private final class VariableSortHandler implements ColumnSortEvent.Handler {
 
     @Override
@@ -624,7 +601,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
               @Override
               public void onResource(Response response, QueryResultDto resource) {
                 if(response.getStatusCode() == Response.SC_OK) {
-                  QueryResultDto resultDto = (QueryResultDto) JsonUtils.unsafeEval(response.getText());
+                  QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
                   JsArray<VariableDto> variables = JsArrays.create();
                   for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
@@ -823,9 +800,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       if(table.getLink().equals(TablePresenter.this.table.getLink())) {
         variables = JsArrays.toSafeArray(resource);
         getView().renderRows(variables);
-        for(int i = 0; i < variables.length(); i++) {
-          getView().addVariableSuggestion(variables.get(i).getName());
-        }
         getView().afterRenderRows();
       }
     }
@@ -988,13 +962,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setCopyDataCommand(Command cmd);
 
-    void addVariableSuggestion(String suggestion);
-
-    HandlerRegistration addVariableSuggestionHandler(SelectionHandler<Suggestion> handler);
-
     HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler);
-
-    void clearVariableSuggestion();
 
     HasAuthorization getCopyDataAuthorizer();
 

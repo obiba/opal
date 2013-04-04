@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChan
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -57,9 +58,9 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
   @Override
   protected void onBind() {
     super.onBind();
-    super.registerHandler(getView().getTree().addSelectionHandler(new TreeSelectionHandler()));
+    registerHandler(getView().getTree().addSelectionHandler(new TreeSelectionHandler()));
 
-    super.registerHandler(
+    registerHandler(
         getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
 
           @Override
@@ -69,7 +70,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
         }));
 
-    super.registerHandler(getEventBus()
+    registerHandler(getEventBus()
         .addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
 
           @Override
@@ -83,24 +84,31 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
         }));
 
-    super.registerHandler(
-        getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(DatasourceUpdatedEvent.getType(), new DatasourceUpdatedEvent.Handler() {
+
+      @Override
+      public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
+        updateTree(event.getDatasourceName(), true);
+      }
+
+    }));
+
+    registerHandler(getEventBus().addHandler(DatasourcesRefreshEvent.getType(), new DatasourcesRefreshEvent.Handler() {
+
+      @Override
+      public void onRefresh(DatasourcesRefreshEvent event) {
+        updateTree(null, false);
+      }
+
+    }));
+
+    registerHandler(
+        getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
 
           @Override
-          public void onDatasourceUpdated(DatasourceUpdatedEvent event) {
-            updateTree(event.getDatasourceName(), true);
+          public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+            getView().selectTable(event.getTable().getDatasourceName(), event.getTable().getName(), false);
           }
-
-        }));
-
-    super.registerHandler(
-        getEventBus().addHandler(DatasourcesRefreshEvent.getType(), new DatasourcesRefreshEvent.Handler() {
-
-          @Override
-          public void onRefresh(DatasourcesRefreshEvent event) {
-            updateTree(null, false);
-          }
-
         }));
 
     updateTree(null, false);

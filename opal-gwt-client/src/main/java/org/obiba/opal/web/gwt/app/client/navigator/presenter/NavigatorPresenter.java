@@ -138,7 +138,8 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         .addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
           @Override
           public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-            getView().getSearch().setText("datasource:\"" + event.getSelection().getName() + "\"");
+            getView().getSearch().setText("datasource:" + quoteIfContainsSpace(event.getSelection().getName()));
+
           }
         }));
 
@@ -147,13 +148,21 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           @Override
           public void onTableSelectionChanged(TableSelectionChangeEvent event) {
             getView().getSearch().setText( //
-                "datasource:\"" + event.getSelection().getDatasourceName() +//
-                    "\" AND table:\"" + event.getSelection().getName() + "\"");
+                "datasource:" + quoteIfContainsSpace(event.getSelection().getDatasourceName()) +//
+                    " AND table:" + quoteIfContainsSpace(event.getSelection().getName()) + "");
           }
         }));
 
     getView().getSearch().addSelectionHandler(new VariableSuggestionSelectionHandler());
     getView().getSearch().getValueBox().addFocusHandler(new VariableSuggestionFocusHandler());
+  }
+
+  private String quoteIfContainsSpace(String s) {
+
+    if(s.contains(" ")) {
+      return "\"" + s + "\"";
+    }
+    return s;
   }
 
   @Override
@@ -197,7 +206,6 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
             public void onResource(Response response, final TableDto tableDto) {
-              getEventBus().fireEvent(new TableSelectionChangeEvent(NavigatorPresenter.this, tableDto, null, null));
 
               UriBuilder ub = UriBuilder.create()
                   .segment("datasource", datasourceName, "table", tableName, "variables");

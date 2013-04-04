@@ -63,8 +63,6 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
     VariableSuggestOracle oracle = new VariableSuggestOracle(eventBus);
     search = new SuggestBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
-
-    search.setWidth("350px"); // for 1024x768 screens
   }
 
   @Override

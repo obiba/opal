@@ -13,10 +13,7 @@
       <g:Label addStyleNames="small-indent" ui:field="tableOrView">(View)</g:Label>
     </g:FlowPanel>
 
-    <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left">
-      <!--<o:DefaultSuggestBox ui:field="variableNameSuggestBox" defaultSuggestionsEnabled="false"-->
-      <!--addStyleNames="right-aligned ui-corner-all"/>-->
-    </g:FlowPanel>
+    <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
     <g:FlowPanel ui:field="indexStatus" addStyleNames="index-status" visible="false">
       <b:Alert ui:field="indexStatusAlert" close="false" visible="false">

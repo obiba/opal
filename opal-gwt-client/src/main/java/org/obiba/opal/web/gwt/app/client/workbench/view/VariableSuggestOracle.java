@@ -125,10 +125,6 @@ public class VariableSuggestOracle extends SuggestOracle {
    */
   public VariableSuggestOracle(EventBus eventBus) {
     this.eventBus = eventBus;
-//    this.whitespaceChars = new char[whitespaceChars.length()];
-//    for(int i = 0; i < whitespaceChars.length(); i++) {
-//      this.whitespaceChars[i] = whitespaceChars.charAt(i);
-//    }
   }
 
   /**
