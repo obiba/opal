@@ -30,7 +30,6 @@ import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.ValueUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
@@ -348,13 +347,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
-    public void updateVariables(final String select) {
-      GWT.log(table.getLink());
-      GWT.log(table.hasTimestamps() + " timesp");
+    public void updateVariables(String select) {
+      final String query = select.isEmpty()
+          ? "*"
+          : select.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ");
 
       UriBuilder ub = UriBuilder.create()
           .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
-          .query("query", select.isEmpty() ? "*" : select)//
+          .query("query", query)//
           .query("limit", String.valueOf(table.getVariableCount()))//
           .query("variable", "true");
 
@@ -377,8 +377,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             public void onResponseCode(Request request, Response response) {
               // Use the previous way of filtering variables
               String link = table.getLink() + "/variables";
-              if(select != null && !select.isEmpty()) {
-                link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(select) + "/)");
+              if(query != null && !query.isEmpty()) {
+                link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(query) + "/)");
               }
               if(variablesRequest != null) {
                 variablesRequest.cancel();
