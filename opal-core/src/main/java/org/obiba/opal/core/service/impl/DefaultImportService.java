@@ -130,7 +130,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(String unitName, @Nonnull String sourceDatasourceName, String destinationDatasourceName,
+  public void importData(@Nonnull String sourceDatasourceName, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException,
       InterruptedException {
@@ -138,7 +138,7 @@ public class DefaultImportService implements ImportService {
 
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
     try {
-      importData(unitName, sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration,
+      importData(sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration,
           ignoreUnknownIdentifier);
     } finally {
       MagmaEngine.get().removeTransientDatasource(sourceDatasource.getName());
@@ -146,7 +146,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(String unitName, @Nonnull List<String> sourceTableNames, String destinationDatasourceName,
+  public void importData(@Nonnull List<String> sourceTableNames, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException {
@@ -161,7 +161,7 @@ public class DefaultImportService implements ImportService {
     }
     Set<ValueTable> sourceTables = builder.build();
     try {
-      importData(unitName, sourceTables, destinationDatasourceName, allowIdentifierGeneration, ignoreUnknownIdentifier);
+      importData(sourceTables, destinationDatasourceName, allowIdentifierGeneration, ignoreUnknownIdentifier);
     } finally {
       for(ValueTable table : sourceTables) {
         MagmaEngine.get().removeTransientDatasource(table.getDatasource().getName());
@@ -170,13 +170,9 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(String unitName, Set<ValueTable> sourceTables, @Nonnull String destinationDatasourceName,
+  public void importData(Set<ValueTable> sourceTables, @Nonnull String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
-    // If unitName is the empty string, coerce it to null
-    String nonEmptyUnitName = Strings.emptyToNull(unitName);
-    Assert.isTrue(!Objects.equal(nonEmptyUnitName, FunctionalUnit.OPAL_INSTANCE),
-        "unitName cannot be " + FunctionalUnit.OPAL_INSTANCE);
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
 
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
@@ -320,8 +316,9 @@ public class DefaultImportService implements ImportService {
   private void copyToDestinationDatasource(FileObject file, Datasource destinationDatasource,
       @Nullable FunctionalUnit unit, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws IOException, InterruptedException {
-    DatasourceEncryptionStrategy datasourceEncryptionStrategy = null;
-    if(unit != null) datasourceEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
+    DatasourceEncryptionStrategy datasourceEncryptionStrategy = unit == null
+        ? null
+        : unit.getDatasourceEncryptionStrategy();
     // always wrap fs datasources in onyx datasource to support old onyx data dictionary (from 1.0 to 1.6 version)
     Datasource sourceDatasource = new OnyxDatasource(
         new FsDatasource(file.getName().getBaseName(), opalRuntime.getFileSystem().getLocalFile(file),

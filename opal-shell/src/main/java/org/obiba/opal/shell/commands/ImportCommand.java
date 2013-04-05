@@ -195,8 +195,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing datasource: %s ...\n", options.getSource());
     try {
-      importService.importData(getUnitName(), options.getSource(), options.getDestination(), options.isForce(),
-          options.isIgnore());
+      importService.importData(options.getSource(), options.getDestination(), options.isForce(), options.isIgnore());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {
@@ -221,8 +220,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing tables: %s ...\n", getTableNames());
     try {
-      importService.importData(getUnitName(), options.getTables(), options.getDestination(), options.isForce(),
-          options.isIgnore());
+      importService.importData(options.getTables(), options.getDestination(), options.isForce(), options.isIgnore());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {

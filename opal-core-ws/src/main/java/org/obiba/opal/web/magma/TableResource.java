@@ -189,11 +189,6 @@ public class TableResource extends AbstractValueTableResource {
       @QueryParam("ignoreUnknownIds") @DefaultValue("false") boolean ignoreUnknownIds)
       throws IOException, InterruptedException {
     ValueTable vt = getValueTable();
-//    if(vt.getDatasource() == null) {
-//      return Response.status(BAD_REQUEST).entity(ClientErrorDtos
-//          .getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", "Cannot write to a table without datasource")
-//          .build()).build();
-//    }
     try {
       if(importService == null) {
         writeValueSets(vt.getDatasource().createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
@@ -201,8 +196,7 @@ public class TableResource extends AbstractValueTableResource {
         Datasource ds = new StaticDatasource("import");
         // static writers will add entities and variables while writing values
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
-        importService
-            .importData(unitName, ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
+        importService.importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
       }
     } catch(NoSuchFunctionalUnitException ex) {
       return Response.status(BAD_REQUEST)
