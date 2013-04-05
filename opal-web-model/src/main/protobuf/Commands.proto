@@ -38,7 +38,7 @@ message ImportCommandOptionsDto {
   optional bool force = 6 [default = false];
   repeated string tables = 7;
   optional bool ignore = 8 [default = false];
-  optional bool incremental = 9 [default = true];
+  optional bool incremental = 9 [default = false];
 }
 
 message CopyCommandOptionsDto {
