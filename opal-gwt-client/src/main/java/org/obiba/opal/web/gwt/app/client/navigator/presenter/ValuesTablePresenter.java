@@ -348,9 +348,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void updateVariables(String select) {
-      final String query = select.isEmpty()
-          ? "*"
-          : select.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ");
+      final String query = select.isEmpty() ? "*" : select;
 
       UriBuilder ub = UriBuilder.create()
           .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")

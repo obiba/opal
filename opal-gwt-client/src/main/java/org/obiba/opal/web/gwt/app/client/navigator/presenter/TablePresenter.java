@@ -600,16 +600,17 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
             .withCallback(new ResourceCallback<QueryResultDto>() {
               @Override
-              public void onResource(Response response, QueryResultDto resource) {
+              public void onResource(Response response, QueryResultDto resultDto) {
                 if(response.getStatusCode() == Response.SC_OK) {
-                  QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
                   JsArray<VariableDto> variables = JsArrays.create();
-                  for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-                    VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
-                        .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
+                  if(resultDto.getTotalHits() > 0) {
+                    for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+                      VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
+                          .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
 
-                    variables.push(varDto.getVariable());
+                      variables.push(varDto.getVariable());
+                    }
                   }
                   getView().renderRows(variables);
                 }
