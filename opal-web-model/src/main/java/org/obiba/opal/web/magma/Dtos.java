@@ -52,7 +52,7 @@ import com.google.common.collect.Lists;
 /**
  * Utilities for manipulating Magma Dto instances
  */
-@SuppressWarnings({ "OverlyCoupledClass", "UnusedDeclaration" })
+@SuppressWarnings("OverlyCoupledClass")
 public final class Dtos {
 
   public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc
@@ -65,14 +65,14 @@ public final class Dtos {
 
   };
 
-  public static final Function<VariableDto, Variable> variableFromDtoFunc = new Function<VariableDto, Variable>() {
-
-    @Override
-    public Variable apply(VariableDto from) {
-      return fromDto(from);
-    }
-
-  };
+//  public static final Function<VariableDto, Variable> variableFromDtoFunc = new Function<VariableDto, Variable>() {
+//
+//    @Override
+//    public Variable apply(VariableDto from) {
+//      return fromDto(from);
+//    }
+//
+//  };
 
   private Dtos() {}
 

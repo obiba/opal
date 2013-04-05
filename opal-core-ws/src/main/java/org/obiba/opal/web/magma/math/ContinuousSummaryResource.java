@@ -31,6 +31,7 @@ import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
+import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsQueryBuilders;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.slf4j.Logger;
@@ -88,7 +89,7 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
 
       log.debug("jsonObject: {}", jsonObject.toString(2));
 
-      ContinuousSummaryDto.Builder builder = ContinuousSummaryDto.newBuilder();
+      Search.EsContinuousSummaryDto.Builder builder = Search.EsContinuousSummaryDto.newBuilder();
       JsonFormat.merge(jsonObject.toString(), builder);
       return builder.build();
 

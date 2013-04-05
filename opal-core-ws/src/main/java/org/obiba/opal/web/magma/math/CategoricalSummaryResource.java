@@ -28,6 +28,7 @@ import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
+import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsQueryBuilders;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.slf4j.Logger;
@@ -82,9 +83,9 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
       log.debug("jsonObject: {}", jsonObject.toString(2));
 
-      CategoricalSummaryDto.Builder builder = CategoricalSummaryDto.newBuilder();
+      Search.EsCategoricalSummaryDto.Builder builder = Search.EsCategoricalSummaryDto.newBuilder();
       JsonFormat.merge(jsonObject.toString(), builder);
-      return builder.build();
+      return builder.build().getSummary();
 
     } catch(JSONException e) {
       throw new RuntimeException(e);
