@@ -592,9 +592,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
             .query("variable", "true");
 
         // Keep sort info
-        if(sortColumnName != null) {
-          ub.query("sortField", sortColumnName);
-        }
+        ub.query("sortField", sortColumnName == null ? "index" : sortColumnName);
         ub.query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
 
         ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
