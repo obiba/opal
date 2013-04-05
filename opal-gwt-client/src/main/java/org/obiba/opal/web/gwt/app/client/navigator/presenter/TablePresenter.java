@@ -583,6 +583,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       } else if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 
         String query = getView().getFilter().getText();
+        query = query.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ");
 
         UriBuilder ub = UriBuilder.create()
             .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
