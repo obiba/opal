@@ -55,6 +55,8 @@ import com.google.common.collect.Lists;
 @SuppressWarnings("OverlyCoupledClass")
 public final class Dtos {
 
+  // private static final Logger log = LoggerFactory.getLogger(Dtos.class);
+
   public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc
       = new Function<VariableEntity, VariableEntityDto>() {
 
@@ -349,65 +351,61 @@ public final class Dtos {
     return builder.build();
   }
 
-  @SuppressWarnings("ConstantConditions")
   public static Math.CategoricalSummaryDto.Builder asDto(CategoricalVariableSummary summary) {
     Math.CategoricalSummaryDto.Builder dtoBuilder = Math.CategoricalSummaryDto.newBuilder() //
         .setMode(summary.getMode()) //
         .setN(summary.getN());
     for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
-      dtoBuilder.addFrequencies(Math.FrequencyDto.newBuilder() //
+      Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq()) //
-          .setPct(getNumericDouble(frequency.getPct())));
+          .setFreq(frequency.getFreq());
+      if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
+      dtoBuilder.addFrequencies(freqBuilder);
     }
     return dtoBuilder;
   }
 
-  @SuppressWarnings("ConstantConditions")
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   public static Math.ContinuousSummaryDto.Builder asDto(ContinuousVariableSummary summary) {
     DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();
 
-    Math.DescriptiveStatsDto.Builder descriptiveBuilder = Math.DescriptiveStatsDto.newBuilder() //
-        .setMin(getNumericDouble(descriptiveStats.getMin())) //
-        .setMax(getNumericDouble(descriptiveStats.getMax())) //
-        .setN(descriptiveStats.getN()) //
-        .setMean(getNumericDouble(descriptiveStats.getMean())) //
-        .setSum(getNumericDouble(descriptiveStats.getSum())) //
-        .setSumsq(getNumericDouble(descriptiveStats.getSumsq())) //
-        .setStdDev(getNumericDouble(descriptiveStats.getStandardDeviation())) //
-        .setVariance(getNumericDouble(descriptiveStats.getVariance())) //
-        .setSkewness(getNumericDouble(descriptiveStats.getSkewness())) //
-        .setGeometricMean(getNumericDouble(descriptiveStats.getGeometricMean())) //
-        .setKurtosis(getNumericDouble(descriptiveStats.getKurtosis())) //
-        .setMedian(getNumericDouble(descriptiveStats.apply(new Median()))) //
-        .addAllPercentiles(getNumericDoubles(summary.getPercentiles()));
+    Math.DescriptiveStatsDto.Builder descriptiveBuilder = Math.DescriptiveStatsDto.newBuilder()
+        .setN(descriptiveStats.getN()).addAllPercentiles(summary.getPercentiles());
+
+    if(isNumeric(descriptiveStats.getMin())) descriptiveBuilder.setMin(descriptiveStats.getMin());
+    if(isNumeric(descriptiveStats.getMax())) descriptiveBuilder.setMax(descriptiveStats.getMax());
+    if(isNumeric(descriptiveStats.getMean())) descriptiveBuilder.setMean(descriptiveStats.getMean());
+    if(isNumeric(descriptiveStats.getSum())) descriptiveBuilder.setSum(descriptiveStats.getSumsq());
+    if(isNumeric(descriptiveStats.getSumsq())) descriptiveBuilder.setSumsq(descriptiveStats.getSumsq());
+    if(isNumeric(descriptiveStats.getStandardDeviation())) {
+      descriptiveBuilder.setStdDev(descriptiveStats.getStandardDeviation());
+    }
+    if(isNumeric(descriptiveStats.getVariance())) descriptiveBuilder.setVariance(descriptiveStats.getVariance());
+    if(isNumeric(descriptiveStats.getSkewness())) descriptiveBuilder.setSkewness(descriptiveStats.getSkewness());
+    if(isNumeric(descriptiveStats.getGeometricMean())) {
+      descriptiveBuilder.setGeometricMean(descriptiveStats.getGeometricMean());
+    }
+    if(isNumeric(descriptiveStats.getKurtosis())) descriptiveBuilder.setKurtosis(descriptiveStats.getKurtosis());
+    double median = descriptiveStats.apply(new Median());
+    if(isNumeric(median)) descriptiveBuilder.setMedian(median);
+    if(isNumeric(descriptiveStats.getVariance())) descriptiveBuilder.setVariance(descriptiveStats.getVariance());
 
     Math.ContinuousSummaryDto.Builder continuousBuilder = Math.ContinuousSummaryDto.newBuilder()
-        .addAllDistributionPercentiles(getNumericDoubles(summary.getDistributionPercentiles()));
+        .addAllDistributionPercentiles(summary.getDistributionPercentiles());
     for(IntervalFrequency.Interval interval : summary.getIntervalFrequencies()) {
-      continuousBuilder.addIntervalFrequency(Math.IntervalFrequencyDto.newBuilder() //
-          .setLower(getNumericDouble(interval.getLower())) //
-          .setUpper(getNumericDouble(interval.getUpper())) //
-          .setFreq(interval.getFreq()) //
-          .setDensity(getNumericDouble(interval.getDensity())) //
-          .setDensityPct(getNumericDouble(interval.getDensityPct())));
+      Math.IntervalFrequencyDto.Builder freqBuilder = Math.IntervalFrequencyDto.newBuilder()
+          .setFreq(interval.getFreq());
+      if(isNumeric(interval.getLower())) freqBuilder.setLower(interval.getLower());
+      if(isNumeric(interval.getUpper())) freqBuilder.setUpper(interval.getUpper());
+      if(isNumeric(interval.getDensity())) freqBuilder.setDensity(interval.getDensity());
+      if(isNumeric(interval.getDensityPct())) freqBuilder.setDensityPct(interval.getDensityPct());
+      continuousBuilder.addIntervalFrequency(freqBuilder);
     }
     return continuousBuilder.setSummary(descriptiveBuilder);
   }
 
-  @Nullable
-  private static Double getNumericDouble(@Nullable Double d) {
-    return d == null || d.isInfinite() || d.isNaN() ? null : d;
-  }
-
-  private static Iterable<Double> getNumericDoubles(Iterable<Double> doubles) {
-    return Iterables.transform(doubles, new Function<Double, Double>() {
-      @Nullable
-      @Override
-      public Double apply(@Nullable Double input) {
-        return getNumericDouble(input);
-      }
-    });
+  private static boolean isNumeric(double d) {
+    return !Double.isNaN(d) && !Double.isInfinite(d);
   }
 
   private static final class FilteredToStringFunction implements Function<Object, String> {
