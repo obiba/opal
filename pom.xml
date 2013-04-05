@@ -1413,7 +1413,7 @@
     <obiba-commons.version>1.4-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <ow2-spec.version>1.0.2</ow2-spec.version>
-    <protobuf-java-format.version>1.2</protobuf-java-format.version>
+    <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.3.0</protobuf.version>
     <protostuff.version>1.0.1</protostuff.version>
     <quartz.version>1.8.3</quartz.version>
