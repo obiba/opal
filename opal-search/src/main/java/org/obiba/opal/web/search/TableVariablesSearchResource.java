@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.search;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -85,6 +86,14 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
   @Override
   protected String getSearchPath() {
     return indexManager.getIndex(getValueTable()).getRequestPath();
+  }
+
+  @Override
+  protected Collection<String> getFilterTypes() {
+    Collection<String> types = new ArrayList<String>();
+    types.add(indexManager.getIndex(getValueTable()).getIndexName());
+
+    return types;
   }
 
   protected Search.QueryResultDto convertResonse(JSONObject jsonResponse, boolean addVariableDto) throws JSONException {

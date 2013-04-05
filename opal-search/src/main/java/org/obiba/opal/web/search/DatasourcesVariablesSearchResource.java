@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.search;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -18,10 +20,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Search;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -29,10 +36,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/datasources/variables")
-public class VariablesSearchResource extends AbstractVariablesSearchResource {
+public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchResource {
+
+    private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);
 
   @Autowired
-  public VariablesSearchResource(VariablesIndexManager manager, OpalSearchService opalSearchService,
+  public DatasourcesVariablesSearchResource(VariablesIndexManager manager, OpalSearchService opalSearchService,
       ElasticSearchProvider esProvider) {
     super(opalSearchService, esProvider, manager);
   }
@@ -55,5 +64,19 @@ public class VariablesSearchResource extends AbstractVariablesSearchResource {
   @Override
   protected String getSearchPath() {
     return indexManager.getName();
+  }
+
+  @Override
+  protected Collection<String> getFilterTypes() {
+    Collection<String> types = new ArrayList<String>();
+
+    for (Datasource datasource : MagmaEngine.get().getDatasources()) {
+      for (ValueTable valueTable : datasource.getValueTables()) {
+        log.info("Variables {}", valueTable.getVariables());
+        types.add(indexManager.getIndex(valueTable).getIndexName());
+      }
+    }
+
+    return types;
   }
 }

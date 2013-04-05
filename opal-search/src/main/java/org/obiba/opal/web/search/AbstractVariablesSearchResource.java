@@ -21,10 +21,13 @@ import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
+import org.obiba.opal.web.ws.SortDir;
 
 import com.google.common.base.Strings;
 
 public abstract class AbstractVariablesSearchResource {
+
+  protected static final String DEFAULT_SORT_FIELD = "_score";
 
   protected static final String INDEX_FIELD = "index";
 
@@ -45,14 +48,16 @@ public abstract class AbstractVariablesSearchResource {
   // Protected members
   //
 
-  protected abstract String getSearchPath();
+  abstract protected String getSearchPath();
+
+  abstract protected Collection<String> getFilterTypes();
 
   protected Search.QueryResultDto convertResonse(JSONObject jsonResponse) throws JSONException {
     return new EsResultConverter().convert(jsonResponse);
   }
 
   protected JSONObject executeQuery(String query, int offset, int limit, Collection<String> fields) throws JSONException {
-    return executeQuery(query, offset, limit, fields, INDEX_FIELD, "ASC");
+    return executeQuery(query, offset, limit, fields, DEFAULT_SORT_FIELD, SortDir.DESC.toString());
   }
 
   protected JSONObject executeQuery(String query, int offset, int limit, Collection<String> fields, String sortField,
@@ -60,11 +65,12 @@ public abstract class AbstractVariablesSearchResource {
 
     addDefaultFields(fields);
 
-    if(Strings.isNullOrEmpty(sortField)) sortField = INDEX_FIELD;
+    if(Strings.isNullOrEmpty(sortField)) sortField = DEFAULT_SORT_FIELD;
+    if(Strings.isNullOrEmpty(sortDir)) sortDir = SortDir.DESC.toString();
 
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
     JSONObject jsonQuery = jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit)
-        .setSortField(sortField).setSortDir(sortDir).build();
+        .setSortField(sortField).setSortDir(sortDir).setFilterTypes(getFilterTypes()).build();
     EsQueryExecutor queryExecutor = new EsQueryExecutor(esProvider).setSearchPath(getSearchPath());
     return queryExecutor.execute(jsonQuery, RestRequest.Method.POST);
   }
