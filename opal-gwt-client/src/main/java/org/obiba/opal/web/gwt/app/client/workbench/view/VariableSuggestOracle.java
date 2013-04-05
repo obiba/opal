@@ -160,14 +160,17 @@ public class VariableSuggestOracle extends SuggestOracle {
 
   @Override
   public void requestSuggestions(final Request request, final Callback callback) {
-    final String query = request.getQuery();
+    String query = request.getQuery();
 
     if(query.length() > 1) {
+      // Uppercase operators AND, OR, NOT
+      query = query.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ");
       UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
           .query("query", query)//
           .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
 
       // Get candidates from search words.
+      final String finalQuery = query;
       ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
           .withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
 
@@ -181,7 +184,7 @@ public class VariableSuggestOracle extends SuggestOracle {
             @Override
             public void onResource(com.google.gwt.http.client.Response response, QueryResultDto resource) {
               if(response.getStatusCode() == com.google.gwt.http.client.Response.SC_OK) {
-                QueryResultDto resultDto = (QueryResultDto) JsonUtils.unsafeEval(response.getText());
+                QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
                 List<VariableSuggestion> suggestions = new ArrayList<VariableSuggestion>();
                 for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
@@ -199,7 +202,7 @@ public class VariableSuggestOracle extends SuggestOracle {
                     }
                   }
 
-                  suggestions.add(convertToFormattedSuggestions(query, attributes));
+                  suggestions.add(convertToFormattedSuggestions(finalQuery, attributes));
                 }
 
                 // Convert candidates to suggestions.
