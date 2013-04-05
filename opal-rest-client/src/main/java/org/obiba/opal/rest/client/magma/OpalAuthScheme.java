@@ -1,5 +1,7 @@
 package org.obiba.opal.rest.client.magma;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
@@ -15,11 +17,11 @@ import org.apache.http.message.BufferedHeader;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EncodingUtils;
+import org.obiba.opal.web.security.OpalAuth;
 
 public class OpalAuthScheme extends BasicScheme {
 
-  public static final String NAME = "X-Opal-Auth";
-
+  @Nullable
   @Override
   public String getRealm() {
     return null;
@@ -27,7 +29,7 @@ public class OpalAuthScheme extends BasicScheme {
 
   @Override
   public String getSchemeName() {
-    return NAME;
+    return OpalAuth.CREDENTIALS_HEADER;
   }
 
   /**
@@ -60,17 +62,15 @@ public class OpalAuthScheme extends BasicScheme {
     if(credentials == null) throw new IllegalArgumentException("credentials may not be null");
     if(charset == null) throw new IllegalArgumentException("charset may not be null");
 
-    StringBuilder tmp = new StringBuilder()//
-        .append(credentials.getUserPrincipal().getName())//
-        .append(":")//
-        .append(credentials.getPassword() == null ? "null" : credentials.getPassword());
+    String tmp = credentials.getUserPrincipal().getName() + ":" +
+        (credentials.getPassword() == null ? "null" : credentials.getPassword());
 
-    byte[] base64password = Base64.encodeBase64(EncodingUtils.getBytes(tmp.toString(), charset));
+    byte[] base64password = Base64.encodeBase64(EncodingUtils.getBytes(tmp, charset));
 
     CharArrayBuffer buffer = new CharArrayBuffer(32);
     buffer.append(proxy ? AUTH.PROXY_AUTH_RESP : AUTH.WWW_AUTH_RESP);
     buffer.append(": ");
-    buffer.append(NAME);
+    buffer.append(OpalAuth.CREDENTIALS_HEADER);
     buffer.append(" ");
     buffer.append(base64password, 0, base64password.length);
 

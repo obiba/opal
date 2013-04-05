@@ -9,21 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
-import java.util.Collections;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VectorSource;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 public class AbstractSummaryResource {
 
@@ -39,12 +33,8 @@ public class AbstractSummaryResource {
   @Nonnull
   private final Variable variable;
 
-  @Nullable
-  private final VectorSource vectorSource;
-
   protected AbstractSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, @Nonnull ValueTable valueTable, @Nonnull Variable variable,
-      @Nullable VectorSource vectorSource) {
+      ElasticSearchProvider esProvider, @Nonnull ValueTable valueTable, @Nonnull Variable variable) {
     Preconditions.checkNotNull(valueTable);
     Preconditions.checkNotNull(variable);
 
@@ -53,7 +43,6 @@ public class AbstractSummaryResource {
     this.esProvider = esProvider;
     this.valueTable = valueTable;
     this.variable = variable;
-    this.vectorSource = vectorSource;
   }
 
   @Nonnull
@@ -64,18 +53,6 @@ public class AbstractSummaryResource {
   @Nonnull
   public Variable getVariable() {
     return variable;
-  }
-
-  @Nullable
-  public VectorSource getVectorSource() {
-    return vectorSource;
-  }
-
-  @Nonnull
-  protected Iterable<Value> getValues() {
-    return vectorSource == null
-        ? Collections.<Value>emptySet()
-        : vectorSource.getValues(Sets.newTreeSet(getValueTable().getVariableEntities()));
   }
 
   protected boolean canQueryEsIndex() {

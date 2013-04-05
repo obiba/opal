@@ -22,6 +22,8 @@ package <message.proto.javaPackageName>;
 import com.google.gwt.core.client.*;
 import org.obiba.opal.web.model.client.magma.*;
 import org.obiba.opal.web.model.client.opal.*;
+import org.obiba.opal.web.model.client.search.*;
+import org.obiba.opal.web.model.client.math.*;
 
 >>
 

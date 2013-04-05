@@ -1,5 +1,8 @@
 import "Opal.proto";
+
 import "Magma.proto";
+
+import "Math.proto";
 
 package Search;
 
@@ -123,4 +126,18 @@ message VariableItemDto {
   extend ItemResultDto {
     optional VariableItemDto item = 1001;
   }
+}
+
+message EsCategoricalSummaryDto {
+  required Math.CategoricalSummaryDto summary = 1;
+  required string nature = 2;
+  required bool distinct = 3;
+}
+
+message EsContinuousSummaryDto {
+  required Math.ContinuousSummaryDto summary = 1;
+  required string nature = 2;
+  required string distribution = 3;
+  required int32 intervals = 4;
+  repeated double defaultPercentiles = 5;
 }

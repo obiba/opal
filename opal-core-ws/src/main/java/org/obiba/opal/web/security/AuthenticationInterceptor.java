@@ -11,6 +11,7 @@ package org.obiba.opal.web.security;
 
 import java.lang.annotation.Annotation;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -44,8 +45,6 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(AuthenticationInterceptor.class);
 
-  private static final String X_OPAL_AUTH = "X-Opal-Auth";
-
   private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
 
   @Autowired
@@ -53,6 +52,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
     super(securityManager);
   }
 
+  @Nullable
   @Override
   public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
     // Check authentication before processing. If resource requires authentication and user is not authenticated, return
@@ -76,7 +76,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
 
     // Not authorized: method requires proper authentication, and no user is authenticated
     return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED)
-        .header(HttpHeaders.WWW_AUTHENTICATE, X_OPAL_AUTH + " realm=\"Opal\"").build();
+        .header(HttpHeaders.WWW_AUTHENTICATE, OpalAuth.CREDENTIALS_HEADER + " realm=\"Opal\"").build();
   }
 
   @Override
@@ -100,10 +100,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
 
   private boolean isOpalCookieValid(HttpRequest request) {
     Cookie cookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
-    if(cookie != null) {
-      return isValidSessionId(cookie.getValue());
-    }
-    return false;
+    return cookie != null && isValidSessionId(cookie.getValue());
   }
 
   private boolean isWebServiceAuthenticated(Annotation... annotations) {

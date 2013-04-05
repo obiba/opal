@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.rest.client;
 
 import java.util.Date;
 
+import org.obiba.opal.web.security.OpalAuth;
+
 import com.google.gwt.core.client.impl.Md5Digest;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.Cookies;
@@ -19,8 +21,6 @@ import com.google.gwt.user.client.Cookies;
  *
  */
 public class RequestCredentials {
-
-  private static final String OPAL_CREDENTIALS_HEADER = "X-Opal-Auth";
 
   /**
    * Opal session id cookie name.
@@ -36,7 +36,7 @@ public class RequestCredentials {
 
   public RequestBuilder provideCredentials(RequestBuilder builder) {
     if(hasCredentials()) {
-      builder.setHeader("X-Opal-Auth", extractCredentials());
+      builder.setHeader(OpalAuth.CREDENTIALS_HEADER, extractCredentials());
     }
     return builder;
   }
@@ -79,7 +79,7 @@ public class RequestCredentials {
    * @return
    */
   public boolean hasExpired(RequestBuilder request) {
-    return request.getHeader(OPAL_CREDENTIALS_HEADER) != null && hasCredentials() == false;
+    return request.getHeader(OpalAuth.CREDENTIALS_HEADER) != null && !hasCredentials();
   }
 
   /**
@@ -93,7 +93,7 @@ public class RequestCredentials {
   }
 
   public void invalidate() {
-    Cookies.removeCookie(RequestCredentials.OPALSID, "/");
+    Cookies.removeCookie(OPALSID, "/");
   }
 
   /**
@@ -102,7 +102,7 @@ public class RequestCredentials {
    * @return the opalsid.
    */
   public String extractCredentials() {
-    return Cookies.getCookie(RequestCredentials.OPALSID);
+    return Cookies.getCookie(OPALSID);
   }
 
   private static String toHexString(byte[] bytes) {

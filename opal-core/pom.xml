@@ -11,7 +11,6 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>org.obiba.opal</groupId>
   <artifactId>opal-core</artifactId>
 
   <name>opal-core</name>

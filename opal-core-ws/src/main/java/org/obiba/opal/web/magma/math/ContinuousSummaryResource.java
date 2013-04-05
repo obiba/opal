@@ -9,155 +9,111 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.ContinuousDistribution;
-import org.apache.commons.math.distribution.ExponentialDistributionImpl;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.descriptive.rank.Median;
-import org.obiba.magma.Category;
-import org.obiba.magma.Value;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VectorSource;
-import org.obiba.magma.math.stat.IntervalFrequency;
-import org.obiba.magma.math.stat.IntervalFrequency.Interval;
-import org.obiba.magma.type.IntegerType;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummary.Distribution;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.TimestampedResponses;
+import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
-import org.obiba.opal.web.model.Math.DescriptiveStatsDto;
-import org.obiba.opal.web.model.Math.IntervalFrequencyDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
+import org.obiba.opal.web.model.Search.EsContinuousSummaryDto;
+import org.obiba.opal.web.search.support.EsQueryBuilders;
+import org.obiba.opal.web.search.support.EsQueryExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
+import com.googlecode.protobuf.format.JsonFormat;
 
-@SuppressWarnings("MagicNumber")
 public class ContinuousSummaryResource extends AbstractSummaryResource {
 
-  // Holds missing categories (the case of continuous variables that have "special" values such as 8888 or 9999 that
-  // indicate a missing value)
-  private final Set<Value> missing = Sets.newHashSet();
+  private static final Logger log = LoggerFactory.getLogger(ContinuousSummaryResource.class);
 
   public ContinuousSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable, VectorSource vectorSource) {
-    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable, vectorSource);
-    if(!variable.getValueType().isNumeric()) {
-      throw new IllegalArgumentException("continuous variables must be numeric");
-    }
-    if(variable.hasCategories()) {
-      for(Category c : variable.getCategories()) {
-        if(c.isMissing()) {
-          missing.add(variable.getValueType().valueOf(c.getName()));
-        }
-      }
-    }
+      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable) {
+    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable);
   }
 
   @GET
   @POST
   public Response compute(@QueryParam("d") @DefaultValue("normal") Distribution distribution,
       @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals) {
-    List<Double> percentilesOrDefault = percentiles != null && !percentiles.isEmpty()
-        ? percentiles
-        : ImmutableList
-            .of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d, 90d,
-                95d, 99.5d, 99.95d);
 
-    SummaryStatisticsDto entity = SummaryStatisticsDto.newBuilder()//
-        .setResource(getVariable().getName())//
-        .setExtension(ContinuousSummaryDto.continuous,
-            distribution.calc(getVariable().getValueType(), missing, getValues(), percentilesOrDefault, intervals)
-                .build()).build();
+    ContinuousSummaryDto summary = canQueryEsIndex()
+        ? queryEs(distribution, percentiles, intervals)
+        : queryMagma(distribution, percentiles, intervals);
 
-    return TimestampedResponses.ok(getValueTable(), entity).build();
+    SummaryStatisticsDto statisticsDto = SummaryStatisticsDto.newBuilder().setResource(getVariable().getName())
+        .setExtension(ContinuousSummaryDto.continuous, summary).build();
+    return TimestampedResponses.ok(getValueTable(), statisticsDto).build();
+
   }
 
-  @SuppressWarnings("ParameterHidesMemberVariable")
-  public enum Distribution {
-    normal {
-      @Nullable
-      @Override
-      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        return ds.getStandardDeviation() > 0
-            ? new NormalDistributionImpl(ds.getMean(), ds.getStandardDeviation())
-            : null;
-      }
-    },
-    exponential {
-      @Override
-      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        return new ExponentialDistributionImpl(ds.getMean());
-      }
-    };
+  private ContinuousSummaryDto queryEs(Distribution distribution, List<Double> percentiles, int intervals) {
+    log.info("Query ES for {} summary", getVariable().getName());
 
-    @Nullable
-    abstract ContinuousDistribution getDistribution(DescriptiveStatistics ds);
+    try {
 
-    public ContinuousSummaryDto.Builder calc(ValueType type, Set<Value> missing, Iterable<Value> values,
-        Iterable<Double> percentiles, int intervals) {
-      DescriptiveStatistics ds = new DescriptiveStatistics();
-      for(Value value : values) {
-        addValue(ds, missing, value);
+      // TODO query on defaultPercentiles
+      JSONObject esQuery = new EsQueryBuilders.EsBoolTermsQueryBuilder() //
+          .addTerm("_id", getVariable().getVariableReference(getValueTable())) //
+          .addTerm("_type", statsIndexManager.getIndex(getValueTable()).getIndexName()) //
+          .addTerm("nature", "continuous") //
+          .addTerm("distribution", distribution.name()) //
+          .addTerm("intervals", String.valueOf(intervals)).build();
+      log.debug("ES query: {}", esQuery.toString(2));
+
+      JSONObject response = new EsQueryExecutor(esProvider).execute(esQuery);
+      log.debug("ES Response: {}", response.toString(2));
+
+      JSONObject jsonHitsInfo = response.getJSONObject("hits");
+      if(jsonHitsInfo.getInt("total") != 1) {
+        return queryMagma(distribution, percentiles, intervals); // fallback
       }
 
-      DescriptiveStatsDto.Builder builder = DescriptiveStatsDto.newBuilder().setMin(ds.getMin()).setMax(ds.getMax())
-          .setN(ds.getN()).setMean(ds.getMean()).setSum(ds.getSum()).setSumsq(ds.getSumsq())
-          .setStdDev(ds.getStandardDeviation()).setVariance(ds.getVariance()).setSkewness(ds.getSkewness())
-          .setGeometricMean(ds.getGeometricMean()).setKurtosis(ds.getKurtosis()).setMedian(ds.apply(new Median()));
-      ContinuousSummaryDto.Builder continuous = ContinuousSummaryDto.newBuilder();
-      if(ds.getVariance() > 0) {
-        IntervalFrequency bf = new IntervalFrequency(ds.getMin(), ds.getMax(), intervals, type == IntegerType.get());
-        for(double d : ds.getSortedValues()) {
-          bf.add(d);
-        }
+      JSONObject jsonObject = jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source");
 
-        for(Interval interval : bf.intervals()) {
-          continuous.addIntervalFrequency(
-              IntervalFrequencyDto.newBuilder().setLower(interval.getLower()).setUpper(interval.getUpper())
-                  .setFreq(interval.getFreq()).setDensity(interval.getDensity())
-                  .setDensityPct(interval.getDensityPct()));
-        }
+      log.debug("jsonObject: {}", jsonObject.toString(2));
 
-        ContinuousDistribution cd = getDistribution(ds);
-        for(Double p : percentiles) {
-          builder.addPercentiles(ds.getPercentile(p));
-          try {
-            if(cd != null) continuous.addDistributionPercentiles(cd.inverseCumulativeProbability(p / 100d));
-          } catch(MathException ignored) {
-          }
-        }
-      }
-      return continuous.setSummary(builder);
+      EsContinuousSummaryDto.Builder builder = EsContinuousSummaryDto.newBuilder();
+      JsonFormat.merge(jsonObject.toString(), builder);
+      return builder.build().getSummary();
+
+    } catch(JSONException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @SuppressWarnings("ConstantConditions")
-    private void addValue(DescriptiveStatistics ds, Set<Value> missing, Value value) {
-      if(!value.isNull() && !missing.contains(value)) {
-        if(value.isSequence()) {
-          for(Value v : value.asSequence().getValue()) {
-            addValue(ds, missing, v);
-          }
-        } else {
-          ds.addValue(((Number) value.getValue()).doubleValue());
-        }
-      }
-    }
+  private ContinuousSummaryDto queryMagma(Distribution distribution, List<Double> percentiles, int intervals) {
 
+    log.info("Query Magma for {} summary", getVariable().getName());
+
+    ContinuousVariableSummary summary = new ContinuousVariableSummary.Builder(getVariable(), distribution) //
+        .defaultPercentiles(percentiles) //
+        .intervals(intervals) //
+        .addTable(getValueTable()) //
+        .build();
+
+    // TODO should we store this summary to ES with a new thread?
+    statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
+
+    return Dtos.asDto(summary).build();
   }
 
 }

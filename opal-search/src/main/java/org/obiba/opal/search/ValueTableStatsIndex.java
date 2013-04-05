@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import org.obiba.magma.Value;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 
 /**
  * An index of a {@code ValueTable} variables.
@@ -32,5 +33,7 @@ public interface ValueTableStatsIndex extends ValueTableIndex {
 
   void computeAndIndexSummaries();
 
-  void indexSummary(CategoricalVariableSummary summary);
+  void indexSummary(@Nonnull CategoricalVariableSummary summary);
+
+  void indexSummary(@Nonnull ContinuousVariableSummary summary);
 }

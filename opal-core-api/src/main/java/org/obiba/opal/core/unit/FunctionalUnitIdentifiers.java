@@ -12,6 +12,8 @@ package org.obiba.opal.core.unit;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import javax.annotation.Nullable;
+
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
@@ -37,9 +39,10 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
     /**
      * Unit's identifier for the variable entity (can be null).
      */
+    @Nullable
     private final String unitIdentifier;
 
-    UnitIdentifier(String opalIdentifier, String unitIdentifier) {
+    UnitIdentifier(String opalIdentifier, @Nullable String unitIdentifier) {
       this.opalIdentifier = opalIdentifier;
       this.unitIdentifier = unitIdentifier;
     }
@@ -52,12 +55,17 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
       return entityFor(getOpalIdentifier());
     }
 
+    @Nullable
     public String getUnitIdentifier() {
       return unitIdentifier;
     }
 
     public VariableEntity getUnitEntity() {
       return entityFor(getUnitIdentifier());
+    }
+
+    private VariableEntity entityFor(@Nullable String identifier) {
+      return new VariableEntityBean(identifiersTable.getEntityType(), identifier);
     }
 
     public boolean hasUnitIdentifier() {
@@ -71,7 +79,7 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
   private final FunctionalUnit unit;
 
   public FunctionalUnitIdentifiers(ValueTable identifiers, FunctionalUnit unit) {
-    this.identifiersTable = identifiers;
+    identifiersTable = identifiers;
     this.unit = unit;
   }
 
@@ -90,20 +98,17 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
   public Iterator<UnitIdentifier> iterator() {
     return new Iterator<UnitIdentifier>() {
 
-      private Iterator<VariableEntity> opalEntities;
+      private final Iterator<VariableEntity> opalEntities;
 
-      private Iterator<Value> unitIdentifiers;
+      private final Iterator<Value> unitIdentifiers;
 
       {
-        TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
-        if(identifiersTable.hasVariable(unit.getKeyVariableName())) {
-          this.unitIdentifiers = identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource()
-              .getValues(opalEntities).iterator();
-        } else {
-          // Make sure not to loop on iterators reuturned by this method call, or an infinite loop will happen
-          this.unitIdentifiers = Iterables.cycle(TextType.get().nullValue()).iterator();
-        }
-        this.opalEntities = opalEntities.iterator();
+        TreeSet<VariableEntity> entities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
+        unitIdentifiers = identifiersTable.hasVariable(unit.getKeyVariableName())
+            ? identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource().getValues(entities)
+            .iterator()
+            : Iterables.cycle(TextType.get().nullValue()).iterator();
+        opalEntities = entities.iterator();
       }
 
       @Override
@@ -124,7 +129,4 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
     };
   }
 
-  private VariableEntity entityFor(String identifier) {
-    return new VariableEntityBean(identifiersTable.getEntityType(), identifier);
-  }
 }

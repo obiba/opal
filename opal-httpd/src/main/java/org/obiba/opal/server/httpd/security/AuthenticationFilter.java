@@ -12,8 +12,10 @@ package org.obiba.opal.server.httpd.security;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 
+import javax.annotation.Nullable;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +24,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
@@ -38,6 +41,7 @@ import org.obiba.opal.core.unit.security.X509CertificateAuthenticationToken;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
 import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
 import org.obiba.opal.web.security.HttpHeaderAuthenticationToken;
+import org.obiba.opal.web.security.OpalAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -45,8 +49,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class AuthenticationFilter extends OncePerRequestFilter {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
-
-  private static final String X_OPAL_AUTH = "X-Opal-Auth";
 
   private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
 
@@ -59,7 +61,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   private final SubjectAclService subjectAclService;
 
   public AuthenticationFilter(SecurityManager mgr, OpalRuntime opalRuntime, SubjectAclService subjectAclService) {
-    if(mgr instanceof SessionsSecurityManager == false) {
+    if(!(mgr instanceof SessionsSecurityManager)) {
       throw new IllegalStateException("SecurityManager does not support session management");
     }
     securityManager = (SessionsSecurityManager) mgr;
@@ -143,7 +145,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   private void ensureUserHomeExists(String username) {
     try {
       FileObject home = opalRuntime.getFileSystem().getRoot().resolveFile("/home/" + username);
-      if(home.exists() == false) {
+      if(!home.exists()) {
         log.info("Creating user home: /home/{}", username);
         home.createFolder();
       }
@@ -161,7 +163,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       found = findPermission(acl, homePerm);
       if(found) break;
     }
-    if(found == false) {
+    if(!found) {
       subjectAclService
           .addSubjectPermission("opal", folderNode, SubjectAclService.SubjectType.USER.subjectFor(username), homePerm);
       subjectAclService.addSubjectPermission("opal", folderNode.replace("/files/", "/files/meta/"),
@@ -180,10 +182,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     return found;
   }
 
+  @Nullable
   private Subject authenticateBySslCert(HttpServletRequest request) {
     X509Certificate[] chain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
     for(X509Certificate cert : chain) {
-      X509CertificateAuthenticationToken token = new X509CertificateAuthenticationToken(cert);
+      AuthenticationToken token = new X509CertificateAuthenticationToken(cert);
       String sessionId = extractSessionId(request);
       Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
       subject.login(token);
@@ -193,14 +196,14 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     return null;
   }
 
-  private boolean hasSslCert(HttpServletRequest request) {
+  private boolean hasSslCert(ServletRequest request) {
     X509Certificate[] chain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
     return chain != null && chain.length > 0;
   }
 
   private Subject authenticateByOpalAuthHeader(HttpServletRequest request) {
     String opalAuthToken = getOpalAuthToken(request);
-    HttpHeaderAuthenticationToken token = new HttpHeaderAuthenticationToken(opalAuthToken);
+    AuthenticationToken token = new HttpHeaderAuthenticationToken(opalAuthToken);
     Subject subject = new Subject.Builder(getSecurityManager()).sessionId(opalAuthToken).buildSubject();
     subject.login(token);
     return subject;
@@ -210,7 +213,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     String authorization = getAuthorizationHeader(request);
     String sessionId = extractSessionId(request);
 
-    HttpAuthorizationToken token = new HttpAuthorizationToken(X_OPAL_AUTH, authorization);
+    AuthenticationToken token = new HttpAuthorizationToken(OpalAuth.CREDENTIALS_HEADER, authorization);
     Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
     subject.login(token);
     return subject;
@@ -220,7 +223,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     String sessionId = extractSessionId(request);
     String requestId = extractRequestId(request);
     String url = request.getRequestURI();
-    HttpCookieAuthenticationToken token = new HttpCookieAuthenticationToken(sessionId, url, requestId);
+    AuthenticationToken token = new HttpCookieAuthenticationToken(sessionId, url, requestId);
     Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
     subject.login(token);
     return subject;
@@ -243,11 +246,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private boolean hasOpalAuthHeader(HttpServletRequest request) {
     String header = getOpalAuthToken(request);
-    return header != null && header.isEmpty() == false;
+    return header != null && !header.isEmpty();
   }
 
   private String getOpalAuthToken(HttpServletRequest request) {
-    return request.getHeader(X_OPAL_AUTH);
+    return request.getHeader(OpalAuth.CREDENTIALS_HEADER);
   }
 
   private boolean hasOpalSessionCookie(HttpServletRequest request) {
@@ -257,7 +260,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private boolean hasAuthorizationHeader(HttpServletRequest request) {
     String header = getAuthorizationHeader(request);
-    return header != null && header.isEmpty() == false;
+    return header != null && !header.isEmpty();
   }
 
   private String getAuthorizationHeader(HttpServletRequest request) {
@@ -265,7 +268,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   }
 
   private String extractSessionId(HttpServletRequest request) {
-    String sessionId = request.getHeader(X_OPAL_AUTH);
+    String sessionId = request.getHeader(OpalAuth.CREDENTIALS_HEADER);
     if(sessionId == null) {
       // Extract from the cookie (only used for GET or POST requests)
       Cookie cookie = findCookie(request, OPAL_SESSION_ID_COOKIE_NAME);
@@ -281,6 +284,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     return cookie != null && cookie.getValue() != null;
   }
 
+  @Nullable
   private String extractRequestId(HttpServletRequest request) {
     Cookie cookie = findCookie(request, OPAL_REQUEST_ID_COOKIE_NAME);
     if(cookie != null) {
@@ -289,6 +293,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     return null;
   }
 
+  @Nullable
   private Cookie findCookie(HttpServletRequest request, String cookieName) {
     Cookie[] cookies = request.getCookies();
     if(cookies != null) {

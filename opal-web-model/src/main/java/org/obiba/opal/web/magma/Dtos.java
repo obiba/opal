@@ -15,6 +15,8 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math.stat.descriptive.rank.Median;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
@@ -25,7 +27,10 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
+import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
@@ -35,6 +40,7 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
+import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 
 import com.google.common.base.Function;
@@ -46,7 +52,7 @@ import com.google.common.collect.Lists;
 /**
  * Utilities for manipulating Magma Dto instances
  */
-@SuppressWarnings({ "OverlyCoupledClass", "UnusedDeclaration" })
+@SuppressWarnings("OverlyCoupledClass")
 public final class Dtos {
 
   public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc
@@ -59,14 +65,12 @@ public final class Dtos {
 
   };
 
-  public static final Function<VariableDto, Variable> variableFromDtoFunc = new Function<VariableDto, Variable>() {
-
-    @Override
-    public Variable apply(VariableDto from) {
-      return fromDto(from);
-    }
-
-  };
+//  public static final Function<VariableDto, Variable> variableFromDtoFunc = new Function<VariableDto, Variable>() {
+//    @Override
+//    public Variable apply(VariableDto from) {
+//      return fromDto(from);
+//    }
+//  };
 
   private Dtos() {}
 
@@ -224,13 +228,11 @@ public final class Dtos {
       builder.setTimestamps(tsBuilder);
     }
 
-    if(valueTable.getDatasource() != null) {
-      builder.setDatasourceName(valueTable.getDatasource().getName());
-      String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
-      builder.setLink(link);
-      if(valueTable.isView()) {
-        builder.setViewLink(link.replaceFirst("/table/", "/view/"));
-      }
+    builder.setDatasourceName(valueTable.getDatasource().getName());
+    String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
+    builder.setLink(link);
+    if(valueTable.isView()) {
+      builder.setViewLink(link.replaceFirst("/table/", "/view/"));
     }
 
     return builder;
@@ -345,6 +347,67 @@ public final class Dtos {
     }
 
     return builder.build();
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public static Math.CategoricalSummaryDto.Builder asDto(CategoricalVariableSummary summary) {
+    Math.CategoricalSummaryDto.Builder dtoBuilder = Math.CategoricalSummaryDto.newBuilder() //
+        .setMode(summary.getMode()) //
+        .setN(summary.getN());
+    for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
+      dtoBuilder.addFrequencies(Math.FrequencyDto.newBuilder() //
+          .setValue(frequency.getValue()) //
+          .setFreq(frequency.getFreq()) //
+          .setPct(getNumericDouble(frequency.getPct())));
+    }
+    return dtoBuilder;
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public static Math.ContinuousSummaryDto.Builder asDto(ContinuousVariableSummary summary) {
+    DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();
+
+    Math.DescriptiveStatsDto.Builder descriptiveBuilder = Math.DescriptiveStatsDto.newBuilder() //
+        .setMin(getNumericDouble(descriptiveStats.getMin())) //
+        .setMax(getNumericDouble(descriptiveStats.getMax())) //
+        .setN(descriptiveStats.getN()) //
+        .setMean(getNumericDouble(descriptiveStats.getMean())) //
+        .setSum(getNumericDouble(descriptiveStats.getSum())) //
+        .setSumsq(getNumericDouble(descriptiveStats.getSumsq())) //
+        .setStdDev(getNumericDouble(descriptiveStats.getStandardDeviation())) //
+        .setVariance(getNumericDouble(descriptiveStats.getVariance())) //
+        .setSkewness(getNumericDouble(descriptiveStats.getSkewness())) //
+        .setGeometricMean(getNumericDouble(descriptiveStats.getGeometricMean())) //
+        .setKurtosis(getNumericDouble(descriptiveStats.getKurtosis())) //
+        .setMedian(getNumericDouble(descriptiveStats.apply(new Median()))) //
+        .addAllPercentiles(getNumericDoubles(summary.getPercentiles()));
+
+    Math.ContinuousSummaryDto.Builder continuousBuilder = Math.ContinuousSummaryDto.newBuilder()
+        .addAllDistributionPercentiles(getNumericDoubles(summary.getDistributionPercentiles()));
+    for(IntervalFrequency.Interval interval : summary.getIntervalFrequencies()) {
+      continuousBuilder.addIntervalFrequency(Math.IntervalFrequencyDto.newBuilder() //
+          .setLower(getNumericDouble(interval.getLower())) //
+          .setUpper(getNumericDouble(interval.getUpper())) //
+          .setFreq(interval.getFreq()) //
+          .setDensity(getNumericDouble(interval.getDensity())) //
+          .setDensityPct(getNumericDouble(interval.getDensityPct())));
+    }
+    return continuousBuilder.setSummary(descriptiveBuilder);
+  }
+
+  @Nullable
+  private static Double getNumericDouble(@Nullable Double d) {
+    return d == null || d.isInfinite() || d.isNaN() ? null : d;
+  }
+
+  private static Iterable<Double> getNumericDoubles(Iterable<Double> doubles) {
+    return Iterables.transform(doubles, new Function<Double, Double>() {
+      @Nullable
+      @Override
+      public Double apply(@Nullable Double input) {
+        return getNumericDouble(input);
+      }
+    });
   }
 
   private static final class FilteredToStringFunction implements Function<Object, String> {

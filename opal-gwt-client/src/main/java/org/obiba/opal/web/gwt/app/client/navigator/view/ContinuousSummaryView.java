@@ -10,13 +10,13 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import org.obiba.opal.web.gwt.plot.client.HistogramPlot;
-import org.obiba.opal.web.gwt.plot.client.JqPlot;
 import org.obiba.opal.web.gwt.plot.client.NormalProbabilityPlot;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
 import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -34,7 +34,7 @@ public class ContinuousSummaryView extends Composite {
   @UiTemplate("ContinuousSummaryView.ui.xml")
   interface ContinuousSummaryViewUiBinder extends UiBinder<Widget, ContinuousSummaryView> {}
 
-  private static ContinuousSummaryViewUiBinder uiBinder = GWT.create(ContinuousSummaryViewUiBinder.class);
+  private static final ContinuousSummaryViewUiBinder uiBinder = GWT.create(ContinuousSummaryViewUiBinder.class);
 
   @UiField
   Label obs;
@@ -77,9 +77,9 @@ public class ContinuousSummaryView extends Composite {
 
   final Widget widget;
 
-  final JqPlot histogram;
+  HistogramPlot histogram;
 
-  final JqPlot qqPlot;
+  NormalProbabilityPlot qqPlot;
 
   public ContinuousSummaryView(ContinuousSummaryDto continuous) {
     widget = uiBinder.createAndBindUi(this);
@@ -87,33 +87,32 @@ public class ContinuousSummaryView extends Composite {
     histogramElement.setId(HTMLPanel.createUniqueId());
     qqPlotElement.setId(HTMLPanel.createUniqueId());
 
-    obs.setText("" + Math.round(continuous.getSummary().getN()));
-    max.setText("" + continuous.getSummary().getMax());
-    min.setText("" + continuous.getSummary().getMin());
-    mean.setText("" + continuous.getSummary().getMean());
-    median.setText("" + continuous.getSummary().getMedian());
-    stdDev.setText("" + continuous.getSummary().getStdDev());
-    variance.setText("" + continuous.getSummary().getVariance());
-    skewness.setText("" + continuous.getSummary().getSkewness());
-    kurtosis.setText("" + continuous.getSummary().getKurtosis());
-    sum.setText("" + continuous.getSummary().getSum());
-    sumsq.setText("" + continuous.getSummary().getSumsq());
+    DescriptiveStatsDto descriptiveStats = continuous.getSummary();
 
-    DescriptiveStatsDto ds = continuous.getSummary();
-    if(ds.getVariance() > 0) {
-      HistogramPlot plot = new HistogramPlot(histogramElement.getId(), ds.getMin(), ds.getMax());
-      if(continuous.getIntervalFrequencyArray() != null) {
-        for(int i = 0; i < continuous.getIntervalFrequencyArray().length(); i++) {
-          IntervalFrequencyDto value = continuous.getIntervalFrequencyArray().get(i);
-          plot.push(value.getLower(), value.getUpper(), value.getDensity());
+    obs.setText("" + Math.round(descriptiveStats.getN()));
+    max.setText("" + descriptiveStats.getMax());
+    min.setText("" + descriptiveStats.getMin());
+    mean.setText("" + descriptiveStats.getMean());
+    median.setText("" + descriptiveStats.getMedian());
+    stdDev.setText("" + descriptiveStats.getStdDev());
+    variance.setText("" + descriptiveStats.getVariance());
+    skewness.setText("" + descriptiveStats.getSkewness());
+    kurtosis.setText("" + descriptiveStats.getKurtosis());
+    sum.setText("" + descriptiveStats.getSum());
+    sumsq.setText("" + descriptiveStats.getSumsq());
+
+    if(descriptiveStats.getVariance() > 0) {
+      histogram = new HistogramPlot(histogramElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());
+      JsArray<IntervalFrequencyDto> frequencyArray = continuous.getIntervalFrequencyArray();
+      if(frequencyArray != null) {
+        int length = frequencyArray.length();
+        for(int i = 0; i < length; i++) {
+          IntervalFrequencyDto value = frequencyArray.get(i);
+          histogram.push(value.getLower(), value.getUpper(), value.getDensity());
         }
       }
-      histogram = plot;
-      NormalProbabilityPlot qqplot = new NormalProbabilityPlot(qqPlotElement.getId(), ds.getMin(), ds.getMax());
-      qqplot.push(ds.getPercentilesArray(), continuous.getDistributionPercentilesArray());
-      this.qqPlot = qqplot;
-    } else {
-      this.histogram = this.qqPlot = null;
+      qqPlot = new NormalProbabilityPlot(qqPlotElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());
+      qqPlot.push(descriptiveStats.getPercentilesArray(), continuous.getDistributionPercentilesArray());
     }
   }
 

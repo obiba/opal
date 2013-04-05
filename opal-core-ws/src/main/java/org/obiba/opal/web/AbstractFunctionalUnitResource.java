@@ -12,7 +12,10 @@ package org.obiba.opal.web;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -56,25 +59,19 @@ public abstract class AbstractFunctionalUnitResource {
     return getUnitsFromName(reader.readNext());
   }
 
-  protected List<FunctionalUnit> getUnitsFromName(String... unitNames) {
+  protected List<FunctionalUnit> getUnitsFromName(@Nonnull String... unitNames) {
     // find the units
     List<FunctionalUnit> units = new ArrayList<FunctionalUnit>();
-    List<String> visitedUnitNames = new ArrayList<String>();
-    for(int i = 0; i < unitNames.length; i++) {
-      String unit = unitNames[i];
-      if(!visitedUnitNames.contains(unit)) {
-        visitedUnitNames.add(unit);
-        FunctionalUnit functionalUnit;
-        if(unit.equals(FunctionalUnit.OPAL_INSTANCE)) {
-          functionalUnit = FunctionalUnit.OPAL;
-        } else {
-          functionalUnit = resolveFunctionalUnit(unit);
-        }
-
-        units.add(functionalUnit);
-      } else {
+    Collection<String> visitedUnitNames = new ArrayList<String>();
+    for(String unit : unitNames) {
+      if(visitedUnitNames.contains(unit)) {
         throw new InvalidRequestException("DuplicateFunctionalUnitNames");
       }
+      visitedUnitNames.add(unit);
+      FunctionalUnit functionalUnit = FunctionalUnit.OPAL_INSTANCE.equals(unit)
+          ? FunctionalUnit.OPAL
+          : resolveFunctionalUnit(unit);
+      units.add(functionalUnit);
     }
     return units;
   }

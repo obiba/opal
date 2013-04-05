@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
@@ -116,7 +118,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     summaryTabPresenter.unbind();
   }
 
-  private void updateDisplay(TableDto tableDto, VariableDto variableDto, VariableDto previous, VariableDto next) {
+  private void updateDisplay(TableDto tableDto, VariableDto variableDto, @Nullable VariableDto previous,
+      @Nullable VariableDto next) {
     table = tableDto;
     variable = variableDto;
 
@@ -143,7 +146,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     getView().renderAttributeRows(variable.getAttributesArray());
   }
 
-  private void updateMenuDisplay(VariableDto previous, VariableDto next) {
+  private void updateMenuDisplay(@Nullable VariableDto previous, @Nullable VariableDto next) {
     getView().setParentName(variable.getParentLink().getRel());
     getView().setPreviousName(previous == null ? "" : previous.getName());
     getView().setNextName(next == null ? "" : next.getName());
