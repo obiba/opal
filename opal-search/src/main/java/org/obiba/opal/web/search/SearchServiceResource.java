@@ -20,8 +20,8 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.ValuesIndexManager;
@@ -75,6 +75,7 @@ public class SearchServiceResource extends IndexResource {
     });
   }
 
+  @SuppressWarnings("ConstantConditions")
   private Opal.TableIndexStatusDto getTableStatusDto(Datasource datasource, ValueTable valueTable) {
     float progress = 0f;
     if(synchroManager.getCurrentTask() != null &&
@@ -84,10 +85,14 @@ public class SearchServiceResource extends IndexResource {
 
     URI link = UriBuilder.fromPath("/").path(ValueTableIndexResource.class)
         .build(datasource.getName(), valueTable.getName());
-    Opal.TableIndexStatusDto tableStatusDto = Opal.TableIndexStatusDto.newBuilder().setDatasource(datasource.getName())
-        .setTable(valueTable.getName()).setSchedule(getScheduleDto(datasource.getName(), valueTable.getName()))
-        .setStatus(getTableIndexationStatus(datasource.getName(), valueTable.getName())).setProgress(progress)
-        .setLink(link.getPath()).setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
+    Timestamps timestamps = valueTable.getTimestamps();
+    Opal.TableIndexStatusDto tableStatusDto = Opal.TableIndexStatusDto.newBuilder() //
+        .setDatasource(datasource.getName()) //
+        .setTable(valueTable.getName()) //
+        .setSchedule(getScheduleDto(datasource.getName(), valueTable.getName())) //
+        .setStatus(getTableIndexationStatus(datasource.getName(), valueTable.getName())) //
+        .setProgress(progress) //
+        .setLink(link.getPath()).setTableLastUpdate(timestamps.getLastUpdate().toString()).build();
 
     if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
       tableStatusDto = tableStatusDto.toBuilder()
