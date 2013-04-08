@@ -1664,4 +1664,8 @@ public interface Translations extends Constants {
   @Description("Filter Variable label")
   @Constants.DefaultStringValue("Filter variables...")
   String filterVariables();
+
+  @Description("Clear filter label")
+  @DefaultStringValue("Clear filter")
+  String clearFilter();
 }

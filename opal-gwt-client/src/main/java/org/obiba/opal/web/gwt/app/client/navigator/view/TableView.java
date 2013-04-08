@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
@@ -33,7 +34,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
-import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -167,7 +167,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   SimplePager pager;
 
   @UiField
-  TextBox filter;
+  TextBoxClearable filter;
 
   @UiField
   Panel permissions;
@@ -191,9 +191,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   public TableView() {
     widget = uiBinder.createAndBindUi(this);
     toolbarPanel.add(toolbar = new NavigatorMenuBar());
-    filter.addStyleName("variables-filter-box");
+
     addTableColumns();
     initializeAnchorTexts();
+    initializeFilter();
   }
 
   @Override
@@ -210,6 +211,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
         panel.add(content);
       }
     }
+  }
+
+  private void initializeFilter() {
+    filter.getTextBox().setPlaceholder(translations.filterVariables());
+    filter.getTextBox().addStyleName("input-xlarge");
+    filter.getClear().setTitle(translations.clearFilter());
   }
 
   private void addTableColumns() {
@@ -257,8 +264,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
 
-    filter.setText("");
-    filter.setPlaceholder(translations.filterVariables());
+    filter.clearText();
+    filter.getTextBox().setPlaceholder(translations.filterVariables());
   }
 
   @SuppressWarnings({ "unchecked" })
@@ -314,7 +321,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   public void clear() {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
     checkColumn.getSelectionModel().clear();
-    filter.setText("");
+    filter.clearText();
   }
 
   @Override
@@ -700,12 +707,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public HandlerRegistration addFilterVariableHandler(KeyUpHandler handler) {
-    return filter.addKeyUpHandler(handler);
+    return filter.getTextBox().addKeyUpHandler(handler);
   }
 
   @Override
   public HasText getFilter() {
-    return filter;
+    return filter.getTextBox();
   }
 
 }

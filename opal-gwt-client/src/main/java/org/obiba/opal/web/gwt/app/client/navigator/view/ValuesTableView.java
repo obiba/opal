@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
@@ -98,7 +99,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   Table<ValueSetDto> valuesTable;
 
   @UiField
-  TextBox filter;
+  TextBoxClearable filter;
 
   @UiField
   NumericTextBox pageSize;
@@ -158,7 +159,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     visibleColumns.setMin(1);
     visibleColumns.addKeyUpHandler(new OnEnterSubmitKeyUpHandler());
 
-    filter.addKeyUpHandler(new FilterOnEnterSubmitKeyUpHandler());
+    filter.getTextBox().addKeyUpHandler(new FilterOnEnterSubmitKeyUpHandler());
+    filter.getClear().setTitle(translations.clearFilter());
 
     visibleListVariable = new AbstractList<VariableDto>() {
 
@@ -211,10 +213,10 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     searchBox.setText("");
-    filter.setText("");
-    filter.setPlaceholder(translations.filterVariables());
+    filter.clearText();
+    filter.getTextBox().setPlaceholder(translations.filterVariables());
     lastFilter = "";
-    filter.setValue(lastFilter, false);
+    filter.getTextBox().setValue(lastFilter, false);
     setRefreshing(false);
   }
 
@@ -335,9 +337,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
     }
 
-    if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getText().isEmpty()) {
+    if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getTextBox().getText().isEmpty()) {
       lastFilter = "^" + escape(listVariable.get(0).getName()) + "$";
-      filter.setValue(lastFilter, false);
+      filter.getTextBox().setValue(lastFilter, false);
     }
 
     if(dataProvider != null) {
@@ -604,12 +606,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
       if(start > table.getValueSetCount()) return;
 
-      if(filter.getText().isEmpty()) {
+      if(filter.getTextBox().getText().isEmpty()) {
         setRefreshing(true);
         fetcher.request(visibleListVariable, start, pager.getPageSize());
       } else {
         setRefreshing(true);
-        fetcher.request(filter.getText(), start, pager.getPageSize());
+        fetcher.request(filter.getTextBox().getText(), start, pager.getPageSize());
       }
     }
 
@@ -645,7 +647,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     @Override
     public void onKeyUp(KeyUpEvent event) {
-      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getText().isEmpty()) {
+      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getTextBox().getText().isEmpty()) {
 
         int page = DEFAULT_PAGE_SIZE;
         int columns = DEFAULT_MAX_VISIBLE_COLUMNS;
@@ -657,12 +659,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
           columns = visibleColumns.getNumberValue().intValue();
         }
 
-        if(!lastFilter.equals(filter.getText()) || maxVisibleColumns != columns) {
+        if(!lastFilter.equals(filter.getTextBox().getText()) || maxVisibleColumns != columns) {
           // variables list has changed so update all
-          lastFilter = filter.getText();
+          lastFilter = filter.getTextBox().getText();
           maxVisibleColumns = columns;
           setRefreshing(true);
-          fetcher.updateVariables(filter.getText());
+          fetcher.updateVariables(filter.getTextBox().getText());
         } else if(valuesTable.getPageSize() != page) {
           // page size only has changed
           setRefreshing(true);
@@ -689,12 +691,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
           columns = visibleColumns.getNumberValue().intValue();
         }
 
-        if(!lastFilter.equals(filter.getText()) || maxVisibleColumns != columns) {
+        if(!lastFilter.equals(filter.getTextBox().getText()) || maxVisibleColumns != columns) {
           // variables list has changed so update all
-          lastFilter = filter.getText();
+          lastFilter = filter.getTextBox().getText();
           maxVisibleColumns = columns;
           setRefreshing(true);
-          fetcher.updateVariables(filter.getText());
+          fetcher.updateVariables(filter.getTextBox().getText());
         } else if(valuesTable.getPageSize() != page) {
           // page size only has changed
           setRefreshing(true);
