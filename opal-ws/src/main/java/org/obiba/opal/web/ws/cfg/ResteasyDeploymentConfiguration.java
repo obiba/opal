@@ -58,8 +58,6 @@ public class ResteasyDeploymentConfiguration {
 
   /**
    * Required because the normal SpringBeanProcessor does not pickup classes annotated with {@code ServerInterceptor}.
-   * This
-   * <p/>
    * https://jira.jboss.org/browse/RESTEASY-394
    */
   private static class ServerInterceptorSpringBeanProcessor implements BeanPostProcessor {
@@ -68,7 +66,7 @@ public class ResteasyDeploymentConfiguration {
 
     private final Dispatcher dispatcher;
 
-    public ServerInterceptorSpringBeanProcessor(final Dispatcher dispatcher) {
+    private ServerInterceptorSpringBeanProcessor(Dispatcher dispatcher) {
       this.dispatcher = dispatcher;
     }
 
@@ -77,18 +75,18 @@ public class ResteasyDeploymentConfiguration {
       Class<?> beanClass = bean.getClass();
       if(beanClass.isAnnotationPresent(ServerInterceptor.class)) {
         if(PreProcessInterceptor.class.isAssignableFrom(beanClass)) {
-          log.info("Registring bean '{}' as pre-process interceptor.", beanName);
+          log.info("Registering bean '{}' as pre-process interceptor.", beanName);
           dispatcher.getProviderFactory().getServerPreProcessInterceptorRegistry()
               .register((PreProcessInterceptor) bean);
         }
         if(PostProcessInterceptor.class.isAssignableFrom(beanClass)) {
-          log.info("Registring bean '{}' as post-process interceptor.", beanName);
+          log.info("Registering bean '{}' as post-process interceptor.", beanName);
           dispatcher.getProviderFactory().getServerPostProcessInterceptorRegistry()
               .register((PostProcessInterceptor) bean);
         }
       }
       if(ExceptionMapper.class.isAssignableFrom(beanClass)) {
-        log.info("Registring bean '{}' as exception mapper.", beanName);
+        log.info("Registering bean '{}' as exception mapper.", beanName);
         dispatcher.getProviderFactory().addExceptionMapper((ExceptionMapper<?>) bean);
       }
       return bean;
