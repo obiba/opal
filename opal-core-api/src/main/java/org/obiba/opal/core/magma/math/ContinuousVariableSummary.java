@@ -119,7 +119,8 @@ public class ContinuousVariableSummary {
 
   @SuppressWarnings({ "MethodOnlyUsedFromInnerClass", "MagicNumber" })
   private void compute() {
-    if(descriptiveStats.getVariance() <= 0) return;
+    double variance = descriptiveStats.getVariance();
+    if(Double.isNaN(variance) || Double.isInfinite(variance) || variance <= 0) return;
 
     IntervalFrequency intervalFrequency = new IntervalFrequency(descriptiveStats.getMin(), descriptiveStats.getMax(),
         intervals, getVariable().getValueType() == IntegerType.get());
