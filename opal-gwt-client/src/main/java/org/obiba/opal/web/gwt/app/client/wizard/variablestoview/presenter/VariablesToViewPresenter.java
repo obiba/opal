@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.CopyVariablesToViewEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -33,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsVariableCopyColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -155,6 +157,7 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
         getView().renderRows(variables, derivedVariables, false);
       }
     }));
+
     // Save button
     registerHandler(getView().getSaveButton().addClickHandler(new ClickHandler() {
       @Override
@@ -309,6 +312,8 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
         getView().hideDialog();
         getEventBus().fireEvent(NotificationEvent.newBuilder().info(message).build());
         getEventBus().fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
+        if (getView().gotoView()) selectView();
+
 
       } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());
@@ -321,6 +326,18 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
+    }
+
+    private void selectView() {
+      UriBuilder builder = UriBuilder.create();
+      builder.segment("datasource", getView().getDatasourceName(), "table", view.getName());
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(builder.build()).get()
+          .withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, final TableDto tableDto) {
+               getEventBus().fireEvent(new TableSelectionChangeEvent(this, tableDto));
+            }
+          }).send();
     }
   }
 
@@ -355,7 +372,7 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
         derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
       }
 
-//      getView().clear();
+      getView().clear();
       getView().renderRows(variables, derivedVariables, true);
       getView().showDialog();
     }
@@ -366,6 +383,8 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
     HasClickHandlers getSaveButton();
 
     HasClickHandlers getCancelButton();
+
+    void clear();
 
     void showDialog();
 
@@ -390,6 +409,8 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
     boolean isRenameSelected();
 
     HasClickHandlers getRenameButton();
+
+    Boolean gotoView();
 
     void updateRenameCheckboxVisibility(List<VariableDto> originalVariables);
   }

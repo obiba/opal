@@ -96,13 +96,18 @@
             <!-- Rename -->
             <g:FlowPanel styleName="input">
               <g:CheckBox ui:field="renameWithNumber">
-                <ui:msg description="Rename categories with number label">Rename categories with number</ui:msg>
+                <ui:msg description="Rename each category with a number">Rename each category with a number"</ui:msg>
               </g:CheckBox>
               <g:Label addStyleNames="help-block">
                 <ui:msg description="Rename categories with number help label">Modify variables script to rename
                   original categories names with number.
                 </ui:msg>
               </g:Label>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="input">
+              <g:CheckBox ui:field="gotoViewCheck">
+                <ui:msg description="Go to newly created view label">Go to the newly created view</ui:msg>
+              </g:CheckBox>
             </g:FlowPanel>
 
           </g:FlowPanel>

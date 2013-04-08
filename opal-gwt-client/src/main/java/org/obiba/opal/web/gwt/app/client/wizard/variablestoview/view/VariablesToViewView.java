@@ -102,6 +102,9 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   CheckBox renameWithNumber;
 
   @UiField
+  CheckBox gotoViewCheck;
+
+  @UiField
   Button saveButton;
 
   @UiField
@@ -182,6 +185,11 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
     table.setEmptyTableWidget(noVariables);
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
+  }
+
+  @Override
+  public void clear() {
+    gotoViewCheck.setValue(false);
   }
 
   @Override
@@ -368,5 +376,10 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   @Override
   public HasClickHandlers getRenameButton() {
     return renameWithNumber;
+  }
+
+  @Override
+  public Boolean gotoView() {
+    return gotoViewCheck.getValue();
   }
 }
