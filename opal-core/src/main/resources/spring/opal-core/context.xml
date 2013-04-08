@@ -23,4 +23,6 @@
 
   <bean class="org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor"/>
 
+  <context:component-scan base-package="org.obiba.opal"/>
+
 </beans>
