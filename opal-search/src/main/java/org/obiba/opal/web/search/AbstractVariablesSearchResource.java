@@ -21,10 +21,13 @@ import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
+import org.obiba.opal.web.ws.SortDir;
 
 import com.google.common.base.Strings;
 
 public abstract class AbstractVariablesSearchResource {
+
+  protected static final String DEFAULT_SORT_FIELD = "_score";
 
   protected static final String INDEX_FIELD = "index";
 
@@ -45,26 +48,27 @@ public abstract class AbstractVariablesSearchResource {
   // Protected members
   //
 
-  protected abstract String getSearchPath();
+  abstract protected String getSearchPath();
 
   protected Search.QueryResultDto convertResonse(JSONObject jsonResponse) throws JSONException {
     return new EsResultConverter().convert(jsonResponse);
   }
 
-  protected JSONObject executeQuery(String query, int offset, int limit, Collection<String> fields) throws JSONException {
-    return executeQuery(query, offset, limit, fields, INDEX_FIELD, "ASC");
-  }
-
-  protected JSONObject executeQuery(String query, int offset, int limit, Collection<String> fields, String sortField,
-      String sortDir) throws JSONException {
+  protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
+      String sortField, String sortDir) {
 
     addDefaultFields(fields);
-
-    if(Strings.isNullOrEmpty(sortField)) sortField = INDEX_FIELD;
+    if(Strings.isNullOrEmpty(sortField)) sortField = DEFAULT_SORT_FIELD;
+    if(Strings.isNullOrEmpty(sortDir)) sortDir = SortDir.DESC.toString();
 
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
-    JSONObject jsonQuery = jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit)
-        .setSortField(sortField).setSortDir(sortDir).build();
+    jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit).setSortField(sortField)
+        .setSortDir(sortDir);
+
+    return jsonBuilder;
+  }
+
+  protected JSONObject executeQuery(JSONObject jsonQuery) throws JSONException {
     EsQueryExecutor queryExecutor = new EsQueryExecutor(esProvider).setSearchPath(getSearchPath());
     return queryExecutor.execute(jsonQuery, RestRequest.Method.POST);
   }

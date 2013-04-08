@@ -17,7 +17,6 @@ import javax.annotation.Nonnull;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.obiba.opal.web.ws.SortDir;
 
 import com.google.common.base.Strings;
 
@@ -45,6 +44,8 @@ public class QuerySearchJsonBuilder {
   private int size = DEFAULT_SIZE;
 
   private Collection<String> fields;
+
+  private Collection<String> filterTypes;
 
   private String query;
 
@@ -79,8 +80,8 @@ public class QuerySearchJsonBuilder {
     return this;
   }
 
-  public QuerySearchJsonBuilder setSortDir(String value) {
-    sortDir = Strings.isNullOrEmpty(value) ? SortDir.ASC.toString() : value.toLowerCase();
+  public QuerySearchJsonBuilder setSortDir(@Nonnull String value) {
+    sortDir = value.toLowerCase(); // elastic search accepts only lower case
     return this;
   }
 
@@ -93,11 +94,17 @@ public class QuerySearchJsonBuilder {
     return this;
   }
 
+  public QuerySearchJsonBuilder setFilterTypes(@Nonnull Collection<String> value) {
+    filterTypes = value;
+    return this;
+  }
+
   public JSONObject build() throws JSONException {
     JSONObject jsonQuery = new JSONObject();
     jsonQuery.accumulate("query", new JSONObject().put("query_string", buildQueryStringJson()));
     jsonQuery.put("sort", buildSortJson());
-    jsonQuery.put("fields", new JSONArray(fields));
+    if (fields != null && fields.size() > 0) jsonQuery.put("fields", new JSONArray(fields));
+    if (filterTypes != null && filterTypes.size() > 0) jsonQuery.put("filter", buildFilter());
     jsonQuery.put("from", from);
     jsonQuery.put("size", size);
 
@@ -122,6 +129,11 @@ public class QuerySearchJsonBuilder {
     }
 
     return new JSONObject().put(sortField, new JSONObject().put("order", sortDir));
+  }
+
+  private JSONObject buildFilter() throws JSONException {
+    return new JSONObject().put("bool", new JSONObject()
+        .put("must", new JSONObject().put("terms", new JSONObject().put("_type", new JSONArray(filterTypes)))));
   }
 
 }
