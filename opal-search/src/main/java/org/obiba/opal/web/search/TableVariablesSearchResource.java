@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.search;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -32,6 +31,7 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.ItemResultDtoStrategy;
+import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -60,14 +60,14 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
   @Path("_search")
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("variable") @DefaultValue("false") boolean addVariableDto,
-      @QueryParam("field") List<String> fields, @QueryParam("sortField") String sortField,
-      @QueryParam("sortDir") String sortDir) {
+      @QueryParam("variable") @DefaultValue("false") boolean addVariableDto, @QueryParam("field") List<String> fields,
+      @QueryParam("sortField") String sortField, @QueryParam("sortDir") String sortDir) {
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      Search.QueryResultDto dtoResponse = convertResonse(
-          executeQuery(query, offset, limit, fields, getFieldSortName(sortField), sortDir), addVariableDto);
+      QuerySearchJsonBuilder jsonBuiler = //
+          buildQuerySearch(query, offset, limit, fields, getFieldSortName(sortField), sortDir);
+      Search.QueryResultDto dtoResponse = convertResonse(executeQuery(jsonBuiler.build()), addVariableDto);
       return Response.ok().entity(dtoResponse).build();
     } catch(NoSuchValueSetException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
