@@ -10,8 +10,8 @@
 package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -29,18 +29,17 @@ public class LocalesResource {
 
   private final Set<Locale> locales;
 
-  public LocalesResource(Set<Locale> locales) {
+  public LocalesResource(Collection<Locale> locales) {
     this.locales = new LinkedHashSet<Locale>();
     this.locales.addAll(locales);
   }
 
   @GET
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
-    List<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
+    Collection<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
     for(Locale locale : locales) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
     }
-
     return localeDtos;
   }
 

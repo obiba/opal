@@ -22,6 +22,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary.Distribution;
 import org.obiba.opal.search.StatsIndexManager;
@@ -44,8 +45,8 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
   private static final Logger log = LoggerFactory.getLogger(ContinuousSummaryResource.class);
 
   public ContinuousSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable) {
-    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable);
+      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable, VariableValueSource vvs) {
+    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable, vvs);
   }
 
   @GET
@@ -107,11 +108,12 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
     ContinuousVariableSummary summary = new ContinuousVariableSummary.Builder(getVariable(), distribution) //
         .defaultPercentiles(percentiles) //
         .intervals(intervals) //
-        .addTable(getValueTable()) //
+        .addTable(getValueTable(), getVariableValueSource()) //
         .build();
 
-    // TODO should we store this summary to ES with a new thread?
-    statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
+    if(!"_transient".equals(getVariable().getName())) {
+      statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
+    }
 
     return Dtos.asDto(summary).build();
   }

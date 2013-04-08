@@ -20,6 +20,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
@@ -44,15 +45,14 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
   private static final Logger log = LoggerFactory.getLogger(CategoricalSummaryResource.class);
 
   public CategoricalSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable) {
-    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable);
+      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable, VariableValueSource vvs) {
+    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable, vvs);
   }
 
   @GET
   @POST
   public Response get(@QueryParam("distinct") boolean distinct) {
     CategoricalSummaryDto summary = canQueryEsIndex() ? queryEs(distinct) : queryMagma(distinct);
-
     SummaryStatisticsDto statisticsDto = SummaryStatisticsDto.newBuilder().setResource(getVariable().getName())
         .setExtension(CategoricalSummaryDto.categorical, summary).build();
     return TimestampedResponses.ok(getValueTable(), statisticsDto).build();
@@ -100,11 +100,12 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
     CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(getVariable()) //
         .distinct(distinct) //
-        .addTable(getValueTable()) //
+        .addTable(getValueTable(), getVariableValueSource()) //
         .build();
 
-    // TODO should we store this summary to ES with a new thread?
-    statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
+    if(!"_transient".equals(getVariable().getName())) {
+      statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
+    }
 
     return Dtos.asDto(summary).build();
   }

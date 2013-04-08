@@ -128,7 +128,8 @@ public class ContinuousVariableSummaryTest {
     replay(table, vectorSource, valueSource);
 
     ContinuousVariableSummary summary = new ContinuousVariableSummary.Builder(variable,
-        ContinuousVariableSummary.Distribution.normal).addTable(table).build();
+        ContinuousVariableSummary.Distribution.normal).addTable(table, table.getVariableValueSource(variable.getName()))
+        .build();
 
     verify(table, vectorSource, valueSource);
 

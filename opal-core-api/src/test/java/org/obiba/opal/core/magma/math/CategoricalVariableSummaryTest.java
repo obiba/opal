@@ -111,7 +111,8 @@ public class CategoricalVariableSummaryTest {
 
     replay(table, vectorSource, valueSource);
 
-    CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(variable).addTable(table).build();
+    CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(variable)
+        .addTable(table, table.getVariableValueSource(variable.getName())).build();
     assertThat(summary, notNullValue());
     return summary;
   }

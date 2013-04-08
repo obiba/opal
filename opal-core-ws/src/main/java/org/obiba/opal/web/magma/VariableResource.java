@@ -83,14 +83,15 @@ public class VariableResource {
     switch(nature) {
       case CATEGORICAL:
         return new CategoricalSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(),
-            variable);
+            variable, vvs);
       case CONTINUOUS:
         return new ContinuousSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(),
-            variable);
+            variable, vvs);
       case TEMPORAL:
       case UNDETERMINED:
       default:
-        return new DefaultSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(), variable);
+        return new DefaultSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(), variable,
+            vvs);
     }
   }
 

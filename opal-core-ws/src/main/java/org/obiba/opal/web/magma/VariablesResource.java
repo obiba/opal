@@ -31,6 +31,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
@@ -111,7 +112,7 @@ public class VariablesResource extends AbstractValueTableResource {
     String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() +
         "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
-    ExcelDatasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
+    Datasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
 
     destinationDatasource.initialise();
     try {
@@ -147,7 +148,7 @@ public class VariablesResource extends AbstractValueTableResource {
     }
   }
 
-  protected VariableWriter addOrUpdateTableVariables(List<VariableDto> variables) {
+  protected VariableWriter addOrUpdateTableVariables(Iterable<VariableDto> variables) {
     VariableWriter vw = getValueTable().getDatasource()
         .createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
     for(VariableDto variable : variables) {
@@ -166,7 +167,7 @@ public class VariablesResource extends AbstractValueTableResource {
   // private methods
   //
 
-  protected ClientErrorDto getErrorMessage(Status responseStatus, String errorStatus) {
+  protected ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
 

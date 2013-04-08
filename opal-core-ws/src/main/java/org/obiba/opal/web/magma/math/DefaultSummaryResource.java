@@ -14,6 +14,7 @@ import javax.ws.rs.POST;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
@@ -25,8 +26,9 @@ import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 public class DefaultSummaryResource extends AbstractSummaryResource {
 
   public DefaultSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable) {
-    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable);
+      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable,
+      VariableValueSource variableValueSource) {
+    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable, variableValueSource);
   }
 
   @GET

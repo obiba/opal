@@ -17,9 +17,9 @@ import javax.annotation.Nonnull;
 
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
+import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.type.BooleanType;
 import org.springframework.util.Assert;
@@ -58,11 +58,11 @@ public class CategoricalVariableSummary {
     Assert.notNull(variable, "Variable cannot be null");
   }
 
-  private void add(@Nonnull ValueTable table) {
+  private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
     Assert.notNull(variable, "ValueTable cannot be null");
+    Assert.notNull(variableValueSource, "variableValueSource cannot be null");
 
-    VariableValueSource valueSource = table.getVariableValueSource(variable.getName());
-    VectorSource vectorSource = valueSource.asVectorSource();
+    VectorSource vectorSource = variableValueSource.asVectorSource();
     if(vectorSource == null) return;
     for(Value value : vectorSource.getValues(Sets.newTreeSet(table.getVariableEntities()))) {
       add(value);
@@ -216,12 +216,12 @@ public class CategoricalVariableSummary {
       return this;
     }
 
-    public Builder addTable(@Nonnull ValueTable table) {
+    public Builder addTable(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
       if(addedValue) {
         throw new IllegalStateException("Cannot add table for variable " + summary.getVariable().getName() +
             " because values where previously added with addValue().");
       }
-      summary.add(table);
+      summary.add(table, variableValueSource);
       addedTable = true;
 
       return this;

@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.mgt.SecurityManager;
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -46,11 +47,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -63,6 +66,10 @@ import org.springframework.web.filter.RequestContextFilter;
 public class OpalJettyServer implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(OpalJettyServer.class);
+
+  private static final int MAX_IDLE_TIME = 30000;
+
+  private static final int REQUEST_HEADER_SIZE = 8192;
 
   private final Server jettyServer;
 
@@ -95,8 +102,8 @@ public class OpalJettyServer implements Service {
     if(httpPort != null && httpPort > 0) {
       SelectChannelConnector httpConnector = new SelectChannelConnector();
       httpConnector.setPort(httpPort);
-      httpConnector.setMaxIdleTime(maxIdleTime != null ? maxIdleTime : 30000);
-      httpConnector.setRequestHeaderSize(8192);
+      httpConnector.setMaxIdleTime(maxIdleTime == null ? MAX_IDLE_TIME : maxIdleTime);
+      httpConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
       server.addConnector(httpConnector);
     }
 
@@ -106,7 +113,7 @@ public class OpalJettyServer implements Service {
 
         @Override
         protected void doStart() throws Exception {
-          super.setSslContext(sslContextFactory.createSslContext());
+          setSslContext(sslContextFactory.createSslContext());
         }
 
         @Override
@@ -119,14 +126,14 @@ public class OpalJettyServer implements Service {
 
       SslSelectChannelConnector sslConnector = new SslSelectChannelConnector(jettySsl);
       sslConnector.setPort(httpsPort);
-      sslConnector.setMaxIdleTime(maxIdleTime != null ? maxIdleTime : 30000);
-      sslConnector.setRequestHeaderSize(8192);
+      sslConnector.setMaxIdleTime(maxIdleTime == null ? MAX_IDLE_TIME : maxIdleTime);
+      sslConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
 
       server.addConnector(sslConnector);
     }
 
     if(ajpPort != null && ajpPort > 0) {
-      Ajp13SocketConnector ajp = new Ajp13SocketConnector();
+      Connector ajp = new Ajp13SocketConnector();
       ajp.setPort(ajpPort);
       server.addConnector(ajp);
     }
@@ -141,30 +148,32 @@ public class OpalJettyServer implements Service {
     handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr, securityMgr));
     server.setHandler(handlers);
 
-    this.jettyServer = server;
+    jettyServer = server;
   }
 
   @Bean
   public ServletContextHandler getServletContextHandler() {
-    return this.contextHandler;
+    return contextHandler;
   }
 
   @Override
   public boolean isRunning() {
-    return this.jettyServer.isRunning();
+    return jettyServer.isRunning();
   }
 
+  @Override
   public void start() {
     try {
       webApplicationContext.refresh();
-      log.info("Starting Opal HTTP/s Server on port {}", this.jettyServer.getConnectors()[0].getPort());
-      this.jettyServer.start();
+      log.info("Starting Opal HTTP/s Server on port {}", jettyServer.getConnectors()[0].getPort());
+      jettyServer.start();
     } catch(Exception e) {
       log.error("Error starting jetty", e);
       throw new RuntimeException(e);
     }
   }
 
+  @Override
   public void stop() {
     try {
       if(webApplicationContext.isActive()) {
@@ -176,7 +185,7 @@ public class OpalJettyServer implements Service {
     }
 
     try {
-      this.jettyServer.stop();
+      jettyServer.stop();
     } catch(Exception e) {
       // log and ignore
       log.warn("Exception during HTTPd server shutdown", e);
@@ -203,19 +212,18 @@ public class OpalJettyServer implements Service {
     contextHandler
         .addFilter(new FilterHolder(new AuthenticationFilter(securityMgr, opalRuntime, subjectAclService)), "/ws/*",
             FilterMapping.DEFAULT);
-    // contextHandler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*",
-    // FilterMapping.DEFAULT);
+    // contextHandler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
     // contextHandler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
     contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
 
-    XmlWebApplicationContext webAppCtx = new XmlWebApplicationContext();
-    webAppCtx.setParent(ctx);
-    webAppCtx.setServletContext(contextHandler.getServletContext());
-    webAppCtx.setConfigLocation("classpath:/META-INF/spring/opal-httpd/context.xml");
+    webApplicationContext = new XmlWebApplicationContext();
+    webApplicationContext.setParent(ctx);
+    ((ConfigurableWebApplicationContext) webApplicationContext).setServletContext(contextHandler.getServletContext());
+    ((AbstractRefreshableConfigApplicationContext) webApplicationContext)
+        .setConfigLocation("classpath:/META-INF/spring/opal-httpd/context.xml");
     contextHandler.getServletContext()
-        .setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webAppCtx);
-    this.webApplicationContext = webAppCtx;
+        .setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webApplicationContext);
 
     return contextHandler;
   }
@@ -246,7 +254,7 @@ public class OpalJettyServer implements Service {
         if(opalVersion != null) {
           response.addHeader("X-Opal-Version", opalVersion.toString());
         }
-      } catch(RuntimeException e) {
+      } catch(RuntimeException ignored) {
       }
 
       filterChain.doFilter(request, response);
