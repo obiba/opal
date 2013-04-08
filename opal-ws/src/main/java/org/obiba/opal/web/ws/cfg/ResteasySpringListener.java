@@ -1,8 +1,8 @@
 package org.obiba.opal.web.ws.cfg;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.ext.Provider;
@@ -44,7 +44,7 @@ public class ResteasySpringListener implements SmartApplicationListener, BeanFac
   private final Map<String, SpringResourceFactory> springResourceFactories
       = new HashMap<String, SpringResourceFactory>();
 
-  private final List<String> providers = new ArrayList<String>();
+  private final Collection<String> providers = new ArrayList<String>();
 
   private ConfigurableListableBeanFactory beanFactory;
 
@@ -69,7 +69,9 @@ public class ResteasySpringListener implements SmartApplicationListener, BeanFac
   }
 
   @Override
-  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+  public void postProcessBeanFactory(
+      @SuppressWarnings("ParameterHidesMemberVariable") ConfigurableListableBeanFactory beanFactory)
+      throws BeansException {
     this.beanFactory = beanFactory;
 
     for(String name : beanFactory.getBeanDefinitionNames()) {
@@ -97,10 +99,12 @@ public class ResteasySpringListener implements SmartApplicationListener, BeanFac
     }
   }
 
+  @Override
   public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
     return bean;
   }
 
+  @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
     SpringResourceFactory resourceFactory = springResourceFactories.get(beanName);
     if(resourceFactory == null) return bean;
