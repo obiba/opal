@@ -27,8 +27,8 @@ import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Search;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
+import org.obiba.opal.web.ws.SortDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Path("/datasources/variables")
 public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchResource {
 
-    private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);
+//  private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);
 
   @Autowired
   public DatasourcesVariablesSearchResource(VariablesIndexManager manager, OpalSearchService opalSearchService,
@@ -54,7 +54,10 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      Search.QueryResultDto dtoResponse = convertResonse(executeQuery(query, offset, limit, fields));
+      QuerySearchJsonBuilder jsonBuiler = //
+        buildQuerySearch(query, offset, limit, fields, DEFAULT_SORT_FIELD, SortDir.DESC.toString());
+
+      Search.QueryResultDto dtoResponse = convertResonse(executeQuery(jsonBuiler.build()));
       return Response.ok().entity(dtoResponse).build();
     } catch(Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -67,16 +70,25 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
   }
 
   @Override
-  protected Collection<String> getFilterTypes() {
+  protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
+      String sortField, String sortDir) {
+    return super.buildQuerySearch(query, offset, limit, fields, sortField, sortDir).setFilterTypes(getFilterTypes());
+  }
+
+  //
+  // Private members
+  //
+
+  private Collection<String> getFilterTypes() {
     Collection<String> types = new ArrayList<String>();
 
-    for (Datasource datasource : MagmaEngine.get().getDatasources()) {
-      for (ValueTable valueTable : datasource.getValueTables()) {
-        log.info("Variables {}", valueTable.getVariables());
+    for(Datasource datasource : MagmaEngine.get().getDatasources()) {
+      for(ValueTable valueTable : datasource.getValueTables()) {
         types.add(indexManager.getIndex(valueTable).getIndexName());
       }
     }
 
     return types;
   }
+
 }

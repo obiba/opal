@@ -50,27 +50,25 @@ public abstract class AbstractVariablesSearchResource {
 
   abstract protected String getSearchPath();
 
-  abstract protected Collection<String> getFilterTypes();
-
   protected Search.QueryResultDto convertResonse(JSONObject jsonResponse) throws JSONException {
     return new EsResultConverter().convert(jsonResponse);
   }
 
-  protected JSONObject executeQuery(String query, int offset, int limit, Collection<String> fields) throws JSONException {
-    return executeQuery(query, offset, limit, fields, DEFAULT_SORT_FIELD, SortDir.DESC.toString());
-  }
-
-  protected JSONObject executeQuery(String query, int offset, int limit, Collection<String> fields, String sortField,
-      String sortDir) throws JSONException {
+  protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
+      String sortField, String sortDir) {
 
     addDefaultFields(fields);
-
     if(Strings.isNullOrEmpty(sortField)) sortField = DEFAULT_SORT_FIELD;
     if(Strings.isNullOrEmpty(sortDir)) sortDir = SortDir.DESC.toString();
 
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
-    JSONObject jsonQuery = jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit)
-        .setSortField(sortField).setSortDir(sortDir).setFilterTypes(getFilterTypes()).build();
+    jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit).setSortField(sortField)
+        .setSortDir(sortDir);
+
+    return jsonBuilder;
+  }
+
+  protected JSONObject executeQuery(JSONObject jsonQuery) throws JSONException {
     EsQueryExecutor queryExecutor = new EsQueryExecutor(esProvider).setSearchPath(getSearchPath());
     return queryExecutor.execute(jsonQuery, RestRequest.Method.POST);
   }
