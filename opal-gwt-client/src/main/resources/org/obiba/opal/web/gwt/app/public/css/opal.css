@@ -689,6 +689,10 @@ td.row-actions span {
   margin: 0;
 }
 
+.obiba-Table input {
+  margin: auto;
+}
+
 /* Login */
 
 .login {

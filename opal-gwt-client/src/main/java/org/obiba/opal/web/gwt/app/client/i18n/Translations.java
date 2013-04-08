@@ -1628,8 +1628,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("All {0} {1} are selected.")
   String allItemsSelected();
 
-  @Description("Add variables to view label")
-  @DefaultStringValue("Add variables to view")
+  @Description("Add selected variables to view label")
+  @DefaultStringValue("Add selected variables to view")
   String addVariablesToViewTitle();
 
   @Description("Add variables to view... label")
