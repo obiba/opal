@@ -2379,6 +2379,56 @@ a.icon:hover {
   background-color: #f5f5f5;
 }
 
-.variables-filter-box {
-  width: 350px;
+/* Inspired from : http://viralpatel.net/blogs/clearable-textbox-jquery*/
+.texbox-clearable-wrapper input {
+  border: none;
+}
+
+.texbox-clearable-wrapper input:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+/*Cannot highlight border as light blue on focus because a div does not have the :focus handler*/
+.texbox-clearable-wrapper {
+  border-radius: 0 3px 3px 0;
+  border: 1px solid #CCCCCC;
+  display: -moz-inline-stack;
+  display: inline-block;
+  *display: inline;
+  padding-right: 4px;
+  vertical-align: middle;
+}
+
+.texbox-clearable-wrapper .textbox-clearable-anchor {
+  cursor: pointer;
+  display: -moz-inline-stack;
+  display: inline-block;
+  *display: inline;
+  z-index: 2000;
+  border: 0 solid;
+  color: #999999;
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+}
+
+.texbox-clearable-wrapper .textbox-clearable-anchor a {
+  vertical-align: text-top;
+}
+
+.texbox-clearable-wrapper .textbox-clearable-empty {
+  content: " ";
+  display: inline-block;
+  *display: inline;
+  z-index: 2000;
+  border: 0px solid;
+  color: #FFFFFF;
+  width: 14px;
+  font-size: 14px;
+}
+
+.texbox-clearable-wrapper .textbox-clearable-anchor:hover {
+  text-decoration: none;
 }
