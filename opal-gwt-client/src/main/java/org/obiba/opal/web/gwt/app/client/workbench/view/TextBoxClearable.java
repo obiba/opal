@@ -60,11 +60,14 @@ public class TextBoxClearable extends FlowPanel {
     add(clear);
   }
 
-  public void clearText() {
-    textBox.setText("");
-    empty.setVisible(true);
-    clear.setVisible(false);
+  public void setText(String text) {
+    textBox.setText(text);
+    empty.setVisible(text.isEmpty());
+    clear.setVisible(!text.isEmpty());
+  }
 
+  public String getText() {
+    return textBox.getText();
   }
 
   public TextBox getTextBox() {

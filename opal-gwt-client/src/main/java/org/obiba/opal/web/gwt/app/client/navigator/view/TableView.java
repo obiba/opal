@@ -57,7 +57,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -75,6 +74,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   interface TableViewUiBinder extends UiBinder<Widget, TableView> {}
 
   private static final TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
+
+  private static final Integer VARIABLES_TAB_INDEX = 0;
 
   private static final Integer VALUES_TAB_INDEX = 1;
 
@@ -264,7 +265,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
 
-    filter.clearText();
+    filter.setText("");
     filter.getTextBox().setPlaceholder(translations.filterVariables());
   }
 
@@ -321,7 +322,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   public void clear() {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
     checkColumn.getSelectionModel().clear();
-    filter.clearText();
+    filter.setText("");
   }
 
   @Override
@@ -573,6 +574,19 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
+  public void setVariablesTabCommand(final Command cmd) {
+    tabs.addSelectionHandler(new SelectionHandler<Integer>() {
+
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
+        if(event.getSelectedItem().equals(VARIABLES_TAB_INDEX)) {
+          cmd.execute();
+        }
+      }
+    });
+  }
+
+  @Override
   public boolean isValuesTabSelected() {
     return tabs.getSelectedIndex() == VALUES_TAB_INDEX;
   }
@@ -711,8 +725,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public HasText getFilter() {
-    return filter.getTextBox();
+  public TextBoxClearable getFilter() {
+    return filter;
   }
 
 }

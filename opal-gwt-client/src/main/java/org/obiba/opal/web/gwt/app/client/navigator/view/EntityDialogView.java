@@ -205,8 +205,8 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   }
 
   @Override
-  public void clearFilter() {
-    filter.clearText();
+  public TextBoxClearable getFilter() {
+    return filter;
   }
 
   private void clear() {
@@ -216,7 +216,6 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
       table.removeColumn(0);
     }
 
-    clearFilter();
     addTableColumns();
   }
 

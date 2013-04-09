@@ -58,6 +58,7 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -82,6 +83,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private static final ValuesTableViewUiBinder uiBinder = GWT.create(ValuesTableViewUiBinder.class);
 
   private final Widget widget;
+
+  @UiField
+  DisclosurePanel addPanel;
 
   @UiField
   SimplePager pager;
@@ -213,7 +217,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     searchBox.setText("");
-    filter.clearText();
+    filter.setText("");
     filter.getTextBox().setPlaceholder(translations.filterVariables());
     lastFilter = "";
     filter.getTextBox().setValue(lastFilter, false);
@@ -426,6 +430,25 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private void setMinimumWidth(Column<ValueSetDto, ?> column) {
     valuesTable.setColumnWidth(column, 1, Unit.PX);
+  }
+
+  @Override
+  public void setFilterText(String text) {
+    filter.setText(text);
+    if(!text.isEmpty()) {
+      addPanel.setOpen(true);
+      fetcher.updateVariables(filter.getTextBox().getText());
+    }
+  }
+
+  @Override
+  public String getFilterText() {
+    return filter.getTextBox().getText();
+  }
+
+  @Override
+  public TextBoxClearable getFilter() {
+    return filter;
   }
 
   //
