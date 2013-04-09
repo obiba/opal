@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
@@ -66,15 +68,16 @@ class RestValueTableWriter implements ValueTableWriter {
       }
 
       @Override
-      public void writeVariable(Variable variable) {
+      public void writeVariable(@Nonnull Variable variable) {
         variables.add(variable);
       }
 
     };
   }
 
+  @Nonnull
   @Override
-  public ValueSetWriter writeValueSet(final VariableEntity entity) {
+  public ValueSetWriter writeValueSet(@Nonnull final VariableEntity entity) {
 
     return new ValueSetWriter() {
 
@@ -92,7 +95,7 @@ class RestValueTableWriter implements ValueTableWriter {
       }
 
       @Override
-      public void writeValue(Variable variable, Value value) {
+      public void writeValue(@Nonnull Variable variable, Value value) {
         valueSetsDtoBuilder.addVariables(variable.getName());
         valueSetDtoBuilder.addValues(Dtos.asDto(value));
       }

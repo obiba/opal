@@ -103,7 +103,7 @@ public class RestDatasource extends AbstractDatasource {
 
   @Nonnull
   @Override
-  public ValueTableWriter createWriter(String tableName, String entityType) {
+  public ValueTableWriter createWriter(@Nonnull String tableName, @Nonnull String entityType) {
     if(!hasValueTable(tableName)) {
       URI tableUri = newReference("tables");
       try {
