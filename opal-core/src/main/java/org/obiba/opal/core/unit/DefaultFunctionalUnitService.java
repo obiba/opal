@@ -93,7 +93,7 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
 
   @Override
   public FileObject getUnitDirectory(String unitName) throws NoSuchFunctionalUnitException, FileSystemException {
-    if(hasFunctionalUnit(unitName) == false) {
+    if(!hasFunctionalUnit(unitName)) {
       throw new NoSuchFunctionalUnitException(unitName);
     }
 
@@ -114,7 +114,7 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
   // DefaultOpalRuntime -> OpalJettyServer -> SecurityManager -> FunctionalUnitRealm -> FunctionalUnitService ->
   // DefaultOpalRuntime
   private OpalRuntime getOpalRuntime() {
-    return this.applicationContext.getBean(OpalRuntime.class);
+    return applicationContext.getBean(OpalRuntime.class);
   }
 
 }

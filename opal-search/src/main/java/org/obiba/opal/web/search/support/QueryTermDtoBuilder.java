@@ -20,7 +20,7 @@ public class QueryTermDtoBuilder {
 
   private static final Logger log = LoggerFactory.getLogger(QueryTermDtoBuilder.class);
 
-  private Search.QueryTermDto.Builder dto;
+  private final Search.QueryTermDto.Builder dto;
 
   public QueryTermDtoBuilder(String facet) {
     dto = Search.QueryTermDto.newBuilder().setFacet(facet);
@@ -38,7 +38,7 @@ public class QueryTermDtoBuilder {
    * @return
    */
   public QueryTermDtoBuilder variableTermDto(String variable) {
-    log.info("* Variable " + variable);
+    log.info("* Variable {}", variable);
     Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
     variableDto.setVariable(variable);
     dto.setExtension(Search.VariableTermDto.field, variableDto.build());

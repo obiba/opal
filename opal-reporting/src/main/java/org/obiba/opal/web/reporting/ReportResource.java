@@ -24,8 +24,6 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -35,16 +33,14 @@ import org.springframework.stereotype.Component;
 @Path("/report")
 public class ReportResource {
 
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(ReportResource.class);
+//  private static final Logger log = LoggerFactory.getLogger(ReportResource.class);
 
   private final OpalRuntime opalRuntime;
 
-  private MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
+  private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
   @Autowired
   public ReportResource(OpalRuntime opalRuntime) {
-    super();
     this.opalRuntime = opalRuntime;
   }
 

@@ -97,10 +97,12 @@ public class DefaultCommandJobServiceTest {
     // expect(mockUserProvider.getUsername()).andReturn("testUser").atLeastOnce();
 
     sut = new DefaultCommandJobService() {
+      @Override
       protected List<FutureCommandJob> getFutureCommandJobs() {
         return futureCommandJobs != null ? futureCommandJobs : super.getFutureCommandJobs();
       }
 
+      @Override
       List<FutureCommandJob> getTerminatedJobs() {
         return jobsTerminated != null ? jobsTerminated : super.getTerminatedJobs();
       }
@@ -397,7 +399,7 @@ public class DefaultCommandJobServiceTest {
     aCommandJob.setSubmitTime(submitTime);
     aCommandJob.setStatus(status);
 
-    EasyMock.replay(cmd);
+    replay(cmd);
     return aCommandJob;
   }
 
@@ -417,19 +419,16 @@ public class DefaultCommandJobServiceTest {
 
   static class FutureCommandJobMatcher implements IArgumentMatcher {
 
-    private FutureCommandJob expected;
+    private final FutureCommandJob expected;
 
-    public FutureCommandJobMatcher(FutureCommandJob expected) {
+    FutureCommandJobMatcher(FutureCommandJob expected) {
       this.expected = expected;
     }
 
     @Override
     public boolean matches(Object actual) {
-      if(actual instanceof FutureCommandJob) {
-        return ((FutureCommandJob) actual).getCommandJob().equals(expected.getCommandJob());
-      } else {
-        return false;
-      }
+      return actual instanceof FutureCommandJob &&
+          ((FutureCommandJob) actual).getCommandJob().equals(expected.getCommandJob());
     }
 
     @Override

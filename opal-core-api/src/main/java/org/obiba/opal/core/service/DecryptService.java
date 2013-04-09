@@ -27,13 +27,13 @@ public interface DecryptService {
    * @throws IllegalArgumentException if the specified datasource does not exist
    * @throws IOException if the specified file does not exist or is not a normal file
    */
-  public void decryptData(String unitName, String datasourceName, FileObject file)
+  void decryptData(String unitName, String datasourceName, FileObject file)
       throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
 
   /**
    * Equivalent to <code>decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file)</code>.
    */
-  public void decryptData(String datasourceName, FileObject file)
+  void decryptData(String datasourceName, FileObject file)
       throws NoSuchFunctionalUnitException, IllegalArgumentException, IOException;
 
 }

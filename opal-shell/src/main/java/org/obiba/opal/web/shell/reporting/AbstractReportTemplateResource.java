@@ -33,12 +33,9 @@ public abstract class AbstractReportTemplateResource {
   private final Authorizer authorizer;
 
   protected AbstractReportTemplateResource() {
-    super();
-    if(MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) {
-      this.authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
-    } else {
-      this.authorizer = null;
-    }
+    authorizer = MagmaEngine.get().hasExtension(MagmaSecurityExtension.class) //
+        ? MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer() //
+        : null;
   }
 
   protected boolean reportTemplateExists(String name) {
@@ -73,7 +70,7 @@ public abstract class AbstractReportTemplateResource {
   }
 
   protected boolean authzReadReportTemplate(String name) {
-    return authorizer == null ? true : authorizer.isPermitted("magma:/report-template/" + name + ":GET");
+    return authorizer == null || authorizer.isPermitted("magma:/report-template/" + name + ":GET");
   }
 
 }

@@ -25,6 +25,8 @@ public class CommandLines {
 
   private static final String QUOTE_ONLY = "\"";
 
+  private CommandLines() {}
+
   //
   // Methods
   //
@@ -49,15 +51,11 @@ public class CommandLines {
     String token = null;
     while(parser.hasMoreTokens()) {
       token = parser.nextToken(deliminator);
-      if(!token.equals(QUOTE_ONLY)) {
-        if(!token.trim().equals("")) {
-          arguments.add(token);
-        }
+      if(token.equals(QUOTE_ONLY)) {
+        deliminator = deliminator.equals(WHITESPACE_AND_QUOTE) ? QUOTE_ONLY : WHITESPACE_AND_QUOTE;
       } else {
-        if(deliminator.equals(WHITESPACE_AND_QUOTE)) {
-          deliminator = QUOTE_ONLY;
-        } else {
-          deliminator = WHITESPACE_AND_QUOTE;
+        if(!"".equals(token.trim())) {
+          arguments.add(token);
         }
       }
     }

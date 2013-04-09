@@ -26,7 +26,7 @@ public interface UnitKeyStoreService {
    * @param unitName functional unit name
    * @return the unit's keystore (or <code>null</code> if no keystore exists for that unit)
    */
-  public UnitKeyStore getUnitKeyStore(String unitName);
+  UnitKeyStore getUnitKeyStore(String unitName);
 
   /**
    * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit} or if it doesn't exist, create, persist and
@@ -36,14 +36,14 @@ public interface UnitKeyStoreService {
    * @return the unit's keystore
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  public UnitKeyStore getOrCreateUnitKeyStore(String unitName) throws NoSuchFunctionalUnitException;
+  UnitKeyStore getOrCreateUnitKeyStore(String unitName) throws NoSuchFunctionalUnitException;
 
   /**
    * Save a {@link FunctionalUnit}'s keystore. This will persist any keystore updates.
    *
    * @param unitKeyStore functional unit keystore
    */
-  public void saveUnitKeyStore(UnitKeyStore unitKeyStore);
+  void saveUnitKeyStore(UnitKeyStore unitKeyStore);
 
   /**
    * Creates a new key or updates an existing key. It is the responsibility of the client to ensure that the caller
@@ -57,7 +57,7 @@ public interface UnitKeyStoreService {
    * L=Montreal, ST=Quebec, C=CA)
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  public void createOrUpdateKey(String unitName, String alias, String algorithm, int size, String certificateInfo)
+  void createOrUpdateKey(String unitName, String alias, String algorithm, int size, String certificateInfo)
       throws NoSuchFunctionalUnitException;
 
   /**
@@ -68,7 +68,7 @@ public interface UnitKeyStoreService {
    * @return true is the alias exists.
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  public boolean aliasExists(String unitName, String alias) throws NoSuchFunctionalUnitException;
+  boolean aliasExists(String unitName, String alias) throws NoSuchFunctionalUnitException;
 
   /**
    * Deletes the specified public/private key pair from the specified functional unit's keystore.
@@ -77,7 +77,7 @@ public interface UnitKeyStoreService {
    * @param alias name of the public/private key pair to be deleted
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  public void deleteKey(String unitName, String alias) throws NoSuchFunctionalUnitException;
+  void deleteKey(String unitName, String alias) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key and its associated certificate into the specified keystore at the given alias.
@@ -88,7 +88,7 @@ public interface UnitKeyStoreService {
    * @param certificate certificate in the PEM format
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  public void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate)
+  void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate)
       throws NoSuchFunctionalUnitException;
 
   /**
@@ -100,7 +100,7 @@ public interface UnitKeyStoreService {
    * @param certificate
    * @throws NoSuchFunctionalUnitException
    */
-  public void importKey(String unitName, String alias, InputStream privateKey, InputStream certificate)
+  void importKey(String unitName, String alias, InputStream privateKey, InputStream certificate)
       throws NoSuchFunctionalUnitException;
 
   /**
@@ -113,7 +113,7 @@ public interface UnitKeyStoreService {
    * L=Montreal, ST=Quebec, C=CA)
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  public void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo)
+  void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo)
       throws NoSuchFunctionalUnitException;
 
   /**
@@ -125,7 +125,7 @@ public interface UnitKeyStoreService {
    * @param certificateInfo
    * @throws NoSuchFunctionalUnitException
    */
-  public void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo)
+  void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo)
       throws NoSuchFunctionalUnitException;
 
   /**
@@ -133,6 +133,6 @@ public interface UnitKeyStoreService {
    * @param alias
    * @param byteArrayInputStream
    */
-  public void importCertificate(String unit, String alias, InputStream byteArrayInputStream);
+  void importCertificate(String unit, String alias, InputStream byteArrayInputStream);
 
 }

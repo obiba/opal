@@ -54,6 +54,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
    * @return
    * @throws JSONException
    */
+  @Override
   public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper, Search.QueryTermsDto dtoQueries)
       throws JSONException {
 
@@ -109,6 +110,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
    * @return
    * @throws JSONException
    */
+  @Override
   public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper, Search.QueryTermDto dtoQuery)
       throws JSONException {
 
@@ -156,7 +158,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
     EsRestRequest(ValueTableIndex tableIndex, String body, String path, Map<String, String> params) {
       this.body = body;
       this.params = params;
-      this.esUri = tableIndex.getRequestPath() + "/" + path;
+      esUri = tableIndex.getRequestPath() + "/" + path;
     }
 
     @Override
@@ -172,11 +174,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
     @Override
     public String rawPath() {
       int pathEndPos = esUri.indexOf('?');
-      if(pathEndPos < 0) {
-        return esUri;
-      } else {
-        return esUri.substring(0, pathEndPos);
-      }
+      return pathEndPos < 0 ? esUri : esUri.substring(0, pathEndPos);
     }
 
     @Override

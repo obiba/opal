@@ -18,7 +18,7 @@ public final class ROperations {
 
   private static class NoOpROperation implements ROperation {
 
-    private final static NoOpROperation INSTANCE = new NoOpROperation();
+    private final static ROperation INSTANCE = new NoOpROperation();
 
     @Override
     public void doWithConnection(RConnection connection) {
@@ -30,17 +30,17 @@ public final class ROperations {
     return NoOpROperation.INSTANCE;
   }
 
-  public static ROperationWithResult eval(final String script, final String env) {
+  public static ROperationWithResult eval(final String script, String env) {
     return new AbstractROperationWithResult() {
 
       @Override
       protected void doWithConnection() {
-        super.eval(script);
+        eval(script);
       }
     };
   }
 
-  public static ROperation assign(final String name, final String script) {
+  public static ROperation assign(String name, String script) {
     return assign(name, script, null, false);
   }
 

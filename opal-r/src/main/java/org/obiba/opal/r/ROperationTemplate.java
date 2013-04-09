@@ -19,8 +19,8 @@ public interface ROperationTemplate {
    *
    * @param rop
    */
-  public void execute(ROperation rop);
+  void execute(ROperation rop);
 
-  public void execute(Iterable<ROperation> rop);
+  void execute(Iterable<ROperation> rop);
 
 }

@@ -44,7 +44,7 @@ public class UnitTrustManager implements X509TrustManager {
       }
     }
     for(UnitKeyStore keyStore : getUnitKeystores()) {
-      for(Certificate cert : keyStore.getCertficateEntries()) {
+      for(Certificate cert : keyStore.getCertificateEntries()) {
         for(X509Certificate x509Cert : chain) {
           try {
             x509Cert.verify(cert.getPublicKey());

@@ -173,7 +173,7 @@ public class OpalRSessionManager implements SessionListener {
       try {
         rSession.close();
       } catch(Exception e) {
-        log.warn("Failed closing R session: " + rSession.getId(), e);
+        log.warn("Failed closing R session: {}", rSession.getId(), e);
       }
     }
   }
@@ -212,7 +212,7 @@ public class OpalRSessionManager implements SessionListener {
 
   private static final class SubjectRSessions implements Iterable<OpalRSession> {
 
-    private List<OpalRSession> rSessions = new ArrayList<OpalRSession>();
+    private final List<OpalRSession> rSessions = new ArrayList<OpalRSession>();
 
     private OpalRSession currentRSession;
 
@@ -252,7 +252,7 @@ public class OpalRSessionManager implements SessionListener {
       try {
         rSession.close();
       } catch(Exception e) {
-        log.warn("Failed closing R session: " + rSessionId, e);
+        log.warn("Failed closing R session: {}", rSessionId, e);
       }
     }
 

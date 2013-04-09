@@ -49,6 +49,7 @@ class SecuredFileObject extends DecoratedFileObject {
     return toSecuredFileObjects(super.findFiles(selector));
   }
 
+  @Nullable
   @Override
   public FileObject getChild(String name) throws FileSystemException {
     FileObject child = super.getChild(name);
@@ -105,12 +106,13 @@ class SecuredFileObject extends DecoratedFileObject {
         return;
       }
 
-      sourceFile.moveTo(((SecuredFileObject) destFile).getDecoratedFileObject());
+      sourceFile.moveTo(((DecoratedFileObject) destFile).getDecoratedFileObject());
       return;
     }
     throw new FileSystemException("vfs.provider.local/delete-file.error", getName());
   }
 
+  @Nullable
   private FileObject[] toSecuredFileObjects(FileObject... children) {
     if(children == null) return null;
 

@@ -26,18 +26,17 @@ public class ReportTemplate {
 
   private String format;
 
-  private Map<String, String> parameters;
+  private final Map<String, String> parameters;
 
   private String schedule;
 
-  private Set<String> emailNotificationAddresses;
+  private final Set<String> emailNotificationAddresses;
 
   //
   // Constructors
   //
 
   public ReportTemplate() {
-    super();
     parameters = Maps.newHashMap();
     emailNotificationAddresses = Sets.newHashSet();
   }

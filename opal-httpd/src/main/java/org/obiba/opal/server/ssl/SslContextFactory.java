@@ -16,6 +16,6 @@ import javax.net.ssl.SSLContext;
  */
 public interface SslContextFactory {
 
-  public SSLContext createSslContext();
+  SSLContext createSslContext();
 
 }

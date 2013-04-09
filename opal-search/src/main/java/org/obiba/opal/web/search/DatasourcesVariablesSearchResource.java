@@ -54,10 +54,10 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      QuerySearchJsonBuilder jsonBuiler = //
-        buildQuerySearch(query, offset, limit, fields, DEFAULT_SORT_FIELD, SortDir.DESC.toString());
+      QuerySearchJsonBuilder jsonBuilder = //
+          buildQuerySearch(query, offset, limit, fields, DEFAULT_SORT_FIELD, SortDir.DESC.toString());
 
-      Search.QueryResultDto dtoResponse = convertResonse(executeQuery(jsonBuiler.build()));
+      Search.QueryResultDto dtoResponse = convertResponse(executeQuery(jsonBuilder.build()));
       return Response.ok().entity(dtoResponse).build();
     } catch(Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).build();

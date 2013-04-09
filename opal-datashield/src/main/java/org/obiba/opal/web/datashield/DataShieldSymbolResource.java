@@ -73,8 +73,8 @@ public class DataShieldSymbolResource extends RSymbolResource {
 
   protected Response putRestrictedRScript(UriInfo uri, String content) {
     try {
-      getRSession().execute(
-          new RestrictedAssignmentROperation(getName(), content, this.configSupplier.get().getAssignEnvironment()));
+      getRSession()
+          .execute(new RestrictedAssignmentROperation(getName(), content, configSupplier.get().getAssignEnvironment()));
       return Response.created(getSymbolURI(uri)).build();
     } catch(ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();

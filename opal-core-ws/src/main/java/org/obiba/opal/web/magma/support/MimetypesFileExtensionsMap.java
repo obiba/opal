@@ -19,6 +19,9 @@ import java.util.Iterator;
 
 import javax.activation.MimetypesFileTypeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -39,13 +42,16 @@ import com.google.common.collect.Multimap;
  */
 public class MimetypesFileExtensionsMap {
 
+  private static final Logger log = LoggerFactory.getLogger(MimetypesFileExtensionsMap.class);
+
   public static final String DEFAULT_FILE_EXTENSION = "bin";
 
+  @SuppressWarnings("StaticNonFinalField")
   private static MimetypesFileExtensionsMap singleton;
 
-  private Multimap<String, String> mimetypes;
+  private final Multimap<String, String> mimetypes;
 
-  private MimetypesFileTypeMap activationMimetypes;
+  private final MimetypesFileTypeMap activationMimetypes;
 
   public static MimetypesFileExtensionsMap get() {
     if(singleton == null) {
@@ -58,8 +64,7 @@ public class MimetypesFileExtensionsMap {
     if(mimetype == null) return DEFAULT_FILE_EXTENSION;
 
     Collection<String> exts = mimetypes.get(mimetype);
-    if(exts.size() == 0) return DEFAULT_FILE_EXTENSION;
-    else return exts.iterator().next();
+    return exts.isEmpty() ? DEFAULT_FILE_EXTENSION : exts.iterator().next();
   }
 
   public boolean containsMimetype(String mimetype) {
@@ -97,7 +102,7 @@ public class MimetypesFileExtensionsMap {
     String line = null;
     try {
       while((line = reader.readLine()) != null) {
-        if(line.startsWith("#") == false) {
+        if(!line.startsWith("#")) {
           final String[] entries = line.split("\\s+");
           if(entries != null && entries.length > 1) {
             mimetypes.putAll(entries[0], new Iterable<String>() {
@@ -129,8 +134,7 @@ public class MimetypesFileExtensionsMap {
         }
       }
     } catch(IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      log.error("IOException", e);
     }
 
   }

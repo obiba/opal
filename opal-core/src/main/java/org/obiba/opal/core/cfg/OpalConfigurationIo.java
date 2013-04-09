@@ -46,7 +46,7 @@ public class OpalConfigurationIo {
 
   @Autowired
   public OpalConfigurationIo(@Value("${OPAL_HOME}/conf/opal-config.xml") File opalConfigFile) {
-    this.configFile = opalConfigFile;
+    configFile = opalConfigFile;
   }
 
   public OpalConfiguration readConfiguration() throws InvalidConfigurationException {
@@ -56,7 +56,7 @@ public class OpalConfigurationIo {
       return (OpalConfiguration) doCreateXStreamInstance(applicationContext).fromXML(isr);
     } catch(FileNotFoundException e) {
       throw new InvalidConfigurationException(
-          "Opal configuration file '" + this.configFile.getAbsolutePath() + "' cannot be found.", e);
+          "Opal configuration file '" + configFile.getAbsolutePath() + "' cannot be found.", e);
     } catch(XStreamException e) {
       throw new InvalidConfigurationException("Error reading Opal configuration file.", e);
     } finally {
@@ -74,7 +74,7 @@ public class OpalConfigurationIo {
       FileUtil.moveFile(tmpConfig, configFile);
     } catch(FileNotFoundException e) {
       throw new InvalidConfigurationException(
-          "Opal configuration file '" + this.configFile.getAbsolutePath() + "' is not a regular file.", e);
+          "Opal configuration file '" + configFile.getAbsolutePath() + "' is not a regular file.", e);
     } catch(IOException e) {
       throw new InvalidConfigurationException("Cannot write Opal configuration file.", e);
     } catch(XStreamException e) {

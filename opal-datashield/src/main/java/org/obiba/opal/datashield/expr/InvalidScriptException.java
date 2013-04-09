@@ -14,7 +14,6 @@ public class InvalidScriptException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   public InvalidScriptException() {
-    super();
   }
 
   public InvalidScriptException(String message, Throwable cause) {

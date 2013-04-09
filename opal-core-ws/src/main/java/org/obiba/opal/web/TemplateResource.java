@@ -30,11 +30,10 @@ import org.springframework.stereotype.Component;
 @NoAuthorization
 public class TemplateResource {
 
-  private MimetypesFileTypeMap mimeTypes;
+  private final MimetypesFileTypeMap mimeTypes;
 
   public TemplateResource() {
-    super();
-    this.mimeTypes = new MimetypesFileTypeMap();
+    mimeTypes = new MimetypesFileTypeMap();
   }
 
   @GET

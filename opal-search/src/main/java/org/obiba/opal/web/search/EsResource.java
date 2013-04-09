@@ -74,7 +74,7 @@ public class EsResource {
     try {
       latch.await();
       Response r = ref.get();
-      return (r != null) ? r : Response.serverError().build();
+      return r != null ? r : Response.serverError().build();
     } catch(InterruptedException e) {
       throw new RuntimeException(e);
     }
@@ -106,7 +106,7 @@ public class EsResource {
     JaxRsRestRequest(HttpServletRequest servletRequest, String body) {
       this.body = body;
       this.servletRequest = servletRequest;
-      this.params = Maps.newHashMap();
+      params = Maps.newHashMap();
 
       // Remove the opal-ws part of the requested uri
       rawPath = servletRequest.getRequestURI().replaceFirst(servletRequest.getContextPath(), "")
@@ -114,7 +114,7 @@ public class EsResource {
 
       // Reconstruct the uri
       String queryString = servletRequest.getQueryString();
-      esUri = rawPath + (queryString != null ? ('?' + queryString) : "");
+      esUri = rawPath + (queryString != null ? '?' + queryString : "");
 
       RestUtils.decodeQueryString(queryString != null ? queryString : "", 0, params);
     }
@@ -132,11 +132,7 @@ public class EsResource {
     @Override
     public String rawPath() {
       int pathEndPos = esUri.indexOf('?');
-      if(pathEndPos < 0) {
-        return esUri;
-      } else {
-        return esUri.substring(0, pathEndPos);
-      }
+      return pathEndPos < 0 ? esUri : esUri.substring(0, pathEndPos);
     }
 
     @Override

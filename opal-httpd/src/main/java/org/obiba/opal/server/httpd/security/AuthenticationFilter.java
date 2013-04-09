@@ -287,10 +287,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   @Nullable
   private String extractRequestId(HttpServletRequest request) {
     Cookie cookie = findCookie(request, OPAL_REQUEST_ID_COOKIE_NAME);
-    if(cookie != null) {
-      return cookie.getValue();
-    }
-    return null;
+    return cookie == null ? null : cookie.getValue();
   }
 
   @Nullable

@@ -44,7 +44,7 @@ public abstract class AbstractROperation implements ROperation {
     try {
       connection.assign(sym, ct);
     } catch(RserveException e) {
-      log.warn("Failed assigning '" + sym + "' with: " + ct, e);
+      log.warn("Failed assigning '{}' with: {}", sym, ct, e);
       throw new RRuntimeException(e);
     }
   }
@@ -59,7 +59,7 @@ public abstract class AbstractROperation implements ROperation {
     try {
       connection.assign(sym, ct);
     } catch(RserveException e) {
-      log.warn("Failed assigning '" + sym + "' with REXP", e);
+      log.warn("Failed assigning '{}' with REXP", sym, e);
       throw new RRuntimeException(e);
     }
   }
@@ -93,7 +93,7 @@ public abstract class AbstractROperation implements ROperation {
       }
       evaled = connection.eval("try(" + cmd + ")");
     } catch(RserveException e) {
-      log.warn("Failed evaluating: " + script, e);
+      log.warn("Failed evaluating: {}", script, e);
       throw new RRuntimeException(e);
     }
     if(evaled.inherits("try-error")) {

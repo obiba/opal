@@ -15,6 +15,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -60,8 +63,9 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       return entityFor(getOpalIdentifier());
     }
 
+    @Nullable
     public String getUnitIdentifier(String unitName) {
-      if(unitIdentifiers.containsKey(unitName) == false) {
+      if(!unitIdentifiers.containsKey(unitName)) {
         return null;
       }
       return (String) unitIdentifiers.get(unitName).getValue();
@@ -71,15 +75,19 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       return entityFor(getUnitIdentifier(unitName));
     }
 
+    private VariableEntity entityFor(String identifier) {
+      return new VariableEntityBean(identifiersTable.getEntityType(), identifier);
+    }
+
     public boolean hasUnitIdentifier(String unitName) {
-      return unitIdentifiers.containsKey(unitName) && unitIdentifiers.get(unitName).isNull() == false;
+      return unitIdentifiers.containsKey(unitName) && !unitIdentifiers.get(unitName).isNull();
     }
 
     void write(ValueTableWriter vtw) throws IOException {
       if(dirty) {
         ValueSetWriter vsw = vtw.writeValueSet(getOpalEntity());
         for(FunctionalUnit unit : units) {
-          if(unit.isOpal() == false) {
+          if(!unit.isOpal()) {
             vsw.writeValue(unitVariable(unit), unitIdentifiers.get(unit.getName()));
           }
         }
@@ -87,15 +95,16 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       }
     }
 
+    @SuppressWarnings("ConstantConditions")
     boolean set(String unitName, String identifier) {
-      Value currentIdentifier = this.unitIdentifiers.get(unitName);
-      if(currentIdentifier.isNull() == false && currentIdentifier.getValue().equals(identifier) == false) {
+      Value currentIdentifier = unitIdentifiers.get(unitName);
+      if(!currentIdentifier.isNull() && !currentIdentifier.getValue().equals(identifier)) {
         throw new IllegalIdentifierAssociationException(
             "Cannot override current unit identifier: " + unitName + ":" + currentIdentifier + " <--> opal:" +
                 opalIdentifier);
       }
       // Check duplicates
-      if(index.get(unitName).unitIdentifierIsNewOrFor(identifier, opalIdentifier) == false) {
+      if(!index.get(unitName).unitIdentifierIsNewOrFor(identifier, opalIdentifier)) {
         throw new IllegalIdentifierAssociationException(
             "Cannot create duplicate unit identifier: " + unitName + ":" + identifier + " <--> opal:" + opalIdentifier);
       }
@@ -103,7 +112,7 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       if(currentIdentifier.isNull()) {
         // Index
         index.get(unitName).put(identifier, opalIdentifier);
-        this.unitIdentifiers.put(unitName, TextType.get().valueOf(identifier));
+        unitIdentifiers.put(unitName, TextType.get().valueOf(identifier));
         dirty = true;
         return true;
       }
@@ -117,14 +126,14 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
 
   private static class UnitIdentifiers {
 
-    private Map<String, String> unitIdentifierToOpalIdentifier = Maps.newHashMap();
+    private final Map<String, String> unitIdentifierToOpalIdentifier = Maps.newHashMap();
 
     /**
      * @param opalIdentifier
      * @return
      */
     public boolean unitIdentifierIsNewOrFor(String unitIdentifier, String opalIdentifier) {
-      return unitIdentifierToOpalIdentifier.containsKey(unitIdentifier) == false ||
+      return !unitIdentifierToOpalIdentifier.containsKey(unitIdentifier) ||
           unitIdentifierToOpalIdentifier.get(unitIdentifier).equals(opalIdentifier);
     }
 
@@ -133,12 +142,13 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
      * @param opalIdentifier
      */
     public void put(Value unitIdentifier, String opalIdentifier) {
-      if(unitIdentifier.isNull() == false) {
+      if(!unitIdentifier.isNull()) {
+        //noinspection ConstantConditions
         put((String) unitIdentifier.getValue(), opalIdentifier);
       }
     }
 
-    public void put(String unitIdentifier, String opalIdentifier) {
+    public void put(@Nonnull String unitIdentifier, @Nonnull String opalIdentifier) {
       if(unitIdentifier == null) throw new IllegalArgumentException("unitIdentifier cannot be null");
       if(opalIdentifier == null) throw new IllegalArgumentException("opalIdentifier cannot be null");
       unitIdentifierToOpalIdentifier.put(unitIdentifier, opalIdentifier);
@@ -152,7 +162,7 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
   private final Map<String, UnitIdentifiers> index = Maps.newHashMap();
 
   public IdentifierAssociations(ValueTable identifiers, FunctionalUnit... units) {
-    this.identifiersTable = identifiers;
+    identifiersTable = identifiers;
     this.units = units;
     for(FunctionalUnit unit : units) {
       index.put(unit.getName(), new UnitIdentifiers());
@@ -166,10 +176,6 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
   @Override
   public Iterator<IdentifierAssociation> iterator() {
     return new IdentifierAssociationIterator();
-  }
-
-  private VariableEntity entityFor(String identifier) {
-    return new VariableEntityBean(identifiersTable.getEntityType(), identifier);
   }
 
   private final class IdentifierAssociationIterator implements Iterator<IdentifierAssociation> {
@@ -220,7 +226,5 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
     }
 
   }
-
-  ;
 
 }

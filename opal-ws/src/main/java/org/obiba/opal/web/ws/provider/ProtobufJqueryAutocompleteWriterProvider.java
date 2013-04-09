@@ -61,7 +61,7 @@ public class ProtobufJqueryAutocompleteWriterProvider extends AbstractProtobufPr
       MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
       throws IOException, WebApplicationException {
     Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
-    final Descriptor descriptor = protobuf().descriptors().forMessage(messageType);
+    Descriptor descriptor = protobuf().descriptors().forMessage(messageType);
     String valueProperty = uriInfo.getQueryParameters().getFirst("value");
     String labelProperty = uriInfo.getQueryParameters().getFirst("label");
     FieldDescriptor valueFd = descriptor.findFieldByName(valueProperty);
@@ -71,18 +71,19 @@ public class ProtobufJqueryAutocompleteWriterProvider extends AbstractProtobufPr
 
     OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8");
     if(isWrapped(type, genericType, annotations, mediaType)) {
-      printer.print((Collection<Message>) t, output);
+      printer.print((Iterable<Message>) t, output);
     } else {
       printer.print((Message) t, output);
     }
     output.flush();
   }
 
+  @Override
   protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     if((Collection.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
       Class<?> baseType = Types.getCollectionBaseType(type, genericType);
-      if(baseType == null) return false;
-      return Message.class.isAssignableFrom(baseType) && !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
+      return baseType != null && Message.class.isAssignableFrom(baseType) &&
+          !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
     }
     return false;
   }
@@ -98,11 +99,11 @@ public class ProtobufJqueryAutocompleteWriterProvider extends AbstractProtobufPr
       this.labelFd = labelFd;
     }
 
-    public void print(Collection<Message> msgs, OutputStreamWriter writer) throws IOException {
+    public void print(Iterable<Message> msgs, OutputStreamWriter writer) throws IOException {
       boolean first = true;
       writer.write('[');
       for(Message msg : msgs) {
-        if(first == false) writer.append(',');
+        if(!first) writer.append(',');
         print(msg, writer);
         first = false;
       }

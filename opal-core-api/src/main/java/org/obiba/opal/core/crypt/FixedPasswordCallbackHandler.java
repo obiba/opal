@@ -24,19 +24,19 @@ public class FixedPasswordCallbackHandler implements CallbackHandler {
 
   private final char[] password;
 
-  public FixedPasswordCallbackHandler(char[] password) {
+  public FixedPasswordCallbackHandler(char... password) {
     this.password = Arrays.copyOf(password, password.length);
   }
 
   @Override
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-    for(int i = 0; i < callbacks.length; i++) {
-      if(callbacks[i] instanceof PasswordCallback) {
-        PasswordCallback callback = (PasswordCallback) callbacks[i];
+    for(Callback callback1 : callbacks) {
+      if(callback1 instanceof PasswordCallback) {
+        PasswordCallback callback = (PasswordCallback) callback1;
         callback.setPassword(password);
         return;
       }
-      throw new UnsupportedCallbackException(callbacks[i]);
+      throw new UnsupportedCallbackException(callback1);
     }
   }
 

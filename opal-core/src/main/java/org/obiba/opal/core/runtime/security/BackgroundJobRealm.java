@@ -24,8 +24,7 @@ import org.springframework.stereotype.Component;
 public class BackgroundJobRealm extends AuthorizingRealm {
 
   public BackgroundJobRealm() {
-    super();
-    super.setCredentialsMatcher(new AllowAllCredentialsMatcher());
+    setCredentialsMatcher(new AllowAllCredentialsMatcher());
   }
 
   @Override

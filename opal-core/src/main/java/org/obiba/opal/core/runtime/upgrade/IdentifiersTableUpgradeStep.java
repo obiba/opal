@@ -27,7 +27,7 @@ public class IdentifiersTableUpgradeStep extends AbstractConfigurationUpgradeSte
     for(int i = 0; i < list.getLength(); i++) {
       Node node = list.item(i);
       System.out.println("node " + i);
-      if(node.getTextContent().equals("keySessionFactory")) {
+      if("keySessionFactory".equals(node.getTextContent())) {
         System.out.println(" remove node from parent");
         Node toRemove = node.getParentNode().getParentNode();
         toRemove.getParentNode().removeChild(toRemove);

@@ -20,10 +20,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ShiroSessionOpalShellHolder implements OpalShellHolder {
 
+  @Override
   public OpalShell getCurrentShell() {
     return (OpalShell) SecurityUtils.getSubject().getSession().getAttribute(OpalShell.class);
   }
 
+  @Override
   public void bind(OpalShell shell) {
     SecurityUtils.getSubject().getSession().setAttribute(OpalShell.class, shell);
   }

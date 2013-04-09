@@ -127,10 +127,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     Assert.hasText(alias, "alias must not be null or empty");
 
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
-    if(unitKeyStore != null) {
-      return unitKeyStore.aliasExists(alias);
-    }
-    return false;
+    return unitKeyStore != null && unitKeyStore.aliasExists(alias);
   }
 
   @Override
@@ -220,7 +217,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     UnitKeyStore unitKeyStore = null;
     try {
       unitKeyStore = new UnitKeyStore(unitName, loadKeyStore(unitKeyStoreState.getKeyStore(), passwordCallback));
-      unitKeyStore.setCallbackHander(callbackHandler);
+      unitKeyStore.setCallbackHandler(callbackHandler);
       UnitKeyStore.loadBouncyCastle();
     } catch(GeneralSecurityException ex) {
       throw new RuntimeException(ex);
@@ -274,7 +271,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
    * Returns "Password for 'name':  ".
    */
   private String getPasswordFor(String name) {
-    return new StringBuilder().append(PASSWORD_FOR).append(" '").append(name).append("':  ").toString();
+    return PASSWORD_FOR + " '" + name + "':  ";
   }
 
   private static void clearPasswordCache(CallbackHandler callbackHandler, String passwordKey) {

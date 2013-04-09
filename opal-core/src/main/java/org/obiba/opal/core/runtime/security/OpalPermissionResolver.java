@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security;
 
-import org.apache.shiro.authz.Permission;
 import org.obiba.opal.core.runtime.security.SpatialRealm.RestSpace;
 
 import eu.flatwhite.shiro.spatial.SingleSpaceRelationProvider;
@@ -25,9 +24,4 @@ public class OpalPermissionResolver extends SpatialPermissionResolver {
         new SingleSpaceRelationProvider(new NodeRelationProvider()));
   }
 
-  @Override
-  public Permission resolvePermission(String permissionString) {
-    // TODO Auto-generated method stub
-    return super.resolvePermission(permissionString);
-  }
 }

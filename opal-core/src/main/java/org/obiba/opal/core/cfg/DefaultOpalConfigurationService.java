@@ -32,6 +32,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
     this.opalConfigIo = opalConfigIo;
   }
 
+  @Override
   public void readOpalConfiguration() {
     opalConfigurationLock.lock();
     try {

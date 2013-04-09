@@ -55,7 +55,7 @@ public class DataShieldEnvironmentResource {
   @GET
   @Path("/methods")
   public List<DataShield.DataShieldMethodDto> getDataShieldMethods() {
-    final List<DataShield.DataShieldMethodDto> dtos = Lists.newArrayList();
+    List<DataShield.DataShieldMethodDto> dtos = Lists.newArrayList();
     for(DataShieldMethod method : listMethods()) {
       dtos.add(methodConverterRegistry.asDto(method));
     }
@@ -77,7 +77,7 @@ public class DataShieldEnvironmentResource {
 
     });
 
-    DataShieldLog.adminLog("deleted all methods from environment {}.", this.environment);
+    DataShieldLog.adminLog("deleted all methods from environment {}.", environment);
     return Response.ok().build();
   }
 
@@ -94,7 +94,7 @@ public class DataShieldEnvironmentResource {
         getEnvironment(config).addMethod(methodConverterRegistry.parse(dto));
       }
     });
-    DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), this.environment);
+    DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), environment);
     UriBuilder ub = UriBuilder.fromUri(uri.getRequestUri().resolve(""))
         .path(DataShieldEnvironmentResource.class, "getDataShieldMethod");
     return Response.created(ub.build(dto.getName())).build();
@@ -122,7 +122,7 @@ public class DataShieldEnvironmentResource {
       }
     });
 
-    DataShieldLog.adminLog("modified method '{}' in environment {}.", name, this.environment);
+    DataShieldLog.adminLog("modified method '{}' in environment {}.", name, environment);
 
     return Response.ok().build();
   }
@@ -138,7 +138,7 @@ public class DataShieldEnvironmentResource {
         getEnvironment(config).removeMethod(name);
       }
     });
-    DataShieldLog.adminLog("deleted method '{}' from environment {}.", name, this.environment);
+    DataShieldLog.adminLog("deleted method '{}' from environment {}.", name, environment);
     return Response.ok().build();
   }
 
@@ -167,7 +167,7 @@ public class DataShieldEnvironmentResource {
   }
 
   private DataShieldEnvironment getEnvironment(DatashieldConfiguration config) {
-    return config.getEnvironment(this.environment);
+    return config.getEnvironment(environment);
   }
 
 }

@@ -30,12 +30,11 @@ public class SubjectPermissionsConverterRegistry {
 
   @Autowired
   public SubjectPermissionsConverterRegistry(Set<SubjectPermissionConverter> converters) {
-    super();
     this.converters = converters;
   }
 
   public Iterable<String> convert(Iterable<Permissions> permissions) {
-    final List<String> perms = Lists.newArrayList();
+    List<String> perms = Lists.newArrayList();
     for(Permissions sp : permissions) {
       for(String p : sp.getPermissions()) {
         Iterables.addAll(perms, convert(sp.getDomain(), sp.getNode(), p));

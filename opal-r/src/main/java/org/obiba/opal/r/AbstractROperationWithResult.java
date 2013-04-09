@@ -22,6 +22,7 @@ public abstract class AbstractROperationWithResult extends AbstractROperation im
 
   private REXP result;
 
+  @Override
   public REXP getResult() {
     if(!hasResult()) throw new NoSuchElementException();
     return result;

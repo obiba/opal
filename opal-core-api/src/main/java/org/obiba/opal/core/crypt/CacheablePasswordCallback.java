@@ -24,7 +24,7 @@ public class CacheablePasswordCallback extends PasswordCallback {
   // Instance Variables
   //
 
-  private String passwordKey;
+  private final String passwordKey;
 
   private String confirmationPrompt;
 
@@ -37,7 +37,7 @@ public class CacheablePasswordCallback extends PasswordCallback {
   }
 
   public boolean isConfirmationPrompt() {
-    return confirmationPrompt != null && !confirmationPrompt.equals("");
+    return confirmationPrompt != null && !"".equals(confirmationPrompt);
   }
 
   private CacheablePasswordCallback(String passwordKey, String prompt, boolean echoOn) {
@@ -66,6 +66,7 @@ public class CacheablePasswordCallback extends PasswordCallback {
     return confirmationPrompt;
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
 
     private String passwordKey;
@@ -84,7 +85,7 @@ public class CacheablePasswordCallback extends PasswordCallback {
      * Key used to cache password.
      */
     public Builder key(String Key) {
-      this.passwordKey = Key;
+      passwordKey = Key;
       return this;
     }
 
@@ -108,7 +109,7 @@ public class CacheablePasswordCallback extends PasswordCallback {
      * Turns password echoing on. Echoing is off by default.
      */
     public Builder echoOn() {
-      this.echoOn = true;
+      echoOn = true;
       return this;
     }
 

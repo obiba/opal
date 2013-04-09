@@ -52,6 +52,7 @@ public class QuartzCommandJob implements Job {
   // Job Methods
   //
 
+  @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     autowireSelf(context);
 

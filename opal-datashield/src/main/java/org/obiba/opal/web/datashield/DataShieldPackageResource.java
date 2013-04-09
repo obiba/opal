@@ -106,7 +106,7 @@ public class DataShieldPackageResource extends RPackageResource {
   public Response deletePackage() {
 
     try {
-      final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods();
+      DataShield.DataShieldPackageMethodsDto methods = getPackageMethods();
 
 //      ImmutableList<Object> allMethods = ImmutableList.builder()
 //          .addAll(methods.getAggregateList()).addAll(methods.getAssignList()).build();

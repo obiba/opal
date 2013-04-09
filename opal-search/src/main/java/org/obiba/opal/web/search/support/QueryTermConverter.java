@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.search.support;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
@@ -47,8 +46,7 @@ public class QueryTermConverter {
     JSONObject jsonQuery = new JSONObject("{\"query\":{\"match_all\":{}}, \"size\":0}");
     JSONObject jsonFacets = new JSONObject();
 
-    for(Iterator<Search.QueryTermDto> iterator = dtoQueries.getQueriesList().iterator(); iterator.hasNext(); ) {
-      Search.QueryTermDto dtoQuery = iterator.next();
+    for(Search.QueryTermDto dtoQuery : dtoQueries.getQueriesList()) {
       JSONObject jsonFacet = new JSONObject();
 
       if(dtoQuery.hasExtension(Search.LogicalTermDto.filter)) {
@@ -84,8 +82,8 @@ public class QueryTermConverter {
     List<Search.FilterDto> filters = dtoLogicalFilter.getExtension(Search.FilterDto.filters);
 
     if(filters.size() > 1) {
-      for(Iterator<Search.FilterDto> iterator = filters.iterator(); iterator.hasNext(); ) {
-        jsonOperator.accumulate(operatorName, convertFilterType(iterator.next()));
+      for(Search.FilterDto filter : filters) {
+        jsonOperator.accumulate(operatorName, convertFilterType(filter));
       }
 
       jsonFacet.put(filterName, jsonOperator);
@@ -170,7 +168,7 @@ public class QueryTermConverter {
     List<String> values = dtoTerms.getValuesList();
 
     if(values.size() == 1) {
-      jsonFilter.put("term", new JSONObject().put(variableFieldName(variable), values.get(0).toString()));
+      jsonFilter.put("term", new JSONObject().put(variableFieldName(variable), values.get(0)));
     } else {
       jsonFilter.put("terms", new JSONObject().put(variableFieldName(variable), values));
     }

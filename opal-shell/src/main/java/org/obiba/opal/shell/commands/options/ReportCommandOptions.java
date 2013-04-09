@@ -10,6 +10,6 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 public interface ReportCommandOptions extends HelpOption {
 
   @Option(shortName = "n", description = "The report template name.")
-  public String getName();
+  String getName();
 
 }

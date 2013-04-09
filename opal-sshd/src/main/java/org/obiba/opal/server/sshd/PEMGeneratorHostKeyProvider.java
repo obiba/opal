@@ -51,11 +51,13 @@ public class PEMGeneratorHostKeyProvider extends AbstractGeneratorHostKeyProvide
     super(path, algorithm, keySize);
   }
 
+  @Override
   protected KeyPair doReadKeyPair(InputStream is) throws Exception {
     PEMReader r = new PEMReader(new InputStreamReader(is));
     return (KeyPair) r.readObject();
   }
 
+  @Override
   protected void doWriteKeyPair(KeyPair kp, OutputStream os) throws Exception {
     PEMWriter w = new PEMWriter(new OutputStreamWriter(os));
     try {

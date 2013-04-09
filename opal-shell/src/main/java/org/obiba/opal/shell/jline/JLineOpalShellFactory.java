@@ -29,6 +29,7 @@ public class JLineOpalShellFactory implements OpalShellFactory {
   public JLineOpalShellFactory() {
   }
 
+  @Override
   public OpalShell newShell(CommandRegistry commandRegistry, InputStream in, OutputStream out, OutputStream err) {
     if(commandRegistry == null) throw new IllegalArgumentException("commandRegistry cannot be null");
     if(in == null) throw new IllegalArgumentException("in cannot be null");
@@ -51,7 +52,7 @@ public class JLineOpalShellFactory implements OpalShellFactory {
      */
     @Override
     public void close() throws IOException {
-      this.delegate.close();
+      delegate.close();
     }
 
     /**
@@ -59,7 +60,7 @@ public class JLineOpalShellFactory implements OpalShellFactory {
      */
     @Override
     public void flush() throws IOException {
-      this.delegate.flush();
+      delegate.flush();
     }
 
     /**
@@ -70,9 +71,9 @@ public class JLineOpalShellFactory implements OpalShellFactory {
       for(int i = off; i < len; i++) {
         char c = cbuf[i];
         if(c == '\n') {
-          this.delegate.write('\r');
+          delegate.write('\r');
         }
-        this.delegate.write(c);
+        delegate.write(c);
       }
     }
   }

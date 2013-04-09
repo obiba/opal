@@ -18,14 +18,17 @@ public class OpalAnnotationConfigurationHelper implements FactoryBean {
 
   private final List<Class<?>> additionalClasses = Lists.newArrayList();
 
+  @Override
   public Object getObject() throws Exception {
     return ImmutableSet.copyOf(Iterables.concat(annotatedClasses, additionalClasses));
   }
 
+  @Override
   public Class<?> getObjectType() {
     return Set.class;
   }
 
+  @Override
   public boolean isSingleton() {
     return true;
   }

@@ -54,7 +54,7 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
     X509Certificate x509Cert = x509Token.getCredentials();
     for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
       UnitKeyStore keyStore = unit.getKeyStore();
-      for(Certificate cert : keyStore.getCertficateEntries()) {
+      for(Certificate cert : keyStore.getCertificateEntries()) {
         try {
           x509Cert.verify(cert.getPublicKey());
           SimplePrincipalCollection principals = new SimplePrincipalCollection();

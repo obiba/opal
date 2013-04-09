@@ -39,7 +39,7 @@ public class ServicesResource {
 
   @GET
   public List<Opal.ServiceDto> services() {
-    final List<Opal.ServiceDto> serviceDtos = Lists.newArrayList();
+    List<Opal.ServiceDto> serviceDtos = Lists.newArrayList();
 
     for(Service service : services) {
       Opal.ServiceStatus status = service.isRunning() ? Opal.ServiceStatus.RUNNING : Opal.ServiceStatus.STOPPED;

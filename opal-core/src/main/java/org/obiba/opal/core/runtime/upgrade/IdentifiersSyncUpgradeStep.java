@@ -148,11 +148,11 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
 
   public static final class VariableEntityStateDao extends VariableEntityBean {
 
-    private long id;
+    private final long id;
 
-    private Timestamp created;
+    private final Timestamp created;
 
-    private Timestamp updated;
+    private final Timestamp updated;
 
     public VariableEntityStateDao(long id, String entityType, String entityIdentifier, Timestamp created,
         Timestamp updated) {
@@ -174,15 +174,6 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
       return updated;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-      return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-      return super.hashCode();
-    }
   }
 
 }

@@ -31,22 +31,21 @@ public class OpalRService implements Service, ROperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
 
-  private String host;
+  private final String host;
 
-  private Integer port;
+  private final Integer port;
 
-  private String username;
+  private final String username;
 
-  private String password;
+  private final String password;
 
-  private String encoding;
+  private final String encoding;
 
   @Autowired
   public OpalRService(@Value("${org.obiba.opal.Rserve.host}") String host,
       @Value("${org.obiba.opal.Rserve.port}") Integer port, @Value("${org.obiba.opal.Rserve.username}") String username,
       @Value("${org.obiba.opal.Rserve.password}") String password,
       @Value("${org.obiba.opal.Rserve.encoding}") String encoding) {
-    super();
     this.host = host;
     this.port = port;
     this.username = username;
@@ -65,11 +64,7 @@ public class OpalRService implements Service, ROperationTemplate {
 
     try {
       if(host.trim().length() > 0) {
-        if(port != null) {
-          conn = new RConnection(host.trim(), port.intValue());
-        } else {
-          conn = new RConnection(host.trim());
-        }
+        conn = port == null ? new RConnection(host.trim()) : new RConnection(host.trim(), port);
       } else {
         conn = new RConnection();
       }

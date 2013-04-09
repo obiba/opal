@@ -30,6 +30,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -84,10 +85,9 @@ public class FilesResource {
 
   @Autowired
   public FilesResource(OpalRuntime opalRuntime) {
-    super();
 
     this.opalRuntime = opalRuntime;
-    this.mimeTypes = new MimetypesFileTypeMap();
+    mimeTypes = new MimetypesFileTypeMap();
   }
 
   //
@@ -106,13 +106,10 @@ public class FilesResource {
   @NoAuthorization
   public Response getFileDetails(@PathParam("path") String path) throws FileSystemException {
     FileObject file = resolveFileInFileSystem(path);
-    if(file.exists() == false) {
-      return getPathNotExistResponse(path);
-    } else if(file.getType() == FileType.FILE) {
-      return getFileDetails(file);
-    } else {
-      return getFolderDetails(file);
+    if(file.exists()) {
+      return file.getType() == FileType.FILE ? getFileDetails(file) : getFolderDetails(file);
     }
+    return getPathNotExistResponse(path);
   }
 
   @GET
@@ -127,13 +124,10 @@ public class FilesResource {
   @AuthenticatedByCookie
   public Response getFile(@PathParam("path") String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
-    if(!file.exists()) {
-      return getPathNotExistResponse(path);
-    } else if(file.getType() == FileType.FILE) {
-      return getFile(file);
-    } else {
-      return getFolder(file);
+    if(file.exists()) {
+      return file.getType() == FileType.FILE ? getFile(file) : getFolder(file);
     }
+    return getPathNotExistResponse(path);
   }
 
   @POST
@@ -160,7 +154,8 @@ public class FilesResource {
 
     if(folder == null || !folder.exists()) {
       return getPathNotExistResponse(path);
-    } else if(folder.getType() != FileType.FOLDER) {
+    }
+    if(folder.getType() != FileType.FOLDER) {
       return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
     }
 
@@ -206,7 +201,7 @@ public class FilesResource {
   @Consumes("text/plain")
   public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo)
       throws FileSystemException {
-    if(folderName == null || folderName.trim().length() == 0) return Response.status(Status.BAD_REQUEST).build();
+    if(folderName == null || folderName.trim().isEmpty()) return Response.status(Status.BAD_REQUEST).build();
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
@@ -229,15 +224,18 @@ public class FilesResource {
     }
   }
 
+  @Nullable
   private Response validateFolder(FileObject folder, String path) throws FileSystemException {
     if(folder == null || !folder.exists()) {
       return getPathNotExistResponse(path);
-    } else if(folder.getType() != FileType.FOLDER) {
+    }
+    if(folder.getType() != FileType.FOLDER) {
       return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
     }
     return null;
   }
 
+  @Nullable
   private Response validateFile(FileObject file) throws FileSystemException {
     // Folder or file already exist at specified path.
     if(file.exists()) {
@@ -289,7 +287,7 @@ public class FilesResource {
   @Path("/charsets/available")
   @NoAuthorization
   public Response getAvailableCharsets() {
-    SortedMap<String, Charset> charsets = java.nio.charset.Charset.availableCharsets();
+    SortedMap<String, Charset> charsets = Charset.availableCharsets();
     List<String> names = new ArrayList<String>();
     for(Charset charSet : charsets.values()) {
       names.add(charSet.name());
@@ -326,7 +324,7 @@ public class FilesResource {
     SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
     String folderName = folder.getName().getBaseName();
     File compressedFolder = new File(System.getProperty("java.io.tmpdir"),
-        (folderName.equals("") ? "filesystem" : folderName) + "_" +
+        ("".equals(folderName) ? "filesystem" : folderName) + "_" +
             dateTimeFormatter.format(System.currentTimeMillis()) + ".zip");
     compressedFolder.deleteOnExit();
     String mimeType = mimeTypes.getContentType(compressedFolder);
@@ -371,7 +369,7 @@ public class FilesResource {
   private Opal.FileDto.Builder getBaseFolderBuilder(FileObject folder) throws FileSystemException {
     Opal.FileDto.Builder fileBuilder = Opal.FileDto.newBuilder();
     String folderName = folder.getName().getBaseName();
-    fileBuilder.setName(folderName.equals("") ? "root" : folderName).setType(Opal.FileDto.FileType.FOLDER)
+    fileBuilder.setName("".equals(folderName) ? "root" : folderName).setType(Opal.FileDto.FileType.FOLDER)
         .setPath(folder.getName().getPath());
     fileBuilder.setLastModifiedTime(folder.getContent().getLastModifiedTime());
     fileBuilder.setReadable(folder.isReadable()).setWritable(folder.isWriteable());
@@ -408,7 +406,7 @@ public class FilesResource {
 
       fileBuilder.setLastModifiedTime(child.getContent().getLastModifiedTime());
 
-      if(child.getType().hasChildren() && child.getChildren().length > 0 && (level - 1) > 0 && child.isReadable()) {
+      if(child.getType().hasChildren() && child.getChildren().length > 0 && level - 1 > 0 && child.isReadable()) {
         addChildren(fileBuilder, child, level - 1);
       }
 
@@ -455,12 +453,11 @@ public class FilesResource {
       // to force a call to flush() on every call to write() in order to prevent the system from running out of memory
       // when copying large files.
       localFileStream = new BufferedOutputStream(fileToWriteTo.getContent().getOutputStream()) {
+        @Override
         public synchronized void write(byte[] b, int off, int len) throws IOException {
           flush();
           super.write(b, off, len);
         }
-
-        ;
 
       };
       uploadedFileStream = uploadedFile.getInputStream();
@@ -487,8 +484,7 @@ public class FilesResource {
 
     // Add its children files and subfolders.
     FileObject[] files = folder.getChildren();
-    for(int i = 0; i < files.length; i++) {
-      FileObject file = files[i];
+    for(FileObject file : files) {
       String path = file.getName().getPath();
 
       // only add files for which download is authorized

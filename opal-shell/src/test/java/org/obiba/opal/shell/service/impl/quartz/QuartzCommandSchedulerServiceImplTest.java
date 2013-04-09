@@ -179,15 +179,16 @@ public class QuartzCommandSchedulerServiceImplTest {
 
   static class CommandStub implements Command<Object> {
 
-    private String name;
+    private final String name;
 
-    private String commandLine;
+    private final String commandLine;
 
-    public CommandStub(String name, String commandLine) {
+    CommandStub(String name, String commandLine) {
       this.name = name;
       this.commandLine = commandLine;
     }
 
+    @Override
     public String getName() {
       return name;
     }
@@ -197,26 +198,30 @@ public class QuartzCommandSchedulerServiceImplTest {
       return commandLine;
     }
 
+    @Override
     public int execute() {
       return 0;
     }
 
+    @Override
     public Object getOptions() {
       return null;
     }
 
+    @Override
     public void setOptions(Object options) {
     }
 
+    @Override
     public void setShell(OpalShell shell) {
     }
   }
 
   static class JobDetailMatcher implements IArgumentMatcher {
 
-    private JobDetail expected;
+    private final JobDetail expected;
 
-    public JobDetailMatcher(JobDetail expected) {
+    JobDetailMatcher(JobDetail expected) {
       this.expected = expected;
     }
 
@@ -262,9 +267,9 @@ public class QuartzCommandSchedulerServiceImplTest {
 
   static class CronTriggerMatcher implements IArgumentMatcher {
 
-    private CronTrigger expected;
+    private final CronTrigger expected;
 
-    public CronTriggerMatcher(CronTrigger expected) {
+    CronTriggerMatcher(CronTrigger expected) {
       this.expected = expected;
     }
 

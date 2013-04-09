@@ -115,7 +115,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     this.unitKeyStoreService = unitKeyStoreService;
     this.importService = importService;
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-    this.identifiersTableService = identifiersTableResolver;
+    identifiersTableService = identifiersTableResolver;
     this.opalSearchService = opalSearchService;
     this.statsIndexManager = statsIndexManager;
     this.esProvider = esProvider;
@@ -285,7 +285,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private void writeOpalIdentifiers(PrintWriter writer) {
     // no unit: list of opal ids
-    TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(
+    Iterable<VariableEntity> opalEntities = new TreeSet<VariableEntity>(
         identifiersTableService.getValueTable().getVariableEntities());
     for(VariableEntity entity : opalEntities) {
       writer.append('\"').append(entity.getIdentifier()).append("\"\n");
@@ -364,7 +364,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
     ImmutableList.Builder<TableIdentifiersSync> builder = ImmutableList.builder();
 
-    Iterable<ValueTable> tables = Iterables.filter((tableList == null || tableList.size() == 0)
+    Iterable<ValueTable> tables = Iterables.filter(tableList == null || tableList.isEmpty()
         ? ds.getValueTables()
         : Iterables.transform(tableList, new Function<String, ValueTable>() {
 

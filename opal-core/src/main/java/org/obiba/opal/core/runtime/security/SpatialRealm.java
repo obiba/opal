@@ -60,14 +60,12 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   @Autowired
   public SpatialRealm(SubjectAclService subjectAclService,
       SubjectPermissionsConverterRegistry subjectPermissionsConverterRegistry) {
-    super();
     if(subjectAclService == null) throw new IllegalArgumentException("subjectAclService cannot be null");
     this.subjectAclService = subjectAclService;
     this.subjectPermissionsConverterRegistry = subjectPermissionsConverterRegistry;
 
-    super.setPermissionResolver(
-        new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(),
-            new SingleSpaceRelationProvider(new NodeRelationProvider())));
+    setPermissionResolver(new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(),
+        new SingleSpaceRelationProvider(new NodeRelationProvider())));
     rolePermissionResolver = new GroupPermissionResolver();
   }
 
@@ -122,9 +120,9 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   @Override
   protected void afterCacheManagerSet() {
     super.afterCacheManagerSet();
-    if(super.isAuthorizationCachingEnabled()) {
+    if(isAuthorizationCachingEnabled()) {
       CacheManager cacheManager = getCacheManager();
-      this.rolePermissionCache = cacheManager.getCache(getAuthorizationCacheName() + "_role");
+      rolePermissionCache = cacheManager.getCache(getAuthorizationCacheName() + "_role");
     }
   }
 
@@ -217,7 +215,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
         for(int i = 0; i < nodes; i++) {
           Node lhs = n1.getPath().get(i);
           Node rhs = n2.getPath().get(i);
-          if(lhs.getPathElem().equals(rhs.getPathElem()) == false) {
+          if(!lhs.getPathElem().equals(rhs.getPathElem())) {
             // Check for plural form
             return isPluralForm(lhs, rhs) ? 1 : d;
           }

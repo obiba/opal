@@ -25,11 +25,11 @@ public class NonExistentVariableEntitiesException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   @Nonnull
-  private final Set<VariableEntity> nonExistentVariableEntites;
+  private final Set<VariableEntity> nonExistentVariableEntities;
 
   public NonExistentVariableEntitiesException(@Nonnull Set<VariableEntity> nonExistentVariableEntities) {
     Assert.notNull(nonExistentVariableEntities, "nonExistentVariableEntities must not be null");
-    nonExistentVariableEntites = nonExistentVariableEntities;
+    this.nonExistentVariableEntities = nonExistentVariableEntities;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class NonExistentVariableEntitiesException extends RuntimeException {
 
   public String getNonExistentIdentifiers() {
     StringBuilder sb = new StringBuilder();
-    for(VariableEntity variableEntity : nonExistentVariableEntites) {
+    for(VariableEntity variableEntity : nonExistentVariableEntities) {
       sb.append(variableEntity.getIdentifier()).append(",");
     }
     sb.setLength(sb.length() - 1); // remove last comma.

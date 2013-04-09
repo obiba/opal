@@ -15,10 +15,11 @@ import org.obiba.magma.audit.UserProvider;
 
 public class OpalUserProvider implements UserProvider {
 
+  @Override
   public String getUsername() {
     // TODO: Defaulting to "Unknown" as a temporary patch.
     Subject subject = SecurityUtils.getSubject();
-    return (subject != null && subject.getPrincipal() != null) ? subject.getPrincipal().toString() : "Unknown";
+    return subject != null && subject.getPrincipal() != null ? subject.getPrincipal().toString() : "Unknown";
   }
 
 }

@@ -33,11 +33,11 @@ public class OpalFileSystemMockBuilder {
   // Instance Variables
   //
 
-  private OpalFileSystem opalFileSystemMock;
+  private final OpalFileSystem opalFileSystemMock;
 
-  private FileObject root;
+  private final FileObject root;
 
-  private Map<String, FileObject> fileMap = new HashMap<String, FileObject>();
+  private final Map<String, FileObject> fileMap = new HashMap<String, FileObject>();
 
   private IExpectationSetters<?> expectationSetters;
 
@@ -81,7 +81,7 @@ public class OpalFileSystemMockBuilder {
     return this;
   }
 
-  public OpalFileSystemMockBuilder getLocalFile(String absolutePath, String localPath) throws FileSystemException {
+  public OpalFileSystemMockBuilder getLocalFile(String absolutePath, String localPath) {
     FileObject file = fileMap.get(absolutePath);
     expect(opalFileSystemMock.getLocalFile(file)).andReturn(new File(localPath)).anyTimes();
 
@@ -145,19 +145,16 @@ public class OpalFileSystemMockBuilder {
 
   static class FileObjectMatcher implements IArgumentMatcher {
 
-    private FileObject expected;
+    private final FileObject expected;
 
-    public FileObjectMatcher(FileObject expected) {
+    FileObjectMatcher(FileObject expected) {
       this.expected = expected;
     }
 
     @Override
     public boolean matches(Object actual) {
-      if(actual instanceof FileObject) {
-        return ((FileObject) actual).getName().getPath().equals(expected.getName().getPath());
-      } else {
-        return false;
-      }
+      return actual instanceof FileObject &&
+          ((FileObject) actual).getName().getPath().equals(expected.getName().getPath());
     }
 
     @Override

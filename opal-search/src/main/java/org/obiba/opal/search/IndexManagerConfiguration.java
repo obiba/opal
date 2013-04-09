@@ -19,7 +19,7 @@ import org.obiba.opal.web.model.Opal;
 
 public class IndexManagerConfiguration implements OpalConfigurationExtension {
 
-  private Map<String, Schedule> indexConfigurations;
+  private final Map<String, Schedule> indexConfigurations;
 
   public IndexManagerConfiguration() {
     indexConfigurations = new HashMap<String, Schedule>();

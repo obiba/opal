@@ -74,7 +74,7 @@ public interface ExportService {
   /**
    * Export tables to the provided {@link Datasource} using the provided {@link DatasourceCopier}. If logging is
    * required ensure that the {@code DatasourceCopier} is configured with an appropriate logger. It is the
-   * responsibility of the caller to remove the {@code destinationDatasource} from {@code Magama}.
+   * responsibility of the caller to remove the {@code destinationDatasource} from {@code Magma}.
    *
    * @param unit the functional unit to which the tables are being exported (for key separation)
    * @param sourceTables tables to export.

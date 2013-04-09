@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -27,6 +28,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
@@ -40,14 +42,17 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
@@ -77,7 +82,7 @@ public class UnitKeyStore implements KeyProvider {
   private static final String PASSWORD_FOR = "Password for";
 
   public enum UnitKeyType {
-    KEY_PAIR, CERTIFICATE;
+    KEY_PAIR, CERTIFICATE
   }
 
   private final String unitName;
@@ -93,7 +98,7 @@ public class UnitKeyStore implements KeyProvider {
 
   public Set<String> listAliases() {
     try {
-      return ImmutableSet.copyOf(Iterators.forEnumeration(this.store.aliases()));
+      return ImmutableSet.copyOf(Iterators.forEnumeration(store.aliases()));
     } catch(KeyStoreException e) {
       throw new RuntimeException(e);
     }
@@ -101,12 +106,12 @@ public class UnitKeyStore implements KeyProvider {
 
   public Entry getEntry(String alias) {
     try {
-      if(this.store.isKeyEntry(alias)) {
+      if(store.isKeyEntry(alias)) {
         CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
             .prompt("Password for '" + alias + "':  ").build();
-        return this.store.getEntry(alias, new PasswordProtection(getKeyPassword(passwordCallback)));
-      } else if(this.store.isCertificateEntry(alias)) {
-        return this.store.getEntry(alias, null);
+        return store.getEntry(alias, new PasswordProtection(getKeyPassword(passwordCallback)));
+      } else if(store.isCertificateEntry(alias)) {
+        return store.getEntry(alias, null);
       } else {
         throw new UnsupportedOperationException("unsupported key type");
       }
@@ -155,6 +160,7 @@ public class UnitKeyStore implements KeyProvider {
     return listKeyPairs().contains(alias);
   }
 
+  @Override
   public KeyPair getKeyPair(String alias)
       throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
     KeyPair keyPair = null;
@@ -176,6 +182,7 @@ public class UnitKeyStore implements KeyProvider {
     return keyPair;
   }
 
+  @Override
   public KeyPair getKeyPair(PublicKey publicKey)
       throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
     Enumeration<String> aliases = null;
@@ -188,6 +195,7 @@ public class UnitKeyStore implements KeyProvider {
     return findKeyPairForPublicKey(publicKey, aliases);
   }
 
+  @Override
   public PublicKey getPublicKey(Datasource datasource) throws NoSuchKeyException {
     try {
       Certificate cert = store.getCertificate(datasource.getName());
@@ -203,7 +211,7 @@ public class UnitKeyStore implements KeyProvider {
   public X509Certificate importCertificate(String alias, FileObject certFile) {
     X509Certificate cert = getCertificateFromFile(certFile);
     try {
-      this.store.setCertificateEntry(alias, cert);
+      store.setCertificateEntry(alias, cert);
     } catch(KeyStoreException e) {
       throw new MagmaCryptRuntimeException(e);
     }
@@ -213,14 +221,14 @@ public class UnitKeyStore implements KeyProvider {
   public X509Certificate importCertificate(String alias, InputStream pem) {
     X509Certificate cert = getCertificate(pem);
     try {
-      this.store.setCertificateEntry(alias, cert);
+      store.setCertificateEntry(alias, cert);
     } catch(KeyStoreException e) {
       throw new MagmaCryptRuntimeException(e);
     }
     return cert;
   }
 
-  public List<Certificate> getCertficateEntries() {
+  public List<Certificate> getCertificateEntries() {
     List<Certificate> certs = Lists.newArrayList();
     for(String alias : listAliases()) {
       Entry keyEntry = getEntry(alias);
@@ -236,8 +244,8 @@ public class UnitKeyStore implements KeyProvider {
   // Methods
   //
 
-  public void setCallbackHander(CallbackHandler callbackHander) {
-    this.callbackHandler = callbackHander;
+  public void setCallbackHandler(CallbackHandler callbackHandler) {
+    this.callbackHandler = callbackHandler;
   }
 
   public String getUnitName() {
@@ -254,7 +262,7 @@ public class UnitKeyStore implements KeyProvider {
     return passwordCallback.getPassword();
   }
 
-  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, KeyPair keyPair,
+  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, @Nullable KeyPair keyPair,
       CacheablePasswordCallback passwordCallback)
       throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
       IOException {
@@ -277,7 +285,7 @@ public class UnitKeyStore implements KeyProvider {
     }
   }
 
-  private KeyPair findKeyPairForPublicKey(PublicKey publicKey, Enumeration<String> aliases) {
+  private KeyPair findKeyPairForPublicKey(Key publicKey, Enumeration<String> aliases) {
     KeyPair keyPair = null;
 
     while(aliases.hasMoreElements()) {
@@ -296,26 +304,18 @@ public class UnitKeyStore implements KeyProvider {
     return keyPair;
   }
 
-  private static void translateAndRethrowKeyStoreIOException(IOException ex) {
-    if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
-      throw new KeyProviderSecurityException("Wrong keystore password");
-    }
-    throw new RuntimeException(ex);
-  }
-
   public static X509Certificate makeCertificate(PrivateKey issuerPrivateKey, PublicKey subjectPublicKey,
       String certificateInfo, String signatureAlgorithm)
       throws SignatureException, InvalidKeyException, CertificateEncodingException, NoSuchAlgorithmException {
-    final org.bouncycastle.x509.X509V3CertificateGenerator certificateGenerator
-        = new org.bouncycastle.x509.X509V3CertificateGenerator();
-    final org.bouncycastle.asn1.x509.X509Name issuerDN = new org.bouncycastle.asn1.x509.X509Name(certificateInfo);
-    final org.bouncycastle.asn1.x509.X509Name subjectDN = new org.bouncycastle.asn1.x509.X509Name(certificateInfo);
-    final int daysTillExpiry = 30 * 365;
+    X509V3CertificateGenerator certificateGenerator = new X509V3CertificateGenerator();
+    X509Name issuerDN = new X509Name(certificateInfo);
+    X509Name subjectDN = new X509Name(certificateInfo);
+    int daysTillExpiry = 30 * 365;
 
-    final Calendar expiry = Calendar.getInstance();
+    Calendar expiry = Calendar.getInstance();
     expiry.add(Calendar.DAY_OF_YEAR, daysTillExpiry);
 
-    certificateGenerator.setSerialNumber(java.math.BigInteger.valueOf(System.currentTimeMillis()));
+    certificateGenerator.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
     certificateGenerator.setIssuerDN(issuerDN);
     certificateGenerator.setSubjectDN(subjectDN);
     certificateGenerator.setPublicKey(subjectPublicKey);
@@ -373,14 +373,15 @@ public class UnitKeyStore implements KeyProvider {
   public UnitKeyType getKeyType(String alias) {
     if(listKeyPairs().contains(alias)) {
       return UnitKeyType.KEY_PAIR;
-    } else if(listCertificates().contains(alias)) {
+    }
+    if(listCertificates().contains(alias)) {
       return UnitKeyType.CERTIFICATE;
     }
-    throw new IllegalArgumentException("unkown alias '" + alias + "'or key type");
+    throw new IllegalArgumentException("unknown alias '" + alias + "'or key type");
   }
 
   public static void loadBouncyCastle() {
-    if(java.security.Security.getProvider("BC") == null) java.security.Security.addProvider(new BouncyCastleProvider());
+    if(Security.getProvider("BC") == null) Security.addProvider(new BouncyCastleProvider());
   }
 
   /**
@@ -433,7 +434,7 @@ public class UnitKeyStore implements KeyProvider {
   private void makeAndStoreKeyEntry(String alias, KeyPair keyPair, String certificateInfo) {
     X509Certificate cert;
     try {
-      cert = UnitKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo,
+      cert = makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo,
           chooseSignatureAlgorithm(keyPair.getPrivate().getAlgorithm()));
       CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
           .prompt(getPasswordFor(alias)).build();
@@ -449,7 +450,7 @@ public class UnitKeyStore implements KeyProvider {
 
   private X509Certificate makeCertificate(String algorithm, String certificateInfo, KeyPair keyPair)
       throws SignatureException, InvalidKeyException, CertificateEncodingException, NoSuchAlgorithmException {
-    X509Certificate cert = UnitKeyStore.makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo,
+    X509Certificate cert = makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo,
         chooseSignatureAlgorithm(algorithm));
     return cert;
   }
@@ -464,7 +465,7 @@ public class UnitKeyStore implements KeyProvider {
 
   private String chooseSignatureAlgorithm(String keyAlgorithm) {
     // TODO add more algorithms here.
-    if(keyAlgorithm.equals("DSA")) {
+    if("DSA".equals(keyAlgorithm)) {
       return "SHA1withDSA";
     }
     return "SHA1WithRSA";
@@ -484,6 +485,7 @@ public class UnitKeyStore implements KeyProvider {
     PEMReader pemReader = null;
     try {
       pemReader = new PEMReader(new InputStreamReader(privateKey), new PasswordFinder() {
+        @Override
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported private key");
         }
@@ -491,7 +493,8 @@ public class UnitKeyStore implements KeyProvider {
       Object object = pemReader.readObject();
       if(object == null) {
         throw new RuntimeException("No PEM information.");
-      } else if(object instanceof KeyPair) {
+      }
+      if(object instanceof KeyPair) {
         return (KeyPair) object;
       }
       throw new RuntimeException("Unexpected type [" + object + "]. Expected KeyPair.");
@@ -519,6 +522,7 @@ public class UnitKeyStore implements KeyProvider {
     PEMReader pemReader = null;
     try {
       pemReader = new PEMReader(new InputStreamReader(privateKey), new PasswordFinder() {
+        @Override
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported private key");
         }
@@ -539,7 +543,8 @@ public class UnitKeyStore implements KeyProvider {
     if(pemObject instanceof KeyPair) {
       KeyPair keyPair = (KeyPair) pemObject;
       return keyPair.getPrivate();
-    } else if(pemObject instanceof Key) {
+    }
+    if(pemObject instanceof Key) {
       return (Key) pemObject;
     }
     throw new RuntimeException("Unexpected type [" + pemObject + "]. Expected KeyPair or Key.");
@@ -560,6 +565,7 @@ public class UnitKeyStore implements KeyProvider {
     try {
       pemReader = new PEMReader(new InputStreamReader(certificate), new PasswordFinder() {
 
+        @Override
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported certificate");
         }
@@ -567,7 +573,8 @@ public class UnitKeyStore implements KeyProvider {
       Object object = pemReader.readObject();
       if(object == null) {
         throw new RuntimeException("No PEM information.");
-      } else if(object instanceof X509Certificate) {
+      }
+      if(object instanceof X509Certificate) {
         return (X509Certificate) object;
       }
       throw new RuntimeException("Unexpected type [" + object + "]. Expected X509Certificate.");
@@ -580,23 +587,18 @@ public class UnitKeyStore implements KeyProvider {
     }
   }
 
-  private static void clearPasswordCache(CallbackHandler callbackHandler, String alias) {
-    if(callbackHandler instanceof CachingCallbackHandler) {
-      ((CachingCallbackHandler) callbackHandler).clearPasswordCache(alias);
-    }
-  }
-
   /**
    * Returns "Password for 'name':  ".
    */
   private String getPasswordFor(String name) {
-    return new StringBuilder().append(PASSWORD_FOR).append(" '").append(name).append("':  ").toString();
+    return PASSWORD_FOR + " '" + name + "':  ";
   }
 
   //
   // Inner Classes
   //
 
+  @SuppressWarnings({ "StaticMethodOnlyUsedInOneClass", "ParameterHidesMemberVariable" })
   public static class Builder {
     private String unit;
 
@@ -624,9 +626,9 @@ public class UnitKeyStore implements KeyProvider {
 
     public UnitKeyStore build() {
       Assert.hasText(unit, "unit must not be null or empty");
-      Assert.notNull(callbackHandler, "callbackHander must not be null");
+      Assert.notNull(callbackHandler, "callbackHandler must not be null");
 
-      UnitKeyStore.loadBouncyCastle();
+      loadBouncyCastle();
 
       CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit)
           .prompt("Enter '" + unit + "' keystore password:  ")
@@ -656,9 +658,22 @@ public class UnitKeyStore implements KeyProvider {
       return keyStore;
     }
 
+    private static void clearPasswordCache(CallbackHandler callbackHandler, String alias) {
+      if(callbackHandler instanceof CachingCallbackHandler) {
+        ((CachingCallbackHandler) callbackHandler).clearPasswordCache(alias);
+      }
+    }
+
+    private static void translateAndRethrowKeyStoreIOException(IOException ex) {
+      if(ex.getCause() != null && ex.getCause() instanceof UnrecoverableKeyException) {
+        throw new KeyProviderSecurityException("Wrong keystore password");
+      }
+      throw new RuntimeException(ex);
+    }
+
     private UnitKeyStore createUnitKeyStore(KeyStore keyStore) {
       UnitKeyStore unitKeyStore = new UnitKeyStore(unit, keyStore);
-      unitKeyStore.setCallbackHander(callbackHandler);
+      unitKeyStore.setCallbackHandler(callbackHandler);
       return unitKeyStore;
     }
   }

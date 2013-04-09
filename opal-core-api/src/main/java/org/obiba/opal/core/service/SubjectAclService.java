@@ -44,7 +44,7 @@ public interface SubjectAclService {
 
   Iterable<Subject> getSubjects(String domain, SubjectType type);
 
-  public class Subject implements Comparable<Subject> {
+  class Subject implements Comparable<Subject> {
 
     private final String principal;
 
@@ -98,7 +98,7 @@ public interface SubjectAclService {
 
   }
 
-  public enum SubjectType {
+  enum SubjectType {
     USER, GROUP;
 
     public Subject subjectFor(String principal) {
@@ -107,7 +107,7 @@ public interface SubjectAclService {
 
   }
 
-  public interface Permissions {
+  interface Permissions {
 
     String getDomain();
 
@@ -119,7 +119,7 @@ public interface SubjectAclService {
 
   }
 
-  public interface SubjectAclChangeCallback {
-    public void onSubjectAclChanged(Subject subject);
+  interface SubjectAclChangeCallback {
+    void onSubjectAclChanged(Subject subject);
   }
 }

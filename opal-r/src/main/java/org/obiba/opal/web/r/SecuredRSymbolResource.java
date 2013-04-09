@@ -58,11 +58,10 @@ public class SecuredRSymbolResource extends RSymbolResource {
   private Iterable<ValueTable> getValueTables(String path) {
     if(!path.contains(".") && !path.contains(":")) {
       return MagmaEngine.get().getDatasource(path).getValueTables();
-    } else if(path.contains(".") && !path.contains(":")) {
-      return ImmutableSet.of(getValueTable(path, MagmaEngineTableResolver.valueOf(path)));
-    } else {
-      return ImmutableSet.of(getValueTable(path, MagmaEngineVariableResolver.valueOf(path)));
     }
+    return path.contains(".") && !path.contains(":")
+        ? ImmutableSet.of(getValueTable(path, MagmaEngineTableResolver.valueOf(path)))
+        : ImmutableSet.of(getValueTable(path, MagmaEngineVariableResolver.valueOf(path)));
   }
 
   private ValueTable getValueTable(String path, MagmaEngineReferenceResolver resolver) {

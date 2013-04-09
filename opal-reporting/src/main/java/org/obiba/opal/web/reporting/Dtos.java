@@ -23,6 +23,8 @@ import com.google.common.collect.Sets;
 
 public class Dtos {
 
+  private Dtos() {}
+
   public static ReportTemplate fromDto(ReportTemplateDto reportTemplateDto) {
     ReportTemplate reportTemplate = new ReportTemplate();
     reportTemplate.setName(reportTemplateDto.getName());
@@ -62,7 +64,7 @@ public class Dtos {
     return dtoBuilder.build();
   }
 
-  public static Set<ReportTemplateDto> asDto(Set<ReportTemplate> reportTemplates) {
+  public static Set<ReportTemplateDto> asDto(Iterable<ReportTemplate> reportTemplates) {
 
     Set<Opal.ReportTemplateDto> reportTemplateDtos = new LinkedHashSet<ReportTemplateDto>();
     for(ReportTemplate reportTemplate : reportTemplates) {

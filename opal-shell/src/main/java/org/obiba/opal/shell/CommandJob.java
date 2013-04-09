@@ -62,37 +62,43 @@ public class CommandJob implements OpalShell, Runnable {
     if(command == null) throw new IllegalArgumentException("command cannot be null");
     this.command = command;
     this.command.setShell(this);
-    this.messages = new ArrayList<Message>();
-    this.status = Status.NOT_STARTED;
+    messages = new ArrayList<Message>();
+    status = Status.NOT_STARTED;
   }
 
   //
   // OpalShell Methods
   //
 
+  @Override
   public void printf(String format, Object... args) {
     if(format == null) throw new IllegalArgumentException("format cannot be null");
     messages.add(createMessage(String.format(format, args)));
   }
 
+  @Override
   public void printUsage() {
     // nothing to do
   }
 
+  @Override
   public char[] passwordPrompt(String format, Object... args) {
     // nothing to do -- return null
     return null;
   }
 
+  @Override
   public String prompt(String format, Object... args) {
     // nothing to do -- return null
     return null;
   }
 
+  @Override
   public void exit() {
     // nothing to do
   }
 
+  @Override
   public void addExitCallback(OpalShellExitCallback callback) {
     // nothing to do
   }
@@ -101,6 +107,7 @@ public class CommandJob implements OpalShell, Runnable {
   // Runnable Methods
   //
 
+  @Override
   public void run() {
     try {
       printf("Job started.");
@@ -108,7 +115,7 @@ public class CommandJob implements OpalShell, Runnable {
       int errorCode = 0;
 
       // Don't execute the command if the job has been cancelled.
-      if(!status.equals(Status.CANCEL_PENDING)) {
+      if(status != Status.CANCEL_PENDING) {
         status = Status.IN_PROGRESS;
         startTime = getCurrentTime();
         errorCode = command.execute();
@@ -203,7 +210,7 @@ public class CommandJob implements OpalShell, Runnable {
     // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
     // CANCEL_PENDING (i.e., job was interrupted); in that case set it to CANCELED.
     if(status == Status.IN_PROGRESS) {
-      status = (errorCode == 0) ? Status.SUCCEEDED : Status.FAILED;
+      status = errorCode == 0 ? Status.SUCCEEDED : Status.FAILED;
     } else if(status == Status.CANCEL_PENDING) {
       status = Status.CANCELED;
     } else {

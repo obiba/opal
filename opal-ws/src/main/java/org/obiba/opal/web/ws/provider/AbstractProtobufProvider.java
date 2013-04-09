@@ -44,18 +44,16 @@ public class AbstractProtobufProvider {
   @SuppressWarnings("unchecked")
   protected Class<Message> extractMessageType(Class<?> type, Type genericType, Annotation[] annotations,
       MediaType mediaType) {
-    if(isWrapped(type, genericType, annotations, mediaType)) {
-      return Types.getCollectionBaseType(type, genericType);
-    } else {
-      return (Class<Message>) type;
-    }
+    return isWrapped(type, genericType, annotations, mediaType)
+        ? Types.getCollectionBaseType(type, genericType)
+        : (Class<Message>) type;
   }
 
   protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     if((Iterable.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
       Class<?> baseType = Types.getCollectionBaseType(type, genericType);
-      if(baseType == null) return false;
-      return Message.class.isAssignableFrom(baseType) && !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
+      return baseType != null && Message.class.isAssignableFrom(baseType) &&
+          !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
     }
     return false;
   }
@@ -76,7 +74,7 @@ public class AbstractProtobufProvider {
   protected Iterable<Message> sort(Class<Message> messageType, Iterable<Message> msgs) {
     MultivaluedMap<String, String> query = requestAttributesProvider.getUriInfo().getQueryParameters();
 
-    if(query.containsKey("sortField") == false || Strings.isNullOrEmpty(query.getFirst("sortField"))) return msgs;
+    if(!query.containsKey("sortField") || Strings.isNullOrEmpty(query.getFirst("sortField"))) return msgs;
 
     String fieldName = query.getFirst("sortField");
     if(Strings.isNullOrEmpty(fieldName)) return msgs;
@@ -87,12 +85,11 @@ public class AbstractProtobufProvider {
     return sortMessages(protobuf().descriptors().forMessage(messageType), msgs, fieldName, sortDir);
   }
 
-  private Iterable<Message> sortMessages(Descriptor descriptor, Iterable<Message> msgs, final String field,
-      SortDir sortDir) {
+  private Iterable<Message> sortMessages(Descriptor descriptor, Iterable<Message> msgs, String field, SortDir sortDir) {
     Preconditions.checkNotNull(sortDir);
     Preconditions.checkNotNull(field);
 
-    final FieldDescriptor sortField = descriptor.findFieldByName(field);
+    FieldDescriptor sortField = descriptor.findFieldByName(field);
     // Can't sort on repeated fields
     if(sortField.isRepeated()) return msgs;
     // Can't sort on complex types
@@ -108,7 +105,7 @@ public class AbstractProtobufProvider {
   }
 
   private Iterable<Message> sortMessages(Iterable<Message> msgs, final FieldDescriptor field,
-      final Ordering<Comparable<?>> ordering) {
+      Ordering<Comparable<?>> ordering) {
     return ordering.onResultOf(new Function<Message, Comparable<?>>() {
       @Override
       public Comparable<?> apply(Message input) {

@@ -26,7 +26,6 @@ public class DataShieldMethodConverterRegistry {
 
   @Autowired
   public DataShieldMethodConverterRegistry(Set<DataShieldMethodConverter> converters) {
-    super();
     this.converters = converters;
   }
 

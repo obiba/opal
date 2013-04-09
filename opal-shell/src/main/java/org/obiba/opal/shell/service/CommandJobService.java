@@ -27,7 +27,7 @@ public interface CommandJobService extends Service {
    * @param owner the command job's owner
    * @return the command job's id
    */
-  public Integer launchCommand(CommandJob commandJob, Subject owner);
+  Integer launchCommand(CommandJob commandJob, Subject owner);
 
   /**
    * Assigns an id to a command job and submits it for asynchronous execution.
@@ -37,7 +37,7 @@ public interface CommandJobService extends Service {
    * @param commandJob the submitted command job
    * @return the command job's id
    */
-  public Integer launchCommand(CommandJob commandJob);
+  Integer launchCommand(CommandJob commandJob);
 
   /**
    * Returns the specified command job.
@@ -45,14 +45,14 @@ public interface CommandJobService extends Service {
    * @param id command job id
    * @return the command job (<code>null</code> if none)
    */
-  public CommandJob getCommand(Integer id);
+  CommandJob getCommand(Integer id);
 
   /**
    * Returns the history of launched commands.
    *
    * @return history of launched commands
    */
-  public List<CommandJob> getHistory();
+  List<CommandJob> getHistory();
 
   /**
    * Cancels the specified command job.
@@ -62,7 +62,7 @@ public interface CommandJobService extends Service {
    * @throws IllegalStateException if the command job is not in a "cancellable" state (either NOT_STARTED or
    * IN_PROGRESS) and therefore cannot be cancelled
    */
-  public void cancelCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;
+  void cancelCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;
 
   /**
    * Deletes the specified command job.
@@ -72,11 +72,11 @@ public interface CommandJobService extends Service {
    * @throws IllegalStateException if the command job is in a "running" state (IN_PROGRESS or CANCEL_PENDING) and
    * therefore cannot be deleted
    */
-  public void deleteCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;
+  void deleteCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;
 
   /**
    * Deletes all completed commands (i.e., commands in the SUCCEEDED, FAILED or CANCELED state).
    */
-  public void deleteCompletedCommands();
+  void deleteCompletedCommands();
 
 }

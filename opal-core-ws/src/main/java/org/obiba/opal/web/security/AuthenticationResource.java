@@ -68,7 +68,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @Path("/session/{id}")
   public Response checkSession(@PathParam("id") String sessionId) {
     // Find the Shiro Session
-    if(isValidSessionId(sessionId) == false) {
+    if(!isValidSessionId(sessionId)) {
       return Response.status(Status.NOT_FOUND).build();
     }
     return Response.ok().build();
@@ -90,7 +90,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @Path("/session/{id}/username")
   public Opal.Subject getSubject(@PathParam("id") String sessionId) {
     // Find the Shiro username
-    if(isValidSessionId(sessionId) == false) {
+    if(!isValidSessionId(sessionId)) {
       return Opal.Subject.newBuilder().setPrincipal(null).setType(Opal.Subject.SubjectType.USER).build();
     }
 

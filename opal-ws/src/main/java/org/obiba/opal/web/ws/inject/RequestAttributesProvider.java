@@ -20,9 +20,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public interface RequestAttributesProvider {
 
-  public ServletRequestAttributes currentRequestAttributes();
+  ServletRequestAttributes currentRequestAttributes();
 
-  public UriInfo getUriInfo();
+  UriInfo getUriInfo();
 
-  public String getResourcePath(URI uri);
+  String getResourcePath(URI uri);
 }

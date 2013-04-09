@@ -32,7 +32,7 @@ public class OpalPermissions implements SubjectAclService.Permissions {
 
   public OpalPermissions(URI uri, Iterable<AclAction> actions) {
     this.uri = uri;
-    this.perms = Iterables.transform(actions, new Function<AclAction, String>() {
+    perms = Iterables.transform(actions, new Function<AclAction, String>() {
 
       @Override
       public String apply(AclAction input) {

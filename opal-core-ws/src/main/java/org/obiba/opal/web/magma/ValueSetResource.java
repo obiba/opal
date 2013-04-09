@@ -26,6 +26,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Attribute;
+import org.obiba.magma.AttributeAware;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
@@ -122,7 +123,7 @@ public class ValueSetResource extends AbstractValueTableResource {
     ResponseBuilder builder;
     try {
       Value value = extractValue(entity.getIdentifier());
-      if(value.isNull() || (value.isSequence() && pos != null && pos > value.asSequence().getSize() - 1)) {
+      if(value.isNull() || value.isSequence() && pos != null && pos > value.asSequence().getSize() - 1) {
         builder = Response.status(Status.NOT_FOUND);
       } else {
         value = getValueAt(value, pos);
@@ -219,18 +220,18 @@ public class ValueSetResource extends AbstractValueTableResource {
 
     builder.append(name);
     int dot = name.lastIndexOf('.');
-    if(dot != -1) {
-      String id = identifier;
-      if(pos != null) {
-        id = id + "-" + (pos + 1);
-      }
-      builder.insert(dot, "-" + id);
-    } else {
+    if(dot == -1) {
       builder.append("-").append(identifier);
       if(pos != null) {
         builder.append("-").append(pos + 1);
       }
       builder.append(".").append(getFileExtension(variable));
+    } else {
+      String id = identifier;
+      if(pos != null) {
+        id = id + "-" + (pos + 1);
+      }
+      builder.insert(dot, "-" + id);
     }
 
     return builder.toString();
@@ -261,7 +262,8 @@ public class ValueSetResource extends AbstractValueTableResource {
     return MediaType.APPLICATION_OCTET_STREAM;
   }
 
-  private String getFileNameFromAttributes(Variable variable) {
+  @Nullable
+  private String getFileNameFromAttributes(AttributeAware variable) {
     for(Attribute attr : variable.getAttributes()) {
       if("filename".equalsIgnoreCase(attr.getName()) || "file-name".equalsIgnoreCase(attr.getName())) {
         String name = variable.getAttributeStringValue(attr.getName());
@@ -273,7 +275,8 @@ public class ValueSetResource extends AbstractValueTableResource {
     return null;
   }
 
-  private String getFileExtensionFromAttributes(Variable variable) {
+  @Nullable
+  private String getFileExtensionFromAttributes(AttributeAware variable) {
     for(Attribute attr : variable.getAttributes()) {
       if("fileextension".equalsIgnoreCase(attr.getName()) || "file-extension".equalsIgnoreCase(attr.getName())) {
         String extension = variable.getAttributeStringValue(attr.getName());

@@ -69,15 +69,15 @@ public class BirtReportServiceImpl implements ReportService {
     File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine")
         .getAbsoluteFile();
 
-    if(reportEngineHome.exists() == false) {
+    if(!reportEngineHome.exists()) {
       log.error("Could not find Birt engine distribution in directory '{}'.",
           System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME));
       return;
     }
 
-    this.engine = instantiateEngine(reportEngineHome);
-    this.engine.start();
-    log.info("Sucessfully started BIRT Report Engine.");
+    engine = instantiateEngine(reportEngineHome);
+    engine.start();
+    log.info("Successfully started BIRT Report Engine.");
   }
 
   @Override
@@ -86,10 +86,10 @@ public class BirtReportServiceImpl implements ReportService {
       if(engine != null) {
         log.info("Shutting down BIRT Report Engine.");
         engine.stop();
-        log.info("Sucessfully shutdown BIRT Report Engine.");
+        log.info("Successfully shutdown BIRT Report Engine.");
       }
     } catch(Throwable t) {
-      log.warn("Error stoping BIRT", t);
+      log.warn("Error stopping BIRT", t);
     } finally {
       engine = null;
     }
@@ -146,14 +146,14 @@ public class BirtReportServiceImpl implements ReportService {
     for(int i = 0; i < jars.length; i++) {
       try {
         urls[i] = jars[i].toURI().toURL();
-      } catch(MalformedURLException e) {
+      } catch(MalformedURLException ignored) {
       }
     }
     return createClassLoader(urls);
   }
 
-  private ClassLoader createClassLoader(URL[] urls) {
-    // This ClassLoader will load classes from the BIRT classpath before lookin in the Opal classpath except for classes
+  private ClassLoader createClassLoader(URL... urls) {
+    // This ClassLoader will load classes from the BIRT classpath before looking in the Opal classpath except for classes
     // in the "common" package
     return new ChildFirstClassLoader(urls) {
       @Override

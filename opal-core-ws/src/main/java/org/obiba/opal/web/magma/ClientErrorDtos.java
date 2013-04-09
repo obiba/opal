@@ -66,7 +66,7 @@ public class ClientErrorDtos {
     ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
     clientError.addArguments(pe.getMessage());
     // build a parsing error dto list
-    if(pe.getChildren().size() == 0) {
+    if(pe.getChildren().isEmpty()) {
       clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
     } else {
       for(DatasourceParsingException child : pe.getChildrenAsList()) {

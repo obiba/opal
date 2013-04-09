@@ -52,7 +52,7 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
 
   public ShellCallbackHandler(OpalShellHolder opalShellHolder) {
     this.opalShellHolder = opalShellHolder;
-    this.passwordCache = new HashMap<String, char[]>();
+    passwordCache = new HashMap<String, char[]>();
   }
 
   //
@@ -67,6 +67,7 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
    * @throws UnsupportedCallbackException if a callback is of a type not supported (only <code>TextInputCallback</code>
    * and <code>PasswordCallback</code> are supported)
    */
+  @Override
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
     OpalShell shell = getCurrentShell();
     for(Callback c : callbacks) {
@@ -76,7 +77,7 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
       } else if(c instanceof PasswordCallback) {
         PasswordCallback passwordCallback = (PasswordCallback) c;
         if(passwordCallback instanceof CacheablePasswordCallback) {
-          handleCacheablePasswordCallback(((CacheablePasswordCallback) passwordCallback));
+          handleCacheablePasswordCallback((CacheablePasswordCallback) passwordCallback);
         } else {
           passwordCallback.setPassword(shell.passwordPrompt(" %s", passwordCallback.getPrompt()));
         }
@@ -102,7 +103,7 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
     }
   }
 
-  private char[] promptAndConfirmPassword(CacheablePasswordCallback callback) throws IOException {
+  private char[] promptAndConfirmPassword(CacheablePasswordCallback callback) {
     OpalShell shell = getCurrentShell();
 
     char[] passwordOne;
@@ -117,6 +118,7 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
     return passwordOne;
   }
 
+  @Override
   public void cacheCallbackResult(Callback callback) {
     if(callback instanceof CacheablePasswordCallback) {
       CacheablePasswordCallback cacheableCallback = (CacheablePasswordCallback) callback;
@@ -124,6 +126,7 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
     }
   }
 
+  @Override
   public void clearPasswordCache(String alias) {
     passwordCache.remove(alias);
   }

@@ -65,14 +65,14 @@ public class XStreamVariableReader implements MessageBodyReader<Object> {
     } catch(ClassNotFoundException e) {
       throw new MagmaRuntimeException(e);
     }
-    return isWrapped(type, genericType, annotations, mediaType) ? list : (list.size() > 0 ? list.get(0) : null);
+    return isWrapped(type, genericType, annotations, mediaType) ? list : list.size() > 0 ? list.get(0) : null;
   }
 
   protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     if((Collection.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
       Class<?> baseType = Types.getCollectionBaseType(type, genericType);
-      if(baseType == null) return false;
-      return Variable.class.isAssignableFrom(baseType) && !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
+      return baseType != null && Variable.class.isAssignableFrom(baseType) &&
+          !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
     }
     return false;
   }

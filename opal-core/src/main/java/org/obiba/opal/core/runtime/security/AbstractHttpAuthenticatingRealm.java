@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security;
 
+import javax.annotation.Nullable;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -54,6 +56,7 @@ public abstract class AbstractHttpAuthenticatingRealm extends AuthorizingRealm {
 
   abstract protected String getSessionId(AuthenticationToken token);
 
+  @Nullable
   protected Session getSession(String sessionId) {
     if(sessionId != null) {
       SessionManager manager = getSessionManager();
@@ -69,9 +72,10 @@ public abstract class AbstractHttpAuthenticatingRealm extends AuthorizingRealm {
     return null;
   }
 
+  @Nullable
   protected SessionManager getSessionManager() {
     SecurityManager sm = SecurityUtils.getSecurityManager();
-    if(sm instanceof SessionsSecurityManager) return (SessionsSecurityManager) sm;
+    if(sm instanceof SessionsSecurityManager) return sm;
     return null;
   }
 }

@@ -10,7 +10,6 @@
 package org.obiba.opal.reporting.service.birt.bootstrap;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,7 @@ import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IEngineTask;
+import org.eclipse.birt.report.engine.api.IRenderOption;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
@@ -52,7 +52,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
   @Override
   public void render(String formatName, Map<String, String> parameters, String reportDesign, String reportOutput)
       throws BirtEngineException {
-    if(isRunning() == false) {
+    if(!isRunning()) {
       throw new BirtEngineException("Report engine not running. Please check startup logs for details.");
     }
 
@@ -89,12 +89,12 @@ public class EmbeddedBirtEngine implements BirtEngine {
       File reportEngineHome = new File(System.getProperty(BIRT_HOME_SYSTEM_PROPERTY_NAME), "ReportEngine")
           .getAbsoluteFile();
 
-      if(reportEngineHome.exists() == false) {
+      if(!reportEngineHome.exists()) {
         log.warn("BIRT ReportEngine directory does not exist {}", reportEngineHome.getPath());
         return;
       }
 
-      final EngineConfig config = new EngineConfig();
+      EngineConfig config = new EngineConfig();
       config.setEngineHome(reportEngineHome.getAbsolutePath());
       configureOsgi(config);
       bindLoggingToSlf4J(config);
@@ -133,7 +133,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
       }
     }
 
-    if(task.validateParameters() == false) {
+    if(!task.validateParameters()) {
       // TODO: what do we do with invalid parameters?
     }
 
@@ -141,7 +141,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
     return task;
   }
 
-  private RenderOption getOptions(BirtReportFormat format, String reportOutput) {
+  private IRenderOption getOptions(BirtReportFormat format, String reportOutput) {
     RenderOption options = format.createRenderOption();
     options.setOutputFileName(reportOutput);
     return options;
@@ -165,14 +165,13 @@ public class EmbeddedBirtEngine implements BirtEngine {
     }
   }
 
-  private void configureOsgi(EngineConfig config) throws IOException {
-    final File osgiHome = Files.createTempDir();
+  private void configureOsgi(EngineConfig config) {
+    osgiHome = Files.createTempDir();
 
     Map<String, String> osgiConfig = new HashMap<String, String>();
     osgiConfig.put(OSGI_CONFIGURATION_AREA_PROPERTY_NAME, osgiHome + "/configuration");
     osgiConfig.put(OSGI_INSTANCE_AREA_PROPERTY_NAME, osgiHome + "/workspace");
     config.setOSGiConfig(osgiConfig);
-    this.osgiHome = osgiHome;
   }
 
   /**

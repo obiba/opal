@@ -31,6 +31,7 @@ public class JLineOpalShell extends AbstractOpalShell {
     }
   }
 
+  @Override
   public void printf(String format, Object... args) {
     try {
       consoleReader.printString(String.format(format, args));
@@ -41,14 +42,16 @@ public class JLineOpalShell extends AbstractOpalShell {
     }
   }
 
+  @Override
   public char[] passwordPrompt(String format, Object... args) {
     try {
-      return consoleReader.readLine(String.format(format, args), Character.valueOf((char) 0)).toCharArray();
+      return consoleReader.readLine(String.format(format, args), (char) 0).toCharArray();
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
   }
 
+  @Override
   public String prompt(String format, Object... args) {
     try {
       return consoleReader.readLine(String.format(format, args));

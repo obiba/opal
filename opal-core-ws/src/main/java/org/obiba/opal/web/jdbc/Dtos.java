@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
 final class Dtos {
 
   static final class JdbcDataSourceDtos {
-    static Function<JdbcDataSource, JdbcDataSourceDto> asDto = new Function<JdbcDataSource, JdbcDataSourceDto>() {
+    static final Function<JdbcDataSource, JdbcDataSourceDto> asDto = new Function<JdbcDataSource, JdbcDataSourceDto>() {
 
       @Override
       public JdbcDataSourceDto apply(JdbcDataSource input) {
@@ -35,7 +35,8 @@ final class Dtos {
 
     };
 
-    static Function<JdbcDataSourceDto, JdbcDataSource> fromDto = new Function<JdbcDataSourceDto, JdbcDataSource>() {
+    static final Function<JdbcDataSourceDto, JdbcDataSource> fromDto
+        = new Function<JdbcDataSourceDto, JdbcDataSource>() {
 
       @Override
       public JdbcDataSource apply(JdbcDataSourceDto dto) {
@@ -45,6 +46,7 @@ final class Dtos {
 
     };
 
+    private JdbcDataSourceDtos() {}
   }
 
 }

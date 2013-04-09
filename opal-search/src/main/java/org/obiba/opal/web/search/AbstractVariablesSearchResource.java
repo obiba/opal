@@ -50,7 +50,7 @@ public abstract class AbstractVariablesSearchResource {
 
   abstract protected String getSearchPath();
 
-  protected Search.QueryResultDto convertResonse(JSONObject jsonResponse) throws JSONException {
+  protected Search.QueryResultDto convertResponse(JSONObject jsonResponse) throws JSONException {
     return new EsResultConverter().convert(jsonResponse);
   }
 

@@ -26,9 +26,9 @@ public class OpalRuntimeMockBuilder {
   // Instance Variables
   //
 
-  private OpalRuntime opalRuntimeMock;
+  private final OpalRuntime opalRuntimeMock;
 
-  private OpalConfigurationService opalConfigurationServiceMock;
+  private final OpalConfigurationService opalConfigurationServiceMock;
 
   private IExpectationSetters<?> expectationSetters;
 

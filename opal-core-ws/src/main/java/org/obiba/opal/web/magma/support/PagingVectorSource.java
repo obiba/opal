@@ -13,5 +13,5 @@ import org.obiba.magma.Value;
 
 public interface PagingVectorSource {
 
-  public Iterable<Value> getValues(int offset, int limit);
+  Iterable<Value> getValues(int offset, int limit);
 }

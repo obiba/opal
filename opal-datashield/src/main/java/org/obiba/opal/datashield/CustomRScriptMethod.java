@@ -28,6 +28,7 @@ public class CustomRScriptMethod implements DataShieldMethod {
     this.script = script;
   }
 
+  @Override
   public String getName() {
     return name;
   }

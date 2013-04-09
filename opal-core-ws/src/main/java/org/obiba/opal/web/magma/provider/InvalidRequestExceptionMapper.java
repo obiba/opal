@@ -25,6 +25,7 @@ public class InvalidRequestExceptionMapper implements ExceptionMapper<InvalidReq
   // ExceptionMapper Methods
   //
 
+  @Override
   public Response toResponse(InvalidRequestException exception) {
     ClientErrorDto errorDto = ClientErrorDto.newBuilder() //
         .setCode(Status.BAD_REQUEST.getStatusCode()) //

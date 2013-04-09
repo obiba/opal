@@ -37,6 +37,7 @@ public class VariablesViewResource extends VariablesResource {
     this.viewDtos = viewDtos;
   }
 
+  @Override
   @POST
   public Response addOrUpdateVariables(List<VariableDto> variables) {
     VariableWriter vw = null;
@@ -45,7 +46,7 @@ public class VariablesViewResource extends VariablesResource {
       // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
       // done with the current Magma implementation).
 
-      if(getValueTable().isView() == false) {
+      if(!getValueTable().isView()) {
         vw = addOrUpdateTableVariables(variables);
       } else if(viewManager != null || viewDtos == null) {
         vw = addOrUpdateViewVariables(variables);
@@ -63,7 +64,7 @@ public class VariablesViewResource extends VariablesResource {
     }
   }
 
-  private VariableWriter addOrUpdateViewVariables(List<VariableDto> variables) {
+  private VariableWriter addOrUpdateViewVariables(Iterable<VariableDto> variables) {
     View view = getValueTableAsView();
     VariableWriter vw = view.getListClause().createWriter();
     for(VariableDto variable : variables) {

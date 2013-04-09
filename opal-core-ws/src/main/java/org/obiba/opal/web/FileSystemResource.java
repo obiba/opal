@@ -34,11 +34,10 @@ public class FileSystemResource {
 
   private static final Logger log = LoggerFactory.getLogger(FileSystemResource.class);
 
-  private OpalRuntime opalRuntime;
+  private final OpalRuntime opalRuntime;
 
   @Autowired
   public FileSystemResource(OpalRuntime opalRuntime) {
-    super();
     this.opalRuntime = opalRuntime;
   }
 

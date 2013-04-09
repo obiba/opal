@@ -47,7 +47,7 @@ public class JdbcDataSourceResource {
 
   @DELETE
   public Response delete() {
-    if(jdbcDataSource.isEditable() == false) {
+    if(!jdbcDataSource.isEditable()) {
       return Response.status(Status.BAD_REQUEST).build();
     }
     jdbcDataSourceRegistry.remove(jdbcDataSource);
@@ -56,10 +56,10 @@ public class JdbcDataSourceResource {
 
   @PUT
   public Response update(JdbcDataSourceDto dto) {
-    if(jdbcDataSource.isEditable() == false) {
+    if(!jdbcDataSource.isEditable()) {
       return Response.status(Status.BAD_REQUEST).build();
     }
-    if(dto.getName().equals(jdbcDataSource.getName()) == false) {
+    if(!dto.getName().equals(jdbcDataSource.getName())) {
       return Response.status(Status.BAD_REQUEST).entity(
           ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode()).setStatus("InvalidName").build())
           .build();
@@ -82,7 +82,7 @@ public class JdbcDataSourceResource {
           return con.isValid(1);
         }
       });
-      if(result != null && result == true) {
+      if(result != null && result != null && result) {
         return Response.ok().build();
       }
     } catch(DataAccessException dae) {

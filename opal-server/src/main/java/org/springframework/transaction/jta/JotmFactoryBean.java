@@ -75,7 +75,7 @@ import org.springframework.beans.factory.FactoryBean;
  * @see org.objectweb.jotm.Current
  * @since 21.01.2004
  */
-public class JotmFactoryBean implements FactoryBean, DisposableBean {
+public class JotmFactoryBean implements FactoryBean<Current>, DisposableBean {
 
   private Current jotmCurrent;
 
@@ -83,14 +83,14 @@ public class JotmFactoryBean implements FactoryBean, DisposableBean {
 
   public JotmFactoryBean() throws NamingException {
     // Check for already active JOTM instance.
-    this.jotmCurrent = Current.getCurrent();
+    jotmCurrent = Current.getCurrent();
 
     // If none found, create new local JOTM instance.
-    if(this.jotmCurrent == null) {
+    if(jotmCurrent == null) {
       // Only for use within the current Spring context:
       // local, not bound to registry.
-      this.jotm = new Jotm(true, false);
-      this.jotmCurrent = Current.getCurrent();
+      jotm = new Jotm(true, false);
+      jotmCurrent = Current.getCurrent();
     }
   }
 
@@ -100,11 +100,11 @@ public class JotmFactoryBean implements FactoryBean, DisposableBean {
    * Should only be called for a local JOTM instance, not when accessing an existing (shared) JOTM instance.
    */
   public void setDefaultTimeout(int defaultTimeout) {
-    this.jotmCurrent.setDefaultTimeout(defaultTimeout);
+    jotmCurrent.setDefaultTimeout(defaultTimeout);
     // The following is a JOTM oddity: should be used for demarcation transaction only,
     // but is required here in order to actually get rid of JOTM's default (60 seconds).
     try {
-      this.jotmCurrent.setTransactionTimeout(defaultTimeout);
+      jotmCurrent.setTransactionTimeout(defaultTimeout);
     } catch(SystemException ex) {
       // should never happen
     }
@@ -117,17 +117,20 @@ public class JotmFactoryBean implements FactoryBean, DisposableBean {
    * Application code should never need to access this.
    */
   public Jotm getJotm() {
-    return this.jotm;
+    return jotm;
   }
 
-  public Object getObject() {
-    return this.jotmCurrent;
+  @Override
+  public Current getObject() {
+    return jotmCurrent;
   }
 
-  public Class getObjectType() {
-    return this.jotmCurrent.getClass();
+  @Override
+  public Class<?> getObjectType() {
+    return jotmCurrent.getClass();
   }
 
+  @Override
   public boolean isSingleton() {
     return true;
   }
@@ -135,9 +138,10 @@ public class JotmFactoryBean implements FactoryBean, DisposableBean {
   /**
    * Stop the local JOTM instance, if created by this FactoryBean.
    */
+  @Override
   public void destroy() {
-    if(this.jotm != null) {
-      this.jotm.stop();
+    if(jotm != null) {
+      jotm.stop();
     }
   }
 

@@ -44,6 +44,7 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   @Autowired
   private UnitKeyStoreService keystoreService;
 
+  @Override
   public int execute() {
     FileObject outputDir = getFileSystemRoot();
     if(options.isOutput()) {
@@ -68,7 +69,7 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   }
 
   private boolean validUnit() {
-    if(getFunctionalUnitService().hasFunctionalUnit(options.getUnit()) == false) {
+    if(!getFunctionalUnitService().hasFunctionalUnit(options.getUnit())) {
       getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
       return false;
     }
@@ -79,11 +80,11 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
     for(String path : decryptedFilePaths) {
       try {
         FileObject decryptedFile = getDecryptedFile(path);
-        if(decryptedFile.exists() == false) {
-          getShell().printf("Skipping non-existent input file %s\n", path);
-        } else {
+        if(decryptedFile.exists()) {
           getShell().printf("Decrypting input file %s\n", path);
           encryptFile(decryptedFile, outputDir);
+        } else {
+          getShell().printf("Skipping non-existent input file %s\n", path);
         }
       } catch(IOException ex) {
         getShell().printf("Unexpected decrypt exception: %s, skipping\n", ex.getMessage());

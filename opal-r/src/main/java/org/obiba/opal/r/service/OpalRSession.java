@@ -11,6 +11,7 @@ package org.obiba.opal.r.service;
 
 import java.util.SortedSet;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.obiba.magma.VariableEntity;
@@ -34,7 +35,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
 
   private final String id;
 
-  private final ReentrantLock lock = new ReentrantLock();
+  private final Lock lock = new ReentrantLock();
 
   private RSession rSession;
 
@@ -46,14 +47,13 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
    * @param connection
    */
   OpalRSession(RConnection connection) {
-    super();
     try {
-      this.rSession = connection.detach();
+      rSession = connection.detach();
     } catch(RserveException e) {
       log.error("Error while detaching R session.", e);
       throw new RRuntimeException(e);
     }
-    this.id = UUID.randomUUID().toString();
+    id = UUID.randomUUID().toString();
   }
 
   /**
@@ -70,11 +70,13 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
     return entities != null;
   }
 
+  @Override
   public SortedSet<VariableEntity> getEntities() {
     if(entities == null) throw new IllegalStateException("call setEntities() first");
     return entities;
   }
 
+  @Override
   public void setEntities(SortedSet<VariableEntity> entities) {
     if(this.entities != null) throw new IllegalStateException("cannot invoke setEntities() more than once.");
     this.entities = ImmutableSortedSet.copyOf(entities);
@@ -108,6 +110,7 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
    *
    * @param rops
    */
+  @Override
   public void execute(Iterable<ROperation> rops) {
     RConnection connection = null;
     lock.lock();

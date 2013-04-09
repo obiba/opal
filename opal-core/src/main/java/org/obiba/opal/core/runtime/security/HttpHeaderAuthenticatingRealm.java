@@ -21,8 +21,7 @@ import org.springframework.stereotype.Component;
 public class HttpHeaderAuthenticatingRealm extends AbstractHttpAuthenticatingRealm {
 
   public HttpHeaderAuthenticatingRealm() {
-    super();
-    super.setCredentialsMatcher(new AllowAllCredentialsMatcher());
+    setCredentialsMatcher(new AllowAllCredentialsMatcher());
   }
 
   @Override

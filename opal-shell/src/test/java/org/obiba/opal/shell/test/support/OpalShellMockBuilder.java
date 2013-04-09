@@ -23,7 +23,7 @@ public class OpalShellMockBuilder {
   // Instance Variables
   //
 
-  private OpalShell opalShellMock;
+  private final OpalShell opalShellMock;
 
   private IExpectationSetters<?> expectationSetters;
 

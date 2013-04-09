@@ -27,7 +27,7 @@ public class InvalidRequestException extends RuntimeException {
   // Instance Variables
   //
 
-  private List<String> messageArgs;
+  private final List<String> messageArgs;
 
   //
   // Constructors
@@ -39,9 +39,7 @@ public class InvalidRequestException extends RuntimeException {
     this.messageArgs = new ArrayList<String>();
 
     if(messageArgs != null) {
-      for(String messageArg : messageArgs) {
-        this.messageArgs.add(messageArg);
-      }
+      Collections.addAll(this.messageArgs, messageArgs);
     }
   }
 

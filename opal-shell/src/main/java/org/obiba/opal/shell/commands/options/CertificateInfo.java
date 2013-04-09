@@ -39,7 +39,7 @@ public class CertificateInfo {
   }
 
   private String getConfirmationQuestion() {
-    return new StringBuilder().append("Is ").append(getDnString()).append(" correct?").toString();
+    return "Is " + getDnString() + " correct?";
   }
 
   private String getDnString() {
@@ -52,7 +52,7 @@ public class CertificateInfo {
   }
 
   private String getConfirmationPrompt(String answer) {
-    return new StringBuilder().append("  [").append(answer).append("]:  ").toString();
+    return "  [" + answer + "]:  ";
   }
 
   /**
@@ -69,7 +69,7 @@ public class CertificateInfo {
 
   private void getCertificateInfoAttributes() {
     shell.printf("%s:\n", "Certificate creation");
-    for(CertificateInfo.Attribute attribute : infoList) {
+    for(Attribute attribute : infoList) {
       shell.printf(" %s\n", attribute.getQuestion());
       attribute.setValue(shell.prompt(attribute.getPrompt()));
     }
@@ -84,15 +84,12 @@ public class CertificateInfo {
       helpUser = true;
       ans = "no";
       String answer = shell.prompt(getConfirmationPrompt(ans));
-      if(answer != null && !answer.equals("")) {
+      if(answer != null && !"".equals(answer)) {
         ans = answer;
       }
-    } while(!(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("no") || ans.equalsIgnoreCase("y") ||
-        ans.equalsIgnoreCase("n")));
-    if(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("y")) {
-      return true;
-    }
-    return false;
+    } while(!("yes".equalsIgnoreCase(ans) || "no".equalsIgnoreCase(ans) || "y".equalsIgnoreCase(ans) ||
+        "n".equalsIgnoreCase(ans)));
+    return "yes".equalsIgnoreCase(ans) || "y".equalsIgnoreCase(ans);
   }
 
   public static class Attribute {
@@ -122,13 +119,13 @@ public class CertificateInfo {
     }
 
     public void setValue(String value) {
-      if(value != null && !value.equals("")) {
+      if(value != null && !"".equals(value)) {
         this.value = value;
       }
     }
 
     public String getPrompt() {
-      return new StringBuilder().append("  [").append(value).append("]:  ").toString();
+      return "  [" + value + "]:  ";
     }
 
   }

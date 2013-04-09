@@ -15,7 +15,7 @@ public enum VariableNature {
 
   /**
    * A continuous variable: its value can take any value of it's {@code ValueType}. Some values may have a particular
-   * meaning: they indicate a missing value. These are defined as missing {@code Category} intances.
+   * meaning: they indicate a missing value. These are defined as missing {@code Category} instances.
    */
   CONTINUOUS,
 

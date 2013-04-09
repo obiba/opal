@@ -182,7 +182,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
     return mockOptions;
   }
 
-  private OpalFileSystem createMockFileSystem(FileObject mockFileSystemRoot) throws FileSystemException {
+  private OpalFileSystem createMockFileSystem(FileObject mockFileSystemRoot) {
     OpalFileSystem mockFileSystem = createMock(OpalFileSystem.class);
     expect(mockFileSystem.getRoot()).andReturn(mockFileSystemRoot).atLeastOnce();
 
@@ -190,8 +190,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
   }
 
   private FileObject createMockFileSystemRoot() {
-    FileObject mockFileSystemRoot = createMock(FileObject.class);
-    return mockFileSystemRoot;
+    return createMock(FileObject.class);
   }
 
   private FileObject createMockFile(String baseName, boolean exists, boolean withReplay) throws FileSystemException {

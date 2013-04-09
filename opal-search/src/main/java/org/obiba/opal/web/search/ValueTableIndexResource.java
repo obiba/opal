@@ -68,6 +68,7 @@ public class ValueTableIndexResource extends IndexResource {
     super(indexManager, configService, esProvider, synchroManager);
   }
 
+  @SuppressWarnings("ConstantConditions")
   @GET
   @OPTIONS
   @Path("/")

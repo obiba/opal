@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.security;
 
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -58,7 +59,7 @@ public class SubjectAcl extends AbstractEntity {
     this(domain, node, null, null, null);
   }
 
-  public SubjectAcl(String domain, String node, SubjectAclService.SubjectType type) {
+  public SubjectAcl(String domain, @Nullable String node, SubjectAclService.SubjectType type) {
     this(domain, node, null, type.toString(), null);
   }
 

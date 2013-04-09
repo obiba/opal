@@ -68,7 +68,7 @@ public class OpalConfiguration {
   }
 
   public void addExtension(OpalConfigurationExtension extension) {
-    if(hasExtension(extension.getClass()) == false) {
+    if(!hasExtension(extension.getClass())) {
       extensions.add(extension);
     }
   }

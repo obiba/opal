@@ -17,6 +17,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
@@ -50,7 +51,7 @@ public class RestDatasourceTest {
   @Test
   @Ignore
   public void testValueSetWriter() throws URISyntaxException, IOException {
-    RestDatasource ds = new RestDatasource("rest", "http://127.0.0.1:8080/ws", "test", "administrator", "password");
+    Datasource ds = new RestDatasource("rest", "http://127.0.0.1:8080/ws", "test", "administrator", "password");
 
     // ensure test table exists
     ValueTableWriter vtw = ds.createWriter("RestDatasourceTest", "Participant");

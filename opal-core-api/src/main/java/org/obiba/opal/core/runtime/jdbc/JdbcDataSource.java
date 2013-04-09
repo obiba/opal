@@ -92,7 +92,7 @@ public class JdbcDataSource {
   public Properties readProperties() {
     Properties prop = new Properties();
     try {
-      if(Strings.isNullOrEmpty(getProperties()) == false) {
+      if(!Strings.isNullOrEmpty(getProperties())) {
         prop.load(new ByteArrayInputStream(getProperties().getBytes()));
       }
     } catch(IOException e) {

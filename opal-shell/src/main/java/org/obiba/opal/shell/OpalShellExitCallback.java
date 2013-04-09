@@ -17,6 +17,6 @@ public interface OpalShellExitCallback {
   /**
    * Invoked when the shell is exiting.
    */
-  public void onExit();
+  void onExit();
 
 }

@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 public class WebShellCommandRegistry extends AbstractCommandRegistry {
 
   public WebShellCommandRegistry() {
-    super();
 
     addAvailableCommand(ImportCommand.class, ImportCommandOptions.class);
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);

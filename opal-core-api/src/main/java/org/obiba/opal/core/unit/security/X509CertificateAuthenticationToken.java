@@ -12,7 +12,7 @@ public class X509CertificateAuthenticationToken implements AuthenticationToken {
 
   private final X509Certificate certificate;
 
-  public X509CertificateAuthenticationToken(final X509Certificate certificate) {
+  public X509CertificateAuthenticationToken(X509Certificate certificate) {
     if(certificate == null) throw new IllegalArgumentException("certificate cannot be null");
     this.certificate = certificate;
   }

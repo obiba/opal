@@ -39,7 +39,7 @@ public class X509CertificateAuthenticationFilter extends OncePerRequestFilter {
           SecurityUtils.getSubject().login(token);
           log.info("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
         } catch(AuthenticationException e) {
-          log.error("Unsucessfull authentication", e);
+          log.error("Unsuccessfully authentication", e);
         }
       }
     }

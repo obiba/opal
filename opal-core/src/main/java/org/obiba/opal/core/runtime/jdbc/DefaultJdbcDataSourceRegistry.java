@@ -210,7 +210,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public void update(final JdbcDataSource jdbcDataSource) {
-    if(getJdbcDataSource(jdbcDataSource.getName()).isEditable() == false) return;
+    if(!getJdbcDataSource(jdbcDataSource.getName()).isEditable()) return;
     configSupplier.modify(new ExtensionConfigModificationTask<JdbcDataSourcesConfig>() {
 
       @Override
@@ -226,7 +226,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Override
   public void remove(final JdbcDataSource jdbcDataSource) {
-    if(getJdbcDataSource(jdbcDataSource.getName()).isEditable() == false) return;
+    if(!getJdbcDataSource(jdbcDataSource.getName()).isEditable()) return;
     configSupplier.modify(new ExtensionConfigModificationTask<JdbcDataSourcesConfig>() {
 
       @Override
@@ -250,7 +250,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
   }
 
   private JdbcDataSourcesConfig get() {
-    if(configSupplier.hasExtension() == false) {
+    if(!configSupplier.hasExtension()) {
       configSupplier.addExtension(new JdbcDataSourcesConfig());
     }
     return configSupplier.get();

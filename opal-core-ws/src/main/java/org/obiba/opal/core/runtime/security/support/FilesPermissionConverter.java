@@ -43,11 +43,9 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
       @Override
       Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
-        if(args.length == 0) {
-          return Lists.newArrayList(magmaConvert("/files", "*:GET/*"));
-        } else {
-          return Lists.newArrayList(magmaConvert("/files/{0}", "*:GET/*", args));
-        }
+        return args.length == 0
+            ? Lists.newArrayList(magmaConvert("/files", "*:GET/*"))
+            : Lists.newArrayList(magmaConvert("/files/{0}", "*:GET/*", args));
       }
     },
     /**
@@ -57,13 +55,10 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
       @Override
       Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
-        if(args.length == 0) {
-          return Lists.newArrayList(magmaConvert("/files", "GET:GET/*"), //
-              magmaConvert("/files", "POST:GET/*"));
-        } else {
-          return Lists.newArrayList(magmaConvert("/files/{0}", "GET:GET/*", args),//
-              magmaConvert("/files/{0}", "POST:GET/*", args));
-        }
+        return args.length == 0
+            ? Lists.newArrayList(magmaConvert("/files", "GET:GET/*"), magmaConvert("/files", "POST:GET/*"))
+            : Lists.newArrayList(magmaConvert("/files/{0}", "GET:GET/*", args),
+                magmaConvert("/files/{0}", "POST:GET/*", args));
       }
     },
     /**
@@ -73,11 +68,9 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
       @Override
       Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
-        if(args.length == 0) {
-          return Lists.newArrayList(magmaConvert("/files", "GET:GET/GET"));
-        } else {
-          return Lists.newArrayList(magmaConvert("/files/{0}", "GET:GET/GET", args));
-        }
+        return args.length == 0
+            ? Lists.newArrayList(magmaConvert("/files", "GET:GET/GET"))
+            : Lists.newArrayList(magmaConvert("/files/{0}", "GET:GET/GET", args));
       }
 
     };

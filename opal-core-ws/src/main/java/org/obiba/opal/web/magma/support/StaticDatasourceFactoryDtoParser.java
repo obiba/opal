@@ -46,7 +46,7 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
 
   @Nonnull
   @Override
-  protected DatasourceFactory internalParse(final DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     return new StaticDatasourceFactory(dto);
   }
 
@@ -59,7 +59,6 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     private final DatasourceFactoryDto dto;
 
     private StaticDatasourceFactory(DatasourceFactoryDto dto) {
-      super();
       this.dto = dto;
       if(dto.getName() != null) {
         setName(dto.getName());

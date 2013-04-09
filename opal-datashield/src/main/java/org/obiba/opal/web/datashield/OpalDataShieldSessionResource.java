@@ -51,7 +51,7 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
       ROperationWithResult operation;
       switch(configurationSupplier.get().getLevel()) {
         case RESTRICTED:
-          operation = new RestrictedRScriptROperation(body, this.configurationSupplier.get().getAggregateEnvironment(),
+          operation = new RestrictedRScriptROperation(body, configurationSupplier.get().getAggregateEnvironment(),
               DataShieldScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()));
           break;
         case UNRESTRICTED:
@@ -71,7 +71,7 @@ public class OpalDataShieldSessionResource extends OpalRSessionResource {
 
   @Override
   protected RSymbolResource onGetRSymbolResource(String name) {
-    return new DataShieldSymbolResource(this.configurationSupplier, getOpalRSession(), name);
+    return new DataShieldSymbolResource(configurationSupplier, getOpalRSession(), name);
   }
 
   @Override

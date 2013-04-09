@@ -31,7 +31,6 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
   @SuppressWarnings("null")
   public AbstractRestrictedRScriptROperation(String script, DataShieldEnvironment environment,
       DataShieldScriptValidator validator) throws ParseException, InvalidScriptException {
-    super();
     Preconditions.checkArgument(script != null, "script cannot be null");
     Preconditions.checkArgument(environment != null, "environment cannot be null");
     Preconditions.checkArgument(validator != null, "validator cannot be null");
@@ -39,11 +38,11 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
     this.environment = environment;
 
     DataShieldLog.userLog("parsing '{}'", script);
-    this.scriptAst = new DataShieldGrammar(new StringReader(script)).root();
+    scriptAst = new DataShieldGrammar(new StringReader(script)).root();
     try {
-      validator.validate(this.scriptAst);
+      validator.validate(scriptAst);
     } catch(InvalidScriptException e) {
-      DataShieldLog.userLog("Script failed valiation: " + e.getMessage());
+      DataShieldLog.userLog("Script failed validation: " + e.getMessage());
       throw e;
     }
   }

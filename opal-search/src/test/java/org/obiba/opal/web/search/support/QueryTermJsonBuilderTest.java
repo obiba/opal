@@ -10,8 +10,12 @@
 package org.obiba.opal.web.search.support;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryTermJsonBuilderTest {
+
+  private static final Logger log = LoggerFactory.getLogger(QueryTermJsonBuilderTest.class);
 
   @Test
   public void testBuild_QueryTerm() throws Exception {
@@ -48,7 +52,7 @@ public class QueryTermJsonBuilderTest {
     QueryTermJsonBuilder queryBuilder = new QueryTermJsonBuilder().setTermFieldName("_id").setTermFieldValue("6436175")
         .setTermFilters(filtersBuilder.build());
 
-    System.out.println(">>>>> " + queryBuilder.build().toString());
+    log.info(">>>>> {}", queryBuilder.build().toString());
 
   }
 

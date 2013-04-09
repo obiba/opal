@@ -26,7 +26,7 @@ public class TransactionalThreadFactory implements ThreadFactory {
   @Autowired
   public TransactionalThreadFactory(PlatformTransactionManager txManager) {
     if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
-    this.txTemplate = new TransactionTemplate(txManager);
+    txTemplate = new TransactionTemplate(txManager);
   }
 
   @Override
@@ -38,10 +38,11 @@ public class TransactionalThreadFactory implements ThreadFactory {
 
     private final Runnable runnable;
 
-    public TransactionalThread(Runnable runnable) {
+    private TransactionalThread(Runnable runnable) {
       this.runnable = runnable;
     }
 
+    @Override
     public void run() {
       txTemplate.execute(new TransactionCallbackWithoutResult() {
         @Override

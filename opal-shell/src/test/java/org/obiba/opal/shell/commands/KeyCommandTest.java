@@ -54,7 +54,7 @@ public class KeyCommandTest {
 
   @Test
   public void testCreateActionCreatesOrUpdatesKey() {
-    KeyCommandOptions mockOptions = createMockOptionsForCreateAction("my-unit", "my-alias", "RSA", 2048);
+    KeyCommandOptions mockOptions = createMockOptionsForCreateAction("my-unit", "my-alias");
 
     OpalRuntime mockRuntime = createMockRuntime();
     FunctionalUnitService mockUnitService = createMockUnitService("my-unit");
@@ -63,8 +63,7 @@ public class KeyCommandTest {
 
     UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
     expect(mockUnitKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
-    mockUnitKeyStoreService
-        .createOrUpdateKey("my-unit", "my-alias", "RSA", 2048, getCertificateInfoAsString(CERTIFICATE_INFO));
+    mockUnitKeyStoreService.createOrUpdateKey("my-unit", "my-alias", "RSA", 2048, getCertificateInfoAsString());
     expectLastCall().atLeastOnce();
 
     replay(mockOptions, mockRuntime, mockShell, mockUnitService, mockUnitKeyStoreService);
@@ -199,8 +198,7 @@ public class KeyCommandTest {
     };
   }
 
-  private KeyCommandOptions createMockOptionsForCreateAction(String unitName, String alias, String algorithm,
-      int size) {
+  private KeyCommandOptions createMockOptionsForCreateAction(String unitName, String alias) {
     KeyCommandOptions mockOptions = createMock(KeyCommandOptions.class);
     expect(mockOptions.isUnit()).andReturn(true).atLeastOnce();
     expect(mockOptions.getUnit()).andReturn(unitName).atLeastOnce();
@@ -216,9 +214,8 @@ public class KeyCommandTest {
   }
 
   private OpalRuntime createMockRuntime() {
-    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
 
-    return mockRuntime;
+    return createMock(OpalRuntime.class);
   }
 
   private FunctionalUnitService createMockUnitService(String unitName) {
@@ -255,7 +252,7 @@ public class KeyCommandTest {
     return mockShell;
   }
 
-  private String getCertificateInfoAsString(String[] certificateInfo) {
+  private String getCertificateInfoAsString() {
     StringBuilder sb = new StringBuilder();
     sb.append("CN=");
     sb.append(CERTIFICATE_INFO[0]);
@@ -269,7 +266,6 @@ public class KeyCommandTest {
     sb.append(CERTIFICATE_INFO[4]);
     sb.append(", C=");
     sb.append(CERTIFICATE_INFO[5]);
-
     return sb.toString();
   }
 
@@ -335,7 +331,7 @@ public class KeyCommandTest {
     return mockShell;
   }
 
-  private OpalFileSystem createMockFileSystem(FileObject mockFileSystemRoot) throws FileSystemException {
+  private OpalFileSystem createMockFileSystem(FileObject mockFileSystemRoot) {
     OpalFileSystem mockFileSystem = createMock(OpalFileSystem.class);
     expect(mockFileSystem.getRoot()).andReturn(mockFileSystemRoot).atLeastOnce();
 

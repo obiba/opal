@@ -34,9 +34,9 @@ import com.google.common.base.Strings;
  */
 public class OpalRSessionResource extends AbstractOpalRSessionResource {
 
-  private OpalRSessionManager opalRSessionManager;
+  private final OpalRSessionManager opalRSessionManager;
 
-  private OpalRSession rSession;
+  private final OpalRSession rSession;
 
   public OpalRSessionResource(OpalRSessionManager opalRSessionManager, OpalRSession rSession) {
     this.opalRSessionManager = opalRSessionManager;

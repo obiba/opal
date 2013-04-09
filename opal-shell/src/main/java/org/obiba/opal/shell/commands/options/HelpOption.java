@@ -17,5 +17,5 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 public interface HelpOption {
 
   @Option(helpRequest = true, shortName = "h", description = "Display this help.")
-  public boolean isHelp();
+  boolean isHelp();
 }

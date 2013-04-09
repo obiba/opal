@@ -69,9 +69,9 @@ public abstract class AbstractCommandRegistry implements CommandRegistry {
   protected <T> void addAvailableCommand(Class<? extends Command<T>> commandClass, Class<T> optionsClass) {
     if(commandClass == null) throw new IllegalArgumentException("commandClass cannot be null");
     if(optionsClass == null) throw new IllegalArgumentException("optionClass cannot be null");
-    if(commandClass.isAnnotationPresent(CommandUsage.class) == false) throw new IllegalArgumentException(
+    if(!commandClass.isAnnotationPresent(CommandUsage.class)) throw new IllegalArgumentException(
         "command class " + commandClass.getName() + " must be annotated with @CommandUsage");
-    if(optionsClass.isAnnotationPresent(CommandLineInterface.class) == false) throw new IllegalArgumentException(
+    if(!optionsClass.isAnnotationPresent(CommandLineInterface.class)) throw new IllegalArgumentException(
         "options class " + optionsClass.getName() + " must be annotated with @CommandLineInterface");
 
     CommandLineInterface annotation = optionsClass.getAnnotation(CommandLineInterface.class);
@@ -88,7 +88,7 @@ public abstract class AbstractCommandRegistry implements CommandRegistry {
   @Override
   public Class<?> getOptionsClass(String commandName) {
     if(commandName == null) throw new IllegalArgumentException("commandName cannot be null");
-    if(hasCommand(commandName) == false) throw new IllegalArgumentException("no such command " + commandName);
+    if(!hasCommand(commandName)) throw new IllegalArgumentException("no such command " + commandName);
     return optionsMap.get(commandName);
   }
 

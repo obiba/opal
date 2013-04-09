@@ -18,7 +18,7 @@ abstract class AbstractSecurityComponent {
 
   private final SessionsSecurityManager securityManager;
 
-  public AbstractSecurityComponent(SessionsSecurityManager securityManager) {
+  AbstractSecurityComponent(SessionsSecurityManager securityManager) {
     if(securityManager == null) throw new IllegalArgumentException("securityManager cannot be null");
     this.securityManager = securityManager;
   }

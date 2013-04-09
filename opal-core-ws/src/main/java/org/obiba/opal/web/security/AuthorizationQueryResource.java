@@ -46,7 +46,7 @@ public class AuthorizationQueryResource {
   @GET
   public Iterable<Acls> get(@QueryParam("domain") String domain, @QueryParam("type") SubjectAclService.SubjectType type,
       @QueryParam("node") List<String> nodes) {
-    if(nodes == null || nodes.size() == 0) return getSubjects(domain, type);
+    if(nodes == null || nodes.isEmpty()) return getSubjects(domain, type);
 
     return getAclsGroupedBySubject(domain, type, nodes);
   }
@@ -61,7 +61,7 @@ public class AuthorizationQueryResource {
   }
 
   private Iterable<Acls> getAclsGroupedBySubject(String domain, SubjectAclService.SubjectType type,
-      List<String> nodes) {
+      Iterable<String> nodes) {
     Map<Opal.Subject, Acls.Builder> aclMap = new HashMap<Opal.Subject, Acls.Builder>();
 
     for(String node : nodes) {

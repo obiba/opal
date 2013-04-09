@@ -93,7 +93,7 @@ public class WebShellResourceTest {
   public void testGetCommand_ReturnsNotFoundResponseIfJobDoesNotExist() {
     // Setup
     Integer bogusJobId = 1;
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     expect(mockCommandJobService.getCommand(bogusJobId)).andReturn(null).atLeastOnce();
 
     WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
@@ -140,7 +140,7 @@ public class WebShellResourceTest {
   public void testGetCommandStatus_ReturnsNotFoundResponseIfJobDoesNotExist() {
     // Setup
     Integer bogusJobId = 1;
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     expect(mockCommandJobService.getCommand(bogusJobId)).andReturn(null).atLeastOnce();
 
     WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
@@ -183,7 +183,7 @@ public class WebShellResourceTest {
   public void testSetCommandStatus_ReturnsNotFoundResponseIfJobDoesNotExist() {
     // Setup
     Integer bogusJobId = 1;
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     mockCommandJobService.cancelCommand(bogusJobId);
     expectLastCall().andThrow(new NoSuchCommandJobException(bogusJobId));
 
@@ -205,7 +205,7 @@ public class WebShellResourceTest {
   public void testSetCommandStatus_ReturnsBadRequestResponseIfJobIsNotCancellable() {
     // Setup
     Integer bogusJobId = 1;
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     mockCommandJobService.cancelCommand(bogusJobId);
     expectLastCall().andThrow(new IllegalStateException());
 
@@ -262,7 +262,7 @@ public class WebShellResourceTest {
   public void testDeleteCommand_ReturnsNotFoundResponseIfJobDoesNotExist() {
     // Setup
     Integer bogusJobId = 1;
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     mockCommandJobService.deleteCommand(bogusJobId);
     expectLastCall().andThrow(new NoSuchCommandJobException(bogusJobId));
 
@@ -284,7 +284,7 @@ public class WebShellResourceTest {
   public void testDeleteCommand_ReturnsBadRequestResponseIfJobIsNotDeletable() {
     // Setup
     Integer jobId = 1;
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     mockCommandJobService.deleteCommand(jobId);
     expectLastCall().andThrow(new IllegalStateException());
 
@@ -305,7 +305,7 @@ public class WebShellResourceTest {
   @Test
   public void testDeleteCompletedCommands() {
     // Setup
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     mockCommandJobService.deleteCompletedCommands();
     expectLastCall().once();
 
@@ -332,7 +332,7 @@ public class WebShellResourceTest {
     expect(mockCommandRegistry.<ImportCommandOptions>newCommand(importCommand.getName())).andReturn(importCommand)
         .atLeastOnce();
 
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, importCommand, null))))
         .andReturn(jobId).atLeastOnce();
 
@@ -371,7 +371,7 @@ public class WebShellResourceTest {
     expect(mockCommandRegistry.<CopyCommandOptions>newCommand(copyCommand.getName())).andReturn(copyCommand)
         .atLeastOnce();
 
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, copyCommand, null))))
         .andReturn(jobId).atLeastOnce();
 
@@ -407,7 +407,7 @@ public class WebShellResourceTest {
     expect(mockCommandRegistry.<ReportCommandOptions>newCommand(reportCommand.getName())).andReturn(reportCommand)
         .atLeastOnce();
 
-    CommandJobService mockCommandJobService = createMockCommandJobService(createEmptyCommandJobList());
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, reportCommand, null))))
         .andReturn(jobId).atLeastOnce();
 
@@ -438,7 +438,7 @@ public class WebShellResourceTest {
 
   private void testGetCommands(List<CommandJob> commandJobList) {
     // Setup
-    CommandJobService mockCommandJobService = createMockCommandJobService(commandJobList);
+    CommandJobService mockCommandJobService = createMockCommandJobService();
     expect(mockCommandJobService.getHistory()).andReturn(commandJobList).atLeastOnce();
 
     WebShellResource sut = new WebShellResource(null, mockCommandJobService, null);
@@ -471,14 +471,12 @@ public class WebShellResourceTest {
     }
   }
 
-  private CommandJobService createMockCommandJobService(List<CommandJob> history) {
-    CommandJobService mockCommandJobService = createMock(CommandJobService.class);
-    return mockCommandJobService;
+  private CommandJobService createMockCommandJobService() {
+    return createMock(CommandJobService.class);
   }
 
   private CommandRegistry createMockCommandRegistry() {
-    CommandRegistry mockCommandRegistry = createMock(CommandRegistry.class);
-    return mockCommandRegistry;
+    return createMock(CommandRegistry.class);
   }
 
   private List<CommandJob> createNonEmptyCommandJobList() {
@@ -563,7 +561,8 @@ public class WebShellResourceTest {
   }
 
   private ImportCommand createImportCommand() {
-    ImportCommand command = new ImportCommand() {
+
+    return new ImportCommand() {
       @Override
       public String getName() {
         return "import";
@@ -579,12 +578,11 @@ public class WebShellResourceTest {
         return 0;
       }
     };
-
-    return command;
   }
 
   private ReportCommand createReportCommand() {
-    ReportCommand command = new ReportCommand() {
+
+    return new ReportCommand() {
       @Override
       public String getName() {
         return "report";
@@ -600,12 +598,11 @@ public class WebShellResourceTest {
         return 0;
       }
     };
-
-    return command;
   }
 
   private CopyCommand createCopyCommand() {
-    CopyCommand command = new CopyCommand() {
+
+    return new CopyCommand() {
       @Override
       public String getName() {
         return "copy";
@@ -622,8 +619,6 @@ public class WebShellResourceTest {
       }
 
     };
-
-    return command;
   }
 
   private Date createTimestamp(int year, int month, int date, int hour, int minute) {
@@ -639,9 +634,9 @@ public class WebShellResourceTest {
     if(entity != null) {
       if(entity instanceof CommandStateDto) {
         CommandStateDto dto = (CommandStateDto) entity;
-        return (dto.getId() == job.getId() && dto.getCommand().equals(job.getCommand().getName()) &&
+        return dto.getId() == job.getId() && dto.getCommand().equals(job.getCommand().getName()) &&
             dto.getCommandArgs().equals(job.getCommand().toString()) && dto.getOwner().equals(job.getOwner()) &&
-            dto.getStatus().equals(job.getStatus().toString()));
+            dto.getStatus().equals(job.getStatus().toString());
       } else {
         return false;
       }
@@ -656,22 +651,24 @@ public class WebShellResourceTest {
 
   static class CommandJobMatcher implements IArgumentMatcher {
 
-    private CommandJob expected;
+    private final CommandJob expected;
 
-    public CommandJobMatcher(CommandJob expected) {
+    CommandJobMatcher(CommandJob expected) {
       this.expected = expected;
     }
 
+    @Override
     public boolean matches(Object actual) {
       if(actual instanceof CommandJob) {
         CommandJob actualJob = (CommandJob) actual;
-        return (actualJob.getCommand().getName().equals(expected.getCommand().getName()) &&
-            actualJob.getCommand().toString().equals(expected.getCommand().toString()));
+        return actualJob.getCommand().getName().equals(expected.getCommand().getName()) &&
+            actualJob.getCommand().toString().equals(expected.getCommand().toString());
       } else {
         return false;
       }
     }
 
+    @Override
     public void appendTo(StringBuffer buffer) {
       buffer.append("eqCommandJob(");
       buffer.append(expected.getClass().getName());

@@ -104,7 +104,7 @@ public class ServiceResource {
   @Path("/cfg")
   public Response saveConfig(Opal.ServiceCfgDto serviceDto) {
 
-    Service service = opalRuntime.getService(name);
+    opalRuntime.getService(name);
     configHandler.put(serviceDto, name);
 
     return Response.ok().build();

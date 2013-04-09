@@ -15,6 +15,6 @@ import org.jboss.resteasy.spi.HttpRequest;
 
 public interface RequestCyclePostProcess {
 
-  public void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response);
+  void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response);
 
 }

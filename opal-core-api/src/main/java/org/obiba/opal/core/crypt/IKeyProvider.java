@@ -28,7 +28,7 @@ public interface IKeyProvider {
    * @throws KeyProviderInitializationException if for any reason the <code>IKeyProvider</code> could not be
    * initialized
    */
-  public void init(Map<String, String> keyProviderArgs) throws KeyProviderInitializationException;
+  void init(Map<String, String> keyProviderArgs) throws KeyProviderInitializationException;
 
   /**
    * Returns the key pair with the specified alias.
@@ -38,7 +38,7 @@ public interface IKeyProvider {
    * @param KeyProviderSecurityException if access to the <code>KeyPair</code> was forbidden
    * @return the <code>KeyPair</code> (<code>null</code> if not found)
    */
-  public KeyPair getKeyPair(String alias) throws KeyPairNotFoundException, KeyProviderSecurityException;
+  KeyPair getKeyPair(String alias) throws KeyPairNotFoundException, KeyProviderSecurityException;
 
   /**
    * Returns the <code>KeyPair</code> for the specified public key.
@@ -48,5 +48,5 @@ public interface IKeyProvider {
    * @param KeyProviderSecurityException if access to the <code>KeyPair</code> was forbidden
    * @return the corresponding <code>KeyPair</code> (<code>null</code> if not found)
    */
-  public KeyPair getKeyPair(PublicKey publicKey) throws KeyPairNotFoundException, KeyProviderSecurityException;
+  KeyPair getKeyPair(PublicKey publicKey) throws KeyPairNotFoundException, KeyProviderSecurityException;
 }

@@ -28,6 +28,7 @@ public class RFunctionDataShieldMethod implements DataShieldMethod {
     this.function = function;
   }
 
+  @Override
   public String getName() {
     return name;
   }

@@ -58,7 +58,7 @@ public class WebShellResource extends AbstractCommandsResource {
   // Instance Variables
   //
 
-  private CommandRegistry commandRegistry;
+  private final CommandRegistry commandRegistry;
 
   //
   // Constructors
@@ -93,11 +93,9 @@ public class WebShellResource extends AbstractCommandsResource {
   public Response getCommand(@PathParam("id") Integer id) {
     CommandJob commandJob = commandJobService.getCommand(id);
 
-    if(commandJob != null) {
-      return Response.ok(toCommandStateDto(commandJob)).build();
-    } else {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+    return commandJob == null
+        ? Response.status(Status.NOT_FOUND).build()
+        : Response.ok(toCommandStateDto(commandJob)).build();
   }
 
   @DELETE
@@ -125,11 +123,9 @@ public class WebShellResource extends AbstractCommandsResource {
   public Response getCommandStatus(@PathParam("id") Integer id) {
     CommandJob commandJob = commandJobService.getCommand(id);
 
-    if(commandJob != null) {
-      return Response.ok(toCommandStateDto(commandJob).getStatus().toString()).build();
-    } else {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+    return commandJob == null
+        ? Response.status(Status.NOT_FOUND).build()
+        : Response.ok(toCommandStateDto(commandJob).getStatus()).build();
   }
 
   @PUT
@@ -164,7 +160,7 @@ public class WebShellResource extends AbstractCommandsResource {
 
   @POST
   @Path("/copy")
-  public Response copyData(final Commands.CopyCommandOptionsDto options) {
+  public Response copyData(Commands.CopyCommandOptionsDto options) {
     CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(opalRuntime, options);
     Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand("copy");
     copyCommand.setOptions(copyOptions);

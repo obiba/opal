@@ -46,10 +46,10 @@ public class ProtobufJsonReaderProvider extends AbstractProtobufProvider impleme
       throws IOException, WebApplicationException {
     Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
 
-    final ExtensionRegistry extensionRegistry = protobuf().extensions().forMessage(messageType);
-    final Builder builder = protobuf().builders().forMessage(messageType);
+    ExtensionRegistry extensionRegistry = protobuf().extensions().forMessage(messageType);
+    Builder builder = protobuf().builders().forMessage(messageType);
 
-    InputStreamReader input = new InputStreamReader(entityStream, "UTF-8");
+    Readable input = new InputStreamReader(entityStream, "UTF-8");
     if(isWrapped(type, genericType, annotations, mediaType)) {
       // JsonFormat does not provide a mergeCollection method
       return JsonIoUtil.mergeCollection(input, extensionRegistry, builder);

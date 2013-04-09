@@ -16,11 +16,11 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 public interface ShowCommandOptions extends HelpOption {
 
   @Option(shortName = "d", description = "List the datasources.")
-  public boolean getDatasources();
+  boolean getDatasources();
 
   @Option(shortName = "t", description = "List the tables.")
-  public boolean getTables();
+  boolean getTables();
 
   @Option(shortName = "u", description = "List the functional units.")
-  public boolean getUnits();
+  boolean getUnits();
 }

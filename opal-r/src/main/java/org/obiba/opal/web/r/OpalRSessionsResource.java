@@ -40,7 +40,7 @@ public class OpalRSessionsResource {
 
   @GET
   public List<OpalR.RSessionDto> getRSessionIds() {
-    final List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
+    List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
     for(OpalRSession rSession : opalRSessionManager.getSubjectRSessions()) {
       rSessions.add(Dtos.asDto(rSession));
     }

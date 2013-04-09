@@ -66,7 +66,7 @@ public class BasicBirtReportServiceImpl implements ReportService {
 
   private String getBirtCommandLine(String format, Map<String, String> parameters, String reportDesign,
       String reportOutput) {
-    StringBuffer cmd = new StringBuffer(birtExec);
+    StringBuilder cmd = new StringBuilder(birtExec);
 
     if(format != null) {
       cmd.append(" -f ").append(format);
@@ -102,7 +102,7 @@ public class BasicBirtReportServiceImpl implements ReportService {
       birtExec += ".sh";
     }
 
-    log.info("birtExec=" + birtExec);
+    log.info("birtExec={}", birtExec);
     running = true;
   }
 
@@ -123,12 +123,13 @@ public class BasicBirtReportServiceImpl implements ReportService {
 
   static class OutputPurger extends Thread {
 
-    InputStream inputStream;
+    final InputStream inputStream;
 
     OutputPurger(InputStream pInputStream) {
       inputStream = pInputStream;
     }
 
+    @Override
     public void run() {
       try {
         InputStreamReader isReader = new InputStreamReader(inputStream);
@@ -141,7 +142,7 @@ public class BasicBirtReportServiceImpl implements ReportService {
           }
         }
 
-      } catch(IOException ex) {
+      } catch(IOException ignored) {
       }
     }
   }

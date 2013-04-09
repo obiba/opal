@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 public class CookieAuthenticatingRealm extends AbstractHttpAuthenticatingRealm {
 
   public CookieAuthenticatingRealm() {
-    super();
   }
 
   @Override

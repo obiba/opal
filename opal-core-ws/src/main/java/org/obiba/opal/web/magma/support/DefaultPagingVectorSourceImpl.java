@@ -22,15 +22,16 @@ import org.obiba.magma.VectorSource;
 
 public class DefaultPagingVectorSourceImpl implements PagingVectorSource {
 
-  private ValueTable vt;
+  private final ValueTable vt;
 
-  private VariableValueSource vvs;
+  private final VariableValueSource vvs;
 
   public DefaultPagingVectorSourceImpl(ValueTable vt, VariableValueSource vvs) {
     this.vt = vt;
     this.vvs = vvs;
   }
 
+  @Override
   public Iterable<Value> getValues(int offset, int limit) {
     VectorSource vectorSource = vvs.asVectorSource();
     if(vectorSource == null) {
@@ -42,7 +43,7 @@ public class DefaultPagingVectorSourceImpl implements PagingVectorSource {
     // expects a SortedSet of entities).
     TreeSet<VariableEntity> sortedEntities = new TreeSet<VariableEntity>(vt.getVariableEntities());
     int end = Math.min(offset + limit, sortedEntities.size());
-    List<VariableEntity> entitySubList = (new ArrayList<VariableEntity>(sortedEntities)).subList(offset, end);
+    List<VariableEntity> entitySubList = new ArrayList<VariableEntity>(sortedEntities).subList(offset, end);
 
     return vectorSource.getValues(new TreeSet<VariableEntity>(entitySubList));
   }

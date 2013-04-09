@@ -28,12 +28,13 @@ public abstract class AbstractOpalShell implements OpalShell {
   private boolean quit = false;
 
   public AbstractOpalShell(CommandRegistry registry) {
-    this.commandRegistry = registry;
+    commandRegistry = registry;
   }
 
+  @Override
   public void run() {
     printf("Welcome to opal.\nType help to get a list of available commands.\n");
-    while(quit == false) {
+    while(!quit) {
       String cmdline = prompt("%s@opal> ", SecurityUtils.getSubject().getPrincipal());
       if(cmdline == null) {
         break;
@@ -53,6 +54,7 @@ public abstract class AbstractOpalShell implements OpalShell {
 
   }
 
+  @Override
   public void exit() {
     quit = true;
     for(OpalShellExitCallback callback : exitCallbacks) {
@@ -60,32 +62,37 @@ public abstract class AbstractOpalShell implements OpalShell {
     }
   }
 
+  @Override
   public void addExitCallback(OpalShellExitCallback callback) {
     exitCallbacks.add(callback);
   }
 
+  @Override
   public void printUsage() {
 
     int maxSize = Integer.MIN_VALUE;
-    for(String command : this.commandRegistry.getAvailableCommands()) {
+    for(String command : commandRegistry.getAvailableCommands()) {
       maxSize = Math.max(maxSize, command.length() + 2);
     }
     printf("Usage:\n  <command> <options> <arguments>\n\nCommands:\n");
     // Create a TreeSet so that the output is sorted on command name
-    for(String command : Sets.newTreeSet(this.commandRegistry.getAvailableCommands())) {
+    for(String command : Sets.newTreeSet(commandRegistry.getAvailableCommands())) {
       // %-<maxSize>s: constantly print <maxSize> characters, left-justified
-      printf("  %-" + maxSize + "s%s\n", command, this.commandRegistry.getCommandUsage(command).description());
+      printf("  %-" + maxSize + "s%s\n", command, commandRegistry.getCommandUsage(command).description());
     }
     printf("\nFor help on a specific command, type:\n<command> --help\n");
   }
 
+  @Override
   public abstract void printf(String format, Object... args);
 
+  @Override
   public abstract char[] passwordPrompt(String format, Object... args);
 
+  @Override
   public abstract String prompt(String format, Object... args);
 
-  private void executeCommand(String commandName, String[] args) {
+  private void executeCommand(String commandName, String... args) {
     String[] commandArgs = Arrays.copyOfRange(args, 1, args.length); // omit args[0], the command name
     try {
       // Create the options object.
@@ -121,7 +128,7 @@ public abstract class AbstractOpalShell implements OpalShell {
       }
       printf("%s\n", error);
     }
-    if(helpRequested == false) {
+    if(!helpRequested) {
       printf("Type '%s --help' for command usage.\n", commandName);
     }
   }

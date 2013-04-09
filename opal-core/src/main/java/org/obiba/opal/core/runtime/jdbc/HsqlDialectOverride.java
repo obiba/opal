@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.hibernate.cfg.Environment;
+import org.hibernate.dialect.HSQLDialect;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 
 public class HsqlDialectOverride extends PropertiesFactoryBean {
@@ -21,7 +22,7 @@ public class HsqlDialectOverride extends PropertiesFactoryBean {
   protected Properties createProperties() throws IOException {
     Properties props = super.createProperties();
     String dialect = props.getProperty(Environment.DIALECT);
-    if(dialect != null && dialect.equals(org.hibernate.dialect.HSQLDialect.class.getName())) {
+    if(dialect != null && dialect.equals(HSQLDialect.class.getName())) {
       props.setProperty(Environment.DIALECT, MagmaHSQLDialect.class.getName());
     }
     return props;

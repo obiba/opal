@@ -70,17 +70,15 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   ReportTemplateResource(String name, OpalConfigurationService configService,
       CommandSchedulerService commandSchedulerService) {
-    super();
     this.name = name;
     this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
-    this.opalRuntime = null;
+    opalRuntime = null;
   }
 
   @Autowired
   public ReportTemplateResource(ReportService reportService, OpalConfigurationService configService,
       CommandSchedulerService commandSchedulerService, OpalRuntime opalRuntime) {
-    super();
     this.configService = configService;
     this.commandSchedulerService = commandSchedulerService;
     this.opalRuntime = opalRuntime;
@@ -89,18 +87,16 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @GET
   public Response getReportTemplate() {
     ReportTemplate reportTemplate = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
-    if(reportTemplate == null || authzReadReportTemplate(name) == false) {
-      return Response.status(Status.NOT_FOUND).build();
-    } else {
-      return Response.ok(Dtos.asDto(reportTemplate)).build();
-    }
+    return reportTemplate == null || !authzReadReportTemplate(name)
+        ? Response.status(Status.NOT_FOUND).build()
+        : Response.ok(Dtos.asDto(reportTemplate)).build();
   }
 
   @DELETE
   public Response deleteReportTemplate() {
     ReportTemplate reportTemplateToRemove = getOpalConfigurationService().getOpalConfiguration()
         .getReportTemplate(name);
-    if(reportTemplateToRemove == null || authzReadReportTemplate(name) == false) {
+    if(reportTemplateToRemove == null || !authzReadReportTemplate(name)) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
       getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {
@@ -117,7 +113,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   @PUT
   public Response updateReportTemplate(@Context UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
-    if(reportTemplateExists() == false) return Response.status(Status.NOT_FOUND).build();
+    if(!reportTemplateExists()) return Response.status(Status.NOT_FOUND).build();
 
     try {
       Assert.isTrue(reportTemplateDto.getName().equals(name),
@@ -155,7 +151,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @Path("/reports/latest")
   public Response getReport() throws FileSystemException {
     FileObject reportFolder = getReportFolder();
-    if(reportFolder.exists() == false) {
+    if(!reportFolder.exists()) {
       return Response.status(Status.NOT_FOUND).build();
     }
 
@@ -171,11 +167,9 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
       }
     }
 
-    if(lastReportFile == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    } else {
-      return Response.ok(getReportDto(lastReportFile)).build();
-    }
+    return lastReportFile == null
+        ? Response.status(Status.NOT_FOUND).build()
+        : Response.ok(getReportDto(lastReportFile)).build();
   }
 
   private ReportDto getReportDto(FileObject reportFile) throws FileSystemException {

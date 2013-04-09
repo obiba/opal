@@ -20,11 +20,9 @@ public class NoSuchRSessionException extends RuntimeException {
   private String rSessionId;
 
   public NoSuchRSessionException() {
-    super();
   }
 
   public NoSuchRSessionException(String rSessionId) {
-    super();
     this.rSessionId = rSessionId;
   }
 
@@ -34,9 +32,7 @@ public class NoSuchRSessionException extends RuntimeException {
 
   @Override
   public String getMessage() {
-    if(rSessionId != null) {
-      return "No such R session with identifier: " + rSessionId;
-    } else return "No current R session";
+    return rSessionId == null ? "No current R session" : "No such R session with identifier: " + rSessionId;
   }
 
 }

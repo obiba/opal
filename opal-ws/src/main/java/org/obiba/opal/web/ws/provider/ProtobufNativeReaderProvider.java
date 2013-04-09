@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -53,10 +54,10 @@ public class ProtobufNativeReaderProvider extends AbstractProtobufProvider imple
       MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
       throws IOException, WebApplicationException {
     Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
-    final ExtensionRegistry extensionRegistry = protobuf().extensions().forMessage(messageType);
-    final Builder builder = protobuf().builders().forMessage(messageType);
+    ExtensionRegistry extensionRegistry = protobuf().extensions().forMessage(messageType);
+    Builder builder = protobuf().builders().forMessage(messageType);
     if(isWrapped(type, genericType, annotations, mediaType)) {
-      ArrayList<Message> msgs = new ArrayList<Message>();
+      Collection<Message> msgs = new ArrayList<Message>();
       Builder b = builder.clone();
       while(b.mergeDelimitedFrom(entityStream, extensionRegistry)) {
         msgs.add(b.build());

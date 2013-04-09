@@ -26,7 +26,7 @@ public class REvaluationRuntimeException extends RuntimeException {
 
   private static final Logger log = LoggerFactory.getLogger(REvaluationRuntimeException.class);
 
-  private REXP result;
+  private final REXP result;
 
   public REvaluationRuntimeException(String msg, REXP result) {
     super(msg);

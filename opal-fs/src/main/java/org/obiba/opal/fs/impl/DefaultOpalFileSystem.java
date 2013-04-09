@@ -8,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
@@ -190,6 +191,7 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     }
   }
 
+  @Nullable
   private FileObject searchFolder(FileObject folder, String obfuscatedPath) throws FileSystemException {
     FileObject matchingFile = null;
     for(FileObject file : folder.getChildren()) {

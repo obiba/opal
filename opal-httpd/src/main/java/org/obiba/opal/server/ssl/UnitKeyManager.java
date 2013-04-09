@@ -17,7 +17,9 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedKeyManager;
 
@@ -40,13 +42,13 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
 
   private final UnitKeyStore unitKeyStore;
 
-  public UnitKeyManager(final UnitKeyStore unitKeyStore) {
+  public UnitKeyManager(UnitKeyStore unitKeyStore) {
     if(unitKeyStore == null) throw new IllegalArgumentException("unitKeyStore cannot be null");
     this.unitKeyStore = unitKeyStore;
   }
 
   @Override
-  public String chooseClientAlias(String[] keyTypes, Principal[] issuers, Socket socket) {
+  public String chooseClientAlias(String[] keyTypes, Principal[] issuers, @Nullable Socket socket) {
     log.debug("chooseClientAlias({}, {}, socket)", keyTypes, issuers);
     for(String keyType : keyTypes) {
       if(isKeyType(HTTPS_ALIAS, keyType)) {
@@ -61,7 +63,7 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
   }
 
   @Override
-  public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+  public String chooseServerAlias(String keyType, Principal[] issuers, @Nullable Socket socket) {
     log.debug("Requested keyType: '{}'", keyType);
     if(isKeyType(HTTPS_ALIAS, keyType)) {
       log.debug("Selecting key '{}'", HTTPS_ALIAS);
@@ -82,7 +84,7 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
   public X509Certificate[] getCertificateChain(String alias) {
     log.debug("getCertificateChain({})", alias);
     try {
-      Certificate[] certs = this.unitKeyStore.getKeyStore().getCertificateChain(alias);
+      Certificate[] certs = unitKeyStore.getKeyStore().getCertificateChain(alias);
       // Convert Certificate[] to X509Certificate[]
       return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     } catch(KeyStoreException e) {
@@ -90,6 +92,7 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
     }
   }
 
+  @Nullable
   @Override
   public String[] getClientAliases(String keyType, Principal[] issuers) {
     log.debug("getClientAliases({}, {})", keyType, issuers);
@@ -99,17 +102,14 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
   @Override
   public PrivateKey getPrivateKey(String alias) {
     log.debug("getPrivateKey({})", alias);
-    try {
-      return unitKeyStore.getKeyPair(alias).getPrivate();
-    } catch(RuntimeException e) {
-      throw e;
-    }
+    return unitKeyStore.getKeyPair(alias).getPrivate();
   }
 
   @Override
   public String[] getServerAliases(String keyType, Principal[] issuers) {
     log.debug("getServerAliases({}, {})", keyType, issuers);
-    return unitKeyStore.listKeyPairs().toArray(new String[] { });
+    Set<String> keyPairs = unitKeyStore.listKeyPairs();
+    return keyPairs.toArray(new String[keyPairs.size()]);
   }
 
   @Override

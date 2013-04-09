@@ -28,19 +28,19 @@ public interface VariableEntitiesHolder {
    *
    * @return
    */
-  public boolean hasEntities();
+  boolean hasEntities();
 
   /**
    * Returns an immutable view of the set of entities
    *
    * @return
    */
-  public SortedSet<VariableEntity> getEntities();
+  SortedSet<VariableEntity> getEntities();
 
   /**
    * Assign the constant set of entities to work with. This method may only be called once.
    *
    * @param entities
    */
-  public void setEntities(SortedSet<VariableEntity> entities);
+  void setEntities(SortedSet<VariableEntity> entities);
 }

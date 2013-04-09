@@ -28,18 +28,18 @@ public class OpalDaemon implements Daemon {
 
   @Override
   public void init(DaemonContext context) throws Exception {
-    this.opalServerOptions = CliFactory.parseArguments(OpalServerOptions.class, context.getArguments());
+    opalServerOptions = CliFactory.parseArguments(OpalServerOptions.class, context.getArguments());
   }
 
   @Override
   public void start() throws Exception {
-    this.opalServer = new OpalServer(opalServerOptions);
-    this.opalServer.boot();
+    opalServer = new OpalServer(opalServerOptions);
+    opalServer.boot();
   }
 
   @Override
   public void stop() throws Exception {
-    this.opalServer.shutdown();
+    opalServer.shutdown();
   }
 
 }

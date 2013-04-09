@@ -30,7 +30,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
     AGGREGATE, ASSIGN;
 
     public String symbol() {
-      return "." + this.toString();
+      return "." + toString();
     }
   }
 
@@ -61,11 +61,11 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
 
   public synchronized DataShieldEnvironment getEnvironment(Environment env) {
     Preconditions.checkArgument(env != null, "env cannot be null");
-    for(DataShieldEnvironment environment : this.environments) {
+    for(DataShieldEnvironment environment : environments) {
       if(environment.getEnvironment() == env) return environment;
     }
     DataShieldEnvironment e = new DataShieldEnvironment(env, Lists.<DataShieldMethod>newArrayList());
-    this.environments.add(e);
+    environments.add(e);
     return e;
   }
 

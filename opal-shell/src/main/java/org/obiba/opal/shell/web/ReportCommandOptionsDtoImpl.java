@@ -14,10 +14,9 @@ import org.obiba.opal.web.model.Commands.ReportCommandOptionsDto;
 
 public class ReportCommandOptionsDtoImpl implements ReportCommandOptions {
 
-  private ReportCommandOptionsDto dto;
+  private final ReportCommandOptionsDto dto;
 
   public ReportCommandOptionsDtoImpl(ReportCommandOptionsDto dto) {
-    super();
     this.dto = dto;
   }
 

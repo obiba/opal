@@ -26,7 +26,7 @@ public interface ServiceConfigurationHandler {
    * @param config
    * @return the service dto
    */
-  public Opal.ServiceCfgDto get(OpalConfigurationExtension config);
+  Opal.ServiceCfgDto get(OpalConfigurationExtension config);
 
   /**
    * Parses the provided {@code Opal.ServiceCfgDto} instance and builds a corresponding {@code
@@ -35,7 +35,7 @@ public interface ServiceConfigurationHandler {
    *
    * @param serviceDto
    */
-  public void put(Opal.ServiceCfgDto serviceDto);
+  void put(Opal.ServiceCfgDto serviceDto);
 
   /**
    * Returns true when this instance is capable of building {@code OpalConfigurationExtension} and convert it into a
@@ -44,7 +44,7 @@ public interface ServiceConfigurationHandler {
    * @param config
    * @return
    */
-  public boolean canGet(OpalConfigurationExtension config);
+  boolean canGet(OpalConfigurationExtension config);
 
   /**
    * Returns true when this instance is capable of building {@code Opal.ServiceCfgDto} and convert it into a
@@ -53,6 +53,6 @@ public interface ServiceConfigurationHandler {
    * @param serviceDto
    * @return
    */
-  public boolean canPut(Opal.ServiceCfgDto serviceDto);
+  boolean canPut(Opal.ServiceCfgDto serviceDto);
 
 }

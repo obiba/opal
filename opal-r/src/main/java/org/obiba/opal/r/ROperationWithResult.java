@@ -17,12 +17,12 @@ import org.rosuda.REngine.REXPRaw;
  */
 public interface ROperationWithResult extends ROperation {
 
-  public boolean hasResult();
+  boolean hasResult();
 
-  public REXP getResult();
+  REXP getResult();
 
-  public boolean hasRawResult();
+  boolean hasRawResult();
 
-  public REXPRaw getRawResult();
+  REXPRaw getRawResult();
 
 }

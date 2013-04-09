@@ -32,7 +32,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   // Instance Variables
   //
 
-  private Scheduler scheduler;
+  private final Scheduler scheduler;
 
   //
   // Constructors
@@ -47,6 +47,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   // CommandSchedulerService Methods
   //
 
+  @Override
   public void addCommand(String name, String group, Command<?> command) {
     JobDetail jobDetail = new JobDetail(name, group, QuartzCommandJob.class);
     jobDetail.setDurability(true); // OPAL-917
@@ -60,6 +61,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
     }
   }
 
+  @Override
   public void deleteCommand(String name, String group) {
     try {
       scheduler.deleteJob(name, group);
@@ -68,6 +70,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
     }
   }
 
+  @Override
   public void scheduleCommand(String name, String group, String cronExpression) {
     try {
       scheduler.scheduleJob(new CronTrigger(name + "-trigger", group, name, group, cronExpression));
@@ -78,6 +81,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
     }
   }
 
+  @Override
   public void unscheduleCommand(String name, String group) {
     try {
       Trigger[] triggers = scheduler.getTriggersOfJob(name, group);
@@ -89,10 +93,11 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
     }
   }
 
+  @Override
   public String getCommandSchedule(String name, String group) {
     try {
       Trigger[] triggers = scheduler.getTriggersOfJob(name, group);
-      return (triggers.length != 0 && triggers[0] instanceof CronTrigger) ? ((CronTrigger) triggers[0])
+      return triggers.length != 0 && triggers[0] instanceof CronTrigger ? ((CronTrigger) triggers[0])
           .getCronExpression() : null;
     } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);

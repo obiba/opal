@@ -26,6 +26,6 @@ public interface OpalShellFactory {
    * @param err
    * @return
    */
-  public OpalShell newShell(CommandRegistry registry, InputStream in, OutputStream out, OutputStream err);
+  OpalShell newShell(CommandRegistry registry, InputStream in, OutputStream out, OutputStream err);
 
 }

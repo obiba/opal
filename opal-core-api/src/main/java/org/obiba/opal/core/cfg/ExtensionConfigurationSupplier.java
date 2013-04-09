@@ -14,7 +14,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import com.google.common.base.Supplier;
 
 /**
- * A base class for managing a {@code OpalConfigurationExtension} within the {@code OpalConfiguraton}. Simply extend
+ * A base class for managing a {@code OpalConfigurationExtension} within the {@code OpalConfiguration}. Simply extend
  * this class and provide the concrete implementation of {@code OpalConfigurationExtension}.
  *
  * @param <T> the concrete implementation of {@code OpalConfigurationExtension} that is managed by this instance.

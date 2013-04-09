@@ -56,12 +56,12 @@ public class OpalShellTest {
     EasyMock.verify(mockRegistry);
   }
 
-  private class TestOpalShell extends AbstractOpalShell {
+  private static class TestOpalShell extends AbstractOpalShell {
 
     /**
      * @param registry
      */
-    public TestOpalShell(CommandRegistry registry) {
+    private TestOpalShell(CommandRegistry registry) {
       super(registry);
     }
 

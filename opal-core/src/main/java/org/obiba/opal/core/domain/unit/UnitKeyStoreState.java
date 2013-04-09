@@ -11,6 +11,7 @@ package org.obiba.opal.core.domain.unit;
 
 import java.util.Arrays;
 
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -52,6 +53,7 @@ public class UnitKeyStoreState extends AbstractEntity {
     this.unit = unit;
   }
 
+  @Nullable
   public byte[] getKeyStore() {
     if(keyStore != null) {
       return Arrays.copyOf(keyStore, keyStore.length);
@@ -59,7 +61,7 @@ public class UnitKeyStoreState extends AbstractEntity {
     return null;
   }
 
-  public void setKeyStore(byte[] keyStore) {
+  public void setKeyStore(byte... keyStore) {
     if(keyStore != null) {
       this.keyStore = Arrays.copyOf(keyStore, keyStore.length);
     }

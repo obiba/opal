@@ -13,7 +13,7 @@ import java.security.cert.X509Certificate;
 
 public final class X509PrettyPrinter {
 
-  private static final String format = //
+  private static final String FORMAT = //
       "Certificate:\n" + //
           "  Data:\n" + //
           "    Version: %d\n" + //
@@ -29,9 +29,11 @@ public final class X509PrettyPrinter {
           "    X509v3 extensions: %d\n" + //
           "  Signature Algorithm: %s\n";
 
-  public static String prettyPrint(final X509Certificate x509) {
+  private X509PrettyPrinter() {}
+
+  public static String prettyPrint(X509Certificate x509) {
     if(x509 == null) throw new IllegalArgumentException("x509 cannot be null");
-    return String.format(format, x509.getVersion(), x509.getSerialNumber(), x509.getSigAlgName(),
+    return String.format(FORMAT, x509.getVersion(), x509.getSerialNumber(), x509.getSigAlgName(),
         x509.getIssuerX500Principal().getName(), x509.getNotBefore(), x509.getNotAfter(),
         x509.getSubjectX500Principal().getName(), x509.getPublicKey().getAlgorithm(), x509.getBasicConstraints(),
         x509.getSigAlgName());

@@ -55,7 +55,7 @@ public class ProtobufProviderHelper {
 
     private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
-    Descriptor forMessage(final Class<Message> messageType) {
+    Descriptor forMessage(Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
       return (Descriptor) invokeStaticMethod(extractStaticMethod("getDescriptor", methodCache, messageType));
     }
@@ -68,11 +68,11 @@ public class ProtobufProviderHelper {
 
     private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
-    ExtensionRegistry forMessage(final Class<Message> messageType) {
+    ExtensionRegistry forMessage(Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
 
       Class<?> enclosingType = messageType.getEnclosingClass();
-      if(registryCache.containsKey(enclosingType) == false) {
+      if(!registryCache.containsKey(enclosingType)) {
         ExtensionRegistry registry = ExtensionRegistry.newInstance();
         invokeStaticMethod(extractStaticMethod("registerAllExtensions", methodCache, messageType.getEnclosingClass(),
             ExtensionRegistry.class), registry);
@@ -86,7 +86,7 @@ public class ProtobufProviderHelper {
 
     private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
-    Builder forMessage(final Class<Message> messageType) {
+    Builder forMessage(Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
       return (Builder) invokeStaticMethod(extractStaticMethod("newBuilder", methodCache, messageType));
     }
@@ -101,28 +101,28 @@ public class ProtobufProviderHelper {
     } catch(WebApplicationException e) {
       throw e;
     } catch(RuntimeException e) {
-      log.error("Error invoking '" + method.getName() + "' method for type " + method.getDeclaringClass().getName(), e);
+      log.error("Error invoking '{}' method for type {}", method.getName(), method.getDeclaringClass().getName(), e);
       throw new WebApplicationException(500);
     } catch(IllegalAccessException e) {
-      log.error("Error invoking '" + method.getName() + "' method for type " + method.getDeclaringClass().getName(), e);
+      log.error("Error invoking '{}' method for type {}", method.getName(), method.getDeclaringClass().getName(), e);
       throw new WebApplicationException(500);
     } catch(InvocationTargetException e) {
-      log.error("Error invoking '" + method.getName() + "' method for type " + method.getDeclaringClass().getName(), e);
+      log.error("Error invoking '{}' method for type {}", method.getName(), method.getDeclaringClass().getName(), e);
       throw new WebApplicationException(500);
     }
   }
 
-  private static Method extractStaticMethod(final String methodName, final Map<Class<?>, Method> methodCache,
-      final Class<?> type, Class<?>... arguments) {
+  private static Method extractStaticMethod(String methodName, Map<Class<?>, Method> methodCache, Class<?> type,
+      Class<?>... arguments) {
     if(methodName == null) throw new IllegalArgumentException("methodName cannot be null");
     if(methodCache == null) throw new IllegalArgumentException("methodCache cannot be null");
     if(type == null) throw new IllegalArgumentException("type cannot be null");
 
-    if(methodCache.containsKey(type) == false) {
+    if(!methodCache.containsKey(type)) {
       try {
         methodCache.put(type, type.getMethod(methodName, arguments));
       } catch(SecurityException e) {
-        log.error("Error getting '" + methodName + "' method from type " + type.getName(), e);
+        log.error("Error getting '{}' method from type {}", methodName, type.getName(), e);
         throw new WebApplicationException(500);
       } catch(NoSuchMethodException e) {
         throw new IllegalStateException(

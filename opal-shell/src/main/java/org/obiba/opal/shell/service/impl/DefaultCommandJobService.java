@@ -54,27 +54,27 @@ public class DefaultCommandJobService implements CommandJobService {
 
   private boolean isRunning;
 
-  private AtomicInteger lastJobId;
+  private final AtomicInteger lastJobId;
 
   /**
    * Jobs submitted for execution, but not yet executed.
    */
-  private BlockingQueue<Runnable> jobsNotStarted;
+  private final BlockingQueue<Runnable> jobsNotStarted;
 
   /**
    * Jobs in the process of being executed.
    */
-  private List<FutureCommandJob> jobsStarted;
+  private final List<FutureCommandJob> jobsStarted;
 
   /**
    * Jobs that have terminated.
    */
-  private List<FutureCommandJob> jobsTerminated;
+  private final List<FutureCommandJob> jobsTerminated;
 
   /**
    * Comparator for sorting jobs in order of submit time, most recent first.
    */
-  private Comparator<CommandJob> jobComparator;
+  private final Comparator<CommandJob> jobComparator;
 
   //
   // Constructors
@@ -301,7 +301,7 @@ public class DefaultCommandJobService implements CommandJobService {
 
   static class FutureCommandJob extends FutureTask<Object> {
 
-    private CommandJob commandJob;
+    private final CommandJob commandJob;
 
     FutureCommandJob(Subject subject, CommandJob commandJob) {
       super(subject.associateWith(commandJob), null);

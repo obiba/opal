@@ -74,7 +74,7 @@ public class RScriptGenerator implements DataShieldGrammarVisitor {
     return node.childrenAccept(this, data);
   }
 
-  private DataShieldMethod findMethod(final String name) {
-    return this.environment.getMethod(name);
+  private DataShieldMethod findMethod(String name) {
+    return environment.getMethod(name);
   }
 }

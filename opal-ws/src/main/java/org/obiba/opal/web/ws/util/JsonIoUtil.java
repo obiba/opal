@@ -71,7 +71,7 @@ public final class JsonIoUtil {
   }
 
   /**
-   * Callback called when a Message instance part of a collection has been read. Ususally, the message instance would be
+   * Callback called when a Message instance part of a collection has been read. Unusually, the message instance would be
    * added to a collection.
    */
   private interface MergeCallback {

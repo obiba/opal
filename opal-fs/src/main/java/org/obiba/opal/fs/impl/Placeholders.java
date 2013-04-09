@@ -12,6 +12,8 @@ package org.obiba.opal.fs.impl;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.annotation.Nullable;
+
 final class Placeholders {
 
   private static final String PREFIX = "${";
@@ -20,6 +22,7 @@ final class Placeholders {
 
   private Placeholders() {}
 
+  @Nullable
   public static String replaceAll(String value) {
     if(value == null || value.isEmpty()) return value;
     String replaced = value;

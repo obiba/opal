@@ -14,7 +14,7 @@ public interface OpalShell extends Runnable {
    * @param format message format as per {@code String#format(String, Object...)}
    * @param args message arguments
    */
-  public void printf(String format, Object... args);
+  void printf(String format, Object... args);
 
   /**
    * Prompts the shell for a password.
@@ -23,7 +23,7 @@ public interface OpalShell extends Runnable {
    * @param args prompt message arguments
    * @return the password as entered on the shell
    */
-  public char[] passwordPrompt(String format, Object... args);
+  char[] passwordPrompt(String format, Object... args);
 
   /**
    * Prompts the shell for an input.
@@ -32,23 +32,23 @@ public interface OpalShell extends Runnable {
    * @param args prompt message arguments
    * @return the text as entered on the shell
    */
-  public String prompt(String format, Object... args);
+  String prompt(String format, Object... args);
 
   /**
    * Prints the usage to the shell
    */
-  public void printUsage();
+  void printUsage();
 
   /**
    * Tell the shell to exit.
    */
-  public void exit();
+  void exit();
 
   /**
    * Adds a callback instance to be notified when the shell exists.
    *
    * @param callback
    */
-  public void addExitCallback(OpalShellExitCallback callback);
+  void addExitCallback(OpalShellExitCallback callback);
 
 }

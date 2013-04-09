@@ -27,7 +27,7 @@ public abstract class DomainPermissionConverter implements SubjectPermissionConv
 
   @Override
   public boolean canConvert(String dmn, String permission) {
-    return !(dmn == null || dmn.equals(domain) == false || permission == null) && hasPermission(permission);
+    return !(dmn == null || !dmn.equals(domain) || permission == null) && hasPermission(permission);
   }
 
   protected abstract boolean hasPermission(String permission);

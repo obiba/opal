@@ -64,6 +64,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   // AbstractOpalRuntimeDependentCommand Methods
   //
 
+  @Override
   public int execute() {
     if(options.isUnit()) {
       if(unitDoesNotExist(options.getUnit()) || unitIsOpalInstance(options.getUnit())) {
@@ -86,21 +87,24 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private int executeAction(String action) {
     if(action.equals(CREATE_ACTION) && hasAlias()) {
       return createKey();
-    } else if(action.equals(DELETE_ACTION) && hasAlias()) {
-      return deleteKey();
-    } else if(action.equals(IMPORT_ACTION) && hasAlias()) {
-      return importKey();
-    } else if(action.equals(EXPORT_ACTION) && hasAlias()) {
-      return exportCertificate();
-    } else if(action.equals(LIST_ACTION) && hasAlias() == false) {
-      return listKeystore();
-    } else {
-      return unrecognizedOptionsHelp();
     }
+    if(action.equals(DELETE_ACTION) && hasAlias()) {
+      return deleteKey();
+    }
+    if(action.equals(IMPORT_ACTION) && hasAlias()) {
+      return importKey();
+    }
+    if(action.equals(EXPORT_ACTION) && hasAlias()) {
+      return exportCertificate();
+    }
+    if(action.equals(LIST_ACTION) && !hasAlias()) {
+      return listKeystore();
+    }
+    return unrecognizedOptionsHelp();
   }
 
   private boolean hasAlias() {
-    return options.isAlias() == true;
+    return options.isAlias();
   }
 
   private int createKey() {
@@ -110,7 +114,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
     if(options.isAlgorithm() && options.isSize()) {
       try {
-        if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
+        if(keyDoesNotExistOrOverwriteConfirmed(unit)) {
           String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
           unitKeyStoreService
               .createOrUpdateKey(unit, options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
@@ -175,21 +179,21 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   }
 
   private void importPrivateKey(String unit) throws FileSystemException {
-    if(getFile(options.getPrivate()).exists() == false) {
+    if(!getFile(options.getPrivate()).exists()) {
       getShell().printf("Private key file '%s' does not exist. Cannot import key.\n", options.getPrivate());
       return;
     }
-    if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
+    if(options.isCertificate() && !getFile(options.getCertificate()).exists()) {
       getShell().printf("Certificate file '%s' does not exist. Cannot import key.\n", options.getCertificate());
       return;
     }
-    if(keyDoesNotExistOrOverwriteConfirmed(unit, options.getAlias())) {
+    if(keyDoesNotExistOrOverwriteConfirmed(unit)) {
       importKeyFromFileOrInteractively(unit, options.getAlias());
     }
   }
 
   private void importCertificate(String unit) throws FileSystemException {
-    if(options.isCertificate() && getFile(options.getCertificate()).exists() == false) {
+    if(options.isCertificate() && !getFile(options.getCertificate()).exists()) {
       getShell().printf("Certificate file '%s' does not exist. Cannot import certificate.\n", options.getCertificate());
       return;
     }
@@ -284,7 +288,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private int listKeystore() {
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
-    UnitKeyStore uks = this.unitKeyStoreService.getUnitKeyStore(unit);
+    UnitKeyStore uks = unitKeyStoreService.getUnitKeyStore(unit);
     if(uks != null) {
       getShell().printf("Listing available keys (alias: <key type>) for '%s'\n", unit);
       for(String alias : uks.listAliases()) {
@@ -304,7 +308,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     return 0; // success!
   }
 
-  private boolean keyDoesNotExistOrOverwriteConfirmed(String unit, String alias) {
+  private boolean keyDoesNotExistOrOverwriteConfirmed(String unit) {
     boolean createKeyConfirmation = true;
     if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
       createKeyConfirmation = confirmKeyOverWrite();
@@ -325,15 +329,12 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     String ans = "no";
     do {
       String answer = getShell().prompt(String.format("  [%s]:  ", ans));
-      if(answer != null && !answer.equals("")) {
+      if(answer != null && !"".equals(answer)) {
         ans = answer;
       }
-    } while(!(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("no") || ans.equalsIgnoreCase("y") ||
-        ans.equalsIgnoreCase("n")));
-    if(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("y")) {
-      return true;
-    }
-    return false;
+    } while(!("yes".equalsIgnoreCase(ans) || "no".equalsIgnoreCase(ans) || "y".equalsIgnoreCase(ans) ||
+        "n".equalsIgnoreCase(ans)));
+    return "yes".equalsIgnoreCase(ans) || "y".equalsIgnoreCase(ans);
   }
 
   private UnitKeyStore getUnitKeyStore() {
@@ -348,7 +349,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   }
 
   private boolean unitDoesNotExist(String unitName) {
-    return getFunctionalUnitService().hasFunctionalUnit(unitName) == false;
+    return !getFunctionalUnitService().hasFunctionalUnit(unitName);
   }
 
   private boolean unitIsOpalInstance(String unitName) {

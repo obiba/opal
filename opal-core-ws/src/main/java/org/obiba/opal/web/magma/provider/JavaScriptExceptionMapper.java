@@ -26,6 +26,7 @@ public class JavaScriptExceptionMapper implements ExceptionMapper<RhinoException
   // ExceptionMapper Methods
   //
 
+  @Override
   public Response toResponse(RhinoException exception) {
     ClientErrorDto.Builder errorDtoBuilder = ClientErrorDtos
         .getErrorMessage(Status.BAD_REQUEST, "JavaScriptException", exception);

@@ -62,6 +62,7 @@ public class DefaultDecryptService implements DecryptService {
   // DecryptService Methods
   //
 
+  @Override
   public void decryptData(String unitName, String datasourceName, FileObject file)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     Assert.notNull(file, "file is null");
@@ -75,7 +76,7 @@ public class DefaultDecryptService implements DecryptService {
       throw new NoSuchFunctionalUnitException(unitName);
     }
     // Create an FsDatasource for the specified file.
-    FsDatasource sourceDatasource = new FsDatasource(file.getName().getBaseName(),
+    Datasource sourceDatasource = new FsDatasource(file.getName().getBaseName(),
         opalRuntime.getFileSystem().getLocalFile(file),
         unit != null ? getDatasourceEncryptionStrategy(unit) : getOpalInstanceEncryptionStrategy());
     try {
@@ -86,6 +87,7 @@ public class DefaultDecryptService implements DecryptService {
     }
   }
 
+  @Override
   public void decryptData(String datasourceName, FileObject file)
       throws NoSuchDatasourceException, IllegalArgumentException, IOException {
     decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file);

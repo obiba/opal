@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.r.service.OpalRSessionManager;
@@ -43,7 +44,6 @@ public class OpalRResource {
 
   @Autowired
   public OpalRResource(OpalRService opalRService, OpalRSessionManager opalRSessionManager) {
-    super();
     this.opalRService = opalRService;
     this.opalRSessionManager = opalRSessionManager;
   }
@@ -59,13 +59,12 @@ public class OpalRResource {
 
     if(Strings.isNullOrEmpty(rscript)) return Response.status(Status.BAD_REQUEST).build();
 
-    RScriptROperation rop = new RScriptROperation(rscript);
+    ROperationWithResult rop = new RScriptROperation(rscript);
     opalRService.execute(rop);
     if(rop.hasResult() && rop.hasRawResult()) {
       return Response.ok().entity(rop.getRawResult().asBytes()).build();
     } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}",
-          new Object[] { rscript, rop.hasResult(), rop.hasRawResult() });
+      log.error("R Script '{}' has result: {}, has raw result: {}", rscript, rop.hasResult(), rop.hasRawResult());
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }

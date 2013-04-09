@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.slf4j.Logger;
@@ -33,13 +34,12 @@ public abstract class AbstractOpalRSessionResource {
   protected Response executeScript(OpalRSession rSession, String script) {
     if(script == null) return Response.status(Status.BAD_REQUEST).build();
 
-    RScriptROperation rop = new RScriptROperation(script);
+    ROperationWithResult rop = new RScriptROperation(script);
     rSession.execute(rop);
     if(rop.hasResult() && rop.hasRawResult()) {
       return Response.ok().entity(rop.getRawResult().asBytes()).build();
     } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}",
-          new Object[] { script, rop.hasResult(), rop.hasRawResult() });
+      log.error("R Script '{}' has result: {}, has raw result: {}", script, rop.hasResult(), rop.hasRawResult());
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }

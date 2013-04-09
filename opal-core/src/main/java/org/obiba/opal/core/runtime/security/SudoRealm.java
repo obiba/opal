@@ -25,8 +25,7 @@ import org.springframework.stereotype.Component;
 public class SudoRealm extends AuthorizingRealm {
 
   public SudoRealm() {
-    super();
-    super.setCredentialsMatcher(new AllowAllCredentialsMatcher());
+    setCredentialsMatcher(new AllowAllCredentialsMatcher());
   }
 
   @Override

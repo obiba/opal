@@ -96,7 +96,7 @@ public class JsonIoUtilTest {
   }
 
   private Collection<DatasourceDto> createDtos(String... names) {
-    ArrayList<DatasourceDto> dtos = new ArrayList<DatasourceDto>(names.length);
+    Collection<DatasourceDto> dtos = new ArrayList<DatasourceDto>(names.length);
     for(String name : names) {
       dtos.add(DatasourceDto.newBuilder().setName(name).setType("type").setLink("http://localhost/" + name).build());
     }

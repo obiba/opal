@@ -1,7 +1,7 @@
 /* 
  * This java source file is placed into the public domain.
  * 
- * The orginal author is Ceki Gulcu, QOS.ch
+ * The original author is Ceki Gulcu, QOS.ch
  * 
  * THIS SOFTWARE IS PROVIDED AS-IS WITHOUT WARRANTY OF ANY KIND, NOT EVEN
  * THE IMPLIED WARRANTY OF MERCHANTABILITY. THE AUTHOR OF THIS SOFTWARE,
@@ -21,7 +21,7 @@ import java.net.URLClassLoader;
  */
 public class ChildFirstClassLoader extends URLClassLoader {
 
-  public ChildFirstClassLoader(URL[] urls) {
+  public ChildFirstClassLoader(URL... urls) {
     super(urls);
   }
 
@@ -29,10 +29,12 @@ public class ChildFirstClassLoader extends URLClassLoader {
     super(urls, parent);
   }
 
+  @Override
   public void addURL(URL url) {
     super.addURL(url);
   }
 
+  @Override
   public Class<?> loadClass(String name) throws ClassNotFoundException {
     return loadClass(name, false);
   }
@@ -42,6 +44,7 @@ public class ChildFirstClassLoader extends URLClassLoader {
    * <p/>
    * The implementation is surprisingly straightforward.
    */
+  @Override
   protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 
     // System.out.println("ChildFirstClassLoader("+name+", "+resolve+")");
@@ -61,11 +64,7 @@ public class ChildFirstClassLoader extends URLClassLoader {
     // if we could not find it, delegate to parent
     // Note that we don't attempt to catch any ClassNotFoundException
     if(c == null) {
-      if(getParent() != null) {
-        c = getParent().loadClass(name);
-      } else {
-        c = getSystemClassLoader().loadClass(name);
-      }
+      c = getParent() == null ? getSystemClassLoader().loadClass(name) : getParent().loadClass(name);
     }
 
     if(resolve) {
@@ -78,6 +77,7 @@ public class ChildFirstClassLoader extends URLClassLoader {
   /**
    * Override the parent-first resource loading model established by java.lang.Classloader with child-first behavior.
    */
+  @Override
   public URL getResource(String name) {
     URL url = findResource(name);
 

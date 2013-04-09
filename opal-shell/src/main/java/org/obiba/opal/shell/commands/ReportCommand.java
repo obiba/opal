@@ -146,9 +146,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
     FileObject reportDir = getFile("/reports/" + reportTemplateName);
     reportDir.createFolder();
-    FileObject reportFile = reportDir.resolveFile(reportFileName);
 
-    return reportFile;
+    return reportDir.resolveFile(reportFileName);
   }
 
   private String getReportFileName(String reportTemplateName, String reportFormat, Date reportDate) {

@@ -24,6 +24,7 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.stereotype.Component;
 
 import com.google.protobuf.Message;
+import com.google.protobuf.MessageLite;
 
 @Component
 @Provider
@@ -51,7 +52,7 @@ public class ProtobufNativeWriterProvider extends AbstractProtobufProvider imple
         m.writeDelimitedTo(entityStream);
       }
     } else {
-      ((Message) t).writeTo(entityStream);
+      ((MessageLite) t).writeTo(entityStream);
     }
   }
 

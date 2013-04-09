@@ -15,8 +15,8 @@ package org.obiba.opal.shell;
  */
 public interface OpalShellHolder {
 
-  public OpalShell getCurrentShell();
+  OpalShell getCurrentShell();
 
-  public void bind(OpalShell shell);
+  void bind(OpalShell shell);
 
 }

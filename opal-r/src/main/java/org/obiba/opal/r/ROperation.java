@@ -21,6 +21,6 @@ public interface ROperation {
    *
    * @param connection
    */
-  public void doWithConnection(RConnection connection);
+  void doWithConnection(RConnection connection);
 
 }

@@ -47,7 +47,7 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
   @Autowired
   public RequestCycleInterceptor(RequestAttributesProvider provider, Set<RequestCyclePreProcess> preProcesses,
       Set<RequestCyclePostProcess> postProcesses) {
-    this.requestAttributesProvider = provider;
+    requestAttributesProvider = provider;
     this.preProcesses = new ArrayList<RequestCyclePreProcess>(preProcesses);
     this.postProcesses = new ArrayList<RequestCyclePostProcess>(postProcesses);
     Collections.sort(this.preProcesses, new AnnotationAwareOrderComparator());
@@ -91,7 +91,7 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
 
     private RequestCycle(HttpRequest request, ResourceMethod method) {
       this.request = request;
-      this.resourceMethod = method;
+      resourceMethod = method;
       requestAttributesProvider.currentRequestAttributes()
           .setAttribute(REQ_ATTR, this, RequestAttributes.SCOPE_REQUEST);
     }

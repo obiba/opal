@@ -14,7 +14,7 @@ package org.obiba.opal.core.runtime.security;
  */
 public interface SubjectPermissionConverter {
 
-  public boolean canConvert(String domain, String permission);
+  boolean canConvert(String domain, String permission);
 
-  public Iterable<String> convert(String domain, String node, String permission);
+  Iterable<String> convert(String domain, String node, String permission);
 }

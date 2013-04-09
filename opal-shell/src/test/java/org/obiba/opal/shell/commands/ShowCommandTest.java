@@ -156,12 +156,12 @@ public class ShowCommandTest extends AbstractMagmaTest {
   }
 
   private void recordExpectedShellOutputForUnits(OpalShell mockShell, String... units) {
-    if(units.length != 0) {
+    if(units.length == 0) {
+      mockShell.printf("No functional units\n");
+    } else {
       for(String unitName : units) {
         mockShell.printf("functional unit [%s], with key variable [%s]\n", unitName, unitName + "KeyVariable");
       }
-    } else {
-      mockShell.printf("No functional units\n");
     }
   }
 

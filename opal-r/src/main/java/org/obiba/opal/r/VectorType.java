@@ -90,11 +90,7 @@ public enum VectorType {
       int i = 0;
       for(Value value : values) {
         // OPAL-1536 do not push missings
-        if(variable.isMissingValue(value)) {
-          doubles[i++] = REXPDouble.NA;
-        } else {
-          doubles[i++] = ((Number) value.getValue()).doubleValue();
-        }
+        doubles[i++] = variable.isMissingValue(value) ? REXPDouble.NA : ((Number) value.getValue()).doubleValue();
       }
       return new REXPDouble(doubles);
     }
@@ -120,9 +116,9 @@ public enum VectorType {
     }
   };
 
-  private ValueType type;
+  private final ValueType type;
 
-  private VectorType(ValueType type) {
+  VectorType(ValueType type) {
     this.type = type;
   }
 
@@ -146,9 +142,9 @@ public enum VectorType {
     Variable variable = vvs.getVariable();
     int size = entities.size();
     Iterable<Value> values = vvs.asVectorSource().getValues(entities);
-    if(variable.isRepeatable()) {
-      return asValueSequencesVector(variable, size, values);
-    } else return asValuesVector(variable, size, values);
+    return variable.isRepeatable()
+        ? asValueSequencesVector(variable, size, values)
+        : asValuesVector(variable, size, values);
   }
 
   /**
@@ -229,7 +225,7 @@ public enum VectorType {
       }
 
       String str = value.toString();
-      strings[i] = (str != null && str.length() > 0) ? str : null;
+      strings[i] = str != null && str.length() > 0 ? str : null;
       i++;
     }
 

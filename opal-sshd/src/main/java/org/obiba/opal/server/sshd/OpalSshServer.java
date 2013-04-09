@@ -68,6 +68,7 @@ public class OpalSshServer implements Service {
         new PEMGeneratorHostKeyProvider(System.getProperty("OPAL_HOME") + "/conf/sshd.pem", "RSA", 2048));
     sshd.setShellFactory(new Factory<Command>() {
 
+      @Override
       public Command create() {
         return new OpalShellCommand();
       }
@@ -75,6 +76,7 @@ public class OpalSshServer implements Service {
     });
     sshd.setPasswordAuthenticator(new PasswordAuthenticator() {
 
+      @Override
       public boolean authenticate(String username, String password, ServerSession session) {
         try {
           SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password.toCharArray(),
@@ -145,31 +147,38 @@ public class OpalSshServer implements Service {
 
     private OutputStream err;
 
+    @Override
     @SuppressWarnings("deprecation")
     public void destroy() {
       thread.stop();
     }
 
+    @Override
     public void setErrorStream(OutputStream err) {
       this.err = err;
     }
 
+    @Override
     public void setExitCallback(ExitCallback callback) {
       exitCallback = callback;
     }
 
+    @Override
     public void setInputStream(InputStream in) {
       this.in = in;
     }
 
+    @Override
     public void setOutputStream(OutputStream out) {
       this.out = out;
     }
 
+    @Override
     public void start(Environment env) throws IOException {
       OpalShell shell = shellFactory.newShell(commandRegistry, in, out, err);
       shell.addExitCallback(new OpalShellExitCallback() {
 
+        @Override
         public void onExit() {
           SecurityUtils.getSubject().logout();
           exitCallback.onExit(0);

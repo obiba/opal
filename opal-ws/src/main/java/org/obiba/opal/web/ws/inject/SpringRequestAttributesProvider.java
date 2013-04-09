@@ -32,11 +32,10 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
     throw new IllegalStateException("Not a servlet request");
   }
 
+  @Override
   public UriInfo getUriInfo() {
     return ServletUtil.extractUriInfo(currentRequestAttributes().getRequest(), ResteasyServletConfiguration.WS_ROOT);
   }
-
-  ;
 
   @Override
   public String getResourcePath(URI uri) {

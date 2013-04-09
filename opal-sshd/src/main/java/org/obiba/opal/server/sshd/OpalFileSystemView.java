@@ -36,7 +36,7 @@ public class OpalFileSystemView implements FileSystemView {
   private final String user;
 
   public OpalFileSystemView(OpalRuntime runtime, String user) {
-    this.opalfs = runtime.getFileSystem();
+    opalfs = runtime.getFileSystem();
     this.user = user;
   }
 
@@ -71,14 +71,13 @@ public class OpalFileSystemView implements FileSystemView {
 
     private FileObjectSshFile(FileObject fo, String userName) {
       super(fo.getName().getPath(), opalfs.getLocalFile(fo), userName);
-      this.file = fo;
+      file = fo;
     }
 
     @Override
     public SshFile getParentFile() {
       try {
-        return new FileObjectSshFile(this.file.getParent() == null ? opalfs.getRoot() : this.file.getParent(),
-            getOwner());
+        return new FileObjectSshFile(file.getParent() == null ? opalfs.getRoot() : file.getParent(), getOwner());
       } catch(FileSystemException e) {
         throw new RuntimeException(e);
       }
@@ -87,7 +86,7 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public boolean isReadable() {
       try {
-        return this.file.isReadable();
+        return file.isReadable();
       } catch(FileSystemException e) {
         throw new RuntimeException(e);
       }
@@ -97,7 +96,7 @@ public class OpalFileSystemView implements FileSystemView {
     public boolean isRemovable() {
       try {
         // TODO not enough: check DELETE permission on corresponding resource
-        return this.file.getParent().isWriteable();
+        return file.getParent().isWriteable();
       } catch(FileSystemException e) {
         throw new RuntimeException(e);
       }
@@ -106,7 +105,7 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public boolean isWritable() {
       try {
-        return this.file.isWriteable();
+        return file.isWriteable();
       } catch(FileSystemException e) {
         throw new RuntimeException(e);
       }
@@ -115,8 +114,8 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public List<SshFile> listSshFiles() {
       try {
-        if(this.file.getType() == FileType.FOLDER) {
-          List<FileObject> children = Arrays.asList(this.file.getChildren());
+        if(file.getType() == FileType.FOLDER) {
+          List<FileObject> children = Arrays.asList(file.getChildren());
           Collections.sort(children, new Comparator<FileObject>() {
 
             @Override
@@ -143,7 +142,7 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public boolean mkdir() {
       try {
-        this.file.createFolder();
+        file.createFolder();
         return true;
       } catch(FileSystemException e) {
         return false;
@@ -153,7 +152,7 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public boolean move(SshFile destination) {
       try {
-        this.file.moveTo(((FileObjectSshFile) destination).file);
+        file.moveTo(((FileObjectSshFile) destination).file);
         return true;
       } catch(FileSystemException e) {
         return false;
@@ -163,7 +162,7 @@ public class OpalFileSystemView implements FileSystemView {
     @Override
     public boolean delete() {
       try {
-        return this.file.delete();
+        return file.delete();
       } catch(FileSystemException e) {
         return false;
       }

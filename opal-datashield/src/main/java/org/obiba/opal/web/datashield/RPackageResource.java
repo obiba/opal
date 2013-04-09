@@ -101,12 +101,12 @@ public abstract class RPackageResource {
 
   /**
    * Install OpenMx package with default settings (multithreaded).
+   *
    * @return
    */
   private String getInstallOpenMxPackageCommand() {
     return "if (!require('OpenMx', character.only=TRUE)) { source('http://openmx.psyc.virginia.edu/getOpenMx.R') }";
   }
-
 
   private String getInstallGitHubCommand(String name, String username, String ref) {
     return "devtools::install_github('" + name + "', username='" + username + "', ref='" + ref + "')";
@@ -122,7 +122,7 @@ public abstract class RPackageResource {
   protected OpalR.RPackageDto getDatashieldPackage(final String name) throws REXPMismatchException {
     RScriptROperation rop = getInstalledPackages();
     REXP rexp = rop.getResult();
-    final RStringMatrix matrix = new RStringMatrix(rexp);
+    RStringMatrix matrix = new RStringMatrix(rexp);
 
     Iterator<OpalR.RPackageDto> iter = Iterables
         .filter(Iterables.transform(matrix.iterateRows(), new StringsToRPackageDto(matrix)),

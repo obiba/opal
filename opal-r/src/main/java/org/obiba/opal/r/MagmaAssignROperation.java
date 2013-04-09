@@ -57,7 +57,6 @@ public class MagmaAssignROperation extends AbstractROperation {
       .newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
   public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path) {
-    super();
     if(holder == null) throw new IllegalArgumentException("holder cannot be null");
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
@@ -82,7 +81,7 @@ public class MagmaAssignROperation extends AbstractROperation {
   }
 
   void prepareEntities(ValueTable table) {
-    if(holder.hasEntities() == false) {
+    if(!holder.hasEntities()) {
       holder.setEntities(ImmutableSortedSet.copyOf(table.getVariableEntities()));
     }
   }
@@ -102,7 +101,7 @@ public class MagmaAssignROperation extends AbstractROperation {
      * @param path
      * @return
      */
-    public REXP asVector(String path);
+    REXP asVector(String path);
 
     /**
      * Check if path can be resolved as a datasource, table or variable.
@@ -110,7 +109,7 @@ public class MagmaAssignROperation extends AbstractROperation {
      * @param path
      * @return
      */
-    public boolean canResolve(String path);
+    boolean canResolve(String path);
 
   }
 
@@ -139,7 +138,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     public REXP asVector(String path) {
       Datasource datasource = MagmaEngine.get().getDatasource(path);
 
-      if(holder.hasEntities() == false) {
+      if(!holder.hasEntities()) {
         SortedSet<VariableEntity> entities = Sets.newTreeSet();
         for(ValueTable vt : datasource.getValueTables()) {
           entities.addAll(vt.getVariableEntities());
@@ -168,10 +167,10 @@ public class MagmaAssignROperation extends AbstractROperation {
 
     private ValueTable table;
 
-    public ValueTableRConverter() {
+    private ValueTableRConverter() {
     }
 
-    public ValueTableRConverter(ValueTable table) {
+    private ValueTableRConverter(ValueTable table) {
       this.table = table;
     }
 

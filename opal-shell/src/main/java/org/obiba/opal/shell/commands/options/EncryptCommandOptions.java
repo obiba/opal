@@ -17,18 +17,18 @@ import uk.co.flamingpenguin.jewel.cli.Unparsed;
 public interface EncryptCommandOptions extends HelpOption {
 
   @Option(shortName = "u", description = "The functional unit.")
-  public String getUnit();
+  String getUnit();
 
   @Option(shortName = "a", description = "Alias of key to use for encrypting the destination datasource")
-  public String getAlias();
+  String getAlias();
 
   @Option(shortName = "o", longName = "out",
       description = "The directory into which the decrypted files are written. Default is current directory.")
-  public String getOutput();
+  String getOutput();
 
-  public boolean isOutput();
+  boolean isOutput();
 
   @Unparsed(name = "FILE")
-  public List<String> getFiles();
+  List<String> getFiles();
 
 }

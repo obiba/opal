@@ -16,17 +16,17 @@ public interface SplitCommandOptions extends HelpOption {
 
   @Option(shortName = "u",
       description = "The functional unit. This is used to resolve filenames and decrypt the input file if necessary.")
-  public String getUnit();
+  String getUnit();
 
   @Option(shortName = "o", longName = "out",
       description = "The directory into which the decrypted files are written. Directory is created if it does not exist.")
-  public String getOutput();
+  String getOutput();
 
   @Option(shortName = "s", longName = "size",
       description = "Maximum number of entities to write per file. Default is 500.", defaultValue = "500")
-  public Integer getChunkSize();
+  Integer getChunkSize();
 
   @Unparsed(name = "FILE")
-  public List<String> getFiles();
+  List<String> getFiles();
 
 }

@@ -13,8 +13,6 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.search.IndexManager;
-import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
 
@@ -33,12 +31,12 @@ public class IndexManagerHelper {
     this.indexManager = indexManager;
   }
 
-  public IndexManagerHelper setDatasource(String datasource) {
+  public IndexManagerHelper setDatasource(@SuppressWarnings("ParameterHidesMemberVariable") String datasource) {
     this.datasource = datasource;
     return this;
   }
 
-  public IndexManagerHelper setTable(String table) {
+  public IndexManagerHelper setTable(@SuppressWarnings("ParameterHidesMemberVariable") String table) {
     this.table = table;
     return this;
   }

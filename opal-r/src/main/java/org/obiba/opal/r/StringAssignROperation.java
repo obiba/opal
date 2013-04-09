@@ -21,15 +21,13 @@ import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
  */
 public class StringAssignROperation extends AbstractROperation {
 
-  private MultivaluedMap<String, String> symbols;
+  private final MultivaluedMap<String, String> symbols;
 
   public StringAssignROperation(MultivaluedMap<String, String> symbols) {
-    super();
     this.symbols = symbols;
   }
 
   public StringAssignROperation(String symbol, String content) {
-    super();
     symbols = new MultivaluedMapImpl<String, String>();
     symbols.putSingle(symbol, content);
   }
