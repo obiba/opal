@@ -169,7 +169,10 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
         return;
       }
     }
-    getView().setDerivedVariable(false, "");
+
+    // Show the edit variable with a null script
+    getView().setDerivedVariable(true, "null");
+    getView().setEditCommand(new EditCommand());
   }
 
   private void authorize() {
