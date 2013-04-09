@@ -178,7 +178,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
   private class EsValueTableVariablesIndex extends EsValueTableIndex implements ValueTableVariablesIndex {
 
     private EsValueTableVariablesIndex(ValueTable vt) {
-      super(vt, "variables");
+      super(vt);
     }
 
     @Nonnull

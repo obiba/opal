@@ -241,8 +241,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
      * @param vt
      * @param prefixName used to avoid same type name. (Must be unique in ES (even though in different ES indices))
      */
-    EsValueTableIndex(@Nonnull ValueTable vt, @Nonnull String prefixName) {
-      name = prefixName + "-" + indexName(vt);
+    EsValueTableIndex(@Nonnull ValueTable vt) {
+      name = indexName(vt);
       valueTableReference = vt.getTableReference();
     }
 

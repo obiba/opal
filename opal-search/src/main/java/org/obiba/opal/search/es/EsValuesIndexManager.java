@@ -209,7 +209,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   private class EsValueTableValuesIndex extends EsValueTableIndex implements ValueTableValuesIndex {
 
     private EsValueTableValuesIndex(ValueTable vt) {
-      super(vt, "values");
+      super(vt);
     }
 
     @Override

@@ -112,7 +112,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     private final Map<String, ContinuousVariableSummary.Builder> continuousSummaryBuilders = Maps.newHashMap();
 
     private EsValueTableStatsIndex(@Nonnull ValueTable vt) {
-      super(vt, "stats");
+      super(vt);
     }
 
     @Override
