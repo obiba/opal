@@ -48,7 +48,7 @@ message LogicalTermDto {
 
   extend QueryTermDto {
     optional LogicalTermDto filter = 3000;
-    optional LogicalTermDto facet_filter = 3001;
+    optional LogicalTermDto facetFilter = 3001;
   }
 
   extensions 1000 to max;
@@ -56,7 +56,7 @@ message LogicalTermDto {
 
 message InTermDto {
   repeated string values = 1;
-  optional int32 minimum_match = 2 [default = 1];
+  optional int32 minimumMatch = 2 [default = 1];
 
   extend FilterDto {
     optional InTermDto terms = 1000;
@@ -67,8 +67,8 @@ message InTermDto {
 message RangeTermDto {
   optional string from = 1;
   optional string to = 2;
-  optional bool include_lower = 3 [default = true];
-  optional bool include_upper = 4 [default = false];
+  optional bool includeLower = 3 [default = true];
+  optional bool includeUpper = 4 [default = false];
 
   extend FilterDto {
     optional RangeTermDto range = 1001;
@@ -77,7 +77,7 @@ message RangeTermDto {
 
 message QueryResultDto {
   repeated FacetResultDto facets = 1;
-  required int32 total_hits = 2;
+  required int32 totalHits = 2;
   repeated ItemResultDto hits = 3;
 }
 
@@ -97,9 +97,9 @@ message FacetResultDto {
     optional float min = 3;
     optional float max = 4;
     optional float mean = 5;
-    optional float sum_of_squares = 6;
+    optional float sumOfSquares = 6;
     optional float variance = 7;
-    optional float std_deviation = 8;
+    optional float stdDeviation = 8;
   }
 
   required string facet = 1;
