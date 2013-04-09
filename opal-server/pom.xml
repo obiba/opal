@@ -65,6 +65,11 @@
       <artifactId>opal-gwt-client</artifactId>
       <type>war</type>
     </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-project</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 
     <dependency>
       <groupId>net.sf.ehcache</groupId>
