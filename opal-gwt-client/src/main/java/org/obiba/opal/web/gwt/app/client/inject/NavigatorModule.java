@@ -31,11 +31,13 @@ import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.ExcelDatas
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.FsDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.HibernateDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.JdbcDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.NullDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.view.CsvDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.view.ExcelDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.view.FsDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.view.HibernateDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.view.JdbcDatasourceFormView;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.view.NullDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.view.CreateDatasourceView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveBooleanVariableStepPresenter;
@@ -99,6 +101,8 @@ public class NavigatorModule extends AbstractOpalModule {
         JdbcDatasourceFormView.class, JdbcDatasourceFormPresenter.Subscriber.class);
     bindDatasourceFormPresenter(CsvDatasourceFormPresenter.class, CsvDatasourceFormPresenter.Display.class,
         CsvDatasourceFormView.class, CsvDatasourceFormPresenter.Subscriber.class);
+    bindDatasourceFormPresenter(NullDatasourceFormPresenter.class, NullDatasourceFormPresenter.Display.class,
+        NullDatasourceFormView.class, NullDatasourceFormPresenter.Subscriber.class);
 
     configureDeriveVariablePresenters();
   }

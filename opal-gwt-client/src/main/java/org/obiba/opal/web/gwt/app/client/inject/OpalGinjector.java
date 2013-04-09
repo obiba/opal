@@ -55,6 +55,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.ExcelDatas
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.FsDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.HibernateDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.JdbcDatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.NullDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
@@ -197,6 +198,8 @@ public interface OpalGinjector extends Ginjector {
   FsDatasourceFormPresenter getxresourFsDatasourceFormPresenter();
 
   JdbcDatasourceFormPresenter getJdbcDatasourceFormPresenter();
+
+  NullDatasourceFormPresenter getNullDatasourceFormPresenter();
 
   CreateViewStepPresenter getCreateViewStepPresenter();
 

@@ -1088,7 +1088,8 @@ public interface Translations extends Constants {
       "jdbc", "Custom SQL", //
       "fs", "XML", //
       "csv", "CSV", //
-      "excel", "Excel" })
+      "excel", "Excel", //
+      "null", "None"})
   Map<String, String> datasourceTypeMap();
 
   @Description("Data Import Format Step")

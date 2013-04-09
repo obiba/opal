@@ -186,6 +186,9 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
     datasourceName.setText(dto.getName());
     datasourceType.setText(translations.datasourceTypeMap().get(dto.getType()));
     toolbar.getAddItem().setVisible(false);
+    boolean isNull = dto.getType().equals("null");
+    toolbar.setImportDataItemEnabled(!isNull);
+    toolbar.setAddUpdateTablesItemEnabled(!isNull);
   }
 
   @Override

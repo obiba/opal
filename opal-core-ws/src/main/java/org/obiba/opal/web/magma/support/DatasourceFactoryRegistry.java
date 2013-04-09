@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import java.util.Set;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,7 +38,6 @@ public class DatasourceFactoryRegistry {
    *
    * @param dto the {@code DatasourceFactoryDto} to parse
    * @return an instance of {@code DatasourceFactory} for the given {@code dto}
-   * @throws NoSuchDatasourceFactoryException when no {@code DatasourceFactoryDtoParser} is available to parse the given
    * {@code dto}
    */
   public DatasourceFactory parse(DatasourceFactoryDto dto) throws NoSuchDatasourceFactoryException {
@@ -47,7 +47,9 @@ public class DatasourceFactoryRegistry {
         return parser.parse(dto);
       }
     }
-    throw new NoSuchDatasourceFactoryException(dto);
+    DatasourceFactory factory = new NullDatasourceFactory();
+    factory.setName(dto.getName());
+    return factory;
   }
 
 }

@@ -105,7 +105,10 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
   public void setDatasources(JsArray<DatasourceDto> datasources) {
     datasourceListBox.clear();
     for(int i = 0; i < datasources.length(); i++) {
-      datasourceListBox.addItem(datasources.get(i).getName(), datasources.get(i).getName());
+      DatasourceDto dto = datasources.get(i);
+      if(!dto.getType().equals("null")) {
+        datasourceListBox.addItem(dto.getName(), dto.getName());
+      }
     }
     this.datasources = datasources;
     if(datasources.length() > 0) displayTablesFor(datasources.get(0).getName());

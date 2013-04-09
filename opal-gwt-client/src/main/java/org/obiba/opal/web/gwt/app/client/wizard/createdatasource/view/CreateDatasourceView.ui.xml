@@ -20,9 +20,10 @@
           </g:FlowPanel>
           <g:FlowPanel styleName="input">
             <g:Label addStyleNames="key">
-              <ui:msg description="Type label">Type</ui:msg>
+              <ui:msg description="Storage Type label">Storage Type</ui:msg>
             </g:Label>
             <o:Chooser ui:field="datasourceType">
+              <g:item value="null"></g:item>
               <g:item value="hibernate"></g:item>
               <g:item value="jdbc"></g:item>
             </o:Chooser>

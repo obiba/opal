@@ -21,7 +21,7 @@
         keyStyleNames="span2 small-indent">
       <g:FlowPanel>
         <g:Label>
-          <ui:msg description="Type label">Type</ui:msg>
+          <ui:msg description="Storage Type label">Storage Type</ui:msg>
         </g:Label>
         <g:Label ui:field="datasourceType"/>
       </g:FlowPanel>

@@ -284,4 +284,16 @@ public class NavigatorMenuBar extends MenuBar {
       copyDataItem.setEnabled(enabled);
     }
   }
+
+  public void setImportDataItemEnabled(boolean enabled) {
+    if(importDataItem != null) {
+      importDataItem.setEnabled(enabled);
+    }
+  }
+
+  public void setAddUpdateTablesItemEnabled(boolean enabled) {
+    if(addUpdateTablesItem != null) {
+      addUpdateTablesItem.setEnabled(enabled);
+    }
+  }
 }

@@ -82,6 +82,10 @@
       <artifactId>magma-datasource-limesurvey</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-null</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
@@ -97,11 +101,6 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-datasource-null</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
