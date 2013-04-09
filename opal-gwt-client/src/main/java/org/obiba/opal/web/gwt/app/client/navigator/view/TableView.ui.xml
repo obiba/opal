@@ -87,8 +87,9 @@
 
         <b:Controls addStyleNames="left-aligned">
           <b:InputAddOn prependIcon="FILTER">
-            <b:TextBox ui:field="filter"></b:TextBox>
+            <o:TextBoxClearable ui:field="filter"></o:TextBoxClearable>
           </b:InputAddOn>
+
         </b:Controls>
 
         <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>

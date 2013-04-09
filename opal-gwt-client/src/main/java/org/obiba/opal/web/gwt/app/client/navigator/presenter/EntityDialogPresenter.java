@@ -18,7 +18,9 @@ import java.util.Map;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -27,6 +29,8 @@ import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
+import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
@@ -43,7 +47,6 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Event;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
@@ -74,10 +77,11 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
-  public void initialize(TableDto table, String entityType, String entityId) {
+  public void initialize(TableDto table, String entityType, String entityId, String filterText) {
     selectedTable = table;
     this.entityType = entityType;
     this.entityId = entityId;
+    getView().getFilter().setText(filterText);
   }
 
   @Override
@@ -92,10 +96,24 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
       public void onChange(ChangeEvent event) {
         TableDto table = getView().getSelectedTable();
         if(table != null) {
-          getView().clearFilter();
-          selectedTable = table;
-          loadVariables(selectedTable);
+          // Fetch table info
+          UriBuilder uriBuilder = UriBuilder.create()
+              .segment("datasource", table.getDatasourceName(), "table", table.getName());
+          ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(uriBuilder.build()).get()
+              .withCallback(new ResourceCallback<TableDto>() {
+                @Override
+                public void onResource(Response response, TableDto resource) {
+                  selectedTable = resource;
+                  loadVariables(selectedTable, getView().getFilter().getText());
+                }
+              }).send();
         }
+      }
+    });
+    getView().getFilter().getClear().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        loadVariables(selectedTable, "");
       }
     });
   }
@@ -135,7 +153,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
             getView().setTables(resource, selectedTable);
-            loadVariables(selectedTable);
+            loadVariables(selectedTable, getView().getFilter().getText());
           }
         }).send();
   }
@@ -146,20 +164,29 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
   private void loadVariables(final TableDto table, final String select) {
     UriBuilder uriBuilder = UriBuilder.create()
-        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables");
+        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search");
 
     uriBuilder.query("query", select.isEmpty() ? "*" : select)//
         .query("limit", String.valueOf(table.getVariableCount()))//
         .query("variable", "true");
 
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseErrorCallback(getEventBus(), "InternalError"))
         .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariablesFound"))
-        .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+        .withCallback(new ResourceCallback<QueryResultDto>() {
           @Override
-          public void onResource(Response response, JsArray<VariableDto> resource) {
-            buildVariableMap(resource);
-            loadValueSets(table, select);
+          public void onResource(Response response, QueryResultDto resource) {
+            JsArray<VariableDto> variables = JsArrays.create();
+            if(resource.getHitsArray() != null && resource.getHitsArray().length() > 0) {
+              for(int i = 0; i < resource.getHitsArray().length(); i++) {
+                VariableItemDto varDto = (VariableItemDto) resource.getHitsArray().get(i)
+                    .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
+
+                variables.push(varDto.getVariable());
+              }
+            }
+            buildVariableMap(variables);
+            loadValueSets(table);
           }
 
           private void buildVariableMap(JsArray<VariableDto> variables) {
@@ -171,15 +198,11 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
             }
           }
 
-          private void loadValueSets(TableDto table, String filter) {
+          private void loadValueSets(TableDto table) {
             UriBuilder uriBuilder = UriBuilder.create()
                 .segment("datasource", table.getDatasourceName(), "table", table.getName(), "valueSet", entityId);
 
             StringBuilder link = new StringBuilder(uriBuilder.build());
-
-            if(!filter.isEmpty()) {
-              link.append("?select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
-            }
 
             ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link.toString()).get()
                 .withCallback(Response.SC_INTERNAL_SERVER_ERROR,
@@ -202,18 +225,15 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
                     for(int i = 0; i < variableCount; i++) {
                       String variableName = variables.get(i);
-                      rows.add(new VariableValueRow(variableName, values.get(i), variablesMap.get(variableName)));
+                      if(variablesMap.containsKey(variableName)) {
+                        rows.add(new VariableValueRow(variableName, values.get(i), variablesMap.get(variableName)));
+                      }
                     }
-
                     getView().renderRows(rows);
                   }
                 }).send();
           }
         }).send();
-  }
-
-  private String cleanFilter(String filter) {
-    return filter.replaceAll("/", "\\\\/");
   }
 
   // TODO Generalized this function so other Presenters can use it
@@ -306,13 +326,13 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
     void renderRows(List<VariableValueRow> rows);
 
-    void clearFilter();
-
     HasClickHandlers getButton();
 
     TableDto getSelectedTable();
 
     HasChangeHandlers getTableChooser();
+
+    TextBoxClearable getFilter();
   }
 
   public static class VariableValueRow {
