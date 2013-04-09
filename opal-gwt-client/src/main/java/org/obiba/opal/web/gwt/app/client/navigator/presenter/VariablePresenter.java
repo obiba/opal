@@ -44,7 +44,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
@@ -386,7 +385,6 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     @Override
     public void execute() {
 
-      GWT.log("New edit command");
       ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(getViewLink()).get()
           .withCallback(new ResourceCallback<ViewDto>() {
 
