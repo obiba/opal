@@ -60,7 +60,7 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
   private CategoricalSummaryDto queryEs(boolean distinct) {
 
-    log.info("Query ES for {} summary", getVariable().getName());
+    log.debug("Query ES for {} summary", getVariable().getName());
 
     try {
 
@@ -69,10 +69,10 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
           .addTerm("_type", statsIndexManager.getIndex(getValueTable()).getIndexName()) //
           .addTerm("nature", "categorical") //
           .addTerm("distinct", String.valueOf(distinct)).build();
-      log.debug("ES query: {}", esQuery.toString(2));
+      log.trace("ES query: {}", esQuery.toString(2));
 
       JSONObject response = new EsQueryExecutor(esProvider).execute(esQuery);
-      log.debug("ES Response: {}", response.toString(2));
+      log.trace("ES Response: {}", response.toString(2));
 
       JSONObject jsonHitsInfo = response.getJSONObject("hits");
       if(jsonHitsInfo.getInt("total") != 1) {
@@ -96,7 +96,7 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
   private CategoricalSummaryDto queryMagma(boolean distinct) {
 
-    log.info("Query Magma for {} summary", getVariable().getName());
+    log.debug("Query Magma for {} summary", getVariable().getName());
 
     CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(getVariable()) //
         .distinct(distinct) //

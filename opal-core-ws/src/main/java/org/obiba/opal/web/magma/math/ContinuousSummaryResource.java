@@ -65,7 +65,7 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
   }
 
   private ContinuousSummaryDto queryEs(Distribution distribution, List<Double> percentiles, int intervals) {
-    log.info("Query ES for {} summary", getVariable().getName());
+    log.debug("Query ES for {} summary", getVariable().getName());
 
     try {
 
@@ -76,10 +76,10 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
           .addTerm("nature", "continuous") //
           .addTerm("distribution", distribution.name()) //
           .addTerm("intervals", String.valueOf(intervals)).build();
-      log.debug("ES query: {}", esQuery.toString(2));
+      log.trace("ES query: {}", esQuery.toString(2));
 
       JSONObject response = new EsQueryExecutor(esProvider).execute(esQuery);
-      log.debug("ES Response: {}", response.toString(2));
+      log.trace("ES Response: {}", response.toString(2));
 
       JSONObject jsonHitsInfo = response.getJSONObject("hits");
       if(jsonHitsInfo.getInt("total") != 1) {
@@ -103,7 +103,7 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
 
   private ContinuousSummaryDto queryMagma(Distribution distribution, List<Double> percentiles, int intervals) {
 
-    log.info("Query Magma for {} summary", getVariable().getName());
+    log.debug("Query Magma for {} summary", getVariable().getName());
 
     ContinuousVariableSummary summary = new ContinuousVariableSummary.Builder(getVariable(), distribution) //
         .defaultPercentiles(percentiles) //
