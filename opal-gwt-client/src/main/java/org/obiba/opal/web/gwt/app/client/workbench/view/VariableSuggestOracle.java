@@ -160,17 +160,14 @@ public class VariableSuggestOracle extends SuggestOracle {
 
   @Override
   public void requestSuggestions(final Request request, final Callback callback) {
-    String query = request.getQuery();
+    final String query = request.getQuery();
 
     if(query.length() > 1) {
-      // Uppercase operators AND, OR, NOT
-      query = query.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ");
       UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
           .query("query", query)//
           .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
 
       // Get candidates from search words.
-      final String finalQuery = query;
       ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
           .withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
 
@@ -202,7 +199,7 @@ public class VariableSuggestOracle extends SuggestOracle {
                     }
                   }
 
-                  suggestions.add(convertToFormattedSuggestions(finalQuery, attributes));
+                  suggestions.add(convertToFormattedSuggestions(query, attributes));
                 }
 
                 // Convert candidates to suggestions.

@@ -29,13 +29,8 @@
       <g:FlowPanel addStyleNames="right-aligned small-search-box">
         <g:Grid>
           <g:row>
-            <!--<g:customCell styleName="top-aligned">-->
-            <!--<g:Label>-->
-            <!--<ui:msg description="Variable label">Variables </ui:msg>-->
-            <!--</g:Label>-->
-            <!--</g:customCell>-->
             <g:customCell styleName="top-aligned">
-              <g:SuggestBox ui:field="search" styleName="variable-search-box"></g:SuggestBox>
+              <g:SuggestBox ui:field="search" addStyleNames="variable-search-box"></g:SuggestBox>
             </g:customCell>
             <g:customCell styleName="top-aligned">
               <o:HelpImage page="Working+with+Datasources" imageSize="16" addStyleNames="xsmall-indent"></o:HelpImage>

@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEve
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -74,7 +75,6 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -180,6 +180,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().setPreviousCommand(new PreviousCommand());
     getView().setNextCommand(new NextCommand());
     getView().setValuesTabCommand(new ValuesCommand());
+    getView().setVariablesTabCommand(new VariablesCommand());
 
     // Copy variables handler
     getView().getCopyVariables().addClickHandler(new ClickHandler() {
@@ -197,6 +198,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     // Filter variable event
     registerHandler(getView().addFilterVariableHandler(new FilterVariableHandler()));
+    // Filter: Clear filter event
+    registerHandler(getView().getFilter().getClear().addClickHandler(new FilterClearHandler()));
 
     // OPAL-975
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
@@ -520,8 +523,24 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void execute() {
       valuesTablePresenter.setTable(table);
+      valuesTablePresenter.setFilter(getView().getFilter().getText());
     }
+  }
 
+  private final class VariablesCommand implements Command {
+
+    @Override
+    public void execute() {
+      getView().getFilter().setText(valuesTablePresenter.getView().getFilterText());
+
+      // Fetch variables
+      if(valuesTablePresenter.getView().getFilterText().isEmpty()) {
+        updateVariables();
+      } else {
+        String sortColumnName = getView().getClickableColumnName(sortColumn);
+        doFilterVariables(sortColumnName);
+      }
+    }
   }
 
   /**
@@ -581,47 +600,54 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       if(filter.isEmpty()) {
         updateVariables();
       } else if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+        doFilterVariables(sortColumnName);
+      }
+    }
+  }
 
-        String query = getView().getFilter().getText();
-        query = query.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ");
+  private void doFilterVariables(String sortColumnName) {
+    String query = getView().getFilter().getText();
+    UriBuilder ub = UriBuilder.create()
+        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
+        .query("query", query)//
+        .query("limit", String.valueOf(table.getVariableCount()))//
+        .query("variable", "true");
 
-        UriBuilder ub = UriBuilder.create()
-            .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
-            .query("query", query)//
-            .query("limit", String.valueOf(table.getVariableCount()))//
-            .query("variable", "true");
+    // Keep sort info
+    ub.query("sortField", sortColumnName == null ? "index" : sortColumnName);
+    ub.query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
 
-        // Keep sort info
-        if(sortColumnName != null) {
-          ub.query("sortField", sortColumnName);
-        }
-        ub.query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResourceCallback<QueryResultDto>() {
+          @Override
+          public void onResource(Response response, QueryResultDto resultDto) {
+            if(response.getStatusCode() == Response.SC_OK) {
 
-        ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
-            .withCallback(new ResourceCallback<QueryResultDto>() {
-              @Override
-              public void onResource(Response response, QueryResultDto resource) {
-                if(response.getStatusCode() == Response.SC_OK) {
-                  QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
+              JsArray<VariableDto> variables = JsArrays.create();
+              if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
+                for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+                  VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
+                      .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
 
-                  JsArray<VariableDto> variables = JsArrays.create();
-                  for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-                    VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
-                        .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
-
-                    variables.push(varDto.getVariable());
-                  }
-                  getView().renderRows(variables);
+                  variables.push(varDto.getVariable());
                 }
               }
-            })//
-            .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
-              }
-            }).send();
-      }
+              getView().renderRows(variables);
+            }
+          }
+        })//
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+          }
+        }).send();
+  }
+
+  private final class FilterClearHandler implements ClickHandler {
+    @Override
+    public void onClick(ClickEvent event) {
+      updateVariables();
     }
   }
 
@@ -989,6 +1015,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setValuesTabCommand(Command cmd);
 
+    void setVariablesTabCommand(Command cmd);
+
     boolean isValuesTabSelected();
 
     void setIndexStatusVisible(boolean b);
@@ -1013,7 +1041,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     HandlerRegistration addFilterVariableHandler(KeyUpHandler handler);
 
-    HasText getFilter();
+    TextBoxClearable getFilter();
   }
 
 }

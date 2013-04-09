@@ -16,10 +16,10 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresent
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -90,7 +90,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   TableChooser tableChooser;
 
   @UiField
-  TextBox filter;
+  TextBoxClearable filter;
 
   @UiField
   Button closeButton;
@@ -124,13 +124,14 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   }
 
   private void initializeDisplayOptions() {
-    filter.setPlaceholder(translations.filterVariables());
-    filter.addKeyUpHandler(new KeyUpHandler() {
+    filter.getClear().setTitle(translations.clearFilter());
+    filter.getTextBox().setPlaceholder(translations.filterVariables());
+    filter.getTextBox().addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getText().isEmpty()) {
+        if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getTextBox().getText().isEmpty()) {
           // variables list has changed so update all
-          variablesFilterHandler.filterVariables(filter.getText());
+          variablesFilterHandler.filterVariables(filter.getTextBox().getText());
         }
       }
     });
@@ -204,8 +205,8 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   }
 
   @Override
-  public void clearFilter() {
-    filter.setText("");
+  public TextBoxClearable getFilter() {
+    return filter;
   }
 
   private void clear() {
@@ -215,7 +216,6 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
       table.removeColumn(0);
     }
 
-    clearFilter();
     addTableColumns();
   }
 

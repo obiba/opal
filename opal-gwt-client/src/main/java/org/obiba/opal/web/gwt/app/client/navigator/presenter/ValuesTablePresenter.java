@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -32,6 +33,8 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -104,11 +107,22 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     fetcher.updateVariables(select);
   }
 
+  public void setFilter(String filter) {
+    getView().setFilterText(filter);
+  }
+
   @Override
   protected void onBind() {
     super.onBind();
     getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
     getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
+
+    registerHandler(getView().getFilter().getClear().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        fetcher.updateVariables(getView().getFilter().getTextBox().getText());
+      }
+    }));
   }
 
   /**
@@ -268,16 +282,18 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<QueryResultDto>() {
             @Override
-            public void onResource(Response response, QueryResultDto resource) {
+            public void onResource(Response response, QueryResultDto resultDto) {
               if(response.getStatusCode() == Response.SC_OK) {
-                QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
                 List<VariableDto> variables = new ArrayList<VariableDto>();
-                for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-                  VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
-                      .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
+                if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
+                  ;
+                  for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+                    VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
+                        .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
 
-                  variables.add(varDto.getVariable());
+                    variables.add(varDto.getVariable());
+                  }
                 }
                 request(variables, offset, limit);
               }
@@ -342,15 +358,13 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestEntityDialog(String entityType, String entityId) {
-      entityDialogPresenter.initialize(table, entityType, entityId);
+      entityDialogPresenter.initialize(table, entityType, entityId, getView().getFilterText());
       addToPopupSlot(entityDialogPresenter);
     }
 
     @Override
     public void updateVariables(String select) {
-      final String query = select.isEmpty()
-          ? "*"
-          : select.replaceAll(" and ", " AND ").replaceAll(" or ", " OR ").replaceAll(" not ", " NOT ");
+      final String query = select.isEmpty() ? "*" : select;
 
       UriBuilder ub = UriBuilder.create()
           .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
@@ -377,7 +391,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             public void onResponseCode(Request request, Response response) {
               // Use the previous way of filtering variables
               String link = table.getLink() + "/variables";
-              if(query != null && !query.isEmpty()) {
+              if(!query.isEmpty()) {
                 link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(query) + "/)");
               }
               if(variablesRequest != null) {
@@ -418,6 +432,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void setViewMode(ViewMode mode);
 
     void setVariableLabelFieldUpdater(ValueUpdater<String> updater);
+
+    void setFilterText(String filter);
+
+    String getFilterText();
+
+    TextBoxClearable getFilter();
   }
 
   public enum ViewMode {
