@@ -342,7 +342,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getTextBox().getText().isEmpty()) {
-      lastFilter = "^" + escape(listVariable.get(0).getName()) + "$";
+      lastFilter = "fullName:\"" + table.getDatasourceName() + "." + table.getName() + ":" +
+          escape(listVariable.get(0).getName()) + "\"";
       filter.getTextBox().setValue(lastFilter, false);
     }
 
