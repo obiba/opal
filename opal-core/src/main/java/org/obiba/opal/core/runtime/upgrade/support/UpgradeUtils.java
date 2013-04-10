@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 import javax.sql.DataSource;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry;
 import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
@@ -35,18 +36,18 @@ public class UpgradeUtils {
 
   private final static Logger log = LoggerFactory.getLogger(UpgradeUtils.class);
 
-  private final OpalConfigurationProvider opalConfigurationProvider;
-
   private final DataSourceFactory dataSourceFactory;
 
   private final DataSource opalDataSource;
 
   private final DataSource keyDataSource;
 
+  private final OpalConfigurationService configurationService;
+
   @Autowired
-  public UpgradeUtils(OpalConfigurationProvider opalConfigurationProvider, DataSourceFactory dataSourceFactory,
+  public UpgradeUtils(OpalConfigurationService configurationService, DataSourceFactory dataSourceFactory,
       DataSource opalDataSource, DataSource keyDataSource) {
-    this.opalConfigurationProvider = opalConfigurationProvider;
+    this.configurationService = configurationService;
     this.dataSourceFactory = dataSourceFactory;
     this.opalDataSource = opalDataSource;
     this.keyDataSource = keyDataSource;
@@ -70,7 +71,7 @@ public class UpgradeUtils {
     dataSourceNames.put(opalDataSource, "Default");
     dataSourceNames.put(keyDataSource, "Key");
 
-    OpalConfiguration configuration = opalConfigurationProvider.readOpalConfiguration(true);
+    OpalConfiguration configuration = configurationService.getOpalConfiguration();
     try {
       DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig dataSourcesConfig = configuration
           .getExtension(DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig.class);
