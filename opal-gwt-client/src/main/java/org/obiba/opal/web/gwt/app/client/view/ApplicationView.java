@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -38,29 +39,23 @@ import com.google.gwt.user.client.ui.Widget;
 public class ApplicationView implements ApplicationPresenter.Display {
 
   @UiTemplate("ApplicationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<LayoutPanel, ApplicationView> {}
+  interface ViewUiBinder extends UiBinder<Panel, ApplicationView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private final LayoutPanel dock;
+  private final Panel dock;
 
   @UiField
-  Panel topBar;
+  NavLink help;
 
   @UiField
-  MenuBar menuBar;
+  NavLink quit;
 
   @UiField
-  Anchor help;
+  NavLink administration;
 
   @UiField
-  Anchor quit;
-
-  @UiField
-  Anchor administration;
-
-  @UiField
-  InlineLabel username;
+  NavLink username;
 
   @UiField
   Anchor obiba;
@@ -69,22 +64,22 @@ public class ApplicationView implements ApplicationPresenter.Display {
   Label version;
 
   @UiField
-  MenuItem dashboardItem;
+  NavLink dashboardItem;
 
   @UiField
-  MenuItem datasourcesItem;
+  NavLink datasourcesItem;
 
   @UiField
-  MenuItem listJobsItem;
+  NavLink listJobsItem;
 
   @UiField
-  MenuItem fileExplorer;
+  NavLink fileExplorer;
 
   @UiField
-  MenuItem reportsItem;
+  NavLink reportsItem;
 
   @UiField
-  MenuItem unitsItem;
+  NavLink unitsItem;
 
   @UiField
   Panel workbench;
@@ -121,12 +116,12 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
-  public MenuItem getDashboardItem() {
+  public NavLink getDashboardItem() {
     return dashboardItem;
   }
 
   @Override
-  public MenuItem getListJobsItem() {
+  public NavLink getListJobsItem() {
     return listJobsItem;
   }
 
@@ -162,12 +157,12 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
-  public MenuItem getFileExplorerItem() {
+  public NavLink getFileExplorerItem() {
     return fileExplorer;
   }
 
   @Override
-  public MenuItem getReportsItem() {
+  public NavLink getReportsItem() {
     return reportsItem;
   }
 
@@ -188,12 +183,12 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
-  public MenuItem getDatasourcesItem() {
+  public NavLink getDatasourcesItem() {
     return datasourcesItem;
   }
 
   @Override
-  public MenuItem getUnitsItem() {
+  public NavLink getUnitsItem() {
     return unitsItem;
   }
 

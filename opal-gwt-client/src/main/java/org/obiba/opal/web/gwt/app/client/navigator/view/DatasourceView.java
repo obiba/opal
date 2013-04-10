@@ -53,9 +53,6 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   private final Widget widget;
 
   @UiField
-  Label datasourceName;
-
-  @UiField
   Label datasourceType;
 
   @UiField
@@ -184,7 +181,6 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public void setDatasource(DatasourceDto dto) {
-    datasourceName.setText(dto.getName());
     datasourceType.setText(translations.datasourceTypeMap().get(dto.getType()));
     toolbar.getAddItem().setVisible(false);
     boolean isNull = "null".equals(dto.getType());

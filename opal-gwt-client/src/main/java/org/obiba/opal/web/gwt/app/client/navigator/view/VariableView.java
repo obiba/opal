@@ -74,9 +74,6 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   private final NavigatorMenuBar toolbar;
 
   @UiField
-  Label variableName;
-
-  @UiField
   Label entityType;
 
   @UiField
@@ -271,7 +268,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
 
   @Override
   public void setVariableName(String name) {
-    variableName.setText(name);
+
   }
 
   @Override

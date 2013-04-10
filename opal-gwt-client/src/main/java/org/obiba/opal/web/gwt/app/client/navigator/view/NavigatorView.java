@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -27,9 +28,8 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -44,10 +44,10 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   private static final NavigatorViewUiBinder uiBinder = GWT.create(NavigatorViewUiBinder.class);
 
   @UiField
-  ScrollPanel navigatorDisplayPanel;
+  Panel navigatorDisplayPanel;
 
   @UiField
-  ScrollPanel treePanel;
+  Panel breadcrumb;
 
   @UiField
   Button createDatasourceButton;
@@ -93,7 +93,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @Override
   public void addToSlot(Object slot, Widget content) {
     if(slot == NavigatorPresenter.LEFT_PANE) {
-      treePanel.add(content);
+      breadcrumb.add(content);
     } else {
       navigatorDisplayPanel.add(content);
     }
@@ -102,7 +102,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @Override
   public void removeFromSlot(Object slot, Widget content) {
     if(slot == NavigatorPresenter.LEFT_PANE) {
-      treePanel.remove(content);
+      breadcrumb.remove(content);
     } else {
       navigatorDisplayPanel.remove(content);
     }
@@ -111,8 +111,8 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @Override
   public void setInSlot(Object slot, Widget content) {
     if(slot == NavigatorPresenter.LEFT_PANE) {
-      treePanel.clear();
-      treePanel.add(content);
+      breadcrumb.clear();
+      breadcrumb.add(content);
     } else {
       navigatorDisplayPanel.clear();
       navigatorDisplayPanel.add(content);

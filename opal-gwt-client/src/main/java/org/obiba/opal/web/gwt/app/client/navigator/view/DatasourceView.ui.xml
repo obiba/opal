@@ -8,13 +8,6 @@
 
   <g:FlowPanel width="100%" addStyleNames="navigator">
 
-    <g:FlowPanel addStyleNames="titlebar">
-      <g:Label addStyleNames="title" ui:field="datasourceName">opal-data</g:Label>
-      <g:Label addStyleNames="small-indent">
-        <ui:msg description="Datasource title in parentheses">(Datasource)</ui:msg>
-      </g:Label>
-    </g:FlowPanel>
-
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
     <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" addStyleNames="small-dual-indent top-margin"

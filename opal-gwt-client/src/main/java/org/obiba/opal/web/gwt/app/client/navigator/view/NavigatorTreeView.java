@@ -9,19 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.github.gwtbootstrap.client.ui.NavLink;
 
-import javax.annotation.Nullable;
-
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.event.logical.shared.HasSelectionHandlers;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -30,170 +28,93 @@ import com.gwtplatform.mvp.client.ViewImpl;
  */
 public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresenter.Display {
 
-  Tree tree;
+  private final Translations translations = GWT.create(Translations.class);
 
-  TreeItem currentSelection = null;
+  private Breadcrumbs breadcrumbs;
+
+  private String table;
+
+  private String datasource;
+
+  private ClickHandler datasourceClickHandler;
+
+  private ClickHandler tableClickHandler;
 
   public NavigatorTreeView() {
-    tree = new Tree();
-    tree.setAnimationEnabled(true);
-    tree.addSelectionHandler(new SelectionHandler<TreeItem>() {
-
-      @Override
-      public void onSelection(SelectionEvent<TreeItem> event) {
-        TreeItem item = event.getSelectedItem();
-        item.addStyleName("selected");
-        if(currentSelection != null && !currentSelection.equals(item)) {
-          currentSelection.removeStyleName("selected");
-        }
-        currentSelection = item;
-      }
-    });
-  }
-
-  @Override
-  public void setItems(List<TreeItem> items) {
-    // update items and keep tree state as much as possible
-    Collection<String> expandedItems = new ArrayList<String>();
-    for(int i = 0; i < tree.getItemCount(); i++) {
-      TreeItem item = tree.getItem(i);
-      if(item.getState()) {
-        expandedItems.add(item.getText());
-      }
-    }
-    tree.clear();
-    for(TreeItem item : items) {
-      item.setState(expandedItems.contains(item.getText()));
-      tree.addItem(item);
-    }
-    if(currentSelection == null) return;
-
-    if(currentSelection.getParentItem() != null) {
-      reselectTable();
-    } else {
-      reselectDatasource();
-    }
-  }
-
-  private void reselectTable() {
-    String datasourceName = currentSelection.getParentItem().getText();
-    currentSelection = getTableItem(datasourceName, currentSelection.getText());
-    if(currentSelection == null) {
-      selectDatasource(datasourceName, true);
-    } else {
-      // soft selection (do not trigger event)
-      currentSelection.addStyleName("selected");
-      tree.setSelectedItem(currentSelection, false);
-    }
-  }
-
-  private void reselectDatasource() {
-    currentSelection = getDatasourceItem(currentSelection.getText());
-    if(currentSelection == null) {
-      selectFirstDatasource(true);
-    } else {
-      // soft selection (do not trigger event)
-      currentSelection.addStyleName("selected");
-      tree.setSelectedItem(currentSelection, false);
-    }
-  }
-
-  @Override
-  public HasSelectionHandlers<TreeItem> getTree() {
-    return tree;
+    breadcrumbs = new Breadcrumbs();
   }
 
   @Override
   public void clear() {
-    tree.clear();
+    breadcrumbs.clear();
+    breadcrumbs.add(new NavLink("Projects"));
+  }
+
+  @Override
+  public void selectVariable(TableDto table, VariableDto variable, boolean fireEvent) {
+    clear();
+    breadcrumbs.add(getDatasourceLink(table.getDatasourceName()));
+    breadcrumbs.add(getTableLink(table.getName()));
+    breadcrumbs.add(new NavLink(variable.getName()));
   }
 
   @Override
   public Widget asWidget() {
-    return tree;
+    return breadcrumbs;
   }
 
   @Override
-  public void selectFirstDatasource(boolean fireEvents) {
-    tree.setSelectedItem(tree.getItem(0), fireEvents);
-  }
-
-  @Override
-  public void selectTable(String datasourceName, String tableName, boolean fireEvents) {
-    if(!isTableSelected(datasourceName, tableName)) {
-      TreeItem dsItem = getDatasourceItem(datasourceName);
-      if(dsItem != null) {
-        dsItem.setState(true);
-        selectChildren(tableName, dsItem, fireEvents);
-      }
-    }
-  }
-
-  private void selectChildren(String tableName, TreeItem dsItem, boolean fireEvents) {
-    for(int j = 0; j < dsItem.getChildCount(); j++) {
-      TreeItem tableItem = dsItem.getChild(j);
-      if(tableName.equals(tableItem.getText())) {
-        tree.setSelectedItem(tableItem, fireEvents);
-        break;
-      }
+  public void selectTable(String datasource, String table, boolean fireEvents) {
+    clear();
+    breadcrumbs.add(getDatasourceLink(datasource));
+    breadcrumbs.add(getTableLink(table));
+    if (fireEvents) {
+      tableClickHandler.onClick(null);
     }
   }
 
   @Override
-  public void selectDatasource(String datasourceName, boolean fireEvents) {
-    if(!isDatasourceSelected(datasourceName)) {
-      TreeItem dsItem = getDatasourceItem(datasourceName);
-      if(dsItem != null) {
-        tree.setSelectedItem(dsItem, fireEvents);
-      }
+  public void selectDatasource(String datasource, boolean fireEvents) {
+    clear();
+    breadcrumbs.add(getDatasourceLink(datasource));
+    this.datasource = datasource;
+    if (fireEvents) {
+      datasourceClickHandler.onClick(null);
     }
-  }
-
-  @Nullable
-  private TreeItem getDatasourceItem(String datasourceName) {
-    for(int i = 0; i < tree.getItemCount(); i++) {
-      TreeItem dsItem = tree.getItem(i);
-      if(dsItem.getText().equals(datasourceName)) {
-        return dsItem;
-      }
-    }
-    return null;
-  }
-
-  @Nullable
-  private TreeItem getTableItem(String datasourceName, String tableName) {
-    TreeItem dsItem = getDatasourceItem(datasourceName);
-    if(dsItem != null) {
-      for(int j = 0; j < dsItem.getChildCount(); j++) {
-        TreeItem tableItem = dsItem.getChild(j);
-        if(tableName.equals(tableItem.getText())) {
-          return tableItem;
-        }
-      }
-    }
-    return null;
-  }
-
-  private boolean isDatasourceSelected(String datasourceName) {
-    TreeItem selected = tree.getSelectedItem();
-    return selected != null && selected.getParentItem() == null && selected.getText().equals(datasourceName);
-  }
-
-  private boolean isTableSelected(String datasourceName, String tableName) {
-    TreeItem selected = tree.getSelectedItem();
-    return selected != null && selected.getParentItem() != null &&
-        selected.getParentItem().getText().equals(datasourceName) && selected.getText().equals(tableName);
   }
 
   @Override
-  public boolean hasDatasource(String datasourceName) {
-    for(int i = 0; i < tree.getItemCount(); i++) {
-      TreeItem dsItem = tree.getItem(i);
-      if(dsItem.getText().equals(datasourceName)) {
-        return true;
-      }
-    }
-    return false;
+  public void setDatasourceClickHandler(ClickHandler handler) {
+    datasourceClickHandler = handler;
+  }
+
+  @Override
+  public void setTableClickHandler(ClickHandler handler) {
+    tableClickHandler = handler;
+  }
+
+  @Override
+  public String getDatasourceName() {
+    return datasource;
+  }
+
+  @Override
+  public String getTableName() {
+    return table;
+  }
+
+  private NavLink getDatasourceLink(String datasourceName) {
+    NavLink link = new NavLink(datasourceName);
+    link.addClickHandler(datasourceClickHandler);
+    datasource = datasourceName;
+    return link;
+  }
+
+  private NavLink getTableLink(String tableName) {
+    NavLink link = new NavLink(tableName);
+    link.addClickHandler(tableClickHandler);
+    table = tableName;
+    return link;
   }
 
 }

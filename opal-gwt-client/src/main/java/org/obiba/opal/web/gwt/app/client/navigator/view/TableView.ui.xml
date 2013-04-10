@@ -8,11 +8,6 @@
     ui:generateLocales="default">
 
   <g:FlowPanel width="100%" addStyleNames="navigator">
-    <g:FlowPanel addStyleNames="titlebar">
-      <g:Label addStyleNames="title" ui:field="tableName">Table Name</g:Label>
-      <g:Label addStyleNames="small-indent" ui:field="tableOrView">(View)</g:Label>
-    </g:FlowPanel>
-
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
     <g:FlowPanel ui:field="indexStatus" addStyleNames="index-status" visible="false">

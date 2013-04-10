@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -58,19 +59,19 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     HasUrl getDownloder();
 
-    MenuItem getDatasourcesItem();
+    NavLink getDatasourcesItem();
 
     HasAuthorization getAdministrationAuthorizer();
 
-    MenuItem getListJobsItem();
+    NavLink getListJobsItem();
 
-    MenuItem getFileExplorerItem();
+    NavLink getFileExplorerItem();
 
-    MenuItem getDashboardItem();
+    NavLink getDashboardItem();
 
-    MenuItem getReportsItem();
+    NavLink getReportsItem();
 
-    MenuItem getUnitsItem();
+    NavLink getUnitsItem();
 
     void setCurrentSelection(MenuItem selection);
 
@@ -146,50 +147,44 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     }));
 
-    getView().getDashboardItem().setCommand(new Command() {
-
+    getView().getDashboardItem().addClickHandler(new ClickHandler() {
       @Override
-      public void execute() {
+      public void onClick(ClickEvent event) {
         getEventBus().fireEvent(new PlaceChangeEvent(Places.dashboardPlace));
       }
     });
 
-    getView().getReportsItem().setCommand(new Command() {
-
+    getView().getDatasourcesItem().addClickHandler(new ClickHandler() {
       @Override
-      public void execute() {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.reportTemplatesPlace));
-      }
-    });
-
-    getView().getUnitsItem().setCommand(new Command() {
-
-      @Override
-      public void execute() {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.unitsPlace));
-      }
-    });
-
-    getView().getDatasourcesItem().setCommand(new Command() {
-
-      @Override
-      public void execute() {
+      public void onClick(ClickEvent event) {
         getEventBus().fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
       }
     });
 
-    getView().getListJobsItem().setCommand(new Command() {
-
+    getView().getReportsItem().addClickHandler(new ClickHandler() {
       @Override
-      public void execute() {
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.reportTemplatesPlace));
+      }
+    });
+
+    getView().getUnitsItem().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.unitsPlace));
+      }
+    });
+
+    getView().getListJobsItem().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
         getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
       }
     });
 
-    getView().getFileExplorerItem().setCommand(new Command() {
-
+    getView().getFileExplorerItem().addClickHandler(new ClickHandler() {
       @Override
-      public void execute() {
+      public void onClick(ClickEvent event) {
         getEventBus().fireEvent(new PlaceChangeEvent(Places.filesPlace));
       }
     });

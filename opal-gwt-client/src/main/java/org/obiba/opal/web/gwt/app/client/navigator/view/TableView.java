@@ -93,12 +93,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   private final NavigatorMenuBar toolbar;
 
   @UiField
-  Label tableName;
-
-  @UiField
-  Label tableOrView;
-
-  @UiField
   Label entityType;
 
   @UiField
@@ -332,13 +326,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void setTable(TableDto dto) {
-    tableName.setText(dto.getName());
-
-    String tableOrViewText = dto.hasViewLink() ? translations.viewLabel() : translations.tableLabel();
-    tableOrView.setText("(" + tableOrViewText + ")");
-
     entityType.setText(dto.getEntityType());
-
     entityCount.setText(Integer.toString(dto.getValueSetCount()));
   }
 

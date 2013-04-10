@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import java.util.Iterator;
 
+import com.github.gwtbootstrap.client.ui.Row;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -19,6 +20,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
@@ -40,19 +42,19 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
   //
 
   @UiField
-  DockLayoutPanel workbench;
+  Panel workbench;
 
   @UiField
-  FlowPanel topHeader;
+  Row topHeader;
 
   @UiField
-  SimplePanel controlContent;
+  Row controlContent;
 
   @UiField
-  SplitLayoutPanel content;
+  Row content;
 
   @UiField
-  ScrollPanel mainContent;
+  SimplePanel mainContent;
 
   private final WidgetCollection children = new WidgetCollection(this);
 
@@ -70,26 +72,6 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
 
   public WorkbenchLayout() {
     initWidget(uiBinder.createAndBindUi(this));
-    addHandlers();
-  }
-
-  private void addHandlers() {
-  }
-
-  public Widget getTitleWidget() {
-    return titleWidget;
-  }
-
-  public Widget getSummaryWidget() {
-    return summaryWidget;
-  }
-
-  public Widget getControlWidget() {
-    return controlWidget;
-  }
-
-  public Widget getMainWidget() {
-    return mainWidget;
   }
 
   public void setTitleWidget(Widget w) {
@@ -103,26 +85,27 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
     children.add(w);
     summaryWidget = w;
     summaryWidget.removeFromParent();
-    // topHeader.add(summaryWidget);
+    topHeader.add(summaryWidget);
   }
 
   public void setControlWidget(Widget w) {
     children.add(w);
     controlWidget = w;
-    controlContent.setWidget(controlWidget);
+    controlContent.add(controlWidget);
   }
 
   public void setMainWidget(Widget w) {
     children.add(w);
     mainWidget = w;
-    if(mainWidget instanceof DockLayoutPanel) {
+    mainContent.setWidget(mainWidget);
+    /*if(mainWidget instanceof DockLayoutPanel) {
       mainWidget.removeFromParent();
       content.remove(mainContent);
       mainWidget.setStyleName("main", true);
       content.add(mainWidget);
     } else {
-      mainContent.setWidget(mainWidget);
-    }
+
+    }*/
   }
 
   //
