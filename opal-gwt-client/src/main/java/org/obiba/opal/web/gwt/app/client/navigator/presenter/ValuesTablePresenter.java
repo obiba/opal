@@ -287,7 +287,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
                 List<VariableDto> variables = new ArrayList<VariableDto>();
                 if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
-                  ;
                   for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
                     VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
                         .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
@@ -391,7 +390,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             public void onResponseCode(Request request, Response response) {
               // Use the previous way of filtering variables
               String link = table.getLink() + "/variables";
-              if(!query.isEmpty()) {
+
+              if(!"*".equals(query)) {
                 link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(query) + "/)");
               }
               if(variablesRequest != null) {
@@ -412,7 +412,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             }
           }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND)//
           .send();
-//
     }
   }
 
