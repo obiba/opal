@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -64,7 +65,7 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
   }
 
   public void setEntityType(String entityType) {
-    getView().setUnitRadiosEnabled("Participant".equalsIgnoreCase(entityType));
+    getView().setUnitRadiosEnabled(Strings.isNullOrEmpty(entityType) || "Participant".equalsIgnoreCase(entityType));
   }
 
   public void updateImportConfig(ImportConfig importConfig) {
