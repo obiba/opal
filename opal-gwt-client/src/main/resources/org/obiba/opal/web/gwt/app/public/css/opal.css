@@ -2399,6 +2399,7 @@ a.icon:hover {
   *display: inline;
   padding-right: 4px;
   vertical-align: middle;
+  background-color: #FFFFFF;
 }
 
 .texbox-clearable-wrapper .textbox-clearable-anchor {
@@ -2412,6 +2413,7 @@ a.icon:hover {
   width: 14px;
   height: 14px;
   font-size: 14px;
+  background-color: #FFFFFF;
 }
 
 .texbox-clearable-wrapper .textbox-clearable-anchor a {
@@ -2427,6 +2429,7 @@ a.icon:hover {
   color: #FFFFFF;
   width: 14px;
   font-size: 14px;
+  background-color: #FFFFFF;
 }
 
 .texbox-clearable-wrapper .textbox-clearable-anchor:hover {
