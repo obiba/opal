@@ -33,8 +33,10 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.AbstractSafeHtmlCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -266,7 +268,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private void setRefreshing(boolean refresh) {
     refreshPending.setVisible(refresh);
-//    refreshButton.setEnabled(!refresh);
   }
 
   private String getColumnLabel(int i) {
@@ -291,12 +292,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private Header<String> getColumnHeader(final int i) {
 
-    Header<String> header = new Header<String>(new ClickableTextCell(new VariableHeaderHtmlRenderer())) {
-      @Override
-      public String getValue() {
-        return listVariable.get(i).getName();
-      }
-    };
+    Header<String> header = new Header<String>(createColumnHeaderCell()) {
+          @Override
+          public String getValue() {
+            return listVariable.get(i).getName();
+          }
+        };
 
     header.setUpdater(updater);
 
@@ -306,6 +307,14 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @Override
   public void setVariableLabelFieldUpdater(ValueUpdater<String> updater) {
     this.updater = updater;
+  }
+
+  private AbstractSafeHtmlCell<String> createColumnHeaderCell() {
+    if (viewMode == ValuesTablePresenter.ViewMode.SIMPLE_MODE) {
+      return new TextCell();
+    }
+
+    return new ClickableTextCell(new VariableHeaderHtmlRenderer());
   }
 
   private VariableDto getVariableAt(int i) {
