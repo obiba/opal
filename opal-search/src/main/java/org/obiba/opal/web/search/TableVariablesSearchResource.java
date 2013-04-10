@@ -65,9 +65,9 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      QuerySearchJsonBuilder jsonBuilder = //
-          buildQuerySearch(query, offset, limit, fields, getFieldSortName(sortField), sortDir);
-      Search.QueryResultDto dtoResponse = convertResponse(executeQuery(jsonBuilder.build()), addVariableDto);
+      QuerySearchJsonBuilder jsonBuiler = //
+          buildQuerySearch(query, offset, limit, fields, sortField, sortDir);
+      Search.QueryResultDto dtoResponse = convertResonse(executeQuery(jsonBuiler.build()), addVariableDto);
       return Response.ok().entity(dtoResponse).build();
     } catch(NoSuchValueSetException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
@@ -87,8 +87,7 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
     return indexManager.getIndex(getValueTable()).getRequestPath();
   }
 
-  protected Search.QueryResultDto convertResponse(JSONObject jsonResponse, boolean addVariableDto)
-      throws JSONException {
+  protected Search.QueryResultDto convertResonse(JSONObject jsonResponse, boolean addVariableDto) throws JSONException {
     EsResultConverter converter = new EsResultConverter();
     if(addVariableDto) converter.setStrategy(new ItemResultDtoStrategy(getValueTable()));
     return converter.convert(jsonResponse);
@@ -96,9 +95,5 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
 
   private ValueTable getValueTable() {
     return MagmaEngine.get().getDatasource(datasource).getValueTable(table);
-  }
-
-  protected String getFieldSortName(String field) {
-    return indexManager.getIndex(getValueTable()).getFieldSortName(field);
   }
 }
