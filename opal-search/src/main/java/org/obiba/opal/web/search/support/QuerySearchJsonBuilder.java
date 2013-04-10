@@ -29,7 +29,7 @@ public class QuerySearchJsonBuilder {
   private final static int DEFAULT_SIZE = 10;
 
   static {
-    defaultQueryFields.add("name");
+    defaultQueryFields.add("name.analyzed");
     defaultQueryFields.add("label*");
     defaultQueryFields.add("description*");
     defaultQueryFields.add("maelstrom*");

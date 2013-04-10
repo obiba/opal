@@ -26,6 +26,8 @@ import org.obiba.runtime.Version;
 
 public class ValueTableVariablesMapping {
 
+  private static final String ANALYZED_FIELD_POSTFIX = ".analyzed";
+
   private final ValueTypeMappings valueTypeMappings = new ValueTypeMappings();
 
   private final AttributeMapping attributeMapping = new AttributeMapping();
@@ -119,8 +121,8 @@ public class ValueTableVariablesMapping {
     notAnalyzed.put("index", "not_analyzed");
 
     Map<String, Map<String, String>> fields = new HashMap<String, Map<String, String>>();
-    fields.put(field, analyzed);
-    fields.put("untouched", notAnalyzed);
+    fields.put(field + ANALYZED_FIELD_POSTFIX, analyzed);
+    fields.put(field, notAnalyzed);
 
     return fields;
   }

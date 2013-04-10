@@ -26,17 +26,4 @@ public interface ValueTableVariablesIndex extends ValueTableIndex {
    */
   @Nonnull
   String getFieldName(@Nonnull Attribute attribute);
-
-  /**
-   * Returns the sort name of the input field. Fields with tokenized value require a special mapping so sorting
-   * becomes possible. A field value "toto tata titi" is tokenized to 'toto' 'tata' 'titi' breaking the integrity of
-   * the original value and therefore not srotable. These fields require two mappings, one analyzed and not analyzed.
-   * See Elastic Search documentation for "multi field type".
-   *
-   * @param field
-   * @return
-   */
-  @Nonnull
-  String getFieldSortName(@Nonnull String field);
-
 }

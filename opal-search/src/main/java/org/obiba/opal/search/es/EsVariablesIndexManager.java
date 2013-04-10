@@ -187,27 +187,5 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       return AttributeMapping.getFieldName(attribute);
     }
 
-    @Nonnull
-    @Override
-    @SuppressWarnings("unchecked")
-    public String getFieldSortName(@Nonnull String field) {
-      EsMapping.Properties properties = readMapping().properties();
-      Map<String, Object> result = properties.getProperty(field);
-
-      if(result == null || !"multi_field".equals(result.get("type")) || !result.containsKey("fields")) {
-        return field;
-      }
-
-      Map<String, Object> fields = (Map<String, Object>) result.get("fields");
-      for(String fieldKey : fields.keySet()) {
-        if(!field.equals(fieldKey)) {
-          // the field name get post-fixed by the un-analyzed mapping name (usually 'untouched')
-          return field + "." + fieldKey;
-        }
-      }
-
-      return field;
-    }
-
   }
 }
