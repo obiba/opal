@@ -23,20 +23,20 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class ClearElasticSearchIndexes extends AbstractUpgradeStep {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(ClearElasticSearchIndexes.class);
 
   @Value("${OPAL_HOME}/data")
   private String indexPath;
 
   @Override
   public void execute(Version currentVersion) {
-    log.info("Clear Elastic Search indexes: " + indexPath);
+    log.info("Clear Elastic Search indexes: {}", indexPath);
     try {
       File indexDir = new File(indexPath);
       if(indexDir.exists() && indexDir.isDirectory()) {
         deleteDirectoryContents(indexDir);
       } else {
-        log.warn("Cannot find Elastic Search indexes: " + indexPath);
+        log.warn("Cannot find Elastic Search indexes: {}", indexPath);
       }
     } catch(IOException e) {
       throw new RuntimeException("Error while clearing Elastic Search indexes " + indexPath, e);

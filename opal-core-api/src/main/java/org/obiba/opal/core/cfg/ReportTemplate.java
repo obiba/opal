@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -92,7 +93,7 @@ public class ReportTemplate {
     return emailNotificationAddresses;
   }
 
-  public void setEmailNotificationAddresses(Set<String> emailNotificationAddresses) {
+  public void setEmailNotificationAddresses(Collection<String> emailNotificationAddresses) {
     this.emailNotificationAddresses.clear();
     if(emailNotificationAddresses != null) {
       this.emailNotificationAddresses.addAll(emailNotificationAddresses);

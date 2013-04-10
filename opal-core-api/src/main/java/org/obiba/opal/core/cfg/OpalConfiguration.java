@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
@@ -100,6 +102,7 @@ public class OpalConfiguration {
     }
   }
 
+  @Nullable
   public ReportTemplate getReportTemplate(String name) {
     for(ReportTemplate reportTemplate : reportTemplates) {
       if(reportTemplate.getName().equals(name)) {
