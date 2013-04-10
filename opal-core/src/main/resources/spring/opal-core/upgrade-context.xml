@@ -37,10 +37,16 @@
     <constructor-arg ref="jotm"/>
   </bean>
 
-  <bean id="opalConfigurationProvider" class="org.obiba.opal.core.runtime.upgrade.support.OpalConfigurationProvider"/>
+  <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService">
+    <constructor-arg>
+      <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo">
+        <constructor-arg value="${OPAL_HOME}/conf/opal-config.xml"/>
+      </bean>
+    </constructor-arg>
+  </bean>
 
   <bean id="upgradeUtils" class="org.obiba.opal.core.runtime.upgrade.support.UpgradeUtils">
-    <constructor-arg index="0" ref="opalConfigurationProvider"/>
+    <constructor-arg index="0" ref="upgradeOpalConfigurationService"/>
     <constructor-arg index="1" ref="dataSourceFactory"/>
     <constructor-arg index="2" ref="opalDataSource"/>
     <constructor-arg index="3" ref="keyDataSource"/>

@@ -1053,6 +1053,12 @@
         <version>${xmlunit.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>${joda-time.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -1411,6 +1417,7 @@
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
     <jline.version>0.9.94</jline.version>
+    <joda-time.version>2.2</joda-time.version>
     <jotm.version>2.2.3</jotm.version>
     <jpa.version>1.0</jpa.version>
     <json.version>20090211</json.version>

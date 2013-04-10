@@ -17,8 +17,12 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormat;
 import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.BackgroundJob;
 import org.obiba.opal.core.runtime.upgrade.support.UpgradeUtils;
 import org.slf4j.Logger;
@@ -28,11 +32,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Component;
-
-import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SuppressWarnings({ "MagicNumber", "MethodReturnAlwaysConstant" })
 @Component
@@ -51,11 +50,27 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
   @Autowired
   private BinaryMover binaryMover;
 
+  @Autowired
+  private OpalConfigurationService configurationService;
+
   @Override
   public void run() {
+    OpalConfiguration opalConfiguration = configurationService.getOpalConfiguration();
+    if(opalConfiguration.isBinariesMigrated()) {
+      log.info("Binaries storage already updated");
+    } else {
+      upgradeBinariesStorage();
+      configurationService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
+        @Override
+        public void doWithConfig(OpalConfiguration config) {
+          config.setBinariesMigrated(true);
+        }
+      });
+    }
+  }
 
+  private void upgradeBinariesStorage() {
     Map<DataSource, String> dataSourceNames = upgradeUtils.getConfiguredDatasources();
-
     for(Map.Entry<DataSource, String> entry : dataSourceNames.entrySet()) {
       DataSource dataSource = entry.getKey();
       String dataSourceName = entry.getValue();
@@ -67,7 +82,7 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
 
   private void processAndRetryDatasource(DataSource dataSource, String dataSourceName) {
     boolean done = false;
-    long sleep = 5;
+    long sleepMs = 5000;
     while(!done) {
       try {
         log.debug("Process dataSource {}", dataSourceName);
@@ -76,40 +91,14 @@ public class BinariesStorageUpgradeJob implements BackgroundJob {
       } catch(Throwable e) {
         //noinspection StringConcatenationArgumentToLogCall
         log.error("Error while moving binaries for " + dataSourceName, e);
-        log.info("Waiting {}s", formatSleepPeriod(sleep));
+        log.info("Waiting for {}", PeriodFormat.getDefault().print(new Period(sleepMs)));
         try {
-          Thread.sleep(sleep * 1000);
-          sleep *= 2;
+          Thread.sleep(sleepMs);
+          sleepMs *= 2;
         } catch(InterruptedException ignored) {
         }
       }
     }
-  }
-
-  //TODO use Joda PeriodFormatter
-  private String formatSleepPeriod(long sleep) {
-    long hours = MILLISECONDS.toHours(sleep);
-    long minutes = MILLISECONDS.toMinutes(sleep) - HOURS.toMinutes(hours);
-    long seconds = MILLISECONDS.toSeconds(sleep) - HOURS.toSeconds(hours) - MINUTES.toSeconds(minutes);
-    long millis = sleep - HOURS.toMillis(hours) - MINUTES.toMillis(minutes) - SECONDS.toMillis(seconds);
-
-    Collection<Object> args = new ArrayList<Object>();
-    StringBuilder format = new StringBuilder();
-    if(hours > 0) {
-      format.append("%dhours ");
-      args.add(hours);
-    }
-    if(minutes > 0) {
-      format.append("%dmin ");
-      args.add(minutes);
-    }
-    if(seconds > 0) {
-      format.append("%dsec ");
-      args.add(seconds);
-    }
-    format.append("%dms");
-    args.add(millis);
-    return String.format(format.toString(), args.toArray(new Object[args.size()]));
   }
 
   private void processDataSource(DataSource dataSource, String name) {

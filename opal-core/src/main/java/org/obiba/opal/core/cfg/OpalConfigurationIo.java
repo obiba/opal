@@ -23,9 +23,11 @@ import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import com.thoughtworks.xstream.XStream;
@@ -33,10 +35,8 @@ import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 @Component
-public class OpalConfigurationIo {
-  //
-  // Instance Variables
-  //
+public class OpalConfigurationIo implements ApplicationContextAware {
+
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
   private final File configFile;
@@ -84,9 +84,14 @@ public class OpalConfigurationIo {
     }
   }
 
-  protected XStream doCreateXStreamInstance(ApplicationContext applicationContext) {
+  protected XStream doCreateXStreamInstance(
+      @SuppressWarnings("ParameterHidesMemberVariable") ApplicationContext applicationContext) {
     return MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory()
         .createXStream(new InjectingReflectionProviderWrapper(new PureJavaReflectionProvider(), applicationContext));
   }
 
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = applicationContext;
+  }
 }

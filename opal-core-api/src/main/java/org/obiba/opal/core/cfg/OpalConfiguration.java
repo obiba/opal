@@ -39,6 +39,8 @@ public class OpalConfiguration {
 
   private final List<OpalConfigurationExtension> extensions;
 
+  private boolean binariesMigrated;
+
   public OpalConfiguration() {
     functionalUnits = Sets.newLinkedHashSet();
     reportTemplates = Sets.newLinkedHashSet();
@@ -131,4 +133,11 @@ public class OpalConfiguration {
     return reportTemplates.size() > 0;
   }
 
+  public boolean isBinariesMigrated() {
+    return binariesMigrated;
+  }
+
+  public void setBinariesMigrated(boolean binariesMigrated) {
+    this.binariesMigrated = binariesMigrated;
+  }
 }
