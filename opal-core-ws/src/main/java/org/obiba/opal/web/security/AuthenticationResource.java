@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -16,6 +17,7 @@ import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -47,12 +49,12 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @POST
   @Path("/sessions")
   @NotAuthenticated
-  public Response createSession(@FormParam("username") String username, @FormParam("password") String password)
+  public Response createSession(@Context HttpServletRequest servletRequest, @FormParam("username") String username, @FormParam("password") String password)
       throws FileSystemException {
     try {
       SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password));
     } catch(AuthenticationException e) {
-      log.info("Authentication failure of user '{}': {}", username, e.getMessage());
+      log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(), e.getMessage());
       // When a request contains credentials and they are invalid, the a 403 (Forbidden) should be returned.
       return Response.status(Status.FORBIDDEN).build();
     }

@@ -11,6 +11,7 @@ package org.obiba.opal.web.security;
 
 import java.net.URISyntaxException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -59,13 +60,13 @@ public class SecurityResourceTest {
   @Test
   public void testLogin() throws FileSystemException {
     mockRealm.addAccount("administrator", "password");
-    Response response = securityResource.createSession("administrator", "password");
+    Response response = securityResource.createSession(mockHttpServletRequest(), "administrator", "password");
     Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testLoginBadCredentials() throws FileSystemException {
-    Response response = securityResource.createSession("admninistrator", "password");
+    Response response = securityResource.createSession(mockHttpServletRequest(), "admninistrator", "password");
     Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
   }
 
@@ -111,6 +112,13 @@ public class SecurityResourceTest {
   public void testDeleteSession() {
     Response response = securityResource.deleteSession(testSessionId);
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  private HttpServletRequest mockHttpServletRequest() {
+    HttpServletRequest httpServletRequestMock = createMock(HttpServletRequest.class);
+    expect(httpServletRequestMock.getRemoteAddr()).andReturn("127.0.0.1").anyTimes();
+
+    return httpServletRequestMock;
   }
 
   private SessionManager mockSessionManager() {
