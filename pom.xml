@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -1138,7 +1139,7 @@
             <minimumTokens>30</minimumTokens>
             <targetJdk>${maven.compiler.target}</targetJdk>
             <excludeRoots>
-              <excludeRoot>target/generated-sources</excludeRoot>              
+              <excludeRoot>target/generated-sources</excludeRoot>
             </excludeRoots>
             <rulesets>
               <ruleset>https://github.com/obiba/conventions/raw/master/obiba-pmd-ruleset.xml</ruleset>
@@ -1405,7 +1406,7 @@
     <jta.version>1.0.1B</jta.version>
     <junit.version>4.7</junit.version>
     <liquibase.version>1.9.4</liquibase.version>
-    <magma.version>1.5.1</magma.version>
+    <magma.version>1.5.2</magma.version>
     <mail.version>1.4</mail.version>
     <mockftpserver.version>2.1</mockftpserver.version>
     <mysql-connector-java.version>5.1.17</mysql-connector-java.version>
