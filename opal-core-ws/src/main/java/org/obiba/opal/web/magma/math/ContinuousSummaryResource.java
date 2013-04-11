@@ -111,7 +111,7 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
         .addTable(getValueTable(), getVariableValueSource()) //
         .build();
 
-    if(!"_transient".equals(getVariable().getName())) {
+    if(!"_transient".equals(getVariable().getName()) && isEsAvailable()) {
       statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
     }
 

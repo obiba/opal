@@ -66,8 +66,11 @@ public class AbstractSummaryResource {
     return variableValueSource;
   }
 
+  protected boolean isEsAvailable() {
+    return opalSearchService.isEnabled() && opalSearchService.isRunning() && statsIndexManager.isReady();
+  }
+
   protected boolean canQueryEsIndex() {
-    return opalSearchService.isEnabled() && opalSearchService.isRunning() && statsIndexManager.isReady() &&
-        statsIndexManager.isIndexUpToDate(valueTable);
+    return isEsAvailable() && statsIndexManager.isIndexUpToDate(valueTable);
   }
 }
