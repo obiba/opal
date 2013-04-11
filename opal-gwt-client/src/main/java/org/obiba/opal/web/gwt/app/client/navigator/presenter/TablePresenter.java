@@ -212,15 +212,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().getClear().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        showWaitCursor();
-
         ResponseCodeCallback callback = new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             if(response.getStatusCode() == SC_OK) {
               updateIndexStatus();
             } else {
-              showDefaultCursor();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
@@ -237,8 +234,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().getCancel().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        showWaitCursor();
-
         ResponseCodeCallback callback = new ResponseCodeCallback() {
 
           @Override
@@ -247,7 +242,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
               cancelIndexation = true;
               updateIndexStatus();
             } else {
-              showDefaultCursor();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
@@ -266,8 +260,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().getIndexNow().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        showWaitCursor();
-
         ResponseCodeCallback callback = new ResponseCodeCallback() {
 
           @Override
@@ -283,7 +275,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
               // Schedule the timer to run once in X seconds.
               t.schedule(DELAY_MILLIS);
             } else {
-              showDefaultCursor();
               ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
@@ -315,10 +306,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     });
 
   }
-
-  private void showWaitCursor() {RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.WAIT);}
-
-  private void showDefaultCursor() {RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.DEFAULT);}
 
   private String getIndexResource(String datasource, String table) {
     return UriBuilder.create().segment("datasource", "{}", "table", "{}", "index").build(datasource, table);
@@ -777,7 +764,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().setIndexStatusVisible(false);
-      showDefaultCursor();
     }
   }
 
@@ -804,11 +790,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
           // Schedule the timer to run once in 2 seconds.
           t.schedule(DELAY_MILLIS);
-        } else {
-          showDefaultCursor();
         }
-      } else {
-        showDefaultCursor();
       }
     }
   }
