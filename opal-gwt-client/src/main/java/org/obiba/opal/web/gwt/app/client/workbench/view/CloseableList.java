@@ -10,16 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-<<<<<<< HEAD
-import javax.annotation.Nullable;
-
-=======
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
->>>>>>> Search variables widget improvements
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,11 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class CloseableList extends UList {
 
-<<<<<<< HEAD
-  private final Collection<ItemRemovedHandler> itemRemovedHandlers = new ArrayList<ItemRemovedHandler>();
-=======
   private final List<ItemRemovedHandler> itemRemovedHandlers = new ArrayList<ItemRemovedHandler>();
->>>>>>> Search variables widget improvements
 
   private ItemValidator itemValidator;
 
@@ -46,13 +36,6 @@ public class CloseableList extends UList {
     addStyleName("closeables");
   }
 
-<<<<<<< HEAD
-  public boolean addItem(String text) {
-    return addItem(text, true);
-  }
-
-  public boolean addItem(String text, boolean validate) {
-=======
   public boolean addItem(String text, VariableSearchListItem.ItemType type) {
     return addItem(text, true, null, type);
   }
@@ -62,7 +45,6 @@ public class CloseableList extends UList {
   }
 
   public boolean addItem(String text, boolean validate, String title, VariableSearchListItem.ItemType type) {
->>>>>>> Search variables widget improvements
     if(Strings.isNullOrEmpty(text)) return false;
 
     if(validate && itemValidator != null && !itemValidator.validate(text)) return false;
@@ -72,10 +54,6 @@ public class CloseableList extends UList {
     return true;
   }
 
-<<<<<<< HEAD
-  private void addItemInternal(String text) {
-    final ListItem item = new ListItem();
-=======
   private void addItemInternal(String text, String title, VariableSearchListItem.ItemType type) {
     final VariableSearchListItem item = new VariableSearchListItem(type);
 
@@ -86,7 +64,6 @@ public class CloseableList extends UList {
     item.add(new InlineLabel(quoteIfContainsSpace(text)));
     IconAnchor close = new IconAnchor();
     close.setIcon(IconType.REMOVE);
->>>>>>> Search variables widget improvements
 
     close.addClickHandler(new ClickHandler() {
 
@@ -127,7 +104,6 @@ public class CloseableList extends UList {
     return ((HasText) label).getText();
   }
 
-  @Nullable
   private ListItem getItem(String text) {
     ListItem it = null;
     for(int i = 0; i < getWidgetCount(); i++) {
@@ -158,13 +134,7 @@ public class CloseableList extends UList {
   public void focusOrRemoveLastItem() {
     if(getWidgetCount() > 0) {
       Widget lastItem = getWidget(getWidgetCount() - 1);
-<<<<<<< HEAD
-      if(lastItem.getStyleName().contains("focus")) {
-        removeItem((ListItem) lastItem);
-      } else {
-=======
       if(!lastItem.getStyleName().contains("focus")) {
->>>>>>> Search variables widget improvements
         lastItem.addStyleName("focus");
       } else {
         removeItem((ListItem) lastItem);
@@ -199,12 +169,4 @@ public class CloseableList extends UList {
   public interface ItemValidator {
     boolean validate(String text);
   }
-<<<<<<< HEAD
-
-  public interface ItemTransformer {
-    boolean addItem(String text);
-  }
-
-=======
->>>>>>> Search variables widget improvements
 }
