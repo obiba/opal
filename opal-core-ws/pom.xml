@@ -5,7 +5,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>1.13-SNAPSHOT</version>
+    <version>1.13.3</version>
   </parent>
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal-core-ws</artifactId>
