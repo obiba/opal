@@ -2435,3 +2435,9 @@ a.icon:hover {
 .texbox-clearable-wrapper .textbox-clearable-anchor:hover {
   text-decoration: none;
 }
+
+/* Special case for bootstrap button in the admin page */
+.dropdown-button-small a {
+    height: 15px !important;
+    margin-top: -2px;
+}
