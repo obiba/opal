@@ -31,6 +31,7 @@ import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableStatsIndex;
 import org.obiba.opal.search.es.mapping.StatsMapping;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Search.EsCategoricalSummaryDto;
 import org.obiba.opal.web.model.Search.EsContinuousSummaryDto;
@@ -51,7 +52,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public EsStatsIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
+  public EsStatsIndexManager(OpalSearchService esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, Version version) {
     super(esProvider, esConfig, indexConfig, version);
   }
@@ -155,7 +156,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     @Override
     public void computeAndIndexSummaries() {
 
-      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+      BulkRequestBuilder bulkRequest = opalSearchService.getClient().prepareBulk();
 
       TimedExecution timedExecution = new TimedExecution().start();
 
@@ -186,7 +187,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     public void indexSummary(@Nonnull ContinuousVariableSummary summary) {
       TimedExecution timedExecution = new TimedExecution().start();
 
-      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+      BulkRequestBuilder bulkRequest = opalSearchService.getClient().prepareBulk();
       indexSummary(summary, bulkRequest);
       sendAndCheck(bulkRequest);
       updateTimestamps();
@@ -199,7 +200,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     public void indexSummary(@Nonnull CategoricalVariableSummary summary) {
       TimedExecution timedExecution = new TimedExecution().start();
 
-      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+      BulkRequestBuilder bulkRequest = opalSearchService.getClient().prepareBulk();
       indexSummary(summary, bulkRequest);
       sendAndCheck(bulkRequest);
       updateTimestamps();
@@ -232,7 +233,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
     private void indexMessage(@Nonnull String variableName, @Nonnull Message message,
         @Nonnull BulkRequestBuilder bulkRequest) {
-      IndexRequestBuilder request = esProvider.getClient() //
+      IndexRequestBuilder request = opalSearchService.getClient() //
           .prepareIndex(getName(), getIndexName(), getValueTableReference() + ":" + variableName) //
           .setSource(JsonFormat.printToString(message));
       bulkRequest.add(request);

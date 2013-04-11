@@ -40,6 +40,7 @@ import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   protected static final int ES_BATCH_SIZE = 100;
 
   @Nonnull
-  protected final ElasticSearchProvider esProvider;
+  protected final OpalSearchService opalSearchService;
 
   @Nonnull
   private final ElasticSearchConfigurationService esConfig;
@@ -70,16 +71,16 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   private final Map<String, ValueTableIndex> indices = Maps.newHashMap();
 
-  protected EsIndexManager(@Nonnull ElasticSearchProvider esProvider,
+  protected EsIndexManager(@Nonnull OpalSearchService opalSearchService,
       @Nonnull ElasticSearchConfigurationService esConfig, @Nonnull IndexManagerConfigurationService indexConfig,
       @Nonnull Version version) {
 
-    Preconditions.checkNotNull(esProvider);
+    Preconditions.checkNotNull(opalSearchService);
     Preconditions.checkNotNull(esConfig);
     Preconditions.checkNotNull(esConfig);
     Preconditions.checkNotNull(version);
 
-    this.esProvider = esProvider;
+    this.opalSearchService = opalSearchService;
     this.esConfig = esConfig;
     this.indexConfig = indexConfig;
     runtimeVersion = version;
@@ -127,13 +128,13 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   @Nonnull
   protected IndexMetaData createIndex() {
-    IndicesAdminClient idxAdmin = esProvider.getClient().admin().indices();
+    IndicesAdminClient idxAdmin = opalSearchService.getClient().admin().indices();
     if(!idxAdmin.exists(new IndicesExistsRequest(getName())).actionGet().exists()) {
       log.info("Creating index [{}]", getName());
       idxAdmin.prepareCreate(getName()).setSettings(getIndexSettings()).execute().actionGet();
     }
-    return esProvider.getClient().admin().cluster().prepareState().setFilterIndices(getName()).execute().actionGet()
-        .getState().getMetaData().index(getName());
+    return opalSearchService.getClient().admin().cluster().prepareState().setFilterIndices(getName()).execute()
+        .actionGet().getState().getMetaData().index(getName());
   }
 
   @Override
@@ -177,7 +178,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     }
 
     private void createMapping() {
-      esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName())
+      opalSearchService.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName())
           .setSource(getMapping()).execute().actionGet();
     }
 
@@ -188,7 +189,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
           // process failures by iterating through each bulk response item
           throw new RuntimeException(bulkResponse.buildFailureMessage());
         }
-        return esProvider.getClient().prepareBulk();
+        return opalSearchService.getClient().prepareBulk();
       }
       return bulkRequest;
     }
@@ -281,7 +282,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
         EsMapping mapping = readMapping();
         //noinspection ConstantConditions
         mapping.meta().setString("_updated", DateTimeType.get().valueOf(new Date()).toString());
-        esProvider.getClient().admin().indices().preparePutMapping(getName()).setType(getIndexName())
+        opalSearchService.getClient().admin().indices().preparePutMapping(getName()).setType(getIndexName())
             .setSource(mapping.toXContent()).execute().actionGet();
       } catch(IOException e) {
         throw new RuntimeException(e);
@@ -295,17 +296,17 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
           // process failures by iterating through each bulk response item
           throw new RuntimeException(bulkResponse.buildFailureMessage());
         }
-        return esProvider.getClient().prepareBulk();
+        return opalSearchService.getClient().prepareBulk();
       }
       return bulkRequest;
     }
 
     @Override
     public void delete() {
-      if(esProvider.isEnabled()) {
+      if(opalSearchService.isEnabled() && opalSearchService.isRunning()) {
         try {
-          esProvider.getClient().admin().indices().prepareDeleteMapping(getName()).setType(getIndexName()).execute()
-              .actionGet();
+          opalSearchService.getClient().admin().indices().prepareDeleteMapping(getName()).setType(getIndexName())
+              .execute().actionGet();
         } catch(TypeMissingException ignored) {
         } catch(IndexMissingException ignored) {
         }
@@ -376,10 +377,10 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
     @Nullable
     private IndexMetaData getIndexMetaData() {
-      if(esProvider.getClient() == null) return null;
+      if(opalSearchService.getClient() == null) return null;
 
-      IndexMetaData imd = esProvider.getClient().admin().cluster().prepareState().setFilterIndices(getName()).execute()
-          .actionGet().getState().getMetaData().index(getName());
+      IndexMetaData imd = opalSearchService.getClient().admin().cluster().prepareState().setFilterIndices(getName())
+          .execute().actionGet().getState().getMetaData().index(getName());
       return imd == null ? createIndex() : imd;
     }
 

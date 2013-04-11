@@ -39,6 +39,7 @@ import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.runtime.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,7 +61,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public EsValuesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
+  public EsValuesIndexManager(OpalSearchService esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, @Nonnull ThreadFactory threadFactory, Version version,
       @Nonnull StatsIndexManager statsIndexManager) {
     super(esProvider, esConfig, indexConfig, version);
@@ -115,7 +116,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     private class ValuesReaderCallback implements ConcurrentReaderCallback {
 
-      private BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+      private BulkRequestBuilder bulkRequest = opalSearchService.getClient().prepareBulk();
 
       private final Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
 
@@ -133,7 +134,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         }
 
         String identifier = entity.getIdentifier();
-        bulkRequest.add(esProvider.getClient().prepareIndex(getName(), valueTable.getEntityType(), identifier)
+        bulkRequest.add(opalSearchService.getClient().prepareIndex(getName(), valueTable.getEntityType(), identifier)
             .setSource("{\"identifier\":\"" + identifier + "\"}"));
         try {
           XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
@@ -142,7 +143,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           }
           builder.endObject();
 
-          IndexRequestBuilder requestBuilder = esProvider.getClient()
+          IndexRequestBuilder requestBuilder = opalSearchService.getClient()
               .prepareIndex(getName(), index.getIndexName(), identifier).setParent(identifier).setSource(builder);
           bulkRequest.add(requestBuilder);
           done++;

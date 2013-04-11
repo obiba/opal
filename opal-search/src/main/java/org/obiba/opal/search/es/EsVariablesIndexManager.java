@@ -31,6 +31,7 @@ import org.obiba.opal.search.ValueTableVariablesIndex;
 import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.mapping.AttributeMapping;
 import org.obiba.opal.search.es.mapping.ValueTableVariablesMapping;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.runtime.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public EsVariablesIndexManager(ElasticSearchProvider esProvider, ElasticSearchConfigurationService esConfig,
+  public EsVariablesIndexManager(OpalSearchService esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, Version version) {
     super(esProvider, esConfig, indexConfig, version);
   }
@@ -89,7 +90,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
     @Override
     protected void index() {
-      BulkRequestBuilder bulkRequest = esProvider.getClient().prepareBulk();
+      BulkRequestBuilder bulkRequest = opalSearchService.getClient().prepareBulk();
 
       int tableIndex = 0;
       for(Variable variable : valueTable.getVariables()) {
@@ -123,8 +124,8 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
           indexVariableCategories(variable, xcb);
         }
 
-        bulkRequest.add(
-            esProvider.getClient().prepareIndex(getName(), index.getIndexName(), fullName).setSource(xcb.endObject()));
+        bulkRequest.add(opalSearchService.getClient().prepareIndex(getName(), index.getIndexName(), fullName)
+            .setSource(xcb.endObject()));
         if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
           return sendAndCheck(bulkRequest);
         }

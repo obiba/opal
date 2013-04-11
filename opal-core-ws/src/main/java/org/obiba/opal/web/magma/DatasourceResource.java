@@ -101,7 +101,7 @@ public class DatasourceResource {
     if(importService == null) throw new IllegalArgumentException("importService cannot be null");
     if(opalSearchService == null) throw new IllegalArgumentException("opalSearchService cannot be null");
     if(statsIndexManager == null) throw new IllegalArgumentException("statsIndexManager cannot be null");
-    if(esProvider == null) throw new IllegalArgumentException("esProvider cannot be null");
+    if(esProvider == null) throw new IllegalArgumentException("opalSearchService cannot be null");
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
 
     this.configService = configService;
