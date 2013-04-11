@@ -1914,16 +1914,18 @@ ul.closeables {
 ul.closeables li {
   float: left;
   list-style: none outside none;
-  background-clip: padding-box;
-  background-color: #E4E4E4;
-  background-image: -moz-linear-gradient(center bottom, #E4E4E4 0%, #EEEEEE 70%);
-  border: 1px solid #B4B4B4;
-  border-radius: 3px 3px 3px 3px;
-  -moz-border-radius: 3px 3px 3px 3px;
-  -webkit-border-radius: 3px 3px 3px 3px;
-  color: #333333;
-  margin: 3px 0 3px 5px;
-  padding: 3px 6px 3px 6px;
+  border-radius: 2px 2px 2px 2px;
+  -moz-border-radius: 2px 2px 2px 2px;
+  -webkit-border-radius: 2px 2px 2px 2px;
+  margin-left: 4px;
+  padding: 0px 6px;
+  background-color: #999999;
+  color: #FFFFFF;
+  font-weight: bold;
+  vertical-align: baseline;
+  white-space: nowrap;
+  line-height: 14px;
+  font-size: 1.1em;
 }
 
 ul.closeables li.focus {
@@ -1935,16 +1937,20 @@ ul.closeables li span {
 }
 
 ul.closeables li a {
-  color: #888888;
-  font-weight: bold;
+  color: #FFFFFF;
+  /*font-weight: bold;*/
   padding-left: 6px;
   text-decoration: none;
-  -moz-text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-  -webkit-text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+  /*-moz-text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);*/
+  /*-webkit-text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);*/
+  /*text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);*/
 }
 
-.obiba-SuggestListBox {
+/*ul.closeables li i {*/
+/*color: #FFFFFF;*/
+/*}*/
+
+.Box {
   border: 1px solid #CCCCCC;
   border-radius: 3px 3px 3px 3px;
   -moz-border-radius: 3px 3px 3px 3px;
@@ -1953,21 +1959,33 @@ ul.closeables li a {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
 }
 
-.obiba-SuggestListBox > div {
+.obiba-SuggestListobiba-SuggestListBox > div {
   margin: 0;
   padding: 0;
 }
 
 .obiba-SuggestListBox input {
   border: none;
-  margin-top: 4px;
-  margin-left: 4px;
+  /*margin-left: 4px;*/
   box-shadow: none;
+  /*margin-bottom:0px;*/
+  margin: 0px 0px 0px 4px;
+  padding: 0px;
+  width: 275px;
 }
 
 .obiba-SuggestListBox input:focus {
   border: none;
   box-shadow: none;
+}
+
+div.obiba-SuggestListBox {
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 0 3px 3px 0;
+  display: inline-block;
+  padding-right: 4px;
+  vertical-align: middle;
 }
 
 /* Icons : http://www.justbenicestudio.com/studio/websymbols/*/
@@ -2349,10 +2367,10 @@ a.icon:hover {
 /*margin-right: 3em;*/
 /*}*/
 
-.small-search-box input {
-  font-size: 1em;
-  padding: 1px;
-  width: 350px;
+.small-search-box {
+  font-size: 0.9em;
+  /*padding: 1px;*/
+  /*width: 350px;*/
 }
 
 .first-column-checkbox tr td:first-child, .first-column-checkbox tr th:first-child {
@@ -2362,8 +2380,10 @@ a.icon:hover {
 
 /* SuggestBox */
 .variable-search-box {
-  background: url(../image/16/search.png) no-repeat 2px 2px;
+  background: url(../image/16/search.png) no-repeat 2px 3px;
   padding-left: 20px !important;
+  font-size: 0.9em;
+  /*width:350px;*/
 }
 
 .variable-search-suggest-box {
@@ -2416,8 +2436,25 @@ a.icon:hover {
   background-color: #FFFFFF;
 }
 
+.obiba-SuggestListBox .textbox-clearable-anchor {
+  /*background-color: #FFFFFF;*/
+  /*border: 0 solid;*/
+  color: #999999;
+  /*cursor: pointer;*/
+  display: inline-block;
+  font-size: 14px;
+  height: 12px;
+  width: 14px;
+  z-index: 2000;
+  float: right;
+}
+
 .texbox-clearable-wrapper .textbox-clearable-anchor a {
   vertical-align: text-top;
+}
+
+.obiba-SuggestListBox .textbox-clearable-anchor a {
+  /*vertical-align: text-top;*/
 }
 
 .texbox-clearable-wrapper .textbox-clearable-empty {
@@ -2432,7 +2469,21 @@ a.icon:hover {
   background-color: #FFFFFF;
 }
 
-.texbox-clearable-wrapper .textbox-clearable-anchor:hover {
+.obiba-SuggestListBox .textbox-clearable-empty {
+  content: " ";
+  display: inline-block;
+  *display: inline;
+  z-index: 2000;
+  border: 0px solid;
+  color: #FFFFFF;
+  width: 14px;
+  font-size: 14px;
+  background-color: #FFFFFF;
+  float: right;
+}
+
+.texbox-clearable-wrapper .textbox-clearable-anchor:hover,
+.obiba-SuggestListBox .textbox-clearable-anchor:hover {
   text-decoration: none;
 }
 
