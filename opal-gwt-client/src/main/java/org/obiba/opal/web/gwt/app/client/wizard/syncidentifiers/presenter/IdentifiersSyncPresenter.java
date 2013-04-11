@@ -152,7 +152,7 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
         getEventBus().fireEvent(NotificationEvent.newBuilder().info("IdentifiersImportationCompleted").build());
       } else {
         try {
-          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(
               NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
         } catch(Exception e) {

@@ -51,6 +51,7 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
     actionCell = new ClickableTextCell(new LocalisedSafeHtmlRenderer(translations.actionMap()));
 
     hasCellFieldUpdater = new FieldUpdater<T, String>() {
+      @Override
       public void update(int rowIndex, T object, String value) {
 
         // Value can be null when an action is not available for a particular row
@@ -73,6 +74,7 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
     delegate.onBrowserEvent(context, parent, value, event, valueUpdater);
   }
 
+  @Override
   public void setActionHandler(ActionHandler<T> actionHandler) {
     this.actionHandler = actionHandler;
   }
@@ -81,7 +83,7 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
 
     List<HasCell<T, ?>> hasCells = new ArrayList<HasCell<T, ?>>();
 
-    for(final String actionName : actionNames) {
+    for(String actionName : actionNames) {
       hasCells.add(new Action(actionName));
     }
 
@@ -93,7 +95,7 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
     private final String actionName;
 
     Action(String name) {
-      this.actionName = name;
+      actionName = name;
     }
 
     @Override

@@ -65,7 +65,6 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   Panel jobs;
 
   public DashboardView() {
-    super();
     initWidget(uiBinder.createAndBindUi(this));
     getDatasourcesLink().setHref("#" + Places.navigator);
     getUnitsLink().setHref("#" + Places.units);

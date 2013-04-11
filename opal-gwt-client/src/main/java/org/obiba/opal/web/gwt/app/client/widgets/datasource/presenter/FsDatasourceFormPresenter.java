@@ -43,7 +43,7 @@ public class FsDatasourceFormPresenter extends PresenterWidget<FsDatasourceFormP
   }
 
   @Override
-  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
+  public PresenterWidget<? extends DatasourceFormPresenter.Display> getPresenter() {
     return this;
   }
 

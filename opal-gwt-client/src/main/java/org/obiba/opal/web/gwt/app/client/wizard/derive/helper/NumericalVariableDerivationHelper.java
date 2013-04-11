@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
@@ -117,7 +119,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     addValueMapEntry(value, value, newValue);
   }
 
-  public void addValueMapEntry(N lower, N upper, String newValue) {
+  public void addValueMapEntry(@Nullable N lower, @Nullable N upper, String newValue) {
     if(lower == null && upper == null) return;
 
     ValueMapEntry entry = null;
@@ -139,7 +141,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     Collections.sort(valueMapEntries, new NumericValueMapEntryComparator());
   }
 
-  public boolean isRangeOverlap(N lower, N upper) {
+  public boolean isRangeOverlap(@Nullable N lower, @Nullable N upper) {
     return isRangeOverlap(buildRange(lower, upper));
   }
 
@@ -162,13 +164,14 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
   public static <N extends Number & Comparable<N>> Range<N> buildRange(N lower, N upper) {
     if(lower == null) {
       return Ranges.lessThan(upper);
-    } else if(upper == null) {
-      return Ranges.atLeast(lower);
-    } else if(lower.equals(upper)) {
-      return Ranges.closed(lower, upper);
-    } else {
-      return Ranges.closedOpen(lower, upper);
     }
+    if(upper == null) {
+      return Ranges.atLeast(lower);
+    }
+    if(lower.equals(upper)) {
+      return Ranges.closed(lower, upper);
+    }
+    return Ranges.closedOpen(lower, upper);
   }
 
   private final class NumericValueMapEntryComparator implements Comparator<ValueMapEntry> {

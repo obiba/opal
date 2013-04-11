@@ -63,7 +63,8 @@ public class CreateFolderDialogPresenter extends PresenterWidget<CreateFolderDia
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         String folderToCreate = getView().getFolderToCreate().getText();
         if("".equals(folderToCreate)) {
@@ -76,7 +77,8 @@ public class CreateFolderDialogPresenter extends PresenterWidget<CreateFolderDia
       }
     }));
 
-    super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
@@ -84,7 +86,7 @@ public class CreateFolderDialogPresenter extends PresenterWidget<CreateFolderDia
 
   }
 
-  private void createFolder(final String destination, final String folder) {
+  private void createFolder(String destination, String folder) {
 
     ResourceCallback<FileDto> createdCallback = new ResourceCallback<FileDto>() {
 

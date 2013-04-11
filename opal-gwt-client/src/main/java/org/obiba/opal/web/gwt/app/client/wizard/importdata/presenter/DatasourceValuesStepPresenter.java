@@ -28,7 +28,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 
 /**
  *
@@ -68,13 +67,12 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
             }
           }
 
-        })
-        .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            getView().showErrors((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
-          }
-        }).send();
+        }).withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        getView().showErrors((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
+      }
+    }).send();
   }
 
   //
@@ -97,7 +95,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   //
   // Inner classes and interfaces
   //
-  public interface Display extends  com.gwtplatform.mvp.client.View {
+  public interface Display extends com.gwtplatform.mvp.client.View {
 
     enum Slots {
       Values

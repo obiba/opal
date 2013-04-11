@@ -75,10 +75,10 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
           @Override
           public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-            if(!getView().hasDatasource(event.getSelection().getName())) {
-              updateTree(event.getSelection().getName(), false);
-            } else {
+            if(getView().hasDatasource(event.getSelection().getName())) {
               getView().selectDatasource(event.getSelection().getName(), false);
+            } else {
+              updateTree(event.getSelection().getName(), false);
             }
           }
 

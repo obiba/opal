@@ -149,7 +149,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
 
   public interface ValueSetFetcher {
 
-    public void request(String filter);
+    void request(String filter);
 
     void requestBinaryValue(VariableDto variable, String entityIdentifier, int index);
   }

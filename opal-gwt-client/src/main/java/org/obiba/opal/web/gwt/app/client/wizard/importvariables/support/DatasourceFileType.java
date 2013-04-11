@@ -23,7 +23,7 @@ public enum DatasourceFileType {
     if(position > -1) {
       try {
         type = valueOf(filename.substring(position + 1).toUpperCase());
-      } catch(Exception e) {
+      } catch(Exception ignored) {
       }
     }
 

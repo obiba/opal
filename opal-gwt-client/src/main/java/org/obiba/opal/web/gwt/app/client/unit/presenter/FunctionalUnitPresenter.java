@@ -70,9 +70,9 @@ public class FunctionalUnitPresenter
       FunctionalUnitListPresenter FunctionalUnitListPresenter,
       FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter) {
     super(eventBus, display, proxy);
-    this.functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
-    this.functionalUnitListPresenter = FunctionalUnitListPresenter;
-    this.functionalUnitUpdateDialogPresenter = FunctionalUnitUpdateDialogPresenter;
+    functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
+    functionalUnitListPresenter = FunctionalUnitListPresenter;
+    functionalUnitUpdateDialogPresenter = FunctionalUnitUpdateDialogPresenter;
   }
 
   @Override
@@ -132,8 +132,7 @@ public class FunctionalUnitPresenter
 
     @Override
     public void onClick(ClickEvent event) {
-      String url = new StringBuilder("/functional-units/entities/csv").toString();
-      getEventBus().fireEvent(new FileDownloadEvent(url));
+      getEventBus().fireEvent(new FileDownloadEvent("/functional-units/entities/csv"));
     }
 
   }

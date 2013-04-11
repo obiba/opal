@@ -36,6 +36,7 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   // FieldValidator Methods
   //
 
+  @Override
   public final String validate() {
     return hasError() ? errorMessageKey : null;
   }

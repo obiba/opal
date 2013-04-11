@@ -63,6 +63,7 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
         .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
 
+          @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {
             JsArray<DatasourceDto> datasources = resource != null
                 ? resource
@@ -126,6 +127,6 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
 
   public interface DatasourcesRefreshedCallback {
 
-    public void onDatasourcesRefreshed();
+    void onDatasourcesRefreshed();
   }
 }

@@ -71,21 +71,24 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
 
   @Override
   protected void onBind() {
-    super.registerHandler(getView().getUploadButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getUploadButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         uploadFile();
       }
     }));
 
-    super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
     }));
 
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
-    super.registerHandler(getView().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
+    registerHandler(getView().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
+      @Override
       public void onSubmitComplete(SubmitCompleteEvent event) {
         getView().hideDialog();
         getEventBus().fireEvent(new FileUploadedEvent());
@@ -102,6 +105,7 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
           event.isConfirmed()) {
@@ -133,6 +137,7 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
   private void uploadFile() {
 
     actionRequiringConfirmation = new Runnable() {
+      @Override
       public void run() {
         submitFile();
       }

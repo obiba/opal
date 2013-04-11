@@ -18,6 +18,8 @@ import com.google.gwt.core.client.JsonUtils;
  */
 public class ClientErrorDtos {
 
+  private ClientErrorDtos() {}
+
   /**
    * Given a ClientErrorDto JSON string, returns the ClientErrorDto's <code>status</code> field (i.e., the error message
    * key).

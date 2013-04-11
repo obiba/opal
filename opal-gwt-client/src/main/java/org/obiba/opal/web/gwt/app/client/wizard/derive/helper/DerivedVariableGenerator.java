@@ -331,7 +331,7 @@ public abstract class DerivedVariableGenerator {
           appended = true;
         }
       }
-      if(appended == false) {
+      if(!appended) {
         newValue = attr.getValue() + " | " + origAttr.getValue();
       }
     }

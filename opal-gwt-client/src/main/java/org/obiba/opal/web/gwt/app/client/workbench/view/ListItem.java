@@ -29,6 +29,7 @@ public class ListItem extends ComplexPanel implements HasText {
     add(w);
   }
 
+  @Override
   public void add(Widget w) {
     add(w, getElement());
   }
@@ -37,12 +38,14 @@ public class ListItem extends ComplexPanel implements HasText {
     insert(w, getElement(), beforeIndex, true);
   }
 
+  @Override
   public String getText() {
     return DOM.getInnerText(getElement());
   }
 
+  @Override
   public void setText(String text) {
-    DOM.setInnerText(getElement(), (text == null) ? "" : text);
+    DOM.setInnerText(getElement(), text == null ? "" : text);
   }
 
 }

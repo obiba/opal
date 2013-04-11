@@ -83,6 +83,7 @@ public class NotificationView extends PopupViewImpl implements NotificationPrese
     messagePanel.setSpacing(5);
 
     okay.addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         dialog.hide();
       }
@@ -98,7 +99,9 @@ public class NotificationView extends PopupViewImpl implements NotificationPrese
     dialog.setPopupPosition(Window.getClientWidth() - 350, 50);
     FadeAnimation.create(dialog.getElement()).from(0).to(0.85).start();
     dialog.show();
-    if(!sticky) {
+    if(sticky) {
+      nonStickyTimer = null;
+    } else {
       nonStickyTimer = new Timer() {
 
         @Override
@@ -115,8 +118,6 @@ public class NotificationView extends PopupViewImpl implements NotificationPrese
         }
       };
       nonStickyTimer.schedule(5000);
-    } else {
-      nonStickyTimer = null;
     }
   }
 

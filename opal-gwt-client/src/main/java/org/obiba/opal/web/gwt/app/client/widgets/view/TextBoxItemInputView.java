@@ -32,20 +32,24 @@ public class TextBoxItemInputView implements ItemInputDisplay {
     addEnterKeyHandler();
   }
 
+  @Override
   public void clear() {
     textBox.setText("");
   }
 
+  @Override
   public String getItem() {
     return textBox.getText();
   }
 
+  @Override
   public Widget asWidget() {
     return textBox;
   }
 
+  @Override
   public void setEnterKeyHandler(EnterKeyHandler handler) {
-    this.enterKeyHandler = handler;
+    enterKeyHandler = handler;
   }
 
   private void addEnterKeyHandler() {

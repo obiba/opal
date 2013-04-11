@@ -78,6 +78,6 @@ public class FileSelectionRequiredEvent extends GwtEvent<FileSelectionRequiredEv
 
   public interface Handler extends EventHandler {
 
-    public void onFileSelectionRequired(FileSelectionRequiredEvent event);
+    void onFileSelectionRequired(FileSelectionRequiredEvent event);
   }
 }

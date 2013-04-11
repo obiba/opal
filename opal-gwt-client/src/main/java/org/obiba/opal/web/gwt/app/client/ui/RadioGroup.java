@@ -50,12 +50,12 @@ public class RadioGroup<T> implements HasValue<T> {
   }
 
   public HandlerRegistration addButton(HasValue<Boolean> button, T value) {
-    if(this.buttons.size() != this.values.size()) throw new IllegalStateException("buttons and values are out of sync");
+    if(buttons.size() != values.size()) throw new IllegalStateException("buttons and values are out of sync");
 
-    this.buttons.add(button);
-    this.values.add(value);
+    buttons.add(button);
+    values.add(value);
 
-    final int index = this.buttons.size() - 1;
+    final int index = buttons.size() - 1;
 
     return button.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
@@ -83,7 +83,7 @@ public class RadioGroup<T> implements HasValue<T> {
   public T getValue() {
     for(int i = 0; i < buttons.size(); i++) {
       Boolean value = buttons.get(i).getValue();
-      if(value != null && value == true) {
+      if(value != null && value != null && value) {
         return values.get(i);
       }
     }

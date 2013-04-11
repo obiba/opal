@@ -86,8 +86,7 @@ public class ResizeHandle extends Widget
 
     private final int minHeight;
 
-    public MouseResizeHandler(UIObject objectToResize, int minWidth, int minHeight) {
-      super();
+    private MouseResizeHandler(UIObject objectToResize, int minWidth, int minHeight) {
       this.objectToResize = objectToResize;
       this.minWidth = minWidth;
       this.minHeight = minHeight;
@@ -97,7 +96,7 @@ public class ResizeHandle extends Widget
     public void onMouseDown(MouseDownEvent evt) {
       // GWT.log("begin drag at x=" + evt.getX() + " y=" + evt.getY());
       dragging = true;
-      DOM.setCapture(ResizeHandle.this.getElement());
+      DOM.setCapture(getElement());
       dragStartX = evt.getX();
       dragStartY = evt.getY();
     }

@@ -57,7 +57,7 @@ public class ReportTemplatePresenter
     super(eventBus, display, proxy);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateListPresenter = reportTemplateListPresenter;
-    this.reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenter;
+    reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenter;
   }
 
   @Override

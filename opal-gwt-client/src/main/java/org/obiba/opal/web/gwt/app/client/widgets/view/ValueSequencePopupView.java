@@ -99,7 +99,7 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   @Inject
   public ValueSequencePopupView(EventBus eventBus) {
     super(eventBus);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     resizeHandle.makeResizable(content);
     toggleGroup.setShowHideTexts();
     toggleGroup.setDelegate(new Delegate() {
@@ -135,7 +135,7 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
     dialogBox.setModal(modal);
     dialogBox.setText(variable.getName() + " - " + entityIdentifier);
     occurrenceGroup.setText(variable.getOccurrenceGroup());
-    toggleGroup.setVisible(variable.getOccurrenceGroup() != null && variable.getOccurrenceGroup().isEmpty() == false);
+    toggleGroup.setVisible(variable.getOccurrenceGroup() != null && !variable.getOccurrenceGroup().isEmpty());
     toggleGroup.setOn(true);
     this.variable = variable;
     valuesTable.setEmptyTableWidget(valuesTable.getLoadingIndicator());

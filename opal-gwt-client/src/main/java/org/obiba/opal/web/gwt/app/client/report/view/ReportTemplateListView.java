@@ -90,6 +90,7 @@ public class ReportTemplateListView extends ViewImpl implements ReportTemplateLi
     }
   }
 
+  @Override
   public ReportTemplateDto getSelectedReportTemplate() {
     return selectionModel.getSelectedObject();
   }

@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
@@ -125,7 +127,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     addSelectButtonHandler();
     addCancelButtonHandler();
     addCreateFolderButtonHandler();
-    super.registerHandler(getView().addUploadButtonHandler(new ClickHandler() {
+    registerHandler(getView().addUploadButtonHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -136,15 +138,15 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
   }
 
   private void addCreateFolderButtonHandler() {
-    super.registerHandler(getView().addCreateFolderButtonHandler(new CreateFolderButtonHandler()));
+    registerHandler(getView().addCreateFolderButtonHandler(new CreateFolderButtonHandler()));
   }
 
   private void addSelectButtonHandler() {
-    super.registerHandler(getView().addSelectButtonHandler(new SelectButtonHandler()));
+    registerHandler(getView().addSelectButtonHandler(new SelectButtonHandler()));
   }
 
   private void addCancelButtonHandler() {
-    super.registerHandler(getView().addCancelButtonHandler(new CancelButtonHandler()));
+    registerHandler(getView().addCancelButtonHandler(new CancelButtonHandler()));
   }
 
   private void createFolder(String destination, String folder) {
@@ -175,6 +177,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     return folderDetailsPresenter.getCurrentFolder();
   }
 
+  @Nullable
   public FileSelection getSelection() {
     FileSelection selection = null;
 
@@ -183,7 +186,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
       FileDto currentSelection = folderDetailsPresenter.getSelectedFile();
 
       resolver.resolveSelection(fileSelectionType, currentFolder.getPath(),
-          currentSelection != null ? currentSelection.getPath() : null, getView().getNewFileName());
+          currentSelection == null ? null : currentSelection.getPath(), getView().getNewFileName());
       if(resolver.resolved()) {
         selection = resolver.getSelection();
         break;
@@ -226,6 +229,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
   class CreateFolderButtonHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
       String newFolder = getView().getCreateFolderName().getText().trim();
       FileDto currentFolder = getCurrentFolder();
@@ -241,10 +245,11 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
   class SelectButtonHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
       FileSelection selection = getSelection();
       if(selection != null) {
-        getEventBus().fireEvent(new FileSelectionEvent(FileSelectorPresenter.this.fileSelectionSource, selection));
+        getEventBus().fireEvent(new FileSelectionEvent(fileSelectionSource, selection));
       }
       getView().hideDialog();
     }
@@ -252,6 +257,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
   class CancelButtonHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
       getView().hideDialog();
     }
@@ -259,9 +265,9 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
   public static class FileSelection {
 
-    private String selectionPath;
+    private final String selectionPath;
 
-    private FileSelectionType selectionType;
+    private final FileSelectionType selectionType;
 
     public FileSelection(String selectionPath, FileSelectionType selectionType) {
       this.selectionPath = selectionPath;
@@ -279,12 +285,12 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
   interface SelectionResolver {
 
-    public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
+    void resolveSelection(FileSelectionType type, String selectedFolder, @Nullable String selectedFile,
         String newFileName);
 
-    public boolean resolved();
+    boolean resolved();
 
-    public FileSelection getSelection();
+    FileSelection getSelection();
   }
 
   static abstract class AbstractSelectionResolver implements SelectionResolver {
@@ -293,10 +299,12 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
     protected boolean resolved;
 
+    @Override
     public boolean resolved() {
       return resolved;
     }
 
+    @Override
     public FileSelection getSelection() {
       return selection;
     }
@@ -305,7 +313,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
       String selectionPath = null;
 
       if(newFileName != null && newFileName.trim().length() != 0) {
-        selectionPath = (!"/".equals(selectedFolder) ? selectedFolder + "/" : selectedFolder) + newFileName;
+        selectionPath = ("/".equals(selectedFolder) ? selectedFolder : selectedFolder + "/") + newFileName;
       } else {
         selectionPath = selectedFile;
       }
@@ -316,42 +324,46 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
   static class FileSelectionResolver extends AbstractSelectionResolver {
 
+    @Override
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
       if(type == FileSelectionType.FILE) {
         selection = getFileSelection(selectedFolder, selectedFile, newFileName);
-        resolved = (selection.getSelectionPath() != null);
+        resolved = selection.getSelectionPath() != null;
       }
     }
   }
 
   static class ExistingFileSelectionResolver extends AbstractSelectionResolver {
 
+    @Override
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
       if(type == FileSelectionType.EXISTING_FILE) {
         selection = new FileSelection(selectedFile, FileSelectionType.FILE);
-        resolved = (selection.getSelectionPath() != null);
+        resolved = selection.getSelectionPath() != null;
       }
     }
   }
 
   static class AnyFolderSelectionResolver extends AbstractSelectionResolver {
 
+    @Override
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
       if(type == FileSelectionType.FOLDER || type == FileSelectionType.EXISTING_FOLDER) {
         selection = new FileSelection(selectedFolder, FileSelectionType.FOLDER);
-        resolved = (selection.getSelectionPath() != null);
+        resolved = selection.getSelectionPath() != null;
       }
     }
   }
 
   static class NewFileOrFolderSelectionResolver extends AbstractSelectionResolver {
 
+    @Override
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
@@ -360,21 +372,22 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
         if(selection.getSelectionPath() == null) {
           selection = new FileSelection(selectedFolder, FileSelectionType.FOLDER);
         }
-        resolved = (selection.getSelectionPath() != null);
+        resolved = selection.getSelectionPath() != null;
       }
     }
   }
 
   static class ExistingFileOrFolderSelectionResolver extends AbstractSelectionResolver {
 
+    @Override
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
       if(type == FileSelectionType.EXISTING_FILE_OR_FOLDER) {
-        selection = (selectedFile != null)
+        selection = selectedFile != null
             ? new FileSelection(selectedFile, FileSelectionType.FILE)
             : new FileSelection(selectedFolder, FileSelectionType.FOLDER);
-        resolved = (selection.getSelectionPath() != null);
+        resolved = selection.getSelectionPath() != null;
       }
     }
   }

@@ -107,9 +107,9 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
       public void onSelection(SelectionEvent<TreeItem> event) {
 
         final TreeItem selectedItem = event.getSelectedItem();
-        FileDto selectedFile = ((FileDto) selectedItem.getUserObject());
+        FileDto selectedFile = (FileDto) selectedItem.getUserObject();
 
-        if(selectedFile.getReadable() == false) {
+        if(!selectedFile.getReadable()) {
           // reset to previous selection
           getView().selectFile(getView().getSelectedFile(), false);
           return;
@@ -130,7 +130,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
         }
       }
 
-      private boolean childrenNotAdded(final TreeItem selectedItem) {
+      private boolean childrenNotAdded(TreeItem selectedItem) {
         return selectedItem.getChildCount() == 0;
       }
 
@@ -143,6 +143,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
     registerHandler(
         getEventBus().addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
 
+          @Override
           public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
             getView().selectFile(event.getFolder(), false);
           }
@@ -151,6 +152,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
 
     registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 
+      @Override
       public void onFolderCreation(FolderCreationEvent event) {
         // Refresh the file system since a new folder was added.
         getView().addBranch(event.getFolder());
@@ -170,7 +172,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
     registerHandler(getView().addFileSystemTreeOpenHandler(new OpenHandler<TreeItem>() {
 
       @Override
-      public void onOpen(final OpenEvent<TreeItem> event) {
+      public void onOpen(OpenEvent<TreeItem> event) {
         refreshTreeNode(event.getTarget());
       }
 

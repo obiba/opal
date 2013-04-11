@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.widgets.event;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.event.shared.EventHandler;
@@ -78,10 +80,9 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
    *
    * @return null if none
    */
+  @Nullable
   public TableDto getSelectedTable() {
-    if(selectedTables != null && selectedTables.size() > 0) {
-      return selectedTables.get(0);
-    } else return null;
+    return selectedTables != null && selectedTables.size() > 0 ? selectedTables.get(0) : null;
   }
 
   //
@@ -90,6 +91,6 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    public void onTableSelection(TableSelectionEvent event);
+    void onTableSelection(TableSelectionEvent event);
   }
 }

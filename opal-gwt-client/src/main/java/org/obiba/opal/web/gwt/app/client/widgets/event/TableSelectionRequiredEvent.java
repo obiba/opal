@@ -40,7 +40,7 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
 
   public TableSelectionRequiredEvent(Object source, SelectionType tableSelectionType) {
     this.source = source;
-    this.selectionType = tableSelectionType;
+    selectionType = tableSelectionType;
   }
 
   //
@@ -80,6 +80,6 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
 
   public interface Handler extends EventHandler {
 
-    public void onTableSelectionRequired(TableSelectionRequiredEvent event);
+    void onTableSelectionRequired(TableSelectionRequiredEvent event);
   }
 }

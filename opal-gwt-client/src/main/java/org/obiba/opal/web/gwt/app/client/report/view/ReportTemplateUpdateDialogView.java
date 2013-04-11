@@ -129,7 +129,7 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
 
   @Override
   public void hideDialog() {
-    super.hide();
+    hide();
   }
 
   @Override
@@ -206,12 +206,12 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   @Override
   public void setSchedule(String schedule) {
     this.schedule.setText(schedule);
-    if(!"".equals(schedule)) {
-      scheduleRadio.setValue(true);
-      runManuallyRadio.setValue(false);
-    } else {
+    if("".equals(schedule)) {
       scheduleRadio.setValue(false);
       runManuallyRadio.setValue(true);
+    } else {
+      scheduleRadio.setValue(true);
+      runManuallyRadio.setValue(false);
     }
   }
 

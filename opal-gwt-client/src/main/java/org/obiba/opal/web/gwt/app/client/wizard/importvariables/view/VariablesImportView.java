@@ -204,6 +204,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
     destinationLabel.setVisible(datasources.length() > 1);
   }
 
+  @Override
   public HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler) {
     return downloadExcelTemplateButton.addClickHandler(handler);
   }
@@ -273,17 +274,17 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
 
   @Override
   public void setFileSelectionValidator(ValidationHandler handler) {
-    this.fileSelectionValidator = handler;
+    fileSelectionValidator = handler;
   }
 
   @Override
   public void setLocaleValidator(ValidationHandler handler) {
-    this.localeValidator = handler;
+    localeValidator = handler;
   }
 
   @Override
   public void setImportableValidator(ValidationHandler handler) {
-    this.importableValidator = handler;
+    importableValidator = handler;
   }
 
   @Override

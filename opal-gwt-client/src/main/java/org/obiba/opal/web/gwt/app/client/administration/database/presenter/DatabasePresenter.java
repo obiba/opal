@@ -115,17 +115,15 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
 
   private void createDatabase() {
     if(methodValidationHandler.validate()) {
-      CreateMethodCallBack createCallback = new CreateMethodCallBack();
-      AlreadyExistMethodCallBack alreadyExistCallback = new AlreadyExistMethodCallBack();
       ResourceRequestBuilderFactory.<JdbcDataSourceDto>newBuilder()
           .forResource(Resources.database(getView().getName().getText())).get()//
-          .withCallback(alreadyExistCallback)//
-          .withCallback(Response.SC_NOT_FOUND, createCallback).send();
+          .withCallback(new AlreadyExistMethodCallBack())//
+          .withCallback(Response.SC_NOT_FOUND, new CreateMethodCallBack()).send();
     }
   }
 
   private void postDatabase(JdbcDataSourceDto dto) {
-    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+    ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()//
         .withResourceBody(JdbcDataSourceDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler)//
@@ -134,7 +132,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
   }
 
   private void putDatabase(JdbcDataSourceDto dto) {
-    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+    ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(Resources.database(getView().getName().getText())).put()//
         .withResourceBody(JdbcDataSourceDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler)//
@@ -159,7 +157,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
 
   private class MethodValidationHandler extends AbstractValidationHandler {
 
-    public MethodValidationHandler(EventBus eventBus) {
+    private MethodValidationHandler(EventBus eventBus) {
       super(eventBus);
     }
 
@@ -213,7 +211,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
 
     JdbcDataSourceDto dto;
 
-    public CreateOrUpdateMethodCallBack(JdbcDataSourceDto dto) {
+    private CreateOrUpdateMethodCallBack(JdbcDataSourceDto dto) {
       this.dto = dto;
     }
 

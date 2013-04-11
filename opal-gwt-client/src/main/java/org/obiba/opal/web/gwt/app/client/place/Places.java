@@ -15,6 +15,8 @@ public final class Places {
 
   public static final Place dashboardPlace = new Place(dashboard);
 
+  private Places() {}
+
   public static String dashboard() {
     return dashboard;
   }

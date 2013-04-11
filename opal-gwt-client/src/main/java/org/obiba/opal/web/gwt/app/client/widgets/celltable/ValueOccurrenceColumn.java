@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
@@ -36,10 +38,10 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
     super(createCell(variable));
     this.pos = pos;
     this.variable = variable;
-    this.valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
+    valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
 
     if("binary".equalsIgnoreCase(variable.getValueType())) {
-      setFieldUpdater(new FieldUpdater<ValueOccurrenceColumn.ValueOccurrence, String>() {
+      setFieldUpdater(new FieldUpdater<ValueOccurrence, String>() {
 
         @Override
         public void update(int index, ValueOccurrence object, String value) {
@@ -52,12 +54,10 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
     }
   }
 
-  private static Cell<String> createCell(final VariableDto variable) {
-    if("binary".equalsIgnoreCase(variable.getValueType())) {
-      return new ClickableTextCell(new ClickableIconRenderer("i-down"));
-    } else {
-      return new TextCell();
-    }
+  private static Cell<String> createCell(VariableDto variable) {
+    return "binary".equalsIgnoreCase(variable.getValueType()) //
+        ? new ClickableTextCell(new ClickableIconRenderer("i-down")) //
+        : new TextCell();
   }
 
   public void setValueSelectionHandler(ValueSelectionHandler valueSelectionHandler) {
@@ -93,6 +93,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
       return JsArrays.toSafeArray(valueSet.getValuesArray().get(pos).getValuesArray());
     }
 
+    @Nullable
     public ValueDto getValue(int pos) {
       JsArray<ValueDto> valueSequence = getValueSequence(pos);
       if(index >= valueSequence.length()) return null;
@@ -102,7 +103,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   public interface ValueSelectionHandler {
 
-    public void onBinaryValueSelection(VariableDto variable, int index, ValueSetDto valueSet);
+    void onBinaryValueSelection(VariableDto variable, int index, ValueSetDto valueSet);
 
   }
 }

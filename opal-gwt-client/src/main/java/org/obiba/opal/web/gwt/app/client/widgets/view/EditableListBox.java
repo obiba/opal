@@ -60,9 +60,10 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
     initWidget(layout);
 
     textBox.addKeyDownHandler(new KeyDownHandler() {
+      @Override
       public void onKeyDown(KeyDownEvent event) {
         int key = event.getNativeKeyCode();
-        if(key == KeyCodes.KEY_DOWN || (event.isControlKeyDown() && key == ' ')) {
+        if(key == KeyCodes.KEY_DOWN || event.isControlKeyDown() && key == ' ') {
           displaySuggestions();
         } else {
           panel.hide();
@@ -80,7 +81,7 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
     textBox.addStyleName(style);
   }
 
-  public boolean hasItem(final String value) {
+  public boolean hasItem(String value) {
     return menuItemsMap.containsKey(value);
   }
 

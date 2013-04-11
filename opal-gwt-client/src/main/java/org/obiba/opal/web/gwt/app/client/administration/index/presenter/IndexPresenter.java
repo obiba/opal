@@ -93,19 +93,23 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   private ScheduleType getScheduleTypeFromName(String type) {
     if(type.equals(ScheduleType.MINUTES_5.getName())) {
       return ScheduleType.MINUTES_5;
-    } else if(type.equals(ScheduleType.MINUTES_15.getName())) {
-      return ScheduleType.MINUTES_15;
-    } else if(type.equals(ScheduleType.MINUTES_30.getName())) {
-      return ScheduleType.MINUTES_30;
-    } else if(type.equals(ScheduleType.HOURLY.getName())) {
-      return ScheduleType.HOURLY;
-    } else if(type.equals(ScheduleType.DAILY.getName())) {
-      return ScheduleType.DAILY;
-    } else if(type.equals(ScheduleType.WEEKLY.getName())) {
-      return ScheduleType.WEEKLY;
-    } else {
-      return ScheduleType.NOT_SCHEDULED;
     }
+    if(type.equals(ScheduleType.MINUTES_15.getName())) {
+      return ScheduleType.MINUTES_15;
+    }
+    if(type.equals(ScheduleType.MINUTES_30.getName())) {
+      return ScheduleType.MINUTES_30;
+    }
+    if(type.equals(ScheduleType.HOURLY.getName())) {
+      return ScheduleType.HOURLY;
+    }
+    if(type.equals(ScheduleType.DAILY.getName())) {
+      return ScheduleType.DAILY;
+    }
+    if(type.equals(ScheduleType.WEEKLY.getName())) {
+      return ScheduleType.WEEKLY;
+    }
+    return ScheduleType.NOT_SCHEDULED;
   }
 
   @SuppressWarnings({ "PMD.NcssMethodCount", "MethodOnlyUsedFromInnerClass" })
@@ -173,10 +177,9 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     }
 
     private void putSchedule(String datasource, String table, ScheduleDto dto) {
-      CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
       ResourceRequestBuilderFactory.newBuilder().forResource(Resources.updateSchedule(datasource, table)).put()//
           .withResourceBody(ScheduleDto.stringify(dto))//
-          .withCallback(Response.SC_OK, callbackHandler).send();
+          .withCallback(Response.SC_OK, new CreateOrUpdateMethodCallBack(dto)).send();
     }
 
   }

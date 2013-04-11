@@ -31,7 +31,7 @@ public class AlertPanel extends FlowPanel {
   }
 
   public void setType(String type) {
-    if(type != null && type.isEmpty() == false) {
+    if(type != null && !type.isEmpty()) {
       addStyleName("alert-" + type.toLowerCase());
     }
   }

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 
@@ -119,7 +121,7 @@ public class ValueMapEntry {
         range.hasUpperBound() ? range.upperEndpoint() : null).label(range.toString());
   }
 
-  public static Builder fromRange(Number lower, Number upper) {
+  public static Builder fromRange(@Nullable Number lower, @Nullable Number upper) {
     String value = "";
     ValueMapEntryType type = ValueMapEntryType.RANGE;
 
@@ -136,7 +138,8 @@ public class ValueMapEntry {
     return new Builder(type).value(value).label(value);
   }
 
-  private static String formatNumber(Number nb) {
+  @Nullable
+  private static String formatNumber(@Nullable Number nb) {
     if(nb == null) return null;
     String str = nb.toString();
     // TODO use NumberFormat
@@ -184,6 +187,7 @@ public class ValueMapEntry {
     return text;
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
     private final ValueMapEntry entry;
 
@@ -191,12 +195,12 @@ public class ValueMapEntry {
       entry = new ValueMapEntry(type, "", "", "", false, 0);
     }
 
-    public Builder value(String value) {
+    public Builder value(@Nullable String value) {
       entry.value = value;
       return this;
     }
 
-    public Builder label(String label) {
+    public Builder label(@Nullable String label) {
       entry.label = label;
       return this;
     }

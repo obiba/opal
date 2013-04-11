@@ -64,12 +64,9 @@ public class FunctionalUnitView extends ViewImpl implements FunctionalUnitPresen
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    HasWidgets panel;
-    if(slot == SplitPaneWorkbenchPresenter.Slot.LEFT) {
-      panel = functionalUnitListPanel;
-    } else {
-      panel = functionalUnitDetailsPanel;
-    }
+    HasWidgets panel = slot == SplitPaneWorkbenchPresenter.Slot.LEFT
+        ? functionalUnitListPanel
+        : functionalUnitDetailsPanel;
     panel.clear();
     if(content != null) {
       panel.add(content);

@@ -34,7 +34,7 @@ public class CsvDatasourceFormView extends AbstractCsvOptionsView implements Csv
   CsvOptionsView csvOptions;
 
   public CsvDatasourceFormView() {
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
@@ -47,6 +47,7 @@ public class CsvDatasourceFormView extends AbstractCsvOptionsView implements Csv
     return csvOptions;
   }
 
+  @Override
   public void clearForm() {
     getCsvOptions().clear();
   }

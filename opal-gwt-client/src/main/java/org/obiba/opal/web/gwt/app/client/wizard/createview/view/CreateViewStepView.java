@@ -107,7 +107,7 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
   public CreateViewStepView(EventBus eventBus) {
     super(eventBus);
     tableChooser = new TableChooser(true);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
 
     ValueChangeHandler<Boolean> handler = new ValueChangeHandler<Boolean>() {
@@ -205,12 +205,12 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
 
   @Override
   public void setSelectTypeValidator(ValidationHandler validator) {
-    this.selectTypeValidator = validator;
+    selectTypeValidator = validator;
   }
 
   @Override
   public void setTablesValidator(ValidationHandler validator) {
-    this.tablesValidator = validator;
+    tablesValidator = validator;
   }
 
   @Override
@@ -264,12 +264,12 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
 
   @Override
   public HasValue<Boolean> getFileViewOption() {
-    return this.useAnExistingView;
+    return useAnExistingView;
   }
 
   @Override
   public HasValue<Boolean> getExcelFileOption() {
-    return this.useAnExcelFile;
+    return useAnExcelFile;
   }
 
   @Override

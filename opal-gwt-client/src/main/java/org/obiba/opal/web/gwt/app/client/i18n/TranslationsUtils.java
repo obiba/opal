@@ -20,6 +20,8 @@ import com.google.gwt.core.client.JsArrayString;
  */
 public class TranslationsUtils {
 
+  private TranslationsUtils() {}
+
   public static String replaceArguments(String msg, List<String> args) {
     String message = msg;
     if(args != null) {

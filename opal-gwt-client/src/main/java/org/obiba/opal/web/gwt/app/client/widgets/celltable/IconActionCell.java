@@ -73,7 +73,7 @@ public class IconActionCell<C> extends AbstractCell<C> {
   public void onBrowserEvent(Context context, Element parent, C value, NativeEvent event,
       ValueUpdater<C> valueUpdater) {
     super.onBrowserEvent(context, parent, value, event, valueUpdater);
-    if(isEnabled() == false) return;
+    if(!isEnabled()) return;
     if("click".equals(event.getType()) || "mousedown".equals(event.getType())) {
       EventTarget eventTarget = event.getEventTarget();
       if(!Element.is(eventTarget)) {

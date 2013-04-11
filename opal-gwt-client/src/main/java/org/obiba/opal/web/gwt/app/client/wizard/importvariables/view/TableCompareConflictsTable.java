@@ -24,7 +24,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
  */
 public class TableCompareConflictsTable extends Table<ConflictDto> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private Column<ConflictDto, String> variableNameColumn;
 
@@ -47,7 +47,7 @@ public class TableCompareConflictsTable extends Table<ConflictDto> {
     addColumn(new TextColumn<ConflictDto>() {
       @Override
       public String getValue(ConflictDto conflict) {
-        if(translations.datasourceComparisonErrorMap().containsKey(conflict.getCode()) == false) {
+        if(!translations.datasourceComparisonErrorMap().containsKey(conflict.getCode())) {
           return conflict.getCode();
         }
         return TranslationsUtils.replaceArguments(translations.datasourceComparisonErrorMap().get(conflict.getCode()),

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -120,10 +122,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
           @Override
           public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
             ReportTemplateDto reportTemplate = event.getReportTemplate();
-            if(reportTemplate != null) {
-              refreshReportTemplateDetails(reportTemplate);
-            } else {
+            if(reportTemplate == null) {
               getView().setReportTemplateDetails(null);
+            } else {
+              refreshReportTemplateDetails(reportTemplate);
             }
           }
         }));
@@ -142,6 +144,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     getView().setUpdateReportTemplateCommand(new EditReportTemplateCommand());
   }
 
+  @SuppressWarnings("ReuseOfLocalVariable")
   private void authorize() {
     // run report
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/report").post()
@@ -376,7 +379,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     private final String templateName;
 
-    public ReportTemplateNotFoundCallBack(String reportTemplateName) {
+    private ReportTemplateNotFoundCallBack(String reportTemplateName) {
       templateName = reportTemplateName;
     }
 
@@ -435,7 +438,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     HandlerRegistration addReportDesignClickHandler(ClickHandler handler);
 
-    void setReportTemplateDetails(ReportTemplateDto reportTemplate);
+    void setReportTemplateDetails(@Nullable ReportTemplateDto reportTemplate);
 
     ReportTemplateDto getReportTemplateDetails();
 

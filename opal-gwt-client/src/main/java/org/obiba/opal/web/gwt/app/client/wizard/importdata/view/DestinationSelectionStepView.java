@@ -83,7 +83,7 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
         boolean knownTable = tableListBox.hasItem(tableListBox.getText());
-        entityTypeListBox.setEnabled(knownTable == false);
+        entityTypeListBox.setEnabled(!knownTable);
         if(knownTable) {
           tableSelectionHandler.onTableSelected(getSelectedDatasource(), getSelectedTable());
         }
@@ -116,7 +116,7 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
 
   @Override
   public String getSelectedTable() {
-    return this.tableListBox.getValue();
+    return tableListBox.getValue();
   }
 
   @Override
@@ -177,6 +177,6 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
 
   @Override
   public void setTableSelectionHandler(TableSelectionHandler handler) {
-    this.tableSelectionHandler = handler;
+    tableSelectionHandler = handler;
   }
 }

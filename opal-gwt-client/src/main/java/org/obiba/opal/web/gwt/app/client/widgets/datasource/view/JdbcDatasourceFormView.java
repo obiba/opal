@@ -70,18 +70,22 @@ public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFo
     }
   }
 
+  @Override
   public HasValue<Boolean> getUseMetadataTablesOption() {
     return useMetadataTablesOption;
   }
 
+  @Override
   public HasValue<Boolean> getDoNotUseMetadataTablesOption() {
     return doNotUseMetadataTablesOption;
   }
 
+  @Override
   public HasText getDefaultCreatedTimestampColumnName() {
     return defaultCreatedTimestampColumnName;
   }
 
+  @Override
   public HasText getDefaultUpdatedTimestampColumnName() {
     return defaultUpdatedTimestampColumnName;
   }

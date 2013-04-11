@@ -50,23 +50,28 @@ public class ConclusionStepView extends Composite implements ConclusionStepPrese
   // UploadVariablesStepPresenter.Display Methods
   //
 
+  @Override
   public void clearResourceRequests() {
     tableListLabel.setVisible(false);
     tableListPanel.clear();
   }
 
+  @Override
   public void addResourceRequest(Display resourceRequestDisplay) {
     tableListLabel.setVisible(true);
     tableListPanel.add(resourceRequestDisplay.asWidget());
   }
 
+  @Override
   public Widget asWidget() {
     return this;
   }
 
+  @Override
   public void startProcessing() {
   }
 
+  @Override
   public void stopProcessing() {
   }
 

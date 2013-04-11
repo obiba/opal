@@ -29,7 +29,6 @@ public class TableCompareVariablesTable extends Table<VariableDto> {
   private Column<VariableDto, String> variableNameColumn;
 
   public TableCompareVariablesTable() {
-    super();
     initColumns();
   }
 

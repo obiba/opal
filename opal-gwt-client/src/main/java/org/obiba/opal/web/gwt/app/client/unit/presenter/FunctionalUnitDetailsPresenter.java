@@ -409,7 +409,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     private final String prefix;
 
-    public GenerateConfirmationRunnable(Number size, boolean allowZeros, String prefix) {
+    private GenerateConfirmationRunnable(Number size, boolean allowZeros, String prefix) {
       this.size = size;
       this.allowZeros = allowZeros;
       this.prefix = prefix;
@@ -553,7 +553,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     @Override
     public void onResource(Response response, JsArray<KeyDto> resource) {
-      JsArray<KeyDto> keyPairs = resource != null ? resource : (JsArray<KeyDto>) JsArray.createArray();
+      JsArray<KeyDto> keyPairs = resource == null ? (JsArray<KeyDto>) JsArray.createArray() : resource;
       getView().setKeyPairs(keyPairs);
     }
 
@@ -563,7 +563,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     private final String functionalUnitName;
 
-    public FunctionalUnitNotFoundCallBack(String functionalUnitName) {
+    private FunctionalUnitNotFoundCallBack(String functionalUnitName) {
       this.functionalUnitName = functionalUnitName;
     }
 

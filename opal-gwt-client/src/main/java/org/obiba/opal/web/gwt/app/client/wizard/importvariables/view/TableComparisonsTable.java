@@ -32,7 +32,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
  */
 public abstract class TableComparisonsTable extends Table<TableComparison> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private Column<TableComparison, String> tableNameColumn;
 
@@ -64,11 +64,9 @@ public abstract class TableComparisonsTable extends Table<TableComparison> {
       @Override
       public String getValue(TableComparison object) {
         int conflicts = object.getNewVariablesConflictsCount();
-        if(conflicts > 0) {
-          return Integer.toString(object.getNewVariablesCount()) + " (" + conflicts + ")";
-        } else {
-          return Integer.toString(object.getNewVariablesCount());
-        }
+        return conflicts > 0
+            ? Integer.toString(object.getNewVariablesCount()) + " (" + conflicts + ")"
+            : Integer.toString(object.getNewVariablesCount());
       }
     }, translations.newVariablesLabel());
 
@@ -77,11 +75,9 @@ public abstract class TableComparisonsTable extends Table<TableComparison> {
       @Override
       public String getValue(TableComparison object) {
         int conflicts = object.getModifiedVariablesConflictsCount();
-        if(conflicts > 0) {
-          return Integer.toString(object.getModifiedVariablesCount()) + " (" + conflicts + ")";
-        } else {
-          return Integer.toString(object.getModifiedVariablesCount());
-        }
+        return conflicts > 0
+            ? Integer.toString(object.getModifiedVariablesCount()) + " (" + conflicts + ")"
+            : Integer.toString(object.getModifiedVariablesCount());
       }
     }, translations.modifiedVariablesLabel());
 
@@ -132,17 +128,16 @@ public abstract class TableComparisonsTable extends Table<TableComparison> {
       @Override
       public Boolean getValue() {
         if(getTableComparisons().isEmpty()) return false;
-        boolean allSelected = true;
         boolean hasSelectable = false;
         for(TableComparison tc : getTableComparisons()) {
           if(tc.isSelectable()) {
             hasSelectable = true;
-            if(getSelectionModel().isSelected(tc) == false) {
+            if(!getSelectionModel().isSelected(tc)) {
               return false;
             }
           }
         }
-        return hasSelectable == false ? false : allSelected;
+        return hasSelectable;
       }
     };
     checkHeader.setUpdater(new ValueUpdater<Boolean>() {

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.job.presenter;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -60,6 +62,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
     this.jobDetailsPresenter = jobDetailsPresenter;
 
     getView().getActionsColumn().setActionHandler(new ActionHandler<CommandStateDto>() {
+      @Override
       public void doAction(CommandStateDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
@@ -75,9 +78,9 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   @Override
   protected void onBind() {
-    super.registerHandler(getView().addClearButtonHandler(new ClearButtonHandler()));
-    super.registerHandler(getView().addRefreshButtonHandler(new RefreshButtonHandler()));
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(getView().addClearButtonHandler(new ClearButtonHandler()));
+    registerHandler(getView().addRefreshButtonHandler(new RefreshButtonHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
   }
 
   @Override
@@ -135,6 +138,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   private void cancelJob(final CommandStateDto dto) {
     actionRequiringConfirmation = new Runnable() {
+      @Override
       public void run() {
         ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -162,6 +166,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   private void deleteCompletedJobs() {
     actionRequiringConfirmation = new Runnable() {
+      @Override
       public void run() {
         ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -186,6 +191,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   public interface Display extends View {
 
+    @Nullable
     SelectionModel<CommandStateDto> getTableSelection();
 
     void renderRows(JsArray<CommandStateDto> rows);
@@ -205,6 +211,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   class ClearButtonHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
       deleteCompletedJobs();
     }
@@ -212,6 +219,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   class RefreshButtonHandler implements ClickHandler {
 
+    @Override
     public void onClick(ClickEvent event) {
       updateTable();
     }
@@ -219,6 +227,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
           event.isConfirmed()) {

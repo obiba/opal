@@ -54,17 +54,20 @@ public class FileExplorerView extends ViewImpl implements Display {
   Button createFolderButton;
 
   public FileExplorerView() {
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
   }
 
+  @Override
   public Button getFileDeleteButton() {
     return fileDeleteButton;
   }
 
+  @Override
   public Button getFileDownloadButton() {
     return fileDownloadButton;
   }
 
+  @Override
   public Button getCreateFolderButton() {
     return createFolderButton;
   }
@@ -81,12 +84,7 @@ public class FileExplorerView extends ViewImpl implements Display {
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    HasWidgets panel;
-    if(slot == SplitPaneWorkbenchPresenter.Slot.LEFT) {
-      panel = this.fileSystemTreePanel;
-    } else {
-      panel = this.folderDetailsPanel;
-    }
+    HasWidgets panel = slot == SplitPaneWorkbenchPresenter.Slot.LEFT ? fileSystemTreePanel : folderDetailsPanel;
     panel.clear();
     if(content != null) {
       panel.add(content);

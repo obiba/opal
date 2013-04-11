@@ -58,9 +58,9 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
   public void setInSlot(Object slot, Widget content) {
     HasWidgets panel = null;
     if(slot == Slots.User) {
-      panel = this.users;
+      panel = users;
     } else if(slot == Slots.Group) {
-      panel = this.groups;
+      panel = groups;
     }
     if(panel != null) {
       panel.clear();

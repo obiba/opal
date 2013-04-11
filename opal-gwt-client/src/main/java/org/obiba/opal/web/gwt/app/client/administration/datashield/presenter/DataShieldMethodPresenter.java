@@ -144,17 +144,15 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
 
   private void createMethod() {
     if(methodValidationHandler.validate()) {
-      CreateMethodCallBack createCallback = new CreateMethodCallBack();
-      AlreadyExistMethodCallBack alreadyExistCallback = new AlreadyExistMethodCallBack();
       ResourceRequestBuilderFactory.<DataShieldMethodDto>newBuilder().forResource(method(getView().getName().getText()))
           .get()//
-          .withCallback(alreadyExistCallback)//
-          .withCallback(Response.SC_NOT_FOUND, createCallback).send();
+          .withCallback(new AlreadyExistMethodCallBack())//
+          .withCallback(Response.SC_NOT_FOUND, new CreateMethodCallBack()).send();
     }
   }
 
   private void postMethod(DataShieldMethodDto dto) {
-    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+    ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(methods()).post()//
         .withResourceBody(DataShieldMethodDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler)//
@@ -163,7 +161,7 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
   }
 
   private void putMethod(DataShieldMethodDto dto) {
-    CreateOrUpdateMethodCallBack callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+    ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(method(getView().getName().getText())).put()//
         .withResourceBody(DataShieldMethodDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler)//
@@ -194,7 +192,7 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
 
   private class MethodValidationHandler extends AbstractValidationHandler {
 
-    public MethodValidationHandler(EventBus eventBus) {
+    private MethodValidationHandler(EventBus eventBus) {
       super(eventBus);
     }
 
@@ -250,7 +248,7 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
 
     DataShieldMethodDto dto;
 
-    public CreateOrUpdateMethodCallBack(DataShieldMethodDto dto) {
+    private CreateOrUpdateMethodCallBack(DataShieldMethodDto dto) {
       this.dto = dto;
     }
 

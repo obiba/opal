@@ -77,6 +77,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   @Override
   protected void onBind() {
     getView().getSignIn().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         createSecurityResource();
       }

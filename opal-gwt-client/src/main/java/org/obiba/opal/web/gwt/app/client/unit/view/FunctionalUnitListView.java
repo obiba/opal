@@ -73,6 +73,7 @@ public class FunctionalUnitListView extends ViewImpl implements FunctionalUnitLi
     }
   }
 
+  @Override
   public FunctionalUnitDto getSelectedFunctionalUnit() {
     return selectionModel.getSelectedObject();
   }

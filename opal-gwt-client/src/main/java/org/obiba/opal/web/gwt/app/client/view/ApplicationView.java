@@ -116,8 +116,8 @@ public class ApplicationView implements ApplicationPresenter.Display {
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    this.workbench.clear();
-    this.workbench.add(content);
+    workbench.clear();
+    workbench.add(content);
   }
 
   @Override
@@ -134,6 +134,7 @@ public class ApplicationView implements ApplicationPresenter.Display {
   public HasUrl getDownloder() {
     return new HasUrl() {
 
+      @Override
       public void setUrl(String url) {
         frame.setUrl(url);
       }

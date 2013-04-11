@@ -24,7 +24,6 @@ public class DefaultAclCallback implements AclCallback {
   private final EventBus eventBus;
 
   public DefaultAclCallback(EventBus eventBus) {
-    super();
     this.eventBus = eventBus;
   }
 

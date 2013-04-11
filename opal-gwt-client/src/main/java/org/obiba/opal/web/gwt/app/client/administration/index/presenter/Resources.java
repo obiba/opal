@@ -13,6 +13,8 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 
 final class Resources {
 
+  private Resources() {}
+
   static String indices() {
     return "/service/search/indices";
   }

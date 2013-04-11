@@ -24,12 +24,12 @@ public class BreadCrumbList extends UList {
   }
 
   public BreadCrumbList(String divider) {
-    super();
     setStyleName("breadcrumb");
     this.divider = divider;
 
   }
 
+  @Override
   public void add(Widget w) {
     if(getWidgetCount() == 0) {
       super.add(new ListItem(w));
@@ -40,6 +40,7 @@ public class BreadCrumbList extends UList {
     }
   }
 
+  @Override
   public void insert(Widget w, int beforeIndex) {
     ListItem item;
     if(beforeIndex > 0) {

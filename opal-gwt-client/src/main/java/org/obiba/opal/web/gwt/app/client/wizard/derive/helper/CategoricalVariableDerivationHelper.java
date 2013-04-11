@@ -60,6 +60,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
       @Nullable SummaryStatisticsDto summaryStatisticsDto) {
     super(originalVariable, destination);
+    //noinspection RedundantCast
     categoricalSummaryDto = summaryStatisticsDto == null
         ? null
         : (CategoricalSummaryDto) summaryStatisticsDto

@@ -126,6 +126,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         }));
     registerHandler(getEventBus().addHandler(FileDownloadEvent.getType(), new FileDownloadEvent.Handler() {
 
+      @Override
       public void onFileDownload(FileDownloadEvent event) {
         getView().getDownloder().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
       }

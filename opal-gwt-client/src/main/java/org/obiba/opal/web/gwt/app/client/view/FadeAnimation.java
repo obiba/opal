@@ -33,7 +33,6 @@ public class FadeAnimation extends Timer {
   private FadedHandler handler;
 
   private FadeAnimation(Element element) {
-    super();
     this.element = element;
   }
 
@@ -69,15 +68,14 @@ public class FadeAnimation extends Timer {
    * Callback when fading is over.
    */
   public interface FadedHandler {
-    public void onFaded(Element element);
+    void onFaded(Element element);
   }
 
   public static class Builder {
     private final FadeAnimation fader;
 
     Builder(Element element) {
-      super();
-      this.fader = new FadeAnimation(element);
+      fader = new FadeAnimation(element);
     }
 
     public Builder from(double from) {
@@ -113,8 +111,7 @@ public class FadeAnimation extends Timer {
   }
 
   public static Builder create(Element element) {
-    Builder builder = new Builder(element);
-    return builder;
+    return new Builder(element);
   }
 
   public static FadeAnimation start(Element element) {

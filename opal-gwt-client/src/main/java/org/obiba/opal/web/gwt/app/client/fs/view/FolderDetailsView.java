@@ -11,8 +11,11 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
@@ -90,9 +93,9 @@ public class FolderDetailsView extends ViewImpl implements Display {
   @Override
   @SuppressWarnings("unchecked")
   public void renderRows(FileDto folder) {
-    JsArray<FileDto> children = folder.getChildrenCount() != 0
-        ? filterChildren(folder.getChildrenArray())
-        : (JsArray<FileDto>) JsArray.createArray();
+    JsArray<FileDto> children = folder.getChildrenCount() == 0
+        ? (JsArray<FileDto>) JsArray.createArray()
+        : filterChildren(folder.getChildrenArray());
 
     if(!"root".equals(folder.getName())) {
       FileDto parent = FileDtos.getParent(folder);
@@ -153,30 +156,32 @@ public class FolderDetailsView extends ViewImpl implements Display {
         double fileSize = object.getSize();
         if(fileSize < KB) {
           return (long) fileSize + " B";
-        } else if(fileSize < MB) {
+        }
+        if(fileSize < MB) {
           double fileSizeInKB = fileSize / KB;
           long iPart = (long) fileSizeInKB;
           long fPart = Math.round((fileSizeInKB - iPart) * 10);
           return iPart + "." + fPart + " KB";
-        } else if(fileSize < GB) {
+        }
+        if(fileSize < GB) {
           double fileSizeInMB = fileSize / MB;
           long iPart = (long) fileSizeInMB;
           long fPart = Math.round((fileSizeInMB - iPart) * 10);
           return iPart + "." + fPart + " MB";
-        } else {
-          double fileSizeInGB = fileSize / GB;
-          long iPart = (long) fileSizeInGB;
-          long fPart = Math.round((fileSizeInGB - iPart) * 10);
-          return iPart + "." + fPart + " GB";
         }
+        double fileSizeInGB = fileSize / GB;
+        long iPart = (long) fileSizeInGB;
+        long fPart = Math.round((fileSizeInGB - iPart) * 10);
+        return iPart + "." + fPart + " GB";
       }
     }, translations.sizeLabel());
 
     table.addColumn(new DateTimeColumn<FileDto>() {
 
+      @Nullable
       @Override
       public Date getValue(FileDto object) {
-        return !"..".equals(object.getName()) ? new Date((long) object.getLastModifiedTime()) : null;
+        return "..".equals(object.getName()) ? null : new Date((long) object.getLastModifiedTime());
       }
     }, translations.lastModifiedLabel());
 
@@ -190,11 +195,11 @@ public class FolderDetailsView extends ViewImpl implements Display {
    * @param fileList the list to be sorted
    * @return the sorted list
    */
-  private List<FileDto> sortFileList(List<FileDto> fileList) {
+  private List<FileDto> sortFileList(Iterable<FileDto> fileList) {
     List<FileDto> sortedList = new ArrayList<FileDto>();
 
-    List<FileDto> folderList = new ArrayList<FileDto>();
-    List<FileDto> regularList = new ArrayList<FileDto>();
+    Collection<FileDto> folderList = new ArrayList<FileDto>();
+    Collection<FileDto> regularList = new ArrayList<FileDto>();
     for(FileDto file : fileList) {
       if(file.getType().isFileType(FileDto.FileType.FOLDER)) {
         folderList.add(file);
@@ -213,7 +218,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
     private final List<FileSelectionHandler> fileSelectionHandlers;
 
-    public FileNameColumn() {
+    private FileNameColumn() {
       super(new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
         @Override
         public SafeHtml render(String object) {

@@ -10,8 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
@@ -114,7 +115,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
   private ImportConfig importConfig;
 
-  private final List<String> availableCharsets = new ArrayList<String>();
+  private final Collection<String> availableCharsets = new ArrayList<String>();
 
   private FunctionalUnitDto functionalUnit;
 
@@ -188,7 +189,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   @Override
   protected void onFinish() {
     super.onFinish();
-    FileValidator validator = new FileValidator();
+    ValidationHandler validator = new FileValidator();
     if(validator.validate()) {
       getView().renderPendingConclusion();
       populateImportData();
@@ -219,30 +220,32 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
   class FileValidator extends AbstractValidationHandler {
 
-    public FileValidator() {
+    FileValidator() {
       super(getEventBus());
     }
 
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-
-      if(getView().getImportFormat() == ImportFormat.CSV) {
-        validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "i", "CSVFileRequired"));
-        validators
-            .add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
-        validators.add(new RequiredTextValidator(getView().getCsvOptions().getCharsetText(), "CharsetNotAvailable"));
-        validators.add(
-            new RequiredTextValidator(getView().getCsvOptions().getFieldSeparatorText(), "FieldSeparatorRequired"));
-        validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuoteText(), "QuoteSeparatorRequired"));
-      } else if(getView().getImportFormat() == ImportFormat.XML) {
-        validators.add(new RegExValidator(getSelectedFile(), ".zip$", "i", "ZipFileRequired"));
-      } else if(getView().getImportFormat() == ImportFormat.SPSS) {
-        validators.add(new RegExValidator(getSelectedFile(), ".sav$", "i", "SpssFileRequired"));
-      } else {
-        validators.add(new RequiredTextValidator(getView().getSelectedFile(), "NoFileSelected"));
+      switch(getView().getImportFormat()) {
+        case CSV:
+          validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "i", "CSVFileRequired"));
+          validators.add(
+              new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
+          validators.add(new RequiredTextValidator(getView().getCsvOptions().getCharsetText(), "CharsetNotAvailable"));
+          validators.add(
+              new RequiredTextValidator(getView().getCsvOptions().getFieldSeparatorText(), "FieldSeparatorRequired"));
+          validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuoteText(), "QuoteSeparatorRequired"));
+          break;
+        case XML:
+          validators.add(new RegExValidator(getSelectedFile(), ".zip$", "i", "ZipFileRequired"));
+          break;
+        case SPSS:
+          validators.add(new RegExValidator(getSelectedFile(), ".sav$", "i", "SpssFileRequired"));
+          break;
+        default:
+          validators.add(new RequiredTextValidator(getView().getSelectedFile(), "NoFileSelected"));
       }
-
       return validators;
     }
   }
@@ -318,7 +321,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   }
 
   private HasText getSelectedCsvFile() {
-    HasText result = new HasText() {
+    return new HasText() {
 
       @Override
       public String getText() {
@@ -330,11 +333,10 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
         // do nothing
       }
     };
-    return result;
   }
 
   private HasText getSelectedFile() {
-    HasText result = new HasText() {
+    return new HasText() {
 
       @Override
       public String getText() {
@@ -346,7 +348,6 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
         // do nothing
       }
     };
-    return result;
   }
 
 }

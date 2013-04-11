@@ -76,7 +76,7 @@ public class IdentifiersMapView extends PopupViewImpl implements IdentifiersMapP
   @Inject
   public IdentifiersMapView(EventBus eventBus) {
     super(eventBus);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
   }

@@ -75,6 +75,7 @@ public class Tooltip extends Composite implements HasWidgets {
     dialog.setGlassEnabled(false);
 
     okay.addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         dialog.hide();
       }
@@ -103,6 +104,7 @@ public class Tooltip extends Composite implements HasWidgets {
     resizeHandle.setVisible(resizable);
   }
 
+  @Override
   public void setSize(String width, String height) {
     contentLayout.setSize(width, height);
   }
@@ -126,7 +128,9 @@ public class Tooltip extends Composite implements HasWidgets {
       FadeAnimation.create(dialog.getElement()).from(0).to(opacity).start();
     }
     dialog.show();
-    if(!sticky) {
+    if(sticky) {
+      nonStickyTimer = null;
+    } else {
       nonStickyTimer = new Timer() {
 
         @Override
@@ -147,8 +151,6 @@ public class Tooltip extends Composite implements HasWidgets {
         }
       };
       nonStickyTimer.schedule(5000);
-    } else {
-      nonStickyTimer = null;
     }
   }
 

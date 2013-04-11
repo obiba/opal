@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
@@ -30,7 +30,7 @@ public class DatasourceParsingErrorPanel extends FlowPanel {
   // Static Variables
   //
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   public DatasourceParsingErrorPanel() {
   }
@@ -39,7 +39,7 @@ public class DatasourceParsingErrorPanel extends FlowPanel {
     setErrors(extractDatasourceParsingErrors(errorDto));
   }
 
-  private void setErrors(List<DatasourceParsingErrorDto> errors) {
+  private void setErrors(Iterable<DatasourceParsingErrorDto> errors) {
     clear();
     AlertPanel.Builder builder = AlertPanel.newBuilder().error();
     for(DatasourceParsingErrorDto dto : errors) {
@@ -49,9 +49,8 @@ public class DatasourceParsingErrorPanel extends FlowPanel {
   }
 
   @SuppressWarnings("unchecked")
-  private List<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
-    List<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
-
+  private Iterable<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
+    Collection<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
     JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto
         .getExtension(ClientErrorDtoExtensions.errors);
     if(errors != null) {

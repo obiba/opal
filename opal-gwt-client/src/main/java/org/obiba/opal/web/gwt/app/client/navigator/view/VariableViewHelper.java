@@ -24,6 +24,8 @@ public class VariableViewHelper {
 
   private static final String LABEL_ATTRIBUTE_NAME = "label";
 
+  private VariableViewHelper() {}
+
   /**
    * Get the 'label' attribute value in current language.
    *

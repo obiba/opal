@@ -75,7 +75,7 @@ public class IdentifiersImportView extends PopupViewImpl implements IdentifiersI
   @Inject
   public IdentifiersImportView(EventBus eventBus) {
     super(eventBus);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     initWidgets();
     initWizardDialog();
   }

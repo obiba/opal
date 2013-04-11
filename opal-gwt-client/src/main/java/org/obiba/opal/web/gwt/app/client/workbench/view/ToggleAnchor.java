@@ -26,7 +26,7 @@ public class ToggleAnchor extends Anchor {
   /**
    * The delegate that will handle events from the toggle anchor.
    */
-  public static interface Delegate {
+  public interface Delegate {
     /**
      * Perform the desired on/off action.
      *
@@ -44,7 +44,6 @@ public class ToggleAnchor extends Anchor {
   private Delegate delegate;
 
   public ToggleAnchor() {
-    super();
 
     addStyleName("label");
 
@@ -85,7 +84,7 @@ public class ToggleAnchor extends Anchor {
 
   public void setOn(boolean on, boolean fire) {
     if(on) {
-      if(fire && isOn() == false && delegate != null) {
+      if(fire && !isOn() && delegate != null) {
         delegate.executeOff();
       }
       setText(onText);
@@ -105,7 +104,7 @@ public class ToggleAnchor extends Anchor {
   }
 
   public void setOffText(String offText) {
-    if(isOn() == false) {
+    if(!isOn()) {
       setText(offText);
     }
     this.offText = offText;

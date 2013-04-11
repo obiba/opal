@@ -41,7 +41,6 @@ public class TableComparePanel extends FlowPanel {
 
   public TableComparePanel(TableCompareDto tableCompareDto, FieldUpdater<VariableDto, String> variableFieldUpdater,
       FieldUpdater<ConflictDto, String> conflictFieldUpdater) {
-    super();
     this.tableCompareDto = tableCompareDto;
     this.variableFieldUpdater = variableFieldUpdater;
     this.conflictFieldUpdater = conflictFieldUpdater;

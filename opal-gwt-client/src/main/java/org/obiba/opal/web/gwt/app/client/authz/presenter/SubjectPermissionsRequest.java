@@ -48,7 +48,7 @@ public class SubjectPermissionsRequest {
     List<String> nodes = new ArrayList<String>();
     for(AclRequest req : aclRequests) {
       String node = req.getResource();
-      if(nodes.contains(node) == false) {
+      if(!nodes.contains(node)) {
         query.append("&").append("node=").append(node);
         nodes.add(node);
       }
@@ -125,7 +125,7 @@ public class SubjectPermissionsRequest {
   }
 
   private void setAclCallback(AclCallback callback) {
-    this.aclGetCallback = callback;
+    aclGetCallback = callback;
     for(AclRequest req : aclRequests) {
       req.setAclDeleteCallback(callback);
       req.setAclAddCallback(callback);

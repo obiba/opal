@@ -69,8 +69,9 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
     getView().addFileSelectionHandler(new FileSelectionHandler() {
 
+      @Override
       public void onFileSelection(FileDto fileDto) {
-        if(fileDto.getType().isFileType(FileType.FILE) == false && fileDto.getReadable()) {
+        if(!fileDto.getType().isFileType(FileType.FILE) && fileDto.getReadable()) {
           getEventBus().fireEvent(new FolderSelectionChangeEvent(fileDto));
           updateTable(fileDto.getPath());
         }
@@ -92,6 +93,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
         new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
+          @Override
           public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
             updateTable(event.getFolder().getPath());
           }
@@ -99,6 +101,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
     registerHandler(getEventBus().addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
 
+      @Override
       public void onFileUploaded(FileUploadedEvent event) {
         // Refresh the current folder since a new file was probably added to it.
         updateTable(currentFolder.getPath());
@@ -107,6 +110,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
     registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 
+      @Override
       public void onFolderCreation(FolderCreationEvent event) {
         getEventBus().fireEvent(new FolderSelectionChangeEvent(event.getFolder()));
         updateTable(event.getFolder().getPath());
@@ -129,11 +133,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
   }
 
   private String getDefaultPath() {
-    if(credentials.getUsername() != null) {
-      return "/home/" + credentials.getUsername();
-    } else {
-      return "/";
-    }
+    return credentials.getUsername() == null ? "/" : "/home/" + credentials.getUsername();
   }
 
   public FileDto getCurrentFolder() {
@@ -148,7 +148,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     return getView().getTableSelectionModel().getSelectedObject();
   }
 
-  private void updateTable(final String path) {
+  private void updateTable(String path) {
     getView().clearSelection();
 
     FileResourceRequest.newBuilder(getEventBus()).path(path).withCallback(new ResourceCallback<FileDto>() {

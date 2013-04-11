@@ -32,7 +32,6 @@ public class TableCompareVariablePanel extends FlowPanel {
   private final VariableDto variableDto;
 
   public TableCompareVariablePanel(VariableDto variableDto) {
-    super();
     this.variableDto = variableDto;
 
     add(initProperties());

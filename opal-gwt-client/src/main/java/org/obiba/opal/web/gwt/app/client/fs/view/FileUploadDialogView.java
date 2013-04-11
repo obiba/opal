@@ -112,14 +112,14 @@ public class FileUploadDialogView extends PopupViewImpl implements Display {
 
   @Override
   public HandlerRegistration addSubmitCompleteHandler(SubmitCompleteHandler handler) {
-    return this.form.addSubmitCompleteHandler(handler);
+    return form.addSubmitCompleteHandler(handler);
   }
 
   @Override
   public void submit(String url) {
     setUploading(true);
-    this.form.setAction(url);
-    this.form.submit();
+    form.setAction(url);
+    form.submit();
   }
 
   @Override
@@ -128,9 +128,9 @@ public class FileUploadDialogView extends PopupViewImpl implements Display {
   }
 
   private void setUploading(boolean isUploading) {
-    inputFieldPanel.setVisible(isUploading == false);
-    cancelButton.setEnabled(isUploading == false);
-    uploadButton.setEnabled(isUploading == false);
+    inputFieldPanel.setVisible(!isUploading);
+    cancelButton.setEnabled(!isUploading);
+    uploadButton.setEnabled(!isUploading);
     uploadingText.setVisible(isUploading);
   }
 

@@ -101,11 +101,9 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
 
   @Override
   public int getSelectedMinutes() {
-    if(type.getSelectedValue().equals(ScheduleType.HOURLY.getName())) {
-      return Integer.parseInt(minutes.getSelectedValue());
-    } else {
-      return Integer.parseInt(hour.getSelectedValue().split(":")[1]);
-    }
+    return type.getSelectedValue().equals(ScheduleType.HOURLY.getName())
+        ? Integer.parseInt(minutes.getSelectedValue())
+        : Integer.parseInt(hour.getSelectedValue().split(":")[1]);
   }
 
   @Override

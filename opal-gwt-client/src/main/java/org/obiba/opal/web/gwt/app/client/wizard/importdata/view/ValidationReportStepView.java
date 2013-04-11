@@ -64,7 +64,7 @@ public class ValidationReportStepView extends Composite {
   // Methods
   //
 
-  public void showTableCompareErrors(final List<TableCompareError> errors) {
+  public void showTableCompareErrors(List<TableCompareError> errors) {
     validationLabel.setVisible(true);
     validationTable.setVisible(true);
     dataProvider.setList(errors);
@@ -120,7 +120,6 @@ public class ValidationReportStepView extends Composite {
     private final String errorMessageKey;
 
     public TableCompareError(String column, String errorMessageKey) {
-      super();
       this.column = column;
       this.errorMessageKey = errorMessageKey;
     }

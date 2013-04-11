@@ -66,7 +66,7 @@ public class TableChooser extends Chooser {
     tableDtoMap.clear();
     HashMap<String, List<TableDto>> datasourceMap = new LinkedHashMap<String, List<TableDto>>();
     for(TableDto table : JsArrays.toIterable(tables)) {
-      if(datasourceMap.containsKey(table.getDatasourceName()) == false) {
+      if(!datasourceMap.containsKey(table.getDatasourceName())) {
         datasourceMap.put(table.getDatasourceName(), new ArrayList<TableDto>());
       }
       datasourceMap.get(table.getDatasourceName()).add(table);

@@ -45,6 +45,7 @@ public class KeyValueItemInputView implements ItemInputDisplay {
     addEnterKeyHandler();
   }
 
+  @Override
   public void clear() {
     keyTextBox.setText("");
     valueTextBox.setText("");
@@ -52,19 +53,22 @@ public class KeyValueItemInputView implements ItemInputDisplay {
     keyTextBox.setFocus(true);
   }
 
+  @Override
   public String getItem() {
     String key = keyTextBox.getText().trim();
     String value = valueTextBox.getText().trim();
 
-    return (key.length() != 0 && value.length() != 0) ? keyTextBox.getText() + " = " + valueTextBox.getText() : "";
+    return key.length() != 0 && value.length() != 0 ? keyTextBox.getText() + " = " + valueTextBox.getText() : "";
   }
 
+  @Override
   public Widget asWidget() {
     return container;
   }
 
+  @Override
   public void setEnterKeyHandler(EnterKeyHandler handler) {
-    this.enterKeyHandler = handler;
+    enterKeyHandler = handler;
   }
 
   private void addEnterKeyHandler() {

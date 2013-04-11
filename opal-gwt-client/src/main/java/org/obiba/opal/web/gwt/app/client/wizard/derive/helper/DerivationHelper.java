@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
@@ -91,7 +93,7 @@ public abstract class DerivationHelper {
     return true;
   }
 
-  public boolean hasValueMapEntryWithValue(String value) {
+  public boolean hasValueMapEntryWithValue(@Nullable String value) {
     return getValueMapEntryWithValue(value) != null;
   }
 

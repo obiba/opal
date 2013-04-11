@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -93,7 +95,7 @@ public class DeriveNumericalVariableStepPresenter
     return stepBuilders;
   }
 
-  private boolean addValueMapEntry(String value, String newValue) {
+  private boolean addValueMapEntry(@Nullable String value, String newValue) {
     if(derivationHelper.hasValueMapEntryWithValue(value)) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
       return false;
@@ -102,7 +104,7 @@ public class DeriveNumericalVariableStepPresenter
     return true;
   }
 
-  private boolean addValueMapEntry(Number lower, Number upper, String newValue) {
+  private boolean addValueMapEntry(@Nullable Number lower, @Nullable Number upper, String newValue) {
     if(!numberType.addValueMapEntry(derivationHelper, lower, upper, newValue)) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.rangeOverlap()).build());
       return false;
@@ -143,7 +145,7 @@ public class DeriveNumericalVariableStepPresenter
       return errorMessages.isEmpty();
     }
 
-    private void validateRangeForm(List<String> errorMessages) {
+    private void validateRangeForm(Collection<String> errorMessages) {
       validateRangeLimitsForm(errorMessages);
       validateRangeDefinitionForm(errorMessages);
     }
@@ -362,6 +364,7 @@ public class DeriveNumericalVariableStepPresenter
 
     },
     DECIMAL() {
+      @Nullable
       @Override
       public String formatNumber(Number nb) {
         if(nb == null) return null;
@@ -397,6 +400,7 @@ public class DeriveNumericalVariableStepPresenter
       }
     };
 
+    @Nullable
     public String formatNumber(Number nb) {
       return nb == null ? null : nb.toString();
     }
@@ -404,11 +408,11 @@ public class DeriveNumericalVariableStepPresenter
     public abstract NumericalVariableDerivationHelper<? extends Number> newDerivationHelper(
         VariableDto originalVariable, VariableDto destinationVariable);
 
-    public abstract void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, String value,
-        String newValue);
+    public abstract void addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper,
+        @Nullable String value, String newValue);
 
-    public abstract boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower,
-        Number upper, String newValue);
+    public abstract boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper,
+        @Nullable Number lower, @Nullable Number upper, String newValue);
   }
 
   /**

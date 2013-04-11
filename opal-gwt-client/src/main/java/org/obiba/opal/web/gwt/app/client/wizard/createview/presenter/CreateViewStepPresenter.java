@@ -143,29 +143,29 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
-    if(event.getEventParameters().length != 0) {
-      if(event.getEventParameters()[0] instanceof String) {
-        datasourceName = (String) event.getEventParameters()[0];
-        UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-        ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
-            .withCallback(new ResourceCallback<DatasourceDto>() {
-
-              @Override
-              public void onResource(Response response, DatasourceDto resource) {
-                datasourceDto = resource;
-              }
-            }).send();
-      } else {
-        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
-      }
-    } else {
+    if(event.getEventParameters().length == 0) {
       throw new IllegalArgumentException("Datasource name is expected as first wizard argument.");
     }
+    if(event.getEventParameters()[0] instanceof String) {
+      datasourceName = (String) event.getEventParameters()[0];
+      UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(new ResourceCallback<DatasourceDto>() {
+
+            @Override
+            public void onResource(Response response, DatasourceDto resource) {
+              datasourceDto = resource;
+            }
+          }).send();
+    } else {
+      throw new IllegalArgumentException("unexpected event parameter type (expected String)");
+    }
+
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
-            getView().addTableSelections(JsArrays.toSafeArray((JsArray<TableDto>) resource));
+            getView().addTableSelections(JsArrays.toSafeArray(resource));
           }
 
         }).send();
@@ -175,8 +175,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     // Get the view name and datasource name.
     String viewName = getView().getViewName().getText();
 
-    ViewFoundCallback overwrite = new ViewFoundCallback();
-    ViewNotFoundCreateCallback create = new ViewNotFoundCreateCallback();
+    ResponseCodeCallback overwrite = new ViewFoundCallback();
+    ResponseCodeCallback create = new ViewNotFoundCreateCallback();
 
     // Create the resource request (the builder).
     getViewRequest(datasourceName, viewName).withCallback(Response.SC_OK, overwrite)//
@@ -192,8 +192,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   private void createView() {
     getView().renderPendingConclusion();
 
-    CompletedCallback completed = new CompletedCallback();
-    FailedCallback failed = new FailedCallback();
+    ResponseCodeCallback completed = new CompletedCallback();
+    ResponseCodeCallback failed = new FailedCallback();
 
     String viewName = getView().getViewName().getText();
 
@@ -238,8 +238,8 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   private void updateView() {
     getView().renderPendingConclusion();
 
-    CompletedCallback completed = new CompletedCallback();
-    FailedCallback failed = new FailedCallback();
+    ResponseCodeCallback completed = new CompletedCallback();
+    ResponseCodeCallback failed = new FailedCallback();
 
     String viewName = getView().getViewName().getText();
 
@@ -325,9 +325,9 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
       String msg = "UnknownError";
       if(response.getText() != null && response.getText().length() != 0) {
         try {
-          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           msg = errorDto.getStatus();
-        } catch(Exception e) {
+        } catch(Exception ignored) {
 
         }
       }
@@ -345,7 +345,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
   class SelectTypeValidator extends AbstractValidationHandler {
 
-    public SelectTypeValidator() {
+    SelectTypeValidator() {
       super(getEventBus());
     }
 
@@ -369,7 +369,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
   class TablesValidator extends AbstractValidationHandler {
 
-    public TablesValidator() {
+    TablesValidator() {
       super(getEventBus());
     }
 
@@ -377,6 +377,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {
+        @Override
         public Collection<TableDto> getCollection() {
           return getView().getSelectedTables();
         }
@@ -426,7 +427,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
 
   class RequiredFileSelectionValidator extends AbstractFieldValidator {
 
-    public RequiredFileSelectionValidator(String msg) {
+    RequiredFileSelectionValidator(String msg) {
       super(msg);
     }
 

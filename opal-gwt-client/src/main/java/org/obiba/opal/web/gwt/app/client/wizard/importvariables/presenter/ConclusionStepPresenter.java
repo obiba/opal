@@ -58,7 +58,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   //
 
   @Inject
-  public ConclusionStepPresenter(final Display display, final EventBus eventBus) {
+  public ConclusionStepPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
 
     resourceRequests = new LinkedHashSet<ResourceRequestPresenter<? extends JavaScriptObject>>();
@@ -144,20 +144,19 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   class ImportVariablesResponseCodeCallback implements ResponseCodeCallback {
 
+    @Override
     public void onResponseCode(Request request, Response response) {
       resourceRequestsCompleted++;
 
       if(resourceRequestsCompleted == resourceRequests.size()) {
         // TODO enable finish getDisplay().setReturnButtonEnabled(true);
-        ;
-
         // OPAL-927: Refresh target datasource.
         refreshTargetDatasource();
       }
     }
 
     private void refreshTargetDatasource() {
-      final ResourceCallback<DatasourceDto> resourceCallback = new ResourceCallback<DatasourceDto>() {
+      ResourceCallback<DatasourceDto> resourceCallback = new ResourceCallback<DatasourceDto>() {
 
         @Override
         public void onResource(Response response, DatasourceDto resource) {
@@ -174,19 +173,21 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
     private final String resourceLink;
 
-    public TableResourceClickHandler(String resourceLink) {
+    TableResourceClickHandler(String resourceLink) {
       this.resourceLink = resourceLink;
     }
 
+    @Override
     public String getResourceLink() {
       return resourceLink;
     }
 
+    @Override
     public void onClick(ClickEvent event) {
       fireTableSelectionChangeEvent(getResourceLink());
     }
 
-    private void fireTableSelectionChangeEvent(final String tableName) {
+    private void fireTableSelectionChangeEvent(String tableName) {
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(getResourceLink()).get()
           .withCallback(new ResourceCallback<TableDto>() {
 

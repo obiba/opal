@@ -63,7 +63,7 @@ public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresen
 
   @Inject
   public LimesurveyStepView() {
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
   }
 
   @Override

@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Maps;
 
 @SuppressWarnings("UnusedDeclaration")
@@ -116,7 +118,7 @@ public class ImportConfig {
     return xmlFile;
   }
 
-  public void setDestinationDatasourceName(String destinationDatasourceName) {
+  public void setDestinationDatasourceName(@Nullable String destinationDatasourceName) {
     this.destinationDatasourceName = destinationDatasourceName;
   }
 

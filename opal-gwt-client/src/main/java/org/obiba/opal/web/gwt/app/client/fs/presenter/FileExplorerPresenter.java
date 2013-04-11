@@ -160,6 +160,7 @@ public class FileExplorerPresenter
         // We are either deleting a file or a folder
         final FileDto fileToDelete = getCurrentSelectionOrFolder();
         actionRequiringConfirmation = new Runnable() {
+          @Override
           public void run() {
             deleteFile(fileToDelete);
           }
@@ -232,6 +233,7 @@ public class FileExplorerPresenter
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
           event.isConfirmed()) {
@@ -260,8 +262,7 @@ public class FileExplorerPresenter
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
-  private void downloadFile(final FileDto file) {
-    String url = new StringBuilder("/files").append(file.getPath()).toString();
-    getEventBus().fireEvent(new FileDownloadEvent(url));
+  private void downloadFile(FileDto file) {
+    getEventBus().fireEvent(new FileDownloadEvent("/files" + file.getPath()));
   }
 }

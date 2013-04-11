@@ -17,6 +17,8 @@ import org.obiba.opal.web.model.client.opal.FileDto.FileType;
  */
 public class FileDtos {
 
+  private FileDtos() {}
+
   public static boolean isFolder(FileDto dto) {
     if(dto == null) throw new IllegalArgumentException("dto cannot be null");
     return FileDto.FileType.FOLDER.isFileType(dto.getType());
@@ -51,14 +53,14 @@ public class FileDtos {
   private static String getFolderName(String folderPath) {
     String folderName = folderPath;
 
-    if(!"/".equals(folderPath)) {
+    if("/".equals(folderPath)) {
+      folderName = "root";
+    } else {
       int lastSeparatorIndex = folderPath.lastIndexOf('/');
 
       if(lastSeparatorIndex != -1) {
         folderName = folderPath.substring(lastSeparatorIndex + 1);
       }
-    } else {
-      folderName = "root";
     }
 
     return folderName;

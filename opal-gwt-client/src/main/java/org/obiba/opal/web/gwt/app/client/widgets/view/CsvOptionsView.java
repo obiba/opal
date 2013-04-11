@@ -133,6 +133,7 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
     charsetView.setDefaultCharset(defaultCharset);
   }
 
+  @Override
   public Widget asWidget() {
     return this;
   }

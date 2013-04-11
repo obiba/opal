@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.job.view;
 
 import java.util.Date;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -102,24 +104,30 @@ public class JobListView extends Composite implements Display {
   // JobListPresenter.Display Methods
   //
 
+  @Nullable
+  @Override
   public SelectionModel<CommandStateDto> getTableSelection() {
     return null;
   }
 
-  public void renderRows(final JsArray<CommandStateDto> rows) {
+  @Override
+  public void renderRows(JsArray<CommandStateDto> rows) {
     pager.setVisible(rows.length() > 50); // OPAL-901
     pager.firstPage();
     dataProvider.setList(JsArrays.toList(rows));
   }
 
+  @Override
   public void showClearJobsButton(boolean show) {
     clearButton.setEnabled(show);
   }
 
+  @Override
   public HasActionHandler<CommandStateDto> getActionsColumn() {
     return actionsColumn;
   }
 
+  @Override
   public HandlerRegistration addClearButtonHandler(ClickHandler handler) {
     return clearButton.addClickHandler(handler);
   }
@@ -184,11 +192,11 @@ public class JobListView extends Composite implements Display {
         String status = object.getStatus();
         if(translations.statusMap().containsKey(status)) {
           return translations.statusMap().get(status);
-        } else if(translations.userMessageMap().containsKey(status)) {
-          return translations.userMessageMap().get(status);
-        } else {
-          return status;
         }
+        if(translations.userMessageMap().containsKey(status)) {
+          return translations.userMessageMap().get(status);
+        }
+        return status;
       }
     }, translations.statusLabel());
 
@@ -201,11 +209,8 @@ public class JobListView extends Composite implements Display {
 
       @Override
       public String[] getActions(CommandStateDto value) {
-        if("NOT_STARTED".equals(value.getStatus().toString()) || "IN_PROGRESS".equals(value.getStatus().toString())) {
-          return new String[] { LOG_ACTION, CANCEL_ACTION };
-        } else {
-          return new String[] { LOG_ACTION };
-        }
+        return "NOT_STARTED".equals(value.getStatus()) || "IN_PROGRESS".equals(value.getStatus()) ? new String[] {
+            LOG_ACTION, CANCEL_ACTION } : new String[] { LOG_ACTION };
       }
     });
     table.addColumn(actionsColumn, translations.actionsLabel());

@@ -72,7 +72,7 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   @Inject
   public CreateDatasourceView(EventBus eventBus) {
     super(eventBus);
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
     for(int i = 0; i < datasourceType.getItemCount(); i++) {
       datasourceType.setItemText(i, translations.datasourceTypeMap().get(datasourceType.getValue(i)));
@@ -184,6 +184,6 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
 
   @Override
   public void setDatasourceSelectionTypeValidationHandler(ValidationHandler handler) {
-    this.selectTypeValidator = handler;
+    selectTypeValidator = handler;
   }
 }

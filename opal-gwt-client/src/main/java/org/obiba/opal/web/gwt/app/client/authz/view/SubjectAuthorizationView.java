@@ -103,7 +103,7 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
     typeLabel.setText(translations.subjectTypeMap().get(type));
   }
 
-  private final class SubjectSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
+  private static final class SubjectSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
     public boolean hasSelection() {
       return getCurrentSelection() != null;
     }

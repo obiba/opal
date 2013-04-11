@@ -30,7 +30,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
  */
 public abstract class TableIdentifiersSyncTable extends Table<TableIdentifiersSync> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private Column<TableIdentifiersSync, String> tableNameColumn;
 
@@ -97,17 +97,16 @@ public abstract class TableIdentifiersSyncTable extends Table<TableIdentifiersSy
       @Override
       public Boolean getValue() {
         if(getTableSyncs().isEmpty()) return false;
-        boolean allSelected = true;
         boolean hasSelectable = false;
         for(TableIdentifiersSync ts : getTableSyncs()) {
           if(ts.getCount() > 0) {
             hasSelectable = true;
-            if(getSelectionModel().isSelected(ts) == false) {
+            if(!getSelectionModel().isSelected(ts)) {
               return false;
             }
           }
         }
-        return hasSelectable == false ? false : allSelected;
+        return hasSelectable;
       }
     };
     checkHeader.setUpdater(new ValueUpdater<Boolean>() {

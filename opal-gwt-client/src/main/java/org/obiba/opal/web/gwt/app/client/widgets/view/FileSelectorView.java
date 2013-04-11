@@ -105,12 +105,7 @@ public class FileSelectorView extends PopupViewImpl implements Display {
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    HasWidgets panel;
-    if(slot == FileSelectorPresenter.LEFT) {
-      panel = this.fileSystemTreePanel;
-    } else {
-      panel = this.folderDetailsPanel;
-    }
+    HasWidgets panel = slot == FileSelectorPresenter.LEFT ? fileSystemTreePanel : folderDetailsPanel;
     panel.clear();
     if(content != null) {
       panel.add(content);

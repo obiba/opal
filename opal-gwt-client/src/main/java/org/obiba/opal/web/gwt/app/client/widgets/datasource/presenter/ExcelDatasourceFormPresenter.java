@@ -34,14 +34,14 @@ public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourc
   private final FileSelectionPresenter fileSelectionPresenter;
 
   @Inject
-  public ExcelDatasourceFormPresenter(final Display display, final EventBus eventBus,
+  public ExcelDatasourceFormPresenter(Display display, EventBus eventBus,
       FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
   }
 
   @Override
-  public PresenterWidget<? extends org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenter.Display> getPresenter() {
+  public PresenterWidget<? extends DatasourceFormPresenter.Display> getPresenter() {
     return this;
   }
 

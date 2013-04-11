@@ -82,12 +82,12 @@ public class CategoricalSummaryView extends Composite {
           grid.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
         }
       }
-      this.plot = freqPlot;
+      plot = freqPlot;
 
       details.setVisible(true);
 
     } else {
-      this.plot = null;
+      plot = null;
       details.setVisible(false);
     }
   }
