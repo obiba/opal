@@ -47,7 +47,7 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
   @Override
   public void clear() {
     breadcrumbs.clear();
-    breadcrumbs.add(new NavLink("Projects"));
+    breadcrumbs.add(new NavLink("Datasources"));
   }
 
   @Override

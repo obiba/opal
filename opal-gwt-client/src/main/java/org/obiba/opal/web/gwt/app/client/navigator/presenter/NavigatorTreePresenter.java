@@ -9,12 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
@@ -30,12 +26,8 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasSelectionHandlers;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
@@ -96,6 +88,15 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
           }
         }));
 
+    registerHandler(getEventBus().addHandler(DatasourcesRefreshEvent.getType(), new DatasourcesRefreshEvent.Handler() {
+
+      @Override
+      public void onRefresh(DatasourcesRefreshEvent event) {
+        updateTree(null, false);
+      }
+
+    }));
+
     getView().setDatasourceClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -152,6 +153,26 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
             }).send();
       }
     });
+  }
+
+  @Override
+  protected void onReveal() {
+    updateTree(null, true);
+  }
+
+  private void updateTree(final String datasourceName, final boolean keepCurrentSelection) {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+
+            JsArray<DatasourceDto> datasources = JsArrays.toSafeArray(resource);
+            if(datasources.length() > 0) {
+              getView().selectDatasource(datasources.get(0).getName(), true);
+            }
+          }
+
+        }).send();
   }
 
   //

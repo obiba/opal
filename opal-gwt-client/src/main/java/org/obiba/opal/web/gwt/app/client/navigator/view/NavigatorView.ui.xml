@@ -9,13 +9,13 @@
 
   <g:FlowPanel>
     <b:PageHeader>
-      <ui:msg description="Projects label">Projects</ui:msg>
+      <ui:msg description="Datasources label">Datasources</ui:msg>
     </b:PageHeader>
     <g:FlowPanel>
       <b:ButtonToolbar addStyleNames="inline">
         <b:ButtonGroup>
           <b:Button ui:field="createDatasourceButton" size="MINI" icon="PLUS">
-            <ui:msg description="Create Project label">Add Project</ui:msg>
+            <ui:msg description="Create Datasource label">Add Datasource</ui:msg>
           </b:Button>
           <b:Button ui:field="importDataButton" size="MINI" icon="SIGNIN">
             <ui:msg description="Data Import label">Import Data</ui:msg>

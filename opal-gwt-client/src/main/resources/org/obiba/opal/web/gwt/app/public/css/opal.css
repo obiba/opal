@@ -864,7 +864,7 @@ td.row-actions span {
 
 /* Content */
 
-.main-content {
+.main .content {
   border: none;
   margin: 0 auto;
   width: 1000px;

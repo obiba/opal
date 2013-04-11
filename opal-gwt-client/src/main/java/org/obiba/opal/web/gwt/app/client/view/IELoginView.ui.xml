@@ -1,4 +1,6 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
   <ui:style>
@@ -53,9 +55,9 @@
         <tr>
           <td/>
           <td>
-            <g:Button visible="false" ui:field="login" styleName="btn">
+            <b:Button visible="false" ui:field="login" styleName="btn">
               <ui:msg description="Sign in button label">Sign In</ui:msg>
-            </g:Button>
+            </b:Button>
           </td>
         </tr>
       </table>

@@ -58,9 +58,6 @@ public class ApplicationView implements ApplicationPresenter.Display {
   NavLink username;
 
   @UiField
-  Anchor obiba;
-
-  @UiField
   Label version;
 
   @UiField
@@ -91,14 +88,6 @@ public class ApplicationView implements ApplicationPresenter.Display {
 
   public ApplicationView() {
     dock = uiBinder.createAndBindUi(this);
-
-    obiba.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        Window.open("http://obiba.org", "_blank", null);
-      }
-    });
   }
 
   @Override

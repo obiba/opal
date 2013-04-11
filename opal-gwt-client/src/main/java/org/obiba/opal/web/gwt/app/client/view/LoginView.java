@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -9,7 +10,6 @@ import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -24,9 +24,6 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   private static final LoginViewUiBinder uiBinder = GWT.create(LoginViewUiBinder.class);
 
   private final Widget panel;
-
-  @UiField
-  Label applicationName;
 
   @UiField
   Label errorMessage;

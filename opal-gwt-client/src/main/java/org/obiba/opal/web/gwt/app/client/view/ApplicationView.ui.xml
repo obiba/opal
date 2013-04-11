@@ -3,19 +3,7 @@
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
-  <!--<g:FlowPanel>
-    <b:Navbar>
-      <b:Brand>Opal</b:Brand>
-      <b:Nav>
-        <b:NavLink ui:field="projects"><ui:msg description="Projects link text">Projects</ui:msg></b:NavLink>
-      </b:Nav>
-      <b:Nav alignment="RIGHT">
-        <b:NavLink ui:field="quit"><ui:msg description="Quit link text">Quit</ui:msg></b:NavLink>
-      </b:Nav>
-      <b:NavSearch size="2" placeholder="Search" alignment="RIGHT"/>
-    </b:Navbar>
-    <g:Anchor ui:field="obiba">obiba.org</g:Anchor>
-  </g:FlowPanel>-->
+
   <g:FlowPanel>
     <b:ResponsiveNavbar position="TOP" scrollspy="false" inverse="true">
       <b:Brand href="#">Opal</b:Brand>
@@ -24,28 +12,34 @@
           <ui:msg description="Dashboard menu item">Dashboard</ui:msg>
         </b:NavLink>
         <b:NavLink ui:field="datasourcesItem">
-          <ui:msg description="Projects label">Projects</ui:msg>
-        </b:NavLink>
-        <b:NavLink ui:field="unitsItem">
-          <ui:msg description="Units menu item">Units</ui:msg>
-        </b:NavLink>
-        <b:NavLink ui:field="reportsItem">
-          <ui:msg description="Reports menu item">Reports</ui:msg>
-        </b:NavLink>
-        <b:NavLink ui:field="fileExplorer">
-          <ui:msg description="Files menu item">Files</ui:msg>
-        </b:NavLink>
-        <b:NavLink ui:field="listJobsItem">
-          <ui:msg description="Jobs menu item">Jobs</ui:msg>
+          <ui:msg description="Datasources label">Datasources</ui:msg>
         </b:NavLink>
       </b:Nav>
+
       <b:Nav alignment="RIGHT">
+        <b:NavSearch size="2" placeholder="Search"/>
         <b:NavLink ui:field="username">
           <ui:msg description="Administration link text">Administration</ui:msg>
         </b:NavLink>
-        <b:NavLink ui:field="administration">
-          <ui:msg description="Administration link text">Administration</ui:msg>
-        </b:NavLink>
+        <b:Nav>
+          <b:Dropdown text="Administration" rightDropdown="true">
+            <b:NavLink ui:field="unitsItem">
+              <ui:msg description="Units menu item">Units</ui:msg>
+            </b:NavLink>
+            <b:NavLink ui:field="reportsItem">
+              <ui:msg description="Reports menu item">Reports</ui:msg>
+            </b:NavLink>
+            <b:NavLink ui:field="fileExplorer">
+              <ui:msg description="Files menu item">Files</ui:msg>
+            </b:NavLink>
+            <b:NavLink ui:field="listJobsItem">
+              <ui:msg description="Jobs menu item">Jobs</ui:msg>
+            </b:NavLink>
+            <b:NavLink ui:field="administration">
+              <ui:msg description="Administration link text">Administration</ui:msg>
+            </b:NavLink>
+          </b:Dropdown>
+        </b:Nav>
         <b:NavLink ui:field="help">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>
@@ -54,16 +48,21 @@
         </b:NavLink>
       </b:Nav>
     </b:ResponsiveNavbar>
-    <g:FlowPanel ui:field="workbench" addStyleNames="main-content">
-      <g:Label>
-        <ui:msg description="Workbench label">The Workbench</ui:msg>
-      </g:Label>
+    <g:FlowPanel addStyleNames="main">
+      <g:FlowPanel ui:field="workbench" addStyleNames="content">
+        <g:Label>
+          <ui:msg description="Workbench label">The Workbench</ui:msg>
+        </g:Label>
+      </g:FlowPanel>
+      <b:FluidRow addStyleNames="footer content">
+        <b:Column size="6">
+          <g:Anchor href="http://obiba.org" target="_blank">© 2013 OBiBa</g:Anchor>
+        </b:Column>
+        <b:Column size="6">
+          <g:Label ui:field="version" addStyleNames="pull-right"/>
+        </b:Column>
+      </b:FluidRow>
     </g:FlowPanel>
-    <g:FlowPanel addStyleNames="footbar">
-      <g:Label>copyright</g:Label>
-      <g:Anchor ui:field="obiba">obiba.org</g:Anchor>
-      <g:Label ui:field="version" addStyleNames="right-aligned"/>
-      <g:Frame ui:field="frame" visible="false"></g:Frame>
-    </g:FlowPanel>
+    <g:Frame ui:field="frame" visible="false"></g:Frame>
   </g:FlowPanel>
 </ui:UiBinder>
