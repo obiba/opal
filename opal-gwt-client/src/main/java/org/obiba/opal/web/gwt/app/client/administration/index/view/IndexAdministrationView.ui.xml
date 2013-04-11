@@ -76,11 +76,11 @@
       </g:FlowPanel>
       <g:HorizontalPanel addStyleNames="content">
         <g:FlowPanel>
-          <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync" size="MINI">
+          <b:Button ui:field="refreshIndicesButton" styleName="btn iconb i-sync">
             <ui:msg description="Refresh indices label">Refresh</ui:msg>
           </b:Button>
         </g:FlowPanel>
-        <b:DropdownButton ui:field="actionsDropdown" text="Actions" size="MINI" addStyleNames="small-indent">
+        <b:DropdownButton ui:field="actionsDropdown" text="Actions" addStyleNames="small-indent dropdown-button-small">
           <b:NavLink>
             <ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg>
           </b:NavLink>
@@ -109,7 +109,7 @@
             </g:row>
           </g:Grid>
         </b:Alert>
-        <o:Table width="100%" ui:field="indexTable" addStyleNames="gwt-CellTable first-column-checkbox"/>
+        <o:Table width="100%" ui:field="indexTable" addStyleNames="gwt-CellTable first-column-checkbox small-top-margin"/>
       </g:VerticalPanel>
     </g:FlowPanel>
 
