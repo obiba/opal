@@ -51,6 +51,7 @@ public class VariableSuggestOracle extends SuggestOracle {
     /**
      * Constructor used by RPC.
      */
+    @SuppressWarnings("UnusedDeclaration")
     public VariableSuggestion() {
     }
 
@@ -95,20 +96,15 @@ public class VariableSuggestOracle extends SuggestOracle {
     }
   }
 
-  /**
-   * Associates candidates with their formatted suggestions.
-   */
-  private final Map<String, String> toRealSuggestions = new HashMap<String, String>();
-
-  /**
-   * The whitespace masks used to prevent matching and replacing of the given
-   * substrings.
-   */
-  private char[] whitespaceChars;
-
   private Response defaultResponse;
 
   private final EventBus eventBus;
+
+  private String datasource;
+
+  private String table;
+
+  private String originalQuery;
 
   /**
    * Constructor for <code>MultiWordSuggestOracle</code> which takes in a set of
@@ -127,23 +123,6 @@ public class VariableSuggestOracle extends SuggestOracle {
     this.eventBus = eventBus;
   }
 
-  /**
-   * Adds a suggestion to the oracle. Each suggestion must be plain text.
-   *
-   * @param suggestion the suggestion
-   */
-  public void add(String suggestion) {
-    toRealSuggestions.put(suggestion, suggestion);
-
-  }
-
-  /**
-   * Removes all of the suggestions from the oracle.
-   */
-  public void clear() {
-    toRealSuggestions.clear();
-  }
-
   @Override
   public boolean isDisplayStringHTML() {
     return true;
@@ -154,92 +133,112 @@ public class VariableSuggestOracle extends SuggestOracle {
     if(defaultResponse != null) {
       callback.onSuggestionsReady(request, defaultResponse);
     } else {
-      super.requestDefaultSuggestions(request, callback);
+      requestSuggestions(request, callback);
     }
+  }
+
+  public void setDatasource(String datasource) {
+    this.datasource = datasource;
+  }
+
+  public void setTable(String table) {
+    this.table = table;
+  }
+
+  public String getOriginalQuery() {
+    return originalQuery;
   }
 
   @Override
   public void requestSuggestions(final Request request, final Callback callback) {
-    final String query = request.getQuery();
-
-    if(query.length() > 1) {
-      UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
-          .query("query", query)//
-          .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
-
-      // Get candidates from search words.
-      ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
-
-            @Override
-            public void onResponseCode(com.google.gwt.http.client.Request request,
-                com.google.gwt.http.client.Response response) {
-              // nothing
-            }
-          })//
-          .withCallback(new ResourceCallback<QueryResultDto>() {
-            @Override
-            public void onResource(com.google.gwt.http.client.Response response, QueryResultDto resource) {
-              if(response.getStatusCode() == com.google.gwt.http.client.Response.SC_OK) {
-                QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
-
-                List<VariableSuggestion> suggestions = new ArrayList<VariableSuggestion>();
-                for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-                  ItemFieldsDto itemDto = (ItemFieldsDto) resultDto.getHitsArray().get(i)
-                      .getExtension("Search.ItemFieldsDto.item");
-
-                  JsArray<EntryDto> fields = itemDto.getFieldsArray();
-                  Map<String, String> attributes = new HashMap<String, String>();
-                  for(int j = 0; j < fields.length(); j++) {
-                    if("label-en".equals(fields.get(j).getKey()) ||
-                        "label".equals(fields.get(j).getKey()) && !attributes.containsKey("label")) {
-                      attributes.put("label", fields.get(j).getValue());
-                    } else {
-                      attributes.put(fields.get(j).getKey(), fields.get(j).getValue());
-                    }
-                  }
-
-                  suggestions.add(convertToFormattedSuggestions(query, attributes));
-                }
-
-                // Convert candidates to suggestions.
-                Response r = new Response(suggestions);
-                callback.onSuggestionsReady(request, r);
-              }
-            }
-
-            private VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
-              SafeHtmlBuilder accum = new SafeHtmlBuilder();
-
-              accum.appendHtmlConstant("<span class='variable-search-suggest-box'>");
-              accum.appendHtmlConstant("<strong>");
-              accum.appendEscaped(attributes.get("name"));
-              accum.appendHtmlConstant("</strong>");
-              accum.appendEscaped(" " + attributes.get("datasource") + "." + attributes.get("table") + "");
-
-              if(attributes.containsKey("label")) {
-                accum.appendHtmlConstant("<br>");
-
-                String label = attributes.get("label");
-                if(label.length() > LABEL_MAX_SIZE) {
-                  label = label.substring(0, LABEL_MAX_SIZE) + " ...";
-                }
-                accum.appendEscaped(label);
-              }
-              accum.appendHtmlConstant("</span>");
-
-              return createSuggestion(query, accum.toSafeHtml().asString(), attributes.get("datasource"),
-                  attributes.get("table"), attributes.get("name"));
-            }
-          })//
-          .withCallback(com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(com.google.gwt.http.client.Request request,
-                com.google.gwt.http.client.Response response) {
-              eventBus.fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
-            }
-          }).send();
+    String prefix = "";
+    if(datasource != null) {
+      prefix = "datasource:" + datasource + " ";
     }
+    if(table != null) {
+      prefix += "table:" + table + " ";
+    }
+
+    originalQuery = request.getQuery();
+    final String query = request.getQuery() == null ? prefix + "*" : prefix + request.getQuery();
+
+    UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
+        .query("query", query)//
+        .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
+
+    // Get candidates from search words.
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(com.google.gwt.http.client.Request request,
+              com.google.gwt.http.client.Response response) {
+            // nothing
+          }
+        })//
+        .withCallback(new ResourceCallback<QueryResultDto>() {
+          @Override
+          public void onResource(com.google.gwt.http.client.Response response, QueryResultDto resource) {
+            if(response.getStatusCode() == com.google.gwt.http.client.Response.SC_OK) {
+              QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
+
+              List<VariableSuggestion> suggestions = new ArrayList<VariableSuggestion>();
+              for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+                ItemFieldsDto itemDto = (ItemFieldsDto) resultDto.getHitsArray().get(i)
+                    .getExtension("Search.ItemFieldsDto.item");
+
+                JsArray<EntryDto> fields = itemDto.getFieldsArray();
+                Map<String, String> attributes = new HashMap<String, String>();
+                for(int j = 0; j < fields.length(); j++) {
+                  if("label-en".equals(fields.get(j).getKey()) ||
+                      "label".equals(fields.get(j).getKey()) && !attributes.containsKey("label")) {
+                    attributes.put("label", fields.get(j).getValue());
+                  } else {
+                    attributes.put(fields.get(j).getKey(), fields.get(j).getValue());
+                  }
+                }
+
+                suggestions.add(convertToFormattedSuggestions(query, attributes));
+              }
+
+              // Convert candidates to suggestions.
+              Response r = new Response(suggestions);
+              callback.onSuggestionsReady(request, r);
+            }
+          }
+
+          private VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
+            SafeHtmlBuilder accum = new SafeHtmlBuilder();
+
+            accum.appendHtmlConstant("<span class='variable-search-suggest-box'>");
+            accum.appendHtmlConstant("<strong>");
+            accum.appendEscaped(attributes.get("name"));
+            accum.appendHtmlConstant("</strong>");
+            accum.appendEscaped(" " + attributes.get("datasource") + "." + attributes.get("table") + "");
+
+            if(attributes.containsKey("label")) {
+              accum.appendHtmlConstant("<br>");
+
+              String label = attributes.get("label");
+              if(label.length() > LABEL_MAX_SIZE) {
+                label = label.substring(0, LABEL_MAX_SIZE) + " ...";
+              }
+              accum.appendEscaped(label);
+            }
+            accum.appendHtmlConstant("</span>");
+
+            return createSuggestion(query, accum.toSafeHtml().asString(), attributes.get("datasource"),
+                attributes.get("table"), attributes.get("name"));
+          }
+        })//
+        .withCallback(com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(com.google.gwt.http.client.Request request,
+              com.google.gwt.http.client.Response response) {
+            eventBus.fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+          }
+        }).send();
+
   }
 
   /**

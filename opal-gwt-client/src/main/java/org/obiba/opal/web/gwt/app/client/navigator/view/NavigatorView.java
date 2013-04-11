@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.SuggestListBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
@@ -24,7 +25,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -56,12 +56,12 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   Button refreshButton;
 
   @UiField(provided = true)
-  SuggestBox search;
+  SuggestListBox search;
 
   @Inject
   public NavigatorView(EventBus eventBus) {
     VariableSuggestOracle oracle = new VariableSuggestOracle(eventBus);
-    search = new SuggestBox(oracle);
+    search = new SuggestListBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -135,7 +135,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public SuggestBox getSearch() {
+  public SuggestListBox getSearch() {
     return search;
   }
 }

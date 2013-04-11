@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
@@ -20,6 +21,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Creat
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.SuggestListBox;
+import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -32,6 +35,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -44,7 +48,6 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.Presenter;
@@ -55,6 +58,8 @@ import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, NavigatorPresenter.Proxy> {
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   public interface Display extends View {
 
@@ -72,7 +77,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
     HandlerRegistration refreshClickHandler(ClickHandler handler);
 
-    SuggestBox getSearch();
+    SuggestListBox getSearch();
 
   }
 
@@ -138,8 +143,9 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         .addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
           @Override
           public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-            getView().getSearch().setText("datasource:" + quoteIfContainsSpace(event.getSelection().getName()));
-
+            getView().getSearch().clear();
+            getView().getSearch().addItem(event.getSelection().getName(), translations.datasourceLabel(),
+                VariableSearchListItem.ItemType.DATASOURCE);
           }
         }));
 
@@ -147,22 +153,16 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
           @Override
           public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-            getView().getSearch().setText( //
-                "datasource:" + quoteIfContainsSpace(event.getSelection().getDatasourceName()) +//
-                    " AND table:" + quoteIfContainsSpace(event.getSelection().getName()) + "");
+            getView().getSearch().clear();
+            getView().getSearch().addItem(event.getSelection().getDatasourceName(), translations.datasourceLabel(),
+                VariableSearchListItem.ItemType.DATASOURCE);
+            getView().getSearch().addItem(event.getSelection().getName(), translations.tableLabel(),
+                VariableSearchListItem.ItemType.TABLE);
           }
         }));
 
-    getView().getSearch().addSelectionHandler(new VariableSuggestionSelectionHandler());
-    getView().getSearch().getValueBox().addFocusHandler(new VariableSuggestionFocusHandler());
-  }
-
-  private String quoteIfContainsSpace(String s) {
-
-    if(s.contains(" ")) {
-      return "\"" + s + "\"";
-    }
-    return s;
+    getView().getSearch().getSuggestBox().addSelectionHandler(new VariableSuggestionSelectionHandler());
+    getView().getSearch().addFocusHandler(new VariableSuggestionFocusHandler());
   }
 
   @Override
@@ -194,8 +194,11 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
     @Override
     public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
-      // Get the table dto to fire the event to select the variable
+      // Reset suggestBox text to user input text
+      String originalQuery = ((VariableSuggestOracle) getView().getSearch().getSuggestOracle()).getOriginalQuery();
+      getView().getSearch().getSuggestBox().setText(originalQuery);
 
+      // Get the table dto to fire the event to select the variable
       final String datasourceName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem())
           .getDatasource();
       final String tableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getTable();
@@ -251,7 +254,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
     @Override
     public void onFocus(FocusEvent event) {
-      getView().getSearch().showSuggestionList();
+      getView().getSearch().getSuggestBox().showSuggestionList();
     }
   }
 }
