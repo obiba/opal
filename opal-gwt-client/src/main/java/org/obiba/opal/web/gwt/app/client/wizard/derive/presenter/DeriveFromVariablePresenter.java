@@ -182,7 +182,8 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   }
 
   @Override
-  List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
+  List<DefaultWizardStepController.Builder> getWizardStepBuilders(
+      @Nullable WizardStepController.StepInHandler stepInHandler) {
     List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
     stepBuilders.add(getView().getDeriveFromVariableStepController(wizardType != DeriveVariablePresenter.FromWizardType)
         .onValidate(new ValidationHandler() {

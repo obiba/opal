@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -24,7 +25,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Objects;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 
 /**
  *
@@ -43,7 +43,7 @@ public abstract class DerivationHelper {
 
   private final VariableDto destination;
 
-  public DerivationHelper(VariableDto originalVariable, VariableDto destination) {
+  public DerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination) {
     this.originalVariable = originalVariable;
     this.destination = destination;
   }
@@ -60,14 +60,12 @@ public abstract class DerivationHelper {
     return valueMapEntries;
   }
 
-  public static List<String> getDestinationCategories(VariableDto destination) {
+  @Nullable
+  public static List<String> getDestinationCategories(@Nullable VariableDto destination) {
     if(destination == null) return null;
-    @SuppressWarnings("unchecked")
-    JsArray<CategoryDto> categoriesArray = destination.getCategoriesArray() == null ? (JsArray<CategoryDto>) JsArray
-        .createArray() : destination.getCategoriesArray();
-    List<String> categories = new ArrayList<String>(categoriesArray.length());
-    for(int i = 0; i < categoriesArray.length(); i++) {
-      categories.add(categoriesArray.get(i).getName());
+    List<String> categories = new ArrayList<String>();
+    for(CategoryDto categoryDto : JsArrays.toIterable(destination.getCategoriesArray())) {
+      categories.add(categoryDto.getName());
     }
     Collections.sort(categories);
     return categories;
@@ -89,7 +87,6 @@ public abstract class DerivationHelper {
     if(!valueMapEntries.contains(entryArg)) {
       valueMapEntries.add(0, entryArg);
     }
-
     return true;
   }
 
@@ -97,7 +94,8 @@ public abstract class DerivationHelper {
     return getValueMapEntryWithValue(value) != null;
   }
 
-  public ValueMapEntry getValueMapEntryWithValue(String value) {
+  @Nullable
+  public ValueMapEntry getValueMapEntryWithValue(@Nullable String value) {
     for(ValueMapEntry entry : valueMapEntries) {
       if(Objects.equal(entry.getValue(), value)) {
         return entry;
@@ -110,6 +108,7 @@ public abstract class DerivationHelper {
     return getValueMapEntryWithNewValue(newValue) != null;
   }
 
+  @Nullable
   public ValueMapEntry getValueMapEntryWithNewValue(String newValue) {
     for(ValueMapEntry entry : valueMapEntries) {
       if(Objects.equal(entry.getNewValue(), newValue)) {
@@ -119,10 +118,12 @@ public abstract class DerivationHelper {
     return null;
   }
 
+  @Nullable
   public ValueMapEntry getEmptiesValueMapEntry() {
     return getValueMapEntryWithValue(ValueMapEntry.EMPTY_VALUES_VALUE);
   }
 
+  @Nullable
   public ValueMapEntry getOthersValueMapEntry() {
     return getValueMapEntryWithValue(ValueMapEntry.OTHER_VALUES_VALUE);
   }
@@ -134,6 +135,7 @@ public abstract class DerivationHelper {
   public List<String> getMapStepWarnings() {
     List<String> warnings = new ArrayList<String>();
     if(getDerivedVariable() != null) {
+      //noinspection ConstantConditions
       for(String derivedCategory : getDestinationCategories(getDerivedVariable())) {
         if(!hasValueMapEntryWithNewValue(derivedCategory)) {
           warnings.add(translationMessages.destinationCategoryNotMapped(derivedCategory));
@@ -147,4 +149,8 @@ public abstract class DerivationHelper {
     return new ArrayList<String>();
   }
 
+  @Nullable
+  protected VariableDto getDestination() {
+    return destination;
+  }
 }

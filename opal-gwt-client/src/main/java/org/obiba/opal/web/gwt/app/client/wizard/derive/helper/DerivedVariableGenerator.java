@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 
+import static org.obiba.opal.web.gwt.app.client.js.JsArrays.toIterable;
+
 /**
  *
  */
@@ -42,8 +45,6 @@ public abstract class DerivedVariableGenerator {
   protected final Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
 
   private boolean categoryValuesAppended;
-
-  private boolean distinctValuesAppended;
 
   public DerivedVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries) {
     this.originalVariable = originalVariable;
@@ -68,9 +69,8 @@ public abstract class DerivedVariableGenerator {
     VariableDtos.setScript(derived, scriptBuilder.toString());
 
     // new categories if destination does not already define them
-    JsArray<CategoryDto> cats = destination == null ? null : derived.getCategoriesArray();
-    if(cats == null || cats.length() == 0) {
-      cats = JsArrays.create();
+    JsArray<CategoryDto> cats = JsArrays.toSafeArray(destination == null ? null : derived.getCategoriesArray());
+    if(cats.length() == 0) {
       for(CategoryDto cat : newCategoriesMap.values()) {
         cats.push(cat);
       }
@@ -84,16 +84,14 @@ public abstract class DerivedVariableGenerator {
 
   protected void appendCategoryValueMapEntries() {
     if(originalVariable.getCategoriesArray() == null) return;
-    int nbCategories = originalVariable.getCategoriesArray().length();
-    for(int i = 0; i < nbCategories; i++) {
-      CategoryDto origCat = originalVariable.getCategoriesArray().get(i);
+    for(Iterator<CategoryDto> it = toIterable(originalVariable.getCategoriesArray()).iterator(); it.hasNext(); ) {
+      CategoryDto origCat = it.next();
       ValueMapEntry entry = getValueMapEntry(origCat.getName());
-
-      if(entry.isType(ValueMapEntryType.CATEGORY_NAME)) {
+      if(entry != null && entry.isType(ValueMapEntryType.CATEGORY_NAME)) {
         // script
         scriptBuilder.append("\n    '").append(normalize(entry.getValue())).append("': ");
         appendNewValue(entry);
-        if(i < nbCategories - 1) scriptBuilder.append(",");
+        if(it.hasNext()) scriptBuilder.append(",");
 
         // new category
         addNewCategory(origCat, entry);
@@ -119,6 +117,7 @@ public abstract class DerivedVariableGenerator {
     }
   }
 
+  @Nullable
   protected ValueMapEntry appendValueMapEntry(String value) {
     ValueMapEntry entry = getValueMapEntry(value);
     if(entry != null) {
@@ -128,12 +127,14 @@ public abstract class DerivedVariableGenerator {
     return entry;
   }
 
+  @Nullable
   private String normalize(String text) {
     return text == null
         ? text
         : text.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "\\r");
   }
 
+  @Nullable
   protected ValueMapEntry getValueMapEntry(String value) {
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getValue().equals(value)) {
@@ -143,14 +144,17 @@ public abstract class DerivedVariableGenerator {
     return null;
   }
 
+  @Nullable
   protected ValueMapEntry getOtherValuesMapEntry() {
     return getMapEntry(ValueMapEntryType.OTHER_VALUES);
   }
 
+  @Nullable
   protected ValueMapEntry getEmptyValuesMapEntry() {
     return getMapEntry(ValueMapEntryType.EMPTY_VALUES);
   }
 
+  @Nullable
   protected ValueMapEntry getMapEntry(ValueMapEntryType type) {
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.isType(type)) return entry;
@@ -166,9 +170,9 @@ public abstract class DerivedVariableGenerator {
         origAttrs = newAttributes(newLabelAttribute(entry));
       }
       if(cat == null) {
-        cat = newCategory(entry);
-        cat.setAttributesArray(copyAttributes(origAttrs));
-        newCategoriesMap.put(cat.getName(), cat);
+        CategoryDto newCat = newCategory(entry);
+        newCat.setAttributesArray(copyAttributes(origAttrs));
+        newCategoriesMap.put(newCat.getName(), newCat);
       } else {
         // merge attributes
         mergeAttributes(origAttrs, cat.getAttributesArray());
@@ -177,30 +181,29 @@ public abstract class DerivedVariableGenerator {
     }
   }
 
-  protected void addNewCategory(ValueMapEntry entry) {
-    if(!entry.getNewValue().isEmpty()) {
-      CategoryDto cat = newCategory(entry);
-      cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
-      if(newCategoriesMap.containsKey(cat.getName())) {
-        // merge attributes
-        mergeAttributes(cat.getAttributesArray(), newCategoriesMap.get(cat.getName()).getAttributesArray());
-      } else {
-        newCategoriesMap.put(entry.getNewValue(), cat);
-      }
-      distinctValuesAppended = true;
+  protected void addNewCategory(@Nullable ValueMapEntry entry) {
+    if(entry == null || entry.getNewValue().isEmpty()) return;
+
+    CategoryDto cat = newCategory(entry);
+    cat.setAttributesArray(newAttributes(newLabelAttribute(entry)));
+    if(newCategoriesMap.containsKey(cat.getName())) {
+      // merge attributes
+      mergeAttributes(cat.getAttributesArray(), newCategoriesMap.get(cat.getName()).getAttributesArray());
+    } else {
+      newCategoriesMap.put(entry.getNewValue(), cat);
     }
   }
 
   protected void appendNewValue(ValueMapEntry entry) {
     String value = entry.getNewValue();
-    if(value != null && !value.isEmpty()) {
-      scriptBuilder.append("'").append(normalize(value)).append("'");
-    } else {
+    if(Strings.isNullOrEmpty(value)) {
       scriptBuilder.append("null");
+    } else {
+      scriptBuilder.append("'").append(normalize(value)).append("'");
     }
   }
 
-  protected void appendSpecialValuesEntry(ValueMapEntry entry) {
+  protected void appendSpecialValuesEntry(@Nullable ValueMapEntry entry) {
     if(entry == null) {
       scriptBuilder.append(",\n  null");
     } else {
@@ -248,6 +251,7 @@ public abstract class DerivedVariableGenerator {
     return derived;
   }
 
+  @Nullable
   public static AttributeDto newLabelAttribute(ValueMapEntry entry) {
     if(entry.getLabel() == null || entry.getLabel().isEmpty()) return null;
 
@@ -277,7 +281,7 @@ public abstract class DerivedVariableGenerator {
 
   protected static JsArray<CategoryDto> copyCategories(JsArray<CategoryDto> origCats) {
     JsArray<CategoryDto> cats = JsArrays.create();
-    for(CategoryDto origCat : JsArrays.toIterable(JsArrays.toSafeArray(origCats))) {
+    for(CategoryDto origCat : toIterable(JsArrays.toSafeArray(origCats))) {
       cats.push(copyCategory(origCat));
     }
     return cats;
@@ -293,7 +297,7 @@ public abstract class DerivedVariableGenerator {
 
   public static JsArray<AttributeDto> copyAttributes(JsArray<AttributeDto> origAttrs) {
     JsArray<AttributeDto> attrs = JsArrays.create();
-    for(AttributeDto origAttr : JsArrays.toIterable(JsArrays.toSafeArray(origAttrs))) {
+    for(AttributeDto origAttr : toIterable(JsArrays.toSafeArray(origAttrs))) {
       attrs.push(copyAttribute(origAttr));
     }
     return attrs;
@@ -302,9 +306,9 @@ public abstract class DerivedVariableGenerator {
   public static void mergeAttributes(JsArray<AttributeDto> origAttrs, JsArray<AttributeDto> attrs) {
     if(origAttrs == null || origAttrs.length() == 0) return;
 
-    for(AttributeDto origAttr : JsArrays.toIterable(origAttrs)) {
+    for(AttributeDto origAttr : toIterable(origAttrs)) {
       boolean found = false;
-      for(AttributeDto attr : JsArrays.toIterable(attrs)) {
+      for(AttributeDto attr : toIterable(attrs)) {
         if(attr.getName().equals(origAttr.getName()) && origAttr.hasValue()) {
           String newValue = mergeAttributeValues(origAttr, attr);
           if(attr.hasLocale() && origAttr.hasLocale() && attr.getLocale().equals(origAttr.getLocale()) //
@@ -347,11 +351,4 @@ public abstract class DerivedVariableGenerator {
     return attr;
   }
 
-  public boolean isCategoryValuesAppended() {
-    return categoryValuesAppended;
-  }
-
-  public boolean isDistinctValuesAppended() {
-    return distinctValuesAppended;
-  }
 }

@@ -67,7 +67,9 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
       FrequencyDto frequencyDto = frequenciesList.get(i);
       double freq = frequencyDto.getFreq();
       String value = frequencyDto.getValue();
-      if(!value.equals(NA)) {
+      if(value.equals(NA)) {
+        setEmptiesFrequency(freq);
+      } else {
         ValueMapEntry entry;
         ValueMapEntry existingEntry = getValueMapEntryWithValue(value);
         if(existingEntry == null) {
@@ -77,8 +79,6 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
           entry = existingEntry;
         }
         entry.setCount(freq);
-      } else {
-        setEmptiesFrequency(freq);
       }
       if(freq > maxFreq) {
         maxFreq = freq;
@@ -161,7 +161,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
     return new DerivedNumericalVariableGenerator<N>(originalVariable, valueMapEntries, entryRangeMap);
   }
 
-  public static <N extends Number & Comparable<N>> Range<N> buildRange(N lower, N upper) {
+  public static <N extends Number & Comparable<N>> Range<N> buildRange(@Nullable N lower, @Nullable N upper) {
     if(lower == null) {
       return Ranges.lessThan(upper);
     }

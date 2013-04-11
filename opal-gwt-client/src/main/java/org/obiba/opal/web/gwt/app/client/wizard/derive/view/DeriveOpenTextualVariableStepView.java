@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
@@ -86,8 +88,8 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl
 
   public DeriveOpenTextualVariableStepView() {
     value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplay());
-    auto = new RadioButton(Method.group);
-    manual = new RadioButton(Method.group);
+    auto = new RadioButton(Method.GROUP_METHOD);
+    manual = new RadioButton(Method.GROUP_METHOD);
     widget = uiBinder.createAndBindUi(this);
     radioGroup = new RadioGroup<Method>();
     radioGroup.addButton(auto, Method.AUTOMATICALLY);
@@ -118,7 +120,7 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl
   }
 
   @Override
-  public void populateValues(List<ValueMapEntry> valueMapEntries, List<String> derivedCategories) {
+  public void populateValues(List<ValueMapEntry> valueMapEntries, @Nullable List<String> derivedCategories) {
     value.setText("");
     newValue.setText("");
     addPanel.setOpen(false);

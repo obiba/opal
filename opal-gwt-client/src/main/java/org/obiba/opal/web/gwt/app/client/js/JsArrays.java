@@ -13,6 +13,8 @@ import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -201,18 +203,13 @@ public class JsArrays {
     return (JsArray<T>) JavaScriptObject.createArray();
   }
 
-  public static <T extends JavaScriptObject> JsArray<T> toSafeArray(JsArray<T> array) {
-    if(array == null) {
-      return create();
-    }
-    return array;
+  public static <T extends JavaScriptObject> JsArray<T> toSafeArray(@Nullable JsArray<T> array) {
+    //noinspection RedundantCast
+    return array == null ? (JsArray<T>) create() : array;
   }
 
   public static <T extends JavaScriptObject> JsArrayString toSafeArray(JsArrayString array) {
-    if(array == null) {
-      return (JsArrayString) JavaScriptObject.createArray();
-    }
-    return array;
+    return array == null ? (JsArrayString) JavaScriptObject.createArray() : array;
   }
 
   private static native <T extends JavaScriptObject> T[] reinterpretCast(JsArray<T> value) /*-{

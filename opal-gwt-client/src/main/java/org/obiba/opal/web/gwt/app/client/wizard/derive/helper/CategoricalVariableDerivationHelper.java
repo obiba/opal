@@ -25,6 +25,7 @@ import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.regexp.shared.RegExp;
 
@@ -49,12 +50,10 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private double maxFrequency;
 
+  private List<String> destinationCategories;
+
   public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
     this(originalVariable, null, null);
-  }
-
-  public CategoricalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination) {
-    this(originalVariable, destination, null);
   }
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
@@ -74,6 +73,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   public void initializeValueMapEntries(boolean recodeCategoriesName) {
     valueMapEntries = new ArrayList<ValueMapEntry>();
+
+    destinationCategories = getDestinationCategories(getDestination());
 
     Collection<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
     int index = 1;
@@ -105,11 +106,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     return categoricalSummaryDto != null;
   }
 
-  /**
-   * @param countByCategoryName
-   * @param missingValueMapEntries
-   * @param index
-   */
   private int initializeValueMapEntriesWithoutCategory(Map<String, Double> countByCategoryName,
       Collection<ValueMapEntry> missingValueMapEntries, int index, boolean recodeCategoriesName) {
     int newIndex = index;
@@ -126,11 +122,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     return newIndex;
   }
 
-  /**
-   * @param countByCategoryName
-   * @param missingValueMapEntries
-   * @param index
-   */
   private int initializeNonMissingCategoryValueMapEntries(Map<String, Double> countByCategoryName,
       Collection<ValueMapEntry> missingValueMapEntries, int index, boolean recodeCategoriesName) {
     int newIndex = index;
@@ -151,9 +142,6 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     return newIndex;
   }
 
-  /**
-   * @param countByCategoryName
-   */
   private void findFrequencies(Map<String, Double> countByCategoryName, JsArray<FrequencyDto> frequencies) {
     if(frequencies == null) return;
     for(int i = 0; i < frequencies.length(); i++) {
@@ -227,7 +215,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
             break;
           }
         }
-        if(!found) {
+        // create new value only if we don't already have mapped all existing categories in destination variable
+        if(!found && (destinationCategories == null || newIndex <= destinationCategories.size())) {
           builder.newValue(Integer.toString(newIndex++));
         }
       }
@@ -279,19 +268,15 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   }
 
   private boolean estimateIsMissing(CategoryDto cat) {
-    boolean missing = false;
-
-    if(estimateIsMissing(cat.getName())) {
-      missing = true;
-    } else if(cat.hasIsMissing()) {
-      missing = cat.getIsMissing();
-    }
-
-    return missing;
+    return estimateIsMissing(cat.getName()) || cat.hasIsMissing() && cat.getIsMissing();
   }
 
   protected boolean estimateIsMissing(String value) {
-    return value == null || value.isEmpty() || RegExp.compile(MISSING_REGEXP, "i").test(value);
+    return Strings.isNullOrEmpty(value) || RegExp.compile(MISSING_REGEXP, "i").test(value);
+  }
+
+  public List<String> getDestinationCategories() {
+    return destinationCategories;
   }
 
   public static class DerivedCategoricalVariableGenerator extends DerivedVariableGenerator {

@@ -12,10 +12,11 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
-import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -41,15 +42,10 @@ public class DeriveCategoricalVariableStepPresenter
     super(eventBus, view);
   }
 
-  //
-  // DerivationPresenter methods
-  //
-
   @Override
   void initialize(TableDto originalTable, TableDto destinationTable, final VariableDto originalVariable,
       final VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
-    // TODO use uribuilder
     ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
         .forResource(getOriginalVariable().getLink() + "/summary?nature=categorical&distinct=true").get()
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
@@ -58,10 +54,11 @@ public class DeriveCategoricalVariableStepPresenter
             derivationHelper = new CategoricalVariableDerivationHelper(originalVariable, derivedVariable,
                 statisticsDto);
             derivationHelper.initializeValueMapEntries();
+
             getView().enableFrequencyColumn(true);
             getView().setMaxFrequency(derivationHelper.getMaxFrequency());
-            getView().populateValues(derivationHelper.getValueMapEntries(),
-                DerivationHelper.getDestinationCategories(getDerivedVariable()));
+            getView()
+                .populateValues(derivationHelper.getValueMapEntries(), derivationHelper.getDestinationCategories());
           }
         }).send();
   }
@@ -91,10 +88,6 @@ public class DeriveCategoricalVariableStepPresenter
     return stepBuilders;
   }
 
-  //
-  // Interfaces
-  //
-
   public interface Display extends View {
 
     DefaultWizardStepController.Builder getMapStepController();
@@ -103,7 +96,7 @@ public class DeriveCategoricalVariableStepPresenter
 
     void enableFrequencyColumn(boolean enableFrequencyColumn);
 
-    void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories);
+    void populateValues(List<ValueMapEntry> valuesMap, @Nullable List<String> derivedCategories);
 
   }
 

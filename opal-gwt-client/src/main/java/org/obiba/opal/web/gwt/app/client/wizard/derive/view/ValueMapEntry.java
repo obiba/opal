@@ -125,6 +125,7 @@ public class ValueMapEntry {
     String value = "";
     ValueMapEntryType type = ValueMapEntryType.RANGE;
 
+    //noinspection IfStatementWithTooManyBranches
     if(lower == null) {
       value = "-" + formatNumber(upper);
     } else if(upper == null) {

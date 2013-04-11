@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveCategoricalVariableStepPresenter;
@@ -120,7 +122,7 @@ public class DeriveCategoricalVariableStepView extends ViewImpl
   }
 
   @Override
-  public void populateValues(List<ValueMapEntry> valuesMap, List<String> derivedCategories) {
+  public void populateValues(List<ValueMapEntry> valuesMap, @Nullable List<String> derivedCategories) {
     valuesMapGrid.populate(valuesMap, derivedCategories);
   }
 

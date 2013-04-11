@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEditorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
@@ -52,8 +54,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   }
 
   @Override
-  void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
-      VariableDto derivedVariable) {
+  void initialize(TableDto originalTable, @Nullable TableDto destinationTable, VariableDto originalVariable,
+      @Nullable VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     getView().getRepeatable().setValue(originalVariable.getIsRepeatable());
     getView().getValueType().setValue(originalVariable.getValueType());

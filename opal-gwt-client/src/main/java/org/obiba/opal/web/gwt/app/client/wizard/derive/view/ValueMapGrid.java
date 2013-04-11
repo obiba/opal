@@ -72,14 +72,15 @@ public class ValueMapGrid extends FlowPanel {
     this.pageSize = pageSize;
   }
 
-  public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries) {
+  public void populate(@SuppressWarnings("ParameterHidesMemberVariable") List<ValueMapEntry> valueMapEntries) {
     populate(valueMapEntries, null);
   }
 
-  public void populate(@SuppressWarnings("hiding") List<ValueMapEntry> valueMapEntries,
-      @Nullable List<String> valueChoices) {
+  @SuppressWarnings("ParameterHidesMemberVariable")
+  public void populate(List<ValueMapEntry> valueMapEntries, @Nullable List<String> valueChoices) {
     this.valueMapEntries = valueMapEntries;
     this.valueChoices = valueChoices;
+    //noinspection ConstantConditions
     if(hasValueChoices() && !valueChoices.contains("")) {
       valueChoices.add(0, "");
     }

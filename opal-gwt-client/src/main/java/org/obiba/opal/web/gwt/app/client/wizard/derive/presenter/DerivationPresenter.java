@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -41,8 +43,8 @@ public abstract class DerivationPresenter<V extends View> extends PresenterWidge
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
-  void initialize(TableDto originalTable, TableDto destinationTable, VariableDto originalVariable,
-      VariableDto derivedVariable) {
+  void initialize(@Nullable TableDto originalTable, @Nullable TableDto destinationTable,
+      @Nullable VariableDto originalVariable, @Nullable VariableDto derivedVariable) {
     this.originalTable = originalTable;
     this.destinationTable = destinationTable;
     this.originalVariable = originalVariable;
@@ -75,10 +77,6 @@ public abstract class DerivationPresenter<V extends View> extends PresenterWidge
 
   public TableDto getDestinationTable() {
     return destinationTable;
-  }
-
-  public void setDestinationTable(TableDto destinationTable) {
-    this.destinationTable = destinationTable;
   }
 
   public void onClose() {

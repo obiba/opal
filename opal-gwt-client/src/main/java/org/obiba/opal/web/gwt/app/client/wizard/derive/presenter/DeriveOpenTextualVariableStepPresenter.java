@@ -192,7 +192,7 @@ public class DeriveOpenTextualVariableStepPresenter
 
     Method getMethod();
 
-    void populateValues(List<ValueMapEntry> valueMapEntries, List<String> derivedCategories);
+    void populateValues(List<ValueMapEntry> valueMapEntries, @Nullable List<String> derivedCategories);
 
     HasClickHandlers getAddButton();
 
