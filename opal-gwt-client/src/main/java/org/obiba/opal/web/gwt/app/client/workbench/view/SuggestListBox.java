@@ -38,18 +38,17 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
  */
 public class SuggestListBox extends FocusPanel {
 
-  private FlowPanel content;
+  private final FlowPanel content;
 
-  private CloseableList closeables;
+  private final CloseableList closeables;
 
   private DefaultSuggestBox suggestBox;
 
-  private List<String> suggestions = new ArrayList<String>();
+  private final List<String> suggestions = new ArrayList<String>();
 
   private boolean strict = true;
 
   public SuggestListBox() {
-    super();
     addStyleName("obiba-SuggestListBox");
 
     content = new FlowPanel();
@@ -100,7 +99,7 @@ public class SuggestListBox extends FocusPanel {
     suggestBox.setDefaultSuggestionsEnabled(false);
     addSuggestBoxHandlers();
     for(String suggestion : suggestions) {
-      if(getItems().contains(suggestion) == false) {
+      if(!getItems().contains(suggestion)) {
         getSuggestOracle().add(suggestion);
       }
     }
@@ -162,6 +161,7 @@ public class SuggestListBox extends FocusPanel {
     });
   }
 
+  @Override
   public void clear() {
     closeables.clear();
     suggestions.clear();
@@ -172,7 +172,7 @@ public class SuggestListBox extends FocusPanel {
     if(suggestions.contains(suggestion)) return;
 
     suggestions.add(suggestion);
-    if(getItems().contains(suggestion) == false) {
+    if(!getItems().contains(suggestion)) {
       getSuggestOracle().add(suggestion);
     }
   }
@@ -213,10 +213,7 @@ public class SuggestListBox extends FocusPanel {
     @Override
     public boolean validate(String text) {
       if(text == null || Strings.isNullOrEmpty(text.trim()) || getItems().contains(text)) return false;
-      if(strict) {
-        return suggestions.contains(text);
-      }
-      return true;
+      return !strict || suggestions.contains(text);
     }
 
   }

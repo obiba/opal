@@ -40,7 +40,7 @@ public class RAdministrationView extends ViewImpl implements RAdministrationPres
   // Static Variables
   //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 
@@ -58,7 +58,6 @@ public class RAdministrationView extends ViewImpl implements RAdministrationPres
   //
 
   public RAdministrationView() {
-    super();
     widget = uiBinder.createAndBindUi(this);
   }
 

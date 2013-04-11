@@ -75,7 +75,8 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
   @UiField
   FlowPanel assignMethods;
 
-  private JsArrayDataProvider<DataShieldMethodDto> methodsDataProvider = new JsArrayDataProvider<DataShieldMethodDto>();
+  private final JsArrayDataProvider<DataShieldMethodDto> methodsDataProvider
+      = new JsArrayDataProvider<DataShieldMethodDto>();
 
   private ActionsColumn<DataShieldMethodDto> actionsColumn;
 

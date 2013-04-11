@@ -29,7 +29,6 @@ public class TableCompareConflictsTable extends Table<ConflictDto> {
   private Column<ConflictDto, String> variableNameColumn;
 
   public TableCompareConflictsTable() {
-    super();
     initColumns();
   }
 

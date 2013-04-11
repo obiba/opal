@@ -48,7 +48,7 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   @UiTemplate("DatasourceView.ui.xml")
   interface DatasourceViewUiBinder extends UiBinder<Widget, DatasourceView> {}
 
-  private static DatasourceViewUiBinder uiBinder = GWT.create(DatasourceViewUiBinder.class);
+  private static final DatasourceViewUiBinder uiBinder = GWT.create(DatasourceViewUiBinder.class);
 
   private final Widget widget;
 
@@ -76,17 +76,17 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   @UiField
   Panel permissions;
 
-  private NavigatorMenuBar toolbar;
+  private final NavigatorMenuBar toolbar;
 
   private MenuItem removeMenuItem;
 
   private MenuItemSeparator removeMenuItemSeparator;
 
-  private ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
+  private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
   private ClickableColumn<TableDto> tableNameColumn;
 
-  private Translations translations = GWT.create(Translations.class);
+  private final Translations translations = GWT.create(Translations.class);
 
   public DatasourceView() {
     widget = uiBinder.createAndBindUi(this);
@@ -151,7 +151,7 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public void setTableSelection(TableDto tableDto, int index) {
-    int pageIndex = (int) (index / table.getPageSize());
+    int pageIndex = index / table.getPageSize();
     if(pageIndex != pager.getPage()) {
       pager.setPage(pageIndex);
     }
@@ -175,7 +175,7 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   }
 
   @Override
-  public void renderRows(final JsArray<TableDto> rows) {
+  public void renderRows(JsArray<TableDto> rows) {
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
@@ -186,7 +186,7 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
     datasourceName.setText(dto.getName());
     datasourceType.setText(translations.datasourceTypeMap().get(dto.getType()));
     toolbar.getAddItem().setVisible(false);
-    boolean isNull = dto.getType().equals("null");
+    boolean isNull = "null".equals(dto.getType());
     toolbar.setImportDataItemEnabled(!isNull);
     toolbar.setAddUpdateTablesItemEnabled(!isNull);
   }

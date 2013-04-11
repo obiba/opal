@@ -28,9 +28,9 @@ public class FileSelectionEvent extends GwtEvent<FileSelectionEvent.Handler> {
   // Instance Variables
   //
 
-  private Object source;
+  private final Object source;
 
-  private FileSelection selectedFile;
+  private final FileSelection selectedFile;
 
   //
   // Constructors

@@ -22,7 +22,7 @@ public class CharacterSetView extends Composite implements CharacterSetDisplay {
   // Static variables
   //
 
-  private EditableListBox charsetListBox = new EditableListBox();
+  private final EditableListBox charsetListBox = new EditableListBox();
 
   //
   // Constructors

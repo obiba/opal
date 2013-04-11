@@ -44,7 +44,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<FunctionalUnitUpdateDialogPresenter.Display> {
 
   @SuppressWarnings("TypeMayBeWeakened")
-  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+  private final Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   private Mode dialogMode;
 
@@ -231,7 +231,7 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
       } else {
         NotificationEvent.Builder builder = NotificationEvent.newBuilder();
         try {
-          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           GWT.log(errorDto.getStatus());
           GWT.log(errorDto.getArgumentsArray().join());
           builder.error(errorDto.getStatus()).args(errorDto.getArgumentsArray());

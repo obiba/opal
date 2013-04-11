@@ -16,20 +16,20 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
  */
 public interface ResourceAuthorizationRequestBuilder {
 
-  public ResourceAuthorizationRequestBuilder forResource(String resource);
+  ResourceAuthorizationRequestBuilder forResource(String resource);
 
-  public ResourceAuthorizationRequestBuilder get();
+  ResourceAuthorizationRequestBuilder get();
 
-  public ResourceAuthorizationRequestBuilder post();
+  ResourceAuthorizationRequestBuilder post();
 
-  public ResourceAuthorizationRequestBuilder put();
+  ResourceAuthorizationRequestBuilder put();
 
-  public ResourceAuthorizationRequestBuilder delete();
+  ResourceAuthorizationRequestBuilder delete();
 
-  public ResourceAuthorizationRequestBuilder request(String resource, HttpMethod method);
+  ResourceAuthorizationRequestBuilder request(String resource, HttpMethod method);
 
-  public ResourceAuthorizationRequestBuilder authorize(HasAuthorization toAuthorize);
+  ResourceAuthorizationRequestBuilder authorize(HasAuthorization toAuthorize);
 
-  public void send();
+  void send();
 
 }

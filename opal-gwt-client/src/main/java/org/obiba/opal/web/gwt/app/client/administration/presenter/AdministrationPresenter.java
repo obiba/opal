@@ -36,8 +36,7 @@ public class AdministrationPresenter
   private TabContentProxy<?> defaultTab;
 
   @Inject
-  public AdministrationPresenter(final Display display, final EventBus eventBus, final Proxy proxy,
-      PlaceManager placeManager) {
+  public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager) {
     super(eventBus, display, proxy, TabSlot, RequestTabs);
     this.placeManager = placeManager;
   }
@@ -45,7 +44,7 @@ public class AdministrationPresenter
   @Override
   public Tab addTab(TabContentProxy<?> tabProxy) {
     if(defaultTab == null || tabProxy.getTabData().getPriority() < defaultTab.getTabData().getPriority()) {
-      this.defaultTab = tabProxy;
+      defaultTab = tabProxy;
     }
     return super.addTab(tabProxy);
   }

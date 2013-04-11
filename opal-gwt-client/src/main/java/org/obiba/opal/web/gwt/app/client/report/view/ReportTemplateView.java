@@ -43,7 +43,7 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   @UiTemplate("ReportTemplateView.ui.xml")
   interface ReportTemplateViewUiBinder extends UiBinder<Widget, ReportTemplateView> {}
 
-  private static ReportTemplateViewUiBinder uiBinder = GWT.create(ReportTemplateViewUiBinder.class);
+  private static final ReportTemplateViewUiBinder uiBinder = GWT.create(ReportTemplateViewUiBinder.class);
 
   public ReportTemplateView() {
     initWidget(uiBinder.createAndBindUi(this));

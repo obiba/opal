@@ -38,7 +38,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
   public static class Subscriber extends DatasourceFormPresenterSubscriber {
 
     @Inject
-    public Subscriber(com.google.gwt.event.shared.EventBus eventBus, CsvDatasourceFormPresenter presenter) {
+    public Subscriber(EventBus eventBus, CsvDatasourceFormPresenter presenter) {
       super(eventBus, presenter);
     }
 
@@ -63,7 +63,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
   //
 
   @Inject
-  public CsvDatasourceFormPresenter(final Display display, final EventBus eventBus,
+  public CsvDatasourceFormPresenter(Display display, EventBus eventBus,
       FileSelectionPresenter csvFileSelectionPresenter) {
     super(eventBus, display);
     this.csvFileSelectionPresenter = csvFileSelectionPresenter;
@@ -98,6 +98,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
     csvFileSelectionPresenter.unbind();
   }
 
+  @Override
   public DatasourceFactoryDto getDatasourceFactory() {
     CsvDatasourceFactoryDto extensionDto = createCsvDatasourceFactoryDto();
 
@@ -107,8 +108,9 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
     return dto;
   }
 
+  @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("csv");
+    return "csv".equalsIgnoreCase(type);
   }
 
   private CsvDatasourceFactoryDto createCsvDatasourceFactoryDto() {
@@ -178,10 +180,12 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
     if(selectedFile == null) {
       selectedFile = new HasText() {
 
+        @Override
         public String getText() {
           return csvFileSelectionPresenter.getSelectedFile();
         }
 
+        @Override
         public void setText(String text) {
           // do nothing
         }
@@ -217,6 +221,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
     void clearForm();
   }
 
+  @Override
   public boolean validateFormData() {
     return validate();
   }

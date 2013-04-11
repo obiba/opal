@@ -36,7 +36,7 @@ public class DataTabView extends Composite implements DataTabPresenter.Display {
   @UiTemplate("DataTabView.ui.xml")
   interface myUiBinder extends UiBinder<Widget, DataTabView> {}
 
-  private static myUiBinder uiBinder = GWT.create(myUiBinder.class);
+  private static final myUiBinder uiBinder = GWT.create(myUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -46,7 +46,7 @@ public class DataTabView extends Composite implements DataTabPresenter.Display {
   @UiField(provided = true)
   TableChooser tableChooser;
 
-  private Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
+  private final Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
 
   public DataTabView() {
     tableChooser = new TableChooser(true);

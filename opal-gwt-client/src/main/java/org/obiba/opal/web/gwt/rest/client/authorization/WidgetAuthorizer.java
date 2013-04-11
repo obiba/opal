@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class WidgetAuthorizer implements HasAuthorization {
 
-  private Widget w;
+  private final Widget w;
 
   public WidgetAuthorizer(Widget w) {
     super();

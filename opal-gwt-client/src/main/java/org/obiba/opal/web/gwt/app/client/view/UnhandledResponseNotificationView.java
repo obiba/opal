@@ -20,10 +20,10 @@ public class UnhandledResponseNotificationView extends PopupViewImpl
   @UiTemplate("UnhandledResponseNotificationView.ui.xml")
   interface UnhandledResponseNotificationViewUiBinder extends UiBinder<Widget, UnhandledResponseNotificationView> {}
 
-  private static UnhandledResponseNotificationViewUiBinder uiBinder = GWT
+  private static final UnhandledResponseNotificationViewUiBinder uiBinder = GWT
       .create(UnhandledResponseNotificationViewUiBinder.class);
 
-  private PopupPanel popup = new PopupPanel(false, true);
+  private final PopupPanel popup = new PopupPanel(false, true);
 
   @UiField
   Label titleMessage;

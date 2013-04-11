@@ -30,14 +30,13 @@ public class FileResourceRequest {
   }
 
   public FileResourceRequest(EventBus eventBus, String path, ResourceCallback<FileDto> callback) {
-    super();
     this.eventBus = eventBus;
     this.path = path;
     this.callback = callback;
   }
 
   public void send() {
-    final String resource = "/files/_meta" + path + "/";
+    String resource = "/files/_meta" + path + "/";
     ResourceRequestBuilderFactory.<FileDto>newBuilder().forResource(resource).get()//
         .withCallback(callback).send();
   }
@@ -48,7 +47,7 @@ public class FileResourceRequest {
 
   public static class Builder {
 
-    private FileResourceRequest request;
+    private final FileResourceRequest request;
 
     protected Builder(EventBus eventBus) {
       request = new FileResourceRequest();

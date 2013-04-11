@@ -49,7 +49,7 @@ public class RadioGroup<T> implements HasValue<T> {
     this.comparator = comparator;
   }
 
-  public HandlerRegistration addButton(HasValue<Boolean> button, final T value) {
+  public HandlerRegistration addButton(HasValue<Boolean> button, T value) {
     if(this.buttons.size() != this.values.size()) throw new IllegalStateException("buttons and values are out of sync");
 
     this.buttons.add(button);

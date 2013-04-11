@@ -70,7 +70,7 @@ public class DataShieldConfigPresenter
 
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final String DATASHIELD_NAME = "DataSHIELD";
+  private static final String DATASHIELD_NAME = "DataSHIELD";
 
   @Inject
   public DataShieldConfigPresenter(Display display, EventBus eventBus, Proxy proxy,
@@ -164,10 +164,10 @@ public class DataShieldConfigPresenter
     }
   }
 
-  public final class DataShieldEnvironment {
+  public interface DataShieldEnvironment {
 
-    public static final String ASSIGN = "assign";
+    String ASSIGN = "assign";
 
-    public static final String AGGREGATE = "aggregate";
+    String AGGREGATE = "aggregate";
   }
 }

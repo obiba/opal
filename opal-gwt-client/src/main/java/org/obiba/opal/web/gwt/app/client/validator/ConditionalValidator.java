@@ -19,9 +19,9 @@ public class ConditionalValidator implements FieldValidator {
   // Instance Variables
   //
 
-  private HasValue<Boolean> condition;
+  private final HasValue<Boolean> condition;
 
-  private FieldValidator delegate;
+  private final FieldValidator delegate;
 
   //
   // Constructors

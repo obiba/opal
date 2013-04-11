@@ -39,21 +39,21 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   public interface Display extends View {
 
-    public void focusOnUserName();
+    void focusOnUserName();
 
-    public void clear();
+    void clear();
 
-    public void showErrorMessageAndClearPassword();
+    void showErrorMessageAndClearPassword();
 
-    public HasValue<String> getUserName();
+    HasValue<String> getUserName();
 
-    public HasValue<String> getPassword();
+    HasValue<String> getPassword();
 
-    public HasClickHandlers getSignIn();
+    HasClickHandlers getSignIn();
 
-    public HasKeyUpHandlers getUserNameTextBox();
+    HasKeyUpHandlers getUserNameTextBox();
 
-    public HasKeyUpHandlers getPasswordTextBox();
+    HasKeyUpHandlers getPasswordTextBox();
 
   }
 

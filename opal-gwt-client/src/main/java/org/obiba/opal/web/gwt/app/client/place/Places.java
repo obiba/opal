@@ -15,7 +15,7 @@ public final class Places {
 
   public static final Place dashboardPlace = new Place(dashboard);
 
-  public static final String dashboard() {
+  public static String dashboard() {
     return dashboard;
   }
 
@@ -23,7 +23,7 @@ public final class Places {
 
   public static final Place navigatorPlace = new Place(navigator);
 
-  public static final String navigator() {
+  public static String navigator() {
     return navigator;
   }
 
@@ -31,7 +31,7 @@ public final class Places {
 
   public static final Place unitsPlace = new Place(units);
 
-  public static final String units() {
+  public static String units() {
     return units;
   }
 
@@ -39,7 +39,7 @@ public final class Places {
 
   public static final Place filesPlace = new Place(files);
 
-  public static final String files() {
+  public static String files() {
     return files;
   }
 
@@ -47,7 +47,7 @@ public final class Places {
 
   public static final Place reportTemplatesPlace = new Place(reportTemplates);
 
-  public static final String reportTemplates() {
+  public static String reportTemplates() {
     return reportTemplates;
   }
 
@@ -55,7 +55,7 @@ public final class Places {
 
   public static final Place jobsPlace = new Place(jobs);
 
-  public static final String jobs() {
+  public static String jobs() {
     return jobs;
   }
 
@@ -63,7 +63,7 @@ public final class Places {
 
   public static final Place administrationPlace = new Place(administration);
 
-  public static final String administration() {
+  public static String administration() {
     return administration;
   }
 
@@ -72,7 +72,7 @@ public final class Places {
     final String place;
 
     private Place(String name) {
-      this.place = name;
+      place = name;
     }
 
     public String getName() {

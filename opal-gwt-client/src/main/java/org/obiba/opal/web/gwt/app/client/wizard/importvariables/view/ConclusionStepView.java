@@ -26,7 +26,7 @@ public class ConclusionStepView extends Composite implements ConclusionStepPrese
   // Static Variables
   //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   //
   // Instance Variables

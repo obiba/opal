@@ -57,7 +57,7 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   @UiTemplate("ValueSequencePopupView.ui.xml")
   interface ValueSequencePopupViewUiBinder extends UiBinder<Widget, ValueSequencePopupView> {}
 
-  private static ValueSequencePopupViewUiBinder uiBinder = GWT.create(ValueSequencePopupViewUiBinder.class);
+  private static final ValueSequencePopupViewUiBinder uiBinder = GWT.create(ValueSequencePopupViewUiBinder.class);
 
   private final Widget widget;
 

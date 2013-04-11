@@ -40,7 +40,7 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
   @SuppressWarnings("unchecked")
   @Inject
-  public JdbcDatasourceFormPresenter(final Display display, final EventBus eventBus) {
+  public JdbcDatasourceFormPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
 
     addValidator(new RequiredOptionValidator(RequiredOptionValidator
@@ -84,7 +84,7 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("jdbc");
+    return "jdbc".equalsIgnoreCase(type);
   }
 
   private JdbcDatasourceSettingsDto getSettings() {

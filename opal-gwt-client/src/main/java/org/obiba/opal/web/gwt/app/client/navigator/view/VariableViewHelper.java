@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.i18n.client.LocaleInfo;
 
 /**
  *
@@ -68,14 +69,14 @@ public class VariableViewHelper {
    * @return
    */
   public static String getCurrentLanguage() {
-    String currentLocaleName = com.google.gwt.i18n.client.LocaleInfo.getCurrentLocale().getLocaleName();
+    String currentLocaleName = LocaleInfo.getCurrentLocale().getLocaleName();
     if(currentLocaleName.equals(DEFAULT_LOCALE_NAME)) {
       // No locale has been specified so the current locale is "default". Return English as the current language.
       return "en";
     }
     int separatorIndex = currentLocaleName.indexOf('_');
 
-    return (separatorIndex != -1) ? currentLocaleName.substring(0, separatorIndex) : currentLocaleName;
+    return separatorIndex != -1 ? currentLocaleName.substring(0, separatorIndex) : currentLocaleName;
   }
 
 }

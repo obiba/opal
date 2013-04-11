@@ -43,9 +43,9 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   @UiTemplate("IndexView.ui.xml")
   interface ViewUiBinder extends UiBinder<DialogBox, IndexView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 

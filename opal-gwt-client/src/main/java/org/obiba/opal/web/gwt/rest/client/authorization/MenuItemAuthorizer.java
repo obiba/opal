@@ -16,18 +16,16 @@ import com.google.gwt.user.client.ui.MenuItem;
  */
 public class MenuItemAuthorizer implements HasAuthorization {
 
-  private MenuItemProvider menuProvider;
+  private final MenuItemProvider menuProvider;
 
   private MenuItem menu;
 
   public MenuItemAuthorizer(MenuItemProvider m) {
-    super();
-    this.menuProvider = m;
+    menuProvider = m;
   }
 
   public MenuItemAuthorizer(final MenuItem m) {
-    super();
-    this.menuProvider = new MenuItemProvider() {
+    menuProvider = new MenuItemProvider() {
 
       @Override
       public MenuItem getMenuItem() {
@@ -55,7 +53,7 @@ public class MenuItemAuthorizer implements HasAuthorization {
   }
 
   public interface MenuItemProvider {
-    public MenuItem getMenuItem();
+    MenuItem getMenuItem();
   }
 
 }

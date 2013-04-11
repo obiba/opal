@@ -40,7 +40,6 @@ public class AbstractTabLayout extends FlowPanel
   private int selectedIndex = -1;
 
   protected AbstractTabLayout(String menuStyleName) {
-    super();
     menu = new UList();
     menu.addStyleName(menuStyleName);
     menu.addStyleName("tabz");
@@ -120,7 +119,7 @@ public class AbstractTabLayout extends FlowPanel
   }
 
   public void insert(Widget content, HasClickHandlers tab, int beforeIndex) {
-    insertItem((HasClickHandlers) tab, beforeIndex);
+    insertItem(tab, beforeIndex);
     insertContent(content, beforeIndex);
 
     if(selectedIndex < 0 || beforeIndex <= selectedIndex) {
@@ -227,7 +226,7 @@ public class AbstractTabLayout extends FlowPanel
   }
 
   private void checkIndex(int index) {
-    assert (index >= 0) && (index < menu.getWidgetCount()) : "Index out of bounds";
+    assert index >= 0 && index < menu.getWidgetCount() : "Index out of bounds";
   }
 
   /**
@@ -274,7 +273,7 @@ public class AbstractTabLayout extends FlowPanel
     // cancel the selection.
     if(fireEvents) {
       BeforeSelectionEvent<Integer> event = BeforeSelectionEvent.fire(this, index);
-      if((event != null) && event.isCanceled()) {
+      if(event != null && event.isCanceled()) {
         return;
       }
     }

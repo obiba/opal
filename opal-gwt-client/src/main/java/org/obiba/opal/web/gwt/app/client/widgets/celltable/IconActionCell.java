@@ -31,7 +31,7 @@ public class IconActionCell<C> extends AbstractCell<C> {
    *
    * @param <T> the type that this delegate acts on
    */
-  public static interface Delegate<T> {
+  public interface Delegate<T> {
     /**
      * Perform the desired action on the given object.
      *

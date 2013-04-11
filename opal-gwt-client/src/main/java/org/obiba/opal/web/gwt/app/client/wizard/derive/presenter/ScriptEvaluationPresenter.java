@@ -278,7 +278,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     }
 
     private void scriptInterpretationFail(Response response) {
-      ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+      ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
       if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
         for(JavaScriptErrorDto error : errors) {

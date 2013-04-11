@@ -18,7 +18,7 @@ import com.google.gwt.event.shared.EventBus;
  */
 public abstract class Authorizer implements HasAuthorization {
 
-  private EventBus eventBus;
+  private final EventBus eventBus;
 
   public Authorizer(EventBus eventBus) {
     super();

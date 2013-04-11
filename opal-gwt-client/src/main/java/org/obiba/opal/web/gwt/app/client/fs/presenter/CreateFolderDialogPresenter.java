@@ -43,7 +43,7 @@ public class CreateFolderDialogPresenter extends PresenterWidget<CreateFolderDia
 
   }
 
-  private Translations translations = GWT.create(Translations.class);
+  private final Translations translations = GWT.create(Translations.class);
 
   private FileDto currentFolder;
 
@@ -66,9 +66,9 @@ public class CreateFolderDialogPresenter extends PresenterWidget<CreateFolderDia
     super.registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
         String folderToCreate = getView().getFolderToCreate().getText();
-        if(folderToCreate.equals("")) {
+        if("".equals(folderToCreate)) {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
-        } else if(folderToCreate.equals(".") || folderToCreate.equals("..")) {
+        } else if(".".equals(folderToCreate) || "..".equals(folderToCreate)) {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
         } else {
           createFolder(currentFolder.getPath(), folderToCreate);

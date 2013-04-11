@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import javax.annotation.Nullable;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
@@ -31,10 +33,6 @@ public class NumericTextBox extends TextBox {
 
   private NumberType numberType = NumberType.INTEGER;
 
-  private KeyUpHandler keyUpHandler = new NumericKeyUpHandler();
-
-  private KeyPressHandler keyPressHandler = new NumericKeyPressHandler();
-
   public NumericTextBox() {
     this(0, 0, 100);
   }
@@ -52,10 +50,9 @@ public class NumericTextBox extends TextBox {
   }
 
   public NumericTextBox(int value, int min, int max, boolean minConstrained, boolean maxConstrained) {
-    super();
 
-    addKeyPressHandler(keyPressHandler);
-    addKeyUpHandler(keyUpHandler);
+    addKeyPressHandler(new NumericKeyPressHandler());
+    addKeyUpHandler(new NumericKeyUpHandler());
 
     this.min = min;
     this.max = max;
@@ -70,7 +67,7 @@ public class NumericTextBox extends TextBox {
   }
 
   public void setNumberType(String type) {
-    this.numberType = NumberType.valueOf(type.toUpperCase());
+    numberType = NumberType.valueOf(type.toUpperCase());
   }
 
   public void setSteps(int step) {
@@ -97,7 +94,7 @@ public class NumericTextBox extends TextBox {
     if(step == 0) return;
     String value = getText();
     Number newValue = numberType.increaseValue(value, step);
-    if(newValue == null || (maxConstrained && (newValue.intValue() > max))) {
+    if(newValue == null || maxConstrained && newValue.intValue() > max) {
       return;
     }
     setValue(numberType.formatValue(newValue));
@@ -107,7 +104,7 @@ public class NumericTextBox extends TextBox {
     if(step == 0) return;
     String value = getText();
     Number newValue = numberType.decreaseValue(value, step);
-    if(newValue == null || (minConstrained && (newValue.intValue() < min))) {
+    if(newValue == null || minConstrained && newValue.intValue() < min) {
       return;
     }
     setValue(numberType.formatValue(newValue));
@@ -122,12 +119,12 @@ public class NumericTextBox extends TextBox {
   public void setValue(String value, boolean fireEvents) {
     try {
       Number newValue = numberType.parseValue(value);
-      if(newValue == null || (maxConstrained && (newValue.intValue() > max)) ||
-          (minConstrained && (newValue.intValue() < min))) {
+      if(newValue == null || maxConstrained && newValue.intValue() > max ||
+          minConstrained && newValue.intValue() < min) {
         return;
       }
       String prevText = getValue();
-      super.setText(numberType.formatValue(newValue));
+      setText(numberType.formatValue(newValue));
       if(fireEvents) {
         ValueChangeEvent.fireIfNotEqual(this, getValue(), prevText);
       }
@@ -136,6 +133,7 @@ public class NumericTextBox extends TextBox {
     }
   }
 
+  @Nullable
   @SuppressWarnings("unchecked")
   public <T extends Number> T getNumberValue() {
     if(getText().isEmpty()) return null;
@@ -166,9 +164,8 @@ public class NumericTextBox extends TextBox {
       }
 
       String newText = getNewText(event.getCharCode());
-      if(newText.equals("-") ||
-          (numberType.equals(NumberType.DECIMAL) && newText.endsWith(".") && newText.length() > 1 &&
-              !newText.substring(0, newText.length() - 1).contains("."))) {
+      if("-".equals(newText) || numberType == NumberType.DECIMAL && newText.endsWith(".") && newText.length() > 1 &&
+          !newText.substring(0, newText.length() - 1).contains(".")) {
         return;
       }
 
@@ -180,12 +177,10 @@ public class NumericTextBox extends TextBox {
       int index = getCursorPos();
       String previousText = getText();
       String newText;
-      if(getSelectionLength() > 0) {
-        newText = previousText.substring(0, getCursorPos()) + code +
-            previousText.substring(getCursorPos() + getSelectionLength(), previousText.length());
-      } else {
-        newText = previousText.substring(0, index) + code + previousText.substring(index, previousText.length());
-      }
+      newText = getSelectionLength() > 0
+          ? previousText.substring(0, getCursorPos()) + code +
+          previousText.substring(getCursorPos() + getSelectionLength(), previousText.length())
+          : previousText.substring(0, index) + code + previousText.substring(index, previousText.length());
       return newText;
     }
   }
@@ -229,6 +224,7 @@ public class NumericTextBox extends TextBox {
 
   public enum NumberType {
     INTEGER {
+      @Nullable
       @Override
       public Number parseValue(String value) {
         try {
@@ -238,19 +234,21 @@ public class NumericTextBox extends TextBox {
         }
       }
 
+      @Nullable
       @Override
       public Number increaseValue(String value, int step) {
         try {
-          return Long.valueOf(value).longValue() + step;
+          return Long.valueOf(value) + step;
         } catch(Exception ex) {
           return null;
         }
       }
 
+      @Nullable
       @Override
       public Number decreaseValue(String value, int step) {
         try {
-          return Long.valueOf(value).longValue() - step;
+          return Long.valueOf(value) - step;
         } catch(Exception ex) {
           return null;
         }
@@ -273,7 +271,7 @@ public class NumericTextBox extends TextBox {
       @Override
       public Number increaseValue(String value, int step) {
         try {
-          return Double.valueOf(value).doubleValue() + step;
+          return Double.valueOf(value) + step;
         } catch(Exception ex) {
           return null;
         }
@@ -282,7 +280,7 @@ public class NumericTextBox extends TextBox {
       @Override
       public Number decreaseValue(String value, int step) {
         try {
-          return Double.valueOf(value).doubleValue() - step;
+          return Double.valueOf(value) - step;
         } catch(Exception ex) {
           return null;
         }
@@ -298,14 +296,17 @@ public class NumericTextBox extends TextBox {
       }
     };
 
+    @Nullable
     public abstract Number parseValue(String value);
 
     public String formatValue(Number value) {
       return value.toString();
     }
 
+    @Nullable
     public abstract Number increaseValue(String value, int step);
 
+    @Nullable
     public abstract Number decreaseValue(String value, int step);
   }
 }

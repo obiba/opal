@@ -28,9 +28,9 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   private final int pos;
 
-  private VariableDto variable;
+  private final VariableDto variable;
 
-  private ValueRenderer valueRenderer;
+  private final ValueRenderer valueRenderer;
 
   public ValueOccurrenceColumn(VariableDto variable, int pos) {
     super(createCell(variable));
@@ -38,7 +38,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
     this.variable = variable;
     this.valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
 
-    if(variable.getValueType().equalsIgnoreCase("binary")) {
+    if("binary".equalsIgnoreCase(variable.getValueType())) {
       setFieldUpdater(new FieldUpdater<ValueOccurrenceColumn.ValueOccurrence, String>() {
 
         @Override
@@ -53,7 +53,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
   }
 
   private static Cell<String> createCell(final VariableDto variable) {
-    if(variable.getValueType().equalsIgnoreCase("binary")) {
+    if("binary".equalsIgnoreCase(variable.getValueType())) {
       return new ClickableTextCell(new ClickableIconRenderer("i-down"));
     } else {
       return new TextCell();

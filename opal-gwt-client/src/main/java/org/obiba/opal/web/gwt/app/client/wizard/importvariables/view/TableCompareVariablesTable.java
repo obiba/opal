@@ -24,7 +24,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
  */
 public class TableCompareVariablesTable extends Table<VariableDto> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private Column<VariableDto, String> variableNameColumn;
 

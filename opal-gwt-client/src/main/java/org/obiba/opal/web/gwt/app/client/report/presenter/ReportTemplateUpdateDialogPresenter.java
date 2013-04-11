@@ -10,9 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -53,13 +55,13 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportTemplateUpdateDialogPresenter.Display> {
 
-  private FileSelectionPresenter fileSelectionPresenter;
+  private final FileSelectionPresenter fileSelectionPresenter;
 
-  private ItemSelectorPresenter emailSelectorPresenter;
+  private final ItemSelectorPresenter emailSelectorPresenter;
 
-  private ItemSelectorPresenter parametersSelectorPresenter;
+  private final ItemSelectorPresenter parametersSelectorPresenter;
 
-  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+  private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   private Mode dialogMode;
 
@@ -112,9 +114,9 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
       Provider<FileSelectionPresenter> fileSelectionPresenterProvider,
       Provider<ItemSelectorPresenter> itemSelectorPresenterProvider) {
     super(eventBus, display);
-    this.fileSelectionPresenter = fileSelectionPresenterProvider.get();
-    this.emailSelectorPresenter = itemSelectorPresenterProvider.get();
-    this.parametersSelectorPresenter = itemSelectorPresenterProvider.get();
+    fileSelectionPresenter = fileSelectionPresenterProvider.get();
+    emailSelectorPresenter = itemSelectorPresenterProvider.get();
+    parametersSelectorPresenter = itemSelectorPresenterProvider.get();
     parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView());
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
   }
@@ -130,9 +132,10 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     validators.add(new RequiredTextValidator(getView().getName(), "ReportTemplateNameIsRequired"));
     validators.add(new FieldValidator() {
 
+      @Nullable
       @Override
       public String validate() {
-        if(getView().getDesignFile().equals("")) {
+        if("".equals(getView().getDesignFile())) {
           return "BirtReportDesignFileIsRequired";
         }
         return null;
@@ -142,6 +145,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
         new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired")));
     validators.add(new FieldValidator() {
 
+      @Nullable
       @Override
       public String validate() {
         for(String email : emailSelectorPresenter.getView().getItems()) {
@@ -173,17 +177,18 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   }
 
   private void addEventHandlers() {
-    super.registerHandler(
+    registerHandler(
         getView().getUpdateReportTemplateButton().addClickHandler(new CreateOrUpdateReportTemplateClickHandler()));
 
-    super.registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
     }));
 
-    super.registerHandler(getView().addEnableScheduleClickHandler(new EnableScheduleClickHandler()));
-    super.registerHandler(getView().addDisableScheduleClickHandler(new DisableScheduleClickHandler()));
+    registerHandler(getView().addEnableScheduleClickHandler(new EnableScheduleClickHandler()));
+    registerHandler(getView().addDisableScheduleClickHandler(new DisableScheduleClickHandler()));
 
   }
 
@@ -200,8 +205,8 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
   private void createReportTemplate() {
     if(validReportTemplate()) {
-      CreateReportTemplateCallBack createReportTemplateCallback = new CreateReportTemplateCallBack();
-      AlreadyExistReportTemplateCallBack alreadyExistReportTemplateCallback = new AlreadyExistReportTemplateCallBack();
+      ResponseCodeCallback createReportTemplateCallback = new CreateReportTemplateCallBack();
+      ResourceCallback alreadyExistReportTemplateCallback = new AlreadyExistReportTemplateCallBack();
       UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
 
       ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder().forResource(ub.build()).get()
@@ -260,7 +265,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
   private void doUpdateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
-    CreateOrUpdateReportTemplateCallBack callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
+    ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
     UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
     ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
         .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
@@ -270,7 +275,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
   private void doCreateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
-    CreateOrUpdateReportTemplateCallBack callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
+    ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
     ResourceRequestBuilderFactory.newBuilder().forResource("/report-templates").post()
         .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
         .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
@@ -328,7 +333,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
     ReportTemplateDto reportTemplate;
 
-    public CreateOrUpdateReportTemplateCallBack(ReportTemplateDto reportTemplate) {
+    private CreateOrUpdateReportTemplateCallBack(ReportTemplateDto reportTemplate) {
       this.reportTemplate = reportTemplate;
     }
 
@@ -343,9 +348,9 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
         String msg = "UnknownError";
         if(response.getText() != null && response.getText().length() != 0) {
           try {
-            ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+            ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
             msg = errorDto.getStatus();
-          } catch(Exception e) {
+          } catch(Exception ignored) {
 
           }
         }

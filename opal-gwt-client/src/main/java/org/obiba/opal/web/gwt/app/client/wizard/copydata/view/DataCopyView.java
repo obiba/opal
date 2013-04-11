@@ -175,7 +175,7 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   public void setDatasources(List<DatasourceDto> datasources) {
     this.datasources.clear();
     for(DatasourceDto datasource : datasources) {
-      if(!datasource.getType().equals("null")) {
+      if(!"null".equals(datasource.getType())) {
         this.datasources.addItem(datasource.getName());
       }
     }

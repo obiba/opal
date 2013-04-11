@@ -29,7 +29,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @UiTemplate("DashboardView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DashboardView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @UiField
   Label participantCount;

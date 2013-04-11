@@ -307,8 +307,8 @@ public abstract class DerivedVariableGenerator {
       for(AttributeDto attr : JsArrays.toIterable(attrs)) {
         if(attr.getName().equals(origAttr.getName()) && origAttr.hasValue()) {
           String newValue = mergeAttributeValues(origAttr, attr);
-          if((attr.hasLocale() && origAttr.hasLocale() && attr.getLocale().equals(origAttr.getLocale())) //
-              || (!attr.hasLocale() && !origAttr.hasLocale())) {
+          if(attr.hasLocale() && origAttr.hasLocale() && attr.getLocale().equals(origAttr.getLocale()) //
+              || !attr.hasLocale() && !origAttr.hasLocale()) {
             attr.setValue(newValue);
             found = true;
             break;

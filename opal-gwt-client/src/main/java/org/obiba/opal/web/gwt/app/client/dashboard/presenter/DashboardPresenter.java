@@ -34,7 +34,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   public interface Proxy extends ProxyPlace<DashboardPresenter> {}
 
   @Inject
-  public DashboardPresenter(final Display display, final EventBus eventBus, final Proxy proxy) {
+  public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy) {
     super(eventBus, display, proxy);
   }
 

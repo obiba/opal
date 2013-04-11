@@ -26,6 +26,6 @@ public class IsNotEqualValidator<T> extends AbstractFieldValidator {
   @Override
   protected boolean hasError() {
     T value = hasValue.getValue();
-    return value == null || value.equals(notExpected) == true;
+    return value == null || value.equals(notExpected);
   }
 }

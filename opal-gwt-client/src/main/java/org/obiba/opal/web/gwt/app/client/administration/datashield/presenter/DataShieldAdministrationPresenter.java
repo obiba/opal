@@ -41,7 +41,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
   private Runnable removeMethodConfirmation;
 
-  private DataShieldMethodPresenter dataShieldMethodPresenter;
+  private final DataShieldMethodPresenter dataShieldMethodPresenter;
 
   @Inject
   public DataShieldAdministrationPresenter(Display display, EventBus eventBus,

@@ -44,7 +44,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   /**
    * Resource requests.
    */
-  private Set<ResourceRequestPresenter<? extends JavaScriptObject>> resourceRequests;
+  private final Set<ResourceRequestPresenter<? extends JavaScriptObject>> resourceRequests;
 
   /**
    * Number of resource requests completed (successfully or with an error).
@@ -172,7 +172,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
   static class TableResourceClickHandler implements ResourceClickHandler {
 
-    private String resourceLink;
+    private final String resourceLink;
 
     public TableResourceClickHandler(String resourceLink) {
       this.resourceLink = resourceLink;

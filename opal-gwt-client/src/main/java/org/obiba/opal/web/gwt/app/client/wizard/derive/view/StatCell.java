@@ -51,7 +51,7 @@ public class StatCell extends AbstractCell<ValueMapEntry> {
   @Override
   public void render(Cell.Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
     if(entry != null) {
-      double width = (maxFrequency == 0 ? 0 : entry.getCount() * (100 / maxFrequency));
+      double width = maxFrequency == 0 ? 0 : entry.getCount() * 100 / maxFrequency;
       String style = "width: " + WIDTH_FORMAT.format(width) + "px;";
       if(width == 0) {
         style += " border: none;";

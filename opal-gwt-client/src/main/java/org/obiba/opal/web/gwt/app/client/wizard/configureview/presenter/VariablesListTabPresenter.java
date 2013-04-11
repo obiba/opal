@@ -886,7 +886,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     public void onFailure(Response response) {
       try {
-        ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+        ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
         @SuppressWarnings("unchecked")
         JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
             .getExtension(ClientErrorDtoExtensions.errors);

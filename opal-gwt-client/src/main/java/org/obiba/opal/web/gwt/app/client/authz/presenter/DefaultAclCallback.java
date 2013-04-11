@@ -21,7 +21,7 @@ import com.google.gwt.http.client.Response;
 
 public class DefaultAclCallback implements AclCallback {
 
-  private EventBus eventBus;
+  private final EventBus eventBus;
 
   public DefaultAclCallback(EventBus eventBus) {
     super();

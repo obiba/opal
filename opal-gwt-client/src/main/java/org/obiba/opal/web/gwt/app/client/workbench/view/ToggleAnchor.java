@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.Anchor;
  */
 public class ToggleAnchor extends Anchor {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   /**
    * The delegate that will handle events from the toggle anchor.

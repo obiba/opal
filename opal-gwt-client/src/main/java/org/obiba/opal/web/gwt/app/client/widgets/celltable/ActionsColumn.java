@@ -17,10 +17,12 @@ public class ActionsColumn<T> extends Column<T, T> implements HasActionHandler<T
     setCellStyleNames("row-actions");
   }
 
+  @Override
   public T getValue(T object) {
     return object;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void setActionHandler(ActionHandler<T> actionHandler) {
     ((HasActionHandler<T>) getCell()).setActionHandler(actionHandler);

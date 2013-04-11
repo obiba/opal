@@ -10,5 +10,5 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 public interface HasUrl {
-  public void setUrl(String url);
+  void setUrl(String url);
 }

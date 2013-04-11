@@ -28,7 +28,7 @@ public class FadeAnimation extends Timer {
 
   private double step = 0.02;
 
-  private Element element;
+  private final Element element;
 
   private FadedHandler handler;
 
@@ -73,7 +73,7 @@ public class FadeAnimation extends Timer {
   }
 
   public static class Builder {
-    private FadeAnimation fader;
+    private final FadeAnimation fader;
 
     Builder(Element element) {
       super();

@@ -44,12 +44,12 @@ public class DataShieldPackageAdministrationPresenter
 
   private Runnable publishMethodsConfirmation;
 
-  private DataShieldPackageCreatePresenter dataShieldPackageCreatePresenter;
+  private final DataShieldPackageCreatePresenter dataShieldPackageCreatePresenter;
 
-  private DataShieldPackagePresenter dataShieldPackagePresenter;
+  private final DataShieldPackagePresenter dataShieldPackagePresenter;
 
   @Inject
-  public DataShieldPackageAdministrationPresenter(final Display display, final EventBus eventBus,
+  public DataShieldPackageAdministrationPresenter(Display display, EventBus eventBus,
       DataShieldPackageCreatePresenter dataShieldPackagePresenter,
       DataShieldPackagePresenter dataShieldPackagePresenter1) {
     super(eventBus, display);
@@ -244,7 +244,7 @@ public class DataShieldPackageAdministrationPresenter
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
-  private void publishDataShieldMethods(final RPackageDto dto) {
+  private void publishDataShieldMethods(RPackageDto dto) {
     ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder().forResource(packageRMethods(dto.getName()))
         .get()//
         .withCallback(new ResourceCallback<DataShieldPackageMethodsDto>() {

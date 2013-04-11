@@ -33,7 +33,7 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
   @UiTemplate("WorkbenchLayout.ui.xml")
   interface WorkbenchLayoutUiBinder extends UiBinder<Widget, WorkbenchLayout> {}
 
-  private static WorkbenchLayoutUiBinder uiBinder = GWT.create(WorkbenchLayoutUiBinder.class);
+  private static final WorkbenchLayoutUiBinder uiBinder = GWT.create(WorkbenchLayoutUiBinder.class);
 
   //
   // Instance Variables
@@ -54,7 +54,7 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
   @UiField
   ScrollPanel mainContent;
 
-  private WidgetCollection children = new WidgetCollection(this);
+  private final WidgetCollection children = new WidgetCollection(this);
 
   private Widget titleWidget;
 
@@ -69,7 +69,6 @@ public class WorkbenchLayout extends Composite implements HasWidgets {
   //
 
   public WorkbenchLayout() {
-    super();
     initWidget(uiBinder.createAndBindUi(this));
     addHandlers();
   }

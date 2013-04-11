@@ -56,15 +56,17 @@ public class SearchVariablesSuggestBox extends DefaultSuggestBox {
     hideSuggestions();
   }
 
+  @Override
   public void hideSuggestions() {
     ((DefaultSuggestionDisplay) getSuggestionDisplay()).hideSuggestions();
   }
 
   @Override
   public MultiWordSuggestOracle getSuggestOracle() {
-    return (MultiWordSuggestOracle) super.getSuggestOracle();
+    return super.getSuggestOracle();
   }
 
+  @Override
   public void setDefaultSuggestionsEnabled(boolean enable) {
     DefaultMultiWordSuggestOracle oracle = (DefaultMultiWordSuggestOracle) super.getSuggestOracle();
     oracle.setWithDefaults(enable);

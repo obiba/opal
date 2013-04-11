@@ -38,7 +38,7 @@ public class FunctionalUnitListPresenter extends PresenterWidget<FunctionalUnitL
   }
 
   @Inject
-  public FunctionalUnitListPresenter(final Display display, final EventBus eventBus) {
+  public FunctionalUnitListPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -61,11 +61,9 @@ public class FunctionalUnitListPresenter extends PresenterWidget<FunctionalUnitL
   }
 
   private void addHandlers() {
-    super.registerHandler(getView().addSelectFunctionalUnitHandler(new FunctionalUnitSelectionChangeHandler()));
-    super.registerHandler(
-        getEventBus().addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
-    super.registerHandler(
-        getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
+    registerHandler(getView().addSelectFunctionalUnitHandler(new FunctionalUnitSelectionChangeHandler()));
+    registerHandler(getEventBus().addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
+    registerHandler(getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
   }
 
   private class FunctionalUnitCreatedHandler implements FunctionalUnitCreatedEvent.Handler {

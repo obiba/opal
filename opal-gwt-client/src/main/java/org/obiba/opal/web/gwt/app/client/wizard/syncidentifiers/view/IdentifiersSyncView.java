@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.syncidentifiers.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
@@ -47,9 +49,9 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
   @UiTemplate("IdentifiersSyncView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, IdentifiersSyncView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -68,7 +70,7 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
   @UiField(provided = true)
   Table<TableIdentifiersSync> tableList;
 
-  private List<TableIdentifiersSync> tableSyncs = new ArrayList<TableIdentifiersSync>();
+  private final List<TableIdentifiersSync> tableSyncs = new ArrayList<TableIdentifiersSync>();
 
   private ListDataProvider<TableIdentifiersSync> tableSyncsProvider;
 
@@ -80,7 +82,7 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
   public IdentifiersSyncView(EventBus eventBus) {
     super(eventBus);
     initTableList();
-    this.widget = uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
   }
 
@@ -107,7 +109,7 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
         });
     table.setSelectionModel(selectionModel);
 
-    this.tableList = table;
+    tableList = table;
   }
 
   private void initWizardDialog() {
@@ -161,6 +163,7 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
     return dialog.addFinishClickHandler(handler);
   }
 
+  @Nullable
   @Override
   public String getSelectedDatasource() {
     int index = datasourceBox.getSelectedIndex();
@@ -197,7 +200,7 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
 
   @Override
   public void setTableIdentifiersSyncRequestHandler(StepInHandler handler) {
-    this.tablesHandler = handler;
+    tablesHandler = handler;
   }
 
   @Override

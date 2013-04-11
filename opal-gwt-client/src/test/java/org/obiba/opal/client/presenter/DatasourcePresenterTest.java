@@ -56,7 +56,7 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
   public void setUp() {
     displayMock = createMock(DatasourcePresenter.Display.class);
     DatasourcePresenter.Proxy proxyMock = createMock(DatasourcePresenter.Proxy.class);
-    eventBusMock = createMock(net.customware.gwt.presenter.client.EventBus.class);
+    eventBusMock = createMock(EventBus.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);

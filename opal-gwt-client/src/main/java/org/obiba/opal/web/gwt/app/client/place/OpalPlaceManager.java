@@ -12,8 +12,7 @@ public class OpalPlaceManager extends PlaceManagerImpl {
   private final PlaceRequest defaultPlaceRequest;
 
   @Inject
-  public OpalPlaceManager(final EventBus eventBus, final TokenFormatter tokenFormatter,
-      @DefaultPlace String defaultNameToken) {
+  public OpalPlaceManager(EventBus eventBus, TokenFormatter tokenFormatter, @DefaultPlace String defaultNameToken) {
     super(eventBus, tokenFormatter);
     this.defaultPlaceRequest = new PlaceRequest(defaultNameToken);
   }

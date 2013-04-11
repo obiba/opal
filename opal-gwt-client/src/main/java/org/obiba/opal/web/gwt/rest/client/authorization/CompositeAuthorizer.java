@@ -14,7 +14,7 @@ package org.obiba.opal.web.gwt.rest.client.authorization;
  */
 public class CompositeAuthorizer implements HasAuthorization {
 
-  private HasAuthorization[] authorizers;
+  private final HasAuthorization[] authorizers;
 
   public CompositeAuthorizer(HasAuthorization... authorizers) {
     super();

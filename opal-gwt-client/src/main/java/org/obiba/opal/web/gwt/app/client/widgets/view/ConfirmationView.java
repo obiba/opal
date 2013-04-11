@@ -76,19 +76,23 @@ public class ConfirmationView extends DialogBox implements Display {
   // ConfirmationPresenter.Display Methods
   //
 
+  @Override
   public void showDialog() {
     center();
     show();
   }
 
+  @Override
   public void hideDialog() {
     hide();
   }
 
+  @Override
   public void setConfirmationTitle(String title) {
     setText(title);
   }
 
+  @Override
   public void setConfirmationMessage(String message) {
     this.message.setHTML(message);
   }

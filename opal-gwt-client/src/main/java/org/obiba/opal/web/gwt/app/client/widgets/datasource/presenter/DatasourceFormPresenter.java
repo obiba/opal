@@ -19,21 +19,21 @@ import com.gwtplatform.mvp.client.View;
  */
 public interface DatasourceFormPresenter {
 
-  public boolean isForType(String type);
+  boolean isForType(String type);
 
-  public PresenterWidget<? extends Display> getPresenter();
+  PresenterWidget<? extends Display> getPresenter();
 
-  public DatasourceFactoryDto getDatasourceFactory();
+  DatasourceFactoryDto getDatasourceFactory();
 
   /**
    * True if the form data in the form are valid. Responsible for displaying the appropriate error message.
    *
    * @return
    */
-  public boolean validateFormData();
+  boolean validateFormData();
 
-  public void clearForm();
+  void clearForm();
 
-  public interface Display extends View {}
+  interface Display extends View {}
 
 }

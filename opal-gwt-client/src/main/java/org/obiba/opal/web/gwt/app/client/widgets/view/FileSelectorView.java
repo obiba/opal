@@ -46,9 +46,9 @@ public class FileSelectorView extends PopupViewImpl implements Display {
 
   private static final String DIALOG_WIDTH = "60em";
 
-  private static FileSelectorViewUiBinder uiBinder = GWT.create(FileSelectorViewUiBinder.class);
+  private static final FileSelectorViewUiBinder uiBinder = GWT.create(FileSelectorViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final DialogBox dialog;
 

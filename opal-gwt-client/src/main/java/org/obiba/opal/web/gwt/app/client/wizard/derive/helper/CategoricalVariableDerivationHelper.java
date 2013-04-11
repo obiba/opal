@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -55,15 +57,13 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     this(originalVariable, destination, null);
   }
 
-  public CategoricalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination,
-      SummaryStatisticsDto summaryStatisticsDto) {
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
+      @Nullable SummaryStatisticsDto summaryStatisticsDto) {
     super(originalVariable, destination);
-    if(summaryStatisticsDto == null) {
-      categoricalSummaryDto = null;
-    } else {
-      categoricalSummaryDto = summaryStatisticsDto
-          .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-    }
+    categoricalSummaryDto = summaryStatisticsDto == null
+        ? null
+        : (CategoricalSummaryDto) summaryStatisticsDto
+            .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
   }
 
   @Override

@@ -58,6 +58,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
 
     registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
@@ -72,7 +73,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
           }
         }).get().send();
 
-    this.methodValidationHandler = new MethodValidationHandler(getEventBus());
+    methodValidationHandler = new MethodValidationHandler(getEventBus());
   }
 
   private void setDialogMode(Mode dialogMode) {

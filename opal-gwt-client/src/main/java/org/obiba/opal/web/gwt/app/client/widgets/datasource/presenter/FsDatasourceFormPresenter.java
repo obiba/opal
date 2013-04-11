@@ -28,7 +28,7 @@ public class FsDatasourceFormPresenter extends PresenterWidget<FsDatasourceFormP
   public static class Subscriber extends DatasourceFormPresenterSubscriber {
 
     @Inject
-    public Subscriber(com.google.gwt.event.shared.EventBus eventBus, FsDatasourceFormPresenter presenter) {
+    public Subscriber(EventBus eventBus, FsDatasourceFormPresenter presenter) {
       super(eventBus, presenter);
     }
 
@@ -37,8 +37,7 @@ public class FsDatasourceFormPresenter extends PresenterWidget<FsDatasourceFormP
   private final FileSelectionPresenter fileSelectionPresenter;
 
   @Inject
-  public FsDatasourceFormPresenter(final Display display, final EventBus eventBus,
-      FileSelectionPresenter fileSelectionPresenter) {
+  public FsDatasourceFormPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
   }
@@ -68,7 +67,7 @@ public class FsDatasourceFormPresenter extends PresenterWidget<FsDatasourceFormP
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("fs");
+    return "fs".equalsIgnoreCase(type);
   }
 
   public interface Display extends DatasourceFormPresenter.Display {
@@ -86,7 +85,7 @@ public class FsDatasourceFormPresenter extends PresenterWidget<FsDatasourceFormP
     boolean isValid = true;
     String file = fileSelectionPresenter.getSelectedFile();
 
-    if(file.length() == 0) {
+    if(file.isEmpty()) {
       isValid = false;
       fireErrorEvent("ZipFileRequired");
     } else if(!file.endsWith(".zip")) {

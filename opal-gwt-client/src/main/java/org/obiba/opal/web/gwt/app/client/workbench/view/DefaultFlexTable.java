@@ -18,15 +18,14 @@ import com.google.gwt.user.client.ui.Widget;
  * A FlexTable with a header and basic styling from bootstrap.
  */
 public class DefaultFlexTable extends FlexTable {
-  private Element head;
+  private final Element head;
 
-  private Element headerTr;
+  private final Element headerTr;
 
   public DefaultFlexTable() {
-    super();
     head = DOM.createTHead();
     headerTr = DOM.createTR();
-    DOM.insertChild(this.getElement(), head, 0);
+    DOM.insertChild(getElement(), head, 0);
     DOM.insertChild(head, headerTr, 0);
     setStyled(true);
   }

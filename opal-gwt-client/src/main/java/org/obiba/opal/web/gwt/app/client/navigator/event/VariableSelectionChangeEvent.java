@@ -46,7 +46,7 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
   public VariableSelectionChangeEvent(TableDto table, VariableDto selectedItem, VariableDto previous,
       VariableDto next) {
     this.table = table;
-    this.selection = selectedItem;
+    selection = selectedItem;
     this.previous = previous;
     this.next = next;
   }

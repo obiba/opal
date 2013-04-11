@@ -18,6 +18,6 @@ import com.google.gwt.http.client.Response;
  */
 public interface ResourceCallback<T extends JavaScriptObject> {
 
-  public void onResource(Response response, T resource);
+  void onResource(Response response, T resource);
 
 }

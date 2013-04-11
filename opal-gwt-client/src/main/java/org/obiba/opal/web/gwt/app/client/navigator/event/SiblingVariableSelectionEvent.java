@@ -36,7 +36,7 @@ public class SiblingVariableSelectionEvent extends GwtEvent<SiblingVariableSelec
   private final Direction direction;
 
   public SiblingVariableSelectionEvent(VariableDto currentItem, Direction direction) {
-    this.currentSelection = currentItem;
+    currentSelection = currentItem;
     this.direction = direction;
   }
 

@@ -31,7 +31,7 @@ public class NullDatasourceFormPresenter extends PresenterWidget<NullDatasourceF
   }
 
   @Inject
-  public NullDatasourceFormPresenter(final Display display, final EventBus eventBus) {
+  public NullDatasourceFormPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -47,7 +47,7 @@ public class NullDatasourceFormPresenter extends PresenterWidget<NullDatasourceF
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("null");
+    return "null".equalsIgnoreCase(type);
   }
 
   @Override

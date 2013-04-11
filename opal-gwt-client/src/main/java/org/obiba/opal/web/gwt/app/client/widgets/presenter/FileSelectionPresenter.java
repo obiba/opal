@@ -99,7 +99,7 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
   }
 
   private void addEventHandlers() {
-    super.registerHandler(eventBus.addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
+    registerHandler(eventBus.addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
 
       @Override
       public void onFileSelection(FileSelectionEvent event) {
@@ -112,7 +112,7 @@ public class FileSelectionPresenter extends WidgetPresenter<FileSelectionPresent
 
     }));
 
-    super.registerHandler(getDisplay().addBrowseClickHandler(new ClickHandler() {
+    registerHandler(getDisplay().addBrowseClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {

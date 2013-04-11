@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.wizard.syncidentifiers.presenter;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
@@ -49,6 +51,7 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
 
   public interface Display extends WizardView {
 
+    @Nullable
     String getSelectedDatasource();
 
     void setDatasources(JsArray<DatasourceDto> datasources);
@@ -63,7 +66,7 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
   }
 
   @Inject
-  public IdentifiersSyncPresenter(final Display display, final EventBus eventBus) {
+  public IdentifiersSyncPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -114,8 +117,8 @@ public class IdentifiersSyncPresenter extends WizardPresenterWidget<IdentifiersS
 
   @Override
   protected void onFinish() {
-    final List<String> selectedTables = getView().getSelectedTables();
-    if(selectedTables.size() == 0) {
+    List<String> selectedTables = getView().getSelectedTables();
+    if(selectedTables.isEmpty()) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
       return;
     }

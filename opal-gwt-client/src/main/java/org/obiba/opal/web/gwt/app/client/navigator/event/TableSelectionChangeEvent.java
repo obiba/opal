@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.event;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.event.shared.EventHandler;
@@ -43,7 +45,7 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
     this(source, tableDto, null, null);
   }
 
-  public TableSelectionChangeEvent(Object source, TableDto tableDto, String previous, String next) {
+  public TableSelectionChangeEvent(Object source, TableDto tableDto, @Nullable String previous, @Nullable String next) {
     this.source = source;
     this.tableDto = tableDto;
     this.previous = previous;

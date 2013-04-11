@@ -71,12 +71,13 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
     registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
 
     registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
     }));
 
-    this.methodValidationHandler = new MethodValidationHandler(getEventBus());
+    methodValidationHandler = new MethodValidationHandler(getEventBus());
   }
 
   private void setDialogMode(Mode dialogMode) {
@@ -128,11 +129,11 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
   }
 
   private String method(String method) {
-    return UriBuilder.create().segment("datashield", "env", this.environement, "method", "{method}").build(method);
+    return UriBuilder.create().segment("datashield", "env", environement, "method", "{method}").build(method);
   }
 
   private String methods() {
-    return UriBuilder.create().segment("datashield", "env", this.environement, "methods").build();
+    return UriBuilder.create().segment("datashield", "env", environement, "methods").build();
   }
 
   private void updateMethod() {

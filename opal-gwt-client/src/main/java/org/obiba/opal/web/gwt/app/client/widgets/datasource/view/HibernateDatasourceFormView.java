@@ -30,7 +30,7 @@ public class HibernateDatasourceFormView extends ViewImpl implements HibernateDa
   @UiTemplate("HibernateDatasourceFormView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, HibernateDatasourceFormView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 

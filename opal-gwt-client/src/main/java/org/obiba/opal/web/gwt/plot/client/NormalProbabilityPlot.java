@@ -37,6 +37,7 @@ public class NormalProbabilityPlot extends JqPlot {
     }
   }
 
+  @Override
   public void plot() {
     JsArray<JsArray<JsArrayNumber>> plotData = JsArray.createArray().cast();
     plotData.push(getXequalsY());

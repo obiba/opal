@@ -25,7 +25,6 @@ public class PropertyPanel extends FlowPanel {
   }
 
   public PropertyPanel(int column) {
-    super();
     this.column = column;
   }
 

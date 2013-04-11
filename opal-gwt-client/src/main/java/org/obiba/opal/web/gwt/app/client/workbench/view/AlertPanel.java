@@ -27,7 +27,6 @@ public class AlertPanel extends FlowPanel {
   private Anchor close;
 
   public AlertPanel() {
-    super();
     addStyleName("alert");
   }
 
@@ -53,7 +52,7 @@ public class AlertPanel extends FlowPanel {
 
         @Override
         public void onClick(ClickEvent event) {
-          AlertPanel.this.removeFromParent();
+          removeFromParent();
         }
       });
       insert(close, 0);
@@ -65,9 +64,9 @@ public class AlertPanel extends FlowPanel {
   }
 
   public static class Builder {
-    private AlertPanel alert;
+    private final AlertPanel alert;
 
-    private List<String> messageList = new ArrayList<String>();
+    private final List<String> messageList = new ArrayList<String>();
 
     Builder() {
       alert = new AlertPanel();

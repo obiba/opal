@@ -58,9 +58,9 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
   private GenerateConfirmationRunnable generateConfirmation;
 
-  private FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
+  private final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
 
-  private Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter;
+  private final Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter;
 
   private final GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter;
 
@@ -116,7 +116,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   }
 
   @Inject
-  public FunctionalUnitDetailsPresenter(final Display display, final EventBus eventBus,
+  public FunctionalUnitDetailsPresenter(Display display, EventBus eventBus,
       FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter,
       GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter,
       Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter) {
@@ -147,6 +147,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
   private void addHandlers() {
     getView().getActionColumn().setActionHandler(new ActionHandler<KeyDto>() {
+      @Override
       public void doAction(KeyDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
@@ -287,6 +288,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         @Override
         public void authorized() {
           removeConfirmation = new Runnable() {
+            @Override
             public void run() {
               deleteKeyPair(dto);
             }
@@ -298,7 +300,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     }
   }
 
-  private void deleteKeyPair(final KeyDto dto) {
+  private void deleteKeyPair(KeyDto dto) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
@@ -306,7 +308,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
           refreshKeyPairs(functionalUnit);
         } else {
-          ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
         }
       }
@@ -319,7 +321,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
-  private void downloadCertificate(final KeyDto dto) {
+  private void downloadCertificate(KeyDto dto) {
     UriBuilder ub = UriBuilder.create()
         .segment("functional-unit", functionalUnit.getName(), "key", dto.getAlias(), "certificate");
     getEventBus().fireEvent(new FileDownloadEvent(ub.build()));
@@ -394,8 +396,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   private final class DownloadIdentifiersCommand implements Command {
     @Override
     public void execute() {
-      String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
-          .append("/entities/identifiers").toString();
+      String url = "/functional-unit/" + functionalUnit.getName() + "/entities/identifiers";
       getEventBus().fireEvent(new FileDownloadEvent(url));
     }
   }
@@ -414,6 +415,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       this.prefix = prefix;
     }
 
+    @Override
     public void run() {
       ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
@@ -423,7 +425,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
             int count = 0;
             try {
               count = Integer.parseInt(response.getText());
-            } catch(NumberFormatException e) {
+            } catch(NumberFormatException ignored) {
             }
             if(count > 0) {
               getEventBus().fireEvent(NotificationEvent.newBuilder().info("IdentifiersGenerationCompleted")
@@ -457,8 +459,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   private final class ExportIdentifiersCommand implements Command {
     @Override
     public void execute() {
-      String url = new StringBuilder("/functional-unit/").append(functionalUnit.getName()) //
-          .append("/entities/csv").toString();
+      String url = "/functional-unit/" + functionalUnit.getName() + "/entities/csv";
       getEventBus().fireEvent(new FileDownloadEvent(url));
     }
   }
@@ -483,6 +484,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     @Override
     public void execute() {
       removeConfirmation = new Runnable() {
+        @Override
         public void run() {
           ResponseCodeCallback callbackHandler = new FunctionalUnitDeleteCallback();
           UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
@@ -517,6 +519,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
         removeConfirmation.run();
@@ -550,7 +553,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     @Override
     public void onResource(Response response, JsArray<KeyDto> resource) {
-      JsArray<KeyDto> keyPairs = (resource != null) ? resource : (JsArray<KeyDto>) JsArray.createArray();
+      JsArray<KeyDto> keyPairs = resource != null ? resource : (JsArray<KeyDto>) JsArray.createArray();
       getView().setKeyPairs(keyPairs);
     }
 
@@ -558,7 +561,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
   private class FunctionalUnitNotFoundCallBack implements ResponseCodeCallback {
 
-    private String functionalUnitName;
+    private final String functionalUnitName;
 
     public FunctionalUnitNotFoundCallBack(String functionalUnitName) {
       this.functionalUnitName = functionalUnitName;

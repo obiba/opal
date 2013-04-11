@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class PropertiesTable extends FlowPanel {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private DefaultFlexTable innerTable;
 

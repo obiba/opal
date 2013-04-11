@@ -188,7 +188,7 @@ public class JsArrays {
         if(size == -1) {
           // size is either "length" or the number of elements that exist between "start" and the array's last item
           // "array.lenght()" (array.length() - start)
-          size = (start + length) > array.length() ? array.length() - start : length;
+          size = start + length > array.length() ? array.length() - start : length;
         }
         return size;
       }

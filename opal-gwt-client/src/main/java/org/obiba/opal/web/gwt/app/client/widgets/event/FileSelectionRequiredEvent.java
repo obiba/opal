@@ -28,9 +28,9 @@ public class FileSelectionRequiredEvent extends GwtEvent<FileSelectionRequiredEv
   // Instance Variables
   //
 
-  private Object source;
+  private final Object source;
 
-  private FileSelectionType fileSelectionType;
+  private final FileSelectionType fileSelectionType;
 
   //
   // Constructors

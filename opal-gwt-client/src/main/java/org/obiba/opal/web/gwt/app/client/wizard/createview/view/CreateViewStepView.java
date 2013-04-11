@@ -47,9 +47,9 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 
 public class CreateViewStepView extends PopupViewImpl implements CreateViewStepPresenter.Display {
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 

@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -50,7 +51,7 @@ import com.google.inject.Provider;
 public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatasourcePresenter.Display>
     implements HasDatasourceForms {
 
-  private final Set<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
+  private final Collection<DatasourceFormPresenter> datasourceFormPresenters = new HashSet<DatasourceFormPresenter>();
 
   public static final WizardType WizardType = new WizardType();
 
@@ -68,7 +69,7 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
   private DatasourceFormPresenter datasourceFormPresenter;
 
   @Inject
-  public CreateDatasourcePresenter(final Display display, final EventBus eventBus, Translations translations) {
+  public CreateDatasourcePresenter(Display display, EventBus eventBus, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
   }
@@ -105,7 +106,7 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
   protected void onFinish() {
     super.onFinish();
     final String datasourceName = getDatasourceName();
-    if(datasourceName.length() == 0) {
+    if(datasourceName.isEmpty()) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatasourceNameRequired").build());
     } else {
       // check datasource name does not already exist
@@ -121,7 +122,7 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
     }
   }
 
-  private boolean validateDatasourceNameUnicity(final String datasourceName, JsArray<DatasourceDto> datasources) {
+  private boolean validateDatasourceNameUnicity(String datasourceName, JsArray<DatasourceDto> datasources) {
     if(datasources != null) {
       for(int i = 0; i < datasources.length(); i++) {
         DatasourceDto ds = datasources.get(i);
@@ -153,7 +154,7 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
     return true;
   }
 
-  private void launchDatasourceCreation(final DatasourceFactoryDto dto) {
+  private void launchDatasourceCreation(DatasourceFactoryDto dto) {
     ResponseCodeCallback callback = new CreateDatasourceResponseCallback();
 
     ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource("/datasources").post()//
@@ -178,7 +179,7 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
   }
 
   protected void addEventHandlers() {
-    super.registerHandler(getView().addDatasourceTypeChangeHandler(new DatasourceTypeChangeHandler()));
+    registerHandler(getView().addDatasourceTypeChangeHandler(new DatasourceTypeChangeHandler()));
     getView().setDatasourceSelectionTypeValidationHandler(new DatasourceSelectionTypeValidationHandler(getEventBus()));
   }
 
@@ -197,10 +198,10 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == 201) {
-        DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
+        DatasourceDto datasourceDto = JsonUtils.unsafeEval(response.getText());
         getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasourceDto));
       } else if(response.getText() != null && response.getText().length() != 0) {
-        ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+        ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
         getEventBus().fireEvent(
             NotificationEvent.newBuilder().error("DatasourceCreationFailed").args(errorDto.getArgumentsArray())
                 .build());
@@ -224,7 +225,7 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
 
   class DatasourceSelectionTypeValidationHandler extends AbstractValidationHandler {
 
-    public DatasourceSelectionTypeValidationHandler(EventBus eventBus) {
+    DatasourceSelectionTypeValidationHandler(EventBus eventBus) {
       super(eventBus);
     }
 

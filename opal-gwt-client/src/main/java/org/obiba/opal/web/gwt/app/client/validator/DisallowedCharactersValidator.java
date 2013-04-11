@@ -19,9 +19,9 @@ public class DisallowedCharactersValidator extends AbstractFieldValidator {
   // Instance Variables
   //
 
-  private HasText textField;
+  private final HasText textField;
 
-  private char[] disallowedChars;
+  private final char[] disallowedChars;
 
   //
   // Constructors

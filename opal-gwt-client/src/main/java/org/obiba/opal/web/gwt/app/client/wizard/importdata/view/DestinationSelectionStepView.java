@@ -37,7 +37,7 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
   @UiTemplate("DestinationSelectionStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DestinationSelectionStepView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 
@@ -106,7 +106,7 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
     datasourceListBox.clear();
     for(int i = 0; i < datasources.length(); i++) {
       DatasourceDto dto = datasources.get(i);
-      if(!dto.getType().equals("null")) {
+      if(!"null".equals(dto.getType())) {
         datasourceListBox.addItem(dto.getName(), dto.getName());
       }
     }

@@ -25,7 +25,7 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
   // Instance Variables
   //
 
-  private ListBox datasourceListBox;
+  private final ListBox datasourceListBox;
 
   private JsArray<DatasourceDto> datasources;
 

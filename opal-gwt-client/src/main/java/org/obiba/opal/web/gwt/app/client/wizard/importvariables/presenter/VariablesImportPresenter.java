@@ -214,7 +214,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     @Override
     public boolean validate() {
       String selectedLocale = getView().getLocale();
-      if (!LanguageLocale.isValid(selectedLocale)) {
+      if(!LanguageLocale.isValid(selectedLocale)) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("InvalidLocaleName").args(selectedLocale).build());
         return false;
       }
@@ -292,7 +292,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
         @Override
         public void onResponseCode(Request request, Response response) {
-          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
 
           if(errorDto.getExtension(ClientErrorDtoExtensions.errors) == null) {
             getEventBus().fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());

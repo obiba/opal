@@ -46,9 +46,9 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
   @UiTemplate("DataShieldMethodView.ui.xml")
   interface DataShieldMethodViewUiBinder extends UiBinder<DialogBox, DataShieldMethodView> {}
 
-  private static DataShieldMethodViewUiBinder uiBinder = GWT.create(DataShieldMethodViewUiBinder.class);
+  private static final DataShieldMethodViewUiBinder uiBinder = GWT.create(DataShieldMethodViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -113,10 +113,10 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
   }
 
   private void updateForm(MethodType type) {
-    script.setVisible(type.equals(MethodType.RSCRIPT));
-    scriptLabel.setVisible(type.equals(MethodType.RSCRIPT));
-    function.setVisible(type.equals(MethodType.RFUNCTION));
-    functionLabel.setVisible(type.equals(MethodType.RFUNCTION));
+    script.setVisible(type == MethodType.RSCRIPT);
+    scriptLabel.setVisible(type == MethodType.RSCRIPT);
+    function.setVisible(type == MethodType.RFUNCTION);
+    functionLabel.setVisible(type == MethodType.RFUNCTION);
   }
 
   @Override
@@ -142,9 +142,9 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
 
   @Override
   public void setDialogMode(Mode dialogMode) {
-    name.setEnabled(Mode.CREATE.equals(dialogMode));
-    typeList.setEnabled(Mode.CREATE.equals(dialogMode));
-    if(Mode.CREATE.equals(dialogMode)) {
+    name.setEnabled(Mode.CREATE == dialogMode);
+    typeList.setEnabled(Mode.CREATE == dialogMode);
+    if(Mode.CREATE == dialogMode) {
       dialog.setText(translations.addDataShieldMethod());
     } else {
       dialog.setText(translations.editDataShieldMethod());
@@ -189,7 +189,7 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
 
   @Override
   public void setScript(String method) {
-    this.script.setText(method);
+    script.setText(method);
   }
 
   @Override
@@ -207,7 +207,7 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
     return new HasBooleanValue() {
       @Override
       public Boolean getValue() {
-        return getType().equals(MethodType.RFUNCTION);
+        return getType() == MethodType.RFUNCTION;
       }
     };
   }
@@ -217,7 +217,7 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
     return new HasBooleanValue() {
       @Override
       public Boolean getValue() {
-        return getType().equals(MethodType.RSCRIPT);
+        return getType() == MethodType.RSCRIPT;
       }
     };
   }

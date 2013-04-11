@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class BreadCrumbTabLayout extends AbstractTabLayout {
 
-  private String divider;
+  private final String divider;
 
   public BreadCrumbTabLayout() {
     this("/");
@@ -36,13 +36,13 @@ public class BreadCrumbTabLayout extends AbstractTabLayout {
 
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
-        final int idx = event.getSelectedItem().intValue();
+        final int idx = event.getSelectedItem();
         if(isAnimationEnabled()) {
           // wait for the end of the animation before removing descendants
           Timer t = new Timer() {
             @Override
             public void run() {
-              if(isAnimationRunning() == false) {
+              if(!isAnimationRunning()) {
                 removeDescendants(idx);
                 cancel();
               }
@@ -64,10 +64,12 @@ public class BreadCrumbTabLayout extends AbstractTabLayout {
     setAnimationEnabled(true);
   }
 
+  @Override
   public void setAnimationEnabled(boolean enable) {
     super.setAnimationEnabled(enable);
   }
 
+  @Override
   public boolean isAnimationEnabled() {
     return super.isAnimationEnabled();
   }

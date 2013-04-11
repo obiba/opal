@@ -33,15 +33,15 @@ import com.google.gwt.user.client.ui.TextBox;
 
 public class EditableListBox extends Composite implements HasText, HasValue<String>, HasEnabled {
 
-  private TextBox textBox = new TextBox();
+  private final TextBox textBox = new TextBox();
 
-  private Button ddBtn = new Button();
+  private final Button ddBtn = new Button();
 
-  private PopupPanel panel = new PopupPanel(true);
+  private final PopupPanel panel = new PopupPanel(true);
 
-  private MenuBar menuBar = new MenuBar(true);
+  private final MenuBar menuBar = new MenuBar(true);
 
-  private Map<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
+  private final Map<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
 
   public EditableListBox() {
     FlowPanel layout = new FlowPanel();

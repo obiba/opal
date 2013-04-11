@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import java.util.Iterator;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -34,8 +36,6 @@ public class FileSystemTreeView extends ViewImpl implements Display {
   private final Translations translations = GWT.create(Translations.class);
 
   private final Tree fileSystemTree;
-
-  private TreeItem treeRoot;
 
   private FileDto selectedFile;
 
@@ -65,7 +65,7 @@ public class FileSystemTreeView extends ViewImpl implements Display {
   @Override
   public void initTree(FileDto rootDto) {
     fileSystemTree.clear();
-    treeRoot = createTreeItem(rootDto);
+    TreeItem treeRoot = createTreeItem(rootDto);
     treeRoot.setText(translations.fileSystemLabel());
     fileSystemTree.addItem(treeRoot);
     addBranch(treeRoot, rootDto);
@@ -73,16 +73,18 @@ public class FileSystemTreeView extends ViewImpl implements Display {
     selectedFile = rootDto;
   }
 
+  @Override
   public HandlerRegistration addFileSystemTreeOpenHandler(OpenHandler<TreeItem> openHandler) {
     return fileSystemTree.addOpenHandler(openHandler);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void addBranch(TreeItem treeItem, FileDto folderToAdd) {
     FileDto file;
-    JsArray<FileDto> children = (folderToAdd.getChildrenCount() != 0)
-        ? folderToAdd.getChildrenArray()
-        : (JsArray<FileDto>) JsArray.createArray();
+    JsArray<FileDto> children = folderToAdd.getChildrenCount() == 0
+        ? (JsArray<FileDto>) JsArray.createArray()
+        : folderToAdd.getChildrenArray();
     for(int i = 0; i < children.length(); i++) {
       file = children.get(i);
 
@@ -96,6 +98,7 @@ public class FileSystemTreeView extends ViewImpl implements Display {
     }
   }
 
+  @Override
   public void addBranch(FileDto folderToAdd) {
     // Only add a branch if the fileSystemTree has been initialized (has a root).
     if(fileSystemTree.getItemCount() > 0) {
@@ -111,7 +114,7 @@ public class FileSystemTreeView extends ViewImpl implements Display {
   }
 
   private TreeItem createTreeItem(FileDto fileItem) {
-    final TreeItem item = new TreeItem(fileItem.getName());
+    TreeItem item = new TreeItem(fileItem.getName());
     item.addStyleName("folder" + (fileItem.getReadable() ? "" : " forbidden"));
     item.setUserObject(fileItem);
     return item;
@@ -130,14 +133,17 @@ public class FileSystemTreeView extends ViewImpl implements Display {
     selectedFile = folder;
   }
 
+  @Override
   public void selectFile(FileDto folder) {
     selectFile(folder, true);
   }
 
+  @Override
   public FileDto getSelectedFile() {
     return selectedFile;
   }
 
+  @Nullable
   private TreeItem findTreeItem(FileDto dto) {
     Iterator<TreeItem> treeIter = fileSystemTree.treeItemIterator();
     while(treeIter.hasNext()) {

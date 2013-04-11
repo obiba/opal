@@ -43,9 +43,9 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   @UiTemplate("DatabaseAdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DatabaseAdministrationView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget uiWidget;
 
@@ -83,7 +83,6 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
       });
 
   public DatabaseAdministrationView() {
-    super();
     uiWidget = uiBinder.createAndBindUi(this);
     databaseTablePager.setDisplay(databaseTable);
     databaseTable.addColumn(Columns.name, translations.nameLabel());

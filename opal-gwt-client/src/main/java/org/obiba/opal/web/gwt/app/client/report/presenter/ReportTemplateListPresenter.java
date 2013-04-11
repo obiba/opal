@@ -34,7 +34,7 @@ import com.gwtplatform.mvp.client.View;
 public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateListPresenter.Display> {
 
   @Inject
-  public ReportTemplateListPresenter(final Display display, final EventBus eventBus) {
+  public ReportTemplateListPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -50,11 +50,9 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
   }
 
   private void addHandlers() {
-    super.registerHandler(
-        getEventBus().addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
-    super.registerHandler(
-        getEventBus().addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
-    super.registerHandler(getView().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
+    registerHandler(getEventBus().addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
+    registerHandler(getEventBus().addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
+    registerHandler(getView().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
   }
 
   private JsArray<ReportTemplateDto> sortReportTemplates(JsArray<ReportTemplateDto> templates) {
@@ -91,7 +89,7 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
   class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
 
     @Override
-    public void onReportTemplateCreated(final ReportTemplateCreatedEvent event) {
+    public void onReportTemplateCreated(ReportTemplateCreatedEvent event) {
       refreshReportTemplates(event.getReportTemplate());
     }
   }
@@ -114,7 +112,7 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
 
   class ReportTemplatesResourceCallback implements ResourceCallback<JsArray<ReportTemplateDto>> {
 
-    private ReportTemplateDto templateToSelect;
+    private final ReportTemplateDto templateToSelect;
 
     ReportTemplatesResourceCallback(ReportTemplateDto templateToSelect) {
       this.templateToSelect = templateToSelect;

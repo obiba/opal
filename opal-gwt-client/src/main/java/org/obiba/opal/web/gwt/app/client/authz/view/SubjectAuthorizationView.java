@@ -68,19 +68,19 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
   @UiField
   HasClickHandlers add;
 
-  private MultiWordSuggestOracle suggestions;
+  private final MultiWordSuggestOracle suggestions;
 
-  private SubjectSuggestionDisplay suggestionDisplay;
+  private final SubjectSuggestionDisplay suggestionDisplay;
 
-  private JsArrayDataProvider<Acls> subjectPermissionsDataProvider = new JsArrayDataProvider<Acls>();
+  private final JsArrayDataProvider<Acls> subjectPermissionsDataProvider = new JsArrayDataProvider<Acls>();
 
   //
   // Static Variables
   //
 
-  private static AuthorizationViewUiBinder uiBinder = GWT.create(AuthorizationViewUiBinder.class);
+  private static final AuthorizationViewUiBinder uiBinder = GWT.create(AuthorizationViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   //
   // Constructors

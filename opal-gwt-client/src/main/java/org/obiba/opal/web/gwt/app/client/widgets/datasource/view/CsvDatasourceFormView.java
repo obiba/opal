@@ -26,7 +26,7 @@ public class CsvDatasourceFormView extends AbstractCsvOptionsView implements Csv
   @UiTemplate("CsvDatasourceFormView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, CsvDatasourceFormView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 

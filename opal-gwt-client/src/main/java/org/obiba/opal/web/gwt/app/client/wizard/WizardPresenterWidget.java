@@ -89,7 +89,7 @@ public abstract class WizardPresenterWidget<V extends WizardView> extends Presen
 
     @Override
     public void onClick(ClickEvent e) {
-      if(hideOnFinish() == false) {
+      if(!hideOnFinish()) {
         getView().hide();
       }
       onClose();

@@ -31,9 +31,9 @@ public class ValidationReportStepView extends Composite {
   // Static Variables
   //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
@@ -48,7 +48,7 @@ public class ValidationReportStepView extends Composite {
   @UiField
   Label validationLabel;
 
-  private ListDataProvider<TableCompareError> dataProvider = new ListDataProvider<TableCompareError>();
+  private final ListDataProvider<TableCompareError> dataProvider = new ListDataProvider<TableCompareError>();
 
   //
   // Constructors

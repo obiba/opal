@@ -31,7 +31,7 @@ public class ReportTemplateListView extends ViewImpl implements ReportTemplateLi
   @UiTemplate("ReportTemplateListView.ui.xml")
   interface ReportTemplateListViewUiBinder extends UiBinder<Widget, ReportTemplateListView> {}
 
-  private static ReportTemplateListViewUiBinder uiBinder = GWT.create(ReportTemplateListViewUiBinder.class);
+  private static final ReportTemplateListViewUiBinder uiBinder = GWT.create(ReportTemplateListViewUiBinder.class);
 
   private final Widget widget;
 

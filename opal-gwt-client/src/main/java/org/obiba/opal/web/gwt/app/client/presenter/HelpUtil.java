@@ -18,11 +18,13 @@ import com.google.gwt.user.client.Window;
  */
 public class HelpUtil {
 
-  private static String OPALDOC_URL = "http://wiki.obiba.org/confluence/display/OPALDOC";
+  private static final String OPALDOC_URL = "http://wiki.obiba.org/confluence/display/OPALDOC";
 
-  private static String OPALDOCDEV_URL = "http://wiki.obiba.org/confluence/display/OPALDOCDEV";
+  private static final String OPALDOCDEV_URL = "http://wiki.obiba.org/confluence/display/OPALDOCDEV";
 
-  private static String OPALDOC_USERGUIDE_PAGE = "Opal+Web+Application+User+Guide";
+  private static final String OPALDOC_USERGUIDE_PAGE = "Opal+Web+Application+User+Guide";
+
+  private HelpUtil() {}
 
   public static void openPage() {
     Window.open(makePageUrl(OPALDOC_USERGUIDE_PAGE), "_blank", null);
@@ -34,7 +36,7 @@ public class HelpUtil {
 
   private static String getOpalDocUrl() {
     String version = ResourceRequestBuilderFactory.newBuilder().getVersion();
-    return (version != null && version.contains("SNAPSHOT")) ? OPALDOCDEV_URL : OPALDOC_URL;
+    return version != null && version.contains("SNAPSHOT") ? OPALDOCDEV_URL : OPALDOC_URL;
   }
 
   private static String makePageUrl(String page) {

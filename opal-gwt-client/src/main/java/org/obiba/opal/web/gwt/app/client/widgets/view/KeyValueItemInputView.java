@@ -28,7 +28,7 @@ public class KeyValueItemInputView implements ItemInputDisplay {
   @UiTemplate("KeyValueItemInputView.ui.xml")
   interface MyUiBinder extends UiBinder<HTMLPanel, KeyValueItemInputView> {}
 
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private final HTMLPanel container;
 

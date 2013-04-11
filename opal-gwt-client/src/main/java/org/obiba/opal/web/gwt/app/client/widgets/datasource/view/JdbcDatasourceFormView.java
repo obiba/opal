@@ -34,7 +34,7 @@ public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFo
   @UiTemplate("JdbcDatasourceFormView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, JdbcDatasourceFormView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 

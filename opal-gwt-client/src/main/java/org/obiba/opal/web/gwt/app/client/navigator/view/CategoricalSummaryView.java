@@ -33,7 +33,7 @@ public class CategoricalSummaryView extends Composite {
   @UiTemplate("CategoricalSummaryView.ui.xml")
   interface CategoricalSummaryViewUiBinder extends UiBinder<HTMLPanel, CategoricalSummaryView> {}
 
-  private static CategoricalSummaryViewUiBinder uiBinder = GWT.create(CategoricalSummaryViewUiBinder.class);
+  private static final CategoricalSummaryViewUiBinder uiBinder = GWT.create(CategoricalSummaryViewUiBinder.class);
 
   @UiField
   Label obs;

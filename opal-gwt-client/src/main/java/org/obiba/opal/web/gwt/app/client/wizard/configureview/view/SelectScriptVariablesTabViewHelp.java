@@ -23,7 +23,7 @@ public class SelectScriptVariablesTabViewHelp extends Composite {
   // Static Variables
   //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   //
   // Constructors

@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.Label;
  */
 public class WizardStep extends FlowPanel {
 
-  private Label title;
+  private final Label title;
 
   public WizardStep() {
     this("");

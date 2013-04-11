@@ -44,23 +44,23 @@ public class FileExplorerPresenter
 
   public interface Display extends View {
 
-    public HasClickHandlers getFileUploadButton();
+    HasClickHandlers getFileUploadButton();
 
-    public HasClickHandlers getFileDeleteButton();
+    HasClickHandlers getFileDeleteButton();
 
-    public HasClickHandlers getFileDownloadButton();
+    HasClickHandlers getFileDownloadButton();
 
-    public HasClickHandlers getCreateFolderButton();
+    HasClickHandlers getCreateFolderButton();
 
-    public void setEnabledFileDeleteButton(boolean enabled);
+    void setEnabledFileDeleteButton(boolean enabled);
 
-    public HasAuthorization getCreateFolderAuthorizer();
+    HasAuthorization getCreateFolderAuthorizer();
 
-    public HasAuthorization getFileUploadAuthorizer();
+    HasAuthorization getFileUploadAuthorizer();
 
-    public HasAuthorization getFileDownloadAuthorizer();
+    HasAuthorization getFileDownloadAuthorizer();
 
-    public HasAuthorization getFileDeleteAuthorizer();
+    HasAuthorization getFileDeleteAuthorizer();
 
   }
 
@@ -91,8 +91,7 @@ public class FileExplorerPresenter
   }
 
   @Override
-  protected PresenterWidget<?> getDefaultPresenter(
-      org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter.Slot slot) {
+  protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
     switch(slot) {
       case CENTER:
         return folderDetailsPresenter;
@@ -134,7 +133,7 @@ public class FileExplorerPresenter
 
   private void setEnableFileDeleteButton() {
     FileDto folder = folderDetailsPresenter.getCurrentFolder();
-    if(folder.getPath().equals("/") || folder.getChildrenCount() > 0) {
+    if("/".equals(folder.getPath()) || folder.getChildrenCount() > 0) {
       getView().setEnabledFileDeleteButton(false);
     } else {
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + folder.getPath()).delete()
@@ -155,7 +154,7 @@ public class FileExplorerPresenter
 
   private void addEventHandlers() {
 
-    super.registerHandler(getView().getFileDeleteButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getFileDeleteButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         // We are either deleting a file or a folder
@@ -171,14 +170,14 @@ public class FileExplorerPresenter
       }
     }));
 
-    super.registerHandler(getView().getFileDownloadButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getFileDownloadButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         downloadFile(getCurrentSelectionOrFolder());
       }
     }));
 
-    super.registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
@@ -187,7 +186,7 @@ public class FileExplorerPresenter
       }
     }));
 
-    super.registerHandler(getView().getFileUploadButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getFileUploadButton().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -197,7 +196,7 @@ public class FileExplorerPresenter
       }
     }));
 
-    super.registerHandler(
+    registerHandler(
         getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
 
           @Override
@@ -209,7 +208,7 @@ public class FileExplorerPresenter
           }
         }));
 
-    super.registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
+    registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
         new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
           @Override
@@ -219,7 +218,7 @@ public class FileExplorerPresenter
 
         }));
 
-    super.registerHandler(getEventBus().addHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
 
       @Override
       public void onFolderRefreshed(FolderRefreshedEvent event) {
@@ -227,7 +226,7 @@ public class FileExplorerPresenter
       }
     }));
 
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
 
   }
 

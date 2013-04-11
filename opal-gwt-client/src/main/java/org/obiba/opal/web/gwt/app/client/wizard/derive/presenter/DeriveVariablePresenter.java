@@ -207,8 +207,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       public boolean apply() {
         VariableDto originalVariable = deriveFromVariablePresenter.getOriginalVariable();
         String valueType = originalVariable.getValueType();
-        return hasCategories(originalVariable) && ("text".equals(valueType) ||
-            "integer".equals(valueType) && allCategoriesMissing(originalVariable) == false);
+        return hasCategories(originalVariable) &&
+            ("text".equals(valueType) || "integer".equals(valueType) && !allCategoriesMissing(originalVariable));
       }
     });
   }
@@ -377,7 +377,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
           deriveFromVariablePresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
 
       if(derivationPresenter != presenter) {
-        if(presenter.isVisible() == false) {
+        if(!presenter.isVisible()) {
           addToSlot(Display.Slots.Derivation, presenter);
         }
         derivationPresenter = presenter;

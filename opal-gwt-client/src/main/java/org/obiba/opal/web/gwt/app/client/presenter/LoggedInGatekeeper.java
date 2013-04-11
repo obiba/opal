@@ -12,7 +12,7 @@ public class LoggedInGatekeeper implements Gatekeeper {
   private final RequestCredentials credentials;
 
   @Inject
-  public LoggedInGatekeeper(final RequestCredentials credentials) {
+  public LoggedInGatekeeper(RequestCredentials credentials) {
     this.credentials = credentials;
   }
 

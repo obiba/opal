@@ -50,7 +50,7 @@ public class ReportTemplatePresenter
   public interface Proxy extends ProxyPlace<ReportTemplatePresenter> {}
 
   @Inject
-  public ReportTemplatePresenter(final Display display, final EventBus eventBus, Proxy proxy,
+  public ReportTemplatePresenter(Display display, EventBus eventBus, Proxy proxy,
       ReportTemplateDetailsPresenter reportTemplateDetailsPresenter,
       ReportTemplateListPresenter reportTemplateListPresenter,
       Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter) {
@@ -73,8 +73,8 @@ public class ReportTemplatePresenter
 
   @Override
   protected void addHandlers() {
-    super.registerHandler(getView().addReportTemplateClickHandler(new AddReportTemplateClickHandler()));
-    super.registerHandler(getView().refreshClickHandler(new ClickHandler() {
+    registerHandler(getView().addReportTemplateClickHandler(new AddReportTemplateClickHandler()));
+    registerHandler(getView().refreshClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {

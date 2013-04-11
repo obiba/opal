@@ -30,7 +30,7 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
   @UiTemplate("AuthorizationView.ui.xml")
   interface AuthorizationViewUiBinder extends UiBinder<Widget, AuthorizationView> {}
 
-  private static AuthorizationViewUiBinder uiBinder = GWT.create(AuthorizationViewUiBinder.class);
+  private static final AuthorizationViewUiBinder uiBinder = GWT.create(AuthorizationViewUiBinder.class);
 
   private final Translations translation = GWT.create(Translations.class);
 

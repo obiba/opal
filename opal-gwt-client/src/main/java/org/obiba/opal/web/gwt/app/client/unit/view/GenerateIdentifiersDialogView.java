@@ -126,6 +126,7 @@ public class GenerateIdentifiersDialogView extends PopupViewImpl implements Disp
     return dialog;
   }
 
+  @Override
   public void hideDialog() {
     clear();
     hide();

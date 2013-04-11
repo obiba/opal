@@ -45,7 +45,7 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
 
   public void setAclRequest(SubjectType type, AclRequest... requests) {
     this.type = type;
-    this.subjectPermissionsRequests = new SubjectPermissionsRequest(type, new AclCallbackImpl(getEventBus()), requests);
+    subjectPermissionsRequests = new SubjectPermissionsRequest(type, new AclCallbackImpl(getEventBus()), requests);
 
     if(!initialized) {
       for(String header : subjectPermissionsRequests.getHeaders()) {
@@ -193,11 +193,11 @@ public class SubjectAuthorizationPresenter extends PresenterWidget<SubjectAuthor
 
   public interface PermissionSelectionHandler {
 
-    public Boolean hasPermission(String header, Acls acls);
+    Boolean hasPermission(String header, Acls acls);
 
-    public void authorize(Subject subject, String header);
+    void authorize(Subject subject, String header);
 
-    public void unauthorize(Subject subject, String header);
+    void unauthorize(Subject subject, String header);
 
   }
 

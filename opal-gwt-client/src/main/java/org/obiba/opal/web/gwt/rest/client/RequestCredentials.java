@@ -105,10 +105,10 @@ public class RequestCredentials {
     return Cookies.getCookie(OPALSID);
   }
 
-  private static String toHexString(byte[] bytes) {
+  private static String toHexString(byte... bytes) {
     StringBuilder buf = new StringBuilder();
-    for(int i = 0; i < bytes.length; ++i) {
-      String hex = Integer.toHexString(bytes[i] & 0xFF);
+    for(byte aByte : bytes) {
+      String hex = Integer.toHexString(aByte & 0xFF);
       buf.append("00".substring(hex.length())).append(hex);
     }
     return buf.toString();

@@ -39,10 +39,11 @@ public class FrequencyPlot extends JqPlot {
     data.push(pct);
   }
 
+  @Override
   public void plot() {
     String title = translations.summaryFrequencyPlot();
     JsArray<JsArrayNumber> plotData = JsArray.createArray().cast();
-    plotData.push(this.data);
+    plotData.push(data);
     JavaScriptObject p = JsonUtils.unsafeEval("{" + //
         "  title:'" + title + "'," + //
         "  seriesDefaults:{renderer:$wnd.jQuery.jqplot.BarRenderer,rendererOptions:{varyBarColor: true},pointLabels:{show:true,hideZeros:true,ypadding:3,edgeTolerance:-5}}," +

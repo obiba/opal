@@ -35,7 +35,6 @@ public abstract class TableIdentifiersSyncTable extends Table<TableIdentifiersSy
   private Column<TableIdentifiersSync, String> tableNameColumn;
 
   public TableIdentifiersSyncTable() {
-    super();
     initColumns();
   }
 
@@ -97,7 +96,7 @@ public abstract class TableIdentifiersSyncTable extends Table<TableIdentifiersSy
 
       @Override
       public Boolean getValue() {
-        if(getTableSyncs().size() == 0) return false;
+        if(getTableSyncs().isEmpty()) return false;
         boolean allSelected = true;
         boolean hasSelectable = false;
         for(TableIdentifiersSync ts : getTableSyncs()) {

@@ -67,7 +67,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
   @Override
   protected void onBind() {
 
-    super.getView().addFileSelectionHandler(new FileSelectionHandler() {
+    getView().addFileSelectionHandler(new FileSelectionHandler() {
 
       public void onFileSelection(FileDto fileDto) {
         if(fileDto.getType().isFileType(FileType.FILE) == false && fileDto.getReadable()) {
@@ -77,20 +77,19 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       }
     });
 
-    super.registerHandler(
-        getView().getTableSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+    registerHandler(getView().getTableSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
-          @Override
-          public void onSelectionChange(SelectionChangeEvent event) {
-            FileDto selectedFile = getView().getTableSelectionModel().getSelectedObject();
-            if(selectedFile != null) {
-              getEventBus().fireEvent(new FileSelectionChangeEvent(selectedFile));
-            }
-          }
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        FileDto selectedFile = getView().getTableSelectionModel().getSelectedObject();
+        if(selectedFile != null) {
+          getEventBus().fireEvent(new FileSelectionChangeEvent(selectedFile));
+        }
+      }
 
-        }));
+    }));
 
-    super.registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
+    registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
         new FileSystemTreeFolderSelectionChangeEvent.Handler() {
 
           public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
@@ -98,7 +97,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
           }
         }));
 
-    super.registerHandler(getEventBus().addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
 
       public void onFileUploaded(FileUploadedEvent event) {
         // Refresh the current folder since a new file was probably added to it.
@@ -106,7 +105,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       }
     }));
 
-    super.registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
+    registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 
       public void onFolderCreation(FolderCreationEvent event) {
         getEventBus().fireEvent(new FolderSelectionChangeEvent(event.getFolder()));

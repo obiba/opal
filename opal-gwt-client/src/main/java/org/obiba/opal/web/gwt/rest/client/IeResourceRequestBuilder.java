@@ -22,8 +22,6 @@ public class IeResourceRequestBuilder<T extends JavaScriptObject> extends Defaul
   public DefaultResourceRequestBuilder<T> forResource(String resource) {
     // Adds a random query parameter to prevent the browser from caching the result (each request will have a unique
     // URI)
-    return super.forResource(
-        new StringBuilder(resource).append(resource.contains("?") ? "&" : "?").append("_=").append(Random.nextInt())
-            .toString());
+    return super.forResource(resource + (resource.contains("?") ? "&" : "?") + "_=" + Random.nextInt());
   }
 }

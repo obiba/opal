@@ -36,7 +36,7 @@ public class RAdministrationPresenter
   private final AuthorizationPresenter authorizationPresenter;
 
   @Inject
-  public RAdministrationPresenter(final Display display, final EventBus eventBus, final Proxy proxy,
+  public RAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       AuthorizationPresenter authorizationPresenter) {
     super(eventBus, display, proxy);
     this.authorizationPresenter = authorizationPresenter;

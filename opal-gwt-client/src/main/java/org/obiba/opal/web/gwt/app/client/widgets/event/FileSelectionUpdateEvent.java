@@ -26,7 +26,7 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
   // Instance Variables
   //
 
-  private Object source;
+  private final Object source;
 
   //
   // Constructors

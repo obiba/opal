@@ -27,7 +27,7 @@ public class XmlFormatStepView extends Composite implements XmlFormatStepPresent
   @UiTemplate("XmlFormatStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, XmlFormatStepView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private FileSelectionPresenter.Display fileSelection;
 

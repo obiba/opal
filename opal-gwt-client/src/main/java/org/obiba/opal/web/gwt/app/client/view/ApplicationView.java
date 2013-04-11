@@ -40,7 +40,7 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @UiTemplate("ApplicationView.ui.xml")
   interface ViewUiBinder extends UiBinder<LayoutPanel, ApplicationView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final LayoutPanel dock;
 

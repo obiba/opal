@@ -136,7 +136,7 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getView().addFinishClickHandler(new ClickHandler() {
+    registerHandler(getView().addFinishClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
@@ -149,7 +149,7 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
           throw new IllegalStateException("unknown key type");
         }
 
-        CreateKeyPairCallBack callbackHandler = new CreateKeyPairCallBack(form);
+        ResponseCodeCallback callbackHandler = new CreateKeyPairCallBack(form);
         UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName(), "keys");
         ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).post()
             .withResourceBody(KeyForm.stringify(form)).withCallback(Response.SC_CREATED, callbackHandler)
@@ -158,7 +158,8 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
 
     }));
 
-    super.registerHandler(getView().addCancelClickHandler(new ClickHandler() {
+    registerHandler(getView().addCancelClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         getView().hideDialog();
       }
@@ -217,7 +218,7 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
 
     KeyForm KeyForm;
 
-    public CreateKeyPairCallBack(KeyForm KeyForm) {
+    private CreateKeyPairCallBack(KeyForm KeyForm) {
       this.KeyForm = KeyForm;
     }
 
@@ -228,7 +229,7 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
         getEventBus().fireEvent(new KeyPairCreatedEvent(functionalUnit, KeyForm.getAlias()));
         getView().hideDialog();
       } else {
-        ClientErrorDto error = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+        ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
         getEventBus().fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
       }
     }
@@ -265,7 +266,7 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
 
   private class PrivateKeyValidationHandler extends AbstractValidationHandler {
 
-    public PrivateKeyValidationHandler() {
+    private PrivateKeyValidationHandler() {
       super(getEventBus());
     }
 
@@ -287,7 +288,7 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
 
   private class PublicKeyValidationHandler extends AbstractValidationHandler {
 
-    public PublicKeyValidationHandler() {
+    private PublicKeyValidationHandler() {
       super(getEventBus());
     }
 

@@ -44,7 +44,7 @@ public class ComparedDatasourcesReportStepView extends Composite
   // Static Variables
   //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   //
   // Instance Variables
@@ -108,7 +108,7 @@ public class ComparedDatasourcesReportStepView extends Composite
 
     table.getTableNameColumn().setFieldUpdater(new TableComparisonFieldUpdater());
 
-    this.tableList = table;
+    tableList = table;
   }
 
   //
@@ -117,7 +117,7 @@ public class ComparedDatasourcesReportStepView extends Composite
 
   @Override
   public List<String> getSelectedTables() {
-    ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
     for(TableComparison tc : tableComparisons) {
       if(tableList.getSelectionModel().isSelected(tc)) {
         builder.add(tc.getTableName());
@@ -163,13 +163,16 @@ public class ComparedDatasourcesReportStepView extends Composite
     return ignoreAllModifications.isVisible();
   }
 
+  @Override
   public Widget asWidget() {
     return this;
   }
 
+  @Override
   public void startProcessing() {
   }
 
+  @Override
   public void stopProcessing() {
   }
 
@@ -217,8 +220,7 @@ public class ComparedDatasourcesReportStepView extends Composite
 
     private final ComparisonResult result;
 
-    public TableComparison(TableCompareDto dto, ComparisonResult result) {
-      super();
+    TableComparison(TableCompareDto dto, ComparisonResult result) {
       this.dto = dto;
       this.result = result;
     }

@@ -96,9 +96,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public ApplicationPresenter(final Display display, final Proxy proxy, final EventBus eventBus,
-      RequestCredentials credentials, NotificationPresenter messageDialog,
-      Provider<FileSelectorPresenter> fileSelectorPresenter, RequestUrlBuilder urlBuilder) {
+  public ApplicationPresenter(Display display, Proxy proxy, EventBus eventBus, RequestCredentials credentials,
+      NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter,
+      RequestUrlBuilder urlBuilder) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
@@ -114,7 +114,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Override
   protected void onBind() {
 
-    super.registerHandler(
+    registerHandler(
         getEventBus().addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
 
           @Override
@@ -124,7 +124,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
             addToPopupSlot(fsp);
           }
         }));
-    super.registerHandler(getEventBus().addHandler(FileDownloadEvent.getType(), new FileDownloadEvent.Handler() {
+    registerHandler(getEventBus().addHandler(FileDownloadEvent.getType(), new FileDownloadEvent.Handler() {
 
       public void onFileDownload(FileDownloadEvent event) {
         getView().getDownloder().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
@@ -239,7 +239,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   private void registerUserMessageEventHandler() {
-    super.registerHandler(getEventBus().addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
+    registerHandler(getEventBus().addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
 
       @Override
       public void onUserMessage(NotificationEvent event) {

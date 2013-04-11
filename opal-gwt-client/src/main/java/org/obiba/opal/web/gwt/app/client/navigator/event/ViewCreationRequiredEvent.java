@@ -71,6 +71,6 @@ public class ViewCreationRequiredEvent extends GwtEvent<ViewCreationRequiredEven
 
   public interface Handler extends EventHandler {
 
-    public void onViewCreationRequired(ViewCreationRequiredEvent event);
+    void onViewCreationRequired(ViewCreationRequiredEvent event);
   }
 }

@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class TextBoxItemInputView implements ItemInputDisplay {
 
-  private TextBox textBox;
+  private final TextBox textBox;
 
   private EnterKeyHandler enterKeyHandler;
 

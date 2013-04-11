@@ -49,7 +49,7 @@ public class JobListView extends Composite implements Display {
   @UiTemplate("JobListView.ui.xml")
   interface JobListViewUiBinder extends UiBinder<WorkbenchLayout, JobListView> {}
 
-  private static JobListViewUiBinder uiBinder = GWT.create(JobListViewUiBinder.class);
+  private static final JobListViewUiBinder uiBinder = GWT.create(JobListViewUiBinder.class);
 
   @UiField
   InlineLabel noJobs;
@@ -68,7 +68,7 @@ public class JobListView extends Composite implements Display {
 
   ListDataProvider<CommandStateDto> dataProvider;
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private ActionsColumn<CommandStateDto> actionsColumn;
 
@@ -201,7 +201,7 @@ public class JobListView extends Composite implements Display {
 
       @Override
       public String[] getActions(CommandStateDto value) {
-        if(value.getStatus().toString().equals("NOT_STARTED") || value.getStatus().toString().equals("IN_PROGRESS")) {
+        if("NOT_STARTED".equals(value.getStatus().toString()) || "IN_PROGRESS".equals(value.getStatus().toString())) {
           return new String[] { LOG_ACTION, CANCEL_ACTION };
         } else {
           return new String[] { LOG_ACTION };

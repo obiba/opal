@@ -57,14 +57,14 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private Runnable actionRequiringConfirmation;
 
-  private Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
+  private final Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
 
-  private Provider<AuthorizationPresenter> authorizationPresenter;
+  private final Provider<AuthorizationPresenter> authorizationPresenter;
 
   private ReportTemplateDto reportTemplate;
 
   @Inject
-  public ReportTemplateDetailsPresenter(final Display display, final EventBus eventBus,
+  public ReportTemplateDetailsPresenter(Display display, EventBus eventBus,
       Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider,
       Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display);
@@ -106,6 +106,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private void addHandlers() {
     getView().getActionColumn().setActionHandler(new ActionHandler<ReportDto>() {
+      @Override
       public void doAction(ReportDto dto, String actionName) {
         if(actionName != null) {
           doActionImpl(dto, actionName);
@@ -113,7 +114,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       }
     });
 
-    super.registerHandler(
+    registerHandler(
         getEventBus().addHandler(ReportTemplateSelectedEvent.getType(), new ReportTemplateSelectedEvent.Handler() {
 
           @Override
@@ -127,11 +128,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
           }
         }));
 
-    super.registerHandler(getView().addReportDesignClickHandler(new ReportDesignClickHandler()));
-    super.registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-    super.registerHandler(
-        getEventBus().addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
-    super.registerHandler(getEventBus()
+    registerHandler(getView().addReportDesignClickHandler(new ReportDesignClickHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    registerHandler(getEventBus().addHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler()));
+    registerHandler(getEventBus()
         .addHandler(ReportTemplateListReceivedEvent.getType(), new ReportTemplateListReceivedEventHandler()));
   }
 
@@ -196,6 +196,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
         @Override
         public void authorized() {
           actionRequiringConfirmation = new Runnable() {
+            @Override
             public void run() {
               deleteReportFile(dto);
             }
@@ -207,7 +208,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     }
   }
 
-  private void deleteReportFile(final ReportDto report) {
+  private void deleteReportFile(ReportDto report) {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
@@ -231,7 +232,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   private void downloadFile(String filePath) {
-    String url = new StringBuilder("/files").append(filePath).toString();
+    String url = "/files" + filePath;
     getEventBus().fireEvent(new FileDownloadEvent(url));
   }
 
@@ -288,6 +289,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     @Override
     public void execute() {
       actionRequiringConfirmation = new Runnable() {
+        @Override
         public void run() {
           String reportTemplateName = getView().getReportTemplateDetails().getName();
           UriBuilder ub = UriBuilder.create().segment("report-template", reportTemplateName);
@@ -313,6 +315,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
+    @Override
     public void onConfirmation(ConfirmationEvent event) {
       if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
           event.isConfirmed()) {
@@ -371,10 +374,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private class ReportTemplateNotFoundCallBack implements ResponseCodeCallback {
 
-    private String templateName;
+    private final String templateName;
 
     public ReportTemplateNotFoundCallBack(String reportTemplateName) {
-      this.templateName = reportTemplateName;
+      templateName = reportTemplateName;
     }
 
     @Override

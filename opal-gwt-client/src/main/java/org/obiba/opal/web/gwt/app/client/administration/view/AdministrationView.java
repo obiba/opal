@@ -51,7 +51,7 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
 
     private AdminTab(TabData tabData, String token) {
       this.tabData = tabData;
-      this.tabContent = new SimplePanel();
+      tabContent = new SimplePanel();
       tab = new Hyperlink();
       tab.setTargetHistoryToken(token);
       // TODO: localise
@@ -103,7 +103,7 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @UiTemplate("AdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, AdministrationView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 
@@ -115,12 +115,11 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   private Widget currentTabContent;
 
   public AdministrationView() {
-    super();
     widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
-  public Tab addTab(final TabData tabData, final String historyToken) {
+  public Tab addTab(TabData tabData, String historyToken) {
     return new AdminTab(tabData, historyToken);
   }
 

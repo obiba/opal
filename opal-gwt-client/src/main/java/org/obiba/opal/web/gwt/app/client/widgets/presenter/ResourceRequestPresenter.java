@@ -91,6 +91,7 @@ public class ResourceRequestPresenter<T extends JavaScriptObject>
   public void setSuccessCodes(Integer... codes) {
     ResponseCodeCallback internalCallback = new ResponseCodeCallback() {
 
+      @Override
       public void onResponseCode(Request request, Response response) {
         getDisplay().completed();
 
@@ -110,12 +111,13 @@ public class ResourceRequestPresenter<T extends JavaScriptObject>
   public void setErrorCodes(Integer... codes) {
     ResponseCodeCallback internalCallback = new ResponseCodeCallback() {
 
+      @Override
       public void onResponseCode(Request request, Response response) {
         getDisplay().failed();
 
         if(response.getText() != null && response.getText().length() != 0) {
           try {
-            ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+            ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
             getDisplay().showErrorMessage(errorDto.getStatus());
           } catch(Exception e) {
             // Should never get here!

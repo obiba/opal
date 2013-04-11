@@ -23,7 +23,7 @@ import com.gwtplatform.mvp.client.View;
 public class ItemSelectorPresenter extends PresenterWidget<ItemSelectorPresenter.Display> {
 
   @Inject
-  public ItemSelectorPresenter(final Display display, final EventBus eventBus) {
+  public ItemSelectorPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 

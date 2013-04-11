@@ -11,6 +11,6 @@ package org.obiba.opal.web.gwt.rest.client;
 
 public interface RequestUrlBuilder {
 
-  public String buildAbsoluteUrl(String relativeUrl);
+  String buildAbsoluteUrl(String relativeUrl);
 
 }

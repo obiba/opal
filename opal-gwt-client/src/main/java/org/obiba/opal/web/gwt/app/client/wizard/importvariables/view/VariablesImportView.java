@@ -55,9 +55,9 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 
 public class VariablesImportView extends PopupViewImpl implements VariablesImportPresenter.Display {
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -232,7 +232,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
 
       @Override
       public void onClick(ClickEvent evt) {
-        if (!localeValidator.validate()) return;
+        if(!localeValidator.validate()) return;
 
         if(fileSelectionStep.isVisible()) {
           if(fileSelectionValidator.validate()) {

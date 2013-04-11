@@ -183,7 +183,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
   class SaveChangesClickHandler implements ClickHandler {
 
-    private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+    private final Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
     SaveChangesClickHandler() {
       HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {

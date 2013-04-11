@@ -19,9 +19,9 @@ public class MinimumSizeCollectionValidator<T> extends AbstractFieldValidator {
   // Instance Variables
   //
 
-  private HasCollection<T> collectionField;
+  private final HasCollection<T> collectionField;
 
-  private int minSize;
+  private final int minSize;
 
   //
   // Constructors

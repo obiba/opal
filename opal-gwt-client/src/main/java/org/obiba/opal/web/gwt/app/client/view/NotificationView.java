@@ -47,7 +47,7 @@ public class NotificationView extends PopupViewImpl implements NotificationPrese
   @UiTemplate("NotificationView.ui.xml")
   interface ViewUiBinder extends UiBinder<PopupPanel, NotificationView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @UiField
   PopupPanel dialog;

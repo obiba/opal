@@ -435,7 +435,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       public void onResponseCode(Request request, Response response) {
         transientRequest = null;
         if(response.getStatusCode() == SC_CREATED) {
-          DatasourceDto datasourceDto = (DatasourceDto) JsonUtils.unsafeEval(response.getText());
+          DatasourceDto datasourceDto = JsonUtils.unsafeEval(response.getText());
           importConfig.setTransientDatasourceName(datasourceDto.getName());
           datasourceDiff(datasourceDto);
         } else {
@@ -474,7 +474,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       datasourceValuesStepPresenter.getView().hideErrors();
     }
   }
-
 
   public interface Display extends WizardView {
 

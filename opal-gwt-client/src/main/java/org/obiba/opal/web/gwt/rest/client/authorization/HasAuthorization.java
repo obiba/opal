@@ -14,10 +14,10 @@ package org.obiba.opal.web.gwt.rest.client.authorization;
  */
 public interface HasAuthorization {
 
-  public void beforeAuthorization();
+  void beforeAuthorization();
 
-  public void authorized();
+  void authorized();
 
-  public void unauthorized();
+  void unauthorized();
 
 }

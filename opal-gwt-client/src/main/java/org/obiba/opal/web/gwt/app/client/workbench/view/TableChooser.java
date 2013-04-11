@@ -32,7 +32,7 @@ public class TableChooser extends Chooser {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
+  private final Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
 
   public TableChooser() {
     initWidget();

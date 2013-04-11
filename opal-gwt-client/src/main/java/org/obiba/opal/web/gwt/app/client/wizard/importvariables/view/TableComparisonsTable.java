@@ -37,7 +37,6 @@ public abstract class TableComparisonsTable extends Table<TableComparison> {
   private Column<TableComparison, String> tableNameColumn;
 
   public TableComparisonsTable() {
-    super();
     initColumns();
   }
 
@@ -132,7 +131,7 @@ public abstract class TableComparisonsTable extends Table<TableComparison> {
 
       @Override
       public Boolean getValue() {
-        if(getTableComparisons().size() == 0) return false;
+        if(getTableComparisons().isEmpty()) return false;
         boolean allSelected = true;
         boolean hasSelectable = false;
         for(TableComparison tc : getTableComparisons()) {

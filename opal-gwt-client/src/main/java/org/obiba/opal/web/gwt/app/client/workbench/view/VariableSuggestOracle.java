@@ -108,7 +108,7 @@ public class VariableSuggestOracle extends SuggestOracle {
 
   private Response defaultResponse;
 
-  private EventBus eventBus;
+  private final EventBus eventBus;
 
   /**
    * Constructor for <code>MultiWordSuggestOracle</code> which takes in a set of

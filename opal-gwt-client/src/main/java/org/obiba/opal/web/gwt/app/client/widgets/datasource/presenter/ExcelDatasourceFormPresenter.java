@@ -31,7 +31,7 @@ public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourc
 
   }
 
-  private FileSelectionPresenter fileSelectionPresenter;
+  private final FileSelectionPresenter fileSelectionPresenter;
 
   @Inject
   public ExcelDatasourceFormPresenter(final Display display, final EventBus eventBus,
@@ -66,7 +66,7 @@ public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourc
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("excel");
+    return "excel".equalsIgnoreCase(type);
   }
 
   public interface Display extends DatasourceFormPresenter.Display {
@@ -84,7 +84,7 @@ public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourc
     boolean isValid = true;
     String file = fileSelectionPresenter.getSelectedFile();
 
-    if(file.length() == 0) {
+    if(file.isEmpty()) {
       isValid = false;
       fireErrorEvent("ExcelFileRequired");
     } else if(!file.endsWith(".xls") && !file.endsWith(".xlsx")) {

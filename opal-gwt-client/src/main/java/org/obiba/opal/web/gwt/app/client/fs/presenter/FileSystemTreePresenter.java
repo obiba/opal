@@ -101,7 +101,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
   }
 
   private void addTreeItemSelectionHandler() {
-    super.registerHandler(getView().getFileSystemTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
+    registerHandler(getView().getFileSystemTree().addSelectionHandler(new SelectionHandler<TreeItem>() {
 
       @Override
       public void onSelection(SelectionEvent<TreeItem> event) {
@@ -140,7 +140,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
   private void addEventHandlers() {
     addTreeItemSelectionHandler();
 
-    super.registerHandler(
+    registerHandler(
         getEventBus().addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
 
           public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
@@ -149,7 +149,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
 
         }));
 
-    super.registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
+    registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 
       public void onFolderCreation(FolderCreationEvent event) {
         // Refresh the file system since a new folder was added.
@@ -157,7 +157,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
       }
     }));
 
-    super.registerHandler(getEventBus().addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
 
       @Override
       public void onFileDeleted(FileDeletedEvent event) {
@@ -167,7 +167,7 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
 
     }));
 
-    super.registerHandler(getView().addFileSystemTreeOpenHandler(new OpenHandler<TreeItem>() {
+    registerHandler(getView().addFileSystemTreeOpenHandler(new OpenHandler<TreeItem>() {
 
       @Override
       public void onOpen(final OpenEvent<TreeItem> event) {

@@ -19,7 +19,7 @@ public class ConditionValidator extends AbstractFieldValidator {
   // Instance Variables
   //
 
-  private HasValue<Boolean> condition;
+  private final HasValue<Boolean> condition;
 
   //
   // Constructors

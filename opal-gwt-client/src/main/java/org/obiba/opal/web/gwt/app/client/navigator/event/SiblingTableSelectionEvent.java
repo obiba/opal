@@ -36,7 +36,7 @@ public class SiblingTableSelectionEvent extends GwtEvent<SiblingTableSelectionEv
   private final Direction direction;
 
   public SiblingTableSelectionEvent(TableDto currentItem, Direction direction) {
-    this.currentSelection = currentItem;
+    currentSelection = currentItem;
     this.direction = direction;
   }
 

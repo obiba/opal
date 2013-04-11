@@ -34,7 +34,7 @@ public abstract class JqPlot {
   public abstract void plot();
 
   public void plotOrRedraw() {
-    if(this.plot == null) {
+    if(plot == null) {
       plot();
     } else {
       redraw();

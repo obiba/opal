@@ -33,20 +33,19 @@ public class DatasourceParsingErrorPanel extends FlowPanel {
   private static Translations translations = GWT.create(Translations.class);
 
   public DatasourceParsingErrorPanel() {
-    super();
   }
 
-  public void setErrors(final ClientErrorDto errorDto) {
+  public void setErrors(ClientErrorDto errorDto) {
     setErrors(extractDatasourceParsingErrors(errorDto));
   }
 
-  private void setErrors(final List<DatasourceParsingErrorDto> errors) {
+  private void setErrors(List<DatasourceParsingErrorDto> errors) {
     clear();
     AlertPanel.Builder builder = AlertPanel.newBuilder().error();
     for(DatasourceParsingErrorDto dto : errors) {
       builder.error(getErrorMessage(dto));
     }
-    this.add(builder.build());
+    add(builder.build());
   }
 
   @SuppressWarnings("unchecked")
@@ -65,7 +64,7 @@ public class DatasourceParsingErrorPanel extends FlowPanel {
   }
 
   private String getErrorMessage(DatasourceParsingErrorDto dto) {
-    if(translations.datasourceParsingErrorMap().containsKey(dto.getKey()) == false) {
+    if(!translations.datasourceParsingErrorMap().containsKey(dto.getKey())) {
       return dto.getDefaultMessage();
     }
     return TranslationsUtils

@@ -30,7 +30,7 @@ public class CreateFolderDialogView extends PopupViewImpl implements Display {
   @UiTemplate("CreateFolderDialogView.ui.xml")
   interface CreateFolderDialogUiBinder extends UiBinder<DialogBox, CreateFolderDialogView> {}
 
-  private static CreateFolderDialogUiBinder uiBinder = GWT.create(CreateFolderDialogUiBinder.class);
+  private static final CreateFolderDialogUiBinder uiBinder = GWT.create(CreateFolderDialogUiBinder.class);
 
   private final Widget widget;
 

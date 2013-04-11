@@ -30,9 +30,9 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
   // Instance Variables
   //
 
-  private Object source;
+  private final Object source;
 
-  private List<TableDto> selectedTables;
+  private final List<TableDto> selectedTables;
 
   //
   // Constructors

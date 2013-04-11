@@ -37,7 +37,7 @@ public class HibernateDatasourceFormPresenter extends PresenterWidget<HibernateD
   }
 
   @Inject
-  public HibernateDatasourceFormPresenter(final Display display, final EventBus eventBus) {
+  public HibernateDatasourceFormPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
@@ -63,7 +63,7 @@ public class HibernateDatasourceFormPresenter extends PresenterWidget<HibernateD
 
   @Override
   public boolean isForType(String type) {
-    return type.equalsIgnoreCase("hibernate");
+    return "hibernate".equalsIgnoreCase(type);
   }
 
   @Override

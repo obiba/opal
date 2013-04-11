@@ -36,7 +36,7 @@ public class ConfigureViewStepView extends PopupViewImpl implements ConfigureVie
   @UiTemplate("ConfigureViewStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<DialogBox, ConfigureViewStepView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @UiField
   DialogBox dialog;

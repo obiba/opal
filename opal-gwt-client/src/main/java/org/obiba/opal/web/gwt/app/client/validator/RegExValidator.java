@@ -19,11 +19,11 @@ public class RegExValidator extends AbstractFieldValidator {
   // Instance Variables
   //
 
-  private HasText textField;
+  private final HasText textField;
 
-  private String regex;
+  private final String regex;
 
-  private String modifiers;
+  private final String modifiers;
 
   //
   // Constructors

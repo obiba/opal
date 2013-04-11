@@ -46,9 +46,9 @@ public class DatabaseView extends PopupViewImpl implements Display {
   @UiTemplate("DatabaseView.ui.xml")
   interface ViewUiBinder extends UiBinder<DialogBox, DatabaseView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -150,8 +150,8 @@ public class DatabaseView extends PopupViewImpl implements Display {
 
   @Override
   public void setDialogMode(Mode dialogMode) {
-    name.setEnabled(Mode.CREATE.equals(dialogMode));
-    if(Mode.CREATE.equals(dialogMode)) {
+    name.setEnabled(Mode.CREATE == dialogMode);
+    if(Mode.CREATE == dialogMode) {
       dialog.setText(translations.addDatabase());
     } else {
       dialog.setText(translations.editDatabase());

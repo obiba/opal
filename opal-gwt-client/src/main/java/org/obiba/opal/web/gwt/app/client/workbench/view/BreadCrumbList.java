@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class BreadCrumbList extends UList {
 
-  private String divider;
+  private final String divider;
 
   public BreadCrumbList() {
     this("");

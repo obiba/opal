@@ -55,7 +55,7 @@ import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.I
 
 public class IdentifiersImportPresenter extends WizardPresenterWidget<IdentifiersImportPresenter.Display> {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   public static final WizardType WizardType = new WizardType();
 
@@ -108,24 +108,24 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
   }
 
-  private FileSelectionPresenter fileSelectionPresenter;
+  private final FileSelectionPresenter fileSelectionPresenter;
 
-  private FileSelectionPresenter csvOptionsFileSelectionPresenter;
+  private final FileSelectionPresenter csvOptionsFileSelectionPresenter;
 
   private ImportConfig importConfig;
 
-  private List<String> availableCharsets = new ArrayList<String>();
+  private final List<String> availableCharsets = new ArrayList<String>();
 
   private FunctionalUnitDto functionalUnit;
 
   protected TableDto identifiersTable;
 
   @Inject
-  public IdentifiersImportPresenter(final Display display, final EventBus eventBus,
+  public IdentifiersImportPresenter(Display display, EventBus eventBus,
       Provider<FileSelectionPresenter> fileSelectionPresenter) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter.get();
-    this.csvOptionsFileSelectionPresenter = fileSelectionPresenter.get();
+    csvOptionsFileSelectionPresenter = fileSelectionPresenter.get();
   }
 
   @Override
@@ -197,7 +197,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   }
 
   private void addEventHandlers() {
-    super.registerHandler(getView().addNextClickHandler(new ClickHandler() {
+    registerHandler(getView().addNextClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
@@ -207,10 +207,10 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   }
 
   private void update() {
-    if(fileSelectionPresenter.getSelectedFile() != null && !fileSelectionPresenter.getSelectedFile().equals("")) {
+    if(fileSelectionPresenter.getSelectedFile() != null && !"".equals(fileSelectionPresenter.getSelectedFile())) {
       csvOptionsFileSelectionPresenter.setSelectedFile(fileSelectionPresenter.getSelectedFile());
     }
-    if(getView().getImportFormat().equals(ImportFormat.CSV)) {
+    if(getView().getImportFormat() == ImportFormat.CSV) {
       getView().setCsvFormatOptions();
     } else {
       getView().setNoFormatOptions();
@@ -227,7 +227,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-      if(getView().getImportFormat().equals(ImportFormat.CSV)) {
+      if(getView().getImportFormat() == ImportFormat.CSV) {
         validators.add(new RegExValidator(getSelectedCsvFile(), ".csv$", "i", "CSVFileRequired"));
         validators
             .add(new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
@@ -235,9 +235,9 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
         validators.add(
             new RequiredTextValidator(getView().getCsvOptions().getFieldSeparatorText(), "FieldSeparatorRequired"));
         validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuoteText(), "QuoteSeparatorRequired"));
-      } else if(getView().getImportFormat().equals(ImportFormat.XML)) {
+      } else if(getView().getImportFormat() == ImportFormat.XML) {
         validators.add(new RegExValidator(getSelectedFile(), ".zip$", "i", "ZipFileRequired"));
-      } else if(getView().getImportFormat().equals(ImportFormat.SPSS)) {
+      } else if(getView().getImportFormat() == ImportFormat.SPSS) {
         validators.add(new RegExValidator(getSelectedFile(), ".sav$", "i", "SpssFileRequired"));
       } else {
         validators.add(new RequiredTextValidator(getView().getSelectedFile(), "NoFileSelected"));
@@ -263,10 +263,11 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   }
 
   private void importIdentifiers() {
-    final DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importConfig);
+    DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importConfig);
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
+      @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
           getView().renderCompletedConclusion();
@@ -319,10 +320,12 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   private HasText getSelectedCsvFile() {
     HasText result = new HasText() {
 
+      @Override
       public String getText() {
         return csvOptionsFileSelectionPresenter.getSelectedFile();
       }
 
+      @Override
       public void setText(String text) {
         // do nothing
       }
@@ -333,10 +336,12 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
   private HasText getSelectedFile() {
     HasText result = new HasText() {
 
+      @Override
       public String getText() {
         return fileSelectionPresenter.getSelectedFile();
       }
 
+      @Override
       public void setText(String text) {
         // do nothing
       }

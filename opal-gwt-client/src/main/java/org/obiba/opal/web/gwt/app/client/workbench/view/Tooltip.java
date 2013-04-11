@@ -39,7 +39,7 @@ public class Tooltip extends Composite implements HasWidgets {
   @UiTemplate("Tooltip.ui.xml")
   interface ViewUiBinder extends UiBinder<PopupPanel, Tooltip> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @UiField
   PopupPanel dialog;

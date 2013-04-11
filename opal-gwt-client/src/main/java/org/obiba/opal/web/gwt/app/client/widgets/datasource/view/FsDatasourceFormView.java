@@ -25,7 +25,7 @@ public class FsDatasourceFormView extends ViewImpl implements FsDatasourceFormPr
   @UiTemplate("FsDatasourceFormView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, FsDatasourceFormView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 

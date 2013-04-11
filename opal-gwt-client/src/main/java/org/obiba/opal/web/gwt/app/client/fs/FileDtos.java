@@ -51,7 +51,7 @@ public class FileDtos {
   private static String getFolderName(String folderPath) {
     String folderName = folderPath;
 
-    if(!folderPath.equals("/")) {
+    if(!"/".equals(folderPath)) {
       int lastSeparatorIndex = folderPath.lastIndexOf('/');
 
       if(lastSeparatorIndex != -1) {

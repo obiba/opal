@@ -32,7 +32,7 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   // Static variables
   //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private FileSelectionPresenter.Display fileSelection;
 

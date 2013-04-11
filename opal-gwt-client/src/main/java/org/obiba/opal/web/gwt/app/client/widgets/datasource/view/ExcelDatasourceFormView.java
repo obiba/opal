@@ -28,7 +28,7 @@ public class ExcelDatasourceFormView extends ViewImpl implements ExcelDatasource
   @UiTemplate("ExcelDatasourceFormView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ExcelDatasourceFormView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 

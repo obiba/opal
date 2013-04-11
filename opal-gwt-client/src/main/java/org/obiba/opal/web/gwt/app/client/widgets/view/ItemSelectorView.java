@@ -28,7 +28,7 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
 
   private Widget widget;
 
-  private Grid itemGrid;
+  private final Grid itemGrid;
 
   private ItemInputDisplay itemInputDisplay;
 

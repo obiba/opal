@@ -37,9 +37,9 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
   @UiTemplate("DataShieldConfigView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DataShieldConfigView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget uiWidget;
 

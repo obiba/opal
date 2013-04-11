@@ -248,7 +248,7 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     public void onResponseCode(Request request, Response response) {
       NotificationEvent.Builder builder = NotificationEvent.newBuilder();
       try {
-        ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+        ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
         builder.error(errorDto.getStatus()).args(errorDto.getArgumentsArray());
       } catch(Exception e) {
         builder.error(response.getText());

@@ -11,6 +11,6 @@ package org.obiba.opal.web.gwt.app.client.validator;
 
 public interface ValidationHandler {
 
-  public boolean validate();
+  boolean validate();
 
 }

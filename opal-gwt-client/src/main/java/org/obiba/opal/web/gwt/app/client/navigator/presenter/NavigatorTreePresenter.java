@@ -46,7 +46,7 @@ import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Display, NavigatorTreePresenter.Proxy> {
 
   @Inject
-  public NavigatorTreePresenter(final Display display, final EventBus eventBus, final Proxy proxy) {
+  public NavigatorTreePresenter(Display display, EventBus eventBus, Proxy proxy) {
     super(eventBus, display, proxy);
   }
 
@@ -190,7 +190,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
       }
     }
 
-    private void fireDatasourceSelectionChangeEvent(final TreeItem item) {
+    private void fireDatasourceSelectionChangeEvent(TreeItem item) {
       UriBuilder ub = UriBuilder.create().segment("datasource", item.getText());
       ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<DatasourceDto>() {

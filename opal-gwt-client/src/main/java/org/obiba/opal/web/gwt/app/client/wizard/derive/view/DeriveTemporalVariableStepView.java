@@ -154,11 +154,9 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
 
   @Override
   public String getGroupMethod() {
-    if(spanRadio.getValue()) {
-      return spanBox.getValue(spanBox.getSelectedIndex());
-    } else {
-      return rangeBox.getValue(rangeBox.getSelectedIndex());
-    }
+    return spanRadio.getValue()
+        ? spanBox.getValue(spanBox.getSelectedIndex())
+        : rangeBox.getValue(rangeBox.getSelectedIndex());
   }
 
   @Override

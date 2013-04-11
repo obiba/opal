@@ -23,7 +23,7 @@ public class RequiredOptionValidator extends AbstractFieldValidator {
   // Instance Variables
   //
 
-  private Set<HasValue<Boolean>> options;
+  private final Set<HasValue<Boolean>> options;
 
   //
   // Constructors

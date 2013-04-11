@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.FocusWidget;
  */
 public class FocusWidgetAuthorizer implements HasAuthorization {
 
-  private FocusWidget w;
+  private final FocusWidget w;
 
   public FocusWidgetAuthorizer(FocusWidget w) {
     super();

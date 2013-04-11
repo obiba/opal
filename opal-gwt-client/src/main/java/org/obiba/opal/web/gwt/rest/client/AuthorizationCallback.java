@@ -19,6 +19,6 @@ import com.google.gwt.http.client.Response;
  */
 public interface AuthorizationCallback {
 
-  public void onResponseCode(Request request, Response response, Set<HttpMethod> allowed);
+  void onResponseCode(Request request, Response response, Set<HttpMethod> allowed);
 
 }

@@ -71,7 +71,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
   //
 
   private void addHandler() {
-    super.registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {

@@ -31,11 +31,11 @@ public class MockGWTBridge extends GWTBridge {
 
   private static final Logger log = LoggerFactory.getLogger(MockGWTBridge.class);
 
-  private Map<Class<?>, Object> mocks = new HashMap<Class<?>, Object>();
+  private final Map<Class<?>, Object> mocks = new HashMap<Class<?>, Object>();
 
   public <T> T addMock(Class<T> type) {
     T mock = EasyMock.createMock(type);
-    this.mocks.put(type, mock);
+    mocks.put(type, mock);
     return mock;
   }
 

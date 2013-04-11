@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.UIObject;
  */
 public class UIObjectAuthorizer implements HasAuthorization {
 
-  private UIObject o;
+  private final UIObject o;
 
   public UIObjectAuthorizer(UIObject o) {
     super();

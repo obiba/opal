@@ -20,7 +20,7 @@ import com.gwtplatform.mvp.client.View;
 
 public abstract class ValidatablePresenterWidget<D extends View> extends PresenterWidget<D> {
 
-  private List<FieldValidator> validators;
+  private final List<FieldValidator> validators;
 
   public ValidatablePresenterWidget(EventBus eventBus, D display) {
     super(eventBus, display);

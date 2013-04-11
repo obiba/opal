@@ -52,9 +52,9 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
   @UiTemplate("AddCryptoKeyDialogView.ui.xml")
   interface ViewUiBinder extends UiBinder<WizardDialogBox, AddCryptoKeyDialogView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final WizardDialogBox dialog;
 

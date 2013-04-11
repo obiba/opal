@@ -47,6 +47,7 @@ public class HistogramPlot extends JqPlot {
     data.push(series);
   }
 
+  @Override
   public void plot() {
     // Nothing to plot
     if(binSize == 0) return;

@@ -16,7 +16,7 @@ public final class ConstantActionsProvider<T> implements ActionsProvider<T> {
 
   private final String[] actions;
 
-  public ConstantActionsProvider(final String... actions) {
+  public ConstantActionsProvider(String... actions) {
     this.actions = actions;
   }
 

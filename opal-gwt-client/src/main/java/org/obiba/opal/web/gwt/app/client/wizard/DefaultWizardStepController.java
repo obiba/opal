@@ -300,7 +300,7 @@ public class DefaultWizardStepController implements WizardStepController {
 
   @Override
   public boolean isFinish() {
-    return (next != null && next.isConclusion()) || !hasNext();
+    return next != null && next.isConclusion() || !hasNext();
   }
 
   @Override
@@ -314,7 +314,7 @@ public class DefaultWizardStepController implements WizardStepController {
   }
 
   protected WizardStepController getNext() {
-    return next == null ? null : (next.shouldSkip() ? next.onNext() : next);
+    return next == null ? null : next.shouldSkip() ? next.onNext() : next;
   }
 
   protected WizardStepController getPrevious() {

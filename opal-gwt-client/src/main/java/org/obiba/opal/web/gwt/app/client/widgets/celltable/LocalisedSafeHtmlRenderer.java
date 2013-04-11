@@ -24,7 +24,7 @@ public class LocalisedSafeHtmlRenderer implements SafeHtmlRenderer<String> {
   private final Map<String, String> localisations;
 
   public LocalisedSafeHtmlRenderer(Map<String, String> localisation) {
-    this.localisations = localisation;
+    localisations = localisation;
   }
 
   @Override

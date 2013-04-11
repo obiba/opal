@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.validator;
 
+import javax.annotation.Nullable;
+
 /**
  *
  */
@@ -19,5 +21,6 @@ public interface FieldValidator {
    *
    * @return error message key if there is an error, <code>null</code> otherwise
    */
+  @Nullable
   String validate();
 }

@@ -162,7 +162,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
     loadVariables(table, "");
   }
 
-  private void loadVariables(final TableDto table, final String select) {
+  private void loadVariables(final TableDto table, String select) {
     UriBuilder uriBuilder = UriBuilder.create()
         .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search");
 
@@ -202,7 +202,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
             UriBuilder uriBuilder = UriBuilder.create()
                 .segment("datasource", table.getDatasourceName(), "table", table.getName(), "valueSet", entityId);
 
-            StringBuilder link = new StringBuilder(uriBuilder.build());
+            String link = uriBuilder.build();
 
             ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link.toString()).get()
                 .withCallback(Response.SC_INTERNAL_SERVER_ERROR,
@@ -297,7 +297,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+      ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
       if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
         for(JavaScriptErrorDto error : errors) {

@@ -20,18 +20,19 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Grid<T> extends DataGrid<T> {
 
-  private static final int DEFAULT_PAGESIZE = 15;
+  private static final int DEFAULT_PAGE_SIZE = 15;
 
-  private static final GridResources resources = GWT.<GridResources>create(GridResources.class);
+  private static final GridResources resources = GWT.create(GridResources.class);
 
   public interface GridResources extends DataGrid.Resources {
+    @Override
     @NotStrict
     @Source("org/obiba/opal/web/gwt/app/public/css/opal-DataGrid.css")
     DataGrid.Style dataGridStyle();
   }
 
   public Grid() {
-    this(DEFAULT_PAGESIZE);
+    this(DEFAULT_PAGE_SIZE);
   }
 
   /**

@@ -31,7 +31,7 @@ public class FunctionalUnitListView extends ViewImpl implements FunctionalUnitLi
   @UiTemplate("FunctionalUnitListView.ui.xml")
   interface FunctionalUnitListViewUiBinder extends UiBinder<Widget, FunctionalUnitListView> {}
 
-  private static FunctionalUnitListViewUiBinder uiBinder = GWT.create(FunctionalUnitListViewUiBinder.class);
+  private static final FunctionalUnitListViewUiBinder uiBinder = GWT.create(FunctionalUnitListViewUiBinder.class);
 
   private final Widget widget;
 

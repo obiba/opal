@@ -36,7 +36,7 @@ public class FileUploadDialogView extends PopupViewImpl implements Display {
   @UiTemplate("FileUploadDialogView.ui.xml")
   interface FileUploadDialogUiBinder extends UiBinder<DialogBox, FileUploadDialogView> {}
 
-  private static FileUploadDialogUiBinder uiBinder = GWT.create(FileUploadDialogUiBinder.class);
+  private static final FileUploadDialogUiBinder uiBinder = GWT.create(FileUploadDialogUiBinder.class);
 
   private final Widget widget;
 

@@ -18,7 +18,7 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.VerticalTabLayout;
  */
 public class TabAuthorizer implements HasAuthorization {
 
-  private AbstractTabLayout tabs;
+  private final AbstractTabLayout tabs;
 
   private final int index;
 

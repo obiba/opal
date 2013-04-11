@@ -41,7 +41,8 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   @UiTemplate("ReportTemplateUpdateDialogView.ui.xml")
   interface ReportTemplateUpdateDialogUiBinder extends UiBinder<DialogBox, ReportTemplateUpdateDialogView> {}
 
-  private static ReportTemplateUpdateDialogUiBinder uiBinder = GWT.create(ReportTemplateUpdateDialogUiBinder.class);
+  private static final ReportTemplateUpdateDialogUiBinder uiBinder = GWT
+      .create(ReportTemplateUpdateDialogUiBinder.class);
 
   @UiField
   DialogBox dialog;
@@ -205,7 +206,7 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   @Override
   public void setSchedule(String schedule) {
     this.schedule.setText(schedule);
-    if(!schedule.equals("")) {
+    if(!"".equals(schedule)) {
       scheduleRadio.setValue(true);
       runManuallyRadio.setValue(false);
     } else {

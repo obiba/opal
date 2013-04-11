@@ -18,14 +18,14 @@ import com.google.gwt.resources.client.CssResource.NotStrict;
  *
  */
 public interface OpalResources extends ClientBundle {
-  public static final OpalResources INSTANCE = GWT.create(OpalResources.class);
+  OpalResources INSTANCE = GWT.create(OpalResources.class);
 
   @NotStrict
   @Source("org/obiba/opal/web/gwt/app/public/css/opal.css")
-  public CssResource css();
+  CssResource css();
 
   @NotStrict
   @Source("org/obiba/opal/web/gwt/app/public/css/opal-custom.css")
-  public CssResource cssCustom();
+  CssResource cssCustom();
 
 }

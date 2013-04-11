@@ -42,7 +42,6 @@ public class ResizeHandle extends Widget
   }
 
   public ResizeHandle(Direction direction) {
-    super();
     setElement(Document.get().createDivElement());
     addStyleName("resizable-handle");
     setResizeDirection(direction);
@@ -75,7 +74,7 @@ public class ResizeHandle extends Widget
 
   private class MouseResizeHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler {
 
-    private UIObject objectToResize;
+    private final UIObject objectToResize;
 
     private boolean dragging = false;
 
@@ -83,9 +82,9 @@ public class ResizeHandle extends Widget
 
     private int dragStartY;
 
-    private int minWidth;
+    private final int minWidth;
 
-    private int minHeight;
+    private final int minHeight;
 
     public MouseResizeHandler(UIObject objectToResize, int minWidth, int minHeight) {
       super();
@@ -110,7 +109,7 @@ public class ResizeHandle extends Widget
       int height = evt.getY() - dragStartY + objectToResize.getOffsetHeight();
       if(height >= minHeight) objectToResize.setHeight(height + "px");
 
-      if(direction.equals(Direction.SOUTH_EAST)) {
+      if(direction == Direction.SOUTH_EAST) {
         int width = evt.getX() - dragStartX + objectToResize.getOffsetWidth();
         if(width >= minWidth) objectToResize.setWidth(width + "px");
       }
@@ -121,7 +120,7 @@ public class ResizeHandle extends Widget
     public void onMouseUp(MouseUpEvent evt) {
       // GWT.log("end drag at x=" + evt.getX() + " y=" + evt.getY());
       dragging = false;
-      DOM.releaseCapture(ResizeHandle.this.getElement());
+      DOM.releaseCapture(getElement());
     }
 
   }

@@ -10,8 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -92,12 +92,12 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
 
   private final FileSelectionPresenter csvOptionsFileSelectionPresenter;
 
-  private final List<String> availableCharsets = new ArrayList<String>();
+  private final Collection<String> availableCharsets = new ArrayList<String>();
 
   protected TableDto identifiersTable;
 
   @Inject
-  public IdentifiersMapPresenter(final Display display, final EventBus eventBus,
+  public IdentifiersMapPresenter(Display display, EventBus eventBus,
       FileSelectionPresenter csvOptionsFileSelectionPresenter) {
     super(eventBus, display);
     this.csvOptionsFileSelectionPresenter = csvOptionsFileSelectionPresenter;
@@ -116,7 +116,7 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
 
     getView().setFileSelectionValidator(new FileValidator());
 
-    super.registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
+    registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
   }
 
   @Override
@@ -149,7 +149,7 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
 
   class FileValidator extends AbstractValidationHandler {
 
-    public FileValidator() {
+    FileValidator() {
       super(getEventBus());
     }
 
@@ -185,11 +185,11 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
     @Override
     public void onResource(Response response, JsArray<FunctionalUnitDto> resource) {
       JsArray<FunctionalUnitDto> units = JsArrays.toSafeArray(resource);
-      if(units.length() != 2) {
+      if(units.length() == 2) {
+        getView().renderMappedUnits(units);
+      } else {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("TwoMappedUnitsExpected").build());
         getView().renderMappedUnitsFailed();
-      } else {
-        getView().renderMappedUnits(units);
       }
     }
   }
@@ -201,7 +201,7 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("MappedUnitsCannotBeIdentified").build());
       } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
         try {
-          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).build());
         } catch(Exception e) {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
@@ -214,11 +214,12 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
   private void mapIdentifiers() {
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
+      @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == 200) {
           getView().renderCompletedConclusion(response.getText());
         } else {
-          final ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           getView().renderFailedConclusion();
           if(errorDto != null) {
             // getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorDto.getStatus()).build());
@@ -266,17 +267,18 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
   }
 
   private HasText getSelectedCsvFile() {
-    HasText result = new HasText() {
+    return new HasText() {
 
+      @Override
       public String getText() {
         return csvOptionsFileSelectionPresenter.getSelectedFile();
       }
 
+      @Override
       public void setText(String text) {
         // do nothing
       }
     };
-    return result;
   }
 
 }

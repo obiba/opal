@@ -10,11 +10,11 @@ import com.google.gwt.resources.client.TextResource;
 
 interface Resources extends ClientBundle {
 
-  static final String LibPath = "lib/";
+  String LibPath = "lib/";
 
-  static final String LangBase = LibPath + "lang-";
+  String LangBase = LibPath + "lang-";
 
-  public final Resources INSTANCE = new Instance();
+  Resources INSTANCE = new Instance();
 
   @Source(LibPath + "prettify.js")
   TextResource script();
@@ -68,7 +68,7 @@ interface Resources extends ClientBundle {
 
   }
 
-  static class Instance implements Resources {
+  class Instance implements Resources {
 
     private static final Resources RESOURCES = GWT.create(Resources.class);
 

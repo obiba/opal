@@ -65,7 +65,7 @@ public class FunctionalUnitPresenter
   final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
 
   @Inject
-  public FunctionalUnitPresenter(final Display display, final EventBus eventBus, final Proxy proxy,
+  public FunctionalUnitPresenter(Display display, EventBus eventBus, Proxy proxy,
       FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter,
       FunctionalUnitListPresenter FunctionalUnitListPresenter,
       FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter) {
@@ -107,10 +107,10 @@ public class FunctionalUnitPresenter
 
   @Override
   protected void addHandlers() {
-    super.registerHandler(getView().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
-    super.registerHandler(getView().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
-    super.registerHandler(getView().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
-    super.registerHandler(getView().addSyncIdentifiersClickHandler(new SyncIdentifiersClickHandler()));
+    registerHandler(getView().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
+    registerHandler(getView().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
+    registerHandler(getView().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
+    registerHandler(getView().addSyncIdentifiersClickHandler(new SyncIdentifiersClickHandler()));
   }
 
   //

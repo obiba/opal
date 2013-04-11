@@ -34,7 +34,6 @@ import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsVariableCopyColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.event.TableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.CategoricalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -312,14 +311,13 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
         getView().hideDialog();
         getEventBus().fireEvent(NotificationEvent.newBuilder().info(message).build());
         getEventBus().fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
-        if (getView().gotoView()) selectView();
-
+        if(getView().gotoView()) selectView();
 
       } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());
       } else {
         try {
-          ClientErrorDto errorDto = (ClientErrorDto) JsonUtils.unsafeEval(response.getText());
+          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(
               NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
         } catch(Exception nothing) {
@@ -334,8 +332,8 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(builder.build()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
-            public void onResource(Response response, final TableDto tableDto) {
-               getEventBus().fireEvent(new TableSelectionChangeEvent(this, tableDto));
+            public void onResource(Response response, TableDto tableDto) {
+              getEventBus().fireEvent(new TableSelectionChangeEvent(this, tableDto));
             }
           }).send();
     }

@@ -49,7 +49,7 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
     HasText getRemoteFolderName();
   }
 
-  private Translations translations;
+  private final Translations translations;
 
   private FileDto currentFolder;
 
@@ -97,7 +97,7 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
   @Override
   public void onReveal() {
     String folderName = currentFolder.getName();
-    getView().getRemoteFolderName().setText(folderName.equals("root") ? translations.fileSystemLabel() : folderName);
+    getView().getRemoteFolderName().setText("root".equals(folderName) ? translations.fileSystemLabel() : folderName);
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -139,7 +139,7 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
     };
 
     String fileName = getView().getFilename();
-    if(fileName.equals("")) {
+    if("".equals(fileName)) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
     } else if(fileExist(fileName)) {
       getEventBus().fireEvent(ConfirmationRequiredEvent

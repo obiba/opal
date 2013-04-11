@@ -10,9 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
@@ -54,7 +54,7 @@ import com.google.inject.Inject;
 
 public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogPresenter.Display> {
 
-  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+  private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   private JsArray<DatasourceDto> datasources;
 
@@ -194,7 +194,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
       for(VariableDto variable : JsArrays.toIterable(JsArrays.toSafeArray(variables))) {
         DerivationHelper derivator = null;
         if(VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
-            variable.getValueType().equals("integer") && VariableDtos.allCategoriesMissing(variable) == false)) {
+            "integer".equals(variable.getValueType()) && !VariableDtos.allCategoriesMissing(variable))) {
           CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
           d.initializeValueMapEntries();
           derivator = d;

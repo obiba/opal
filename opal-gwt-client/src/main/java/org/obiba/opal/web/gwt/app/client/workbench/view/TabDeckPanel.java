@@ -118,12 +118,12 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
         // Figure out if the deck panel has a fixed height
         com.google.gwt.dom.client.Element deckElem = container1.getParentElement();
         int deckWidth = deckElem.getOffsetWidth();
-        if(growing == false) {
-          fixedWidth = container2.getOffsetWidth();
-          container2.getStyle().setPropertyPx("width", Math.max(1, fixedWidth - 1));
-        } else {
+        if(growing) {
           fixedWidth = container1.getOffsetWidth();
           container1.getStyle().setPropertyPx("width", Math.max(1, fixedWidth - 1));
+        } else {
+          fixedWidth = container2.getOffsetWidth();
+          container2.getStyle().setPropertyPx("width", Math.max(1, fixedWidth - 1));
         }
         if(deckElem.getOffsetWidth() != deckWidth) {
           fixedWidth = -1;
@@ -188,22 +188,18 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
 
     private void moveOut(double progress, Element container) {
       int width;
-      if(fixedWidth == -1) {
-        width = (int) (2 * progress * DOM.getElementPropertyInt(container, "scrollWidth"));
-      } else {
-        width = (int) (2 * progress * fixedWidth);
-      }
+      width = fixedWidth == -1
+          ? (int) (2 * progress * DOM.getElementPropertyInt(container, "scrollWidth"))
+          : (int) (2 * progress * fixedWidth);
       String sign = growing ? "-" : "+";
       DOM.setStyleAttribute(container, "marginLeft", sign + normalizeWidth(width) + "px");
     }
 
     private void moveIn(double progress, Element container) {
       int width;
-      if(fixedWidth == -1) {
-        width = (int) ((1.5 - progress) * DOM.getElementPropertyInt(container, "scrollWidth"));
-      } else {
-        width = fixedWidth - (int) (progress * fixedWidth);
-      }
+      width = fixedWidth == -1
+          ? (int) ((1.5 - progress) * DOM.getElementPropertyInt(container, "scrollWidth"))
+          : fixedWidth - (int) (progress * fixedWidth);
       String sign = growing ? "+" : "-";
       DOM.setStyleAttribute(container, "marginLeft", sign + normalizeWidth(width) + "px");
     }
@@ -211,11 +207,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
     private int normalizeWidth(int width) {
       // Issue 2339: If the width is 0px, IE7 will display the entire content
       // widget instead of hiding it completely.
-      if(width == 0) {
-        return 1;
-      } else {
-        return Math.max(1, width - 1);
-      }
+      return width == 0 ? 1 : Math.max(1, width - 1);
     }
 
     /**
@@ -265,7 +257,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
   /**
    * Creates an empty deck panel.
    */
-  public TabDeckPanel() {
+  TabDeckPanel() {
     setElement(DOM.createDiv());
   }
 
@@ -280,7 +272,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
     // As a result, we first initialize the container with a height of 0px, then
     // we attach the child widget to the container. See Issue 2321 for more
     // details.
-    super.add(w, container);
+    add(w, container);
 
     // After w.onLoad is called, it is safe to make the container invisible and
     // set the height of the container and widget to 100%.
@@ -296,10 +288,12 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
     return getWidgetIndex(visibleWidget);
   }
 
+  @Override
   public void insert(IsWidget w, int beforeIndex) {
     insert(asWidgetOrNull(w), beforeIndex);
   }
 
+  @Override
   public void insert(Widget w, int beforeIndex) {
     Element container = createWidgetContainer();
     DOM.insertChild(getElement(), container, beforeIndex);
@@ -309,13 +303,13 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
     finishWidgetInitialization(container, w);
   }
 
+  @Override
   public boolean isAnimationEnabled() {
     return isAnimationEnabled;
   }
 
   public boolean isAnimationRunning() {
-    if(slideAnimation == null) return false;
-    return slideAnimation.isAnimationRunning;
+    return slideAnimation != null && slideAnimation.isAnimationRunning;
   }
 
   @Override
@@ -333,6 +327,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
     return removed;
   }
 
+  @Override
   public void setAnimationEnabled(boolean enable) {
     isAnimationEnabled = enable;
   }
@@ -376,10 +371,10 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
 
     // Set 100% by default.
     Element element = w.getElement();
-    if(DOM.getStyleAttribute(element, "width").equals("")) {
+    if("".equals(DOM.getStyleAttribute(element, "width"))) {
       w.setWidth("100%");
     }
-    if(DOM.getStyleAttribute(element, "height").equals("")) {
+    if("".equals(DOM.getStyleAttribute(element, "height"))) {
       w.setHeight("100%");
     }
 

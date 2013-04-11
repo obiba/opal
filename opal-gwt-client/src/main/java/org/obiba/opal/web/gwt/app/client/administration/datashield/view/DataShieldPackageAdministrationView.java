@@ -51,7 +51,7 @@ public class DataShieldPackageAdministrationView extends ViewImpl
   @UiTemplate("DataShieldPackageAdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DataShieldPackageAdministrationView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Translations translations;
 
@@ -71,7 +71,7 @@ public class DataShieldPackageAdministrationView extends ViewImpl
   @UiField
   SimplePager packagesTablePager;
 
-  private JsArrayDataProvider<RPackageDto> packagesDataProvider = new JsArrayDataProvider<RPackageDto>();
+  private final JsArrayDataProvider<RPackageDto> packagesDataProvider = new JsArrayDataProvider<RPackageDto>();
 
   private ActionsPackageRColumn<RPackageDto> actionsColumn;
 

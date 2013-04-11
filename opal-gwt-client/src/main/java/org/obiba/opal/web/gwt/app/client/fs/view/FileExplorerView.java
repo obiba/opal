@@ -28,7 +28,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class FileExplorerView extends ViewImpl implements Display {
 
-  private static FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
+  private static final FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
 
   @UiTemplate("FileExplorerView.ui.xml")
   interface FileExplorerUiBinder extends UiBinder<WorkbenchLayout, FileExplorerView> {}

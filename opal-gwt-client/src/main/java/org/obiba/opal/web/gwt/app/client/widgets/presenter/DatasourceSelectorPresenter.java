@@ -38,7 +38,7 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
   //
 
   @Inject
-  public DatasourceSelectorPresenter(final Display display, final EventBus eventBus) {
+  public DatasourceSelectorPresenter(Display display, EventBus eventBus) {
     super(display, eventBus);
   }
 

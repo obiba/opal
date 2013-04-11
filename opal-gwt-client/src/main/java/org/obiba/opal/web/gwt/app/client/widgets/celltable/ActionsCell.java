@@ -38,11 +38,11 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
   // Every action shares this Cell instance
   private final Cell<String> actionCell;
 
-  private FieldUpdater<T, String> hasCellFieldUpdater;
+  private final FieldUpdater<T, String> hasCellFieldUpdater;
 
   private ActionHandler<T> actionHandler;
 
-  private CompositeCell<T> delegate;
+  private final CompositeCell<T> delegate;
 
   public ActionsCell(ActionsProvider<T> actionsProvider) {
     super("click", "keydown");

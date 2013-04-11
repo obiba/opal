@@ -13,8 +13,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface WizardStepDisplay {
 
-  public Widget asWidget();
+  Widget asWidget();
 
-  public Widget getStepHelp();
+  Widget getStepHelp();
 
 }

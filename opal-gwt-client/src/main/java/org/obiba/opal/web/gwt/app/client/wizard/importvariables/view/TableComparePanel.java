@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
  */
 public class TableComparePanel extends FlowPanel {
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final TableCompareDto tableCompareDto;
 

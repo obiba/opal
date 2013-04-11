@@ -49,7 +49,7 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   public static final String CANCEL_ACTION = "Cancel";
 
-  private JobDetailsPresenter jobDetailsPresenter;
+  private final JobDetailsPresenter jobDetailsPresenter;
 
   private Runnable actionRequiringConfirmation;
 
@@ -93,8 +93,8 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
   public boolean containsClearableJobs(JsArray<CommandStateDto> jobs) {
     for(int i = 0; i < jobs.length(); i++) {
       CommandStateDto job = jobs.get(i);
-      if(job.getStatus().toString().equals("SUCCEEDED") || job.getStatus().toString().equals("FAILED") ||
-          job.getStatus().toString().equals("CANCELED")) {
+      if("SUCCEEDED".equals(job.getStatus().toString()) || "FAILED".equals(job.getStatus().toString()) ||
+          "CANCELED".equals(job.getStatus().toString())) {
         return true;
       }
     }

@@ -60,9 +60,9 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   @UiTemplate("ReportTemplateDetailsView.ui.xml")
   interface ReportTemplateDetailsViewUiBinder extends UiBinder<Widget, ReportTemplateDetailsView> {}
 
-  private static ReportTemplateDetailsViewUiBinder uiBinder = GWT.create(ReportTemplateDetailsViewUiBinder.class);
+  private static final ReportTemplateDetailsViewUiBinder uiBinder = GWT.create(ReportTemplateDetailsViewUiBinder.class);
 
-  private static Translations translations = GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
@@ -194,11 +194,11 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
     toolbarPanel.setVisible(available);
     reportTemplatePanel.setVisible(available);
     tabs.setVisible(available);
-    noReportTemplatesLabel.setVisible(available == false);
+    noReportTemplatesLabel.setVisible(!available);
   }
 
   @Override
-  public void setProducedReports(final JsArray<ReportDto> reports) {
+  public void setProducedReports(JsArray<ReportDto> reports) {
     pager.setVisible(reports.length() > 10); // OPAL-901
     renderProducedReports(reports);
   }
@@ -230,7 +230,7 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   private String getEmailList(JsArrayString emails) {
     StringBuilder emailList = new StringBuilder();
     for(int i = 0; i < emails.length(); i++) {
-      emailList.append(emails.get(i) + " ");
+      emailList.append(emails.get(i)).append(" ");
     }
     return emailList.toString();
   }
@@ -238,7 +238,7 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   private String getReportParamsList(JsArray<ParameterDto> params) {
     StringBuilder paramList = new StringBuilder();
     for(ParameterDto param : JsArrays.toIterable(params)) {
-      paramList.append(param.getKey() + "=" + param.getValue() + " ");
+      paramList.append(param.getKey()).append("=").append(param.getValue()).append(" ");
     }
     return paramList.toString();
   }

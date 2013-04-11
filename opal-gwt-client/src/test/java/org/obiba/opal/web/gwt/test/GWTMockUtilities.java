@@ -18,6 +18,8 @@ package org.obiba.opal.web.gwt.test;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.annotation.Nullable;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWTBridge;
 
@@ -25,6 +27,8 @@ import com.google.gwt.core.client.GWTBridge;
  * Defangs {@link GWT#create(Class)} to allow unit tests to mock out Widgets and other UIObjects.
  */
 public class GWTMockUtilities {
+
+  private GWTMockUtilities() {}
 
   /**
    * Replace the normal GWT.create() behavior with a method that returns null instead of throwing a runtime exception.
@@ -76,7 +80,7 @@ public class GWTMockUtilities {
    * Install the given instance of {@link GWTBridge}, allowing it to override the behavior of calls to
    * {@link GWT#create(Class)}.
    */
-  private static void setGwtBridge(GWTBridge bridge) {
+  private static void setGwtBridge(@Nullable GWTBridge bridge) {
     Class<GWT> gwtClass = GWT.class;
     Class<?>[] paramTypes = new Class[] { GWTBridge.class };
     Method setBridgeMethod = null;
@@ -87,7 +91,7 @@ public class GWTMockUtilities {
     }
     setBridgeMethod.setAccessible(true);
     try {
-      setBridgeMethod.invoke(gwtClass, new Object[] { bridge });
+      setBridgeMethod.invoke(gwtClass, bridge);
     } catch(IllegalAccessException e) {
       throw new RuntimeException(e);
     } catch(InvocationTargetException e) {

@@ -21,12 +21,13 @@ public class UList extends ComplexPanel {
     setElement(Document.get().createULElement());
   }
 
+  @Override
   public void add(Widget w) {
-    super.add(w, getElement());
+    add(w, getElement());
   }
 
   public void insert(Widget w, int beforeIndex) {
-    super.insert(w, getElement(), beforeIndex, true);
+    insert(w, getElement(), beforeIndex, true);
   }
 
 }

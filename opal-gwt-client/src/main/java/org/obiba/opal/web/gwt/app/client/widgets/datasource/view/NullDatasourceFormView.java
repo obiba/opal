@@ -25,7 +25,7 @@ public class NullDatasourceFormView extends ViewImpl implements NullDatasourceFo
   @UiTemplate("NullDatasourceFormView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, NullDatasourceFormView> {}
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 

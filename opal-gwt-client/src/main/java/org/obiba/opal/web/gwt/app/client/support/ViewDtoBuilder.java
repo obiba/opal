@@ -27,7 +27,7 @@ import com.google.gwt.core.client.JsArrayString;
  */
 public class ViewDtoBuilder {
 
-  private ViewDto viewDto;
+  private final ViewDto viewDto;
 
   public static ViewDtoBuilder newBuilder() {
     return new ViewDtoBuilder();

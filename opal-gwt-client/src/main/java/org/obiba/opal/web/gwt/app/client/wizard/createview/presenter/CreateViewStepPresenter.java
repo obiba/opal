@@ -91,8 +91,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   //
 
   @Inject
-  public CreateViewStepPresenter(final Display display, final EventBus eventBus,
-      FileSelectionPresenter fileSelectionPresenter) {
+  public CreateViewStepPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
   }

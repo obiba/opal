@@ -23,7 +23,7 @@ public class MatchingTableEntitiesValidator extends AbstractFieldValidator {
   // Instance Variables
   //
 
-  private HasCollection<TableDto> tableCollectionField;
+  private final HasCollection<TableDto> tableCollectionField;
 
   //
   // Constructors

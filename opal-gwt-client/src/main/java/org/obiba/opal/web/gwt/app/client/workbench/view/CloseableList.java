@@ -10,7 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -26,20 +29,19 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class CloseableList extends UList {
 
-  private List<ItemRemovedHandler> itemRemovedHandlers = new ArrayList<CloseableList.ItemRemovedHandler>();
+  private final Collection<ItemRemovedHandler> itemRemovedHandlers = new ArrayList<ItemRemovedHandler>();
 
   private ItemValidator itemValidator;
 
   public CloseableList() {
-    super();
     addStyleName("closeables");
   }
 
-  public boolean addItem(final String text) {
+  public boolean addItem(String text) {
     return addItem(text, true);
   }
 
-  public boolean addItem(final String text, boolean validate) {
+  public boolean addItem(String text, boolean validate) {
     if(Strings.isNullOrEmpty(text)) return false;
 
     if(validate && itemValidator != null && !itemValidator.validate(text)) return false;
@@ -49,7 +51,7 @@ public class CloseableList extends UList {
     return true;
   }
 
-  private void addItemInternal(final String text) {
+  private void addItemInternal(String text) {
     final ListItem item = new ListItem();
 
     item.add(new InlineLabel(text));
@@ -89,6 +91,7 @@ public class CloseableList extends UList {
     return ((HasText) label).getText();
   }
 
+  @Nullable
   private ListItem getItem(String text) {
     ListItem it = null;
     for(int i = 0; i < getWidgetCount(); i++) {
@@ -102,7 +105,7 @@ public class CloseableList extends UList {
   }
 
   public List<String> getItemTexts() {
-    ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
     for(int i = 0; i < getWidgetCount(); i++) {
       builder.add(getItemText((ListItem) getWidget(i)));
     }
@@ -119,7 +122,7 @@ public class CloseableList extends UList {
   public void focusOrRemoveLastItem() {
     if(getWidgetCount() > 0) {
       Widget lastItem = getWidget(getWidgetCount() - 1);
-      if(lastItem.getStyleName().indexOf("focus") != -1) {
+      if(lastItem.getStyleName().contains("focus")) {
         removeItem((ListItem) lastItem);
       } else {
         lastItem.addStyleName("focus");
@@ -137,19 +140,19 @@ public class CloseableList extends UList {
   }
 
   public void setItemValidator(ItemValidator validator) {
-    this.itemValidator = validator;
+    itemValidator = validator;
   }
 
   public interface ItemRemovedHandler {
-    public void onItemRemoved(String text);
+    void onItemRemoved(String text);
   }
 
   public interface ItemValidator {
-    public boolean validate(String text);
+    boolean validate(String text);
   }
 
   public interface ItemTransformer {
-    public boolean addItem(String text);
+    boolean addItem(String text);
   }
 
 }

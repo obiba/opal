@@ -27,7 +27,7 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresenter.Display {
 
-  private Widget widget;
+  private final Widget widget;
 
   @UiField
   ListBox database;
@@ -59,7 +59,7 @@ public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresen
     return tablePrefix.getValue();
   }
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   @Inject
   public LimesurveyStepView() {

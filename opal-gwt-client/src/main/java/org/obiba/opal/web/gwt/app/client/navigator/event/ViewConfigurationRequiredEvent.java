@@ -29,7 +29,7 @@ public class ViewConfigurationRequiredEvent extends GwtEvent<ViewConfigurationRe
   // Instance Variables
   //
 
-  private ViewDto view;
+  private final ViewDto view;
 
   private VariableDto variable;
 

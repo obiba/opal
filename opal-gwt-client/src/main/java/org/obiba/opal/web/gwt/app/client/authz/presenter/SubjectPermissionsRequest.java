@@ -30,7 +30,7 @@ public class SubjectPermissionsRequest {
 
   private final SubjectType type;
 
-  private List<AclRequest> aclRequests = new ArrayList<AclRequest>();
+  private final List<AclRequest> aclRequests = new ArrayList<AclRequest>();
 
   private AclGetCallback aclGetCallback;
 

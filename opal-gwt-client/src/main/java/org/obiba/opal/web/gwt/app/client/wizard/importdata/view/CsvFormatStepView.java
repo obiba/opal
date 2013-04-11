@@ -25,7 +25,7 @@ public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvForm
   // Static Variables
   //
 
-  private static ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private final Widget widget;
 

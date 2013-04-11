@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -183,11 +185,11 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     displayDatasource(datasourceDto, null);
   }
 
-  private void displayDatasource(final DatasourceDto datasourceDto, final TableDto tableDto) {
+  private void displayDatasource(final DatasourceDto datasourceDto, @Nullable TableDto tableDto) {
     if(datasourceName == null || !isCurrentDatasource(datasourceDto)) {
       datasourceName = datasourceDto.getName();
       getView().setDatasource(datasourceDto);
-      updateTable(tableDto != null ? tableDto.getName() : null);
+      updateTable(tableDto == null ? null : tableDto.getName());
 
       // make sure the list of datasources is initialized before looking for siblings
       if(datasources == null || datasources.length() == 0 || getDatasourceIndex(datasourceDto) < 0) {
@@ -195,7 +197,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
             .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
               @Override
               public void onResource(Response response, JsArray<DatasourceDto> resource) {
-                datasources = (resource != null) ? resource : (JsArray<DatasourceDto>) JsArray.createArray();
+                datasources = resource == null ? (JsArray<DatasourceDto>) JsArray.createArray() : resource;
                 displayDatasourceSiblings(datasourceDto);
               }
 
@@ -251,14 +253,14 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     }
   }
 
-  private void updateTable(final String tableName) {
+  private void updateTable(@Nullable String tableName) {
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "tables");
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build()).get()
         .withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
   }
 
   private void downloadMetadata(String datasource) {
-    String downloadUrl = new StringBuilder("/datasource/").append(datasource).append("/tables/excel").toString();
+    String downloadUrl = "/datasource/" + datasource + "/tables/excel";
     getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
@@ -266,17 +268,17 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     getEventBus().fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasource));
   }
 
-  private void removeDatasource(final String datasource) {
+  private void removeDatasource() {
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() != Response.SC_OK) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        } else {
+        if(response.getStatusCode() == Response.SC_OK) {
           initDatasources();
           getEventBus().fireEvent(new DatasourcesRefreshEvent());
+        } else {
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
     };
@@ -288,20 +290,22 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
+  @Nullable
   private String getPreviousTableName(int index) {
     TableDto previous = null;
     if(index > 0) {
       previous = tables.get(index - 1);
     }
-    return previous != null ? previous.getName() : null;
+    return previous == null ? null : previous.getName();
   }
 
+  @Nullable
   private String getNextTableName(int index) {
     TableDto next = null;
     if(index < tables.length() - 1) {
       next = tables.get(index + 1);
     }
-    return next != null ? next.getName() : null;
+    return next == null ? null : next.getName();
   }
 
   private void initDatasources() {
@@ -385,7 +389,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       removeDatasourceConfirmation = new Runnable() {
         @Override
         public void run() {
-          removeDatasource(datasourceName);
+          removeDatasource();
         }
       };
 
@@ -604,9 +608,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     void setDatasource(DatasourceDto dto);
 
-    void setPreviousName(String name);
+    void setPreviousName(@Nullable String name);
 
-    void setNextName(String name);
+    void setNextName(@Nullable String name);
 
     void setExcelDownloadCommand(Command cmd);
 

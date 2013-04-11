@@ -11,6 +11,6 @@ package org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter;
 
 public interface HasDatasourceForms {
 
-  public void addDatasourceForm(DatasourceFormPresenter p);
+  void addDatasourceForm(DatasourceFormPresenter p);
 
 }

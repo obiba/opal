@@ -53,7 +53,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
   @UiTemplate("FolderDetailsView.ui.xml")
   interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {}
 
-  private static FolderDetailsUiBinder uiBinder = GWT.create(FolderDetailsUiBinder.class);
+  private static final FolderDetailsUiBinder uiBinder = GWT.create(FolderDetailsUiBinder.class);
 
   private final Widget widget;
 
@@ -62,7 +62,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
   private FileNameColumn fileNameColumn;
 
-  private Translations translations = GWT.create(Translations.class);
+  private final Translations translations = GWT.create(Translations.class);
 
   private boolean displaysFiles = true;
 
@@ -71,26 +71,30 @@ public class FolderDetailsView extends ViewImpl implements Display {
     initTable();
   }
 
+  @Override
   public void setDisplaysFiles(boolean display) {
     displaysFiles = display;
   }
 
+  @Override
   public void clearSelection() {
     getTableSelectionModel().setSelected(getTableSelectionModel().getSelectedObject(), false);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public SingleSelectionModel<FileDto> getTableSelectionModel() {
     return (SingleSelectionModel<FileDto>) table.getSelectionModel();
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public void renderRows(final FileDto folder) {
-    JsArray<FileDto> children = (folder.getChildrenCount() != 0)
+  public void renderRows(FileDto folder) {
+    JsArray<FileDto> children = folder.getChildrenCount() != 0
         ? filterChildren(folder.getChildrenArray())
         : (JsArray<FileDto>) JsArray.createArray();
 
-    if(!folder.getName().equals("root")) {
+    if(!"root".equals(folder.getName())) {
       FileDto parent = FileDtos.getParent(folder);
       parent.setName("..");
       children.unshift(parent);
@@ -119,6 +123,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
     return foldersOnly;
   }
 
+  @Override
   public HandlerRegistration addFileSelectionHandler(FileSelectionHandler fileSelectionHandler) {
     return fileNameColumn.addFileSelectionHandler(fileSelectionHandler);
   }
@@ -147,7 +152,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
       private String getFileSizeWithUnit(FileDto object) {
         double fileSize = object.getSize();
         if(fileSize < KB) {
-          return ((long) fileSize) + " B";
+          return (long) fileSize + " B";
         } else if(fileSize < MB) {
           double fileSizeInKB = fileSize / KB;
           long iPart = (long) fileSizeInKB;
@@ -171,7 +176,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
       @Override
       public Date getValue(FileDto object) {
-        return !object.getName().equals("..") ? new Date((long) object.getLastModifiedTime()) : null;
+        return !"..".equals(object.getName()) ? new Date((long) object.getLastModifiedTime()) : null;
       }
     }, translations.lastModifiedLabel());
 
@@ -206,7 +211,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
   private class FileNameColumn extends Column<FileDto, String> {
 
-    private List<FileSelectionHandler> fileSelectionHandlers;
+    private final List<FileSelectionHandler> fileSelectionHandlers;
 
     public FileNameColumn() {
       super(new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
@@ -220,6 +225,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
       fileSelectionHandlers = new ArrayList<FileSelectionHandler>();
 
       setFieldUpdater(new FieldUpdater<FileDto, String>() {
+        @Override
         public void update(int rowIndex, FileDto dto, String value) {
           for(FileSelectionHandler handler : fileSelectionHandlers) {
             handler.onFileSelection(dto);
@@ -231,11 +237,11 @@ public class FolderDetailsView extends ViewImpl implements Display {
     @Override
     public String getCellStyleNames(Context context, FileDto dto) {
       FileType type = dto.getType();
-      if(type.isFileType(FileType.FOLDER) && dto.getName().equals("..")) {
+      if(type.isFileType(FileType.FOLDER) && "..".equals(dto.getName())) {
         return "folder-up";
       }
       String styles = dto.getType().getName().toLowerCase();
-      if(dto.getReadable() == false) {
+      if(!dto.getReadable()) {
         styles += " forbidden";
       }
       return styles;
@@ -246,6 +252,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
       return new HandlerRegistration() {
 
+        @Override
         public void removeHandler() {
           fileSelectionHandlers.remove(handler);
         }

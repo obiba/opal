@@ -51,7 +51,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
   private FileSelectionType fileSelectionType = FileSelectionType.FILE;
 
-  private List<SelectionResolver> selectionResolverChain;
+  private final List<SelectionResolver> selectionResolverChain;
 
   @Inject
   public FileSelectorPresenter(Display display, EventBus eventBus, FileSystemTreePresenter fileSystemTreePresenter,
@@ -106,20 +106,19 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
   }
 
   public boolean displaysFiles() {
-    return fileSelectionType.equals(FileSelectionType.FILE) ||
-        fileSelectionType.equals(FileSelectionType.EXISTING_FILE) ||
-        fileSelectionType.equals(FileSelectionType.FILE_OR_FOLDER) ||
-        fileSelectionType.equals(FileSelectionType.EXISTING_FILE_OR_FOLDER);
+    return fileSelectionType == FileSelectionType.FILE ||
+        fileSelectionType == FileSelectionType.EXISTING_FILE ||
+        fileSelectionType == FileSelectionType.FILE_OR_FOLDER ||
+        fileSelectionType == FileSelectionType.EXISTING_FILE_OR_FOLDER;
   }
 
   public boolean allowsFileCreation() {
-    return fileSelectionType.equals(FileSelectionType.FILE) ||
-        fileSelectionType.equals(FileSelectionType.FILE_OR_FOLDER);
+    return fileSelectionType == FileSelectionType.FILE || fileSelectionType == FileSelectionType.FILE_OR_FOLDER;
   }
 
   public boolean allowsFolderCreation() {
-    return fileSelectionType.equals(FileSelectionType.FILE) || fileSelectionType.equals(FileSelectionType.FOLDER) ||
-        fileSelectionType.equals(FileSelectionType.FILE_OR_FOLDER);
+    return fileSelectionType == FileSelectionType.FILE || fileSelectionType == FileSelectionType.FOLDER ||
+        fileSelectionType == FileSelectionType.FILE_OR_FOLDER;
   }
 
   private void addEventHandlers() {
@@ -148,7 +147,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     super.registerHandler(getView().addCancelButtonHandler(new CancelButtonHandler()));
   }
 
-  private void createFolder(final String destination, final String folder) {
+  private void createFolder(String destination, String folder) {
 
     ResourceCallback<FileDto> createdCallback = new ResourceCallback<FileDto>() {
 
@@ -231,7 +230,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
       String newFolder = getView().getCreateFolderName().getText().trim();
       FileDto currentFolder = getCurrentFolder();
       if(currentFolder != null && newFolder.length() != 0) {
-        if(currentFolder.getPath().equals("/")) { // create under root
+        if("/".equals(currentFolder.getPath())) { // create under root
           createFolder("/", newFolder);
         } else {
           createFolder(currentFolder.getPath(), newFolder);
@@ -306,7 +305,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
       String selectionPath = null;
 
       if(newFileName != null && newFileName.trim().length() != 0) {
-        selectionPath = (!selectedFolder.equals("/") ? selectedFolder + "/" : selectedFolder) + newFileName;
+        selectionPath = (!"/".equals(selectedFolder) ? selectedFolder + "/" : selectedFolder) + newFileName;
       } else {
         selectionPath = selectedFile;
       }
@@ -320,7 +319,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
-      if(type.equals(FileSelectionType.FILE)) {
+      if(type == FileSelectionType.FILE) {
         selection = getFileSelection(selectedFolder, selectedFile, newFileName);
         resolved = (selection.getSelectionPath() != null);
       }
@@ -332,7 +331,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
-      if(type.equals(FileSelectionType.EXISTING_FILE)) {
+      if(type == FileSelectionType.EXISTING_FILE) {
         selection = new FileSelection(selectedFile, FileSelectionType.FILE);
         resolved = (selection.getSelectionPath() != null);
       }
@@ -344,7 +343,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
-      if(type.equals(FileSelectionType.FOLDER) || type.equals(FileSelectionType.EXISTING_FOLDER)) {
+      if(type == FileSelectionType.FOLDER || type == FileSelectionType.EXISTING_FOLDER) {
         selection = new FileSelection(selectedFolder, FileSelectionType.FOLDER);
         resolved = (selection.getSelectionPath() != null);
       }
@@ -356,7 +355,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
-      if(type.equals(FileSelectionType.FILE_OR_FOLDER)) {
+      if(type == FileSelectionType.FILE_OR_FOLDER) {
         selection = getFileSelection(selectedFolder, selectedFile, newFileName);
         if(selection.getSelectionPath() == null) {
           selection = new FileSelection(selectedFolder, FileSelectionType.FOLDER);
@@ -371,7 +370,7 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     public void resolveSelection(FileSelectionType type, String selectedFolder, String selectedFile,
         String newFileName) {
       resolved = false;
-      if(type.equals(FileSelectionType.EXISTING_FILE_OR_FOLDER)) {
+      if(type == FileSelectionType.EXISTING_FILE_OR_FOLDER) {
         selection = (selectedFile != null)
             ? new FileSelection(selectedFile, FileSelectionType.FILE)
             : new FileSelection(selectedFolder, FileSelectionType.FOLDER);

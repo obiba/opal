@@ -10,7 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 
@@ -51,7 +54,7 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
   @Override
   public void setItems(List<TreeItem> items) {
     // update items and keep tree state as much as possible
-    List<String> expandedItems = new ArrayList<String>();
+    Collection<String> expandedItems = new ArrayList<String>();
     for(int i = 0; i < tree.getItemCount(); i++) {
       TreeItem item = tree.getItem(i);
       if(item.getState()) {
@@ -102,7 +105,7 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
 
   @Override
   public void clear() {
-    this.tree.clear();
+    tree.clear();
   }
 
   @Override
@@ -146,6 +149,7 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
     }
   }
 
+  @Nullable
   private TreeItem getDatasourceItem(String datasourceName) {
     for(int i = 0; i < tree.getItemCount(); i++) {
       TreeItem dsItem = tree.getItem(i);
@@ -156,6 +160,7 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
     return null;
   }
 
+  @Nullable
   private TreeItem getTableItem(String datasourceName, String tableName) {
     TreeItem dsItem = getDatasourceItem(datasourceName);
     if(dsItem != null) {
@@ -171,16 +176,13 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
 
   private boolean isDatasourceSelected(String datasourceName) {
     TreeItem selected = tree.getSelectedItem();
-    if(selected == null) return false;
-    if(selected.getParentItem() != null) return false;
-    return selected.getText().equals(datasourceName);
+    return selected != null && selected.getParentItem() == null && selected.getText().equals(datasourceName);
   }
 
   private boolean isTableSelected(String datasourceName, String tableName) {
     TreeItem selected = tree.getSelectedItem();
-    if(selected == null) return false;
-    if(selected.getParentItem() == null) return false;
-    return selected.getParentItem().getText().equals(datasourceName) && selected.getText().equals(tableName);
+    return selected != null && selected.getParentItem() != null &&
+        selected.getParentItem().getText().equals(datasourceName) && selected.getText().equals(tableName);
   }
 
   @Override

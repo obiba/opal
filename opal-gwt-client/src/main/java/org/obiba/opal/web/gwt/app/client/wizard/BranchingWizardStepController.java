@@ -21,7 +21,7 @@ public class BranchingWizardStepController extends DefaultWizardStepController {
 
   public static class Builder extends DefaultWizardStepController.Builder {
 
-    private BranchingWizardStepController ctrl;
+    private final BranchingWizardStepController ctrl;
 
     private Builder(BranchingWizardStepController ctrl) {
       super(ctrl);
@@ -56,7 +56,7 @@ public class BranchingWizardStepController extends DefaultWizardStepController {
     }
   }
 
-  private List<Candidate> nextCandidates = new ArrayList<Candidate>();
+  private final List<Candidate> nextCandidates = new ArrayList<Candidate>();
 
   public BranchingWizardStepController(WizardStep step, Widget help, Skippable skippable) {
     super(step, help, skippable);

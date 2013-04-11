@@ -176,7 +176,7 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   }
 
   @Override
-  public void setKeyPairs(final JsArray<KeyDto> keyPairs) {
+  public void setKeyPairs(JsArray<KeyDto> keyPairs) {
     renderKeyPairs(keyPairs);
   }
 

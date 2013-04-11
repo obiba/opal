@@ -26,9 +26,9 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
   // Instance Variables
   //
 
-  private Object source;
+  private final Object source;
 
-  private SelectionType selectionType;
+  private final SelectionType selectionType;
 
   //
   // Constructors

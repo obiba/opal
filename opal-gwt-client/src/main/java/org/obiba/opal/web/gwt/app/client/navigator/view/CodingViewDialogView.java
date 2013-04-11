@@ -37,7 +37,7 @@ public class CodingViewDialogView extends Composite implements Display {
   @UiTemplate("CodingViewDialogView.ui.xml")
   interface CodingViewDialogUiBinder extends UiBinder<DialogBox, CodingViewDialogView> {}
 
-  private static CodingViewDialogUiBinder uiBinder = GWT.create(CodingViewDialogUiBinder.class);
+  private static final CodingViewDialogUiBinder uiBinder = GWT.create(CodingViewDialogUiBinder.class);
 
   @UiField
   DialogBox dialog;

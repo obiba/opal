@@ -19,11 +19,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 
 public class TextBoxClearable extends FlowPanel {
 
-  private TextBox textBox;
+  private final TextBox textBox;
 
-  private Anchor clear;
+  private final Anchor clear;
 
-  private Anchor empty;
+  private final Anchor empty;
 
   public TextBoxClearable() {
     addStyleName("texbox-clearable-wrapper");

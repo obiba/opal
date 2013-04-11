@@ -23,10 +23,10 @@ public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Prox
     extends Presenter<D, P> {
 
   public enum Slot {
-    CENTER, LEFT;
+    CENTER, LEFT
   }
 
-  protected SplitPaneWorkbenchPresenter(final EventBus eventBus, final D display, final P proxy) {
+  protected SplitPaneWorkbenchPresenter(EventBus eventBus, D display, P proxy) {
     super(eventBus, display, proxy);
   }
 

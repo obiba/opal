@@ -20,7 +20,7 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   // Instance Variables
   //
 
-  private String errorMessageKey;
+  private final String errorMessageKey;
 
   private List<String> args = new ArrayList<String>();
 

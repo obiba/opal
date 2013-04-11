@@ -174,8 +174,8 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
 
   @Override
   public void setDialogMode(Mode dialogMode) {
-    functionalUnitName.setEnabled(Mode.CREATE.equals(dialogMode));
-    if(Mode.CREATE.equals(dialogMode)) {
+    functionalUnitName.setEnabled(Mode.CREATE == dialogMode);
+    if(Mode.CREATE == dialogMode) {
       dialog.setText(translations.addUnit());
     } else {
       dialog.setText(translations.editUnit());

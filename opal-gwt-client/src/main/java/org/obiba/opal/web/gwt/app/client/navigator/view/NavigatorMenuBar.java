@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
@@ -21,11 +23,11 @@ import com.google.gwt.user.client.ui.MenuItem;
  */
 public class NavigatorMenuBar extends MenuBar {
 
-  private MenuItem previousItem;
+  private final MenuItem previousItem;
 
-  private MenuItem nextItem;
+  private final MenuItem nextItem;
 
-  private MenuItem parentItem;
+  private final MenuItem parentItem;
 
   private MenuBar toolsMenu;
 
@@ -49,7 +51,7 @@ public class NavigatorMenuBar extends MenuBar {
 
   private MenuItem editItem;
 
-  private Translations translations = GWT.create(Translations.class);
+  private final Translations translations = GWT.create(Translations.class);
 
   private boolean separated = false;
 
@@ -102,7 +104,7 @@ public class NavigatorMenuBar extends MenuBar {
     return addItem;
   }
 
-  public void setParentName(String name) {
+  public void setParentName(@Nullable String name) {
     if(name != null && name.length() > 0) {
       parentItem.removeStyleName("disabled");
     } else {

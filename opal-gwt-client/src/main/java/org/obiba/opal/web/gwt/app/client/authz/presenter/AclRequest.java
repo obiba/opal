@@ -121,20 +121,20 @@ public class AclRequest {
   //
 
   public interface AclGetCallback {
-    public void onGet(JsArray<Acls> resource);
+    void onGet(JsArray<Acls> resource);
 
-    public void onGetFailed(Response response);
+    void onGetFailed(Response response);
   }
 
   public interface AclDeleteCallback {
-    public void onDelete(Subject subject);
+    void onDelete(Subject subject);
 
-    public void onDeleteFailed(Response response, Subject subject);
+    void onDeleteFailed(Response response, Subject subject);
   }
 
   public interface AclAddCallback {
-    public void onAdd(Acl resource);
+    void onAdd(Acl resource);
 
-    public void onAddFailed(Response response, Subject subject, String resource, AclAction action);
+    void onAddFailed(Response response, Subject subject, String resource, AclAction action);
   }
 }

@@ -41,7 +41,7 @@ public class PrettyPrintLabel extends Widget {
     prettyPrint();
   }
 
-  private final native void prettyPrint()
+  private native void prettyPrint()
   /*-{
       $wnd.prettyPrint();
   }-*/;
