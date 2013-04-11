@@ -28,6 +28,8 @@ public class QuerySearchJsonBuilder {
 
   private final static int DEFAULT_SIZE = 10;
 
+  private final static String DEFAULT_QUERY_OPERATOR = "AND";
+
   static {
     defaultQueryFields.add("name.analyzed");
     defaultQueryFields.add("label*");
@@ -119,6 +121,7 @@ public class QuerySearchJsonBuilder {
     JSONObject json = new JSONObject();
     json.put("fields", new JSONArray(defaultQueryFields));
     json.put("query", query);
+    json.put("default_operator", DEFAULT_QUERY_OPERATOR);
 
     return json;
   }
