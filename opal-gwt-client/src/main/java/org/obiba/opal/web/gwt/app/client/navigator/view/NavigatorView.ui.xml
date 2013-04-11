@@ -26,18 +26,16 @@
       <g:Button ui:field="refreshButton" styleName="btn iconb i-sync">
         <ui:msg description="Refresh label">Refresh</ui:msg>
       </g:Button>
-      <g:FlowPanel addStyleNames="right-aligned small-search-box">
-        <g:Grid>
-          <g:row>
-            <g:customCell styleName="top-aligned">
-              <g:SuggestBox ui:field="search" addStyleNames="variable-search-box"></g:SuggestBox>
-            </g:customCell>
-            <g:customCell styleName="top-aligned">
-              <o:HelpImage page="Working+with+Datasources" imageSize="16" addStyleNames="xsmall-indent"></o:HelpImage>
-            </g:customCell>
-          </g:row>
-        </g:Grid>
-      </g:FlowPanel>
+      <g:Grid addStyleNames="right-aligned small-search-box">
+        <g:row>
+          <g:customCell>
+            <o:SuggestListBox ui:field="search" addStyleNames="variable-search-box"></o:SuggestListBox>
+          </g:customCell>
+          <g:customCell styleName="top-aligned">
+            <o:HelpImage page="Working+with+Datasources" imageSize="16" addStyleNames="xsmall-indent"></o:HelpImage>
+          </g:customCell>
+        </g:row>
+      </g:Grid>
 
     </g:FlowPanel>
     <g:SplitLayoutPanel>

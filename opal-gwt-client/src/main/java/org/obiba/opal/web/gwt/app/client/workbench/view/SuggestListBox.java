@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemRemovedHandler;
@@ -18,6 +17,8 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemValida
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -25,13 +26,12 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 /**
  *
@@ -42,17 +42,29 @@ public class SuggestListBox extends FocusPanel {
 
   private final CloseableList closeables;
 
-  private DefaultSuggestBox suggestBox;
+  private SuggestBox suggestBox;
 
+<<<<<<< HEAD
   private final List<String> suggestions = new ArrayList<String>();
 
   private boolean strict = true;
 
   public SuggestListBox() {
+=======
+  private final Anchor clear;
+
+  private final Anchor empty;
+
+  private final SuggestOracle oracle;
+
+  private boolean strict = true;
+
+  public SuggestListBox(SuggestOracle oracle) {
+    this.oracle = oracle;
+>>>>>>> Search variables widget improvements
     addStyleName("obiba-SuggestListBox");
 
     content = new FlowPanel();
-    add(content);
 
     closeables = new CloseableList();
     content.add(closeables);
@@ -60,7 +72,6 @@ public class SuggestListBox extends FocusPanel {
 
       @Override
       public void onItemRemoved(String text) {
-        rebuildSuggestBox();
         suggestBox.setFocus(true);
       }
     });
@@ -68,14 +79,36 @@ public class SuggestListBox extends FocusPanel {
     rebuildSuggestBox();
 
     addFocusHandler(new FocusHandler() {
-
       @Override
       public void onFocus(FocusEvent event) {
         suggestBox.setFocus(true);
       }
     });
 
-    setItemValidator(new DefaultItemValidator());
+    clear = new Anchor();
+    clear.setVisible(false);
+    clear.addStyleName("icon-remove-circle");
+    clear.addStyleName("textbox-clearable-anchor");
+    clear.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        closeables.clear();
+        suggestBox.setText("");
+        clear.setVisible(false);
+        empty.setVisible(true);
+        suggestBox.setFocus(false);
+      }
+    });
+    content.add(clear);
+
+    empty = new Anchor();
+    empty.addStyleName("textbox-clearable-empty");
+    empty.setVisible(true);
+    content.add(empty);
+
+    add(content);
+
+//    setItemValidator(new DefaultItemValidator());
   }
 
   /**
@@ -87,76 +120,78 @@ public class SuggestListBox extends FocusPanel {
     this.strict = strict;
   }
 
+  public SuggestBox getSuggestBox() {
+    return suggestBox;
+  }
+
   private void rebuildSuggestBox() {
     if(suggestBox != null) {
       // do this because not able to clear suggest box text
       content.remove(suggestBox);
-      suggestBox.hideSuggestions();
     }
 
-    content.add(suggestBox = new DefaultSuggestBox());
-    suggestBox.setWidth("25px");
-    suggestBox.setDefaultSuggestionsEnabled(false);
+    content.add(suggestBox = new SuggestBox(oracle));
     addSuggestBoxHandlers();
+<<<<<<< HEAD
     for(String suggestion : suggestions) {
       if(!getItems().contains(suggestion)) {
         getSuggestOracle().add(suggestion);
       }
     }
+=======
+
+>>>>>>> Search variables widget improvements
   }
 
   private void addSuggestBoxHandlers() {
 
-    suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
-
-      @Override
-      public void onSelection(SelectionEvent<Suggestion> event) {
-        closeables.addItem(suggestBox.getText());
-        rebuildSuggestBox();
-        suggestBox.setFocus(true);
-      }
-    });
-
-    suggestBox.getTextBox().addKeyDownHandler(new KeyDownHandler() {
-
+    suggestBox.getValueBox().addKeyDownHandler(new KeyDownHandler() {
       @Override
       public void onKeyDown(KeyDownEvent event) {
-        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          if(!Strings.isNullOrEmpty(suggestBox.getText())) {
-            closeables.addItem(suggestBox.getText());
-            rebuildSuggestBox();
-            suggestBox.setFocus(true);
-          }
-        } else if(event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE) {
           if(Strings.isNullOrEmpty(suggestBox.getText())) {
             closeables.focusOrRemoveLastItem();
           }
+        } else {
+          // remove focus
+          closeables.removeLastItemFocus();
         }
       }
     });
 
-    suggestBox.getTextBox().addKeyUpHandler(new KeyUpHandler() {
-
+    suggestBox.getValueBox().addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        String width = (25 + 6 * suggestBox.getText().length()) + "px";
-        suggestBox.setWidth(width);
+        clear.setVisible(!suggestBox.getValueBox().getText().isEmpty());
+        empty.setVisible(suggestBox.getValueBox().getText().isEmpty());
       }
     });
 
-    suggestBox.getTextBox().addFocusHandler(new FocusHandler() {
+    suggestBox.getValueBox().addFocusHandler(new FocusHandler() {
 
       @Override
       public void onFocus(FocusEvent event) {
-        suggestBox.clear();
+        for(int i = 0; i < closeables.getWidgetCount(); i++) {
+          if(((VariableSearchListItem) closeables.getWidget(i)).getType() ==
+              VariableSearchListItem.ItemType.DATASOURCE) {
+            ((VariableSuggestOracle) suggestBox.getSuggestOracle())
+                .setDatasource(((HasText) closeables.getWidget(i)).getText());
+          }
+          if(((VariableSearchListItem) closeables.getWidget(i)).getType() == VariableSearchListItem.ItemType.TABLE) {
+            ((VariableSuggestOracle) suggestBox.getSuggestOracle())
+                .setTable(((HasText) closeables.getWidget(i)).getText());
+          }
+        }
+        suggestBox.showSuggestionList();
       }
     });
 
-    suggestBox.getTextBox().addBlurHandler(new BlurHandler() {
+    suggestBox.getValueBox().addBlurHandler(new BlurHandler() {
 
       @Override
       public void onBlur(BlurEvent event) {
-        suggestBox.clear();
+        ((VariableSuggestOracle) suggestBox.getSuggestOracle()).setTable(null);
+        ((VariableSuggestOracle) suggestBox.getSuggestOracle()).setDatasource(null);
       }
     });
   }
@@ -164,10 +199,9 @@ public class SuggestListBox extends FocusPanel {
   @Override
   public void clear() {
     closeables.clear();
-    suggestions.clear();
-    rebuildSuggestBox();
   }
 
+<<<<<<< HEAD
   public void addSuggestion(String suggestion) {
     if(suggestions.contains(suggestion)) return;
 
@@ -175,36 +209,46 @@ public class SuggestListBox extends FocusPanel {
     if(!getItems().contains(suggestion)) {
       getSuggestOracle().add(suggestion);
     }
+=======
+  public boolean addItem(String text, String title, VariableSearchListItem.ItemType type) {
+    return closeables.addItem(text, false, title, type);
+>>>>>>> Search variables widget improvements
   }
 
-  public boolean addItem(String text) {
-    return closeables.addItem(text, false);
+  public boolean addItem(String text, VariableSearchListItem.ItemType type) {
+    return closeables.addItem(text, false, type);
   }
 
+  @SuppressWarnings("UnusedDeclaration")
   public void removeItem(String text) {
     closeables.removeItem(text);
   }
 
+  @SuppressWarnings("UnusedDeclaration")
   public List<String> getItems() {
     return closeables.getItemTexts();
   }
 
-  public MultiWordSuggestOracle getSuggestOracle() {
+  public SuggestOracle getSuggestOracle() {
     return suggestBox.getSuggestOracle();
   }
 
+  @SuppressWarnings("UnusedDeclaration")
   public void setItemValidator(ItemValidator validator) {
     closeables.setItemValidator(validator);
   }
 
+  @SuppressWarnings("UnusedDeclaration")
   public void addItemRemovedHandler(ItemRemovedHandler handler) {
     closeables.addItemRemovedHandler(handler);
   }
 
+  @SuppressWarnings("UnusedDeclaration")
   public void removeItemRemovedHandler(ItemRemovedHandler handler) {
     closeables.removeItemRemovedHandler(handler);
   }
 
+<<<<<<< HEAD
   /**
    * Validates text is not empty or blank and is unique.
    */
@@ -218,4 +262,6 @@ public class SuggestListBox extends FocusPanel {
 
   }
 
+=======
+>>>>>>> Search variables widget improvements
 }
