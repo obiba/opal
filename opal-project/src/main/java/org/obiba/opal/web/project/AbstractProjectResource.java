@@ -19,10 +19,16 @@ abstract class AbstractProjectResource {
 
   protected Project getProject(Datasource ds) {
     Project project;
-    if (getProjectsConfigurationService().getConfig().hasProject(ds.getName())) {
+    if(getProjectsConfigurationService().getConfig().hasProject(ds.getName())) {
       project = getProjectsConfigurationService().getConfig().getProject(ds.getName());
     } else {
-      project = Project.Builder.create(ds.getName()).build();
+      Project.Builder builder = Project.Builder.create(ds.getName());
+      project = builder.summary("Project about " + ds.getName()) //
+          .description(
+              "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.") //
+          .tags("onyx","limesurvey","datashield","harmonization") //
+          .build();
+      //project = builder.build();
     }
     return project;
   }

@@ -1,0 +1,14 @@
+import "Magma.proto";
+
+package Projects;
+
+option java_package = "org.obiba.opal.web.model";
+
+message ProjectDto {
+  required string name = 1;
+  optional string link = 2;
+  required Magma.DatasourceDto datasource = 3;
+  optional string summary = 4;
+  optional string description = 5;
+  repeated string tags = 6;
+}

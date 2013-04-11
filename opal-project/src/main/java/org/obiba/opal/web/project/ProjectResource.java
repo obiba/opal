@@ -13,10 +13,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.project.NoSuchProjectException;
 import org.obiba.opal.project.cfg.ProjectsConfigurationService;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Projects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -37,9 +39,10 @@ public class ProjectResource extends AbstractProjectResource {
   private String name;
 
   @GET
-  public Opal.ProjectDto get() {
+  public Projects.ProjectDto get() {
     if (MagmaEngine.get().hasDatasource(name)) {
-      return Dtos.asDto(getProject(MagmaEngine.get().getDatasource(name))).build();
+      Datasource ds = MagmaEngine.get().getDatasource(name);
+      return Dtos.asDto(getProject(ds), ds).build();
     } else {
       throw new NoSuchProjectException(name);
     }

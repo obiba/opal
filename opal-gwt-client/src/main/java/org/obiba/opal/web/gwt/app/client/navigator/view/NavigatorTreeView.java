@@ -18,6 +18,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
@@ -105,6 +106,7 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
 
   private NavLink getDatasourceLink(String datasourceName) {
     NavLink link = new NavLink(datasourceName);
+    link.setIcon(IconType.BRIEFCASE);
     link.addClickHandler(datasourceClickHandler);
     datasource = datasourceName;
     return link;
@@ -112,6 +114,7 @@ public class NavigatorTreeView extends ViewImpl implements NavigatorTreePresente
 
   private NavLink getTableLink(String tableName) {
     NavLink link = new NavLink(tableName);
+    link.setIcon(IconType.TABLE);
     link.addClickHandler(tableClickHandler);
     table = tableName;
     return link;

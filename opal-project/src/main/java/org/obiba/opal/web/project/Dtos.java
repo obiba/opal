@@ -13,14 +13,15 @@ import java.net.URI;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.magma.Datasource;
 import org.obiba.opal.project.Project;
 import org.obiba.opal.web.magma.DatasourceResource;
-import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Projects;
 
 public class Dtos {
 
-  public static Opal.ProjectDto.Builder asDto(Project project) {
-    Opal.ProjectDto.Builder builder = Opal.ProjectDto.newBuilder() //
+  public static Projects.ProjectDto.Builder asDto(Project project, Datasource datasource) {
+    Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder() //
         .setName(project.getName());
 
     if(project.hasSummary()) {
@@ -31,8 +32,13 @@ public class Dtos {
       builder.setDescription(project.getDescription());
     }
 
+    if (project.hasTags()) {
+      builder.addAllTags(project.getTags());
+    }
+
     builder.setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString());
-    builder.setDatasourceLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString());
+    builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
+        .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
 
     return builder;
   }

@@ -1,9 +1,7 @@
 package Search;
 
 import "Opal.proto";
-
 import "Magma.proto";
-
 import "Math.proto";
 
 option java_package = "org.obiba.opal.web.model";

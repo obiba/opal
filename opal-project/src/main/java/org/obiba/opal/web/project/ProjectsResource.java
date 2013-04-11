@@ -17,7 +17,7 @@ import javax.ws.rs.Path;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.project.cfg.ProjectsConfigurationService;
-import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Projects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,12 +35,12 @@ public class ProjectsResource extends AbstractProjectResource {
   }
 
   @GET
-  public List<Opal.ProjectDto> getProjects() {
-    List<Opal.ProjectDto> projects = Lists.newArrayList();
+  public List<Projects.ProjectDto> getProjects() {
+    List<Projects.ProjectDto> projects = Lists.newArrayList();
 
     // one project per datasource
     for(Datasource ds : MagmaEngine.get().getDatasources()) {
-      projects.add(Dtos.asDto(getProject(ds)).build());
+      projects.add(Dtos.asDto(getProject(ds), ds).build());
     }
 
     return projects;

@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.project;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Description of a project in Opal.
  */
@@ -19,6 +22,8 @@ public class Project {
   private String summary;
 
   private String description;
+
+  private List<String> tags;
 
   public String getName() {
     return name;
@@ -52,6 +57,20 @@ public class Project {
     this.description = description;
   }
 
+  public boolean hasTags() {
+    return getTags().size()>0;
+  }
+
+  public List<String> getTags() {
+    return tags == null ? tags = new ArrayList<String>() : tags;
+  }
+
+  public void addTag(String tag) {
+    if(!getTags().contains(tag)) {
+      getTags().add(tag);
+    }
+  }
+
   public static class Builder {
 
     private Project project;
@@ -75,6 +94,14 @@ public class Project {
 
     public Builder description(String description) {
       project.setDescription(description);
+      return this;
+    }
+
+    public Builder tags(String... tags) {
+      if (tags == null) return this;
+      for(String tag : tags) {
+        project.addTag(tag);
+      }
       return this;
     }
 
