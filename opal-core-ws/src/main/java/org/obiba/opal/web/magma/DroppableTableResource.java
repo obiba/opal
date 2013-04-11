@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Response;
 
@@ -27,11 +28,12 @@ import org.obiba.opal.search.service.OpalSearchService;
  */
 public class DroppableTableResource extends TableResource {
 
+  @Nullable
   private final Set<ValueTableUpdateListener> tableListeners;
 
   public DroppableTableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService,
       OpalSearchService opalSearchService, StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider,
-      Set<ValueTableUpdateListener> tableListeners) {
+      @Nullable Set<ValueTableUpdateListener> tableListeners) {
     super(valueTable, locales, importService, opalSearchService, statsIndexManager, esProvider);
     this.tableListeners = tableListeners;
   }
@@ -44,7 +46,6 @@ public class DroppableTableResource extends TableResource {
       }
     }
     getDatasource().dropTable(getValueTable().getName());
-
     return Response.ok().build();
   }
 }

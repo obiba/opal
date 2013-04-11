@@ -10,8 +10,8 @@
 package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -86,7 +86,7 @@ public class ViewResource extends AbstractValueTableResource {
     for(Magma.VariableDto variable : derivedVariables.getVariablesList()) {
       if(!variable.getEntityType().equals(getValueTable().getEntityType())) {
 
-        List<String> args = new ArrayList<String>();
+        Collection<String> args = new ArrayList<String>();
         args.add(variable.getEntityType());
         args.add(getValueTable().getEntityType());
 
