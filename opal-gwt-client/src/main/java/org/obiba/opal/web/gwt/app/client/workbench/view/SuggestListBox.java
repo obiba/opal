@@ -44,13 +44,6 @@ public class SuggestListBox extends FocusPanel {
 
   private SuggestBox suggestBox;
 
-<<<<<<< HEAD
-  private final List<String> suggestions = new ArrayList<String>();
-
-  private boolean strict = true;
-
-  public SuggestListBox() {
-=======
   private final Anchor clear;
 
   private final Anchor empty;
@@ -61,7 +54,6 @@ public class SuggestListBox extends FocusPanel {
 
   public SuggestListBox(SuggestOracle oracle) {
     this.oracle = oracle;
->>>>>>> Search variables widget improvements
     addStyleName("obiba-SuggestListBox");
 
     content = new FlowPanel();
@@ -132,15 +124,7 @@ public class SuggestListBox extends FocusPanel {
 
     content.add(suggestBox = new SuggestBox(oracle));
     addSuggestBoxHandlers();
-<<<<<<< HEAD
-    for(String suggestion : suggestions) {
-      if(!getItems().contains(suggestion)) {
-        getSuggestOracle().add(suggestion);
-      }
-    }
-=======
 
->>>>>>> Search variables widget improvements
   }
 
   private void addSuggestBoxHandlers() {
@@ -201,18 +185,8 @@ public class SuggestListBox extends FocusPanel {
     closeables.clear();
   }
 
-<<<<<<< HEAD
-  public void addSuggestion(String suggestion) {
-    if(suggestions.contains(suggestion)) return;
-
-    suggestions.add(suggestion);
-    if(!getItems().contains(suggestion)) {
-      getSuggestOracle().add(suggestion);
-    }
-=======
   public boolean addItem(String text, String title, VariableSearchListItem.ItemType type) {
     return closeables.addItem(text, false, title, type);
->>>>>>> Search variables widget improvements
   }
 
   public boolean addItem(String text, VariableSearchListItem.ItemType type) {
@@ -248,20 +222,4 @@ public class SuggestListBox extends FocusPanel {
     closeables.removeItemRemovedHandler(handler);
   }
 
-<<<<<<< HEAD
-  /**
-   * Validates text is not empty or blank and is unique.
-   */
-  public class DefaultItemValidator implements ItemValidator {
-
-    @Override
-    public boolean validate(String text) {
-      if(text == null || Strings.isNullOrEmpty(text.trim()) || getItems().contains(text)) return false;
-      return !strict || suggestions.contains(text);
-    }
-
-  }
-
-=======
->>>>>>> Search variables widget improvements
 }
