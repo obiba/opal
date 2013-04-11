@@ -59,7 +59,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -75,7 +74,6 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.Presenter;
@@ -275,10 +273,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
               // Schedule the timer to run once in X seconds.
               t.schedule(DELAY_MILLIS);
             } else {
-              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                      .build());
+              getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
             }
           }
 
@@ -386,7 +381,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     updateVariables();
     updateTableIndexStatus();
-
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables

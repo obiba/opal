@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -319,6 +320,7 @@ public class IndexAdministrationPresenter
             if(response.getStatusCode() == Response.SC_OK) {
               getView().serviceStartable();
               getView().clear();
+              getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
             } else {
               getView().clear();
               getView().serviceStoppable();
@@ -352,6 +354,7 @@ public class IndexAdministrationPresenter
             if(response.getStatusCode() == Response.SC_OK) {
               getView().serviceStoppable();
               refresh();
+              getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
             } else {
               getView().serviceStartable();
               getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());

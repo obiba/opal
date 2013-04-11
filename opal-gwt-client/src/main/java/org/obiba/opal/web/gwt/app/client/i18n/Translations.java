@@ -339,7 +339,7 @@ public interface Translations extends Constants {
       "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
       "DestinationFileIsMissing", "Destination File is required.", //
       "ExportDataMissingTables", "At least one table is required.",//
-      "ExportDataDuplicateTableNames", "At least two tables have the name '{0}'. Export can not be completed.",//
+      "ExportDataDuplicateTableNames", "At least two tables have the name '{0}'. Export cannot be completed.",//
       "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
       "NoIdentifiersGenerated", "No Identifiers generated.",//
       "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
@@ -399,12 +399,12 @@ public interface Translations extends Constants {
       "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
       "InvalidLocaleName", "Invalid locale name '{0}'. Please choose a valid locale name from the list.",//
       "CopyVariableSelectAtLeastOne", "Select at least one variable to add.",//
-      "CopyVariableCurrentView", "The view can not be the current view. Please select another destination view.",//
+      "CopyVariableCurrentView", "The view cannot be the current view. Please select another destination view.",//
       "CopyVariableNameRequired", "Variable name cannot be empty.",//
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
       "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}",//
-      "SearchServiceUnavailable", "Can not search variables because the search service is not running."//
+      "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started."//
   })
   Map<String, String> userMessageMap();
 
@@ -778,8 +778,8 @@ public interface Translations extends Constants {
       "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.", //
       "CsvCannotCreateWriter", "Cannot create writer", //
       "CsvCannotSetVariableHeader", "Cannot set variables header", //
-      "CsvCannotObtainWriter", "Can not get csv writer", //
-      "CsvCannotObtainReader", "Can not get csv reader", //
+      "CsvCannotObtainWriter", "Cannot get csv writer", //
+      "CsvCannotObtainReader", "Cannot get csv reader", //
       "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
       "InvalidCharsetCharacter",
       "File contains invalid characters at row '{0}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
