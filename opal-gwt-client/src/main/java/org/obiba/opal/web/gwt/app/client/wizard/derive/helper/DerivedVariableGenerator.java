@@ -27,6 +27,7 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 
 import static org.obiba.opal.web.gwt.app.client.js.JsArrays.toIterable;
@@ -53,7 +54,9 @@ public abstract class DerivedVariableGenerator {
 
   public VariableDto generate(@Nullable VariableDto destination) {
     // CopyVariable in both case because the user could click on Cancel
-    VariableDto derived = destination == null ? copyVariable(originalVariable) : copyVariable(destination);
+    VariableDto derived = destination == null
+        ? copyVariable(originalVariable)
+        : copyVariable(destination, originalVariable.getLink());
 
     scriptBuilder = new StringBuilder();
     newCategoriesMap.clear();
@@ -224,10 +227,14 @@ public abstract class DerivedVariableGenerator {
   }
 
   public static VariableDto copyVariable(@Nonnull VariableDto variable) {
-    return copyVariable(variable, false);
+    return copyVariable(variable, false, variable.getLink());
   }
 
-  public static VariableDto copyVariable(VariableDto variable, boolean withCategories) {
+  public static VariableDto copyVariable(@Nonnull VariableDto variable, String link) {
+    return copyVariable(variable, false, link);
+  }
+
+  public static VariableDto copyVariable(VariableDto variable, boolean withCategories, String link) {
     VariableDto derived = VariableDto.create();
     derived.setName(variable.getName());
     derived.setValueType(variable.getValueType());
@@ -239,8 +246,10 @@ public abstract class DerivedVariableGenerator {
 
     // set attributes
     derived.setAttributesArray(copyAttributes(variable.getAttributesArray()));
-    if(!Strings.isNullOrEmpty(variable.getLink())) {
-      VariableDtos.setDerivedFrom(derived, variable);
+    GWT.log(variable.getLink());
+
+    if(!Strings.isNullOrEmpty(link)) {
+      VariableDtos.setDerivedFrom(derived, link);
     }
 
     // set categories

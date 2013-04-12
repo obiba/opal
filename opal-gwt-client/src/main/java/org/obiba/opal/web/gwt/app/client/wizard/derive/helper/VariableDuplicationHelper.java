@@ -29,7 +29,7 @@ public class VariableDuplicationHelper extends DerivationHelper {
 
   @Override
   public VariableDto getDerivedVariable() {
-    VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, true);
+    VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, true, originalVariable.getLink());
     VariableDtos.setScript(derived, "$('" + originalVariable.getName() + "')");
     return derived;
   }
