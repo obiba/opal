@@ -118,8 +118,8 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   }
 
   @Override
-  public void selectTable(TableDto table) {
-    tableChooser.selectTable(table);
+  public void selectTable(TableDto tableDto) {
+    tableChooser.selectTable(tableDto);
   }
 
   @Override

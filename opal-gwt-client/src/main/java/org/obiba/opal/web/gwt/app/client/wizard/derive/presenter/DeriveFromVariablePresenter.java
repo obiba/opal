@@ -10,9 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +30,10 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
@@ -50,19 +50,15 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
 
   private WizardType wizardType;
 
+  @SuppressWarnings("UnusedDeclaration")
   private String preSelectedDatasource;
 
+  @SuppressWarnings("UnusedDeclaration")
   private String preSelectedTable;
 
   private TableDto table;
 
   private String preSelectedVariable;
-
-  private final Collection<String> restrictedDatasources = new HashSet<String>();
-
-  private final Collection<String> restrictedTables = new HashSet<String>();
-
-  private final Map<String, TableDto> tablesByName = new HashMap<String, TableDto>();
 
   private final Map<String, VariableDto> variablesByName = new HashMap<String, VariableDto>();
 
@@ -119,8 +115,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
                   }).send();
 
             }
-          })
-              //
+          })//
           .withCallback(Response.SC_NOT_FOUND, failureCallback)//
           .withCallback(Response.SC_FORBIDDEN, failureCallback)//
           .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failureCallback)//
@@ -130,32 +125,47 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   }
 
   private void loadTables() {
+    // fetch the current view to retrieve the fromTables
+    UriBuilder ub = UriBuilder.create()
+        .segment("datasource", getDestinationTable().getDatasourceName(), "view", getDestinationTable().getName());
+    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResourceCallback<ViewDto>() {
 
-    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
-        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
-          public void onResource(Response response, JsArray<TableDto> resource) {
-            // TODO: When deriving from, we should only add the tables that are part of the ViewDto.getFromTables().
-//            List<String> tables = new ArrayList<String>();
-//            tablesByName.clear();
-//            if(resource != null) {
-//              for(int i = 0; i < resource.length(); i++) {
-//                TableDto tableDto = resource.get(i);
-//                if(restrictedTables.contains(tableDto.getName())) {
-//                  tablesByName.put(tableDto.getName(), tableDto);
-//                }
-//              }
-//              tables.addAll(tablesByName.keySet());
-//              Collections.sort(tables);
-//            }
-            getView().addTableSelections(JsArrays.toSafeArray(resource));
-            if(table != null) {
-              getView().selectTable(table);
-            }
-            onTableSelection();
-            loadVariables();
+          public void onResource(Response response, final ViewDto viewDto) {
+
+            ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
+                .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+                  @Override
+                  public void onResource(Response response, JsArray<TableDto> resource) {
+                    // When deriving from, we should only add the tables that are part of the ViewDto.getFromTables().
+
+                    JsArray<TableDto> tables = JsArrays.create();
+                    JsArrayString fromTables = viewDto.getFromArray();
+
+                    for(int i = 0; i < fromTables.length(); i++) {
+                      for(int j = 0; j < resource.length(); j++) {
+                        // add the table if its in the fromtables
+                        if(fromTables.get(i)
+                            .equals(resource.get(j).getDatasourceName() + "." + resource.get(j).getName())) {
+                          tables.push(resource.get(j));
+                          break;
+                        }
+                      }
+                    }
+                    getView().addTableSelections(JsArrays.toSafeArray(tables));
+//                    getView().addTableSelections(JsArrays.toSafeArray(resource));
+                    if(table != null) {
+                      getView().selectTable(table);
+                    }
+                    onTableSelection();
+                    loadVariables();
+                  }
+                }).send();
+
           }
         }).send();
+
   }
 
   private void loadVariables() {
@@ -247,7 +257,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
 
     void addTableSelections(JsArray<TableDto> tables);
 
-    void selectTable(TableDto table);
+    void selectTable(TableDto tableDto);
 
     TableDto getSelectedTable();
 
