@@ -2489,6 +2489,23 @@ a.icon:hover {
 
 /* Special case for bootstrap button in the admin page */
 .dropdown-button-small a {
-    height: 15px !important;
-    margin-top: -2px;
+  height: 15px !important;
+  margin-top: -2px;
+}
+
+/* Table chooser full width: If the tablechooser is within a div with full-width*/
+div.full-width select.chzn-done {
+  width: 100%;
+}
+
+div.full-width select.chzn-done+div {
+  width: 100% !important;
+}
+
+div.full-width select.chzn-done+div>div {
+  width: 99% !important;
+}
+
+div.full-width select.chzn-done+div>div>div input {
+  width: 96% !important;
 }
