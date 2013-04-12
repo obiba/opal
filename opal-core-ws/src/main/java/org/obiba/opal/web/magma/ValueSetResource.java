@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma;
 import java.util.HashSet;
 import java.util.Locale;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -39,8 +40,6 @@ import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.support.MimetypesFileExtensionsMap;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -51,20 +50,19 @@ import com.google.common.collect.Iterables;
  */
 public class ValueSetResource extends AbstractValueTableResource {
 
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(ValueSetResource.class);
+//  private static final Logger log = LoggerFactory.getLogger(ValueSetResource.class);
 
   @Nullable
   private final VariableValueSource vvs;
 
-  @Nullable
+  @Nonnull
   private final VariableEntity entity;
 
-  public ValueSetResource(ValueTable valueTable, VariableEntity entity) {
+  public ValueSetResource(ValueTable valueTable, @Nonnull VariableEntity entity) {
     this(valueTable, null, entity);
   }
 
-  public ValueSetResource(ValueTable valueTable, @Nullable VariableValueSource vvs, VariableEntity entity) {
+  public ValueSetResource(ValueTable valueTable, @Nullable VariableValueSource vvs, @Nonnull VariableEntity entity) {
     super(valueTable, new HashSet<Locale>());
     this.vvs = vvs;
     this.entity = entity;
@@ -109,21 +107,18 @@ public class ValueSetResource extends AbstractValueTableResource {
     return getValueAtPosition(pos);
   }
 
-  //
-  // private methods
-  //
-
   /**
    * The position in a sequence of the value is its occurrence.
    *
    * @param pos the occurrence number (start at 0)
    * @return
    */
-  private Response getValueAtPosition(Integer pos) {
+  private Response getValueAtPosition(@Nullable Integer pos) {
     ResponseBuilder builder;
     try {
       Value value = extractValue(entity.getIdentifier());
-      if(value.isNull() || value.isSequence() && pos != null && pos > value.asSequence().getSize() - 1) {
+      if(value == null || value.isNull() ||
+          value.isSequence() && pos != null && pos > value.asSequence().getSize() - 1) {
         builder = Response.status(Status.NOT_FOUND);
       } else {
         value = getValueAt(value, pos);
@@ -172,22 +167,22 @@ public class ValueSetResource extends AbstractValueTableResource {
   }
 
   private ValueSetsDto.ValueDto getValueDto(UriInfo uriInfo, boolean filterBinary) {
-    String link = uriInfo.getPath() + "/value";
     Value value = extractValue(entity.getIdentifier());
-    return Dtos.asDto(link, value, filterBinary).build();
+    return Dtos.asDto(uriInfo.getPath() + "/value", value, filterBinary).build();
   }
 
+  @Nullable
   private Value extractValue(String identifier) {
-    VariableEntity entity = new VariableEntityBean(getValueTable().getEntityType(), identifier);
-    ValueSet valueSet = getValueTable().getValueSet(entity);
-    return vvs.getValue(valueSet);
+    ValueSet valueSet = getValueTable()
+        .getValueSet(new VariableEntityBean(getValueTable().getEntityType(), identifier));
+    return vvs == null ? null : vvs.getValue(valueSet);
   }
 
-  private Value getValueAt(Value value, Integer occurrence) {
+  private Value getValueAt(Value value, @Nullable Integer occurrence) {
     return value.isSequence() && occurrence != null ? value.asSequence().get(occurrence) : value;
   }
 
-  private ResponseBuilder getValueResponse(String identifier, Value value, Integer pos) {
+  private ResponseBuilder getValueResponse(String identifier, Value value, @Nullable Integer pos) {
     Variable variable = vvs.getVariable();
     if(variable.getValueType().equals(BinaryType.get())) {
       return getBinaryValueResponse(identifier, value, pos);
@@ -196,29 +191,26 @@ public class ValueSetResource extends AbstractValueTableResource {
         .type(value.isSequence() ? "text/csv" : MediaType.TEXT_PLAIN);
   }
 
-  private ResponseBuilder getBinaryValueResponse(String identifier, Value value, Integer pos) {
+  private ResponseBuilder getBinaryValueResponse(String identifier, Value value, @Nullable Integer pos) {
     if(value.isSequence()) return Response.status(Status.BAD_REQUEST);
 
     Variable variable = vvs.getVariable();
-    ResponseBuilder builder;
 
     // download as a file
-    builder = TimestampedResponses.ok(getValueTable(), value.getValue()).type(getVariableMimeType(variable));
+    ResponseBuilder builder = TimestampedResponses.ok(getValueTable(), value.getValue())
+        .type(getVariableMimeType(variable));
     builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier, pos) + "\"");
-
     return builder;
   }
 
-  private String getFileName(Variable variable, String identifier, Integer pos) {
+  private String getFileName(Variable variable, String identifier, @Nullable Integer pos) {
     // first look in variables attributes
     String name = getFileNameFromAttributes(variable);
-    StringBuilder builder = new StringBuilder();
-
     if(name == null) {
       name = variable.getName();
     }
 
-    builder.append(name);
+    StringBuilder builder = new StringBuilder(name);
     int dot = name.lastIndexOf('.');
     if(dot == -1) {
       builder.append("-").append(identifier);
@@ -240,9 +232,10 @@ public class ValueSetResource extends AbstractValueTableResource {
   private String getFileExtension(Variable variable) {
     // first look in variables attributes
     String extension = getFileExtensionFromAttributes(variable);
-    if(extension != null) return extension;
+    return extension == null
+        ? MimetypesFileExtensionsMap.get().getPreferedFileExtension(variable.getMimeType())
+        : extension;
 
-    return MimetypesFileExtensionsMap.get().getPreferedFileExtension(variable.getMimeType());
   }
 
   private String getVariableMimeType(Variable variable) {
@@ -254,12 +247,7 @@ public class ValueSetResource extends AbstractValueTableResource {
     // if file extension is defined, get the mime-type from it
     String name = getFileExtensionFromAttributes(variable);
     name = name == null ? getFileNameFromAttributes(variable) : "file." + name;
-
-    if(name != null) {
-      return MimetypesFileExtensionsMap.get().getMimeType(name);
-    }
-
-    return MediaType.APPLICATION_OCTET_STREAM;
+    return name == null ? MediaType.APPLICATION_OCTET_STREAM : MimetypesFileExtensionsMap.get().getMimeType(name);
   }
 
   @Nullable

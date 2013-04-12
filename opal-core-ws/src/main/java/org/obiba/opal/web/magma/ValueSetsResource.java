@@ -35,8 +35,6 @@ import org.obiba.magma.VectorSource;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -48,7 +46,7 @@ import com.google.common.collect.Iterables;
  */
 public class ValueSetsResource extends AbstractValueTableResource {
 
-  private static final Logger log = LoggerFactory.getLogger(ValueSetsResource.class);
+//  private static final Logger log = LoggerFactory.getLogger(ValueSetsResource.class);
 
   @Nullable
   private final VariableValueSource vvs;
@@ -170,7 +168,6 @@ public class ValueSetsResource extends AbstractValueTableResource {
       boolean filterBinary, Value value) {
     String link = uriInfo.getPath().replace("valueSets",
         "valueSet/entity/" + fromEntity.getIdentifier() + "/variable/" + variable.getName() + "/value");
-    log.info("getValueSetDto(uri={})", uriInfo.getPath());
     return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier())
         .addValues(Dtos.asDto(link, value, filterBinary)).build();
   }

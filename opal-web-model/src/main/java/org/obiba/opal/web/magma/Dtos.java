@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -295,16 +296,16 @@ public final class Dtos {
 
   }
 
-  public static ValueSetsDto.ValueDto.Builder asDto(Value value) {
+  public static ValueSetsDto.ValueDto.Builder asDto(@Nonnull Value value) {
     return asDto(null, value);
   }
 
-  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, Value value) {
+  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, @Nonnull Value value) {
     return asDto(link, value, false);
   }
 
   @SuppressWarnings("ConstantConditions")
-  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, Value value, boolean filterBinary) {
+  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, @Nonnull Value value, boolean filterBinary) {
     Function<Object, String> toString = filterBinary ? FilteredToStringFunction.INSTANCE : Functions.toStringFunction();
 
     ValueSetsDto.ValueDto.Builder valueDto = ValueSetsDto.ValueDto.newBuilder();
