@@ -340,7 +340,7 @@ img.clickable {
 
 .help-inline, .help-block {
   color: #888888;
-  margin-top: -5px;
+  margin-top: -moz-calc(-5px);
 }
 
 .help-block a {
