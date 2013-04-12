@@ -93,7 +93,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
   @Override
   public void generateDerivedVariable() {
-    VariableDto derived = DerivedVariableGenerator.copyVariable(getOriginalVariable(), false);
+    VariableDto derived = DerivedVariableGenerator
+        .copyVariable(getOriginalVariable(), false, getOriginalVariable().getLink());
     derived.setIsRepeatable(getView().getRepeatable().getValue());
     VariableDtos.setScript(derived, scriptEditorPresenter.getScript());
     derived.setValueType(getView().getValueType().getValue());
