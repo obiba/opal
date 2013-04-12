@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -136,18 +135,19 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
-            List<String> tables = new ArrayList<String>();
-            tablesByName.clear();
-            if(resource != null) {
-              for(int i = 0; i < resource.length(); i++) {
-                TableDto tableDto = resource.get(i);
-                if(restrictedTables.contains(tableDto.getName())) {
-                  tablesByName.put(tableDto.getName(), tableDto);
-                }
-              }
-              tables.addAll(tablesByName.keySet());
-              Collections.sort(tables);
-            }
+            // TODO: When deriving from, we should only add the tables that are part of the ViewDto.getFromTables().
+//            List<String> tables = new ArrayList<String>();
+//            tablesByName.clear();
+//            if(resource != null) {
+//              for(int i = 0; i < resource.length(); i++) {
+//                TableDto tableDto = resource.get(i);
+//                if(restrictedTables.contains(tableDto.getName())) {
+//                  tablesByName.put(tableDto.getName(), tableDto);
+//                }
+//              }
+//              tables.addAll(tablesByName.keySet());
+//              Collections.sort(tables);
+//            }
             getView().addTableSelections(JsArrays.toSafeArray(resource));
             if(table != null) {
               getView().selectTable(table);
