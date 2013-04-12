@@ -380,23 +380,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
 
     updateVariables();
-    updateTableIndexStatus();
+    updateIndexStatus();
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables
     ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
         .withCallback(new ViewResourceCallback()).send();
-  }
-
-  private void updateTableIndexStatus() {// Check if service is enabled
-    // Table indexation status
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
-        .authorize(getView().getTableIndexStatusAuthorizer()).send();
-
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
-        .authorize(getView().getTableIndexEditAuthorizer()).send();
-
-    updateIndexStatus();
   }
 
   private void updateIndexStatus() {
@@ -910,7 +899,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void onRefresh(TableIndexStatusRefreshEvent event) {
-      updateTableIndexStatus();
+      updateIndexStatus();
     }
   }
 
@@ -982,10 +971,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasAuthorization getValuesAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
-
-    HasAuthorization getTableIndexStatusAuthorizer();
-
-    HasAuthorization getTableIndexEditAuthorizer();
 
     String getClickableColumnName(Column<?, ?> column);
 
