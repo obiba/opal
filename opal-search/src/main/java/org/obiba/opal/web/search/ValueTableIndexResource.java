@@ -111,7 +111,7 @@ public class ValueTableIndexResource extends IndexResource {
       return Response.ok().build();
     }
 
-    throw new SearchServiceException();
+    return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
   }
 
   @DELETE
