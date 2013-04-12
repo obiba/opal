@@ -16,7 +16,7 @@
     <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
 
     <g:FlowPanel ui:field="indexStatus" addStyleNames="index-status" visible="false">
-      <b:Alert ui:field="indexStatusAlert" close="false" visible="false">
+      <b:Alert ui:field="indexStatusAlert" close="false" visible="true">
 
         <g:Grid>
           <g:row>
