@@ -154,7 +154,6 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
                       }
                     }
                     getView().addTableSelections(JsArrays.toSafeArray(tables));
-//                    getView().addTableSelections(JsArrays.toSafeArray(resource));
                     if(table != null) {
                       getView().selectTable(table);
                     }
