@@ -79,7 +79,7 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.watopi</groupId>
+      <groupId>com.github.jdramaix</groupId>
       <artifactId>gwtchosen</artifactId>
       <scope>provided</scope>
     </dependency>

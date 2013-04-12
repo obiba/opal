@@ -865,7 +865,7 @@
         <version>${gwtquery.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.watopi</groupId>
+        <groupId>com.github.jdramaix</groupId>
         <artifactId>gwtchosen</artifactId>
         <version>${gwt-chosen.version}</version>
       </dependency>
@@ -1404,7 +1404,7 @@
     <guava.version>14.0.1</guava.version>
     <gwt.version>2.5.1</gwt.version>
     <gwt-bootstrap.version>2.0.4.0</gwt-bootstrap.version>
-    <gwt-chosen.version>1.1.0</gwt-chosen.version>
+    <gwt-chosen.version>1.1.0-alpha-2</gwt-chosen.version>
     <gwt-presenter.version>1.0.0</gwt-presenter.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
     <gwtp.version>0.6</gwtp.version>
