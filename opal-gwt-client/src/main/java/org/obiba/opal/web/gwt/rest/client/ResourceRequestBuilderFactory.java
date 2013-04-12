@@ -17,6 +17,8 @@ import com.google.gwt.core.client.JavaScriptObject;
  */
 public class ResourceRequestBuilderFactory {
 
+  private ResourceRequestBuilderFactory() {}
+
   public static <T extends JavaScriptObject> ResourceRequestBuilder<T> newBuilder() {
     return GWT.create(ResourceRequestBuilder.class);
   }

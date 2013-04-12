@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
@@ -205,6 +207,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     return builder;
   }
 
+  @Nullable
   @Override
   public Request send() {
     try {

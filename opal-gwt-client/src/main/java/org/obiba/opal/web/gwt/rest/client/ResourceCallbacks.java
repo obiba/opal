@@ -14,6 +14,8 @@ import com.google.gwt.http.client.Response;
 
 public final class ResourceCallbacks {
 
+  private ResourceCallbacks() {}
+
   public static <T extends JavaScriptObject> ResourceCallback<T> noOp() {
     return new ResourceCallback<T>() {
 

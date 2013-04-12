@@ -16,6 +16,8 @@ import com.google.gwt.core.client.GWT;
  */
 public class ResourceAuthorizationRequestBuilderFactory {
 
+  private ResourceAuthorizationRequestBuilderFactory() {}
+
   public static ResourceAuthorizationRequestBuilder newBuilder() {
     return GWT.create(ResourceAuthorizationRequestBuilder.class);
   }

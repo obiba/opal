@@ -25,7 +25,6 @@ public class TabAuthorizer implements HasAuthorization {
   private int selectedIndex;
 
   public TabAuthorizer(AbstractTabLayout tabs, int index) {
-    super();
     this.tabs = tabs;
     this.index = index;
   }

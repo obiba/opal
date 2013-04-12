@@ -19,7 +19,6 @@ public class UIObjectAuthorizer implements HasAuthorization {
   private final UIObject o;
 
   public UIObjectAuthorizer(UIObject o) {
-    super();
     this.o = o;
   }
 

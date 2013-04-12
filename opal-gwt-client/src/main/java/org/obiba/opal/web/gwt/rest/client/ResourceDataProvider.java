@@ -34,7 +34,7 @@ public class ResourceDataProvider<T extends JavaScriptObject> extends AsyncDataP
 
       @Override
       public void onResource(Response response, JsArray<T> resource) {
-        updateRowCount(resource != null ? resource.length() : 0, true);
+        updateRowCount(resource == null ? 0 : resource.length(), true);
         updateRowData(0, JsArrays.toList(resource));
       }
     });

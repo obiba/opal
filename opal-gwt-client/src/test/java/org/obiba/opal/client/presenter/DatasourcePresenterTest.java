@@ -52,6 +52,7 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
   private SubjectAuthorizationPresenter.Display groupsAuthzDisplayMock;
 
+  @SuppressWarnings("unchecked")
   @Before
   public void setUp() {
     displayMock = createMock(DatasourcePresenter.Display.class);

@@ -19,7 +19,6 @@ public class WidgetAuthorizer implements HasAuthorization {
   private final Widget w;
 
   public WidgetAuthorizer(Widget w) {
-    super();
     this.w = w;
   }
 

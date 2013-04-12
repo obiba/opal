@@ -17,7 +17,6 @@ public class CompositeAuthorizer implements HasAuthorization {
   private final HasAuthorization[] authorizers;
 
   public CompositeAuthorizer(HasAuthorization... authorizers) {
-    super();
     this.authorizers = authorizers;
   }
 

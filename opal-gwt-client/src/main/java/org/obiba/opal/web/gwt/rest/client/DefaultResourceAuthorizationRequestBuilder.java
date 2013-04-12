@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -19,6 +20,7 @@ import com.google.gwt.http.client.Response;
 /**
  *
  */
+@SuppressWarnings("ParameterHidesMemberVariable")
 public class DefaultResourceAuthorizationRequestBuilder implements ResourceAuthorizationRequestBuilder {
 
   private String resource;
@@ -104,7 +106,7 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
     }
   }
 
-  private void apply(Set<HttpMethod> allowed) {
+  private void apply(Collection<HttpMethod> allowed) {
     // GWT.log(resource + ": " + allowed);
     if(allowed != null && allowed.contains(method)) {
       authorized();

@@ -113,7 +113,7 @@ public class JsArrays {
     return ret;
   }
 
-  public static <T extends JavaScriptObject> List<T> toList(JsArray<T> jsArray) {
+  public static <T extends JavaScriptObject> List<T> toList(@Nullable JsArray<T> jsArray) {
     final JsArray<T> array = toSafeArray(jsArray);
     return new AbstractList<T>() {
 

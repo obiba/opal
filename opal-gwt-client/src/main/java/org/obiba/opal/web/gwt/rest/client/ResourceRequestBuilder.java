@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client;
 
+import javax.annotation.Nullable;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -47,6 +49,7 @@ public interface ResourceRequestBuilder<T extends JavaScriptObject> {
 
   RequestBuilder build();
 
+  @Nullable
   Request send();
 
   String getVersion();

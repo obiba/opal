@@ -24,7 +24,6 @@ public abstract class CascadingAuthorizer implements HasAuthorization {
   private final ResourceAuthorizationRequestBuilder request;
 
   protected CascadingAuthorizer(ResourceAuthorizationRequestBuilder request, HasAuthorization authorizer) {
-    super();
     this.authorizer = authorizer;
     this.request = request;
   }

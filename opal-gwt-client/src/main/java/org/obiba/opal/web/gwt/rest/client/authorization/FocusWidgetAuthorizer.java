@@ -19,7 +19,6 @@ public class FocusWidgetAuthorizer implements HasAuthorization {
   private final FocusWidget w;
 
   public FocusWidgetAuthorizer(FocusWidget w) {
-    super();
     this.w = w;
   }
 

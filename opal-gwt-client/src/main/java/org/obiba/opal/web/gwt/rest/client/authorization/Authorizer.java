@@ -21,7 +21,6 @@ public abstract class Authorizer implements HasAuthorization {
   private final EventBus eventBus;
 
   public Authorizer(EventBus eventBus) {
-    super();
     this.eventBus = eventBus;
   }
 
