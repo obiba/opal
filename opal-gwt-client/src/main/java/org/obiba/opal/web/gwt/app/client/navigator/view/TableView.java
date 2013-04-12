@@ -85,8 +85,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   private final List<Anchor> tables = new ArrayList<Anchor>();
 
-  private boolean hasLinkAuthorization = true;
-
   @UiField
   FlowPanel toolbarPanel;
 
@@ -529,30 +527,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public HasAuthorization getTableIndexStatusAuthorizer() {
-    return new UIObjectAuthorizer(indexStatus);
-  }
-
-  @Override
-  public HasAuthorization getTableIndexEditAuthorizer() {
-    return new CompositeAuthorizer(new UIObjectAuthorizer(indexStatusAlert), new UIObjectAuthorizer(clearIndexLink),
-        new UIObjectAuthorizer(indexNowLink), new UIObjectAuthorizer(scheduleLink),
-        new UIObjectAuthorizer(cancelLink)) {
-      @Override
-      public void authorized() {
-        super.authorized();
-        hasLinkAuthorization = true;
-      }
-
-      @Override
-      public void unauthorized() {
-        super.unauthorized();    //To change body of overridden methods use File | Settings | File Templates.
-        hasLinkAuthorization = false;
-      }
-    };
-  }
-
-  @Override
   public String getClickableColumnName(Column<?, ?> column) {
     if(column instanceof VariableClickableColumn) {
       return ((VariableClickableColumn) column).getName();
@@ -620,14 +594,11 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
       boolean cancel, boolean progressBar) {
     indexStatusText.setText(text);
     indexStatusAlert.setType(type);
-
-    if(hasLinkAuthorization) {
-      clearIndexLink.setVisible(clear);
-      indexNowLink.setVisible(indexNow);
-      scheduleLink.setVisible(schedule);
-      cancelLink.setVisible(cancel);
-      progress.setVisible(progressBar);
-    }
+    clearIndexLink.setVisible(clear);
+    indexNowLink.setVisible(indexNow);
+    scheduleLink.setVisible(schedule);
+    cancelLink.setVisible(cancel);
+    progress.setVisible(progressBar);
   }
 
   private void setProgressBar(boolean progressBar, int percent) {
