@@ -30,7 +30,7 @@
                 <g:Label ui:field="entityId"/>
               </g:FlowPanel>
             </o:PropertiesTable>
-            <g:FlowPanel styleName="input">
+            <g:FlowPanel styleName="input" addStyleNames="full-width">
               <g:Label addStyleNames="key">
                 <ui:msg description="Table label">Table</ui:msg>
               </g:Label>
