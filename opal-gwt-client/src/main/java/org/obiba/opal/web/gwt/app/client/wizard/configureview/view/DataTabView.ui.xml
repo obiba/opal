@@ -7,7 +7,7 @@
 
   <ui:style>
     .tab {
-      min-height: 30em;
+    min-height: 30em;
     }
   </ui:style>
 
@@ -18,8 +18,8 @@
     <g:Button ui:field="saveChangesButton" styleName="btn right-aligned small-bottom-margin">
       <ui:msg description="Save changes button label">Save Changes</ui:msg>
     </g:Button>
-    <g:FlowPanel>
-      <o:TableChooser ui:field="tableChooser" addStyleNames="full-width"/>
+    <g:FlowPanel addStyleNames="full-width">
+      <o:TableChooser ui:field="tableChooser"/>
     </g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>

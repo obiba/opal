@@ -55,7 +55,6 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
 
   public DeriveFromVariableView() {
     tableChooser = new TableChooser(false); // Single-select
-    tableChooser.setWidth("30em");
     widget = uiBinder.createAndBindUi(this);
   }
 
@@ -89,7 +88,7 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   @Override
   public void setVariables(JsArray<VariableDto> variables, @Nullable String selectedVariable) {
     variableBox.clear();
-    variableBox.setWidth("30em");
+//    variableBox.setWidth("30em");
     variableBox.forceRedraw();
     if(variables != null) {
       for(int i = 0; i < variables.length(); i++) {

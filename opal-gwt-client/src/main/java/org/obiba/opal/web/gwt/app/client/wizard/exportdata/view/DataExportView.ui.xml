@@ -21,7 +21,9 @@
     <g:FlowPanel>
 
       <o:WizardStep ui:field="tablesStep">
-        <o:TableChooser ui:field="tableChooser"/>
+        <g:FlowPanel addStyleNames="full-width">
+          <o:TableChooser ui:field="tableChooser"/>
+        </g:FlowPanel>
       </o:WizardStep>
 
       <o:WizardStep ui:field="destinationStep">

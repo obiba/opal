@@ -261,8 +261,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           link.append("&select=");
           StringBuilder script = new StringBuilder("name().matches(/");
           for(int i = 0; i < variables.size(); i++) {
-            if(i > 0) script.append("|");
-            script.append("^").append(escape(variables.get(i).getName())).append("$");
+            // Apply the offset/limit to the match query
+            if(i >= offset && i < offset + limit) {
+              if(i > offset) script.append("|");
+
+              script.append("^").append(escape(variables.get(i).getName())).append("$");
+            }
           }
           script.append("/)");
           link.append(URL.encodePathSegment(script.toString()));

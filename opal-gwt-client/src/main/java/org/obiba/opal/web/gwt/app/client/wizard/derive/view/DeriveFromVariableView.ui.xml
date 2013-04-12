@@ -9,14 +9,14 @@
     <o:WizardStep ui:field="deriveFromVariableStep">
       <g:FlowPanel>
 
-        <g:FlowPanel styleName="input">
+        <g:FlowPanel styleName="input" addStyleNames="full-width">
           <g:Label addStyleNames="key">
             <ui:msg description="Table label">Table</ui:msg>
           </g:Label>
           <o:TableChooser ui:field="tableChooser"/>
         </g:FlowPanel>
 
-        <g:FlowPanel styleName="input">
+        <g:FlowPanel styleName="input" addStyleNames="full-width">
           <g:Label addStyleNames="key">
             <ui:msg description="Variable label">Variable</ui:msg>
           </g:Label>
