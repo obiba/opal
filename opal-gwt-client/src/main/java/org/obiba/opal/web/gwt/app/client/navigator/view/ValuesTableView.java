@@ -451,7 +451,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   public void setFilterText(String text) {
     filter.setText(text);
 
-//    fetcher.updateVariables(filter.getTextBox().getText());
+    fetcher.updateVariables(filter.getTextBox().getText());
     if(!text.isEmpty()) {
       addPanel.setOpen(true);
     }
