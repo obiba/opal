@@ -139,7 +139,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setViewMode(mode);
   }
 
-  //  private class VariablesResourceCallback implements ResourceCallback<QueryResultDto> {
+  // Filter with Match instead of Es query
   private class VariablesDtoResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
     private final TableDto table;
@@ -154,6 +154,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         JsArray<VariableDto> variables = resource == null
             ? JsArray.createArray().<JsArray<VariableDto>>cast()
             : resource;
+
         getView().setVariables(variables);
       }
     }
@@ -261,12 +262,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           link.append("&select=");
           StringBuilder script = new StringBuilder("name().matches(/");
           for(int i = 0; i < variables.size(); i++) {
-            // Apply the offset/limit to the match query
-            if(i >= offset && i < offset + limit) {
-              if(i > offset) script.append("|");
-
-              script.append("^").append(escape(variables.get(i).getName())).append("$");
-            }
+            if(i > 0) script.append("|");
+            script.append("^").append(escape(variables.get(i).getName())).append("$");
           }
           script.append("/)");
           link.append(URL.encodePathSegment(script.toString()));
@@ -281,7 +278,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
           .query("query", filter)//
           .query("variable", "true")//
-          .query("limit", String.valueOf(table.getVariableCount()));
+          .query("offset", String.valueOf(offset)).query("limit", String.valueOf(limit));
 
       ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<QueryResultDto>() {
@@ -312,12 +309,13 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             @Override
             public void onResponseCode(Request request, Response response) {
               StringBuilder link = getLinkBuilder(offset, limit);
+
               if(filter != null && !filter.isEmpty()) {
                 link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
               }
               doRequest(offset, link.toString());
             }
-          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND).
+          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).
           send();
     }
 
@@ -414,7 +412,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                     }
                   }).send();
             }
-          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND)//
+          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST)//
           .send();
     }
   }
