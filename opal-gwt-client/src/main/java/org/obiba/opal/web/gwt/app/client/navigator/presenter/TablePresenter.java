@@ -413,7 +413,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> variables, boolean isElasticSearch) {
+      public void onVariableResourceCallback(JsArray<VariableDto> variables) {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
           variables = JsArrays.toSafeArray(variables);
           getView().renderRows(variables);
@@ -597,7 +597,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> variables, boolean isElasticSearch) {
+      public void onVariableResourceCallback(JsArray<VariableDto> variables) {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
           variables = JsArrays.toSafeArray(variables);
           getView().renderRows(variables);
