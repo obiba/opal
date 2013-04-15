@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -29,8 +30,6 @@ import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
-import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
@@ -158,82 +157,66 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
         }).send();
   }
 
-  private void loadVariables(TableDto table) {
-    loadVariables(table, "");
-  }
-
   private void loadVariables(final TableDto table, String select) {
-    UriBuilder uriBuilder = UriBuilder.create()
-        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search");
+    JsArray<VariableDto> results = JsArrays.create();
+    new VariablesFilter() {
+      @Override
+      public void beforeVariableResourceCallback() {
+        // nothing
+      }
 
-    uriBuilder.query("query", select.isEmpty() ? "*" : select)//
-        .query("limit", String.valueOf(table.getVariableCount()))//
-        .query("variable", "true");
+      @Override
+      public void onVariableResourceCallback(JsArray<VariableDto> results, boolean isElasticSearch) {
+        buildVariableMap(results);
+      }
 
-    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(uriBuilder.build()).get()
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseErrorCallback(getEventBus(), "InternalError"))
-        .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariablesFound"))
-        .withCallback(new ResourceCallback<QueryResultDto>() {
-          @Override
-          public void onResource(Response response, QueryResultDto resource) {
-            JsArray<VariableDto> variables = JsArrays.create();
-            if(resource.getHitsArray() != null && resource.getHitsArray().length() > 0) {
-              for(int i = 0; i < resource.getHitsArray().length(); i++) {
-                VariableItemDto varDto = (VariableItemDto) resource.getHitsArray().get(i)
-                    .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
+      private void buildVariableMap(JsArray<VariableDto> variables) {
+        variablesMap = new HashMap<String, VariableDto>();
 
-                variables.push(varDto.getVariable());
+        for(int i = 0; i < variables.length(); i++) {
+          VariableDto variable = variables.get(i);
+          variablesMap.put(variable.getName(), variable);
+        }
+        loadValueSets(table);
+      }
+
+      private void loadValueSets(TableDto table) {
+        UriBuilder uriBuilder = UriBuilder.create()
+            .segment("datasource", table.getDatasourceName(), "table", table.getName(), "valueSet", entityId);
+
+        ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(uriBuilder.build()).get()
+            .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseErrorCallback(getEventBus(), "InternalError"))
+            .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariableValuesFound"))
+            .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback())//
+            .withCallback(new ResourceCallback<ValueSetsDto>() {
+              @Override
+              public void onResource(Response response, ValueSetsDto resource) {
+                populateRows(resource);
               }
-            }
-            buildVariableMap(variables);
-            loadValueSets(table);
-          }
 
-          private void buildVariableMap(JsArray<VariableDto> variables) {
-            variablesMap = new HashMap<String, VariableDto>();
+              private void populateRows(ValueSetsDto valueSets) {
+                JsArrayString variables = valueSets.getVariablesArray();
+                JsArray<ValueSetsDto.ValueSetDto> valueSetList = valueSets.getValueSetsArray();
+                JsArray<ValueSetsDto.ValueDto> values = valueSetList.get(0).getValuesArray();
 
-            for(int i = 0; i < variables.length(); i++) {
-              VariableDto variable = variables.get(i);
-              variablesMap.put(variable.getName(), variable);
-            }
-          }
+                List<VariableValueRow> rows = new ArrayList<VariableValueRow>();
+                int variableCount = variables.length();
 
-          private void loadValueSets(TableDto table) {
-            UriBuilder uriBuilder = UriBuilder.create()
-                .segment("datasource", table.getDatasourceName(), "table", table.getName(), "valueSet", entityId);
-
-            String link = uriBuilder.build();
-
-            ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link.toString()).get()
-                .withCallback(Response.SC_INTERNAL_SERVER_ERROR,
-                    new ResponseErrorCallback(getEventBus(), "InternalError"))
-                .withCallback(Response.SC_NOT_FOUND, new ResponseErrorCallback(getEventBus(), "NoVariableValuesFound"))
-                .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback())//
-                .withCallback(new ResourceCallback<ValueSetsDto>() {
-                  @Override
-                  public void onResource(Response response, ValueSetsDto resource) {
-                    populateRows(resource);
+                for(int i = 0; i < variableCount; i++) {
+                  String variableName = variables.get(i);
+                  if(variablesMap.containsKey(variableName)) {
+                    rows.add(new VariableValueRow(variableName, values.get(i), variablesMap.get(variableName)));
                   }
-
-                  private void populateRows(ValueSetsDto valueSets) {
-                    JsArrayString variables = valueSets.getVariablesArray();
-                    JsArray<ValueSetsDto.ValueSetDto> valueSetList = valueSets.getValueSetsArray();
-                    JsArray<ValueSetsDto.ValueDto> values = valueSetList.get(0).getValuesArray();
-
-                    List<VariableValueRow> rows = new ArrayList<VariableValueRow>();
-                    int variableCount = variables.length();
-
-                    for(int i = 0; i < variableCount; i++) {
-                      String variableName = variables.get(i);
-                      if(variablesMap.containsKey(variableName)) {
-                        rows.add(new VariableValueRow(variableName, values.get(i), variablesMap.get(variableName)));
-                      }
-                    }
-                    getView().renderRows(rows);
-                  }
-                }).send();
-          }
-        }).send();
+                }
+                getView().renderRows(rows);
+              }
+            }).send();
+      }
+    }//
+        .withQuery(select)//
+        .withVariable(true)//
+        .withLimit(table.getVariableCount())//
+        .filter(getEventBus(), table, results);
   }
 
   // TODO Generalized this function so other Presenters can use it
