@@ -88,6 +88,7 @@ public class DatasourcesPermissionConverterTest
         "magma:/datasource/patate/table/pwel/index/_search:GET", //
         "magma:/datasource/patate/table/pwel/index/_search:POST", //
         "magma:/datasource/patate/table/pwel/index/_schema:GET", //
+        "magma:/datasource/patate/commands/_copy:POST:GET", //
         "magma:/datasource/patate/table/pwel:GET:GET", //
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/variables:GET:GET/GET", //

@@ -318,10 +318,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .authorize(getView().getExcelDownloadAuthorizer()).send();
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()//
-        .authorize(CascadingAuthorizer.newBuilder()//
-            .and("/functional-units", HttpMethod.GET)//
-            .and("/functional-units/entities/table", HttpMethod.GET)//
-            .authorize(getView().getExportDataAuthorizer()).build())//
+        .authorize(getView().getExportDataAuthorizer())//
         .send();
     // copy data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()

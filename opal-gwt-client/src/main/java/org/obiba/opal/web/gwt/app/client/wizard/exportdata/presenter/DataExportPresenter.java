@@ -107,20 +107,25 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   }
 
   private void initUnits() {
+    ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+      }
+    };
     ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units").get()
         .withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
           @Override
           public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
             getView().setUnits(units);
           }
-        }).send();
+        }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource("/functional-units/entities/table").get()
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
           public void onResource(Response response, TableDto resource) {
             identifierEntityType = resource.getEntityType();
           }
-        }).send();
+        }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
   }
 
   @Override
