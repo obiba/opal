@@ -283,22 +283,13 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
 
         @Override
-        public void onVariableResourceCallback(JsArray<VariableDto> results, boolean isElasticSearch) {
-          if(isElasticSearch) {
-            List<VariableDto> variables = new ArrayList<VariableDto>();
-            for(int i = 0; i < results.length(); i++) {
-              variables.add(results.get(i));
-            }
-
-            request(variables, offset, limit);
-          } else {
-            StringBuilder link = getLinkBuilder(offset, limit);
-            if(filter != null && !filter.isEmpty()) {
-              link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
-            }
-            doRequest(offset, link.toString());
+        public void onVariableResourceCallback(JsArray<VariableDto> results) {
+          List<VariableDto> variables = new ArrayList<VariableDto>();
+          for(int i = 0; i < results.length(); i++) {
+            variables.add(results.get(i));
           }
 
+          request(variables, offset, limit);
         }
       }//
           .withQuery(filter)//
