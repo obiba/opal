@@ -32,7 +32,6 @@ import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.ValueUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -319,7 +318,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     private void doRequest(int offset, String link) {
-      GWT.log("LINK" + link);
       if(valuesRequest != null) {
         valuesRequest.cancel();
         valuesRequest = null;
