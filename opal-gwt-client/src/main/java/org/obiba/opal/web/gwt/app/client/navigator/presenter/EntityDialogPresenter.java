@@ -166,11 +166,11 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> results, boolean isElasticSearch) {
-        buildVariableMap(results);
+      public void onVariableResourceCallback(JsArray<VariableDto> results) {
+        buildVariableMap(results, table);
       }
 
-      private void buildVariableMap(JsArray<VariableDto> variables) {
+      private void buildVariableMap(JsArray<VariableDto> variables, TableDto table) {
         variablesMap = new HashMap<String, VariableDto>();
 
         for(int i = 0; i < variables.length(); i++) {
