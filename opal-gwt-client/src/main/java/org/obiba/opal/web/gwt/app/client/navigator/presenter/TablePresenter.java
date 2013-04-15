@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefresh
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -51,8 +52,6 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
-import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
@@ -406,18 +405,30 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateVariables() {
-    String sortColumnName = getView().getClickableColumnName(sortColumn);
+    JsArray<VariableDto> results = JsArrays.create();
+    new VariablesFilter() {
+      @Override
+      public void beforeVariableResourceCallback() {
+        getView().beforeRenderRows();
+      }
 
-    UriBuilder ub = UriBuilder.create()//
-        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables");
+      @Override
+      public void onVariableResourceCallback(JsArray<VariableDto> variables, boolean isElasticSearch) {
+        if(table.getLink().equals(TablePresenter.this.table.getLink())) {
+          variables = JsArrays.toSafeArray(variables);
+          getView().renderRows(variables);
+          getView().afterRenderRows();
+        }
+      }
+    }//
+        .withLimit(table.getVariableCount())//
+        .withSortDir(
+            sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
+        .withSortField(getView().getClickableColumnName(sortColumn) == null
+            ? "index"
+            : getView().getClickableColumnName(sortColumn))//
+        .filter(getEventBus(), table, results);
 
-    if(sortColumnName != null) {
-      ub.query("sortField", sortColumnName);
-    }
-    ub.query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
-
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build()).get()
-        .withCallback(new VariablesResourceCallback(table)).send();
   }
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
@@ -577,60 +588,30 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private void doFilterVariables(final String sortColumnName) {
     final String query = getView().getFilter().getText();
-    UriBuilder ub = UriBuilder.create()
-        .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
-        .query("query", query)//
-        .query("limit", String.valueOf(table.getVariableCount()))//
-        .query("variable", "true").query("sortField", sortColumnName == null ? "index" : sortColumnName)//
-        .query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
+    JsArray<VariableDto> results = JsArrays.create();
 
-    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
-        .withCallback(new ResourceCallback<QueryResultDto>() {
-          @Override
-          public void onResource(Response response, QueryResultDto resultDto) {
-            if(response.getStatusCode() == Response.SC_OK) {
-
-              JsArray<VariableDto> variables = JsArrays.create();
-              if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
-                for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-                  VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
-                      .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
-
-                  variables.push(varDto.getVariable());
-                }
-              }
-              getView().renderRows(variables);
-            }
-          }
-        })//
-        .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            // Do not use ES
-            UriBuilder ub = UriBuilder.create()//
-                .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables")//
-                    //.query("query", query)//
-                .query("limit", String.valueOf(table.getVariableCount()))//
-                .query("variable", "true")//
-                .query("sortField", sortColumnName == null ? "index" : sortColumnName)//
-                .query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
-
-            if(query != null && !query.isEmpty()) {
-              ub.query("script", "name().matches(/" + cleanFilter(query) + "/)");
-            }
-            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build()).get()
-                .withCallback(new VariablesResourceCallback(table)).send();
-          }
-        }).withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+    new VariablesFilter() {
       @Override
-      public void onResponseCode(Request request, Response response) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+      public void beforeVariableResourceCallback() {
+        getView().beforeRenderRows();
       }
-    }).send();
-  }
 
-  private String cleanFilter(String filter) {
-    return filter.replaceAll("/", "\\\\/");
+      @Override
+      public void onVariableResourceCallback(JsArray<VariableDto> variables, boolean isElasticSearch) {
+        if(table.getLink().equals(TablePresenter.this.table.getLink())) {
+          variables = JsArrays.toSafeArray(variables);
+          getView().renderRows(variables);
+          getView().afterRenderRows();
+        }
+      }
+    }//
+        .withVariable(true)//
+        .withQuery(query)//
+        .withLimit(table.getVariableCount())//
+        .withSortDir(
+            sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
+        .withSortField(sortColumnName == null ? "index" : sortColumnName)//
+        .filter(getEventBus(), table, results);
   }
 
   private final class FilterClearHandler implements ClickHandler {
@@ -793,26 +774,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
           // Schedule the timer to run once in 2 seconds.
           t.schedule(DELAY_MILLIS);
         }
-      }
-    }
-  }
-
-  class VariablesResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
-
-    private final TableDto table;
-
-    VariablesResourceCallback(TableDto table) {
-      this.table = table;
-      getView().beforeRenderRows();
-    }
-
-    @Override
-    public void onResource(Response response, JsArray<VariableDto> resource) {
-
-      if(table.getLink().equals(TablePresenter.this.table.getLink())) {
-        variables = JsArrays.toSafeArray(resource);
-        getView().renderRows(variables);
-        getView().afterRenderRows();
       }
     }
   }

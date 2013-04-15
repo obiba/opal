@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -274,49 +276,84 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void request(final String filter, final int offset, final int limit) {
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
-          .query("query", filter)//
-          .query("variable", "true")//
-          .query("offset", String.valueOf(offset)).query("limit", String.valueOf(limit));
+      JsArray<VariableDto> results = JsArrays.create();
+      new VariablesFilter() {
+        @Override
+        public void beforeVariableResourceCallback() {
+          // nothing
+        }
 
-      ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new ResourceCallback<QueryResultDto>() {
-            @Override
-            public void onResource(Response response, QueryResultDto resultDto) {
-              if(response.getStatusCode() == Response.SC_OK) {
-
-                List<VariableDto> variables = new ArrayList<VariableDto>();
-                if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
-                  for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-                    VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
-                        .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
-
-                    variables.add(varDto.getVariable());
-                  }
-                }
-                request(variables, offset, limit);
-              }
+        @Override
+        public void onVariableResourceCallback(JsArray<VariableDto> results, boolean isElasticSearch) {
+          if(isElasticSearch) {
+            List<VariableDto> variables = new ArrayList<VariableDto>();
+            for(int i = 0; i < results.length(); i++) {
+              variables.add(results.get(i));
             }
-          })//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
-            }
-          })//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              StringBuilder link = getLinkBuilder(offset, limit);
 
-              if(filter != null && !filter.isEmpty()) {
-                link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
-              }
-              doRequest(offset, link.toString());
+            request(variables, offset, limit);
+          } else {
+//            if(response.getStatusCode() == Response.SC_SERVICE_UNAVAILABLE) {
+//              getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+//            }
+
+            StringBuilder link = getLinkBuilder(offset, limit);
+            if(filter != null && !filter.isEmpty()) {
+              link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
             }
-          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).
-          send();
+            doRequest(offset, link.toString());
+          }
+
+        }
+      }//
+          .withQuery(filter)//
+          .withVariable(true)//
+          .withLimit(limit)//
+          .withOffset(offset)//
+          .filter(getEventBus(), table, results);
+
+//      UriBuilder ub = UriBuilder.create()
+//          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
+//          .query("query", filter)//
+//          .query("variable", "true")//
+//          .query("offset", String.valueOf(offset)).query("limit", String.valueOf(limit));
+//
+//      ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
+//          .withCallback(new ResourceCallback<QueryResultDto>() {
+//            @Override
+//            public void onResource(Response response, QueryResultDto resultDto) {
+//              if(response.getStatusCode() == Response.SC_OK) {
+//
+//                List<VariableDto> variables = new ArrayList<VariableDto>();
+//                if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
+//                  for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+//                    VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
+//                        .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
+//
+//                    variables.add(varDto.getVariable());
+//                  }
+//                }
+//                request(variables, offset, limit);
+//              }
+//            }
+//          })//
+//          .withCallback(new ResponseCodeCallback() {
+//            @Override
+//            public void onResponseCode(Request request, Response response) {
+//
+//              if(response.getStatusCode() == Response.SC_SERVICE_UNAVAILABLE) {
+//                getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+//              }
+//
+//              StringBuilder link = getLinkBuilder(offset, limit);
+//
+//              if(filter != null && !filter.isEmpty()) {
+//                link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
+//              }
+//              doRequest(offset, link.toString());
+//            }
+//          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).
+//          send();
     }
 
     private String cleanFilter(String filter) {
@@ -328,6 +365,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     private void doRequest(int offset, String link) {
+      GWT.log("LINK" + link);
       if(valuesRequest != null) {
         valuesRequest.cancel();
         valuesRequest = null;

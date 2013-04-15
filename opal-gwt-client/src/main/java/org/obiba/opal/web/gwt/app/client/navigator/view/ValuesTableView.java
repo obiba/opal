@@ -228,6 +228,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
+    GWT.log("Found " + variables.length());
     valuesTable.setVisible(true);
     pager.setVisible(true);
     setVariables(JsArrays.toList(variables));
@@ -293,11 +294,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private Header<String> getColumnHeader(final int i) {
 
     Header<String> header = new Header<String>(createColumnHeaderCell()) {
-          @Override
-          public String getValue() {
-            return listVariable.get(i).getName();
-          }
-        };
+      @Override
+      public String getValue() {
+        return listVariable.get(i).getName();
+      }
+    };
 
     header.setUpdater(updater);
 
@@ -310,7 +311,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   private AbstractSafeHtmlCell<String> createColumnHeaderCell() {
-    if (viewMode == ValuesTablePresenter.ViewMode.SIMPLE_MODE) {
+    if(viewMode == ValuesTablePresenter.ViewMode.SIMPLE_MODE) {
       return new TextCell();
     }
 
@@ -444,9 +445,10 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @Override
   public void setFilterText(String text) {
     filter.setText(text);
+
+//    fetcher.updateVariables(filter.getTextBox().getText());
     if(!text.isEmpty()) {
       addPanel.setOpen(true);
-      fetcher.updateVariables(filter.getTextBox().getText());
     }
   }
 
