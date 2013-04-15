@@ -575,17 +575,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  private void doFilterVariables(String sortColumnName) {
-    String query = getView().getFilter().getText();
+  private void doFilterVariables(final String sortColumnName) {
+    final String query = getView().getFilter().getText();
     UriBuilder ub = UriBuilder.create()
         .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
         .query("query", query)//
         .query("limit", String.valueOf(table.getVariableCount()))//
-        .query("variable", "true");
-
-    // Keep sort info
-    ub.query("sortField", sortColumnName == null ? "index" : sortColumnName);
-    ub.query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
+        .query("variable", "true").query("sortField", sortColumnName == null ? "index" : sortColumnName)//
+        .query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
 
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
         .withCallback(new ResourceCallback<QueryResultDto>() {
@@ -606,12 +603,34 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
             }
           }
         })//
-        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+        .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+            // Do not use ES
+            UriBuilder ub = UriBuilder.create()//
+                .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables")//
+                    //.query("query", query)//
+                .query("limit", String.valueOf(table.getVariableCount()))//
+                .query("variable", "true")//
+                .query("sortField", sortColumnName == null ? "index" : sortColumnName)//
+                .query("sortDir", sortAscending == null || sortAscending ? SORT_ASCENDING : SORT_DESCENDING);
+
+            if(query != null && !query.isEmpty()) {
+              ub.query("script", "name().matches(/" + cleanFilter(query) + "/)");
+            }
+            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build()).get()
+                .withCallback(new VariablesResourceCallback(table)).send();
           }
-        }).send();
+        }).withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+      }
+    }).send();
+  }
+
+  private String cleanFilter(String filter) {
+    return filter.replaceAll("/", "\\\\/");
   }
 
   private final class FilterClearHandler implements ClickHandler {
@@ -789,6 +808,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
+
       if(table.getLink().equals(TablePresenter.this.table.getLink())) {
         variables = JsArrays.toSafeArray(resource);
         getView().renderRows(variables);
