@@ -84,7 +84,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
 
   public abstract void beforeVariableResourceCallback();
 
-  public abstract void onVariableResourceCallback(JsArray<VariableDto> variables, boolean isElasticSearch);
+  public abstract void onVariableResourceCallback(JsArray<VariableDto> variables);
 
   @Override
   public void filter(EventBus eventBus, TableDto table, JsArray<VariableDto> result) {
@@ -126,7 +126,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
                       results.push(varDto.getVariable());
                     }
                   }
-                  onVariableResourceCallback(results, true);
+                  onVariableResourceCallback(results);
                 }
               }
             })//
@@ -174,7 +174,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
                   result.push(resource.get(i));
                 }
               }
-              onVariableResourceCallback(result, false);
+              onVariableResourceCallback(result);
             }
           }).send();
     }
