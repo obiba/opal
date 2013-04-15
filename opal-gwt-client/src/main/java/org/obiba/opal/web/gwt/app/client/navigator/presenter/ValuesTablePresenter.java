@@ -293,10 +293,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
             request(variables, offset, limit);
           } else {
-//            if(response.getStatusCode() == Response.SC_SERVICE_UNAVAILABLE) {
-//              getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
-//            }
-
             StringBuilder link = getLinkBuilder(offset, limit);
             if(filter != null && !filter.isEmpty()) {
               link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
@@ -310,50 +306,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .withVariable(true)//
           .withLimit(limit)//
           .withOffset(offset)//
+          .showServiceUnavailableMessage(getView().getViewMode() != ViewMode.SIMPLE_MODE)//
           .filter(getEventBus(), table, results);
-
-//      UriBuilder ub = UriBuilder.create()
-//          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
-//          .query("query", filter)//
-//          .query("variable", "true")//
-//          .query("offset", String.valueOf(offset)).query("limit", String.valueOf(limit));
-//
-//      ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
-//          .withCallback(new ResourceCallback<QueryResultDto>() {
-//            @Override
-//            public void onResource(Response response, QueryResultDto resultDto) {
-//              if(response.getStatusCode() == Response.SC_OK) {
-//
-//                List<VariableDto> variables = new ArrayList<VariableDto>();
-//                if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
-//                  for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-//                    VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
-//                        .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
-//
-//                    variables.add(varDto.getVariable());
-//                  }
-//                }
-//                request(variables, offset, limit);
-//              }
-//            }
-//          })//
-//          .withCallback(new ResponseCodeCallback() {
-//            @Override
-//            public void onResponseCode(Request request, Response response) {
-//
-//              if(response.getStatusCode() == Response.SC_SERVICE_UNAVAILABLE) {
-//                getEventBus().fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
-//              }
-//
-//              StringBuilder link = getLinkBuilder(offset, limit);
-//
-//              if(filter != null && !filter.isEmpty()) {
-//                link.append("&select=").append(URL.encodePathSegment("name().matches(/" + cleanFilter(filter) + "/)"));
-//              }
-//              doRequest(offset, link.toString());
-//            }
-//          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).
-//          send();
     }
 
     private String cleanFilter(String filter) {
@@ -469,6 +423,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void addEntitySearchHandler(EntitySearchHandler handler);
 
     void setViewMode(ViewMode mode);
+
+    ViewMode getViewMode();
 
     void setVariableLabelFieldUpdater(ValueUpdater<String> updater);
 

@@ -45,6 +45,8 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
 
   protected boolean variable = false;
 
+  protected boolean serviceUnavailableMessage = true;
+
   public VariablesFilter withQuery(String query) {
     this.query = query;
     return this;
@@ -72,6 +74,11 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
 
   public VariablesFilter withVariable(boolean b) {
     variable = b;
+    return this;
+  }
+
+  public VariablesFilter showServiceUnavailableMessage(boolean b) {
+    serviceUnavailableMessage = b;
     return this;
   }
 
@@ -129,11 +136,12 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
                 next(eventBus, table, results);
               }
             })//
-                // TODO: Not always necessary (on import we should not catch this error here, let Magma handle this)
             .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
-                eventBus.fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+                if(serviceUnavailableMessage) {
+                  eventBus.fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+                }
               }
             }).send();
       }

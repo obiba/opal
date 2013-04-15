@@ -259,6 +259,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
   }
 
+  @Override
+  public ValuesTablePresenter.ViewMode getViewMode() {
+    return viewMode;
+  }
+
   //
   // Private methods
   //
