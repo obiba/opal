@@ -38,7 +38,7 @@
                 <ui:msg description="Filter Variables label">Variables filter</ui:msg>
               </g:Label>
               <g:HorizontalPanel>
-                <b:Controls>
+                <b:Controls addStyleNames="nowrap">
                   <b:InputAddOn prependIcon="FILTER">
                     <o:TextBoxClearable ui:field="filter"></o:TextBoxClearable>
                   </b:InputAddOn>
