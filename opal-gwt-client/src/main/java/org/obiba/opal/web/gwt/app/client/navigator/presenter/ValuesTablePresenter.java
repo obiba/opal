@@ -261,10 +261,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         StringBuilder link = getLinkBuilder(offset, limit);
         if(table.getVariableCount() > variables.size()) {
           link.append("&select=");
-          StringBuilder script = new StringBuilder("name().matches(/");
+          StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
           for(int i = 0; i < variables.size(); i++) {
             if(i > 0) script.append("|");
-            script.append("^").append(escape(variables.get(i).getName())).append("$");
+            script.append("^").append(escape(variables.get(i).getName().toLowerCase())).append("$");
           }
           script.append("/)");
           link.append(URL.encodePathSegment(script.toString()));
@@ -301,7 +301,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     private String cleanFilter(String filter) {
-      return filter.replaceAll("/", "\\\\/");
+      return filter.replaceAll("/", "\\\\/").toLowerCase();
     }
 
     private String escape(String filter) {
@@ -375,7 +375,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               String link = table.getLink() + "/variables";
 
               if(!"*".equals(query)) {
-                link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(query) + "/)");
+                link += "?script=" + URL.encodePathSegment("name().lowerCase().matches(/" + cleanFilter(query) + "/)");
               }
               if(variablesRequest != null) {
                 variablesRequest.cancel();

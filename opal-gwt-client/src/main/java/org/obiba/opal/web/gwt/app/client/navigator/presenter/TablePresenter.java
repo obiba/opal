@@ -36,13 +36,11 @@ import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPrese
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
-import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -55,6 +53,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -410,9 +409,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> variables) {
+      public void onVariableResourceCallback(JsArray<VariableDto> results) {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
-          variables = JsArrays.toSafeArray(variables);
+          variables = JsArrays.toSafeArray(results);
           getView().renderRows(variables);
           getView().afterRenderRows();
         }
@@ -439,6 +438,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     if(index > 0) {
       previous = variables.get(index - 1);
     }
+    GWT.log("Previous " + previous.getName());
     return previous;
   }
 
@@ -832,6 +832,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
+      GWT.log("UPDATE VAR: " + index);
       getEventBus().fireEvent(
           new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
     }

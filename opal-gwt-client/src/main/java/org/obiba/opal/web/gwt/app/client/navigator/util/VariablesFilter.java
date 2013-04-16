@@ -152,7 +152,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
   public class VariablesFilterMagma extends AbstractVariablesFilter {
 
     private String cleanFilter(String filter) {
-      return filter.replaceAll("/", "\\\\/");
+      return filter.replaceAll("/", "\\\\/").toLowerCase();
     }
 
     @Override
@@ -161,7 +161,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
       UriBuilder ub = UriBuilder.create()
           .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables");//
 
-      if(!query.isEmpty()) ub.query("script", "name().matches(/" + cleanFilter(query) + "/)");
+      if(!query.isEmpty()) ub.query("script", "name().lowerCase().matches(/" + cleanFilter(query) + "/)");
       if(limit != null) ub.query("limit", String.valueOf(limit));
       if(!sortField.isEmpty()) ub.query("sortField", sortField);
       if(!sortDir.isEmpty()) ub.query("sortDir", sortDir);
