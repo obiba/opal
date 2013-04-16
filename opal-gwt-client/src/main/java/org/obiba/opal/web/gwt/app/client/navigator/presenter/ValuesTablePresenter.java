@@ -274,7 +274,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
-    public void request(final String filter, final int offset, final int limit) {
+    public void request(String filter, int offset, int limit) {
       JsArray<VariableDto> results = JsArrays.create();
       new VariablesFilter() {
         @Override
@@ -298,10 +298,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .withOffset(offset)//
           .showServiceUnavailableMessage(getView().getViewMode() != ViewMode.SIMPLE_MODE)//
           .filter(getEventBus(), table, results);
-    }
-
-    private String cleanFilter(String filter) {
-      return filter.replaceAll("/", "\\\\/").toLowerCase();
     }
 
     private String escape(String filter) {
@@ -369,6 +365,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               setTable(table);
             }
           }).withCallback(new ResponseCodeCallback() {
+
+            private String cleanFilter(String filter) {
+              return filter.replaceAll("/", "\\\\/").toLowerCase();
+            }
+
             @Override
             public void onResponseCode(Request request, Response response) {
               // Use the previous way of filtering variables

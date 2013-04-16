@@ -53,7 +53,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -90,10 +89,6 @@ import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
   private static final int DELAY_MILLIS = 1000;
-
-  private static final String SORT_DESCENDING = "DESC";
-
-  private static final String SORT_ASCENDING = "ASC";
 
   private JsArray<VariableDto> variables;
 
@@ -384,7 +379,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateIndexStatus() {
-    // If cancelation, call the delete ws
+    // If cancellation, call the delete ws
     if(cancelIndexation) {
       ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
           .forResource(getIndexResource(table.getDatasourceName(), table.getName())).delete()
@@ -438,7 +433,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     if(index > 0) {
       previous = variables.get(index - 1);
     }
-    GWT.log("Previous " + previous.getName());
     return previous;
   }
 
@@ -594,7 +588,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> variables) {
+      public void onVariableResourceCallback(JsArray<VariableDto> results) {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
           variables = JsArrays.toSafeArray(variables);
           getView().renderRows(variables);
@@ -832,7 +826,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
-      GWT.log("UPDATE VAR: " + index);
       getEventBus().fireEvent(
           new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
     }
