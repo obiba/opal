@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma.math;
 
 import java.io.IOException;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
@@ -52,12 +53,13 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
   @GET
   @POST
   public Response get(@QueryParam("distinct") boolean distinct) {
+    SummaryStatisticsDto.Builder builder = SummaryStatisticsDto.newBuilder().setResource(getVariable().getName());
     CategoricalSummaryDto summary = canQueryEsIndex() ? queryEs(distinct) : queryMagma(distinct);
-    SummaryStatisticsDto statisticsDto = SummaryStatisticsDto.newBuilder().setResource(getVariable().getName())
-        .setExtension(CategoricalSummaryDto.categorical, summary).build();
-    return TimestampedResponses.ok(getValueTable(), statisticsDto).build();
+    if(summary != null) builder.setExtension(CategoricalSummaryDto.categorical, summary);
+    return TimestampedResponses.ok(getValueTable(), builder.build()).build();
   }
 
+  @Nullable
   private CategoricalSummaryDto queryEs(boolean distinct) {
 
     log.debug("Query ES for {} summary", getVariable().getName());
@@ -94,6 +96,7 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
     }
   }
 
+  @Nullable
   private CategoricalSummaryDto queryMagma(boolean distinct) {
 
     log.debug("Query Magma for {} summary", getVariable().getName());
@@ -102,6 +105,8 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
         .distinct(distinct) //
         .addTable(getValueTable(), getVariableValueSource()) //
         .build();
+
+    if(summary.isEmpty()) return null;
 
     if(!"_transient".equals(getVariable().getName()) && isEsAvailable()) {
       statsIndexManager.getIndex(getValueTable()).indexSummary(summary);

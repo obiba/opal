@@ -51,6 +51,8 @@ public class CategoricalVariableSummary {
 
   private boolean distinct;
 
+  private boolean empty = true;
+
   private final Collection<Frequency> frequencies = new ArrayList<Frequency>();
 
   private CategoricalVariableSummary(@Nonnull Variable variable) {
@@ -71,7 +73,7 @@ public class CategoricalVariableSummary {
 
   private void add(@Nonnull Value value) {
     Assert.notNull(variable, "Value cannot be null");
-
+    if(empty) empty = false;
     if(value.isSequence()) {
       if(value.isNull()) {
         frequencyDist.addValue(NULL_NAME);
@@ -164,6 +166,10 @@ public class CategoricalVariableSummary {
 
   public void setDistinct(boolean distinct) {
     this.distinct = distinct;
+  }
+
+  public boolean isEmpty() {
+    return empty;
   }
 
   public static class Frequency {
