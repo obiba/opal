@@ -32,10 +32,12 @@ public abstract class AbstractVariablesFilter {
 
   protected TableDto table;
 
-  public abstract void filter(EventBus eventBus, TableDto table, JsArray<VariableDto> result);
+  protected JsArray<VariableDto> results;
 
-  public void next(EventBus eventBus, TableDto table, JsArray<VariableDto> result) {
-    if(nextFilter != null) nextFilter.filter(eventBus, table, result);
+  public abstract void filter(EventBus eventBus, TableDto table);
+
+  public void next(EventBus eventBus, TableDto table, JsArray<VariableDto> results) {
+    if(nextFilter != null) nextFilter.filter(eventBus, table);
   }
 
   public void setNextFilter(AbstractVariablesFilter nextFilter) {

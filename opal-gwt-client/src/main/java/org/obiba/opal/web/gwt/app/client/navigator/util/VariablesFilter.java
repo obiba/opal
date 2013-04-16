@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.navigator.util;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -31,8 +31,6 @@ import com.google.gwt.http.client.Response;
  */
 public abstract class VariablesFilter extends AbstractVariablesFilter {
 
-  private TableDto table;
-
   protected String query = "";
 
   protected Integer limit;
@@ -45,7 +43,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
 
   protected boolean variable = false;
 
-  protected boolean serviceUnavailableMessage = true;
+  protected boolean exactMatch = false;
 
   public VariablesFilter withQuery(String query) {
     this.query = query;
@@ -77,31 +75,32 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
     return this;
   }
 
-  public VariablesFilter showServiceUnavailableMessage(boolean b) {
-    serviceUnavailableMessage = b;
+  public VariablesFilter isExactMatch(boolean b) {
+    exactMatch = b;
     return this;
   }
 
   public abstract void beforeVariableResourceCallback();
 
-  public abstract void onVariableResourceCallback(JsArray<VariableDto> variables);
+  public abstract void onVariableResourceCallback();
 
   @Override
-  public void filter(EventBus eventBus, TableDto table, JsArray<VariableDto> result) {
+  public void filter(EventBus eventBus, TableDto table) {
     this.table = table;
+    results = JsArrays.create();
 
     nextFilter(new VariablesFilterES()).nextFilter(new VariablesFilterMagma());
-    next(eventBus, table, result);
+    next(eventBus, table, results);
   }
 
   public class VariablesFilterES extends AbstractVariablesFilter {
 
     @Override
-    public void filter(final EventBus eventBus, final TableDto table, final JsArray<VariableDto> results) {
+    public void filter(final EventBus eventBus, final TableDto table) {
 
       beforeVariableResourceCallback();
 
-      if(query.isEmpty()) {
+      if(query.isEmpty() || exactMatch) {
         next(eventBus, table, results);
       } else {
         UriBuilder ub = UriBuilder.create()
@@ -123,10 +122,10 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
                       VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
                           .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
 
-                      results.push(varDto.getVariable());
+                      VariablesFilter.this.results.push(varDto.getVariable());
                     }
                   }
-                  onVariableResourceCallback(results);
+                  onVariableResourceCallback();
                 }
               }
             })//
@@ -134,17 +133,10 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
               @Override
               public void onResponseCode(Request request, Response response) {
                 // Returns NOT_FOUND when calling with a transient variable, BAD_REQUEST when index is not found
-                next(eventBus, table, results);
+                next(eventBus, table, VariablesFilter.this.results);
               }
-            }, Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND)//
-            .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                if(serviceUnavailableMessage) {
-                  eventBus.fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
-                }
-              }
-            }).send();
+            }, Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND, Response.SC_SERVICE_UNAVAILABLE)//
+            .send();
       }
     }
   }
@@ -152,16 +144,18 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
   public class VariablesFilterMagma extends AbstractVariablesFilter {
 
     private String cleanFilter(String filter) {
-      return filter.replaceAll("/", "\\\\/");
+      return filter.replaceAll("/", "\\\\/").toLowerCase();
     }
 
     @Override
-    public void filter(EventBus eventBus, TableDto table, final JsArray<VariableDto> result) {
+    public void filter(EventBus eventBus, TableDto table) {
       // Do not use ES
       UriBuilder ub = UriBuilder.create()
           .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables");//
 
-      if(!query.isEmpty()) ub.query("script", "name().matches(/" + cleanFilter(query) + "/)");
+      if(!query.isEmpty()) ub.query("script", exactMatch
+          ? "name().lowerCase().matches(/^" + cleanFilter(query) + "$/)"
+          : "name().lowerCase().matches(/" + cleanFilter(query) + "/)");
       if(limit != null) ub.query("limit", String.valueOf(limit));
       if(!sortField.isEmpty()) ub.query("sortField", sortField);
       if(!sortDir.isEmpty()) ub.query("sortDir", sortDir);
@@ -172,10 +166,10 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
             public void onResource(Response response, JsArray<VariableDto> resource) {
               if(resource != null && resource.length() > 0) {
                 for(int i = 0; i < resource.length(); i++) {
-                  result.push(resource.get(i));
+                  VariablesFilter.this.results.push(resource.get(i));
                 }
               }
-              onVariableResourceCallback(result);
+              onVariableResourceCallback();
             }
           }).send();
     }
