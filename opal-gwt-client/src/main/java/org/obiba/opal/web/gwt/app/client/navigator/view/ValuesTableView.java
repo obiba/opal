@@ -259,11 +259,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
   }
 
-  @Override
-  public ValuesTablePresenter.ViewMode getViewMode() {
-    return viewMode;
-  }
-
   //
   // Private methods
   //
@@ -344,6 +339,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private void setVariables(List<VariableDto> variables) {
     initValuesTable();
+    boolean isExactMatch = false;
+    addPanel.setVisible(true);
 
     listVariable = variables;
     int visible = listVariable.size() < getMaxVisibleColumns() ? listVariable.size() : getMaxVisibleColumns();
@@ -357,8 +354,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getTextBox().getText().isEmpty()) {
-      lastFilter = "name:" + escape(listVariable.get(0).getName());
+      lastFilter = escape(listVariable.get(0).getName());
       filter.getTextBox().setValue(lastFilter, false);
+      isExactMatch = true;
+
+      // hide the filter box since we want to show the values only for the current variable
+      addPanel.setVisible(false);
     }
 
     if(dataProvider != null) {
@@ -366,7 +367,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       dataProvider = null;
     }
     valuesTable.setPageSize(pageSize.getNumberValue().intValue());
-    dataProvider = new ValueSetsDataProvider();
+    dataProvider = new ValueSetsDataProvider(isExactMatch);
     dataProvider.addDataDisplay(valuesTable);
   }
 
@@ -635,6 +636,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto>
       implements ValuesTablePresenter.ValueSetsProvider {
 
+    boolean exactMatch = false;
+
+    public ValueSetsDataProvider(boolean exactMatch) {
+      this.exactMatch = exactMatch;
+    }
+
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
       // Get the new range.
@@ -650,7 +657,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         fetcher.request(visibleListVariable, start, pager.getPageSize());
       } else {
         setRefreshing(true);
-        fetcher.request(filter.getTextBox().getText(), start, pager.getPageSize());
+        fetcher.request(filter.getTextBox().getText(), start, pager.getPageSize(), exactMatch);
       }
     }
 

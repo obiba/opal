@@ -18,7 +18,6 @@ import java.util.Map;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
@@ -158,7 +157,6 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
   }
 
   private void loadVariables(final TableDto table, String select) {
-    JsArray<VariableDto> results = JsArrays.create();
     new VariablesFilter() {
       @Override
       public void beforeVariableResourceCallback() {
@@ -166,7 +164,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> results) {
+      public void onVariableResourceCallback() {
         buildVariableMap(results, table);
       }
 
@@ -216,7 +214,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
         .withQuery(select)//
         .withVariable(true)//
         .withLimit(table.getVariableCount())//
-        .filter(getEventBus(), table, results);
+        .filter(getEventBus(), table);
   }
 
   // TODO Generalized this function so other Presenters can use it

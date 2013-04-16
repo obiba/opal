@@ -261,10 +261,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         StringBuilder link = getLinkBuilder(offset, limit);
         if(table.getVariableCount() > variables.size()) {
           link.append("&select=");
-          StringBuilder script = new StringBuilder("name().matches(/");
+          StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
           for(int i = 0; i < variables.size(); i++) {
             if(i > 0) script.append("|");
-            script.append("^").append(escape(variables.get(i).getName())).append("$");
+            script.append("^").append(escape(variables.get(i).getName().toLowerCase())).append("$");
           }
           script.append("/)");
           link.append(URL.encodePathSegment(script.toString()));
@@ -274,8 +274,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
-    public void request(final String filter, final int offset, final int limit) {
-      JsArray<VariableDto> results = JsArrays.create();
+    public void request(String filter, int offset, int limit, boolean exactMatch) {
+
       new VariablesFilter() {
         @Override
         public void beforeVariableResourceCallback() {
@@ -283,7 +283,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
 
         @Override
-        public void onVariableResourceCallback(JsArray<VariableDto> results) {
+        public void onVariableResourceCallback() {
           List<VariableDto> variables = new ArrayList<VariableDto>();
           for(int i = 0; i < results.length(); i++) {
             variables.add(results.get(i));
@@ -296,12 +296,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .withVariable(true)//
           .withLimit(limit)//
           .withOffset(offset)//
-          .showServiceUnavailableMessage(getView().getViewMode() != ViewMode.SIMPLE_MODE)//
-          .filter(getEventBus(), table, results);
-    }
-
-    private String cleanFilter(String filter) {
-      return filter.replaceAll("/", "\\\\/");
+          .isExactMatch(exactMatch).filter(getEventBus(), table);
     }
 
     private String escape(String filter) {
@@ -369,13 +364,18 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               setTable(table);
             }
           }).withCallback(new ResponseCodeCallback() {
+
+            private String cleanFilter(String filter) {
+              return filter.replaceAll("/", "\\\\/").toLowerCase();
+            }
+
             @Override
             public void onResponseCode(Request request, Response response) {
               // Use the previous way of filtering variables
               String link = table.getLink() + "/variables";
 
               if(!"*".equals(query)) {
-                link += "?script=" + URL.encodePathSegment("name().matches(/" + cleanFilter(query) + "/)");
+                link += "?script=" + URL.encodePathSegment("name().lowerCase().matches(/" + cleanFilter(query) + "/)");
               }
               if(variablesRequest != null) {
                 variablesRequest.cancel();
@@ -413,8 +413,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void setViewMode(ViewMode mode);
 
-    ViewMode getViewMode();
-
     void setVariableLabelFieldUpdater(ValueUpdater<String> updater);
 
     void setFilterText(String filter);
@@ -432,7 +430,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   public interface DataFetcher {
     void request(List<VariableDto> variables, int offset, int limit);
 
-    void request(String filter, int offset, int limit);
+    void request(String filter, int offset, int limit, boolean exactMatch);
 
     void requestBinaryValue(VariableDto variable, String entityIdentifier);
 

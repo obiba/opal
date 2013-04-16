@@ -36,13 +36,11 @@ import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPrese
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
-import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -91,10 +89,6 @@ import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
 
   private static final int DELAY_MILLIS = 1000;
-
-  private static final String SORT_DESCENDING = "DESC";
-
-  private static final String SORT_ASCENDING = "ASC";
 
   private JsArray<VariableDto> variables;
 
@@ -385,7 +379,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateIndexStatus() {
-    // If cancelation, call the delete ws
+    // If cancellation, call the delete ws
     if(cancelIndexation) {
       ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
           .forResource(getIndexResource(table.getDatasourceName(), table.getName())).delete()
@@ -402,7 +396,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateVariables() {
-    JsArray<VariableDto> results = JsArrays.create();
     new VariablesFilter() {
       @Override
       public void beforeVariableResourceCallback() {
@@ -410,9 +403,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> variables) {
+      public void onVariableResourceCallback() {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
-          variables = JsArrays.toSafeArray(variables);
+          variables = JsArrays.toSafeArray(results);
           getView().renderRows(variables);
           getView().afterRenderRows();
         }
@@ -424,7 +417,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .withSortField(getView().getClickableColumnName(sortColumn) == null
             ? "index"
             : getView().getClickableColumnName(sortColumn))//
-        .filter(getEventBus(), table, results);
+        .filter(getEventBus(), table);
 
   }
 
@@ -585,7 +578,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private void doFilterVariables(final String sortColumnName) {
     final String query = getView().getFilter().getText();
-    JsArray<VariableDto> results = JsArrays.create();
 
     new VariablesFilter() {
       @Override
@@ -594,9 +586,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> variables) {
+      public void onVariableResourceCallback() {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
-          variables = JsArrays.toSafeArray(variables);
+          variables = JsArrays.toSafeArray(results);
           getView().renderRows(variables);
           getView().afterRenderRows();
         }
@@ -608,7 +600,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
         .withSortField(sortColumnName == null ? "index" : sortColumnName)//
-        .filter(getEventBus(), table, results);
+        .filter(getEventBus(), table);
   }
 
   private final class FilterClearHandler implements ClickHandler {
