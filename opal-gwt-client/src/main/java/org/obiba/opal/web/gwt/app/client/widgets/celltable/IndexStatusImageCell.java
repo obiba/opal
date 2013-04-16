@@ -45,8 +45,6 @@ public class IndexStatusImageCell extends AbstractCell<String> {
 
   private final static String BULLET_BLACK = "image/16/bullet_black.png";
 
-  private final static String IN_PROGRESS = "image/in-progress.gif";
-
   private static final Translations translations = GWT.create(Translations.class);
 
   public static String getSrc(TableIndexStatusDto tableIndexStatusDto) {
@@ -69,8 +67,7 @@ public class IndexStatusImageCell extends AbstractCell<String> {
       return BULLET_BLACK;
     }
 
-    // When in progress...
-    return IN_PROGRESS;
+    return (int) (tableIndexStatusDto.getProgress() * 100) + "%";
   }
 
   public static String forSrc(String src) {
@@ -88,6 +85,10 @@ public class IndexStatusImageCell extends AbstractCell<String> {
   interface Template extends SafeHtmlTemplates {
     @Template("<img src=\"{0}\" title=\"{1}\"/>")
     SafeHtml img(String url, String title);
+
+    @Template(
+        "<div class=\"progress progress-striped active\" title=\"{0} ({1})\"><div class=\"bar\" style=\"width: {1};\"></div></div>")
+    SafeHtml progress(String status, String percent);
   }
 
   @SuppressWarnings("StaticNonFinalField")
@@ -107,7 +108,11 @@ public class IndexStatusImageCell extends AbstractCell<String> {
   public void render(Context context, String value, SafeHtmlBuilder sb) {
     if(value != null) {
       // The template will sanitize the URI.
-      sb.append(template.img(value, forSrc(value)));
+      if(value.endsWith("%")) {
+        sb.append(template.progress(translations.indexInProgress(), value));
+      } else {
+        sb.append(template.img(value, forSrc(value)));
+      }
     }
   }
 }

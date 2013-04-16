@@ -79,8 +79,9 @@ public class ValueTableIndexResource extends IndexResource {
       URI link = UriBuilder.fromPath("/").path(ValueTableIndexResource.class).build(datasource, table);
       Opal.TableIndexStatusDto tableStatusDto = Opal.TableIndexStatusDto.newBuilder().setDatasource(datasource)
           .setTable(table).setSchedule(getScheduleDto(datasource, table))
-          .setStatus(getTableIndexationStatus(datasource, table)).setProgress(getValueTableIndexationProgress(table))
-          .setLink(link.getPath()).setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
+          .setStatus(getTableIndexationStatus(datasource, table))
+          .setProgress(getValueTableIndexationProgress(datasource, table)).setLink(link.getPath())
+          .setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
 
       if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
         tableStatusDto = tableStatusDto.toBuilder()
@@ -103,7 +104,7 @@ public class ValueTableIndexResource extends IndexResource {
 
       ValueTable valueTable = getValueTable(datasource, table);
 
-      if(!isInProgress(table)) {
+      if(!isInProgress(datasource, table)) {
 
         synchroManager.synchronizeIndex(indexManager, valueTable, 0);
       }

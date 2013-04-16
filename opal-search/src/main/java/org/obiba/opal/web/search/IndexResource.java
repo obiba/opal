@@ -69,18 +69,19 @@ public abstract class IndexResource {
     return MagmaEngine.get().getDatasource(datasource).getValueTable(table);
   }
 
-  protected float getValueTableIndexationProgress(String table) {
+  protected float getValueTableIndexationProgress(String datasource, String table) {
     float progress = 0f;
     IndexSynchronization currentTask = synchroManager.getCurrentTask();
-    if(currentTask != null && currentTask.getValueTable().getName().equals(table)) {
+    if(currentTask != null && currentTask.getValueTable().getName().equals(table) &&
+        currentTask.getValueTable().getDatasource().getName().equals(datasource)) {
 
       progress = synchroManager.getCurrentTask().getProgress();
     }
     return progress;
   }
 
-  protected boolean isInProgress(String table) {
-    return Float.compare(getValueTableIndexationProgress(table), 0f) > 0;
+  protected boolean isInProgress(String datasource, String table) {
+    return Float.compare(getValueTableIndexationProgress(datasource, table), 0f) > 0;
   }
 
   protected ValueTableValuesIndex getValueTableIndex(String datasource, String table) {
@@ -88,7 +89,7 @@ public abstract class IndexResource {
   }
 
   protected Opal.TableIndexationStatus getTableIndexationStatus(String datasource, String table) {
-    boolean inProgress = isInProgress(table);
+    boolean inProgress = isInProgress(datasource, table);
 
     // Set Indexation status
     boolean upToDate = getValueTableIndex(datasource, table).isUpToDate();

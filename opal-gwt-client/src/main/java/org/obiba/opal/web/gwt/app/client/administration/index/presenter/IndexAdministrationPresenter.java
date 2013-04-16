@@ -48,6 +48,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.Range;
@@ -70,6 +71,8 @@ public class IndexAdministrationPresenter
   public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {}
 
   private static final Translations translations = GWT.create(Translations.class);
+
+  private static final int DELAY_MILLIS = 1000;
 
   public interface Display extends View {
 
@@ -115,8 +118,10 @@ public class IndexAdministrationPresenter
 
   private final Provider<IndexConfigurationPresenter> indexConfigurationPresenter;
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final AuthorizationPresenter authorizationPresenter;
 
+  @SuppressWarnings("UnusedDeclaration")
   private Command confirmedCommand;
 
   @Inject
@@ -404,6 +409,26 @@ public class IndexAdministrationPresenter
 
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
+      // If at least one table in the visible range is in progress
+      boolean doRefresh = false;
+      for(int i = 0; i < resource.length(); i++) {
+        if(Double.compare(resource.get(i).getProgress(), 0f) > 0) {
+          doRefresh = true;
+          break;
+        }
+      }
+      if(doRefresh) {
+        // Wait a few seconds for the task to launch before checking its status
+        Timer t = new Timer() {
+          @Override
+          public void run() {
+            refresh();
+          }
+        };
+        // Schedule the timer to run once in X seconds.
+        t.schedule(DELAY_MILLIS);
+      }
+
       getView().renderRows(resource);
       getView().getIndexTable().setVisibleRangeAndClearData(r, true);
       getView().getSelectedIndices().clear();
