@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -38,6 +37,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShieldPackageCreatePresenter.Display> {
 
   private PackageValidationHandler packageValidationHandler;
+
 
   @Inject
   public DataShieldPackageCreatePresenter(Display display, EventBus eventBus) {
@@ -73,44 +73,18 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     return UriBuilder.create().segment("datashield", "packages").query("name", name).build(name);
   }
 
+  private String packagesRMethods(String name) {
+    return UriBuilder.create().segment("datashield", "package", "{name}","methods").build(name);
+  }
+
   private String packagesR(String name, String reference) {
     return UriBuilder.create().segment("datashield", "packages").query("name", name).query("ref", reference)
         .build(name, reference);
   }
 
-  private void createPackage() {
-    if(packageValidationHandler.validate()) {
-      getView().setInstallButtonEnabled(false);
-      getView().setCancelButtonEnabled(false);
-      ResponseCodeCallback createCallback = new CreatePackageCallBack();
-      ResourceCallback alreadyExistCallback = new AlreadyExistMethodCallBack();
-      ResourceRequestBuilderFactory.<RPackageDto>newBuilder().forResource(packageR(getView().getName().getText()))
-          .get()//
-          .withCallback(alreadyExistCallback)//
-          .withCallback(Response.SC_NOT_FOUND, createCallback).send();
-    }
-  }
 
-  private void postMethod(RPackageDto dto) {
-    ResponseCodeCallback callbackHandler = new CreateOrUpdatePackageCallBack(dto);
 
-    if(getView().getReference().getText().isEmpty()) {
-      ResourceRequestBuilderFactory.newBuilder().forResource(packagesR(getView().getName().getText())).post()//
-          .withResourceBody(RPackageDto.stringify(dto))//
-          .withCallback(Response.SC_OK, callbackHandler)//
-          .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
-          .withCallback(Response.SC_CREATED, callbackHandler)//
-          .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-    } else {
-      ResourceRequestBuilderFactory.newBuilder()
-          .forResource(packagesR(getView().getName().getText(), getView().getReference().getText())).post()//
-          .withResourceBody(RPackageDto.stringify(dto))//
-          .withCallback(Response.SC_OK, callbackHandler)//
-          .withCallback(Response.SC_CREATED, callbackHandler)//
-          .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
-          .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-    }
-  }
+
 
   private RPackageDto getDataShieldPackageDto() {
     RPackageDto dto = RPackageDto.create();
@@ -159,13 +133,43 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     public void onResponseCode(Request request, Response response) {
       postMethod(getDataShieldPackageDto());
     }
+
+    private void postMethod(RPackageDto dto) {
+      ResponseCodeCallback callbackHandler = new CreateOrUpdatePackageCallBack(dto);
+
+      if(getView().getReference().getText().isEmpty()) {
+        ResourceRequestBuilderFactory.newBuilder().forResource(packagesR(getView().getName().getText())).post()//
+            .withResourceBody(RPackageDto.stringify(dto))//
+            .withCallback(Response.SC_OK, callbackHandler)//
+            .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
+            .withCallback(Response.SC_CREATED, callbackHandler)//
+            .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      } else {
+        ResourceRequestBuilderFactory.newBuilder()
+            .forResource(packagesR(getView().getName().getText(), getView().getReference().getText())).post()//
+            .withResourceBody(RPackageDto.stringify(dto))//
+            .withCallback(Response.SC_OK, callbackHandler)//
+            .withCallback(Response.SC_CREATED, callbackHandler)//
+            .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
+            .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+      }
+    }
   }
 
   public class CreatePackageClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent arg0) {
-      createPackage();
+      if(packageValidationHandler.validate()) {
+        getView().setInstallButtonEnabled(false);
+        getView().setCancelButtonEnabled(false);
+        ResponseCodeCallback createCallback = new CreatePackageCallBack();
+        ResourceCallback alreadyExistCallback = new AlreadyExistMethodCallBack();
+        ResourceRequestBuilderFactory.<RPackageDto>newBuilder().forResource(packageR(getView().getName().getText()))
+            .get()//
+            .withCallback(alreadyExistCallback)//
+            .withCallback(Response.SC_NOT_FOUND, createCallback).send();
+      }
     }
 
   }
@@ -192,6 +196,8 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
   }
 
   public interface Display extends PopupView {
+
+    String DATASHIELD_ALL_PKG = "datashield";
 
     void hideDialog();
 

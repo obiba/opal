@@ -22,16 +22,6 @@ public class DataShieldMethodUpdatedEvent extends GwtEvent<DataShieldMethodUpdat
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final DataShieldMethodDto dto;
-
-  public DataShieldMethodUpdatedEvent(DataShieldMethodDto dto) {
-    this.dto = dto;
-  }
-
-  public DataShieldMethodDto getDataShieldMethod() {
-    return dto;
-  }
-
   public static Type<Handler> getType() {
     return TYPE;
   }

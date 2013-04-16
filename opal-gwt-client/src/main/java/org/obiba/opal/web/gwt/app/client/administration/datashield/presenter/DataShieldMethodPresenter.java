@@ -256,7 +256,7 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
       if(response.getStatusCode() == Response.SC_OK) {
-        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(dto));
+        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent());
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         getEventBus().fireEvent(new DataShieldMethodCreatedEvent(dto));
       } else {

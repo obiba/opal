@@ -15,6 +15,8 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -24,6 +26,7 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -60,6 +63,12 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   Button cancelButton;
 
   @UiField
+  RadioButton allPkg;
+
+  @UiField
+  RadioButton namedPkg;
+
+  @UiField
   TextBox name;
 
   @UiField
@@ -79,6 +88,19 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   private void initWidgets() {
     dialog.hide();
     resizeHandle.makeResizable(contentLayout);
+    allPkg.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        name.setEnabled(!event.getValue());
+      }
+    });
+    namedPkg.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        name.setEnabled(event.getValue());
+      }
+    });
+    allPkg.setValue(true, true);
   }
 
   @Override
@@ -122,7 +144,16 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
 
   @Override
   public HasText getName() {
-    return name;
+    return new HasText() {
+      @Override
+      public String getText() {
+        return allPkg.getValue() ? DATASHIELD_ALL_PKG : name.getText();
+      }
+
+      @Override
+      public void setText(String text) {
+      }
+    };
   }
 
   @Override
@@ -136,6 +167,8 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
     reference.setText("");
     setInstallButtonEnabled(true);
     setCancelButtonEnabled(true);
+    allPkg.setValue(true, true);
+    namedPkg.setValue(false, true);
   }
 
   @Override
@@ -146,7 +179,6 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
     } else {
       dialog.addStyleName("progress");
     }
-    GWT.log(dialog.getStyleName());
   }
 
   @Override

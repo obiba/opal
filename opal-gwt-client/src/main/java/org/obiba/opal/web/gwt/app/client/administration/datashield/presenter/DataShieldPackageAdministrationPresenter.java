@@ -21,7 +21,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.DataShieldPackageMethodsDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
@@ -193,13 +192,7 @@ public class DataShieldPackageAdministrationPresenter
 
         @Override
         public void authorized() {
-          publishMethodsConfirmation = new Runnable() {
-            @Override
-            public void run() {
-
-              publishDataShieldMethods(dto);
-            }
-          };
+          publishMethodsConfirmation = new PublishMethodsRunnable(dto);
           getEventBus().fireEvent(ConfirmationRequiredEvent
               .createWithKeys(publishMethodsConfirmation, "publishDataShieldMethods",
                   "confirmPublishDataShieldMethods"));
@@ -210,12 +203,7 @@ public class DataShieldPackageAdministrationPresenter
       authorizeDeleteMethod(dto, new Authorizer(getEventBus()) {
         @Override
         public void authorized() {
-          removePackageConfirmation = new Runnable() {
-            @Override
-            public void run() {
-              removeDataShieldPackage(dto);
-            }
-          };
+          removePackageConfirmation = new RemovePackageRunnable(dto);
           getEventBus().fireEvent(ConfirmationRequiredEvent
               .createWithKeys(removePackageConfirmation, "deleteDataShieldPackage", "confirmDeleteDataShieldPackage"));
         }
@@ -223,104 +211,9 @@ public class DataShieldPackageAdministrationPresenter
     }
   }
 
-  private void removeDataShieldPackage(final RPackageDto dto) {
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          updateDataShieldPackages();
-          getEventBus().fireEvent(new DataShieldPackageRemovedEvent(dto));
-        } else {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        }
-      }
-
-    };
-
-    ResourceRequestBuilderFactory.newBuilder().forResource(packageR(dto.getName())).delete() //
-        .withCallback(Response.SC_OK, callbackHandler) //
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
-  }
-
-  private void publishDataShieldMethods(RPackageDto dto) {
-    ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder().forResource(packageRMethods(dto.getName()))
-        .get()//
-        .withCallback(new ResourceCallback<DataShieldPackageMethodsDto>() {
-
-          @Override
-          public void onResource(Response response, DataShieldPackageMethodsDto resource) {
-            if(response.getStatusCode() == Response.SC_OK) {
-              // For each method, delete and post
-              for(int i = 0; i < resource.getAggregateCount(); i++) {
-                DataShieldMethodDto aggregate = resource.getAggregate(i);
-                ResourceRequestBuilderFactory.newBuilder().forResource(
-                    environmentMethod(DataShieldConfigPresenter.DataShieldEnvironment.AGGREGATE, aggregate.getName()))
-                    .delete() //
-                    .withCallback(
-                        new DeleteMethodCallback(aggregate, DataShieldConfigPresenter.DataShieldEnvironment.AGGREGATE),
-                        Response.SC_OK, Response.SC_NOT_FOUND) //
-                    .send();
-              }
-              for(int i = 0; i < resource.getAssignCount(); i++) {
-                DataShieldMethodDto assign = resource.getAssign(i);
-                ResourceRequestBuilderFactory.newBuilder().forResource(
-                    environmentMethod(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN, assign.getName()))
-                    .delete() //
-                    .withCallback(
-                        new DeleteMethodCallback(assign, DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN),
-                        Response.SC_OK, Response.SC_NOT_FOUND) //
-                    .send();
-              }
-            } else {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-            }
-          }
-        }).send();
-  }
-
   //
   // Inner Classes / Interfaces
   //
-
-  private class DeleteMethodCallback implements ResponseCodeCallback {
-
-    private final DataShieldMethodDto dto;
-
-    private final String environment;
-
-    private DeleteMethodCallback(DataShieldMethodDto dto, String environment) {
-      this.dto = dto;
-      this.environment = environment;
-    }
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
-        // Put new method
-        ResourceRequestBuilderFactory.newBuilder().forResource(environmentMethods(environment)).post() //
-            .withResourceBody(DataShieldMethodDto.stringify(dto))
-            .withCallback(new PublishMethodCallback(dto), Response.SC_CREATED, Response.SC_BAD_REQUEST) //
-            .send();
-      } else {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-      }
-    }
-  }
-
-  private class PublishMethodCallback implements ResponseCodeCallback {
-    private final DataShieldMethodDto dto;
-
-    private PublishMethodCallback(DataShieldMethodDto dto) {
-      this.dto = dto;
-    }
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(dto));
-    }
-  }
 
   private final class PackagesUpdate implements HasAuthorization {
     @Override
@@ -387,4 +280,57 @@ public class DataShieldPackageAdministrationPresenter
 
   }
 
+  private class RemovePackageRunnable implements Runnable {
+
+    private final RPackageDto dto;
+
+    public RemovePackageRunnable(RPackageDto dto) {this.dto = dto;}
+
+    @Override
+    public void run() {
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == Response.SC_OK) {
+            updateDataShieldPackages();
+            getEventBus().fireEvent(new DataShieldPackageRemovedEvent(dto));
+          } else {
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          }
+        }
+
+      };
+
+      ResourceRequestBuilderFactory.newBuilder().forResource(packageR(dto.getName())).delete() //
+          .withCallback(Response.SC_OK, callbackHandler) //
+          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+          .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    }
+  }
+
+  private class PublishMethodsRunnable implements Runnable {
+
+    private final RPackageDto dto;
+
+    public PublishMethodsRunnable(RPackageDto dto) {this.dto = dto;}
+
+    @Override
+    public void run() {
+      ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
+          .forResource(packageRMethods(dto.getName())).put()//
+          .withCallback(new ResourceCallback<DataShieldPackageMethodsDto>() {
+
+            @Override
+            public void onResource(Response response, DataShieldPackageMethodsDto resource) {
+              if(response.getStatusCode() == Response.SC_OK) {
+                getEventBus().fireEvent(new DataShieldMethodUpdatedEvent());
+              } else {
+                getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+              }
+            }
+          }).send();
+    }
+
+  }
 }

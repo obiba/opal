@@ -9,15 +9,16 @@
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main">
             <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key">
-                <ui:msg description="Name label">Name</ui:msg>
-              </g:Label>
-              <g:TextBox ui:field="name"/>
-              <g:InlineLabel addStyleNames="help-block">
-                <ui:msg description="DataShield package name description">Name of the DataSHIELD package to be installed
-                  on R server.
-                </ui:msg>
-              </g:InlineLabel>
+              <g:RadioButton name="pkg" ui:field="allPkg" addStyleNames="key"><ui:msg description="Install all Datashield Packages label">Install all DataSHIELD packages</ui:msg></g:RadioButton>
+              <g:RadioButton name="pkg" ui:field="namedPkg" addStyleNames="key"><ui:msg description="Install specific Datashield Package label">Install a specific DataSHIELD package</ui:msg></g:RadioButton>
+              <g:FlowPanel addStyleNames="indent">
+                <g:TextBox ui:field="name"/>
+                <g:InlineLabel addStyleNames="help-block">
+                  <ui:msg description="DataShield package name description">Name of the DataSHIELD package to be installed
+                    on R server.
+                  </ui:msg>
+                </g:InlineLabel>
+              </g:FlowPanel>
             </g:FlowPanel>
 
             <g:DisclosurePanel>
