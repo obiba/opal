@@ -84,8 +84,8 @@ public class IndexSynchronizationManager {
     currentTask.stop();
     syncProducer.deleteCurrentTaskFromQueue();
 
-    // reset currentTask
-    currentTask = null;
+//    // reset currentTask
+//    currentTask = null;
   }
 
   private Subject getSubject() {
