@@ -49,7 +49,7 @@ public abstract class RPackageResource {
   private static final String[] defaultFields = new String[] { "Title", "Description", "Author", "Maintainer",
       "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS };
 
-  private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", "http://cran.datashield.org",
+  private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", //"http://cran.datashield.org",
       "http://cran.rstudio.com" };
 
   protected final OpalRService opalRService;
@@ -169,7 +169,7 @@ public abstract class RPackageResource {
     @Override
     public boolean apply(@Nullable OpalR.RPackageDto input) {
       for(Opal.EntryDto entry : input.getDescriptionList()) {
-        if(entry.getKey().equals("AggregationMethods") || entry.getKey().equals("AssignMethods")) {
+        if(entry.getKey().equals("AggregateMethods") || entry.getKey().equals("AssignMethods")) {
           return true;
         }
       }

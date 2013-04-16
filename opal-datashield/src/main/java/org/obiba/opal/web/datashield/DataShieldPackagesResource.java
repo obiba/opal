@@ -63,21 +63,7 @@ public class DataShieldPackagesResource extends RPackageResource {
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
       @QueryParam("ref") String ref) throws REXPMismatchException {
-    // TODO make sure package is a valid Datashield package (i.e. with aggregate/assign methods) before installation
     installDatashieldPackage(name, ref);
-
-    // will throw a NoSuchRPackageException if installation failed
-    try {
-      getDatashieldPackage(name);
-    } catch(NoSuchRPackageException e) {
-      // maybe it was not specifically a Datashield package, so do some clean up
-      try {
-        removePackage(name);
-      } catch(Exception ex) {
-        // ignore
-      }
-      throw e;
-    }
 
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
     return Response.created(ub.build(name)).build();
