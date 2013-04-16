@@ -130,12 +130,13 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
                 }
               }
             })//
-            .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+            .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
+                // Returns NOT_FOUND when calling with a transient variable, BAD_REQUEST when index is not found
                 next(eventBus, table, results);
               }
-            })//
+            }, Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND)//
             .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
