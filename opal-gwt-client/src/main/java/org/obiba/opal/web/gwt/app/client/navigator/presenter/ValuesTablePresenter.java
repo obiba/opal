@@ -274,8 +274,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
-    public void request(String filter, int offset, int limit) {
-      JsArray<VariableDto> results = JsArrays.create();
+    public void request(String filter, int offset, int limit, boolean exactMatch) {
+
       new VariablesFilter() {
         @Override
         public void beforeVariableResourceCallback() {
@@ -283,7 +283,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
 
         @Override
-        public void onVariableResourceCallback(JsArray<VariableDto> results) {
+        public void onVariableResourceCallback() {
           List<VariableDto> variables = new ArrayList<VariableDto>();
           for(int i = 0; i < results.length(); i++) {
             variables.add(results.get(i));
@@ -296,8 +296,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .withVariable(true)//
           .withLimit(limit)//
           .withOffset(offset)//
-          .showServiceUnavailableMessage(getView().getViewMode() != ViewMode.SIMPLE_MODE)//
-          .filter(getEventBus(), table, results);
+          .isExactMatch(exactMatch).filter(getEventBus(), table);
     }
 
     private String escape(String filter) {
@@ -414,8 +413,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void setViewMode(ViewMode mode);
 
-    ViewMode getViewMode();
-
     void setVariableLabelFieldUpdater(ValueUpdater<String> updater);
 
     void setFilterText(String filter);
@@ -433,7 +430,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   public interface DataFetcher {
     void request(List<VariableDto> variables, int offset, int limit);
 
-    void request(String filter, int offset, int limit);
+    void request(String filter, int offset, int limit, boolean exactMatch);
 
     void requestBinaryValue(VariableDto variable, String entityIdentifier);
 

@@ -396,7 +396,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateVariables() {
-    JsArray<VariableDto> results = JsArrays.create();
     new VariablesFilter() {
       @Override
       public void beforeVariableResourceCallback() {
@@ -404,7 +403,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> results) {
+      public void onVariableResourceCallback() {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
           variables = JsArrays.toSafeArray(results);
           getView().renderRows(variables);
@@ -418,7 +417,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .withSortField(getView().getClickableColumnName(sortColumn) == null
             ? "index"
             : getView().getClickableColumnName(sortColumn))//
-        .filter(getEventBus(), table, results);
+        .filter(getEventBus(), table);
 
   }
 
@@ -579,7 +578,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private void doFilterVariables(final String sortColumnName) {
     final String query = getView().getFilter().getText();
-    JsArray<VariableDto> results = JsArrays.create();
 
     new VariablesFilter() {
       @Override
@@ -588,9 +586,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       }
 
       @Override
-      public void onVariableResourceCallback(JsArray<VariableDto> results) {
+      public void onVariableResourceCallback() {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
-          variables = JsArrays.toSafeArray(variables);
+          variables = JsArrays.toSafeArray(results);
           getView().renderRows(variables);
           getView().afterRenderRows();
         }
@@ -602,7 +600,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
         .withSortField(sortColumnName == null ? "index" : sortColumnName)//
-        .filter(getEventBus(), table, results);
+        .filter(getEventBus(), table);
   }
 
   private final class FilterClearHandler implements ClickHandler {
