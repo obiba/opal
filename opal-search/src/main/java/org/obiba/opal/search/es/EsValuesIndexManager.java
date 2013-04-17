@@ -182,6 +182,11 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         }
       }
 
+      @Override
+      public boolean isCancelled() {
+        return stop;
+      }
+
       /**
        * OPAL-1158: missing values are indexed as null for continuous variables
        *
