@@ -228,7 +228,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
-    GWT.log("Found " + variables.length());
     valuesTable.setVisible(true);
     pager.setVisible(true);
     setVariables(JsArrays.toList(variables));
@@ -466,6 +465,15 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @Override
   public TextBoxClearable getFilter() {
     return filter;
+  }
+
+  @Override
+  public void populateValues(int offset, ValueSetsDto resource) {
+    if(dataProvider != null) {
+      dataProvider.populateValues(offset, resource);
+    } else {
+      setRefreshing(false);
+    }
   }
 
   //

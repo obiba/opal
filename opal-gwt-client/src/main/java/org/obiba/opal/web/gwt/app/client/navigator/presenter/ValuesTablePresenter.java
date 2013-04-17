@@ -201,9 +201,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        if(getView().getValueSetsProvider() != null) {
-          getView().getValueSetsProvider().populateValues(offset, resource);
-        }
+        getView().populateValues(offset, resource);
       }
     }
   }
@@ -256,7 +254,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
       if(variables.isEmpty()) {
-        getView().getValueSetsProvider().populateValues(offset, null);
+        getView().populateValues(offset, null);
       } else {
         StringBuilder link = getLinkBuilder(offset, limit);
         if(table.getVariableCount() > variables.size()) {
@@ -420,6 +418,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     String getFilterText();
 
     TextBoxClearable getFilter();
+
+    void populateValues(int offset, ValueSetsDto resource);
   }
 
   public enum ViewMode {
