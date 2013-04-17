@@ -58,6 +58,10 @@ public abstract class RPackageResource {
     this.opalRService = opalRService;
   }
 
+  protected OpalRService getOpalRService() {
+    return opalRService;
+  }
+
   protected RScriptROperation getInstalledPackages() {
     return getInstalledPackages(new ArrayList<String>());
   }

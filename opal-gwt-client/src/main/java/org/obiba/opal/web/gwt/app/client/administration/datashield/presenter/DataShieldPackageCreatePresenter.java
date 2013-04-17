@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
@@ -71,10 +72,6 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
 
   private String packagesR(String name) {
     return UriBuilder.create().segment("datashield", "packages").query("name", name).build(name);
-  }
-
-  private String packagesRMethods(String name) {
-    return UriBuilder.create().segment("datashield", "package", "{name}","methods").build(name);
   }
 
   private String packagesR(String name, String reference) {
@@ -187,6 +184,7 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
       getView().hideDialog();
       if(response.getStatusCode() == Response.SC_CREATED) {
         getEventBus().fireEvent(new DataShieldPackageCreatedEvent(dto));
+        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent());
       } else if(response.getStatusCode() == Response.SC_NOT_FOUND) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("RPackageInstalledButNotFound").build());
       } else {

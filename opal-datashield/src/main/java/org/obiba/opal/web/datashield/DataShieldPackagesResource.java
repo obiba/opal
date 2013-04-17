@@ -20,9 +20,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.RStringMatrix;
 import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
 import org.obiba.opal.web.datashield.support.NoSuchRPackageException;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
@@ -43,9 +45,16 @@ import com.google.common.collect.Lists;
 public class DataShieldPackagesResource extends RPackageResource {
   private static final Logger log = LoggerFactory.getLogger(DataShieldPackagesResource.class);
 
+  private final DatashieldConfigurationSupplier configurationSupplier;
+
+  private final DataShieldMethodConverterRegistry methodConverterRegistry;
+
   @Autowired
-  public DataShieldPackagesResource(OpalRService opalRService) {
+  public DataShieldPackagesResource(OpalRService opalRService, DatashieldConfigurationSupplier configurationSupplier,
+      DataShieldMethodConverterRegistry methodConverterRegistry) {
     super(opalRService);
+    this.configurationSupplier = configurationSupplier;
+    this.methodConverterRegistry = methodConverterRegistry;
   }
 
   @GET
@@ -64,6 +73,12 @@ public class DataShieldPackagesResource extends RPackageResource {
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
       @QueryParam("ref") String ref) throws REXPMismatchException {
     installDatashieldPackage(name, ref);
+
+    // install or re-install all known datashield package methods
+    for (OpalR.RPackageDto pkg : getPackages()) {
+      DataShieldPackageResource pkgRes = new DataShieldPackageResource(pkg.getName(), getOpalRService(), configurationSupplier, methodConverterRegistry);
+      pkgRes.publishPackageMethods();
+    }
 
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
     return Response.created(ub.build(name)).build();

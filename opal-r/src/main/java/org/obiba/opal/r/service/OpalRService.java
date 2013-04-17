@@ -77,7 +77,7 @@ public class OpalRService implements Service, ROperationTemplate {
         conn.setStringEncoding(encoding);
       }
     } catch(RserveException e) {
-      log.error("Error while connecting to R.", e);
+      log.error("Error while connecting to R: {}", e.getMessage());
       throw new RRuntimeException(e);
     }
 
