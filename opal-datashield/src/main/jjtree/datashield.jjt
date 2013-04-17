@@ -45,7 +45,7 @@ TOKEN : /* Numeric Constants */
 TOKEN:
 {
       < R_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOLLAR> | <DOT> )* >
-  |   < R_OPERATOR: (["/", "!"]) | "%*%">
+  |   < R_OPERATOR: (["/", "!", "="]) | "%*%">
   |   < F_OPERATOR: ([":"] | "%in%") >
   |   < COMMON_OPERATOR: (["+","-","*", "^"]) >
   |   < #LETTER: ["a"-"z", "A"-"Z"] >

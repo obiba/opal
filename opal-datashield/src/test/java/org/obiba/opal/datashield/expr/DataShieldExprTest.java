@@ -35,7 +35,8 @@ public class DataShieldExprTest {
       .put("Function with a function invocation as parameter", "A(B())")//
       .put("Function with multiple parameters", "A(B, C)")//
       .put("Function with multiple kinds of parameters", "A(B, C(), D, E(F(G/H)), A + B * C())")//
-      .put("Function with forumla as argument", "glm(A ~ B + C:D, poisson)")//
+      .put("Function with formula as argument", "glm(A ~ B + C:D, poisson)")//
+      .put("Function with named argument", "A(arg=x,another=y)")//
       .build();
 
   @Test
