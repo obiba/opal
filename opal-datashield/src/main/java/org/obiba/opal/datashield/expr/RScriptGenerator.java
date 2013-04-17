@@ -37,6 +37,13 @@ public class RScriptGenerator implements DataShieldGrammarVisitor {
   }
 
   @Override
+  public Object visit(ASTstring node, Object data) {
+    StringBuilder sb = (StringBuilder) data;
+    sb.append(node.value);
+    return data;
+  }
+
+  @Override
   public Object visit(ASTfuncCall node, Object data) {
     StringBuilder sb = (StringBuilder) data;
     sb.append(findMethod(node.value.toString()).invoke(environment.getEnvironment())).append("( ");

@@ -45,6 +45,8 @@ TOKEN : /* Numeric Constants */
 TOKEN:
 {
       < R_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOLLAR> | <DOT> )* >
+  |   < R_STRING: ( <QUOTE> ) ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOT> )+ ( <QUOTE> ) >
+  |   < R_DBLSTRING: ( <DOUBLEQUOTE> ) ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOT> )+ ( <DOUBLEQUOTE> ) >
   |   < R_OPERATOR: (["/", "!", "="]) | "%*%">
   |   < F_OPERATOR: ([":"] | "%in%") >
   |   < COMMON_OPERATOR: (["+","-","*", "^"]) >
@@ -52,6 +54,8 @@ TOKEN:
   |   < #UNDERSCORE: "_">
   |   < #DOLLAR: "$">
   |   < #DOT: ".">
+  |   < #QUOTE: "'">
+  |   < #DOUBLEQUOTE: "\"">
 }
 
 SimpleNode root() #root :
@@ -76,6 +80,7 @@ void simpleExp() #void :
 {
  ( LOOKAHEAD(2)
      funcCall()
+   | string()
    | symbol()
    | "(" exp() ")"
  )
@@ -93,6 +98,15 @@ void symbol() :
  (
     s=<R_IDENTIFIER>
   | s=<NUMBER>
+ ) {jjtThis.value = s.image;}
+}
+
+void string() :
+{Token s=null;}
+{
+ (
+    s=<R_STRING>
+  | s=<R_DBLSTRING>
  ) {jjtThis.value = s.image;}
 }
 

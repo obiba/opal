@@ -37,18 +37,74 @@ public class DataShieldExprTest {
       .put("Function with multiple kinds of parameters", "A(B, C(), D, E(F(G/H)), A + B * C())")//
       .put("Function with formula as argument", "glm(A ~ B + C:D, poisson)")//
       .put("Function with named argument", "A(arg=x,another=y)")//
+      .put("Function with string argument", "A('this')")//
+      .put("Function with double quoted string argument", "A(\"this\")")//
+      .put("Function with numerical string argument", "A('123')")//
+      .put("Function with alphanumerical string argument and some special characters", "A('this1_that.this')")//
       .build();
 
   @Test
   public void test_testCases() throws ParseException {
     for(String msg : tests.keySet()) {
-      String test = tests.get(msg);
-
-      System.out.println(test);
-      DataShieldGrammar g = new DataShieldGrammar(new StringReader(test));
-      SimpleNode expr = g.root();
-      expr.dump("");
+      doTest(msg, tests.get(msg));
     }
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_funcCallInString() throws ParseException {
+    doTest("Function with function call in string argument", "A('this(that)')");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_dollarInString() throws ParseException {
+    doTest("Function with dollar in string argument", "A('this$that')");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_spaceInString() throws ParseException {
+    doTest("Function with dollar in string argument", "A(\"this that\")");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_slashInString() throws ParseException {
+    doTest("Function with slash in string argument", "A('this/that')");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_backslashInString() throws ParseException {
+    doTest("Function with backslash in string argument", "A('this\\that')");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_operatorInString() throws ParseException {
+    doTest("Function with operator in string argument", "A('this+that')");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_equalInString() throws ParseException {
+    doTest("Function with equal in string argument", "A('this=that')");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_assignInString() throws ParseException {
+    doTest("Function with operator in string argument", "A('this<-that')");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_mixedQuoteInString1() throws ParseException {
+    doTest("Function with mixed quotes in string argument", "A('this\")");
+  }
+
+  @Test(expected = TokenMgrError.class)
+  public void test_mixedQuoteInString2() throws ParseException {
+    doTest("Function with mixed quotes in string argument", "A(\"that')");
+  }
+
+  private void doTest(String msg, String test) throws ParseException {
+    System.out.println(msg + ": " + test);
+    DataShieldGrammar g = new DataShieldGrammar(new StringReader(test));
+    SimpleNode expr = g.root();
+    expr.dump("");
   }
 
   @Test
@@ -57,6 +113,13 @@ public class DataShieldExprTest {
 
       @Override
       public Object visit(ASTsymbol node, Object data) {
+        StringBuilder sb = (StringBuilder) data;
+        sb.append(node.value);
+        return data;
+      }
+
+      @Override
+      public Object visit(ASTstring node, Object data) {
         StringBuilder sb = (StringBuilder) data;
         sb.append(node.value);
         return data;
