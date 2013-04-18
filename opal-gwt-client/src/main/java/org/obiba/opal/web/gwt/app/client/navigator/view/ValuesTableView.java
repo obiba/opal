@@ -11,13 +11,14 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.AbstractList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.EntitySelectionHandler;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
@@ -238,11 +239,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   @Override
-  public ValueSetsProvider getValueSetsProvider() {
-    return dataProvider;
-  }
-
-  @Override
   public void setValueSetsFetcher(DataFetcher provider) {
     fetcher = provider;
   }
@@ -371,6 +367,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   private void initValuesTable() {
+    Logger logger = Logger.getLogger("VariableLoger");
+    logger.log(Level.SEVERE, "is null " + (valuesTable == null));
+    logger.log(Level.SEVERE, "count " + valuesTable.getColumnCount());
     while(valuesTable.getColumnCount() > 0) {
       valuesTable.removeColumn(0);
     }
@@ -471,8 +470,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   public void populateValues(int offset, ValueSetsDto resource) {
     if(dataProvider != null) {
       dataProvider.populateValues(offset, resource);
-    } else {
-      setRefreshing(false);
     }
   }
 

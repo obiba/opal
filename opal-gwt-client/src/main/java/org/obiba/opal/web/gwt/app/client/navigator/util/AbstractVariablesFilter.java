@@ -10,10 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.navigator.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 
 /**
@@ -32,11 +34,11 @@ public abstract class AbstractVariablesFilter {
 
   protected TableDto table;
 
-  protected JsArray<VariableDto> results;
+  protected List<VariableDto> results = new ArrayList<VariableDto>();
 
   public abstract void filter(EventBus eventBus, TableDto table);
 
-  public void next(EventBus eventBus, TableDto table, JsArray<VariableDto> results) {
+  public void next(EventBus eventBus, TableDto table, List<VariableDto> results) {
     if(nextFilter != null) nextFilter.filter(eventBus, table);
   }
 

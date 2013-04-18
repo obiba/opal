@@ -168,12 +168,12 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
         buildVariableMap(results, table);
       }
 
-      private void buildVariableMap(JsArray<VariableDto> variables, TableDto table) {
+      private void buildVariableMap(List<VariableDto> variables, TableDto table) {
         variablesMap = new HashMap<String, VariableDto>();
 
-        for(int i = 0; i < variables.length(); i++) {
-          VariableDto variable = variables.get(i);
-          variablesMap.put(variable.getName(), variable);
+        for(VariableDto v : variables) {
+          //VariableDto variable = variables.get(i);
+          variablesMap.put(v.getName(), v);
         }
         loadValueSets(table);
       }

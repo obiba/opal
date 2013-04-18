@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -163,6 +165,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private class VariablesResourceCallback implements ResourceCallback<QueryResultDto> {
 
+    Logger logger = Logger.getLogger("VariableLogger");
+
     private final TableDto table;
 
     private VariablesResourceCallback(TableDto table) {
@@ -171,17 +175,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void onResource(Response response, QueryResultDto resource) {
+
+      logger.log(Level.SEVERE, "RESPONSE " + response.getText());
+      logger.log(Level.SEVERE, table.getLink() + "==" + ValuesTablePresenter.this.table.getLink());
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
 
-        QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
         JsArray<VariableDto> variables = JsArrays.create();
-        for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+        QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
+        for(int i = 0; i < resultDto.getTotalHits(); i++) {
           VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
               .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
 
           variables.push(varDto.getVariable());
         }
-
         getView().setVariables(variables);
       }
     }
@@ -201,7 +207,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        getView().populateValues(offset, resource);
+        getView().populateValues(offset, resource == null ? ValueSetsDto.create() : resource);
       }
     }
   }
@@ -283,7 +289,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         @Override
         public void onVariableResourceCallback() {
           List<VariableDto> variables = new ArrayList<VariableDto>();
-          for(int i = 0; i < results.length(); i++) {
+          for(int i = 0; i < results.size(); i++) {
             variables.add(results.get(i));
           }
 
@@ -402,8 +408,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void clearTable();
 
     void setVariables(JsArray<VariableDto> variables);
-
-    ValueSetsProvider getValueSetsProvider();
 
     void setValueSetsFetcher(DataFetcher fetcher);
 
