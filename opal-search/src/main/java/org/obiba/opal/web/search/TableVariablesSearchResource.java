@@ -64,7 +64,7 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
       @QueryParam("sortField") String sortField, @QueryParam("sortDir") String sortDir) {
 
     try {
-      if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+      if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       if(!indexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
       QuerySearchJsonBuilder jsonBuiler = //
           buildQuerySearch(query, offset, limit, fields, sortField, sortDir);
@@ -97,6 +97,10 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
   //
   // Private methods
   //
+
+  private boolean canQueryEsIndex() {
+    return searchServiceAvailable() && indexManager.isIndexUpToDate(getValueTable());
+  }
 
   private ValueTable getValueTable() {
     return MagmaEngine.get().getDatasource(datasource).getValueTable(table);
