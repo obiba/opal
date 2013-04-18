@@ -11,8 +11,6 @@ package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -165,8 +163,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private class VariablesResourceCallback implements ResourceCallback<QueryResultDto> {
 
-    Logger logger = Logger.getLogger("VariableLogger");
-
     private final TableDto table;
 
     private VariablesResourceCallback(TableDto table) {
@@ -176,8 +172,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, QueryResultDto resource) {
 
-      logger.log(Level.SEVERE, "RESPONSE " + response.getText());
-      logger.log(Level.SEVERE, table.getLink() + "==" + ValuesTablePresenter.this.table.getLink());
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
 
         JsArray<VariableDto> variables = JsArrays.create();

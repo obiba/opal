@@ -11,8 +11,6 @@ package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.AbstractList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -367,9 +365,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   }
 
   private void initValuesTable() {
-    Logger logger = Logger.getLogger("VariableLoger");
-    logger.log(Level.SEVERE, "is null " + (valuesTable == null));
-    logger.log(Level.SEVERE, "count " + valuesTable.getColumnCount());
     while(valuesTable.getColumnCount() > 0) {
       valuesTable.removeColumn(0);
     }
