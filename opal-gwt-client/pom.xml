@@ -133,7 +133,7 @@
           <hostedWebapp>war</hostedWebapp>
           <extraParam>true</extraParam>
           <includes>**/*Gwt*Suite.java</includes>
-          <!--style>PRETTY</style -->
+          <!--style>DETAILED</style -->
         </configuration>
       </plugin>
       <plugin>

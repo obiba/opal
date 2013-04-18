@@ -183,7 +183,7 @@ public class VariableSuggestOracle extends SuggestOracle {
               QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
               List<VariableSuggestion> suggestions = new ArrayList<VariableSuggestion>();
-              for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+              for(int i = 0; i < resultDto.getTotalHits(); i++) {
                 ItemFieldsDto itemDto = (ItemFieldsDto) resultDto.getHitsArray().get(i)
                     .getExtension("Search.ItemFieldsDto.item");
 

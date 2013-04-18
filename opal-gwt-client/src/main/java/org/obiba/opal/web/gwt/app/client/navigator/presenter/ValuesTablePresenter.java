@@ -171,17 +171,17 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void onResource(Response response, QueryResultDto resource) {
+
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
 
-        QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
         JsArray<VariableDto> variables = JsArrays.create();
-        for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+        QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
+        for(int i = 0; i < resultDto.getTotalHits(); i++) {
           VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
               .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
 
           variables.push(varDto.getVariable());
         }
-
         getView().setVariables(variables);
       }
     }
@@ -201,9 +201,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-        if(getView().getValueSetsProvider() != null) {
-          getView().getValueSetsProvider().populateValues(offset, resource);
-        }
+        getView().populateValues(offset, resource == null ? ValueSetsDto.create() : resource);
       }
     }
   }
@@ -256,7 +254,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
       if(variables.isEmpty()) {
-        getView().getValueSetsProvider().populateValues(offset, null);
+        getView().populateValues(offset, null);
       } else {
         StringBuilder link = getLinkBuilder(offset, limit);
         if(table.getVariableCount() > variables.size()) {
@@ -285,7 +283,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         @Override
         public void onVariableResourceCallback() {
           List<VariableDto> variables = new ArrayList<VariableDto>();
-          for(int i = 0; i < results.length(); i++) {
+          for(int i = 0; i < results.size(); i++) {
             variables.add(results.get(i));
           }
 
@@ -405,8 +403,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void setVariables(JsArray<VariableDto> variables);
 
-    ValueSetsProvider getValueSetsProvider();
-
     void setValueSetsFetcher(DataFetcher fetcher);
 
     void addEntitySearchHandler(EntitySearchHandler handler);
@@ -420,6 +416,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     String getFilterText();
 
     TextBoxClearable getFilter();
+
+    void populateValues(int offset, ValueSetsDto resource);
   }
 
   public enum ViewMode {

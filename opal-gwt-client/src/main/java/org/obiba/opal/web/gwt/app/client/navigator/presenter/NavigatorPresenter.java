@@ -161,6 +161,18 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           }
         }));
 
+    registerHandler(
+        getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+          @Override
+          public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+            getView().getSearch().clear();
+            getView().getSearch().addItem(event.getTable().getDatasourceName(), translations.datasourceLabel(),
+                VariableSearchListItem.ItemType.DATASOURCE);
+            getView().getSearch()
+                .addItem(event.getTable().getName(), translations.tableLabel(), VariableSearchListItem.ItemType.TABLE);
+          }
+        }));
+
     getView().getSearch().getSuggestBox().addSelectionHandler(new VariableSuggestionSelectionHandler());
     getView().getSearch().addFocusHandler(new VariableSuggestionFocusHandler());
   }
