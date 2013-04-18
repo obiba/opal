@@ -44,6 +44,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
@@ -147,7 +148,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   }
 
   private void updateMenuDisplay(@Nullable VariableDto previous, @Nullable VariableDto next) {
-    getView().setParentName(variable.getParentLink().getRel());
+    getView().setParentName(table.getName());
     getView().setPreviousName(previous == null ? "" : previous.getName());
     getView().setNextName(next == null ? "" : next.getName());
 
@@ -354,7 +355,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class ParentCommand implements Command {
     @Override
     public void execute() {
-      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(variable.getParentLink().getLink()).get()
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(table.getLink()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
             public void onResource(Response response, TableDto resource) {
@@ -399,6 +400,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
     @Override
     public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+      GWT.log("Event get table :" + event.getTable().getName());
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
     }
   }
