@@ -67,4 +67,10 @@ public interface IndexManager {
    * @return
    */
   boolean isIndexUpToDate(@Nonnull ValueTable valueTable);
+
+  /**
+   * Returns true if the given table has an index. In the ES paradigm, this refers to a index type.
+   * @return
+   */
+  boolean hasIndex(@Nonnull ValueTable valueTable);
 }
