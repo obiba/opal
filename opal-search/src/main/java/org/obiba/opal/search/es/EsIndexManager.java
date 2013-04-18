@@ -113,7 +113,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   @Override
   public boolean isReady() {
-    return esConfig.getConfig().isEnabled();
+    return opalSearchService.isEnabled();
   }
 
   @Override
