@@ -32,12 +32,14 @@ import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
+import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.model.Search.EsContinuousSummaryDto;
 import org.obiba.opal.web.search.support.EsQueryBuilders;
 import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.protobuf.ExtensionRegistry;
 import com.googlecode.protobuf.format.JsonFormat;
 
 public class ContinuousSummaryResource extends AbstractSummaryResource {
@@ -73,7 +75,7 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
       JSONObject esQuery = new EsQueryBuilders.EsBoolTermsQueryBuilder() //
           .addTerm("_id", getVariable().getVariableReference(getValueTable())) //
           .addTerm("_type", statsIndexManager.getIndex(getValueTable()).getIndexName()) //
-          .addTerm("nature", "continuous") //
+          .addTerm("continuous", String.valueOf(true)) // because I don't know to use field exists query filter
           .addTerm("distribution", distribution.name()) //
           .addTerm("intervals", String.valueOf(intervals)).build();
       log.trace("ES query: {}", esQuery.toString(2));
@@ -88,16 +90,20 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
 
       JSONObject jsonObject = jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source");
 
-      log.debug("jsonObject: {}", jsonObject.toString(2));
+      log.trace("jsonObject: {}", jsonObject.toString(2));
 
-      EsContinuousSummaryDto.Builder builder = EsContinuousSummaryDto.newBuilder();
-      JsonFormat.merge(jsonObject.toString(), builder);
-      return builder.build().getSummary();
+      Search.EsStatsDto.Builder builder = Search.EsStatsDto.newBuilder();
+      ExtensionRegistry registry = ExtensionRegistry.newInstance();
+      registry.add(EsContinuousSummaryDto.continuousSummary);
+      JsonFormat.merge(jsonObject.toString(), registry, builder);
+      return builder.build().getExtension(EsContinuousSummaryDto.continuousSummary).getSummary();
 
     } catch(JSONException e) {
-      throw new RuntimeException(e);
+      log.error("Error while querying ES (will fallback to Magma)", e);
+      return queryMagma(distribution, percentiles, intervals);
     } catch(IOException e) {
-      throw new RuntimeException(e);
+      log.error("Error while querying ES (will fallback to Magma)", e);
+      return queryMagma(distribution, percentiles, intervals);
     }
   }
 

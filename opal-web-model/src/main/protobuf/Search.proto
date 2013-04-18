@@ -1,10 +1,10 @@
+package Search;
+
 import "Opal.proto";
 
 import "Magma.proto";
 
 import "Math.proto";
-
-package Search;
 
 option java_package = "org.obiba.opal.web.model";
 
@@ -128,16 +128,26 @@ message VariableItemDto {
   }
 }
 
+message EsStatsDto {
+  extensions 1000 to max;
+}
+
 message EsCategoricalSummaryDto {
   required Math.CategoricalSummaryDto summary = 1;
-  required string nature = 2;
+  required bool categorical = 2;
   required bool distinct = 3;
+  extend EsStatsDto {
+    optional EsCategoricalSummaryDto categoricalSummary = 1001;
+  }
 }
 
 message EsContinuousSummaryDto {
   required Math.ContinuousSummaryDto summary = 1;
-  required string nature = 2;
+  required bool continuous = 2;
   required string distribution = 3;
   required int32 intervals = 4;
   repeated double defaultPercentiles = 5;
+  extend EsStatsDto {
+    optional EsContinuousSummaryDto continuousSummary = 1002;
+  }
 }

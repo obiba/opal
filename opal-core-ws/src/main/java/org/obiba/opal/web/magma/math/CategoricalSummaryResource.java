@@ -36,6 +36,7 @@ import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.protobuf.ExtensionRegistry;
 import com.googlecode.protobuf.format.JsonFormat;
 
 /**
@@ -69,7 +70,7 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
       JSONObject esQuery = new EsQueryBuilders.EsBoolTermsQueryBuilder() //
           .addTerm("_id", getVariable().getVariableReference(getValueTable())) //
           .addTerm("_type", statsIndexManager.getIndex(getValueTable()).getIndexName()) //
-          .addTerm("nature", "categorical") //
+          .addTerm("categorical", String.valueOf(true)) // because I don't know to use field exists query filter
           .addTerm("distinct", String.valueOf(distinct)).build();
       log.trace("ES query: {}", esQuery.toString(2));
 
@@ -83,16 +84,22 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
       JSONObject jsonObject = jsonHitsInfo.getJSONArray("hits").getJSONObject(0).getJSONObject("_source");
 
-      log.debug("jsonObject: {}", jsonObject.toString(2));
+      log.trace("jsonObject: {}", jsonObject.toString(2));
 
-      Search.EsCategoricalSummaryDto.Builder builder = Search.EsCategoricalSummaryDto.newBuilder();
-      JsonFormat.merge(jsonObject.toString(), builder);
-      return builder.build().getSummary();
+      Search.EsStatsDto.Builder builder = Search.EsStatsDto.newBuilder();
+
+      ExtensionRegistry registry = ExtensionRegistry.newInstance();
+      registry.add(Search.EsCategoricalSummaryDto.categoricalSummary);
+
+      JsonFormat.merge(jsonObject.toString(), registry, builder);
+      return builder.build().getExtension(Search.EsCategoricalSummaryDto.categoricalSummary).getSummary();
 
     } catch(JSONException e) {
-      throw new RuntimeException(e);
+      log.error("Error while querying ES (will fallback to Magma)", e);
+      return queryMagma(distinct);
     } catch(IOException e) {
-      throw new RuntimeException(e);
+      log.error("Error while querying ES (will fallback to Magma)", e);
+      return queryMagma(distinct);
     }
   }
 

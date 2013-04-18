@@ -109,11 +109,6 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           .variables(index.getVariables()).to(new ValuesReaderCallback()).build().read();
     }
 
-    @Override
-    protected XContentBuilder getMapping() {
-      return new ValueTableMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
-    }
-
     private class ValuesReaderCallback implements ConcurrentReaderCallback {
 
       private BulkRequestBuilder bulkRequest = opalSearchService.getClient().prepareBulk();
@@ -221,6 +216,11 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     @Override
     public String getFieldName(String variable) {
       return getIndexName() + "-" + variable;
+    }
+
+    @Override
+    protected XContentBuilder getMapping() {
+      return new ValueTableMapping().createMapping(runtimeVersion, getIndexName(), resolveTable());
     }
 
     @Override

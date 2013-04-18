@@ -24,7 +24,6 @@ import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.support.AbstractRestRequest;
-import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.util.Assert;
 
@@ -64,22 +63,21 @@ public class EsQueryExecutor {
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<byte[]> ref = new AtomicReference<byte[]>();
 
-    elasticSearchProvider.getRest()
-        .dispatchRequest(esRestRequest, new RestChannel() {
+    elasticSearchProvider.getRest().dispatchRequest(esRestRequest, new RestChannel() {
 
-          @Override
-          public void sendResponse(RestResponse response) {
+      @Override
+      public void sendResponse(RestResponse response) {
 
-            try {
-              ref.set(convert(response));
-            } catch(IOException e) {
-              // Not gonna happen
-            } finally {
-              latch.countDown();
-            }
-          }
+        try {
+          ref.set(convert(response));
+        } catch(IOException e) {
+          // Not gonna happen
+        } finally {
+          latch.countDown();
+        }
+      }
 
-        });
+    });
 
     try {
 
@@ -127,7 +125,7 @@ public class EsQueryExecutor {
 
       StringBuilder pathBuilder = new StringBuilder("/");
 
-      if (!Strings.isNullOrEmpty(path)) {
+      if(!Strings.isNullOrEmpty(path)) {
         pathBuilder.append(path).append("/");
       }
 

@@ -182,13 +182,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       log.debug("Updating ValueTable index {}", index.getValueTableReference());
       index.delete();
       createIndex();
-      createMapping();
+      index.createMapping();
       index();
-    }
-
-    private void createMapping() {
-      opalSearchService.getClient().admin().indices().preparePutMapping(getName()).setType(index.getIndexName())
-          .setSource(getMapping()).execute().actionGet();
     }
 
     protected BulkRequestBuilder sendAndCheck(BulkRequestBuilder bulkRequest) {
@@ -204,8 +199,6 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     }
 
     protected abstract void index();
-
-    protected abstract XContentBuilder getMapping();
 
     @Override
     public ValueTableIndex getValueTableIndex() {
@@ -246,6 +239,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
     @Nonnull
     private final String valueTableReference;
+
+    private boolean mappingCreated;
 
     /**
      * @param vt
@@ -321,6 +316,16 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
         }
       }
     }
+
+    protected void createMapping() {
+      if(mappingCreated) return;
+      getIndexMetaData(); // create index if it does not exist yet
+      opalSearchService.getClient().admin().indices().preparePutMapping(getName()).setType(getIndexName())
+          .setSource(getMapping()).execute().actionGet();
+      mappingCreated = true;
+    }
+
+    protected abstract XContentBuilder getMapping();
 
     @Override
     public boolean isUpToDate() {

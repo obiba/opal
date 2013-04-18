@@ -35,6 +35,7 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Search.EsCategoricalSummaryDto;
 import org.obiba.opal.web.model.Search.EsContinuousSummaryDto;
+import org.obiba.opal.web.model.Search.EsStatsDto;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,11 +100,6 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
       // do nothing as we calculate summaries on values indexation (from EsValuesIndexManager)
     }
 
-    @Override
-    protected XContentBuilder getMapping() {
-      return new StatsMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
-    }
-
   }
 
   private class EsValueTableStatsIndex extends EsValueTableIndex implements ValueTableStatsIndex {
@@ -119,6 +115,11 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     @Override
     public String getFieldName(String variable) {
       return getIndexName() + "-" + variable;
+    }
+
+    @Override
+    protected XContentBuilder getMapping() {
+      return new StatsMapping().createMapping(runtimeVersion, getIndexName(), resolveTable());
     }
 
     @Override
@@ -212,27 +213,34 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
     private void indexSummary(@Nonnull CategoricalVariableSummary summary, @Nonnull BulkRequestBuilder bulkRequest) {
 
       EsCategoricalSummaryDto summaryDto = EsCategoricalSummaryDto.newBuilder() //
-          .setNature("categorical") //
+          .setCategorical(true) //
           .setDistinct(summary.isDistinct()) //
           .setSummary(Dtos.asDto(summary)).build();
 
-      indexMessage(summary.getVariable().getName(), summaryDto, bulkRequest);
+      EsStatsDto statsDto = EsStatsDto.newBuilder().setExtension(EsCategoricalSummaryDto.categoricalSummary, summaryDto)
+          .build();
+
+      indexMessage(summary.getVariable().getName(), statsDto, bulkRequest);
     }
 
     private void indexSummary(@Nonnull ContinuousVariableSummary summary, @Nonnull BulkRequestBuilder bulkRequest) {
 
       EsContinuousSummaryDto summaryDto = EsContinuousSummaryDto.newBuilder() //
-          .setNature("continuous") //
+          .setContinuous(true) //
           .setDistribution(summary.getDistribution().name()) //
           .addAllDefaultPercentiles(summary.getDefaultPercentiles()) //
           .setIntervals(summary.getIntervals()) //
           .setSummary(Dtos.asDto(summary)).build();
 
-      indexMessage(summary.getVariable().getName(), summaryDto, bulkRequest);
+      EsStatsDto statsDto = EsStatsDto.newBuilder().setExtension(EsContinuousSummaryDto.continuousSummary, summaryDto)
+          .build();
+
+      indexMessage(summary.getVariable().getName(), statsDto, bulkRequest);
     }
 
     private void indexMessage(@Nonnull String variableName, @Nonnull Message message,
         @Nonnull BulkRequestBuilder bulkRequest) {
+      createMapping();
       IndexRequestBuilder request = opalSearchService.getClient() //
           .prepareIndex(getName(), getIndexName(), getValueTableReference() + ":" + variableName) //
           .setSource(JsonFormat.printToString(message));

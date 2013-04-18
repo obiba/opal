@@ -101,11 +101,6 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       index.updateTimestamps();
     }
 
-    @Override
-    protected XContentBuilder getMapping() {
-      return new ValueTableVariablesMapping().createMapping(runtimeVersion, index.getIndexName(), valueTable);
-    }
-
     private BulkRequestBuilder indexVariable(Variable variable, BulkRequestBuilder bulkRequest, int tableIndex) {
       String fullName = valueTable.getDatasource().getName() + "." + valueTable.getName() + ":" + variable.getName();
       try {
@@ -180,6 +175,11 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
     private EsValueTableVariablesIndex(ValueTable vt) {
       super(vt);
+    }
+
+    @Override
+    protected XContentBuilder getMapping() {
+      return new ValueTableVariablesMapping().createMapping(runtimeVersion, getIndexName(), resolveTable());
     }
 
     @Nonnull
