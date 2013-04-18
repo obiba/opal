@@ -92,6 +92,11 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private JsArray<VariableDto> variables;
 
+  /**
+   * Keep original variables to be able to find next/previous variables even when the list is filtered
+   */
+  private JsArray<VariableDto> originalVariables = JsArrays.create();
+
   private TableDto table;
 
   private TableDto originalTable;
@@ -346,6 +351,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     table = tableDto;
     this.previous = previous;
     this.next = next;
+    originalVariables = JsArrays.create();
 
     getView().clear();
     getView().setTable(tableDto);
@@ -405,7 +411,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       @Override
       public void onVariableResourceCallback() {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
-          variables = JsArrays.toSafeArray(results);
+          variables = JsArrays.create();
+          for(VariableDto v : results) {
+            variables.push(v);
+          }
+
+          if(originalVariables.length() == 0) {
+            // Initialize originalVariables
+            originalVariables = JsArrays.toSafeArray(variables);
+          }
           getView().renderRows(variables);
           getView().afterRenderRows();
         }
@@ -430,15 +444,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private VariableDto getPreviousVariable(int index) {
     VariableDto previous = null;
     if(index > 0) {
-      previous = variables.get(index - 1);
+      previous = originalVariables.get(index - 1);
     }
     return previous;
   }
 
   private VariableDto getNextVariable(int index) {
     VariableDto next = null;
-    if(index < variables.length() - 1) {
-      next = variables.get(index + 1);
+    if(index < originalVariables.length() - 1) {
+      next = originalVariables.get(index + 1);
     }
     return next;
   }
@@ -588,7 +602,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       @Override
       public void onVariableResourceCallback() {
         if(table.getLink().equals(TablePresenter.this.table.getLink())) {
-          variables = JsArrays.toSafeArray(results);
+          TablePresenter.this.table = table;
+
+          variables = JsArrays.create();
+          for(VariableDto v : results) {
+            variables.push(v);
+          }
           getView().renderRows(variables);
           getView().afterRenderRows();
         }
@@ -746,12 +765,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
-        getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
         getView().setIndexStatusAlert(statusDto);
 
         // Refetch if in progress
         if(statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
+
+          // Hide the Cancel button if progress is 100%
+          getView().setCancelVisible(Double.compare(statusDto.getProgress(), 1d) < 0);
 
           Timer t = new Timer() {
             @Override
@@ -760,7 +781,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
             }
           };
 
-          // Schedule the timer to run once in 2 seconds.
+          // Schedule the timer to run once in X seconds.
           t.schedule(DELAY_MILLIS);
         }
       }
@@ -825,7 +846,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void update(int index, VariableDto variableDto, String value) {
       getEventBus().fireEvent(
-          new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
+          new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(variableDto.getIndex()),
+              getNextVariable(variableDto.getIndex())));
     }
   }
 
@@ -836,9 +858,10 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       // Look for the variable and its position in the list by its name.
       // Having a position of the current variable would be more efficient.
       int siblingIndex = 0;
-      for(int i = 0; i < variables.length(); i++) {
-        if(variables.get(i).getName().equals(event.getCurrentSelection().getName())) {
-          if(event.getDirection() == SiblingVariableSelectionEvent.Direction.NEXT && i < variables.length() - 1) {
+      for(int i = 0; i < originalVariables.length(); i++) {
+        if(originalVariables.get(i).getName().equals(event.getCurrentSelection().getName())) {
+          if(event.getDirection() == SiblingVariableSelectionEvent.Direction.NEXT &&
+              i < originalVariables.length() - 1) {
             siblingIndex = i + 1;
           } else siblingIndex = event.getDirection() == SiblingVariableSelectionEvent.Direction.PREVIOUS && i != 0
               ? i - 1
@@ -846,7 +869,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
           break;
         }
       }
-      VariableDto variableDto = variables.get(siblingIndex);
+      VariableDto variableDto = originalVariables.get(siblingIndex);
 
       getView().setVariableSelection(variableDto, siblingIndex);
       getEventBus().fireEvent(new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(siblingIndex),
@@ -973,6 +996,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HandlerRegistration addFilterVariableHandler(KeyUpHandler handler);
 
     TextBoxClearable getFilter();
+
+    void setCancelVisible(boolean b);
   }
 
 }
