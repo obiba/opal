@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.navigator.util;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -87,7 +86,6 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
   @Override
   public void filter(EventBus eventBus, TableDto table) {
     this.table = table;
-    results = JsArrays.create();
 
     nextFilter(new VariablesFilterES()).nextFilter(new VariablesFilterMagma());
     next(eventBus, table, results);
@@ -117,16 +115,14 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
               @Override
               public void onResource(Response response, QueryResultDto resultDto) {
                 if(response.getStatusCode() == Response.SC_OK) {
-                  if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
-                    for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
-                      VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
-                          .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
+                  for(int i = 0; i < resultDto.getTotalHits(); i++) {
+                    VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
+                        .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
 
-                      VariablesFilter.this.results.push(varDto.getVariable());
-                    }
+                    VariablesFilter.this.results.add(varDto.getVariable());
                   }
-                  onVariableResourceCallback();
                 }
+                onVariableResourceCallback();
               }
             })//
             .withCallback(new ResponseCodeCallback() {
@@ -166,7 +162,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
             public void onResource(Response response, JsArray<VariableDto> resource) {
               if(resource != null && resource.length() > 0) {
                 for(int i = 0; i < resource.length(); i++) {
-                  VariablesFilter.this.results.push(resource.get(i));
+                  VariablesFilter.this.results.add(resource.get(i));
                 }
               }
               onVariableResourceCallback();

@@ -700,4 +700,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     return filter;
   }
 
+  @Override
+  public void setCancelVisible(boolean b) {
+    cancelLink.setVisible(b);
+  }
 }

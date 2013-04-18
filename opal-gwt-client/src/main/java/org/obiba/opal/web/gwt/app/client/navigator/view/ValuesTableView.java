@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.EntitySelectionHandler;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.ValueSetsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
@@ -228,7 +227,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
-    GWT.log("Found " + variables.length());
     valuesTable.setVisible(true);
     pager.setVisible(true);
     setVariables(JsArrays.toList(variables));
@@ -236,11 +234,6 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private String escape(String string) {
     return string.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]");
-  }
-
-  @Override
-  public ValueSetsProvider getValueSetsProvider() {
-    return dataProvider;
   }
 
   @Override
@@ -466,6 +459,13 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @Override
   public TextBoxClearable getFilter() {
     return filter;
+  }
+
+  @Override
+  public void populateValues(int offset, ValueSetsDto resource) {
+    if(dataProvider != null) {
+      dataProvider.populateValues(offset, resource);
+    }
   }
 
   //
