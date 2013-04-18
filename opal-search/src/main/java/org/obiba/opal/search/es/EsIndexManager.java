@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -98,6 +99,14 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       indices.put(tableFullName, index);
     }
     return index;
+  }
+
+  @Override
+  public boolean hasIndex(@Nonnull ValueTable valueTable) {
+    ClusterStateResponse resp = opalSearchService.getClient().admin().cluster().prepareState().execute().actionGet();
+    Map<String, MappingMetaData> mappings = resp.state().metaData().index(getName()).mappings();
+    return mappings.containsKey(getIndex(valueTable).getIndexName());
+
   }
 
   protected abstract ValueTableIndex createIndex(@Nonnull ValueTable vt);
