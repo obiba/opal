@@ -134,19 +134,17 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
     }
   }
 
-  private Map<String, Double> loadCountByCategoryName() {
-    if(categoricalSummaryDto != null) {
-      for(FrequencyDto frequencyDto : JsArrays.toIterable(categoricalSummaryDto.getFrequenciesArray())) {
-        String value = frequencyDto.getValue();
-        if(value.equals(NA)) continue;
-        double freq = frequencyDto.getFreq();
-        countByCategoryName.put(value, freq);
-        if(freq > maxFrequency) {
-          maxFrequency = freq;
-        }
+  private void loadCountByCategoryName() {
+    if(categoricalSummaryDto == null) return;
+    for(FrequencyDto frequencyDto : JsArrays.toIterable(categoricalSummaryDto.getFrequenciesArray())) {
+      String value = frequencyDto.getValue();
+      if(value.equals(NA)) continue;
+      double freq = frequencyDto.getFreq();
+      countByCategoryName.put(value, freq);
+      if(freq > maxFrequency) {
+        maxFrequency = freq;
       }
     }
-    return countByCategoryName;
   }
 
   public double getMaxFrequency() {
@@ -173,34 +171,37 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   protected void initializeNonMissingCategoryValueMapEntry(String value, ValueMapEntry.Builder builder) {
 
-    if(recodeCategoriesName) {
-      //noinspection IfStatementWithTooManyBranches
-      if(RegExp.compile("^\\d+$").test(value)) {
-        builder.newValue(value);
-      } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(value)) {
-        builder.newValue("0");
-      } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(value)) {
-        builder.newValue("1");
-        if(index < 2) index = 2;
-      } else if(RegExp.compile(FEMALE_REGEXP, "i").test(value)) {
-        builder.newValue("2");
-        if(index < 3) index = 3;
-      } else {
-        // OPAL-1387 look for a similar entry value and apply same new value
-        boolean found = false;
-        for(ValueMapEntry entry : valueMapEntries) {
-          if(entry.getValue().trim().compareToIgnoreCase(value.trim()) == 0) {
-            builder.newValue(entry.getNewValue());
-            found = true;
-            break;
+    // don't overwrite destination categories if they already exist
+    if(getDestination() == null) {
+      if(recodeCategoriesName) {
+        //noinspection IfStatementWithTooManyBranches
+        if(RegExp.compile("^\\d+$").test(value)) {
+          builder.newValue(value);
+        } else if(RegExp.compile(NO_REGEXP + "|" + NONE_REGEXP, "i").test(value)) {
+          builder.newValue("0");
+        } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(value)) {
+          builder.newValue("1");
+          if(index < 2) index = 2;
+        } else if(RegExp.compile(FEMALE_REGEXP, "i").test(value)) {
+          builder.newValue("2");
+          if(index < 3) index = 3;
+        } else {
+          // OPAL-1387 look for a similar entry value and apply same new value
+          boolean found = false;
+          for(ValueMapEntry entry : valueMapEntries) {
+            if(entry.getValue().trim().compareToIgnoreCase(value.trim()) == 0) {
+              builder.newValue(entry.getNewValue());
+              found = true;
+              break;
+            }
+          }
+          if(!found) {
+            builder.newValue(Integer.toString(index++));
           }
         }
-        if(!found) {
-          builder.newValue(Integer.toString(index++));
-        }
+      } else {
+        builder.newValue(value);
       }
-    } else {
-      builder.newValue(value);
     }
 
     valueMapEntries.add(builder.build());

@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -77,14 +79,12 @@ public class InnerAutoCompleteTextArea extends TextArea {
     return currentSuggestion;
   }
 
+  @Nullable
   @Override
   public String getValueOrThrow() throws ParseException {
     String text = getRealText();
     String parseResult = PassthroughParser.instance().parse(text);
-    if("".equals(text)) {
-      return null;
-    }
-    return parseResult;
+    return "".equals(text) ? null : parseResult;
   }
 
   public boolean isTextSelected() {

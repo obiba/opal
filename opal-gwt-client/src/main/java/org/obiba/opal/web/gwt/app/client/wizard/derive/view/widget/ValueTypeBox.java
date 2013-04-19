@@ -37,8 +37,8 @@ public class ValueTypeBox extends ListBox implements HasValue<String> {
   }
 
   private void populate() {
-    for(ValueType valueType : ValueType.values()) {
-      addItem(valueType.getLabel());
+    for(ValueType type : ValueType.values()) {
+      addItem(type.getLabel());
     }
   }
 

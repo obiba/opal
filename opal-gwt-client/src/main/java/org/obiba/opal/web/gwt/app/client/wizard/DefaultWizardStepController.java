@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DefaultWizardStepController implements WizardStepController {
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
 
     private final DefaultWizardStepController currentStepCtrl;

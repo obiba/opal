@@ -55,7 +55,7 @@ public abstract class DerivedVariableGenerator {
     // Copy variable in both case because the user could click on Cancel
     VariableDto derived = destination == null
         ? copyVariable(originalVariable)
-        : copyVariable(destination, originalVariable.getLink());
+        : copyVariable(destination, true, originalVariable.getLink());
 
     scriptBuilder = new StringBuilder();
     newCategoriesMap.clear();
@@ -89,7 +89,8 @@ public abstract class DerivedVariableGenerator {
     for(Iterator<CategoryDto> it = toIterable(originalVariable.getCategoriesArray()).iterator(); it.hasNext(); ) {
       CategoryDto origCat = it.next();
       ValueMapEntry entry = getValueMapEntry(origCat.getName());
-      if(entry != null && entry.isType(ValueMapEntryType.CATEGORY_NAME)) {
+      if(entry != null && entry.isType(ValueMapEntryType.CATEGORY_NAME) &&
+          !Strings.isNullOrEmpty(entry.getNewValue())) {
         // script
         scriptBuilder.append("\n    '").append(normalize(entry.getValue())).append("': ");
         appendNewValue(entry);
@@ -227,10 +228,6 @@ public abstract class DerivedVariableGenerator {
 
   public static VariableDto copyVariable(@Nonnull VariableDto variable) {
     return copyVariable(variable, false, variable.getLink());
-  }
-
-  public static VariableDto copyVariable(@Nonnull VariableDto variable, String link) {
-    return copyVariable(variable, false, link);
   }
 
   public static VariableDto copyVariable(VariableDto variable, boolean withCategories, String link) {

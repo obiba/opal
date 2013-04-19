@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
-import java.util.Set;
-
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -34,13 +32,6 @@ public abstract class ValueMapCell extends AbstractCell<ValueMapEntry> {
   }
 
   protected static final Template template = GWT.create(Template.class);
-
-  /**
-   * @param consumedEvents
-   */
-  public ValueMapCell(Set<String> consumedEvents) {
-    super(consumedEvents);
-  }
 
   /**
    * @param consumedEvents

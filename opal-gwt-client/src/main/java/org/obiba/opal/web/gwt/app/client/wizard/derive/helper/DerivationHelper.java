@@ -134,9 +134,10 @@ public abstract class DerivationHelper {
 
   public List<String> getMapStepWarnings() {
     List<String> warnings = new ArrayList<String>();
-    if(getDerivedVariable() != null) {
+    VariableDto derivedVariable = getDerivedVariable();
+    if(derivedVariable != null) {
       //noinspection ConstantConditions
-      for(String derivedCategory : getDestinationCategories(getDerivedVariable())) {
+      for(String derivedCategory : getDestinationCategories(derivedVariable)) {
         if(!hasValueMapEntryWithNewValue(derivedCategory)) {
           warnings.add(translationMessages.destinationCategoryNotMapped(derivedCategory));
         }

@@ -126,10 +126,6 @@ public class DeriveCategoricalVariableStepView extends ViewImpl
     valuesMapGrid.populate(valuesMap, derivedCategories);
   }
 
-  //
-  // Widget Display methods
-  //
-
   @Override
   public Widget asWidget() {
     return widget;
