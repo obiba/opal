@@ -367,11 +367,7 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
       // Prepare the array of variableDto
       JsArray<VariableDto> derivedVariables = JsArrays.create();
       for(VariableDto variable : variables) {
-        VariableDto derived = new VariableDuplicationHelper(variable).getDerivedVariable();
-        if(variable.getCategoriesArray().length() > 0) {
-          derived.setCategoriesArray(variable.getCategoriesArray());
-        }
-        derivedVariables.push(derived);
+        derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
       }
 
       getView().clear();

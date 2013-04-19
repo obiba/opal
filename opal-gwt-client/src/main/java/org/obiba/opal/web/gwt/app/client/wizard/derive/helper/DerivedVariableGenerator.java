@@ -254,7 +254,7 @@ public abstract class DerivedVariableGenerator {
 
     // set categories
     if(withCategories) {
-      derived.setCategoriesArray(copyCategories(derived.getCategoriesArray()));
+      derived.setCategoriesArray(copyCategories(variable.getCategoriesArray()));
     }
 
     return derived;
