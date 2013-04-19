@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
@@ -45,6 +47,7 @@ public class VariableViewHelper {
    * @param name the attribute name
    * @return empty string if attribute was not found
    */
+  @Nonnull
   public static String getAttributeValue(JsArray<AttributeDto> attributes, String name) {
     AttributeDto attribute = null;
 
@@ -62,7 +65,7 @@ public class VariableViewHelper {
       }
     }
 
-    return attribute != null ? attribute.getValue() : "";
+    return attribute == null ? "" : attribute.getValue();
   }
 
   /**
@@ -72,13 +75,12 @@ public class VariableViewHelper {
    */
   public static String getCurrentLanguage() {
     String currentLocaleName = LocaleInfo.getCurrentLocale().getLocaleName();
-    if(currentLocaleName.equals(DEFAULT_LOCALE_NAME)) {
+    if(DEFAULT_LOCALE_NAME.equals(currentLocaleName)) {
       // No locale has been specified so the current locale is "default". Return English as the current language.
       return "en";
     }
     int separatorIndex = currentLocaleName.indexOf('_');
-
-    return separatorIndex != -1 ? currentLocaleName.substring(0, separatorIndex) : currentLocaleName;
+    return separatorIndex == -1 ? currentLocaleName : currentLocaleName.substring(0, separatorIndex);
   }
 
 }

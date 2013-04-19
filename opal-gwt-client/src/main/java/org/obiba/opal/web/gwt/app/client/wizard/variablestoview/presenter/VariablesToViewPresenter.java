@@ -205,9 +205,10 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
   private VariableDto getDerivedVariable(VariableDto variable, boolean recodeName) {
     if(VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
         "integer".equals(variable.getValueType()) && !VariableDtos.allCategoriesMissing(variable))) {
-      CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
-      d.initializeValueMapEntries(recodeName);
-      return d.getDerivedVariable();
+      CategoricalVariableDerivationHelper derivationHelper = new CategoricalVariableDerivationHelper(variable,
+          recodeName);
+      derivationHelper.initializeValueMapEntries();
+      return derivationHelper.getDerivedVariable();
     }
     return new VariableDuplicationHelper(variable).getDerivedVariable();
   }

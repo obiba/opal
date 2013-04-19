@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.wizard;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
@@ -34,7 +36,7 @@ public class DefaultWizardStepController implements WizardStepController {
       return new Builder(new DefaultWizardStepController(step, help, skippable));
     }
 
-    public static Builder create(WizardStep step, Widget help) {
+    public static Builder create(WizardStep step, @Nullable Widget help) {
       return new Builder(new DefaultWizardStepController(step, help));
     }
 
@@ -125,6 +127,7 @@ public class DefaultWizardStepController implements WizardStepController {
       return this;
     }
 
+    @Nullable
     public static Builder createChain(List<Builder> steps) {
       switch(steps.size()) {
         case 0:
@@ -170,7 +173,7 @@ public class DefaultWizardStepController implements WizardStepController {
     setSkippable(skippable);
   }
 
-  DefaultWizardStepController(WizardStep step, Widget help) {
+  DefaultWizardStepController(WizardStep step, @Nullable Widget help) {
     this.step = step;
     if(help != null) {
       this.help = new WidgetProviderImpl(help);
@@ -223,9 +226,10 @@ public class DefaultWizardStepController implements WizardStepController {
     }
   }
 
+  @Nullable
   @Override
   public Widget getHelp() {
-    return help != null ? help.getWidget() : null;
+    return help == null ? null : help.getWidget();
   }
 
   @Override

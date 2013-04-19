@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -37,8 +36,6 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
 
     if(method == Method.AUTOMATICALLY) {
 
-      Collection<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
-      int index = 1;
       for(FrequencyDto frequencyDto : sortByFrequency()) {
 
         String value = frequencyDto.getValue();
@@ -49,11 +46,11 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
           entry.missing();
           missingValueMapEntries.add(entry.build());
         } else {
-          index = initializeNonMissingCategoryValueMapEntry(index, value, entry);
+          initializeNonMissingCategoryValueMapEntry(value, entry);
         }
       }
       // recode missing values
-      initializeMissingCategoryValueMapEntries(missingValueMapEntries, index);
+      initializeMissingCategoryValueMapEntries();
     }
 
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());

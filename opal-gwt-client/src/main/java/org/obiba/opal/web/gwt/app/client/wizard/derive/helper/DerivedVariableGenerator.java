@@ -27,7 +27,6 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 
 import static org.obiba.opal.web.gwt.app.client.js.JsArrays.toIterable;
@@ -53,7 +52,7 @@ public abstract class DerivedVariableGenerator {
   }
 
   public VariableDto generate(@Nullable VariableDto destination) {
-    // CopyVariable in both case because the user could click on Cancel
+    // Copy variable in both case because the user could click on Cancel
     VariableDto derived = destination == null
         ? copyVariable(originalVariable)
         : copyVariable(destination, originalVariable.getLink());
@@ -246,7 +245,6 @@ public abstract class DerivedVariableGenerator {
 
     // set attributes
     derived.setAttributesArray(copyAttributes(variable.getAttributesArray()));
-    GWT.log(variable.getLink());
 
     if(!Strings.isNullOrEmpty(link)) {
       VariableDtos.setDerivedFrom(derived, link);

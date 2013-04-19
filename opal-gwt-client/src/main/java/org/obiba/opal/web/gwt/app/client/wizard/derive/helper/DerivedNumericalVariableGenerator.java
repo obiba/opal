@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.derive.helper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +43,8 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
   private void appendGroupMethod() {
     // group method
     // ImmutableSortedSet.Builder<Range<N>> ranges = ImmutableSortedSet.naturalOrder();
-    List<Range<N>> ranges = new ArrayList<Range<N>>();
-    List<ValueMapEntry> outliers = new ArrayList<ValueMapEntry>();
+    Collection<Range<N>> ranges = new ArrayList<Range<N>>();
+    Collection<ValueMapEntry> outliers = new ArrayList<ValueMapEntry>();
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getType() == ValueMapEntryType.CATEGORY_NAME || entry.getType() == ValueMapEntryType.DISTINCT_VALUE) {
         outliers.add(entry);
@@ -62,7 +63,7 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
     scriptBuilder.append(")");
   }
 
-  private void appendBounds(List<Range<N>> ranges) {
+  private void appendBounds(Iterable<Range<N>> ranges) {
     scriptBuilder.append("[");
 
     boolean first = true;
@@ -96,7 +97,7 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
     scriptBuilder.append(bound);
   }
 
-  private void appendOutliers(List<ValueMapEntry> outliers) {
+  private void appendOutliers(Collection<ValueMapEntry> outliers) {
     if(outliers.isEmpty()) return;
     scriptBuilder.append(", [");
     boolean first = true;

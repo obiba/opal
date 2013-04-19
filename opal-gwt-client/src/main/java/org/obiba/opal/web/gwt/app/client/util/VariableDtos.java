@@ -29,6 +29,7 @@ import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.OPAL_NAMESPAC
 import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.SCRIPT_ATTRIBUTE;
 import static org.obiba.opal.web.gwt.app.client.util.AttributeDtos.STATUS_ATTRIBUTE;
 
+@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public class VariableDtos {
 
   private VariableDtos() {

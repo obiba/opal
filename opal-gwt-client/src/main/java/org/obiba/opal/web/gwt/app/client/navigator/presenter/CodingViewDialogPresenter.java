@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.place.Place;
 import net.customware.gwt.presenter.client.place.PlaceRequest;
@@ -56,8 +58,6 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
 
   private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-  private JsArray<DatasourceDto> datasources;
-
   private TableDto table;
 
   private JsArray<VariableDto> variables;
@@ -67,6 +67,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
     super(display, eventBus);
   }
 
+  @Nullable
   @Override
   public Place getPlace() {
     return null;
@@ -86,11 +87,6 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   private void updateDatasources() {
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
         .withCallback(new DatasourcesCallback()).send();
-  }
-
-  public void setTableVariables(TableDto table, JsArray<VariableDto> variables) {
-    this.table = table;
-    this.variables = variables;
   }
 
   @Override
@@ -131,7 +127,7 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
   private final class DatasourcesCallback implements ResourceCallback<JsArray<DatasourceDto>> {
     @Override
     public void onResource(Response response, JsArray<DatasourceDto> resources) {
-      datasources = JsArrays.toSafeArray(resources);
+      JsArray<DatasourceDto> datasources = JsArrays.toSafeArray(resources);
       getDisplay().populateDatasources(datasources);
       getDisplay().getViewName().setText("");
       getDisplay().showProgress(false);
@@ -195,9 +191,8 @@ public class CodingViewDialogPresenter extends WidgetPresenter<CodingViewDialogP
         DerivationHelper derivator = null;
         if(VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
             "integer".equals(variable.getValueType()) && !VariableDtos.allCategoriesMissing(variable))) {
-          CategoricalVariableDerivationHelper d = new CategoricalVariableDerivationHelper(variable);
-          d.initializeValueMapEntries();
-          derivator = d;
+          derivator = new CategoricalVariableDerivationHelper(variable);
+          ((CategoricalVariableDerivationHelper) derivator).initializeValueMapEntries();
         } else if(getDisplay().getDuplicate()) {
           derivator = new VariableDuplicationHelper(variable);
         }

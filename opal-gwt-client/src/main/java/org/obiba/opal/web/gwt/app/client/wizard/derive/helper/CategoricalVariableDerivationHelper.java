@@ -26,7 +26,6 @@ import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.regexp.shared.RegExp;
 
 /**
@@ -48,17 +47,35 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   protected final CategoricalSummaryDto categoricalSummaryDto;
 
+  private final boolean recodeCategoriesName;
+
   private double maxFrequency;
 
   private List<String> destinationCategories;
 
+  private final Map<String, Double> countByCategoryName = new HashMap<String, Double>();
+
+  protected final Collection<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
+
+  protected int index = 1;
+
   public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
-    this(originalVariable, null, null);
+    this(originalVariable, null, null, true);
+  }
+
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable, boolean recodeCategoriesName) {
+    this(originalVariable, null, null, recodeCategoriesName);
   }
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
       @Nullable SummaryStatisticsDto summaryStatisticsDto) {
+    this(originalVariable, destination, summaryStatisticsDto, true);
+  }
+
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
+      @Nullable SummaryStatisticsDto summaryStatisticsDto, boolean recodeCategoriesName) {
     super(originalVariable, destination);
+    this.recodeCategoriesName = recodeCategoriesName;
     //noinspection RedundantCast
     categoricalSummaryDto = summaryStatisticsDto == null
         ? null
@@ -68,47 +85,28 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   @Override
   public void initializeValueMapEntries() {
-    initializeValueMapEntries(true);
-  }
-
-  public void initializeValueMapEntries(boolean recodeCategoriesName) {
     valueMapEntries = new ArrayList<ValueMapEntry>();
 
     destinationCategories = getDestinationCategories(getDestination());
 
-    Collection<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
-    int index = 1;
-
-    // For each category and value without category, make value map entry and process separately missing and non-missing
-    // ones.
-    Map<String, Double> countByCategoryName = new HashMap<String, Double>();
-    if(isSummaryAvailable()) {
-      findFrequencies(countByCategoryName, categoricalSummaryDto.getFrequenciesArray());
-    }
+    // For each category and value without destination category,
+    // make value map entry and process separately missing and non-missing ones.
+    loadCountByCategoryName();
 
     // recode categories
-    index = initializeNonMissingCategoryValueMapEntries(countByCategoryName, missingValueMapEntries, index,
-        recodeCategoriesName);
+    initializeNonMissingCategoryValueMapEntries();
 
     // recode values not corresponding to a category
-    index = initializeValueMapEntriesWithoutCategory(countByCategoryName, missingValueMapEntries, index,
-        recodeCategoriesName);
+    initializeValueMapEntriesWithoutCategory();
 
     // recode missing values
-    initializeMissingCategoryValueMapEntries(missingValueMapEntries, index, recodeCategoriesName);
+    initializeMissingCategoryValueMapEntries();
 
     valueMapEntries.add(ValueMapEntry.createEmpties(translations.emptyValuesLabel()).count(nbEmpty()).build());
     valueMapEntries.add(ValueMapEntry.createOthers(translations.otherValuesLabel()).build());
-
   }
 
-  private boolean isSummaryAvailable() {
-    return categoricalSummaryDto != null;
-  }
-
-  private int initializeValueMapEntriesWithoutCategory(Map<String, Double> countByCategoryName,
-      Collection<ValueMapEntry> missingValueMapEntries, int index, boolean recodeCategoriesName) {
-    int newIndex = index;
+  private void initializeValueMapEntriesWithoutCategory() {
     for(Map.Entry<String, Double> entry : countByCategoryName.entrySet()) {
       String value = entry.getKey();
       ValueMapEntry.Builder builder = ValueMapEntry.fromDistinct(value, entry.getValue());
@@ -116,43 +114,39 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
         builder.missing();
         missingValueMapEntries.add(builder.build());
       } else {
-        newIndex = initializeNonMissingCategoryValueMapEntry(newIndex, value, builder, recodeCategoriesName);
+        initializeNonMissingCategoryValueMapEntry(value, builder);
       }
     }
-    return newIndex;
   }
 
-  private int initializeNonMissingCategoryValueMapEntries(Map<String, Double> countByCategoryName,
-      Collection<ValueMapEntry> missingValueMapEntries, int index, boolean recodeCategoriesName) {
-    int newIndex = index;
+  private void initializeNonMissingCategoryValueMapEntries() {
     for(CategoryDto category : JsArrays.toIterable(originalVariable.getCategoriesArray())) {
-      double count = countByCategoryName.containsKey(category.getName())
-          ? countByCategoryName.get(category.getName())
-          : 0;
+      String categoryName = category.getName();
+      double count = countByCategoryName.containsKey(categoryName) ? countByCategoryName.get(categoryName) : 0;
       ValueMapEntry.Builder builder = ValueMapEntry.fromCategory(category, count);
       if(estimateIsMissing(category)) {
         builder.missing();
         missingValueMapEntries.add(builder.build());
       } else {
-        newIndex = initializeNonMissingCategoryValueMapEntry(newIndex, category.getName(), builder,
-            recodeCategoriesName);
+        initializeNonMissingCategoryValueMapEntry(categoryName, builder);
       }
-      countByCategoryName.remove(category.getName());
+      countByCategoryName.remove(categoryName);
     }
-    return newIndex;
   }
 
-  private void findFrequencies(Map<String, Double> countByCategoryName, JsArray<FrequencyDto> frequencies) {
-    if(frequencies == null) return;
-    for(int i = 0; i < frequencies.length(); i++) {
-      FrequencyDto frequencyDto = frequencies.get(i);
-      String value = frequencyDto.getValue();
-      if(value.equals(NA)) continue;
-      countByCategoryName.put(frequencyDto.getValue(), frequencyDto.getFreq());
-      if(frequencyDto.getFreq() > maxFrequency) {
-        maxFrequency = frequencyDto.getFreq();
+  private Map<String, Double> loadCountByCategoryName() {
+    if(categoricalSummaryDto != null) {
+      for(FrequencyDto frequencyDto : JsArrays.toIterable(categoricalSummaryDto.getFrequenciesArray())) {
+        String value = frequencyDto.getValue();
+        if(value.equals(NA)) continue;
+        double freq = frequencyDto.getFreq();
+        countByCategoryName.put(value, freq);
+        if(freq > maxFrequency) {
+          maxFrequency = freq;
+        }
       }
     }
+    return countByCategoryName;
   }
 
   public double getMaxFrequency() {
@@ -163,13 +157,10 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
    * Return frequency of N/A in summary stats
    */
   protected double nbEmpty() {
-    if(isSummaryAvailable()) {
-      JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
-      if(frequenciesArray != null) {
-        for(int i = 0; i < frequenciesArray.length(); i++) {
-          if(frequenciesArray.get(i).getValue().equals(NA)) {
-            return frequenciesArray.get(i).getFreq();
-          }
+    if(categoricalSummaryDto != null) {
+      for(FrequencyDto frequencyDto : JsArrays.toIterable(categoricalSummaryDto.getFrequenciesArray())) {
+        if(frequencyDto.getValue().equals(NA)) {
+          return frequencyDto.getFreq();
         }
       }
     }
@@ -178,20 +169,9 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   /**
    * Process non-missing categories.
-   *
-   * @param index
-   * @param value
-   * @param builder
-   * @return current index value
    */
-  protected int initializeNonMissingCategoryValueMapEntry(int index, String value, ValueMapEntry.Builder builder) {
-    return initializeNonMissingCategoryValueMapEntry(index, value, builder, false);
-  }
-
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
-  protected int initializeNonMissingCategoryValueMapEntry(int index, String value, ValueMapEntry.Builder builder,
-      boolean recodeCategoriesName) {
-    int newIndex = index;
+  protected void initializeNonMissingCategoryValueMapEntry(String value, ValueMapEntry.Builder builder) {
 
     if(recodeCategoriesName) {
       //noinspection IfStatementWithTooManyBranches
@@ -201,10 +181,10 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
         builder.newValue("0");
       } else if(RegExp.compile(YES_REGEXP + "|" + MALE_REGEXP, "i").test(value)) {
         builder.newValue("1");
-        if(index < 2) newIndex = 2;
+        if(index < 2) index = 2;
       } else if(RegExp.compile(FEMALE_REGEXP, "i").test(value)) {
         builder.newValue("2");
-        if(index < 3) newIndex = 3;
+        if(index < 3) index = 3;
       } else {
         // OPAL-1387 look for a similar entry value and apply same new value
         boolean found = false;
@@ -215,9 +195,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
             break;
           }
         }
-        // create new value only if we don't already have mapped all existing categories in destination variable
-        if(!found && (destinationCategories == null || newIndex <= destinationCategories.size())) {
-          builder.newValue(Integer.toString(newIndex++));
+        if(!found) {
+          builder.newValue(Integer.toString(index++));
         }
       }
     } else {
@@ -226,28 +205,18 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
     valueMapEntries.add(builder.build());
 
-    return newIndex;
   }
 
   /**
    * Recode each missing values with indexes like 8s and 9s.
-   *
-   * @param missingValueMapEntries
-   * @param indexMax
    */
-  protected void initializeMissingCategoryValueMapEntries(Collection<ValueMapEntry> missingValueMapEntries,
-      int indexMax) {
-    initializeMissingCategoryValueMapEntries(missingValueMapEntries, indexMax, false);
-  }
-
-  protected void initializeMissingCategoryValueMapEntries(Collection<ValueMapEntry> missingValueMapEntries,
-      int indexMax, boolean recodeCategoriesName) {
+  protected void initializeMissingCategoryValueMapEntries() {
     if(missingValueMapEntries.isEmpty()) return;
 
     if(recodeCategoriesName) {
       int missIndex = 10 - missingValueMapEntries.size();
       int factor = 1;
-      while(missIndex * factor < indexMax + 1) {
+      while(missIndex * factor < index + 1) {
         factor = factor * 10 + 1;
       }
       for(ValueMapEntry entry : missingValueMapEntries) {

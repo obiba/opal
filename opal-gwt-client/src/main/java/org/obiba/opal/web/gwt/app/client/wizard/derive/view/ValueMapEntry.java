@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
@@ -159,6 +160,7 @@ public class ValueMapEntry {
     return new Builder(type);
   }
 
+  @Nonnull
   private static String buildLabel(String text) {
     if(Strings.isNullOrEmpty(text)) return "";
 
