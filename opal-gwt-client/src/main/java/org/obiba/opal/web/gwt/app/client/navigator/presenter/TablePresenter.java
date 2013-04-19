@@ -162,6 +162,17 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     addEventHandlers();
   }
 
+  private void updateTableIndexStatus() {
+    // Table indexation status
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
+        .authorize(getView().getTableIndexStatusAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").delete()
+        .authorize(getView().getTableIndexEditAuthorizer()).send();
+
+    updateIndexStatus();
+  }
+
   @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
     registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
@@ -376,7 +387,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
 
     updateVariables();
-    updateIndexStatus();
+    updateTableIndexStatus();
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables
@@ -964,6 +975,11 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasAuthorization getValuesAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
+
+    HasAuthorization getTableIndexStatusAuthorizer();
+
+    HasAuthorization getTableIndexEditAuthorizer();
+
 
     String getClickableColumnName(Column<?, ?> column);
 
