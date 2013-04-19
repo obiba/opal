@@ -546,7 +546,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
       @Override
       public void unauthorized() {
-        super.unauthorized();    //To change body of overridden methods use File | Settings | File Templates.
+        super.unauthorized();
         hasLinkAuthorization = false;
       }
     };
