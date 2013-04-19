@@ -1982,7 +1982,7 @@ ul.closeables li a {
 div.obiba-SuggestListBox {
   background-color: #FFFFFF;
   border: 1px solid #CCCCCC;
-  border-radius: 0 3px 3px 0;
+  border-radius: 3px;
   display: inline-block;
   padding-right: 4px;
   vertical-align: middle;
@@ -2383,6 +2383,9 @@ a.icon:hover {
   background: url(../image/16/search.png) no-repeat 2px 3px;
   padding-left: 20px !important;
   font-size: 0.9em;
+  margin-top: -8px;
+  padding-top: 2px;
+  padding-bottom: 2px;
   /*width:350px;*/
 }
 
