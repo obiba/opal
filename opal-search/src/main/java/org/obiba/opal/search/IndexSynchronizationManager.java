@@ -56,8 +56,7 @@ public class IndexSynchronizationManager {
 
   private final BlockingQueue<IndexSynchronization> indexSyncQueue = new LinkedBlockingQueue<IndexSynchronization>();
 
-  public IndexSynchronizationManager() {
-  }
+  private Thread consumer;
 
   // Every minute
   @Scheduled(fixedDelay = 60 * 1000)
@@ -65,7 +64,7 @@ public class IndexSynchronizationManager {
     if(syncConsumer == null) {
       // start one IndexSynchronization consumer thread per index manager
       syncConsumer = new SyncConsumer();
-      Thread consumer = new Thread(getSubject().associateWith(syncConsumer));
+      consumer = new Thread(getSubject().associateWith(syncConsumer));
       consumer.setPriority(Thread.MIN_PRIORITY);
       consumer.start();
     }
@@ -83,9 +82,10 @@ public class IndexSynchronizationManager {
   public void stopTask() {
     currentTask.stop();
     syncProducer.deleteCurrentTaskFromQueue();
+  }
 
-//    // reset currentTask
-//    currentTask = null;
+  public void terminateConsumerThread() {
+    if(consumer != null && consumer.isAlive()) consumer.interrupt();
   }
 
   private Subject getSubject() {
@@ -193,6 +193,7 @@ public class IndexSynchronizationManager {
           consume(indexSyncQueue.take());
         }
       } catch(InterruptedException ignored) {
+        log.debug("Stopping indexing consumer");
       }
     }
 

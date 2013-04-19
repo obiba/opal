@@ -11,6 +11,8 @@ package org.obiba.opal.core.runtime;
 
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
@@ -117,18 +119,15 @@ public class DefaultOpalRuntime implements OpalRuntime {
     return false;
   }
 
+  @Nonnull
   @Override
   public Service getService(String name) throws NoSuchServiceException {
-    if(!hasService(name)) throw new NoSuchServiceException(name);
-
-    Service service = null;
-    for(Service s : services) {
-      if(s.getName().equals(name)) {
-        service = s;
+    for(Service service : services) {
+      if(service.getName().equals(name)) {
+        return service;
       }
     }
-
-    return service;
+    throw new NoSuchServiceException(name);
   }
 
   @Override

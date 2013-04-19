@@ -18,11 +18,14 @@ import org.elasticsearch.rest.RestController;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 public class OpalSearchService implements Service, ElasticSearchProvider {
@@ -33,14 +36,18 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   private final ElasticSearchConfigurationService configService;
 
+  private final ApplicationContext applicationContext;
+
   private Node esNode;
 
   private Client client;
 
   @Autowired
-  public OpalSearchService(ElasticSearchConfigurationService configService) {
-    if(configService == null) throw new IllegalArgumentException("configService cannot be null");
+  public OpalSearchService(ElasticSearchConfigurationService configService, ApplicationContext applicationContext) {
+    Assert.notNull(configService, "configService cannot be null");
+    Assert.notNull(applicationContext, "applicationContext cannot be null");
     this.configService = configService;
+    this.applicationContext = applicationContext;
   }
 
   @Override
@@ -57,13 +64,15 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   public void start() {
     ElasticSearchConfiguration esConfig = configService.getConfig();
     if(!isRunning() && esConfig.isEnabled()) {
-      esNode = NodeBuilder.nodeBuilder().client(true) //
+      esNode = NodeBuilder.nodeBuilder() //
+          .client(true) //
           .settings(ImmutableSettings.settingsBuilder() //
-              .classLoader(OpalSearchService.class.getClassLoader())
+              .classLoader(OpalSearchService.class.getClassLoader()) //
               .loadFromClasspath(DEFAULT_SETTINGS_RESOURCE) //
               .loadFromSource(esConfig.getEsSettings())) //
           .clusterName(esConfig.getClusterName()) //
-          .client(!esConfig.isDataNode()).node();
+          .client(!esConfig.isDataNode()) //
+          .node();
       client = esNode.client();
     }
   }
@@ -81,6 +90,8 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   @Override
   public void stop() {
     if(isRunning()) {
+      // use applicationContext.getBean() to avoid unresolvable circular reference
+      applicationContext.getBean(IndexSynchronizationManager.class).terminateConsumerThread(); // stop indexer thread
       esNode.close();
       esNode = null;
       client = null;

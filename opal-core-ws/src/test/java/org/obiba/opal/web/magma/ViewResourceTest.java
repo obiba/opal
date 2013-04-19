@@ -28,6 +28,7 @@ import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtos;
+import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -58,7 +59,8 @@ public class ViewResourceTest {
     ViewManager mockViewManager = createMock(ViewManager.class);
     ImportService importService = createMock(ImportService.class);
     OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
+        createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 
@@ -76,7 +78,8 @@ public class ViewResourceTest {
     ViewManager mockViewManager = createMock(ViewManager.class);
     ImportService importService = createMock(ImportService.class);
     OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
+        createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 

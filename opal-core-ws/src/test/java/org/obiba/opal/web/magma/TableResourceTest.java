@@ -42,6 +42,7 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
+import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -92,7 +93,8 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   private TableResource createResource(ValueTable table, Set<Locale> locales) {
     ImportService importService = createMock(ImportService.class);
     OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
+        createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
     return new TableResource(table, locales, importService, opalSearchService, statsIndexManager, esProvider);

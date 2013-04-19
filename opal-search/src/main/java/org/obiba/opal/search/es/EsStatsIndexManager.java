@@ -88,11 +88,8 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
   private class Indexer extends EsIndexer {
 
-    private final EsValueTableStatsIndex index;
-
     private Indexer(ValueTable table, EsValueTableStatsIndex index) {
       super(table, index);
-      this.index = index;
     }
 
     @Override

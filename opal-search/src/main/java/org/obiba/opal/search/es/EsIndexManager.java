@@ -24,7 +24,6 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
-import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -45,6 +44,7 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import com.google.common.collect.Maps;
 
@@ -76,10 +76,10 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       @Nonnull ElasticSearchConfigurationService esConfig, @Nonnull IndexManagerConfigurationService indexConfig,
       @Nonnull Version version) {
 
-    Preconditions.checkNotNull(opalSearchService);
-    Preconditions.checkNotNull(esConfig);
-    Preconditions.checkNotNull(esConfig);
-    Preconditions.checkNotNull(version);
+    Assert.notNull(opalSearchService);
+    Assert.notNull(esConfig);
+    Assert.notNull(esConfig);
+    Assert.notNull(version);
 
     this.opalSearchService = opalSearchService;
     this.esConfig = esConfig;
@@ -90,7 +90,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   @Nonnull
   @Override
   public ValueTableIndex getIndex(@Nonnull ValueTable vt) {
-    Preconditions.checkNotNull(vt);
+    Assert.notNull(vt);
 
     String tableFullName = vt.getTableReference();
     ValueTableIndex index = indices.get(tableFullName);
@@ -131,7 +131,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   }
 
   protected Settings getIndexSettings() {
-    return ImmutableSettings.settingsBuilder().put("number_of_shards", esConfig.getConfig().getShards())
+    return ImmutableSettings.settingsBuilder() //
+        .put("number_of_shards", esConfig.getConfig().getShards()) //
         .put("number_of_replicas", esConfig.getConfig().getReplicas()).build();
   }
 

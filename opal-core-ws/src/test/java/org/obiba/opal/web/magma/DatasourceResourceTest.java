@@ -65,6 +65,7 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
+import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -84,6 +85,7 @@ import static org.obiba.core.util.FileUtil.getFileFromResource;
 /**
  *
  */
+@SuppressWarnings("ReuseOfLocalVariable")
 public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
 //  private static final Logger log = LoggerFactory.getLogger(DatasourceResourceTest.class);
@@ -215,7 +217,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     ViewManager viewManagerMock = createMock(ViewManager.class);
     ImportService importService = createMock(ImportService.class);
     OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
+        createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 
@@ -230,7 +233,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
       OpalConfigurationService mockOpalRuntime, ViewManager mockViewManager) {
     ImportService importService = createMock(ImportService.class);
     OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
+        createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 
@@ -253,7 +257,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     ViewManager viewManagerMock = createMock(ViewManager.class);
     ImportService importService = createMock(ImportService.class);
     OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
+        createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 

@@ -28,6 +28,7 @@ import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
+import org.springframework.context.ApplicationContext;
 
 import junit.framework.Assert;
 
@@ -71,7 +72,8 @@ public class FunctionalUnitsResourceTest {
 
     ImportService importService = createMock(ImportService.class);
     OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)));
+        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
+        createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 
