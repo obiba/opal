@@ -27,6 +27,7 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
 import static org.obiba.opal.web.gwt.app.client.js.JsArrays.toIterable;
@@ -51,6 +52,7 @@ public abstract class DerivedVariableGenerator {
     this.valueMapEntries = valueMapEntries;
   }
 
+  @SuppressWarnings("unchecked")
   public VariableDto generate(@Nullable VariableDto destination) {
     // Copy variable in both case because the user could click on Cancel
     VariableDto derived = destination == null
@@ -70,13 +72,14 @@ public abstract class DerivedVariableGenerator {
     // set script in derived variable
     VariableDtos.setScript(derived, scriptBuilder.toString());
 
-    // new categories if destination does not already define them
-    JsArray<CategoryDto> cats = JsArrays.toSafeArray(destination == null ? null : derived.getCategoriesArray());
-    if(cats.length() == 0) {
-      for(CategoryDto cat : newCategoriesMap.values()) {
-        cats.push(cat);
+    // set new categories if destination does not already exist
+    if(destination == null) {
+      if(derived.getCategoriesArray() == null) {
+        derived.setCategoriesArray((JsArray<CategoryDto>) JavaScriptObject.createArray());
       }
-      derived.setCategoriesArray(cats);
+      for(CategoryDto cat : newCategoriesMap.values()) {
+        derived.getCategoriesArray().push(cat);
+      }
     }
 
     return derived;
@@ -249,7 +252,7 @@ public abstract class DerivedVariableGenerator {
 
     // set categories
     if(withCategories) {
-      derived.setCategoriesArray(copyCategories(derived.getCategoriesArray()));
+      derived.setCategoriesArray(copyCategories(variable.getCategoriesArray()));
     }
 
     return derived;
