@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -666,12 +665,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     public void populateValues(int offset, ValueSetsDto valueSets) {
       setRefreshing(false);
 
-      if(valueSets != null) {
-        listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
-        updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
-      } else {
-        setVariables(new ArrayList());
-      }
+      listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
+      updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
     }
   }
 
