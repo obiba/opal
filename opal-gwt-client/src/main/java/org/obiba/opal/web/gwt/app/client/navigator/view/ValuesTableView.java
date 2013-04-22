@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -348,8 +349,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getTextBox().getText().isEmpty()) {
       lastFilter = escape(listVariable.get(0).getName());
-      filter.getTextBox()
-          .setValue(lastFilter.contains(" ") ? "name:\"" + lastFilter + "\"" : "name:" + lastFilter, false);
+      filter.getTextBox().setValue(lastFilter, false);
       isExactMatch = true;
 
       // hide the filter box since we want to show the values only for the current variable
@@ -464,10 +464,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void populateValues(int offset, ValueSetsDto resource) {
-    if(dataProvider != null && resource != null) {
+    if(dataProvider != null) {
       dataProvider.populateValues(offset, resource);
-    } else {
-      valuesTable.setEmptyTableWidget(noValues);
     }
   }
 
@@ -667,8 +665,13 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
       setRefreshing(false);
-      listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
-      updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
+
+      if(valueSets != null) {
+        listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
+        updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
+      } else {
+        setVariables(new ArrayList());
+      }
     }
   }
 
