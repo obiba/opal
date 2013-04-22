@@ -9,10 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemRemovedHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemValidator;
 
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -63,8 +60,14 @@ public class SuggestListBox extends FocusPanel {
     closeables.addItemRemovedHandler(new ItemRemovedHandler() {
 
       @Override
-      public void onItemRemoved(String text) {
+      public void onItemRemoved(ListItem item) {
         suggestBox.setFocus(true);
+
+        if(((VariableSearchListItem) item).getType() == VariableSearchListItem.ItemType.DATASOURCE) {
+          ((VariableSuggestOracle) suggestBox.getSuggestOracle()).setDatasource(null);
+        } else if(((VariableSearchListItem) item).getType() == VariableSearchListItem.ItemType.TABLE) {
+          ((VariableSuggestOracle) suggestBox.getSuggestOracle()).setTable(null);
+        }
       }
     });
 
@@ -99,8 +102,6 @@ public class SuggestListBox extends FocusPanel {
     content.add(empty);
 
     add(content);
-
-//    setItemValidator(new DefaultItemValidator());
   }
 
   /**
@@ -139,6 +140,9 @@ public class SuggestListBox extends FocusPanel {
         } else {
           // remove focus
           closeables.removeLastItemFocus();
+
+          // Lose focus on enter
+          suggestBox.setFocus(event.getNativeKeyCode() != KeyCodes.KEY_ENTER);
         }
       }
     });
@@ -193,33 +197,13 @@ public class SuggestListBox extends FocusPanel {
     return closeables.addItem(text, false, type);
   }
 
-  @SuppressWarnings("UnusedDeclaration")
-  public void removeItem(String text) {
-    closeables.removeItem(text);
-  }
-
-  @SuppressWarnings("UnusedDeclaration")
-  public List<String> getItems() {
-    return closeables.getItemTexts();
-  }
-
   public SuggestOracle getSuggestOracle() {
     return suggestBox.getSuggestOracle();
   }
 
   @SuppressWarnings("UnusedDeclaration")
-  public void setItemValidator(ItemValidator validator) {
-    closeables.setItemValidator(validator);
-  }
-
-  @SuppressWarnings("UnusedDeclaration")
   public void addItemRemovedHandler(ItemRemovedHandler handler) {
     closeables.addItemRemovedHandler(handler);
-  }
-
-  @SuppressWarnings("UnusedDeclaration")
-  public void removeItemRemovedHandler(ItemRemovedHandler handler) {
-    closeables.removeItemRemovedHandler(handler);
   }
 
 }
