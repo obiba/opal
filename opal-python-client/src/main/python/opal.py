@@ -5,6 +5,7 @@ import opal.dictionary
 import opal.data
 import opal.file
 import opal.entity
+import opal.import_opal
 import argparse
 
 def add_opal_arguments(parser):
@@ -35,6 +36,7 @@ add_subcommand('dict', 'Query for data dictionary.', opal.dictionary.add_argumen
 add_subcommand('data', 'Query for data.', opal.data.add_arguments,opal.data.do_command)
 add_subcommand('entity', 'Query for entities (Participant, etc.).', opal.entity.add_arguments,opal.entity.do_command)
 add_subcommand('file', 'Manage Opal file system.', opal.file.add_arguments,opal.file.do_command)
+add_subcommand('import-opal', 'Import data from a remote Opal server.', opal.import_opal.add_arguments,opal.import_opal.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,opal.rest.do_command)
 
 # Execute selected command

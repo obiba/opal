@@ -11,6 +11,7 @@ import json
 import cStringIO
 import os.path
 import getpass
+import urllib
 
 class OpalClient:
   """
@@ -117,8 +118,14 @@ class OpalRequest:
   def accept_json(self):
     return self.accept('application/json')
 
+  def accept_protobuf(self):
+    return self.accept('application/x-protobuf')
+
   def content_type_json(self):
     return self.content_type('application/json')
+
+  def content_type_protobuf(self):
+    return self.content_type('application/x-protobuf')
 
   def method(self, method):
     if not method:
@@ -305,23 +312,60 @@ class MagmaNameResolver:
   def get_ws(self):
     if self.is_datasources():
       if self.is_tables():
-        return '/datasources/tables'
+        return UriBuilder(['datasource', 'tables']).build()
       else:
-        return '/datasources'
+        return UriBuilder(['datasources']).build()
     elif self.is_datasource():
-      return '/datasource/' + self.datasource
+      return UriBuilder(['datasource', self.datasource]).build()
     elif self.is_tables():
-      return '/datasource/' + self.datasource + '/tables'
+      return UriBuilder(['datasource', self.datasource, 'tables']).build()
     elif self.is_table():
       return self.get_table_ws()
     elif self.is_variables():
-      return '/datasource/' + self.datasource + '/table/' + self.table + '/variables'
+      return UriBuilder(['datasource', self.datasource, 'table', self.table, 'variables']).build()
     else:
       return self.get_variable_ws()
 
   def get_table_ws(self):
-    return '/datasource/' + self.datasource + '/table/' + self.table
+    return UriBuilder(['datasource', self.datasource, 'table', self.table]).build()
 
   def get_variable_ws(self):
-    return '/datasource/' + self.datasource + '/table/' + self.table + '/variable/' + self.variable
+    return UriBuilder(['datasource', self.datasource, 'table', self.table, 'variable', self.variable]).build()
 
+class UriBuilder:
+  """
+  Build a valid Uri.
+  """
+  def __init__(self,path=[],params={}):
+    self.path = path
+    self.params = params
+
+  def path(self,path):
+    self.path = path
+    return self
+
+  def segment(self,seg):
+    self.path.append(seg)
+    return self
+
+  def params(self,params):
+    self.params = params
+    return self
+
+  def query(self,key,value):
+    self.params.update(key,value)
+    return self
+
+  def __str__(self):
+    def concat_segment(p,s): return p + '/' + s
+    def concat_params(k): return urllib.quote(k) + '=' + urllib.quote(str(self.params[k]))
+    def concat_query(q,p): return q + '&' + p
+    p = urllib.quote('/' + reduce(concat_segment,self.path))
+    if len(self.params):
+      q = reduce(concat_query, map(concat_params,self.params.keys()))
+      return p + '?' + q
+    else:
+      return p
+
+  def build(self):
+    return self.__str__()
