@@ -354,7 +354,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
-    getView().clear(!table.getLink().equals(tableDto.getLink()));
+    getView().clear(table == null || !table.getLink().equals(tableDto.getLink()));
 
     table = tableDto;
     this.previous = previous;
