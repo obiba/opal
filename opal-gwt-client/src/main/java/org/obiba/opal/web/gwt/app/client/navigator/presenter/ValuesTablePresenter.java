@@ -253,22 +253,22 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
-      if(variables.isEmpty()) {
-        getView().populateValues(offset, null);
-      } else {
-        StringBuilder link = getLinkBuilder(offset, limit);
-        if(table.getVariableCount() > variables.size()) {
-          link.append("&select=");
-          StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
+      StringBuilder link = getLinkBuilder(offset, limit);
+      if(table.getVariableCount() > variables.size()) {
+        link.append("&select=");
+        StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
+        if(variables.isEmpty()) {
+          script.append("^$");
+        } else {
           for(int i = 0; i < variables.size(); i++) {
             if(i > 0) script.append("|");
             script.append("^").append(escape(variables.get(i).getName().toLowerCase())).append("$");
           }
-          script.append("/)");
-          link.append(URL.encodePathSegment(script.toString()));
         }
-        doRequest(offset, link.toString());
+        script.append("/)");
+        link.append(URL.encodePathSegment(script.toString()));
       }
+      doRequest(offset, link.toString());
     }
 
     @Override
