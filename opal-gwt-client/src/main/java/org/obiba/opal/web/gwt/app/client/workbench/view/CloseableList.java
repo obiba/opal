@@ -91,7 +91,7 @@ public class CloseableList extends UList {
     remove(item);
     clearLastItemFocus();
     for(ItemRemovedHandler handler : itemRemovedHandlers) {
-      handler.onItemRemoved(getItemText(item));
+      handler.onItemRemoved(item);
     }
   }
 
@@ -163,7 +163,7 @@ public class CloseableList extends UList {
   }
 
   public interface ItemRemovedHandler {
-    void onItemRemoved(String text);
+    void onItemRemoved(ListItem item);
   }
 
   public interface ItemValidator {
