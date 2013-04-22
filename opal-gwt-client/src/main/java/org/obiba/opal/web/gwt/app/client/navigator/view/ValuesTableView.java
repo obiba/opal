@@ -348,7 +348,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getTextBox().getText().isEmpty()) {
       lastFilter = escape(listVariable.get(0).getName());
-      filter.getTextBox().setValue(lastFilter, false);
+      filter.getTextBox()
+          .setValue(lastFilter.contains(" ") ? "name:\"" + lastFilter + "\"" : "name:" + lastFilter, false);
       isExactMatch = true;
 
       // hide the filter box since we want to show the values only for the current variable
@@ -463,8 +464,10 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   @Override
   public void populateValues(int offset, ValueSetsDto resource) {
-    if(dataProvider != null) {
+    if(dataProvider != null && resource != null) {
       dataProvider.populateValues(offset, resource);
+    } else {
+      valuesTable.setEmptyTableWidget(noValues);
     }
   }
 
