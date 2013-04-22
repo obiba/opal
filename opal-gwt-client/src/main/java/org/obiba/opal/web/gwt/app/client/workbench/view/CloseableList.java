@@ -61,7 +61,9 @@ public class CloseableList extends UList {
       item.setTitle(title);
     }
 
-    item.add(new InlineLabel(quoteIfContainsSpace(text)));
+    InlineLabel label = new InlineLabel(quoteIfContainsSpace(text));
+    label.addStyleName("label");
+    item.add(label);
     IconAnchor close = new IconAnchor();
     close.setIcon(IconType.REMOVE);
 
