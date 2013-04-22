@@ -359,12 +359,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
+    getView().clear(!table.getLink().equals(tableDto.getLink()));
+
     table = tableDto;
     this.previous = previous;
     this.next = next;
     originalVariables = JsArrays.create();
 
-    getView().clear();
     getView().setTable(tableDto);
     getView().setParentName(tableDto.getDatasourceName());
     getView().setPreviousName(previous);
@@ -436,6 +437,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         }
       }
     }//
+        .withQuery(getView().getFilter().getText())//
+        .withVariable(true)//
         .withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
@@ -924,7 +927,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void afterRenderRows();
 
-    void clear();
+    void clear(boolean cleanFilter);
 
     void setTable(TableDto dto);
 
@@ -979,7 +982,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasAuthorization getTableIndexStatusAuthorizer();
 
     HasAuthorization getTableIndexEditAuthorizer();
-
 
     String getClickableColumnName(Column<?, ?> column);
 
