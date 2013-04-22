@@ -92,11 +92,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private JsArray<VariableDto> variables;
 
-  /**
-   * Keep original variables to be able to find next/previous variables even when the list is filtered
-   */
-  private JsArray<VariableDto> originalVariables = JsArrays.create();
-
   private TableDto table;
 
   private TableDto originalTable;
@@ -359,12 +354,12 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
+    getView().clear(!table.getLink().equals(tableDto.getLink()));
+
     table = tableDto;
     this.previous = previous;
     this.next = next;
-    originalVariables = JsArrays.create();
 
-    getView().clear();
     getView().setTable(tableDto);
     getView().setParentName(tableDto.getDatasourceName());
     getView().setPreviousName(previous);
@@ -427,15 +422,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
             variables.push(v);
           }
 
-          if(originalVariables.length() == 0) {
-            // Initialize originalVariables
-            originalVariables = JsArrays.toSafeArray(variables);
-          }
           getView().renderRows(variables);
           getView().afterRenderRows();
         }
       }
     }//
+        .withQuery(getView().getFilter().getText())//
+        .withVariable(true)//
         .withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
@@ -455,15 +448,15 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private VariableDto getPreviousVariable(int index) {
     VariableDto previous = null;
     if(index > 0) {
-      previous = originalVariables.get(index - 1);
+      previous = variables.get(index - 1);
     }
     return previous;
   }
 
   private VariableDto getNextVariable(int index) {
     VariableDto next = null;
-    if(index < originalVariables.length() - 1) {
-      next = originalVariables.get(index + 1);
+    if(index < variables.length() - 1) {
+      next = variables.get(index + 1);
     }
     return next;
   }
@@ -857,8 +850,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     @Override
     public void update(int index, VariableDto variableDto, String value) {
       getEventBus().fireEvent(
-          new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(variableDto.getIndex()),
-              getNextVariable(variableDto.getIndex())));
+          new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
     }
   }
 
@@ -869,10 +861,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       // Look for the variable and its position in the list by its name.
       // Having a position of the current variable would be more efficient.
       int siblingIndex = 0;
-      for(int i = 0; i < originalVariables.length(); i++) {
-        if(originalVariables.get(i).getName().equals(event.getCurrentSelection().getName())) {
-          if(event.getDirection() == SiblingVariableSelectionEvent.Direction.NEXT &&
-              i < originalVariables.length() - 1) {
+      for(int i = 0; i < variables.length(); i++) {
+        if(variables.get(i).getName().equals(event.getCurrentSelection().getName())) {
+          if(event.getDirection() == SiblingVariableSelectionEvent.Direction.NEXT && i < variables.length() - 1) {
             siblingIndex = i + 1;
           } else siblingIndex = event.getDirection() == SiblingVariableSelectionEvent.Direction.PREVIOUS && i != 0
               ? i - 1
@@ -880,7 +871,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
           break;
         }
       }
-      VariableDto variableDto = originalVariables.get(siblingIndex);
+      VariableDto variableDto = variables.get(siblingIndex);
 
       getView().setVariableSelection(variableDto, siblingIndex);
       getEventBus().fireEvent(new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(siblingIndex),
@@ -924,7 +915,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void afterRenderRows();
 
-    void clear();
+    void clear(boolean cleanFilter);
 
     void setTable(TableDto dto);
 
@@ -979,7 +970,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasAuthorization getTableIndexStatusAuthorizer();
 
     HasAuthorization getTableIndexEditAuthorizer();
-
 
     String getClickableColumnName(Column<?, ?> column);
 

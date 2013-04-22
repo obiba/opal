@@ -23,6 +23,7 @@ import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
@@ -183,22 +184,24 @@ public class VariableSuggestOracle extends SuggestOracle {
               QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
               List<VariableSuggestion> suggestions = new ArrayList<VariableSuggestion>();
-              for(int i = 0; i < resultDto.getTotalHits(); i++) {
-                ItemFieldsDto itemDto = (ItemFieldsDto) resultDto.getHitsArray().get(i)
-                    .getExtension("Search.ItemFieldsDto.item");
+              if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
+                for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
+                  ItemFieldsDto itemDto = (ItemFieldsDto) resultDto.getHitsArray().get(i)
+                      .getExtension("Search.ItemFieldsDto.item");
 
-                JsArray<EntryDto> fields = itemDto.getFieldsArray();
-                Map<String, String> attributes = new HashMap<String, String>();
-                for(int j = 0; j < fields.length(); j++) {
-                  if("label-en".equals(fields.get(j).getKey()) ||
-                      "label".equals(fields.get(j).getKey()) && !attributes.containsKey("label")) {
-                    attributes.put("label", fields.get(j).getValue());
-                  } else {
-                    attributes.put(fields.get(j).getKey(), fields.get(j).getValue());
+                  JsArray<EntryDto> fields = itemDto.getFieldsArray();
+                  Map<String, String> attributes = new HashMap<String, String>();
+                  for(int j = 0; j < fields.length(); j++) {
+                    if("label-en".equals(fields.get(j).getKey()) ||
+                        "label".equals(fields.get(j).getKey()) && !attributes.containsKey("label")) {
+                      attributes.put("label", fields.get(j).getValue());
+                    } else {
+                      attributes.put(fields.get(j).getKey(), fields.get(j).getValue());
+                    }
                   }
-                }
 
-                suggestions.add(convertToFormattedSuggestions(query, attributes));
+                  suggestions.add(convertToFormattedSuggestions(query, attributes));
+                }
               }
 
               // Convert candidates to suggestions.
@@ -251,7 +254,10 @@ public class VariableSuggestOracle extends SuggestOracle {
    */
   protected VariableSuggestion createSuggestion(String replacementString, String displayString, String datasource,
       String table, String variable) {
-    return new VariableSuggestion(replacementString, displayString, datasource, table, variable);
+    VariableSuggestion v = new VariableSuggestion(replacementString, displayString, datasource, table, variable);
+    GWT.log("V " + v.getDisplayString());
+
+    return v;
   }
 
 }

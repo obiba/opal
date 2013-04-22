@@ -319,10 +319,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void clear() {
+  public void clear(boolean cleanFilter) {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
     checkColumn.getSelectionModel().clear();
-    filter.setText("");
+    if(cleanFilter) filter.setText("");
   }
 
   @Override
