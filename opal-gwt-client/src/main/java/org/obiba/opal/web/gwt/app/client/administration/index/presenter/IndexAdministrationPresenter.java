@@ -72,7 +72,7 @@ public class IndexAdministrationPresenter
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private static final int DELAY_MILLIS = 1000;
+  private static final int DELAY_MILLIS = 1500;
 
   public interface Display extends View {
 
@@ -277,7 +277,15 @@ public class IndexAdministrationPresenter
             @Override
             public void onResponseCode(Request request, Response response) {
               if(response.getStatusCode() == Response.SC_OK) {
-                refresh();
+                // Wait a few seconds for the task to launch before checking its status
+                Timer t = new Timer() {
+                  @Override
+                  public void run() {
+                    refresh(false);
+                  }
+                };
+                // Schedule the timer to run once in X seconds.
+                t.schedule(DELAY_MILLIS);
               } else {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
                 getEventBus().fireEvent(
@@ -387,10 +395,14 @@ public class IndexAdministrationPresenter
   }
 
   private void refresh() {
+    refresh(true);
+  }
+
+  private void refresh(boolean clearIndices) {
     // Fetch all indices
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
         .forResource(Resources.indices())//
-        .withCallback(new TableIndexStatusResourceCallback(getView().getIndexTable().getVisibleRange()))//
+        .withCallback(new TableIndexStatusResourceCallback(getView().getIndexTable().getVisibleRange(), clearIndices))//
         .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -403,8 +415,11 @@ public class IndexAdministrationPresenter
   private class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
     private final Range r;
 
-    private TableIndexStatusResourceCallback(Range r) {
+    private boolean clearIndices;
+
+    private TableIndexStatusResourceCallback(Range r, boolean clearIndices) {
       this.r = r;
+      this.clearIndices = clearIndices;
     }
 
     @Override
@@ -422,7 +437,7 @@ public class IndexAdministrationPresenter
         Timer t = new Timer() {
           @Override
           public void run() {
-            refresh();
+            refresh(false);
           }
         };
         // Schedule the timer to run once in X seconds.
@@ -431,7 +446,8 @@ public class IndexAdministrationPresenter
 
       getView().renderRows(resource);
       getView().getIndexTable().setVisibleRangeAndClearData(r, true);
-      getView().getSelectedIndices().clear();
+
+      if(clearIndices) getView().getSelectedIndices().clear();
     }
   }
 

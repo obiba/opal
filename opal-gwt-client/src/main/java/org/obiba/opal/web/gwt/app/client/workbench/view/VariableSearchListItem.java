@@ -21,4 +21,12 @@ public class VariableSearchListItem extends ListItem {
     return type;
   }
 
+  public void setItemTitle(String title) {
+    if(type == ItemType.DATASOURCE) {
+      setTitle("datasource:" + title);
+    } else {
+      setTitle("table:" + title);
+    }
+  }
+
 }

@@ -37,29 +37,22 @@ public class CloseableList extends UList {
   }
 
   public boolean addItem(String text, VariableSearchListItem.ItemType type) {
-    return addItem(text, true, null, type);
+    return addItem(text, true, type);
   }
 
   public boolean addItem(String text, boolean validate, VariableSearchListItem.ItemType type) {
-    return addItem(text, validate, null, type);
-  }
-
-  public boolean addItem(String text, boolean validate, String title, VariableSearchListItem.ItemType type) {
     if(Strings.isNullOrEmpty(text)) return false;
 
     if(validate && itemValidator != null && !itemValidator.validate(text)) return false;
 
-    addItemInternal(text, title, type);
+    addItemInternal(text, type);
 
     return true;
   }
 
-  private void addItemInternal(String text, String title, VariableSearchListItem.ItemType type) {
+  private void addItemInternal(String text, VariableSearchListItem.ItemType type) {
     final VariableSearchListItem item = new VariableSearchListItem(type);
-
-    if(title != null) {
-      item.setTitle(title);
-    }
+    item.setItemTitle(text);
 
     InlineLabel label = new InlineLabel(quoteIfContainsSpace(text));
     label.addStyleName("label");
@@ -136,10 +129,10 @@ public class CloseableList extends UList {
   public void focusOrRemoveLastItem() {
     if(getWidgetCount() > 0) {
       Widget lastItem = getWidget(getWidgetCount() - 1);
-      if(!lastItem.getStyleName().contains("focus")) {
-        lastItem.addStyleName("focus");
-      } else {
+      if(lastItem.getStyleName().contains("focus")) {
         removeItem((ListItem) lastItem);
+      } else {
+        lastItem.addStyleName("focus");
       }
     }
   }

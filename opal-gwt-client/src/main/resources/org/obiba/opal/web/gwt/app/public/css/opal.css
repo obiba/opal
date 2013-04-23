@@ -1911,6 +1911,7 @@ ul.closeables {
   margin-left: 0;
 }
 
+/* Truncate labels depending on screen resolution */
 ul.closeables li {
   float: left;
   list-style: none outside none;
@@ -1928,27 +1929,63 @@ ul.closeables li {
   font-size: 1.1em;
 }
 
+/* Truncate labels depending on screen resolution */
+ul.closeables li span {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+}
+
+@media all and (max-width: 1189px) {
+  ul.closeables li {
+    max-width: 80px;
+  }
+}
+
+@media all and (max-width: 1529px) and (min-width: 1190px) {
+  ul.closeables li {
+    max-width: 150px;
+  }
+}
+
+@media all and (min-width:1530px) {
+  ul.closeables li {
+    max-width: 250px;
+  }
+}
+
+@media all and (max-width: 1189px) {
+  ul.closeables li span {
+    max-width: 54px;
+  }
+}
+
+@media all and (max-width: 1529px) and (min-width: 1190px) {
+  ul.closeables li span {
+    max-width: 124px;
+  }
+}
+
+@media all and (min-width:1530px) {
+  ul.closeables li span {
+    max-width: 234px;
+  }
+}
+
 ul.closeables li.focus {
   background: #d4d4d4;
 }
 
-ul.closeables li span {
-
-}
-
 ul.closeables li a {
+  display: inline-block;
   color: #FFFFFF;
-  /*font-weight: bold;*/
   padding-left: 6px;
   text-decoration: none;
-  /*-moz-text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);*/
-  /*-webkit-text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);*/
-  /*text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);*/
 }
-
-/*ul.closeables li i {*/
-/*color: #FFFFFF;*/
-/*}*/
 
 .Box {
   border: 1px solid #CCCCCC;
@@ -1966,12 +2003,28 @@ ul.closeables li a {
 
 .obiba-SuggestListBox input {
   border: none;
-  /*margin-left: 4px;*/
   box-shadow: none;
-  /*margin-bottom:0px;*/
   margin: 0px 0px 0px 4px;
   padding: 0px;
-  width: 275px;
+}
+
+/* Width is dependent of screen resolution */
+@media all and (max-width: 1189px) {
+  .obiba-SuggestListBox input {
+    width: 130px;
+  }
+}
+
+@media all and (max-width: 1529px)and (min-width: 1190px) {
+  .obiba-SuggestListBox input {
+    width: 250px;
+  }
+}
+
+@media all and (min-width:1530px) {
+  .obiba-SuggestListBox input {
+    width: 475px;
+  }
 }
 
 .obiba-SuggestListBox input:focus {
