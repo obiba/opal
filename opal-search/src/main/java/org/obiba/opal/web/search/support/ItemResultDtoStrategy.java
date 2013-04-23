@@ -12,6 +12,7 @@ package org.obiba.opal.web.search.support;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.web.magma.Dtos;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
 
 public class ItemResultDtoStrategy {
@@ -25,7 +26,10 @@ public class ItemResultDtoStrategy {
   public void process(Search.ItemResultDto.Builder dtoItemResultBuilder, int tableIndex) {
     String variableName = MagmaEngineVariableResolver.valueOf(dtoItemResultBuilder.getIdentifier()).getVariableName();
     Search.VariableItemDto.Builder dtoVariableItemBuilder = Search.VariableItemDto.newBuilder();
-    dtoVariableItemBuilder.setVariable(Dtos.asDto(null, valueTable.getVariable(variableName), tableIndex));
+    Magma.LinkDto parentLink = Magma.LinkDto.newBuilder().setRel(valueTable.getName())
+        .setLink("/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName()).build();
+    dtoVariableItemBuilder
+        .setVariable(Dtos.asDto(null, valueTable.getVariable(variableName), tableIndex).setParentLink(parentLink));
     dtoItemResultBuilder.setExtension(Search.VariableItemDto.item, dtoVariableItemBuilder.build());
   }
 
