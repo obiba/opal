@@ -9,6 +9,18 @@ You need to have pycurl installed within your Python install:
 
 http://pycurl.sourceforge.net/
 
+```
+sudo apt-get install python-pycurl
+```
+
+You will also need the Google's Protobuf bindings for Python to be installed:
+
+https://code.google.com/p/protobuf/
+
+```
+sudo apt-get install python-protobuf
+```
+
 ### Usage
 
 To get the options of the command line:
