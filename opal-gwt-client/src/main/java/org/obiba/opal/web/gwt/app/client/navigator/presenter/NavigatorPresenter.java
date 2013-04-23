@@ -144,8 +144,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           @Override
           public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
             getView().getSearch().clear();
-            getView().getSearch().addItem(event.getSelection().getName(), translations.datasourceLabel(),
-                VariableSearchListItem.ItemType.DATASOURCE);
+            getView().getSearch().addItem(event.getSelection().getName(), VariableSearchListItem.ItemType.DATASOURCE);
           }
         }));
 
@@ -154,10 +153,9 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           @Override
           public void onTableSelectionChanged(TableSelectionChangeEvent event) {
             getView().getSearch().clear();
-            getView().getSearch().addItem(event.getSelection().getDatasourceName(), translations.datasourceLabel(),
-                VariableSearchListItem.ItemType.DATASOURCE);
-            getView().getSearch().addItem(event.getSelection().getName(), translations.tableLabel(),
-                VariableSearchListItem.ItemType.TABLE);
+            getView().getSearch()
+                .addItem(event.getSelection().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().getSearch().addItem(event.getSelection().getName(), VariableSearchListItem.ItemType.TABLE);
           }
         }));
 
@@ -166,10 +164,9 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           @Override
           public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
             getView().getSearch().clear();
-            getView().getSearch().addItem(event.getTable().getDatasourceName(), translations.datasourceLabel(),
-                VariableSearchListItem.ItemType.DATASOURCE);
             getView().getSearch()
-                .addItem(event.getTable().getName(), translations.tableLabel(), VariableSearchListItem.ItemType.TABLE);
+                .addItem(event.getTable().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().getSearch().addItem(event.getTable().getName(), VariableSearchListItem.ItemType.TABLE);
           }
         }));
 
