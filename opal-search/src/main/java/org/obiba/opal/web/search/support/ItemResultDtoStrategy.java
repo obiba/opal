@@ -28,8 +28,8 @@ public class ItemResultDtoStrategy {
     Search.VariableItemDto.Builder dtoVariableItemBuilder = Search.VariableItemDto.newBuilder();
     Magma.LinkDto parentLink = Magma.LinkDto.newBuilder().setRel(valueTable.getName())
         .setLink("/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName()).build();
-    dtoVariableItemBuilder
-        .setVariable(Dtos.asDto(null, valueTable.getVariable(variableName), tableIndex).setParentLink(parentLink));
+    dtoVariableItemBuilder.setVariable(Dtos.asDto(parentLink, valueTable.getVariable(variableName), tableIndex)
+        .setLink(parentLink.getLink() + "/variable/" + variableName));
     dtoItemResultBuilder.setExtension(Search.VariableItemDto.item, dtoVariableItemBuilder.build());
   }
 
