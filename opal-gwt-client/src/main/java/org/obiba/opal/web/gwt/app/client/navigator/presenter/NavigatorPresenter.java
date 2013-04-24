@@ -171,7 +171,6 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         }));
 
     getView().getSearch().getSuggestBox().addSelectionHandler(new VariableSuggestionSelectionHandler());
-    getView().getSearch().addFocusHandler(new VariableSuggestionFocusHandler());
   }
 
   @Override
@@ -259,11 +258,4 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
     }
   }
 
-  private class VariableSuggestionFocusHandler implements FocusHandler {
-
-    @Override
-    public void onFocus(FocusEvent event) {
-      getView().getSearch().getSuggestBox().showSuggestionList();
-    }
-  }
 }

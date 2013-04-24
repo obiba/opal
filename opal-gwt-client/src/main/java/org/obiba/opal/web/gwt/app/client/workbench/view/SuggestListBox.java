@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemRemovedHandler;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -152,25 +153,6 @@ public class SuggestListBox extends FocusPanel {
       public void onKeyUp(KeyUpEvent event) {
         clear.setVisible(!suggestBox.getValueBox().getText().isEmpty());
         empty.setVisible(suggestBox.getValueBox().getText().isEmpty());
-      }
-    });
-
-    suggestBox.getValueBox().addFocusHandler(new FocusHandler() {
-
-      @Override
-      public void onFocus(FocusEvent event) {
-        for(int i = 0; i < closeables.getWidgetCount(); i++) {
-          if(((VariableSearchListItem) closeables.getWidget(i)).getType() ==
-              VariableSearchListItem.ItemType.DATASOURCE) {
-            ((VariableSuggestOracle) suggestBox.getSuggestOracle())
-                .setDatasource(((HasText) closeables.getWidget(i)).getText());
-          }
-          if(((VariableSearchListItem) closeables.getWidget(i)).getType() == VariableSearchListItem.ItemType.TABLE) {
-            ((VariableSuggestOracle) suggestBox.getSuggestOracle())
-                .setTable(((HasText) closeables.getWidget(i)).getText());
-          }
-        }
-        suggestBox.showSuggestionList();
       }
     });
 
