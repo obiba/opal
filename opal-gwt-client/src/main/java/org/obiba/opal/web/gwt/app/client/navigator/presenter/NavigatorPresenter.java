@@ -21,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Creat
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.SuggestListBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
@@ -39,8 +38,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -77,8 +74,11 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
     HandlerRegistration refreshClickHandler(ClickHandler handler);
 
-    SuggestListBox getSearch();
+    void addSearchItem(String text, VariableSearchListItem.ItemType type);
 
+    void clearSearch();
+
+    HandlerRegistration addSearchSelectionHandler(SelectionHandler<SuggestOracle.Suggestion> handler);
   }
 
   @ContentSlot
@@ -143,8 +143,8 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         .addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
           @Override
           public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-            getView().getSearch().clear();
-            getView().getSearch().addItem(event.getSelection().getName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().clearSearch();
+            getView().addSearchItem(event.getSelection().getName(), VariableSearchListItem.ItemType.DATASOURCE);
           }
         }));
 
@@ -152,10 +152,10 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
           @Override
           public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-            getView().getSearch().clear();
-            getView().getSearch()
-                .addItem(event.getSelection().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
-            getView().getSearch().addItem(event.getSelection().getName(), VariableSearchListItem.ItemType.TABLE);
+            getView().clearSearch();
+            getView()
+                .addSearchItem(event.getSelection().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().addSearchItem(event.getSelection().getName(), VariableSearchListItem.ItemType.TABLE);
           }
         }));
 
@@ -163,14 +163,13 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
         getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
           @Override
           public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-            getView().getSearch().clear();
-            getView().getSearch()
-                .addItem(event.getTable().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
-            getView().getSearch().addItem(event.getTable().getName(), VariableSearchListItem.ItemType.TABLE);
+            getView().clearSearch();
+            getView().addSearchItem(event.getTable().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().addSearchItem(event.getTable().getName(), VariableSearchListItem.ItemType.TABLE);
           }
         }));
 
-    getView().getSearch().getSuggestBox().addSelectionHandler(new VariableSuggestionSelectionHandler());
+    registerHandler(getView().addSearchSelectionHandler(new VariableSuggestionSelectionHandler()));
   }
 
   @Override
@@ -202,10 +201,6 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
 
     @Override
     public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
-      // Reset suggestBox text to user input text
-      String originalQuery = ((VariableSuggestOracle) getView().getSearch().getSuggestOracle()).getOriginalQuery();
-      getView().getSearch().getSuggestBox().setText(originalQuery);
-
       // Get the table dto to fire the event to select the variable
       final String datasourceName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem())
           .getDatasource();

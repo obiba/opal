@@ -63,12 +63,6 @@ public class SuggestListBox extends FocusPanel {
       @Override
       public void onItemRemoved(ListItem item) {
         suggestBox.setFocus(true);
-
-        if(((VariableSearchListItem) item).getType() == VariableSearchListItem.ItemType.DATASOURCE) {
-          ((VariableSuggestOracle) suggestBox.getSuggestOracle()).setDatasource(null);
-        } else if(((VariableSearchListItem) item).getType() == VariableSearchListItem.ItemType.TABLE) {
-          ((VariableSuggestOracle) suggestBox.getSuggestOracle()).setTable(null);
-        }
       }
     });
 
@@ -156,14 +150,6 @@ public class SuggestListBox extends FocusPanel {
       }
     });
 
-    suggestBox.getValueBox().addBlurHandler(new BlurHandler() {
-
-      @Override
-      public void onBlur(BlurEvent event) {
-        ((VariableSuggestOracle) suggestBox.getSuggestOracle()).setTable(null);
-        ((VariableSuggestOracle) suggestBox.getSuggestOracle()).setDatasource(null);
-      }
-    });
   }
 
   @Override
@@ -179,7 +165,6 @@ public class SuggestListBox extends FocusPanel {
     return suggestBox.getSuggestOracle();
   }
 
-  @SuppressWarnings("UnusedDeclaration")
   public void addItemRemovedHandler(ItemRemovedHandler handler) {
     closeables.addItemRemovedHandler(handler);
   }

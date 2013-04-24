@@ -54,7 +54,7 @@ public class CloseableList extends UList {
     final VariableSearchListItem item = new VariableSearchListItem(type);
     item.setItemTitle(text);
 
-    InlineLabel label = new InlineLabel(quoteIfContainsSpace(text));
+    InlineLabel label = new InlineLabel(text);
     label.addStyleName("label");
     item.add(label);
     IconAnchor close = new IconAnchor();
@@ -90,9 +90,7 @@ public class CloseableList extends UList {
     }
   }
 
-  private String quoteIfContainsSpace(String s) {
-    return s.contains(" ") ? "\"" + s + "\"" : s;
-  }
+
 
   private String getItemText(IndexedPanel item) {
     Widget label = item.getWidget(0);

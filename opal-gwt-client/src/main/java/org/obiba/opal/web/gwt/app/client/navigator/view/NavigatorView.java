@@ -10,13 +10,18 @@
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ListItem;
 import org.obiba.opal.web.gwt.app.client.workbench.view.SuggestListBox;
+import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -25,6 +30,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -58,11 +64,25 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @UiField(provided = true)
   SuggestListBox search;
 
+  private VariableSuggestOracle oracle;
+
   @Inject
   public NavigatorView(EventBus eventBus) {
-    VariableSuggestOracle oracle = new VariableSuggestOracle(eventBus);
+    oracle = new VariableSuggestOracle(eventBus);
     search = new SuggestListBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
+
+    search.addItemRemovedHandler(new CloseableList.ItemRemovedHandler() {
+      @Override
+      public void onItemRemoved(ListItem item) {
+        VariableSearchListItem.ItemType type = ((VariableSearchListItem) item).getType();
+        if(VariableSearchListItem.ItemType.DATASOURCE.equals(type)) {
+          oracle.setDatasource(null);
+        } else if(VariableSearchListItem.ItemType.TABLE.equals(type)) {
+          oracle.setTable(null);
+        }
+      }
+    });
   }
 
   @Override
@@ -135,7 +155,38 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public SuggestListBox getSearch() {
-    return search;
+  public void addSearchItem(String text, VariableSearchListItem.ItemType type) {
+    String qText = quoteIfContainsSpace(text);
+    if (VariableSearchListItem.ItemType.DATASOURCE.equals(type)) {
+      oracle.setDatasource(qText);
+    }
+    if (VariableSearchListItem.ItemType.TABLE.equals(type)) {
+      oracle.setTable(qText);
+    }
+    search.addItem(qText, type);
   }
+
+  private String quoteIfContainsSpace(String s) {
+    return s.contains(" ") ? "\"" + s + "\"" : s;
+  }
+
+  @Override
+  public void clearSearch() {
+    search.clear();
+  }
+
+  @Override
+  public HandlerRegistration addSearchSelectionHandler(final SelectionHandler<SuggestOracle.Suggestion> handler) {
+    return search.getSuggestBox().addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+      @Override
+      public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
+        // Reset suggestBox text to user input text
+        String originalQuery = oracle.getOriginalQuery();
+        search.getSuggestBox().setText(originalQuery);
+        // Forward selection event
+        handler.onSelection(event);
+      }
+    });
+  }
+
 }

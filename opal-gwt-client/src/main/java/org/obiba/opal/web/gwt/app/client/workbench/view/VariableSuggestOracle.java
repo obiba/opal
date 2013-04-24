@@ -23,6 +23,7 @@ import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.shared.EventBus;
