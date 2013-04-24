@@ -1976,7 +1976,7 @@ ul.closeables li span {
   }
 }
 
-ul.closeables li.focus {
+ul.closeables li.focus, ul.closeables li.focus .label {
   background: #d4d4d4;
 }
 
