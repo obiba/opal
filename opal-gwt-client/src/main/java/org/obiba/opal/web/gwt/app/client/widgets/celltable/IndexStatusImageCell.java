@@ -20,6 +20,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 import static org.obiba.opal.web.model.client.opal.ScheduleType.NOT_SCHEDULED;
+import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.IN_PROGRESS;
 import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.OUTDATED;
 import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODATE;
 
@@ -48,7 +49,11 @@ public class IndexStatusImageCell extends AbstractCell<String> {
   private static final Translations translations = GWT.create(Translations.class);
 
   public static String getSrc(TableIndexStatusDto tableIndexStatusDto) {
-
+    // In progress
+    if(tableIndexStatusDto.getStatus().getName().equals(IN_PROGRESS.getName())) {
+      return (int) (tableIndexStatusDto.getProgress() * 100) + "%";
+    }
+    // Up to date
     if(tableIndexStatusDto.getStatus().getName().equals(UPTODATE.getName())) {
       return BULLET_GREEN;
     }
@@ -57,17 +62,13 @@ public class IndexStatusImageCell extends AbstractCell<String> {
         !tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
       return BULLET_ORANGE;
     }
-    // out dated but not scheduled
+    // Out dated but not scheduled
     if(tableIndexStatusDto.getStatus().getName().equals(OUTDATED.getName()) &&
         tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
       return BULLET_RED;
     }
-    // notify() scheduled
-    if(tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-      return BULLET_BLACK;
-    }
-
-    return (int) (tableIndexStatusDto.getProgress() * 100) + "%";
+    // Unknown status
+    return BULLET_BLACK;
   }
 
   public static String forSrc(String src) {
