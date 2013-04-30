@@ -84,7 +84,7 @@ public abstract class RPackageResource {
 
   protected RScriptROperation installDatashieldPackage(String name, String ref) {
     String cmd;
-    execute(getInstallOpenMxPackageCommand());
+    //execute(getInstallOpenMxPackageCommand());
     if(Strings.isNullOrEmpty(ref)) {
       cmd = getInstallPackagesCommand(name);
     } else {
@@ -157,7 +157,7 @@ public abstract class RPackageResource {
     public OpalR.RPackageDto apply(@Nullable String[] input) {
       OpalR.RPackageDto.Builder builder = OpalR.RPackageDto.newBuilder();
       for(int i = 0; i < input.length; i++) {
-        if(!Strings.isNullOrEmpty(input[i])) {
+        if(!Strings.isNullOrEmpty(input[i]) && !"NA".equals(input[i])) {
           Opal.EntryDto.Builder entry = Opal.EntryDto.newBuilder();
           entry.setKey(matrix.getColumnName(i));
           entry.setValue(input[i]);
@@ -174,7 +174,7 @@ public abstract class RPackageResource {
     public boolean apply(@Nullable OpalR.RPackageDto input) {
       for(Opal.EntryDto entry : input.getDescriptionList()) {
         if(entry.getKey().equals("AggregateMethods") || entry.getKey().equals("AssignMethods")) {
-          return true;
+          return !"NA".equals(entry.getValue());
         }
       }
       return false;
