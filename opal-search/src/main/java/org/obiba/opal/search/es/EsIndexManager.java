@@ -104,7 +104,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   @Override
   public boolean hasIndex(@Nonnull ValueTable valueTable) {
     ClusterStateResponse resp = opalSearchService.getClient().admin().cluster().prepareState().execute().actionGet();
-    Map<String, MappingMetaData> mappings = resp.state().metaData().index(getName()).mappings();
+    Map<String, MappingMetaData> mappings = resp.getState().metaData().index(getName()).mappings();
     return mappings.containsKey(getIndex(valueTable).getIndexName());
 
   }
@@ -139,7 +139,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   @Nonnull
   protected IndexMetaData createIndex() {
     IndicesAdminClient idxAdmin = opalSearchService.getClient().admin().indices();
-    if(!idxAdmin.exists(new IndicesExistsRequest(getName())).actionGet().exists()) {
+    if(!idxAdmin.exists(new IndicesExistsRequest(getName())).actionGet().isExists()) {
       log.info("Creating index [{}]", getName());
       idxAdmin.prepareCreate(getName()).setSettings(getIndexSettings()).execute().actionGet();
     }
@@ -370,17 +370,21 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     @Nonnull
     protected EsMapping readMapping() {
       try {
-        IndexMetaData indexMetaData = getIndexMetaData();
+        try {
+          IndexMetaData indexMetaData = getIndexMetaData();
 
-        if(indexMetaData != null) {
-          MappingMetaData metaData = indexMetaData.mapping(getIndexName());
-          if(metaData != null) {
-            byte[] mappingSource = metaData.source().uncompressed();
-            return new EsMapping(getIndexName(), mappingSource);
+          if(indexMetaData != null) {
+            MappingMetaData metaData = indexMetaData.mapping(getIndexName());
+            if(metaData != null) {
+              byte[] mappingSource = metaData.source().uncompressed();
+              return new EsMapping(getIndexName(), mappingSource);
+            }
           }
-        }
 
-        return new EsMapping(getIndexName());
+          return new EsMapping(getIndexName());
+        } catch(IndexMissingException e) {
+          return new EsMapping(getIndexName());
+        }
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
