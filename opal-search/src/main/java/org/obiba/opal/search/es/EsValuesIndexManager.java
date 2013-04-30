@@ -162,17 +162,17 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
-        statsIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
+        //statsIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
       }
 
       @Override
       public void onComplete() {
         if(stop) {
           index.delete();
-          statsIndexManager.getIndex(getValueTable()).delete();
+          //statsIndexManager.getIndex(getValueTable()).delete();
         } else {
           sendAndCheck(bulkRequest);
-          statsIndexManager.getIndex(getValueTable()).computeAndIndexSummaries();
+          //statsIndexManager.getIndex(getValueTable()).computeAndIndexSummaries();
           index.updateTimestamps();
         }
       }
