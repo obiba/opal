@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Dis
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.ValueRenderingHelper;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
@@ -46,12 +47,6 @@ import com.google.gwt.view.client.SingleSelectionModel;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class FolderDetailsView extends ViewImpl implements Display {
-
-  private static final long KB = 1024l;
-
-  private static final long MB = KB * KB;
-
-  private static final long GB = MB * KB;
 
   @UiTemplate("FolderDetailsView.ui.xml")
   interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {}
@@ -149,31 +144,9 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
       @Override
       public String getValue(FileDto object) {
-        return object.getType().isFileType(FileDto.FileType.FILE) ? getFileSizeWithUnit(object) : "";
+        return object.getType().isFileType(FileDto.FileType.FILE) ? ValueRenderingHelper.getSizeWithUnit(object.getSize()) : "";
       }
 
-      private String getFileSizeWithUnit(FileDto object) {
-        double fileSize = object.getSize();
-        if(fileSize < KB) {
-          return (long) fileSize + " B";
-        }
-        if(fileSize < MB) {
-          double fileSizeInKB = fileSize / KB;
-          long iPart = (long) fileSizeInKB;
-          long fPart = Math.round((fileSizeInKB - iPart) * 10);
-          return iPart + "." + fPart + " KB";
-        }
-        if(fileSize < GB) {
-          double fileSizeInMB = fileSize / MB;
-          long iPart = (long) fileSizeInMB;
-          long fPart = Math.round((fileSizeInMB - iPart) * 10);
-          return iPart + "." + fPart + " MB";
-        }
-        double fileSizeInGB = fileSize / GB;
-        long iPart = (long) fileSizeInGB;
-        long fPart = Math.round((fileSizeInGB - iPart) * 10);
-        return iPart + "." + fPart + " GB";
-      }
     }, translations.sizeLabel());
 
     table.addColumn(new DateTimeColumn<FileDto>() {

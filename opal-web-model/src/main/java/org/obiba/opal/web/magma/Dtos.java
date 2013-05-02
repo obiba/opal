@@ -318,6 +318,7 @@ public final class Dtos {
         }
       } else {
         if(filterBinary && value.getValueType() == BinaryType.get()) {
+          valueDto.setSize(value.getValueSize());
           valueDto.setLink(link);
         }
         String valueStr = toString.apply(value);
@@ -417,7 +418,7 @@ public final class Dtos {
     public String apply(Object o) {
       Value input = (Value) o;
       if(input.getValueType() == BinaryType.get()) {
-        return "byte[" + (input.isNull() ? 0 : 1) + "]";
+        return "byte[]";
       }
       return input.toString();
     }

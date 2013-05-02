@@ -66,8 +66,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   @Override
   public String getValue(ValueOccurrence value) {
-    ValueDto v = value.getValue(pos);
-    return valueRenderer.render(v == null ? "" : v.getValue());
+    return valueRenderer.render(value.getValue(pos));
   }
 
   public static final class ValueOccurrence {
