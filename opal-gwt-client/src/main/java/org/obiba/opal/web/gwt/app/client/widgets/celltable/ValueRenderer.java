@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.ValueRenderingHelper;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 
 import com.google.gwt.core.client.GWT;
@@ -33,8 +34,13 @@ public enum ValueRenderer {
   BINARY {
     @Override
     protected String getValue(ValueSetsDto.ValueDto value) {
-      if(value.getLink().isEmpty()) return "";
-      return translations.downloadLabel();
+      if(!value.hasLink() || value.getLink().isEmpty()) return "";
+      String label = translations.downloadLabel();
+      if (value.hasSize()) {
+        label += " [" + ValueRenderingHelper.getSizeWithUnit(value.getSize()) +"]";
+      }
+
+      return label;
     }
 
     @Override
@@ -51,6 +57,10 @@ public enum ValueRenderer {
 
   public String render(String value) {
     if(value == null) return "";
+    return getValue(value);
+  }
+
+  public String render(ValueSetsDto.ValueDto value) {
     return getValue(value);
   }
 
