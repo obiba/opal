@@ -49,7 +49,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
       @Override
       public void onTableSelected(String datasource, String table) {
-        UriBuilder ub = UriBuilder.create().segment("datasource", datasource, "table", table);
+        UriBuilder ub = UriBuilder.create().segment("datasource", datasource, "table", table).query("counts","false");
         ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()//
             .withCallback(new ResourceCallback<TableDto>() {
 

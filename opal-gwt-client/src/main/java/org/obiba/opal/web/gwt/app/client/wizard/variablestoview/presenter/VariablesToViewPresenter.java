@@ -329,7 +329,7 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
 
     private void selectView() {
       UriBuilder builder = UriBuilder.create();
-      builder.segment("datasource", getView().getDatasourceName(), "table", view.getName());
+      builder.segment("datasource", getView().getDatasourceName(), "table", view.getName()).query("counts","false");
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(builder.build()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override

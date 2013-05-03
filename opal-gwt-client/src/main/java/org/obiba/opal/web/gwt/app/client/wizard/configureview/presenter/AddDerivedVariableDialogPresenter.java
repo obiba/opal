@@ -74,38 +74,6 @@ public class AddDerivedVariableDialogPresenter
 
   void refreshVariableNameSuggestions(ViewDto viewDto) {
     getView().clearVariableSuggestions();
-
-    // Add the derived variables to the suggestions.
-    VariableListViewDto variableListDto = (VariableListViewDto) viewDto
-        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
-    for(VariableDto variable : JsArrays.toList(variableListDto.getVariablesArray())) {
-      getView().addVariableSuggestion(variable.getName());
-    }
-
-    VariablesDtoCallBack variablesDtoCallBack = new VariablesDtoCallBack();
-    // Add the variables to the suggestions.
-    String[] tableNameParts;
-    for(int i = 0; i < viewDto.getFromArray().length(); i++) {
-      tableNameParts = viewDto.getFromArray().get(i).split("\\.");
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", tableNameParts[0], "table", tableNameParts[1], "variables");
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()//
-          .forResource(ub.build())//
-          .get()//
-          .withCallback(Response.SC_NOT_FOUND, ResponseCodeCallbacks.NO_OP)//
-          .withCallback(variablesDtoCallBack) //
-          .send();
-    }
-  }
-
-  public class VariablesDtoCallBack implements ResourceCallback<JsArray<VariableDto>> {
-
-    @Override
-    public void onResource(Response response, JsArray<VariableDto> resource) {
-      for(int i = 0; i < resource.length(); i++) {
-        getView().addVariableSuggestion(resource.get(i).getName());
-      }
-    }
   }
 
   private class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
