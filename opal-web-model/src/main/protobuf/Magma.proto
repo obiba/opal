@@ -208,7 +208,7 @@ message ValueSetsDto {
     optional string value = 1;
     optional string link = 2; // link to the value
     repeated ValueDto values = 3; // value sequence
-    optional int64 size = 4; // size of the value, provided for binary values only
+    optional int64 length = 4; // length of the value
   }
   repeated string variables = 1;
   repeated ValueSetDto valueSets = 2;
