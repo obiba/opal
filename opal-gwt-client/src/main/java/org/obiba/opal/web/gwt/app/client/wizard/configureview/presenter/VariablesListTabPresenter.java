@@ -524,7 +524,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       getView().setInProgress(true);
 
       UriBuilder ub = UriBuilder.create()
-          .segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName());
+          .segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName()).query("counts","false");
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
@@ -584,7 +584,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     private void setEmptyDerivedVariable() {
       UriBuilder ub = UriBuilder.create()
-          .segment("datasource", firstTableInViewParts[0], "table", firstTableInViewParts[1]);
+          .segment("datasource", firstTableInViewParts[0], "table", firstTableInViewParts[1]).query("counts","false");
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
