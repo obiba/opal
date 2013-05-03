@@ -36,8 +36,8 @@ public enum ValueRenderer {
     protected String getValue(ValueSetsDto.ValueDto value) {
       if(!value.hasLink() || value.getLink().isEmpty()) return "";
       String label = translations.downloadLabel();
-      if (value.hasSize()) {
-        label += " [" + ValueRenderingHelper.getSizeWithUnit(value.getSize()) +"]";
+      if (value.hasLength()) {
+        label += " [" + ValueRenderingHelper.getSizeWithUnit(value.getLength()) +"]";
       }
 
       return label;
