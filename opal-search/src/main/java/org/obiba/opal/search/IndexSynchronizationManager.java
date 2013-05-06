@@ -20,6 +20,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.type.DateTimeType;
@@ -64,9 +66,10 @@ public class IndexSynchronizationManager {
     if(syncConsumer == null) {
       // start one IndexSynchronization consumer thread per index manager
       syncConsumer = new SyncConsumer();
-      consumer = new Thread(getSubject().associateWith(syncConsumer));
-      consumer.setPriority(Thread.MIN_PRIORITY);
-      consumer.start();
+      startConsumerThread();
+    } else if(consumer != null && !consumer.isAlive() && !consumer.isInterrupted()) {
+      // restart consumer if it died unexpectedly
+      startConsumerThread();
     }
     getSubject().execute(syncProducer);
   }
@@ -82,6 +85,12 @@ public class IndexSynchronizationManager {
   public void stopTask() {
     currentTask.stop();
     syncProducer.deleteCurrentTaskFromQueue();
+  }
+
+  private void startConsumerThread() {
+    consumer = new Thread(getSubject().associateWith(syncConsumer));
+    consumer.setPriority(Thread.MIN_PRIORITY);
+    consumer.start();
   }
 
   public void terminateConsumerThread() {
@@ -206,6 +215,10 @@ public class IndexSynchronizationManager {
         if(sync.getIndexManager().isReady()) {
           getSubject().execute(sync);
         }
+      } catch (NoSuchDatasourceException e) {
+        log.trace("Cannot index: ", e.getMessage());
+      } catch (NoSuchValueTableException e) {
+        log.trace("Cannot index: ", e.getMessage());
       } finally {
         currentTask = null;
       }

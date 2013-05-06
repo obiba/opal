@@ -161,7 +161,9 @@ public class VariableSuggestOracle extends SuggestOracle {
     }
 
     originalQuery = request.getQuery();
-    final String query = request.getQuery() == null ? prefix + "*" : prefix + request.getQuery();
+    if (originalQuery == null || originalQuery.trim().isEmpty()) return;
+
+    final String query = prefix + originalQuery;
 
     UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
         .query("query", query)//
