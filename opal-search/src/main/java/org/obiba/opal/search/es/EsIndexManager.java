@@ -314,6 +314,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
               .execute().actionGet();
         } catch(TypeMissingException ignored) {
         } catch(IndexMissingException ignored) {
+        } finally {
+          mappingCreated = false;
         }
       }
     }
@@ -381,8 +383,10 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
             }
           }
 
+          mappingCreated = false;
           return new EsMapping(getIndexName());
         } catch(IndexMissingException e) {
+          mappingCreated = false;
           return new EsMapping(getIndexName());
         }
       } catch(IOException e) {
